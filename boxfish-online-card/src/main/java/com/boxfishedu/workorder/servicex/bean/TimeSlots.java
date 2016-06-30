@@ -1,0 +1,83 @@
+package com.boxfishedu.workorder.servicex.bean;
+
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import org.apache.commons.collections.CollectionUtils;
+
+import java.io.Serializable;
+
+/**
+ * Created by LuoLiBing on 16/4/19.
+ * 时间片
+ */
+@Data
+public class TimeSlots implements Cloneable, Serializable {
+
+    public final static String CACHE_KEY = "timeSlots";
+    private Long slotId;
+    private String startTime;
+    private String endTime;
+    private boolean selected;
+    private TimeSlotsStatus status = TimeSlotsStatus.FREE;
+    @JsonIgnore
+    private String courseId;
+    @JsonIgnore
+    private String courseName;
+    private String courseType;
+    @JsonProperty(value = "courseInfo")
+    private CourseView courseView;
+    private Long workOrderId;
+
+    public TimeSlots() {}
+
+    public TimeSlots(CourseSchedule courseSchedule) {
+        initTimeSlots(courseSchedule);
+    }
+
+    public void initTimeSlots(CourseSchedule courseSchedule) {
+        this.slotId = courseSchedule.getTimeSlotId().longValue();
+        this.courseId = courseSchedule.getCourseId();
+        this.courseName = courseSchedule.getCourseName();
+        this.courseType = courseSchedule.getCourseType();
+        this.selected = true;
+        this.status = TimeSlotsStatus.ASSIGNED;
+        this.workOrderId = courseSchedule.getWorkorderId();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    public Integer getStatus() {
+        return status.value();
+    }
+
+    public boolean free() {
+        return !selected;
+    }
+
+    public String getCourseType() {
+        if(courseView == null || CollectionUtils.isEmpty(courseView.getCourseType())) {
+            return courseType;
+        } else {
+            return courseView.getCourseType().get(0);
+        }
+
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+        this.status = selected ? TimeSlotsStatus.SELECTED : TimeSlotsStatus.FREE;
+    }
+
+    /*public String getStartTime() {
+        return DateUtil.mockMinutesAfter(5);
+    }
+
+    public String getEndTime() {
+        return DateUtil.mockMinutesAfter(10);
+    }*/
+}

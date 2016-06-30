@@ -1,0 +1,311 @@
+package com.boxfishedu.workorder.service;
+
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.exception.BoxfishException;
+import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.ConstantUtil;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.Service;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.web.param.FishCardFilterParam;
+import com.boxfishedu.workorder.web.view.course.CourseView;
+import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
+import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import java.util.*;
+
+/**
+ * Created by hucl on 16/3/31.
+ */
+@Component
+public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaRepository, Long> {
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+
+    @Autowired
+    private CourseScheduleService courseScheduleService;
+
+    @Autowired
+    private ScheduleCourseInfoService scheduleCourseInfoService;
+
+    @Autowired
+    private ServeService serveService;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
+    private CourseType2TeachingTypeService courseType2TeachingTypeService;
+
+    @Autowired
+    RestTemplate restTemplate;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    public Page<WorkOrder> findByServiceIdOrderByStartTime(Long serviceId, Pageable pageable) {
+        return jpa.findByServiceIdOrderByStartTime(serviceId, pageable);
+    }
+
+    public WorkOrder findByOrderIdAndServiceId(Long orderId, Long serviceId) {
+        return jpa.findByOrderIdAndServiceId(orderId, serviceId);
+    }
+
+    public WorkOrder findByIdForUpdate(Long id) {
+        return jpa.findByIdForUpdate(id);
+    }
+
+    public Page<WorkOrder> findByTeacherIdAndStatusAndCreateTimeBetween(Pageable pageable, Long teacherId, Integer status, Date beginDate, Date endDate) {
+        return jpa.findByTeacherIdAndStatusAndCreateTimeBetween(pageable, teacherId, status, beginDate, endDate);
+    }
+
+    public Page<WorkOrder> findByTeacherIdAndStatusLessThanAndCreateTimeBetween(Pageable pageable, Long teacherId, Integer status, Date beginDate, Date endDate) {
+        return jpa.findByTeacherIdAndStatusLessThanAndCreateTimeBetween(pageable, teacherId, status, beginDate, endDate);
+    }
+
+    public Page<WorkOrder> findByTeacherIdAndCreateTimeBetween(Pageable pageable, Long teacherId, Date beginDate, Date endDate) {
+        return jpa.findByTeacherIdAndCreateTimeBetween(pageable, teacherId, beginDate, endDate);
+    }
+
+    public List<WorkOrder> findByTeacherIdAndCreateTimeBetween(Long teacherId, Date beginDate, Date endDate) {
+        return jpa.findByTeacherIdAndCreateTimeBetween(teacherId, beginDate, endDate);
+    }
+
+    public Page<WorkOrder> findByTeacherIdAndStartTimeBetweenOrderByStartTime(Long teacherId, Date startDate, Date endDate, Pageable pageable) {
+        return jpa.findByTeacherIdAndStartTimeBetweenOrderByStartTime(teacherId, startDate, endDate, pageable);
+    }
+
+    @Transactional
+    public void saveWorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){
+        this.save(workOrder);
+        courseScheduleService.save(courseSchedule);
+        logger.info("||||||鱼卡[{}]入库成功;排课表入库成功[{}]",workOrder.getId(),courseSchedule.getId());
+    }
+
+    public boolean isWorkOrderValid(Long workOrderId) throws BoxfishException {
+        WorkOrder workOrder = jpa.findOne(workOrderId);
+        if (null == workOrder) {
+            return false;
+        }
+        Date endDate = workOrder.getEndTime();
+        if (endDate.before(new Date())) {
+            return false;
+        }
+        return true;
+    }
+
+    public List<WorkOrder> findByStatusAndClassDate(Integer status, Date classDate) {
+        //return jpa.findByStatusAndClassDate(status, classDate);
+        return null;
+    }
+
+    @Transactional
+    public void updateWorkOrderAndSchedule(WorkOrder workOrder, CourseSchedule courseSchedule) {
+        this.save(workOrder);
+        courseScheduleService.save(courseSchedule);
+    }
+
+    private void batchUpdateCourseSchedule(Service service, List<WorkOrder> workOrders,
+                                           Map<WorkOrder, CourseView> workOrderCourseViewMapParam) {
+        // 重算hash值,不然会出错
+        HashMap<WorkOrder, CourseView> workOrderCourseViewMap = Maps.newHashMap();
+        workOrderCourseViewMapParam.forEach((workOrder, courseView) ->
+                workOrderCourseViewMap.put(workOrder, courseView)
+        );
+
+        List<CourseSchedule> courseSchedules = new ArrayList<>();
+        for (WorkOrder workOrder : workOrders) {
+            CourseSchedule courseSchedule = new CourseSchedule();
+            if (workOrder.getTeacherId() != 0l) {
+                courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+            } else {
+                courseSchedule.setStatus(FishCardStatusEnum.CREATED.getCode());
+            }
+            courseSchedule.setStudentId(service.getStudentId());
+            courseSchedule.setTeacherId(workOrder.getTeacherId());
+
+            CourseView courseView = workOrderCourseViewMap.get(workOrder);
+            if (null != courseView) {
+                courseSchedule.setCourseId(courseView.getBookSectionId());
+                courseSchedule.setCourseName(courseView.getName());
+                courseSchedule.setCourseType(courseView.getCourseType().get(0));
+            }
+            courseSchedule.setClassDate(workOrder.getStartTime());
+            courseSchedule.setRoleId(service.getRoleId());
+            courseSchedule.setTimeSlotId(workOrder.getSlotId());
+            courseSchedule.setWorkorderId(workOrder.getId());
+            courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
+            courseSchedules.add(courseSchedule);
+        }
+        courseScheduleService.save(courseSchedules);
+    }
+
+    private List<CourseSchedule> batchUpdateCourseSchedule(Service service, List<WorkOrder> workOrders) {
+        List<CourseSchedule> courseSchedules = new ArrayList<>();
+        for (WorkOrder workOrder : workOrders) {
+            CourseSchedule courseSchedule = new CourseSchedule();
+            courseSchedule.setStatus(workOrder.getStatus());
+            courseSchedule.setStudentId(service.getStudentId());
+            courseSchedule.setTeacherId(workOrder.getTeacherId());
+            courseSchedule.setCourseId(workOrder.getCourseId());
+            courseSchedule.setCourseName(workOrder.getCourseName());
+            courseSchedule.setCourseType(workOrder.getCourseType());
+            courseSchedule.setClassDate(DateUtil.date2SimpleDate(workOrder.getStartTime()));
+            //TODO:此处如果是外教,需要修改roleId为外教的Id
+            courseSchedule.setRoleId(workOrder.getSkuId().intValue());
+            courseSchedule.setTimeSlotId(workOrder.getSlotId());
+            courseSchedule.setWorkorderId(workOrder.getId());
+            courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
+            courseSchedules.add(courseSchedule);
+        }
+        return courseScheduleService.save(courseSchedules);
+    }
+
+    @Transactional
+    public List<CourseSchedule> persistCardInfos(Service service,List<WorkOrder> workOrders,Map<Integer,
+            RecommandCourseView> recommandCoursesMap){
+        service=serveService.findByIdForUpdate(service.getId());
+        if(service.getCoursesSelected()==1){
+            throw new BusinessException("您已选过课程,请勿重复选课");
+        }
+        service.setCoursesSelected(1);
+        serveService.save(service);
+        this.save(workOrders);
+        List<CourseSchedule> courseSchedules=batchUpdateCourseSchedule(service, workOrders);
+        scheduleCourseInfoService.batchSaveCourseInfos(workOrders,courseSchedules, recommandCoursesMap);
+        return courseSchedules;
+    }
+
+    @Transactional
+    public void saveWorkordersAndSchedules(Service service, List<WorkOrder> workOrders,
+                                           Map<WorkOrder, CourseView> workOrderCourseViewMap) {
+        this.save(workOrders);
+        batchUpdateCourseSchedule(service, workOrders, workOrderCourseViewMap);
+    }
+
+    @Transactional
+    public void saveWorkordersAndSchedules(Service service, List<WorkOrder> chineseWorkOrders,
+                                           Map<WorkOrder, CourseView> chineseworkOrderCourseViewMap,
+                                           List<WorkOrder> foreignWorkOrders, Map<WorkOrder, CourseView> foreignworkOrderCourseViewMap
+    ) {
+        this.save(chineseWorkOrders);
+        batchUpdateCourseSchedule(service, chineseWorkOrders, chineseworkOrderCourseViewMap);
+
+        if (!CollectionUtils.isEmpty(foreignWorkOrders)) {
+            this.save(foreignWorkOrders);
+            batchUpdateCourseSchedule(service, foreignWorkOrders, foreignworkOrderCourseViewMap);
+        }
+    }
+
+    //根据service查找出所有状态的工单
+    public Page<WorkOrder> findByQueryCondAllStatus(FishCardFilterParam fishCardFilterParam, Long[] ids, Pageable pageable) {
+        return jpa.findByQueryCondAllStatus(ids, fishCardFilterParam.getBeginDateFormat(),
+                fishCardFilterParam.getEndDateFormat(), pageable);
+    }
+
+    public Page<WorkOrder> findByQueryCondSpecialStatus(FishCardFilterParam fishCardFilterParam, Long[] ids, Pageable pageable) {
+        return jpa.findByQueryCondSpecialStatus(ids, fishCardFilterParam.getBeginDateFormat(),
+                fishCardFilterParam.getEndDateFormat(), fishCardFilterParam.getStatus(), pageable);
+    }
+
+    public void processFilterParam(FishCardFilterParam fishCardFilterParam, boolean isTeacher) {
+        //学生
+        if (!isTeacher) {
+            processStudentFilterParam(fishCardFilterParam);
+        } else {
+            processTeacherFilterParam(fishCardFilterParam);
+        }
+        processDateParam(fishCardFilterParam);
+    }
+
+    public void processStudentFilterParam(FishCardFilterParam fishCardFilterParam) {
+        if (null == fishCardFilterParam.getStudentId()) {
+            throw new BusinessException("学生id为必选项,不应该为空");
+        }
+
+    }
+
+    public void processTeacherFilterParam(FishCardFilterParam fishCardFilterParam) {
+        if (null == fishCardFilterParam.getTeacherId()) {
+            throw new BusinessException("教师id为必选项,不应该为空");
+        }
+    }
+
+    public void processDateParam(FishCardFilterParam fishCardFilterParam) {
+        if (null == fishCardFilterParam.getBeginDate()) {
+            fishCardFilterParam.setBeginDateFormat(DateUtil.String2Date(ConstantUtil.EARLIEST_TIME));
+        } else {
+            fishCardFilterParam.setBeginDateFormat(DateUtil.String2Date(fishCardFilterParam.getBeginDate()));
+        }
+        if (null == fishCardFilterParam.getEndDate()) {
+            fishCardFilterParam.setEndDateFormat(DateUtil.String2Date(ConstantUtil.LATEST_TIME));
+        } else {
+            fishCardFilterParam.setEndDateFormat(DateUtil.String2Date(fishCardFilterParam.getEndDate()));
+        }
+    }
+
+    //查找出教师所有状态的工单
+    public List<WorkOrderView> findByQueryCondAllStatusForTeacher(Long teacherId, Date beginDate, Date endDate, Integer status) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        String sqlOriginal = "select new com.boxfishedu.workorder.web.view.fishcard.WorkOrderView" +
+                "(wo.id,sv.orderId, wo.studentId, sv.id, wo.studentName, wo.teacherId, wo.teacherName, wo.startTime, wo.endTime, wo.status, wo.courseId, wo.courseName, sv.skuId, sv.orderCode)" +
+                " from  WorkOrder wo,Service sv where wo.service.id=sv.id and (wo.teacherId=? and wo.endTime between ? and ?) ";
+        String statusSql = " and status=?";
+        String orderPostFix = " order by wo.startTime";
+        String sql = sqlOriginal;
+        Query query = null;
+        if (null != status) {
+            sql = sql + statusSql + orderPostFix;
+            query = entityManager.createQuery(sql).setParameter(1, teacherId).setParameter(2, beginDate).setParameter(3, endDate).setParameter(4, status);
+        } else {
+            sql += orderPostFix;
+            query = entityManager.createQuery(sql).setParameter(1, teacherId).setParameter(2, beginDate).setParameter(3, endDate);
+        }
+        List<WorkOrderView> workOrderViews = query.getResultList();
+        return workOrderViews;
+    }
+
+    //查找出教师特定状态的工单
+    public List<WorkOrder> findByQueryCondSpecialStatusForTeacher(Long teacherId, Date beginDate, Date endDate, Integer status) {
+        return jpa.findByQueryCondSpecialStatusForTeacher(teacherId, beginDate, endDate, status);
+    }
+
+    public List<WorkOrder> findByStudentIdAndStartTimeBetween(Long studentId, Date beginDate, Date endDate) {
+        return jpa.findByStudentIdAndStartTimeBetween(studentId, beginDate, endDate);
+    }
+
+    public WorkOrder getLatestWorkOrder(Long studentId){
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        String sql = "select wo from WorkOrder wo where wo.studentId=? order by wo.endTime desc";
+        Query query = entityManager.createQuery(sql).setParameter(1, studentId);
+        query.setMaxResults(1);
+        WorkOrder workOrder= (WorkOrder) query.getSingleResult();
+        return workOrder;
+    }
+
+    public void batchSaveCoursesIntoCard(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommandCoursesMap){
+        for (WorkOrder workOrder : workOrders) {
+            RecommandCourseView courseView=recommandCoursesMap.get(workOrder.getSeqNum());
+            workOrder.setCourseId(courseView.getCourseId());
+            workOrder.setCourseName(courseView.getCourseName());
+            workOrder.setCourseType(courseView.getCourseType());
+            workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+            workOrder.setSkuId(new Long(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType())));
+        }
+    }
+}

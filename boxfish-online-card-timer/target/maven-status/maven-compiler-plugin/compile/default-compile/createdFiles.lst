@@ -1,0 +1,12 @@
+com/boxfishedu/fishcard/timer/common/util/JacksonUtil.class
+com/boxfishedu/fishcard/timer/mq/RabbitMqSender.class
+com/boxfishedu/fishcard/timer/mq/RabbitMqConfiguration$MessageRecover.class
+com/boxfishedu/fishcard/timer/ServiceTimerApplication.class
+com/boxfishedu/fishcard/timer/task/NotifyTimer.class
+com/boxfishedu/fishcard/timer/enums/QueueTypeEnum.class
+com/boxfishedu/fishcard/timer/mq/RabbitMqConfiguration.class
+com/boxfishedu/fishcard/timer/common/bean/BoxFishMailMessage.class
+com/boxfishedu/fishcard/timer/common/util/DateUtil.class
+com/boxfishedu/fishcard/timer/mq/RabbitMqReceiver.class
+com/boxfishedu/fishcard/timer/common/mail/SpringMailSender.class
+com/boxfishedu/fishcard/timer/mq/RabbitMqConstant.class

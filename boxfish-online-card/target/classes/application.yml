@@ -1,0 +1,334 @@
+spring.application.name: boxfish-online-card
+logging:
+  level:
+    com:
+      boxfishedu: debug
+    org:
+      springframework: info
+  file: ${user.home}/logs/${spring.application.name}.log
+
+##################线程池配置
+threadpool:
+ httprequest:
+    # 线程池维护线程的最少数量
+    size_core_pool: 8
+    # 线程池维护线程的最大数量,此处为io密集型;可以考虑设定更大
+    size_max_pool: 64
+    # 线程池维护线程所允许的空闲时间
+    time_keep_alive: 2000
+    # 线程池所使用的缓冲队列大小
+    size_work_queue: 1024
+    # 缓冲队列任务调度周期,可以考虑放到redis等其他外围存储,防止内存泄漏
+    period_task_qos: 1000
+
+##################### 免费体验天数和消费购买起始日期天数
+choiceTime:
+  # 免费体验天数
+  freeExperienceDay: 7
+  # 默认为购买后第二天生效
+  consumerStartDay: 1
+  #服务端允许补课的时间范围,单位:天
+  durationAllowMakeUp: 14
+  #补课距离当前课的可开始时间
+  durationFromParentCourse: 1
+
+################项目其他参数配置
+parameter:
+  workorder_valid_time_peroid: 5
+  allow_test: true
+  #超过上课时间的时长(minute):
+  pass_card_start_peroid: 2
+  #超过上课时间时长(minute):
+  pass_card_wait_peroid: 5
+  #超过应该结束时间时长(minute):
+  pass_card_end_time: 2
+  #允许出现的偏差(seconds):
+  pass_beyond_normal: 5
+
+  #教师超过上课时间的时长,标记为迟到(minute)
+  teacher_absent_time_limit: 5
+  #学生超过上课时间的时长,标记为迟到(minute)
+  student_absent_time_limit: 10
+  #超过课程结束时间的时长,标记为服务器强制结束(minute)
+  force_complete_time_limit: 5
+  #距离上课时间提醒教师,单位：minutes
+  notify_teacher_prepare_class_limit: 5
+
+  #封面服务器的地址
+  thumbnail_server: http://api.boxfish.cn/student/publication/data/data/
+
+spring.jpa:
+  show-sql: true
+#  generate-ddl: true
+#  hibernate.ddl-auto: update
+  database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
+  hibernate.naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+
+spring.datasource:
+  driver-class-name: com.mysql.jdbc.Driver
+  test-while-idle: true
+  validation-query: SELECT 1
+  initial-size: 2
+  max-active: 50
+  max-idle: 20
+  connection-timeout: 5000
+  autoReconnect: true
+
+spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
+spring.jackson.time-zone: GMT+8
+
+#spring.profiles.active: product
+spring.profiles.active: local
+#spring.profiles.active: development
+#spring.profiles.active: test
+#spring.profiles.active: demo
+
+#===============================================================local环境======================================================================
+---
+spring:
+  datasource:
+#    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: Box123456
+
+#  mongo:
+#    serverAddress: 101.201.239.116:27017
+#    dbName: fishcard
+#    username: root
+#    password: Boxfish2016
+
+  mongo:
+    serverAddress: 123.56.13.168:27017
+    dbName: fishcard
+    username: root
+    password: Boxfish2016
+
+  redis:
+    hostName: 127.0.0.1
+    password: Box123456
+    port: 6379
+    timeout: 10000
+  rabbitmq:
+    address: 101.201.239.116:5672
+#    address: 101.201.237.252:5672
+    username: boxfish
+    password: boxfish
+    virtualHost: local
+  profiles: local
+
+server.servlet-path: /
+server.port: 8080
+
+##################接口调用地址
+interface:
+  address:
+    teacher_service: http://101.201.237.252:8099
+    course_recommended_service: http://base.boxfish.cn/recommend/core
+#    course_recommended_service: http://114.55.40.98:8001
+    fishcard_service: http://127.0.0.1:8080
+    order_service: http://101.201.237.252:8082
+    course_online_service: http://101.201.66.32:9090
+#    course_online_service: http://online-api.boxfish.cn/teaching-service
+    auth_user: http://114.55.58.184:8099
+
+#===============================================================development环境:101.201.239.116===============================================================
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish2016inside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: Box123456
+
+  mongo:
+    serverAddress: 127.0.0.1:27017
+    dbName: fishcard
+    username: root
+    password: Boxfish2016
+  redis:
+    hostName: 8619f2f4a93c4a70.m.cnbja.kvstore.aliyuncs.com
+    password: Box12345678
+    port: 6379
+    timeout: 10000
+  rabbitmq:
+    address: 101.201.237.252
+#    port: 5672
+    username: boxfish
+    password: boxfish
+    virtualHost: local
+  profiles: development
+
+##################接口调用地址
+interface:
+  address:
+    teacher_service: http://101.201.237.252:8099
+    course_recommended_service: http://114.55.40.98:8001
+    fishcard_service: http://127.0.0.1:8080
+    order_service: http://101.201.237.252:8082
+#    course_online_service: http://101.201.239.116:9090
+    course_online_service: http://online-api.boxfish.cn/teaching-service
+    auth_user: http://114.55.58.184:8099
+server.port: 8080
+
+#===============================================================test环境:123.56.13.168 机器密码:Boxfish016===============================================================
+---
+spring:
+  datasource:
+#    url: jdbc:mysql://boxfish2016inside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
+    username: service
+    password: Box123456
+  mongo:
+    serverAddress: 123.56.13.168:27017
+    dbName: fishcard
+    username: root
+    password: Boxfish2016
+  redis:
+    hostName: 8619f2f4a93c4a70.m.cnbja.kvstore.aliyuncs.com
+    password: Box12345678
+    port: 6379
+    timeout: 10000
+  rabbitmq:
+    address: 127.0.0.1:5672
+#    port: 5672
+    username: admin
+    password: boxfish123
+    virtualHost: local
+  profiles: test
+
+server.port: 8080
+
+##################接口调用地址
+interface:
+  address:
+    teacher_service: http://127.0.0.1:8099
+    course_recommended_service: http://127.0.0.1:8001/recommend/core
+    fishcard_service: http://127.0.0.1:8080
+    order_service: http://127.0.0.1:8082
+    course_online_service: http://127.0.0.1:9090
+    auth_user: http://114.55.58.184:8099
+
+#===============================================================demo环境=====101.201.66.32===============================================================
+#==================mongo:     mongo --host dds-2zeab46e2bd819e41.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish2016demoinside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: Box123456
+  mongo:
+    serverAddress: dds-2zeab46e2bd819e41.mongodb.rds.aliyuncs.com:3717
+    dbName: fishcard
+    username: root
+    password: Boxfish2016
+  redis:
+    hostName: 8cd5c3de54f8402f.m.cnbja.kvstore.aliyuncs.com
+    password: Boxfish2016
+    port: 6379
+    timeout: 10000
+  rabbitmq:
+    address: 127.0.0.1:5672
+#    port: 5672
+    username: admin
+    password: boxfish123
+    virtualHost: local
+  profiles: demo
+
+server.port: 8080
+
+##################接口调用地址
+interface:
+  address:
+    teacher_service: http://localhost:8099
+    course_recommended_service: http://114.55.40.98:8001
+    fishcard_service: http://localhost:8080
+    order_service: http://localhost:8082
+    course_online_service: http://localhost:9090
+    auth_user: http://114.55.58.184:8099
+
+#===============================================================预生产环境===============================================================
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish-online-2016-outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: YYhHkr4dcMNQQueKycvGmdtPFNxu9wEY
+  mongo:
+    serverAddress: dds-2zeab46e2bd819e41.mongodb.rds.aliyuncs.com:3717
+    dbName: fishcard
+    username: root
+    password: Boxfish2016
+  redis:
+    hostName: 8cd5c3de54f8402f.m.cnbja.kvstore.aliyuncs.com
+    password: Boxfish2016
+    port: 6379
+    timeout: 10000
+  rabbitmq:
+    address: 127.0.0.1:5672
+#    port: 5672
+    username: admin
+    password: boxfish123
+    virtualHost: local
+    addresses:
+  profiles: preproduct
+
+  activemq:
+    broker-url:
+server.servlet-path: /fishcard
+server.port: 8080
+
+##################接口调用地址
+interface:
+  address:
+    teacher_service: http://localhost:8099
+    course_recommended_service: http://114.55.40.98:8001
+    fishcard_service: http://localhost:8080
+    order_service: http://localhost:8082
+    course_online_service: http://localhost:9090
+    auth_user: http://base.boxfish.cn/passbook
+
+
+#===============================================================生产环境===============================================================
+#=============192.168.1.30===============192.168.1.29======================192.168.1.25===============================================#
+#=================mongo:    mongo --host dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p
+#=================外网mq:   120.27.227.72:5672(映射:120.27.227.72:5672)================================================================#
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish-online-2016-inside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: nEaJiP7hwoXEUkPDnDjaBK3hEJanHTec
+  mongo:
+    serverAddress: dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717,dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717
+    dbName: fishcard
+    username: root
+    password: sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
+  redis:
+    hostName: 96cbdee519414aba.m.cnhza.kvstore.aliyuncs.com
+    password: kVxowYcWE6NdfKAP6zDhxZsZgkPGuC
+    port: 6379
+    timeout: 10000
+  rabbitmq:
+    address: 192.168.1.19:5672,192.168.1.18:5672,192.168.1.17:5672
+    #port: 5672
+    username: admin
+    password: boxfish123
+    virtualHost: local
+  profiles: product
+
+server.servlet-path: /fishcard
+server.port: 9999
+##################接口调用地址
+interface:
+  address:
+    teacher_service: http://online-api.boxfish.cn/teacher
+#    course_recommended_service: http://base.boxfish.cn/recommend/core
+    course_recommended_service: http://114.55.40.98:8001/recommend/core
+    fishcard_service: http://online-api.boxfish.cn/fishcard
+    order_service: http://online-api.boxfish.cn/order
+    course_online_service: http://online-api.boxfish.cn/teaching-service
+    auth_user: http://base.boxfish.cn/passbook
+#鱼卡管理后台的页面地址
+    fishcard_page: http://101.201.66.109:94/
+
+
