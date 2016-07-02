@@ -19,18 +19,19 @@ public class InterfaceController {
     private NotifyTimer notifyTimer;
 
     @RequestMapping(value = "/assign", method = RequestMethod.POST)
-    public void assignTeacher(){
+    public JsonResultModel assignTeacher(){
         try {
             notifyTimer.notifyService();
-            JsonResultModel.newJsonResultModel("ok");
+            return JsonResultModel.newJsonResultModel("ok");
         }
         catch (Exception ex){
-            JsonResultModel.newJsonResultModel("error"+ex.getMessage());
+            return JsonResultModel.newJsonResultModel("error"+ex.getMessage());
         }
     }
 
-    public void alert(){
+    @RequestMapping(value = "/alert", method = RequestMethod.GET)
+    public JsonResultModel alert(){
         notifyTimer.teacherOutNumberNotifyService();
-        JsonResultModel.newJsonResultModel("ok");
+        return JsonResultModel.newJsonResultModel("ok");
     }
 }
