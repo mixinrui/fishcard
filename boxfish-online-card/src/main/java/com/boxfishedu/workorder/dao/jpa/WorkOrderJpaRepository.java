@@ -54,6 +54,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStatusAndStartTimeBetween(Integer status, Date startDate, Date endDate);
 
+    public List<WorkOrder> findByStatusInAndStartTimeBetween(Integer[] statuses, Date startDate, Date endDate);
+
     public List<WorkOrder> findByStatusLessThanAndEndTimeBetween(Integer status, Date startDate, Date endDate);
 
     public List<WorkOrder> findByStatusAndOrderIdLessThanAndEndTimeBetween(Integer status, long orderId, Date startDate, Date endDate);

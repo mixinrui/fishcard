@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.MessageProperties;
@@ -54,8 +55,10 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         Date startDate= DateUtil.localDate2Date(startLocalDate);
         Date endDate=DateUtil.localDate2Date(endLocalDate);
         logger.debug("@query db开始从数据库查询[[[教师旷课数据]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
-                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
-        List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
+                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate)
+                ,FishCardStatusEnum.TEACHER_ASSIGNED.getCode()+";"+FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode());
+        Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()};
+        List<WorkOrder> result= jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
         return result;
     }
 

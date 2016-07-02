@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
@@ -44,6 +45,9 @@ public class CourseScheduleUpdatorServiceX {
 
     @Autowired
     private RabbitMqSender rabbitMqSender;
+
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
 
     //定时任务，向师生运营组获取教师
 //    @Scheduled(cron="*/10 * * * * ?")
@@ -120,5 +124,6 @@ public class CourseScheduleUpdatorServiceX {
 
         // 创建群组
         serviceSDK.createGroup(workOrder);
+        workOrderLogService.saveWorkOrderLog(workOrder);
     }
 }

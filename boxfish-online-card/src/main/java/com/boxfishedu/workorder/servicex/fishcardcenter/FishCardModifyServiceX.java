@@ -1,6 +1,9 @@
 package com.boxfishedu.workorder.servicex.fishcardcenter;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,6 +39,9 @@ public class FishCardModifyServiceX {
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -69,7 +76,18 @@ public class FishCardModifyServiceX {
 
         //更新新的教师到workorder和courseschedule,此处做事务控制
         workOrderService.updateWorkOrderAndSchedule(workOrder, courseSchedule);
+
+        changeTeacherLog(workOrder);
         //返回结果
         return JsonResultModel.newJsonResultModel(null);
+    }
+
+    public void changeTeacherLog(WorkOrder workOrder){
+        WorkOrderLog workOrderLog=new WorkOrderLog();
+        workOrderLog.setCreateTime(new Date());
+        workOrderLog.setWorkOrderId(workOrder.getId());
+        workOrderLog.setStatus(workOrder.getStatus());
+        workOrderLog.setContent("更换教师:"+ FishCardStatusEnum.getDesc(workOrder.getStatus()));
+        workOrderLogService.save(workOrderLog);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +52,7 @@ public class WorkOrderLogService {
         WorkOrderLog workOrderLog = new WorkOrderLog();
         workOrderLog.setWorkOrderId(workOrder.getId());
         workOrderLog.setStatus(workOrder.getStatus());
+        workOrderLog.setCreateTime(new Date());
         workOrderLog.setContent(FishCardStatusEnum.getDesc(workOrder.getStatus()));
         save(workOrderLog);
     }
@@ -61,6 +63,7 @@ public class WorkOrderLogService {
             WorkOrderLog workOrderLog = new WorkOrderLog();
             workOrderLog.setWorkOrderId(workOrder.getId());
             workOrderLog.setStatus(workOrder.getStatus());
+            workOrderLog.setCreateTime(new Date());
             workOrderLog.setContent(FishCardStatusEnum.getDesc(workOrder.getStatus()));
             workOrderLogs.add(workOrderLog);
         }
