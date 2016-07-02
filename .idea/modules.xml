@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/boxfish-fishcard.iml" filepath="$PROJECT_DIR$/.idea/boxfish-fishcard.iml" />
       <module fileurl="file://$PROJECT_DIR$/boxfish-online-card/boxfish-online-card.iml" filepath="$PROJECT_DIR$/boxfish-online-card/boxfish-online-card.iml" />
       <module fileurl="file://$PROJECT_DIR$/boxfish-online-card-component/boxfish-online-card-component.iml" filepath="$PROJECT_DIR$/boxfish-online-card-component/boxfish-online-card-component.iml" />
+      <module fileurl="file://$PROJECT_DIR$/boxfish-online-card-component/boxfish-online-card-component.iml" filepath="$PROJECT_DIR$/boxfish-online-card-component/boxfish-online-card-component.iml" />
       <module fileurl="file://$PROJECT_DIR$/boxfish-online-card-timer/boxfish-online-card-timer.iml" filepath="$PROJECT_DIR$/boxfish-online-card-timer/boxfish-online-card-timer.iml" />
     </modules>
   </component>
