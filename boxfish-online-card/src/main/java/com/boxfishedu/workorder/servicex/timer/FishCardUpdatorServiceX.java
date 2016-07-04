@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.CourseOnlineService;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -54,6 +55,9 @@ public class FishCardUpdatorServiceX {
     @Autowired
     private CourseOnlineService courseOnlineService;
 
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -66,8 +70,11 @@ public class FishCardUpdatorServiceX {
         if (null == workOrder) {
             throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
         }
-        if (!workOrder.getStatus().equals(fishCardDelayMessage.getStatus())) {
-            logger.info("absentUpdator鱼卡:[{}]的已经处理过,没有旷课现象;当前状态:[{}]",
+        if ((!workOrder.getStatus().equals(fishCardDelayMessage.getStatus()))
+                &&(workOrder.getStatus()!=FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()
+                &&(workOrder.getStatus()!=FishCardStatusEnum.TEACHER_ASSIGNED.getCode()))
+                ) {
+                    logger.info("absentUpdator鱼卡:[{}]的已经处理过,没有旷课现象;当前状态:[{}]",
                     workOrder.getId(), FishCardStatusEnum.getDesc(FishCardStatusEnum.TEACHER_ABSENT.getCode()));
         } else {
             CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
@@ -86,6 +93,7 @@ public class FishCardUpdatorServiceX {
             courseSchedule.setUpdateTime(new Date());
             courseScheduleService.save(courseSchedule);
             workOrderService.save(workOrder);
+            workOrderLogService.saveWorkOrderLog(workOrder);
         }
     }
 
@@ -105,12 +113,14 @@ public class FishCardUpdatorServiceX {
         if (!workOrder.getStatus().equals(fishCardDelayMessage.getStatus())) {
             logger.info("鱼卡:[{}]的已经处理过,无需做强制下课处理,当前状态:[{}]",
                     workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
+            return;
         }
         //处于正在上课,标记为服务器强制完成
         if(fishCardDelayMessage.getStatus()==FishCardStatusEnum.ONCLASS.getCode()) {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]",fishCardDelayMessage.getId(),
                     FishCardStatusEnum.getDesc(FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode()));
             courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode());
+            workOrderLogService.saveWorkOrderLog(workOrder);
         }
         //处于学生接受请求或者ready状态,标记为系统异常
         if(fishCardDelayMessage.getStatus()==FishCardStatusEnum.READY.getCode()
@@ -118,6 +128,7 @@ public class FishCardUpdatorServiceX {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]",fishCardDelayMessage.getId(),
                     FishCardStatusEnum.getDesc(FishCardStatusEnum.EXCEPTION.getCode()));
             courseOnlineService.handleException(workOrder,courseSchedule,FishCardStatusEnum.EXCEPTION.getCode());
+            workOrderLogService.saveWorkOrderLog(workOrder);
         }
     }
 
