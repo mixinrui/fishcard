@@ -23,7 +23,7 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping("/coursing")
-public class CourseOnlineController {
+public class  CourseOnlineController {
     @Autowired
     private CourseOnlineServiceX courseOnlineServiceX;
 

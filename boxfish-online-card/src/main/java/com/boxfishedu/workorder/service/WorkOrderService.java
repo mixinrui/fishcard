@@ -261,7 +261,6 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     //查找出教师所有状态的工单
     public List<WorkOrderView> findByQueryCondAllStatusForTeacher(Long teacherId, Date beginDate, Date endDate, Integer status) {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
         String sqlOriginal = "select new com.boxfishedu.workorder.web.view.fishcard.WorkOrderView" +
                 "(wo.id,sv.orderId, wo.studentId, sv.id, wo.studentName, wo.teacherId, wo.teacherName, wo.startTime, wo.endTime, wo.status, wo.courseId, wo.courseName, sv.skuId, sv.orderCode)" +
                 " from  WorkOrder wo,Service sv where wo.service.id=sv.id and (wo.teacherId=? and wo.endTime between ? and ?) ";
