@@ -75,17 +75,6 @@ public class NotifyTimer {
     }
 
     /**
-     * 学生旷课通知定时器
-     */
-    @Scheduled(cron="0 4/5 * * * ?")
-    public void notifyStudentAbsentService() {
-        logger.info("<<<<<<开始通知<<<检查学生旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.STUDENT_ABSENT_QUERY_NOTIFY.value());
-        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
-        rabbitMqSender.send(serviceTimerMessage);
-    }
-
-    /**
      * 服务器强制下课定时器;从第三分钟开始,每五分钟;与上面区分开
      */
     @Scheduled(cron="0 2/5 * * * ?")
@@ -97,7 +86,18 @@ public class NotifyTimer {
     }
 
     /**
-     * 服务器检测没有补课的超时课程信息..每天4点检查一次
+     * 学生旷课通知定时器;该功能并入强制完成
+     */
+//    @Scheduled(cron="0 4/5 * * * ?")
+    public void notifyStudentAbsentService() {
+        logger.info("<<<<<<开始通知<<<检查学生旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.STUDENT_ABSENT_QUERY_NOTIFY.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    /**
+     * 服务器检测没有补课的超时课程信息..每天4点检查一次;此功能暂时停用
      */
 //    @Scheduled(cron = "0 0 4 * * ?")
     public void studentNotMakeUpService() {

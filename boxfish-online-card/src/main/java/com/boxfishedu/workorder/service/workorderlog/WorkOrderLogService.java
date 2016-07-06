@@ -57,6 +57,15 @@ public class WorkOrderLogService {
         save(workOrderLog);
     }
 
+    public void saveWorkOrderLog(WorkOrder workOrder,String desc){
+        WorkOrderLog workOrderLog = new WorkOrderLog();
+        workOrderLog.setWorkOrderId(workOrder.getId());
+        workOrderLog.setStatus(workOrder.getStatus());
+        workOrderLog.setCreateTime(new Date());
+        workOrderLog.setContent(desc);
+        save(workOrderLog);
+    }
+
     private void saveWorkorderLogs(List<WorkOrder> workOrders) {
         List<WorkOrderLog> workOrderLogs = new ArrayList<>();
         for (WorkOrder workOrder : workOrders) {
