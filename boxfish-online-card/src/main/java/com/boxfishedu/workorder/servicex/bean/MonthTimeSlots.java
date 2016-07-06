@@ -27,6 +27,8 @@ public class MonthTimeSlots extends ResponseBaseView implements Serializable {
 
     private List<DayTimeSlots> data;
 
+    private boolean hasMoreHistory = false;
+
     public final static int DAY_OF_MILLIONS = 86400000;
 
     public MonthTimeSlots() {

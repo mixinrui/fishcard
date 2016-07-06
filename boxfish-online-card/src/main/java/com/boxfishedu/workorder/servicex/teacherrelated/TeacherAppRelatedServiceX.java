@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.YearMonth;
 import java.util.*;
 
 /**
@@ -98,13 +99,23 @@ public class TeacherAppRelatedServiceX {
         return map;
     }
 
-    public JsonResultModel getScheduleByIdAndDateRange(Long teacherId, DateRangeForm dateRangeForm) {
-        //向教师管理中心发起请求,获取教师的排课表
+    public MonthTimeSlots getScheduleByIdAndDateRange(Long teacherId, Date yearMonthDate) {
+        DateRangeForm dateRangeForm;
+        // 如果没有指定查询的年月,则默认查询半年的数据
+        if(yearMonthDate == null) {
+            dateRangeForm = DateUtil.createHalfYearDateRangeForm();
+        } else {
+            YearMonth yearMonth = YearMonth.of(yearMonthDate.getYear(), yearMonthDate.getMonth());
+            dateRangeForm = new DateRangeForm(
+                    DateUtil.convertToDate(yearMonth.atDay(1)),
+                    DateUtil.convertToDate(yearMonth.atEndOfMonth()));
+        }
         logger.info("用户[{}]发起获取课程表请求", teacherId);
         // 1 获取老师已选时间片列表
         MonthTimeSlots resultMonthTimeSlots = serviceSDK.getMonthTimeSlotsByDateBetween(teacherId, dateRangeForm);
         if (CollectionUtils.isEmpty(resultMonthTimeSlots.getData())) {
-            return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
+//            return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
+            return resultMonthTimeSlots;
         }
 
         // 2 获取排课表信息
@@ -113,7 +124,8 @@ public class TeacherAppRelatedServiceX {
         // 3 覆盖处理
         resultMonthTimeSlots.override(courseScheduleMap, serviceSDK);
 
-        return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
+        return resultMonthTimeSlots;
+//        return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
     }
 
 

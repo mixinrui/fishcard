@@ -6,7 +6,9 @@ import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -137,16 +139,6 @@ public class DateUtil {
         }
     }
 
-    public static DateRangeForm createDateRangeForm() {
-        Date startTime = getStartTime(new Date());
-        Calendar instance = Calendar.getInstance();
-        instance.setTime(startTime);
-        // 一年后,不严谨
-        instance.add(Calendar.YEAR, 1);
-        Date endTime = instance.getTime();
-        return new DateRangeForm(startTime, endTime);
-    }
-
     /**
      *
      * @param date
@@ -182,14 +174,6 @@ public class DateUtil {
     public static Date getTheTomrrowLC(Date date){
         date  = getBeforeDays(new Date(),-1)   ;
         return  parseTime(date,0);
-    }
-
-    public static void main(String[] args) {
-//        DateRangeForm dateRangeForm = createDateRangeForm();
-//        System.out.println(dateRangeForm);
-//        System.out.println( getTheTomrrowLC(new Date()) );
-        System.out.println(DateUtil.Date2String24(new Date()));
-
     }
 
     public static String localDate2String(LocalDateTime localDateTime){
@@ -229,6 +213,33 @@ public class DateUtil {
         calendar.setTime(date);
         calendar.add(Calendar.MINUTE, minutes);
         return calendar.getTime();
+    }
+
+
+    public static Date convertToDate(LocalDate localDate) {
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    @Deprecated
+    public static DateRangeForm createDateRangeForm() {
+        Date startTime = getStartTime(new Date());
+        Calendar instance = Calendar.getInstance();
+        instance.setTime(startTime);
+        // 一年后,不严谨
+        instance.add(Calendar.YEAR, 1);
+        Date endTime = instance.getTime();
+        return new DateRangeForm(startTime, endTime);
+    }
+
+    /**
+     * 返回当前起半年时间区间
+     * @return
+     */
+    public static DateRangeForm createHalfYearDateRangeForm() {
+        YearMonth now = YearMonth.now();
+        Date from = convertToDate(now.atDay(1));
+        Date to = convertToDate(now.plusMonths(6).atEndOfMonth());
+        return new DateRangeForm(from, to);
     }
 
 }

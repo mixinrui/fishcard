@@ -1,12 +1,11 @@
 package com.boxfishedu.workorder.web.controller.teacherrelated;
 
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.teacherrelated.TeacherAppRelatedServiceX;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -51,9 +50,12 @@ public class TeacherAppRelatedController {
      */
 //    @Cacheable(value = "teacher_schedule_month", key = "T(java.util.Objects).hash(#teacherId,#dateIntervalView)")
     @RequestMapping(value = "{teacher_id}/schedule/month", method = RequestMethod.GET)
-    public JsonResultModel courseScheduleList(@PathVariable("teacher_id") Long teacherId,Long userId) {
+    public Object courseScheduleMonth(
+            @PathVariable("teacher_id") Long teacherId,
+            Long userId,
+            @DateTimeFormat(pattern = "yyyyMM") Date yearMonth) {
         commonServeServiceX.checkToken(teacherId, userId);
-        return teacherAppRelatedServiceX.getScheduleByIdAndDateRange(teacherId, DateUtil.createDateRangeForm());
+        return teacherAppRelatedServiceX.getScheduleByIdAndDateRange(teacherId, yearMonth);
     }
 
     @RequestMapping(value = "{teacher_id}/schedule/day", method = RequestMethod.GET)
