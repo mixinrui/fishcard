@@ -26,7 +26,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import java.util.*;
 
@@ -35,9 +34,6 @@ import java.util.*;
  */
 @Component
 public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaRepository, Long> {
-    @Autowired
-    private EntityManagerFactory entityManagerFactory;
-
     @Autowired
     private CourseScheduleService courseScheduleService;
 
@@ -289,7 +285,6 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     public WorkOrder getLatestWorkOrder(Long studentId){
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
         String sql = "select wo from WorkOrder wo where wo.studentId=? order by wo.endTime desc";
         Query query = entityManager.createQuery(sql).setParameter(1, studentId);
         query.setMaxResults(1);

@@ -14,7 +14,9 @@ public enum TimerMessageType {
     STUDENT_ABSENT_QUERY_NOTIFY(50),
     COMPLETE_FORCE_SERVER_NOTIFY(60),
     //学生没有补课的清空操作定时器
-    STUDENT_NOT_MAKEUP_NOTIFY(70);
+    STUDENT_NOT_MAKEUP_NOTIFY(70),
+    //教师当天新匹配到的课程
+    TEACHER_COURSE_NEW_ASSIGNEDED_DAY(80);
 
     private int code;
 
