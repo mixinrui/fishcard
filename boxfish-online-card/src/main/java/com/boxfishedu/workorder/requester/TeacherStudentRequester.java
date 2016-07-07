@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.requester;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.workorder.common.config.UrlConf;
@@ -25,7 +26,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -190,7 +193,21 @@ public class TeacherStudentRequester {
                 pageable.getPageNumber(),
                 pageable.getPageSize());
         return restTemplate.getForObject(url, JsonResultModel.class);
+    }
 
+    @Cacheable(value = MonthTimeSlots.CACHE_KEY_TEACHER_FIRST_DAY, key = "#teacherId.toString()")
+    public Long getTeacherFirstDay(Long teacherId) {
+        JsonResultModel jsonResultModel = restTemplate.getForObject(createGetTeacherFirstDayURI(teacherId), JsonResultModel.class);
+        Map beanMap = (Map) jsonResultModel.getData();
+        return (Long) beanMap.get("day");
+    }
+
+    private URI createGetTeacherFirstDayURI(Long teacherId) {
+        return UriComponentsBuilder
+                .fromUriString(urlConf.getTeacher_service())
+                .path("/course/schedule/teacher/first/" + teacherId)
+                .build()
+                .toUri();
     }
 
 }
