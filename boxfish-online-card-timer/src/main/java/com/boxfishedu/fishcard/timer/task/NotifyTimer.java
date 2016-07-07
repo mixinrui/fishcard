@@ -24,8 +24,8 @@ public class NotifyTimer {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //定时任务，向师生运营组获取教师
-//    @Scheduled(cron = "0 0 1 * * ?")
-    @Scheduled(cron="0 0/1 * * * ?")//每30分钟执行一次ls
+    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(cron="0 0/1 * * * ?")//每30分钟执行一次ls
     public void notifyService() {
         logger.info("<<<<<<开始通知<<<开始通知向师生运营获取没有分配的教师>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage();

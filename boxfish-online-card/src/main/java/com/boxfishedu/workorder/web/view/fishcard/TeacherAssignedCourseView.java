@@ -7,7 +7,12 @@ import lombok.Data;
  */
 @Data
 public class TeacherAssignedCourseView {
-    private Long teacherId;
     //当天分配的课程数量
     private Long count;
+    private Long teacherId;
+
+    public TeacherAssignedCourseView(Long count,Long teacherId){
+        this.count=count;
+        this.teacherId=teacherId;
+    }
 }

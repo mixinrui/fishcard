@@ -203,11 +203,13 @@ public class TeacherStudentRequester {
     }
 
     private URI createGetTeacherFirstDayURI(Long teacherId) {
-        return UriComponentsBuilder
+        URI uri= UriComponentsBuilder
                 .fromUriString(urlConf.getTeacher_service())
                 .path("/course/schedule/teacher/first/" + teacherId)
                 .build()
                 .toUri();
+        logger.debug("<==============@createGetTeacherFirstDayURI向师生运营发送获取教师第一个时间片请求,[{}]",uri.getPath());
+        return uri;
     }
 
 }
