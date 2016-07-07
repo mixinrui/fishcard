@@ -122,7 +122,8 @@ public class FishCardUpdatorServiceX {
         }
         //处于学生接受请求或者ready状态,标记为系统异常
         if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.READY.getCode()
-                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
+                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()
+                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.CONNECTED.getCode()) {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
                     FishCardStatusEnum.getDesc(FishCardStatusEnum.EXCEPTION.getCode()));
             courseOnlineService.handleException(workOrder, courseSchedule, FishCardStatusEnum.EXCEPTION.getCode());
@@ -133,7 +134,7 @@ public class FishCardUpdatorServiceX {
                 || fishCardDelayMessage.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
                     FishCardStatusEnum.getDesc(FishCardStatusEnum.STUDENT_ABSENT.getCode()));
-            courseOnlineServiceX.completeCourse(workOrder,courseSchedule,FishCardStatusEnum.STUDENT_ABSENT.getCode());
+            courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
         }
         workOrderLogService.saveWorkOrderLog(workOrder);
     }

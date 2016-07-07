@@ -34,4 +34,16 @@ public class InterfaceController {
         notifyTimer.teacherOutNumberNotifyService();
         return JsonResultModel.newJsonResultModel("ok");
     }
+
+    @RequestMapping(value = "/absent/teacher", method = RequestMethod.GET)
+    public JsonResultModel teacherAbsent(){
+        notifyTimer.notifyTeacherAbsentService();
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
+    @RequestMapping(value = "/complete/force", method = RequestMethod.POST)
+    public JsonResultModel completeForce(){
+        notifyTimer.completeForceService();
+        return JsonResultModel.newJsonResultModel("ok");    
+    }
 }

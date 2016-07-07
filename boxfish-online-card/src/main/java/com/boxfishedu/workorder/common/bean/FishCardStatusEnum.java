@@ -9,6 +9,8 @@ public enum FishCardStatusEnum {
     COURSE_ASSIGNED(20, "分配课程",""),
     TEACHER_ASSIGNED(30, "分配教师",""),//分配教师以后其实就已经是就绪,目前这两个状态有重叠
     WAITFORSTUDENT(31, "等待学生上课应答",""),
+    //师生连通关系介于等待与接受之间
+    CONNECTED(35,"师生已连通",""),
     STUDENT_ACCEPTED(32,"学生接受上课请求",""),
     //学生资源准备完成
     READY(33, "就绪",""),
