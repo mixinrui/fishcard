@@ -15,6 +15,7 @@ import java.io.Serializable;
 @Data
 public class TimeSlots implements Cloneable, Serializable {
 
+    public final static Integer NOT_ASSIGN_STATUS = 0;
     public final static String CACHE_KEY = "timeSlots";
     private Long slotId;
     private String startTime;
@@ -28,6 +29,8 @@ public class TimeSlots implements Cloneable, Serializable {
     private String courseType;
     @JsonProperty(value = "courseInfo")
     private CourseView courseView;
+    // 默认为未分配
+    private Integer courseScheduleStatus = NOT_ASSIGN_STATUS;
     private Long workOrderId;
 
     public TimeSlots() {}
@@ -44,6 +47,7 @@ public class TimeSlots implements Cloneable, Serializable {
         this.selected = true;
         this.status = TimeSlotsStatus.ASSIGNED;
         this.workOrderId = courseSchedule.getWorkorderId();
+        this.courseScheduleStatus = courseSchedule.getStatus();
     }
 
     @Override
@@ -72,12 +76,4 @@ public class TimeSlots implements Cloneable, Serializable {
         this.selected = selected;
         this.status = selected ? TimeSlotsStatus.SELECTED : TimeSlotsStatus.FREE;
     }
-
-    /*public String getStartTime() {
-        return DateUtil.mockMinutesAfter(5);
-    }
-
-    public String getEndTime() {
-        return DateUtil.mockMinutesAfter(10);
-    }*/
 }

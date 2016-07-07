@@ -53,8 +53,6 @@ public class ServiceSDK {
     private final static Logger logger = LoggerFactory.getLogger(ServiceSDK.class);
 
 
-
-
     /**
      * 获取老师一个月选的时间片
      * @param teacherId
