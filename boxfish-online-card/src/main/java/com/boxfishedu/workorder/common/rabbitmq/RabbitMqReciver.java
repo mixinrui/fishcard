@@ -115,6 +115,10 @@ public class RabbitMqReciver {
             else if(serviceTimerMessage.getType()==TimerMessageType.STUDENT_NOT_MAKEUP_NOTIFY.value()){
                 logger.info("@TIMER>>>>>STUDENT_NOT_MAKEUP_NOTIFY>>>>检查学生超期未补课的情况");
             }
+            else if(serviceTimerMessage.getType()==TimerMessageType.TEACHER_COURSE_NEW_ASSIGNEDED_DAY.value()){
+                logger.info("@TIMER>>>>>TEACHER_COURSE_NEW_ASSIGNEDED_DAY>>>>检查教师当天新分课程,并发送相关通知消息");
+
+            }
         } catch (Exception ex) {
             logger.error("检查教师失败",ex);
             throw new AmqpRejectAndDontRequeueException("失败", ex);

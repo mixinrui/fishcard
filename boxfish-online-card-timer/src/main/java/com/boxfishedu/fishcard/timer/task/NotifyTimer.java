@@ -52,6 +52,18 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
+    @Scheduled(cron = "0 0 18 * * ?")
+    public void teacherNewClassNotifyService() {
+        logger.info("<<<<<<开始通知<<<通知教师的新课程数量>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage();
+        serviceTimerMessage.setStatus(0);
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        serviceTimerMessage.setType(TimerMessageType.TEACHER_COURSE_NEW_ASSIGNEDED_DAY.value());
+        serviceTimerMessage.setBody(null);
+        Date date = new Date();
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
     /**
      * 教师上课前五分钟提醒定时器
      */
