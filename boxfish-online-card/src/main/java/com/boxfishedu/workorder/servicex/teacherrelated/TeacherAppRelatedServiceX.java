@@ -317,7 +317,12 @@ public class TeacherAppRelatedServiceX {
     }
 
     private boolean hasMoreHistory(Long teacherId, DateRangeForm dateRangeForm) {
-        Long firstDay = teacherStudentRequester.getTeacherFirstDay(teacherId);
-        return (dateRangeForm.getFrom().getTime() > firstDay);
+        Long firstDay = null;
+        try {
+            firstDay = teacherStudentRequester.getTeacherFirstDay(teacherId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return (firstDay !=null) && (dateRangeForm.getFrom().getTime() > firstDay);
     }
 }

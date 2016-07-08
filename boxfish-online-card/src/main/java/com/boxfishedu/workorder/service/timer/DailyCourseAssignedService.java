@@ -1,12 +1,9 @@
 package com.boxfishedu.workorder.service.timer;
-
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
-import com.boxfishedu.workorder.web.view.fishcard.TeacherAlterView;
-import com.boxfishedu.workorder.web.view.fishcard.TeacherAssignedCourseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.Date;
 import java.util.List;
+
 
 /**
  * Created by hucl on 16/7/7.
