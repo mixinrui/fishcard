@@ -44,10 +44,10 @@ public class CourseOnlineRequester {
      * 发送封装好的消息
      */
     public void pushWrappedMsg(TeachingOnlineMsg teachingOnlineMsg){
-        String url=String.format("%s/teaching/callback/push",
-                urlConf.getCourse_online_service());
+        String url=String.format("%s/teaching/callback/push?user_id=%s&push_title=%s",
+                urlConf.getCourse_online_service(),teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title());
         logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起通知操作,[[[[通知用户[{}]推送消息[{}]]]]],url[{}]",url,teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title());
-        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineMsg,Object.class);}));
+        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,null,Object.class);}));
 
     }
 }
