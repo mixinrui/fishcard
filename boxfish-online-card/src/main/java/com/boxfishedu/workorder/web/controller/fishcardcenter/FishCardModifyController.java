@@ -1,5 +1,8 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.web.param.CourseChangeParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardModifyServiceX;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
@@ -7,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by hucl on 16/5/10.
@@ -23,5 +28,17 @@ public class FishCardModifyController {
     @RequestMapping(value = "/teacher", method = RequestMethod.PUT)
     public JsonResultModel changeTeacher(@RequestBody TeacherChangeParam teacherChangeParam) {
         return fishCardModifyServiceX.changeTeacher(teacherChangeParam);
+    }
+
+    @RequestMapping(value = "/courses/all", method = RequestMethod.PUT)
+    public JsonResultModel changeSpecialOrderCourses(@RequestBody CourseChangeParam courseChangeParam) {
+        fishCardModifyServiceX.changeSpecialOrderCourses(courseChangeParam.getStudentId(),courseChangeParam.getOrderId());
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
+    @RequestMapping(value = "/courses/order", method = RequestMethod.PUT)
+    public JsonResultModel changerderCourses(@RequestBody CourseChangeParam courseChangeParam) {
+        fishCardModifyServiceX.changerderCourses(courseChangeParam.getStudentId());
+        return JsonResultModel.newJsonResultModel("ok");
     }
 }

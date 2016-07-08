@@ -72,5 +72,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select wo from WorkOrder wo where wo.status =?1 and wo.service.amount>0")
     public List<WorkOrder> findWorkOrderContainBackOrder(int status);
 
+    public List<WorkOrder> findByStudentIdAndOrderIdAndStatusLessThan(Long studentId,Long orderId,Integer status);
+
+    public List<WorkOrder> findByStudentIdAndOrderIdAndStatusLessThan(Long studentId,Integer status);
 
 }

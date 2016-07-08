@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.ServiceSDK;
+import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.config.UrlConf;
@@ -56,9 +57,12 @@ public class FishCardModifyServiceX {
     private RestTemplate restTemplate;
 
     @Autowired
+    private FishCardModifyService fishCardModifyService;
+
+    @Autowired
     private UrlConf urlConf;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //选择五门课程供给学生选择
     public JsonResultModel getCoursesForUpdate(Long studentId) {
@@ -76,11 +80,10 @@ public class FishCardModifyServiceX {
             throw new BusinessException("无对应的记录,请检查所传参数是否合法");
         }
 
-        WorkOrder oldWorkOrder= new WorkOrder();
+        WorkOrder oldWorkOrder = new WorkOrder();
         try {
-            BeanUtils.copyProperties(oldWorkOrder,workOrder);
-        }
-        catch (Exception ex){
+            BeanUtils.copyProperties(oldWorkOrder, workOrder);
+        } catch (Exception ex) {
             logger.error("复制鱼卡出错");
         }
 
@@ -106,17 +109,27 @@ public class FishCardModifyServiceX {
         return JsonResultModel.newJsonResultModel(null);
     }
 
-    private void changeTeacherLog(WorkOrder workOrder){
-        WorkOrderLog workOrderLog=new WorkOrderLog();
+    private void changeTeacherLog(WorkOrder workOrder) {
+        WorkOrderLog workOrderLog = new WorkOrderLog();
         workOrderLog.setCreateTime(new Date());
         workOrderLog.setWorkOrderId(workOrder.getId());
         workOrderLog.setStatus(workOrder.getStatus());
-        workOrderLog.setContent("更换教师:"+ FishCardStatusEnum.getDesc(workOrder.getStatus()));
+        workOrderLog.setContent("更换教师:" + FishCardStatusEnum.getDesc(workOrder.getStatus()));
         workOrderLogService.save(workOrderLog);
     }
 
-    public void changeCourses(Long studentId,Long orderId){
+    public void changeSpecialOrderCourses(Long studentId, Long orderId) {
+        List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndOrderIdAndStatusLessThan(studentId, orderId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
+        workOrders.forEach(workOrder -> {
+            fishCardModifyService.changeCourse(workOrder);
+        });
+    }
 
+    public void changerderCourses(Long studentId) {
+        List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndStatusLessThan(studentId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
+        workOrders.forEach(workOrder -> {
+            fishCardModifyService.changeCourse(workOrder);
+        });
     }
 
 }
