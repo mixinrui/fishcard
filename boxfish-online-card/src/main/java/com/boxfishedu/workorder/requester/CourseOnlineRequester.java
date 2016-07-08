@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.workorder.common.bean.TeachingNotificationEnum;
+import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -37,5 +38,16 @@ public class CourseOnlineRequester {
                 urlConf.getCourse_online_service(),workOrderId,TeachingNotificationEnum.toString());
         logger.debug("<<<<<<<<<<<<<@[notifyTeachingOnlinePushMessage]向在线教育发起通知操作,[[[[通知在线教学中心推送消息]]]],url[{}]",url);
         threadPoolManager.execute(new Thread(()->{restTemplate.getForObject(url,Object.class);}));
+    }
+
+    /**
+     * 发送封装好的消息
+     */
+    public void pushWrappedMsg(TeachingOnlineMsg teachingOnlineMsg){
+        String url=String.format("%s/teaching/callback/push",
+                urlConf.getCourse_online_service());
+        logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起通知操作,[[[[通知用户[{}]推送消息[{}]]]]],url[{}]",url,teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title());
+        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineMsg,Object.class);}));
+
     }
 }
