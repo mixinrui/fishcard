@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.servicex.timer;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.CourseScheduleStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -110,7 +109,7 @@ public class CourseScheduleUpdatorServiceX {
         if(courseSchedule.getWorkorderId() == null) {
             logger.error("排课表{}没有对应的工单", courseSchedule.getId());
         }
-        courseSchedule.setStatus(CourseScheduleStatusEnum.ASSIGNEDTEACHER.value());
+        courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
         courseScheduleService.save(courseSchedule);
 
         // 修改工单以及状态,保存工单

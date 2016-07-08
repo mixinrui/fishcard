@@ -72,6 +72,6 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
     }
 
     public List<WorkOrder> findByStudentIdAndStatusLessThan(Long studentId,Integer status){
-        return jpa.findByStudentIdAndOrderIdAndStatusLessThan(studentId,status);
+        return jpa.findByStudentIdAndStatusLessThan(studentId,status);
     }
 }
