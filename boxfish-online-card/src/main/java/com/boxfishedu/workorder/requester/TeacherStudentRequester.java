@@ -1,12 +1,10 @@
 package com.boxfishedu.workorder.requester;
 
 import com.alibaba.fastjson.JSONObject;
-import com.boxfishedu.workorder.common.exception.BoxfishException;
-import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BoxfishException;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -15,6 +13,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import org.slf4j.Logger;
@@ -195,11 +194,15 @@ public class TeacherStudentRequester {
         return restTemplate.getForObject(url, JsonResultModel.class);
     }
 
-    @Cacheable(value = MonthTimeSlots.CACHE_KEY_TEACHER_FIRST_DAY, key = "#teacherId.toString()")
     public Long getTeacherFirstDay(Long teacherId) {
-        JsonResultModel jsonResultModel = restTemplate.getForObject(createGetTeacherFirstDayURI(teacherId), JsonResultModel.class);
-        Map beanMap = (Map) jsonResultModel.getData();
-        return (Long) beanMap.get("day");
+//        Long day = cacheManager.getCache(MonthTimeSlots.CACHE_KEY_TEACHER_FIRST_DAY).get(teacherId.toString(), Long.class);
+//        if(day != null) {
+//            return day;
+//        } else {
+            JsonResultModel jsonResultModel = restTemplate.getForObject(createGetTeacherFirstDayURI(teacherId), JsonResultModel.class);
+            Map beanMap = (Map) jsonResultModel.getData();
+            return (Long) beanMap.get("day");
+//        }
     }
 
     private URI createGetTeacherFirstDayURI(Long teacherId) {
