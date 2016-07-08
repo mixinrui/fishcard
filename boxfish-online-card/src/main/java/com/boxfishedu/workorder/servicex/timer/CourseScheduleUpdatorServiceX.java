@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -116,6 +117,7 @@ public class CourseScheduleUpdatorServiceX {
         WorkOrder workOrder = workOrderService.findOne(courseSchedule.getWorkorderId());
         workOrder.setTeacherId(teacher.getTeacherId());
         workOrder.setTeacherName(teacher.getName());
+        workOrder.setAssignTeacherTime(new Date());
         if(!StringUtils.isEmpty(teacher.getTeacherName())){
             workOrder.setTeacherName(teacher.getTeacherName());
         }
