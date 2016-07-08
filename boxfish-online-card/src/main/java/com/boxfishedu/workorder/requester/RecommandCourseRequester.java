@@ -52,6 +52,15 @@ public class RecommandCourseRequester {
         return recommandCourseView;
     }
 
+    public String getThumbNailPath(RecommandCourseView courseView){
+       return String.format("%s%s", urlConf.getThumbnail_server(), courseView.getCover());
+    }
+
+
+    public RecommandCourseView getRecommandCourse(WorkOrder workOrder) {
+       return getRecommandCourse(workOrder,workOrder.getSeqNum());
+    }
+
     public RecommandCourseView getRecommandCourse___________mock(WorkOrder workOrder, Integer index){
         RecommandCourseView recommandCourseView=mockCourses().get(index.intValue()+"");
         logger.info("假课程[{}]",JacksonUtil.toJSon(recommandCourseView));

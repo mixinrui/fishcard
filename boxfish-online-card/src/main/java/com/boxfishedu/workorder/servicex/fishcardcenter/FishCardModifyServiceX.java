@@ -106,7 +106,7 @@ public class FishCardModifyServiceX {
         return JsonResultModel.newJsonResultModel(null);
     }
 
-    public void changeTeacherLog(WorkOrder workOrder){
+    private void changeTeacherLog(WorkOrder workOrder){
         WorkOrderLog workOrderLog=new WorkOrderLog();
         workOrderLog.setCreateTime(new Date());
         workOrderLog.setWorkOrderId(workOrder.getId());
@@ -114,4 +114,9 @@ public class FishCardModifyServiceX {
         workOrderLog.setContent("更换教师:"+ FishCardStatusEnum.getDesc(workOrder.getStatus()));
         workOrderLogService.save(workOrderLog);
     }
+
+    public void changeCourses(Long studentId,Long orderId){
+
+    }
+
 }
