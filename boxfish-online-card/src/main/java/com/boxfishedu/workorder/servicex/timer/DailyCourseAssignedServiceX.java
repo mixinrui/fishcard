@@ -24,7 +24,7 @@ public class DailyCourseAssignedServiceX {
         this.notifyTeachingOnline(getCardAssignedDaily());
     }
 
-    private List<TeacherAssignedCourseView> getCardAssignedDaily() {
+    public List<TeacherAssignedCourseView> getCardAssignedDaily() {
         return dailyCourseAssignedService.getCardAssignedDaily();
     }
 
