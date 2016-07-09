@@ -62,7 +62,7 @@ public class AvaliableTimeServiceX {
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(avaliableTimeParam.getRoleId());
         List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(dayTimeSlots, (localDateTime, d) -> {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
-            clone.setDay(DateUtil.string(localDateTime));
+            clone.setDay(DateUtil.formatLocalDate(localDateTime));
             return timeLimitPolicy.limit(clone);
         });
 
