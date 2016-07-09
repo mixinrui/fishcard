@@ -154,6 +154,11 @@ public class RabbitMqReciver {
     @RabbitListener(queues = RabbitMqConstant.TEACHING_ONLINE_STATUS_QUEUE)
     public void updateWorkOrderStatus(Map<String,Object> map){
         logger.debug("@updateWorkOrderStatus接收来自在线教学组的更新状态请求,参数{}", JacksonUtil.toJSon(map));
-        courseOnlineServiceX.updateTeachingStatus(map);
+        try {
+            courseOnlineServiceX.updateTeachingStatus(map);
+        }
+        catch (Exception ex){
+            logger.error("@updateWorkOrderStatus,消息处理失败");
+        }
     }
 }

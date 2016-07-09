@@ -25,7 +25,13 @@ public class RabbitMqDealyReceiver {
     public void teacherAbsentDealer(FishCardDelayMessage fishCardDelayMessage) throws Exception{
         logger.info("@============>[teacherAbsentDealer]开始接收delay message{}",fishCardDelayMessage);
         if(fishCardDelayMessage.getType()==FishCardDelayMsgType.TEACHER_ABSENT.value()){
-            fishCardUpdatorServiceX.absentUpdator(fishCardDelayMessage);
+            try {
+                fishCardUpdatorServiceX.absentUpdator(fishCardDelayMessage);
+            }
+            catch (Exception ex){
+                logger.error("@teacherAbsentDealer更新旷课情况失败");
+            }
+
         }
     }
 
@@ -33,7 +39,12 @@ public class RabbitMqDealyReceiver {
     public void studentAbsentDealer(FishCardDelayMessage fishCardDelayMessage) throws Exception{
         logger.info("@============>[studentAbsentDealer]开始接收delay message{}",fishCardDelayMessage);
         if(fishCardDelayMessage.getType()==FishCardDelayMsgType.STUDENT_ABSENT.value()){
-            fishCardUpdatorServiceX.absentUpdator(fishCardDelayMessage);
+            try {
+                fishCardUpdatorServiceX.absentUpdator(fishCardDelayMessage);
+            }
+            catch (Exception ex){
+                logger.error("@studentAbsentDealer更新旷课情况失败");
+            }
         }
     }
 
@@ -41,7 +52,12 @@ public class RabbitMqDealyReceiver {
     public void forceCompleteDealer(FishCardDelayMessage fishCardDelayMessage) throws Exception{
         logger.info("@============>[forceCompleteDealer]开始接收delay message{}",fishCardDelayMessage);
         if(fishCardDelayMessage.getType()==FishCardDelayMsgType.FORCE_COMPLETE_SERVER.value()){
-            fishCardUpdatorServiceX.forceCompleteUpdator(fishCardDelayMessage);
+            try {
+                fishCardUpdatorServiceX.forceCompleteUpdator(fishCardDelayMessage);
+            }
+            catch (Exception ex){
+                logger.error("@forceCompleteDealer强制完成处理失败");
+            }
         }
     }
 
@@ -49,7 +65,12 @@ public class RabbitMqDealyReceiver {
     public void teacherPrepareClassDelaer(FishCardDelayMessage fishCardDelayMessage) throws Exception{
         logger.info("@===============>[teacherPrepareClassDelaer],当前时间[{}]开始接受delay message{}", DateUtil.Date2String(new Date()),fishCardDelayMessage);
         if(fishCardDelayMessage.getType()==FishCardDelayMsgType.NOTIFY_TEACHER_PREPARE_CLASS.value()){
-            fishCardUpdatorServiceX.teacherPrepareClassUpdator(fishCardDelayMessage);
+            try {
+                fishCardUpdatorServiceX.teacherPrepareClassUpdator(fishCardDelayMessage);
+            }
+            catch (Exception ex){
+                logger.error("@teacherPrepareClassDelaer通知教师准备上课失败");
+            }
         }
     }
 }

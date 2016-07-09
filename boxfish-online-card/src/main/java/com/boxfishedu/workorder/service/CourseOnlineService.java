@@ -50,7 +50,7 @@ public class CourseOnlineService {
                 ||(savedStatus==FishCardStatusEnum.STUDENT_ABSENT.getCode());
         if(flag){
             //将接受到的消息加入到mongo中
-            workOrderLogService.saveWorkOrderLog(workOrder,"不会覆盖db消息:"+FishCardStatusEnum.getDesc(workOrder.getStatus()));
+            workOrderLogService.saveWorkOrderLog(workOrder,"不能覆盖已有消息:"+FishCardStatusEnum.getDesc(workOrder.getStatus()));
             String tips="@notAllowUpdateStatus当前鱼卡["+workOrder.getId()+"]状态已经处于冻结状态["+FishCardStatusEnum.get(workOrder.getStatus())+"],不允许再做修改!";
             logger.error(tips);
             throw new BusinessException(tips);
