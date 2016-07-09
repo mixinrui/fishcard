@@ -114,8 +114,8 @@ public class DateUtil {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
 
-    public static String string(LocalDateTime localDateTime) {
-        return dateTimeFormatter.format(localDateTime);
+    public static String formatLocalDate(LocalDateTime localDateTime) {
+        return dateFormatter.format(localDateTime);
     }
 
     public static Date getStartTime(Date date) {
