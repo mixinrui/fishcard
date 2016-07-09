@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class CourseOnlineService {
     @Autowired
     private CourseScheduleService courseScheduleService;
 
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     //通知上课中心,添加学生和答疑老师做好友
@@ -45,7 +49,11 @@ public class CourseOnlineService {
                 ||(savedStatus==FishCardStatusEnum.TEACHER_ABSENT.getCode())
                 ||(savedStatus==FishCardStatusEnum.STUDENT_ABSENT.getCode());
         if(flag){
-            throw new BusinessException("当前鱼卡状态已经处于冻结状态,不允许再做修改!");
+            //将接受到的消息加入到mongo中
+            workOrderLogService.saveWorkOrderLog(workOrder,"不会覆盖db消息:"+FishCardStatusEnum.getDesc(workOrder.getStatus()));
+            String tips="@notAllowUpdateStatus当前鱼卡["+workOrder.getId()+"]状态已经处于冻结状态["+FishCardStatusEnum.get(workOrder.getStatus())+"],不允许再做修改!";
+            logger.error(tips);
+            throw new BusinessException(tips);
         }
     }
 

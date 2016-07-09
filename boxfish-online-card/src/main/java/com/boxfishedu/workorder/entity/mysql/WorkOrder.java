@@ -54,6 +54,10 @@ public class WorkOrder{
     @Temporal(TemporalType.TIMESTAMP)
     private Date actualEndTime;
 
+    @Column(name = "assign_teacher_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date assignTeacherTime;
+
     @Column(name = "status", nullable = true)
     private Integer status;
 

@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.MessageProperties;
@@ -54,7 +55,10 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         Date startDate= DateUtil.localDate2Date(startLocalDate);
         Date endDate=DateUtil.localDate2Date(endLocalDate);
         logger.debug("@query db开始从数据库查询[[[教师旷课数据]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
-                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate)
+                ,FishCardStatusEnum.TEACHER_ASSIGNED.getCode()+";"+FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode());
+//        Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()};
+//        List<WorkOrder> result= jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
         List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
         return result;
     }
@@ -82,7 +86,9 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         Date endDate=DateUtil.localDate2Date(endLocalDate);
         logger.debug("@query db开始从数据库查询[[[需要强制下课]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
                 ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.ONCLASS.getCode());
-        Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.READY.getCode(),FishCardStatusEnum.ONCLASS.getCode()};
+        Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.READY.getCode()
+                ,FishCardStatusEnum.ONCLASS.getCode(),FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()
+                ,FishCardStatusEnum.CONNECTED.getCode()};
         List<WorkOrder> result= jpa.findByStatusInAndOrderIdLessThanAndEndTimeBetween(statuses,Long.MAX_VALUE, startDate, endDate);
         return result;
     }
@@ -114,7 +120,7 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
                 break;
             }
             case FORCE_COMPLETE_SERVER: {
-                calendar.add(Calendar.SECOND,60*forceCompleteTimeLimit+passBeyondNormal);
+                calendar.add(Calendar.SECOND,60*forceCompleteTimeLimit+4*passBeyondNormal);
                 break;
             }
             case NOTIFY_TEACHER_PREPARE_CLASS:{

@@ -84,7 +84,7 @@ public class DateUtil {
     }
 
     public static String Date2String(Date date) throws RuntimeException {
-        return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date);
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
 
 

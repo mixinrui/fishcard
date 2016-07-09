@@ -54,6 +54,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStatusAndStartTimeBetween(Integer status, Date startDate, Date endDate);
 
+    public List<WorkOrder> findByStatusInAndStartTimeBetween(Integer[] statuses, Date startDate, Date endDate);
+
     public List<WorkOrder> findByStatusLessThanAndEndTimeBetween(Integer status, Date startDate, Date endDate);
 
     public List<WorkOrder> findByStatusAndOrderIdLessThanAndEndTimeBetween(Integer status, long orderId, Date startDate, Date endDate);
@@ -70,5 +72,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select wo from WorkOrder wo where wo.status =?1 and wo.service.amount>0")
     public List<WorkOrder> findWorkOrderContainBackOrder(int status);
 
+    public List<WorkOrder> findByStudentIdAndOrderIdAndStatusLessThan(Long studentId,Long orderId,Integer status);
+
+    public List<WorkOrder> findByStudentIdAndStatusLessThan(Long studentId,Integer status);
 
 }

@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.servicex.timer;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.CourseScheduleStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -9,6 +8,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,9 @@ public class CourseScheduleUpdatorServiceX {
 
     @Autowired
     private RabbitMqSender rabbitMqSender;
+
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
 
     //定时任务，向师生运营组获取教师
 //    @Scheduled(cron="*/10 * * * * ?")
@@ -105,13 +109,14 @@ public class CourseScheduleUpdatorServiceX {
         if(courseSchedule.getWorkorderId() == null) {
             logger.error("排课表{}没有对应的工单", courseSchedule.getId());
         }
-        courseSchedule.setStatus(CourseScheduleStatusEnum.ASSIGNEDTEACHER.value());
+        courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
         courseScheduleService.save(courseSchedule);
 
         // 修改工单以及状态,保存工单
         WorkOrder workOrder = workOrderService.findOne(courseSchedule.getWorkorderId());
         workOrder.setTeacherId(teacher.getTeacherId());
         workOrder.setTeacherName(teacher.getName());
+        workOrder.setAssignTeacherTime(new Date());
         if(!StringUtils.isEmpty(teacher.getTeacherName())){
             workOrder.setTeacherName(teacher.getTeacherName());
         }
@@ -120,5 +125,6 @@ public class CourseScheduleUpdatorServiceX {
 
         // 创建群组
         serviceSDK.createGroup(workOrder);
+        workOrderLogService.saveWorkOrderLog(workOrder);
     }
 }

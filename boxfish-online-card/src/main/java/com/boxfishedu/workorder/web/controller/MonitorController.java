@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller;
 
+import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.config.PoolConf;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqDelaySender;
@@ -9,6 +10,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.timer.DailyCourseAssignedServiceX;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +41,9 @@ public class MonitorController {
     private ServeService serveService;
     @Autowired
     private RabbitMqDelaySender rabbitMqDelaySender;
+
+    @Autowired
+    private DailyCourseAssignedServiceX dailyCourseAssignedServiceX;
 
     @RequestMapping(value = "/return/{num}", method = RequestMethod.GET)
     public void returnTest(@PathVariable("num") Integer num) throws Exception {
@@ -82,6 +87,11 @@ public class MonitorController {
         for(int i=0;i<20;i++) {
             serveService.notifyOrderUpdateStatus(orderId, status);
         }
+    }
+
+    @RequestMapping(value = "/card/daily/assign", method = RequestMethod.GET)
+    public JsonResultModel dailyAssignNotidy(){
+        return JsonResultModel.newJsonResultModel(dailyCourseAssignedServiceX.getCardAssignedDaily());
     }
 
     public static void main(String[] args) throws Exception {

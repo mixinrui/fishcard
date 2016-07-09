@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.param;
 
+import com.boxfishedu.beans.form.ScheduleBatchReq;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -30,11 +31,11 @@ public class FetchTeacherParam implements Serializable {
     public ScheduleBatchReq convertToScheduleBatchReq() {
         ScheduleBatchReq scheduleBatchReq = new ScheduleBatchReq();
         scheduleBatchReq.setUserId(this.userId);
-        List<com.boxfishedu.workorder.web.param.bebase3.ScheduleModel> scheduleModelList = Lists.newArrayList();
+        List<com.boxfishedu.beans.form.ScheduleModel> scheduleModelList = Lists.newArrayList();
         scheduleBatchReq.setScheduleModelList(scheduleModelList);
         if (this.scheduleModelList != null) {
             this.scheduleModelList.stream().forEach(scheduleModel -> {
-                com.boxfishedu.workorder.web.param.bebase3.ScheduleModel bean = new com.boxfishedu.workorder.web.param.bebase3.ScheduleModel();
+                com.boxfishedu.beans.form.ScheduleModel bean = new com.boxfishedu.beans.form.ScheduleModel();
                 bean.setId(scheduleModel.getId());
                 bean.setCourseType(scheduleModel.getCourseType());
                 bean.setDay(new Date(scheduleModel.getDay()));

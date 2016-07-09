@@ -3,7 +3,6 @@ package com.boxfishedu.workorder.servicex.teacherrelated;
 import com.boxfishedu.workorder.common.bean.FishCardAuthEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -15,6 +14,7 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.YearMonth;
 import java.util.*;
 
 /**
@@ -98,13 +99,25 @@ public class TeacherAppRelatedServiceX {
         return map;
     }
 
-    public JsonResultModel getScheduleByIdAndDateRange(Long teacherId, DateRangeForm dateRangeForm) {
-        //向教师管理中心发起请求,获取教师的排课表
+    public MonthTimeSlots getScheduleByIdAndDateRange(Long teacherId, YearMonth yearMonth) {
+        DateRangeForm dateRangeForm;
+        // 如果没有指定查询的年月,则默认查询半年的数据
+        if(yearMonth == null) {
+            dateRangeForm = DateUtil.createHalfYearDateRangeForm();
+        } else {
+            dateRangeForm = new DateRangeForm(
+                    DateUtil.convertToDate(yearMonth.atDay(1)),
+                    DateUtil.convertToDate(yearMonth.atEndOfMonth()));
+        }
         logger.info("用户[{}]发起获取课程表请求", teacherId);
         // 1 获取老师已选时间片列表
         MonthTimeSlots resultMonthTimeSlots = serviceSDK.getMonthTimeSlotsByDateBetween(teacherId, dateRangeForm);
+        // 设置是否包含更多的历史记录
+        resultMonthTimeSlots.setHasMoreHistory(hasMoreHistory(teacherId, dateRangeForm));
+        // 调用世超的接口查看老师选择的时间片的最早记录
         if (CollectionUtils.isEmpty(resultMonthTimeSlots.getData())) {
-            return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
+//            return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
+            return resultMonthTimeSlots;
         }
 
         // 2 获取排课表信息
@@ -113,7 +126,8 @@ public class TeacherAppRelatedServiceX {
         // 3 覆盖处理
         resultMonthTimeSlots.override(courseScheduleMap, serviceSDK);
 
-        return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
+        return resultMonthTimeSlots;
+//        return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
     }
 
 
@@ -300,5 +314,15 @@ public class TeacherAppRelatedServiceX {
             }
             return dayTimeSlots;
         });
+    }
+
+    private boolean hasMoreHistory(Long teacherId, DateRangeForm dateRangeForm) {
+        Long firstDay = null;
+        try {
+            firstDay = teacherStudentRequester.getTeacherFirstDay(teacherId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return (firstDay !=null) && (dateRangeForm.getFrom().getTime() > firstDay);
     }
 }

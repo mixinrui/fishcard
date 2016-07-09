@@ -39,7 +39,7 @@ public class FishCardMakeUpService {
         String msgTips="该鱼卡所处状态["+FishCardStatusEnum.getDesc(oldWorkOrder.getStatus())+"]不允许换课";
         if(status!= FishCardStatusEnum.TEACHER_ABSENT.getCode()){
             if(status!=FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()){
-                if(status!=FishCardStatusEnum.EXCEPTION.getCode()){
+                if(status<FishCardStatusEnum.EXCEPTION.getCode()){
                     logger.info("鱼卡[{}]的状态[{}]不允许换课",oldWorkOrder.getId(),FishCardStatusEnum.getDesc(oldWorkOrder.getStatus()));
                     throw new BusinessException(msgTips);
                 }

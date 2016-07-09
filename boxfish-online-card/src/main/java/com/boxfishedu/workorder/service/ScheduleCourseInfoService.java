@@ -13,6 +13,9 @@ import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
+import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +118,22 @@ public class ScheduleCourseInfoService {
             throw new BusinessException("不存在对应的课程,请确认");
         }
         return trialCourse;
+    }
+
+    public void updateCourseIntoScheduleInfo(ScheduleCourseInfo mewScheduleCourseInfo) {
+        Query<ScheduleCourseInfo> updateQuery = datastore.createQuery(ScheduleCourseInfo.class);
+        updateQuery.criteria("workOrderId").equal(mewScheduleCourseInfo.getWorkOrderId());
+        UpdateOperations<ScheduleCourseInfo> updateOperations = datastore.createUpdateOperations(ScheduleCourseInfo.class);
+        updateOperations.set("courseId", mewScheduleCourseInfo.getCourseId());
+        updateOperations.set("name", mewScheduleCourseInfo.getName());
+        updateOperations.set("courseType", mewScheduleCourseInfo.getCourseType());
+        updateOperations.set("difficulty", mewScheduleCourseInfo.getDifficulty());
+        updateOperations.set("thumbnail", mewScheduleCourseInfo.getThumbnail());
+        UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
+        if (updateResults.getUpdatedCount() < 1) {
+            logger.error("updateTrialScheduleInfo方法更新失败");
+            throw new BusinessException("@updateCourseIntoScheduleInfo更新课程信息失败");
+        }
     }
 
 //    public void updateTrialScheduleInfo(TrialLectureModifyParam trialLectureModifyParam, WorkOrder workOrder, CourseSchedule courseSchedule){

@@ -27,7 +27,14 @@ public class MonthTimeSlots extends ResponseBaseView implements Serializable {
 
     private List<DayTimeSlots> data;
 
+    private boolean hasMoreHistory = false;
+
+    /**
+     * 一天的毫秒数
+     */
     public final static int DAY_OF_MILLIONS = 86400000;
+
+    public final static String CACHE_KEY_TEACHER_FIRST_DAY = "teacherFirstDayCacheKey";
 
     public MonthTimeSlots() {
         this.data = Lists.newArrayList();
