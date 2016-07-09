@@ -31,19 +31,19 @@ public class CourseView implements Serializable {
 
     private Long lastModified;
 
-    public static CourseView courseViewAdapter(ScheduleCourseInfo scheduleCourseInfo){
+    public static CourseView courseViewAdapter(ScheduleCourseInfo scheduleCourseInfo) {
         logger.info("scheduleCourseInfo信息 [{}]", scheduleCourseInfo);
-        if(scheduleCourseInfo == null) {
+        if (scheduleCourseInfo == null) {
             return null;
         }
-        CourseView courseView=new CourseView();
+        CourseView courseView = new CourseView();
         courseView.setBookSectionId(scheduleCourseInfo.getCourseId());
         courseView.setThumbnail(scheduleCourseInfo.getThumbnail());
         courseView.setName(scheduleCourseInfo.getName());
-        List<String> courseTypeList= Lists.newArrayList();
+        List<String> courseTypeList = Lists.newArrayList();
         courseTypeList.add(scheduleCourseInfo.getCourseType());
-        List<String> difficultyList=Lists.newArrayList();
-        if(scheduleCourseInfo.getDifficulty() != null) {
+        List<String> difficultyList = Lists.newArrayList();
+        if (scheduleCourseInfo.getDifficulty() != null) {
             difficultyList.add(scheduleCourseInfo.getDifficulty().toString());
         }
         courseView.setCourseType(courseTypeList);
