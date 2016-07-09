@@ -14,6 +14,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by LuoLiBing on 16/4/19.
@@ -83,11 +85,21 @@ public class MonthTimeSlots extends ResponseBaseView implements Serializable {
         }
     }
 
-
     public void transferTimestampToDate() {
         for(DayTimeSlots dayTimeSlots : data) {
             dayTimeSlots.setDay(DateUtil.simpleDateLong2String(Long.valueOf(dayTimeSlots.getDay())));
         }
+    }
+
+
+    // TODO 添加过滤器
+    public MonthTimeSlots filter(Predicate<DayTimeSlots> dayPredicate, Predicate<TimeSlots> timePredicate) {
+
+        this.data = data.parallelStream()
+                .map(d -> d.filter(dayPredicate, timePredicate))
+                .filter(d -> d!=null)
+                .collect(Collectors.toList());
+        return this;
     }
 
 }

@@ -6,10 +6,7 @@ import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,11 +17,11 @@ import java.util.GregorianCalendar;
  */
 public class DateUtil {
 
-    public final static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public final static DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public final static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     public static Date String2Date(String str) throws RuntimeException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -46,7 +43,7 @@ public class DateUtil {
     public static Date String2SimpleDate(String str) throws RuntimeException {
         Date date = null;
         try {
-            date = dateFormat.parse(str);
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(str);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }
@@ -61,11 +58,31 @@ public class DateUtil {
     public static String simpleDate2String(Date date) {
         String dateStr = null;
         try {
-            dateStr = dateFormat.format(date);
+            dateStr = new SimpleDateFormat("yyyy-MM-dd").format(date);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }
         return dateStr;
+    }
+
+    public static LocalDate convertLocalDate(Date date) {
+        return LocalDate.from(date.toInstant());
+    }
+
+    public static LocalDate parseLocalDate(String date) {
+        return LocalDate.parse(date, dateFormatter);
+    }
+
+    public static LocalTime parseLocalTime(String time) {
+        return LocalTime.parse(time, timeFormatter);
+    }
+
+    public static String formatLocalDateTime(LocalDateTime localDateTime) {
+        return dateTimeFormatter.format(localDateTime);
+    }
+
+    public static Date convertToDate(LocalDate localDate) {
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     public static String simpleDateLong2String(Long time) {
@@ -84,7 +101,7 @@ public class DateUtil {
      * @return
      */
     public static String string(Date date) {
-        return dateFormat.format(date);
+        return new SimpleDateFormat("yyyy-MM-dd").format(date);
     }
 
     //TODO:将hh:mm:ss(12进制改为HH:mm:ss:24进制)
@@ -123,11 +140,6 @@ public class DateUtil {
         return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public static int getDayFromDate(Date dt){
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(dt);
-        return cal.get(Calendar.DAY_OF_WEEK) - 1;
-    }
 
     public final static DateFormat HHmmss = new SimpleDateFormat("HH:mm:ss");
 
@@ -176,11 +188,6 @@ public class DateUtil {
         return  parseTime(date,0);
     }
 
-    public static String localDate2String(LocalDateTime localDateTime){
-        Date date=localDate2Date(localDateTime);
-        return Date2String(date);
-    }
-
     public static String localDate2SimpleString(LocalDateTime localDateTime){
         Date date=localDate2Date(localDateTime);
         return simpleDate2String(date2SimpleDate(date));
@@ -191,13 +198,18 @@ public class DateUtil {
     }
 
 
-    public static Date merge(Date date, Date time) {
-        Calendar instance = Calendar.getInstance();
-        instance.setTime(date);
-        instance.set(Calendar.HOUR_OF_DAY, time.getHours());
-        instance.set(Calendar.MINUTE, time.getMinutes());
-        instance.set(Calendar.SECOND, time.getSeconds());
-        return instance.getTime();
+//    public static Date merge(Date date, Date time) {
+//        Calendar instance = Calendar.getInstance();
+//        instance.setTime(date);
+//        instance.set(Calendar.HOUR_OF_DAY, time.getHours());
+//        instance.set(Calendar.MINUTE, time.getMinutes());
+//        instance.set(Calendar.SECOND, time.getSeconds());
+//        return instance.getTime();
+//    }
+
+
+    public static LocalDateTime merge(LocalDate date, LocalTime time) {
+        return LocalDateTime.of(date, time);
     }
 
 
@@ -213,11 +225,6 @@ public class DateUtil {
         calendar.setTime(date);
         calendar.add(Calendar.MINUTE, minutes);
         return calendar.getTime();
-    }
-
-
-    public static Date convertToDate(LocalDate localDate) {
-        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     @Deprecated

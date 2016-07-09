@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.bean;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -61,6 +62,14 @@ public class TimeSlots implements Cloneable, Serializable {
 
     public boolean free() {
         return !selected;
+    }
+
+    /**
+     * 是否有课,通过状态大于0来判断
+     * @return
+     */
+    public boolean isHaveCourse() {
+        return this.courseScheduleStatus > FishCardStatusEnum.UNKNOWN.getCode();
     }
 
     public String getCourseType() {

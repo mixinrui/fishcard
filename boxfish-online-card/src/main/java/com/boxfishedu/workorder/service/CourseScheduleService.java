@@ -1,8 +1,8 @@
 package com.boxfishedu.workorder.service;
 
 
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.CourseScheduleStatusEnum;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
@@ -29,6 +29,7 @@ import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by hucl on 16/4/9.
@@ -163,12 +164,12 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
         return teacherAlterViews;
     }
 
-    public Integer checkIfHaveCourse(Long studentId) {
-        return jpa.checkIfHaveCourse(studentId);
-    }
-
     public CourseSchedule findTop1ByStudentIdAndTimeSlotIdAndClassDate(Long studentId,Integer timeSlotId,Date classDate){
         CourseSchedule courseSchedule=jpa.findTop1ByStudentIdAndTimeSlotIdAndClassDate(studentId,timeSlotId,classDate);
         return courseSchedule;
+    }
+
+    public Optional<Date> findMaxClassDateByTeacherId(Long teacherId) {
+        return jpa.findTop1ClassDateByTeacherId(teacherId);
     }
 }

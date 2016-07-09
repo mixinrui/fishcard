@@ -24,8 +24,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
+
+import static com.boxfishedu.workorder.common.util.DateUtil.*;
+
 
 /**
  * Created by hucl on 16/3/31.
@@ -119,14 +124,17 @@ public class TeacherAppRelatedServiceX {
 //            return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
             return resultMonthTimeSlots;
         }
-
         // 2 获取排课表信息
         Map<String, Map<String, CourseSchedule>> courseScheduleMap = courseSchedule(teacherId, dateRangeForm);
 
         // 3 覆盖处理
         resultMonthTimeSlots.override(courseScheduleMap, serviceSDK);
 
-        return resultMonthTimeSlots;
+        return resultMonthTimeSlots.filter(
+                // 第一个条件为当前时间之前
+                d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                // 第二个条件为老师已分配
+                t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode());
 //        return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
     }
 
@@ -250,9 +258,9 @@ public class TeacherAppRelatedServiceX {
             Iterator<TimeSlots> iterator = dailyScheduleTime.iterator();
             while (iterator.hasNext()) {
                 TimeSlots timeSlots = iterator.next();
-                Date startTime = DateUtil.merge(
-                        DateUtil.String2SimpleDate(dayTimeSlots.getDay()),
-                        DateUtil.parseTime(timeSlots.getStartTime()));
+                LocalDateTime startTime = DateUtil.merge(
+                        parseLocalDate(dayTimeSlots.getDay()),
+                        parseLocalTime(timeSlots.getStartTime()));
                 if (!dateTimeRangeForm.isWithIn(startTime)) {
                     iterator.remove();
                 }
@@ -317,12 +325,12 @@ public class TeacherAppRelatedServiceX {
     }
 
     private boolean hasMoreHistory(Long teacherId, DateRangeForm dateRangeForm) {
-        Long firstDay = null;
-        try {
-            firstDay = teacherStudentRequester.getTeacherFirstDay(teacherId);
-        } catch (Exception e) {
-            e.printStackTrace();
+        Long firstDayTimeStamp = null;
+        Optional<Date> firstDay = courseScheduleService.findMaxClassDateByTeacherId(teacherId);
+        if(firstDay.isPresent()) {
+            firstDayTimeStamp = firstDay.get().getTime();
         }
-        return (firstDay !=null) && (dateRangeForm.getFrom().getTime() > firstDay);
+        return (firstDayTimeStamp !=null) && (dateRangeForm.getFrom().getTime() > firstDayTimeStamp);
     }
+
 }

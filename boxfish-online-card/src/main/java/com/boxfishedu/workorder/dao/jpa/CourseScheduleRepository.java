@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created with Intellij IDEA
@@ -58,4 +59,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     Integer checkIfHaveCourse(Long studentId);
 
     public CourseSchedule findTop1ByStudentIdAndTimeSlotIdAndClassDate(Long studentId, Integer timeSlotId, Date classDate);
+
+    @Query(value = "select max(c.classDate) from CourseSchedule c where teacherId=?1")
+    Optional<Date> findTop1ClassDateByTeacherId(Long teacherId);
 }
