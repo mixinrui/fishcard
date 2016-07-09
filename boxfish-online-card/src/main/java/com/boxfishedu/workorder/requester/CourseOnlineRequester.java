@@ -48,6 +48,5 @@ public class CourseOnlineRequester {
                 urlConf.getCourse_online_service(),teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title());
         logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起通知操作,[[[[通知用户[{}]推送消息[{}]]]]],url[{}]",url,teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title());
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,null,Object.class);}));
-
     }
 }
