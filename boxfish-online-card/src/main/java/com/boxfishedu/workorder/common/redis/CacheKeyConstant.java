@@ -8,5 +8,9 @@ public class CacheKeyConstant {
 
     /**   用于存储鱼卡后台 用户信息   key  user_code : value {password: , token: }     token加密之前  user_code + 时间  以-分割 **/
     public static final String FISHCARD_BACK_ORDER_USERINFO="FISHCARD_BACK_ORDER_USERINFO";
+
+    /**  存储抢单信息中  教师对应的鱼卡列表  **/
+    public static final String FISHCARD_WORKORDER_GRAB_KEY="FISHCARD_WORKORDER_GRAB_KEY";
+
     public static final String NOTIFY_TEACHER_PREPARE_CLASS_KEY="NOTIFY_TEACHER_PREPARE_CLASS_KEY";
 }
