@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Data
 public class DayTimeSlots implements Cloneable, Serializable {
 
-//    private final static long serialVersionUID = 1L;
+    private final static long serialVersionUID = 1L;
 
     public final static String CACHE_KEY = "DayTimeSlots";
 

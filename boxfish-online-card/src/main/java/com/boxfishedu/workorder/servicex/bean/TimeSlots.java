@@ -16,7 +16,7 @@ import java.io.Serializable;
 @Data
 public class TimeSlots implements Cloneable, Serializable {
 
-//    private final static long serialVersionUID = 1L;
+    private final static long serialVersionUID = 1L;
 
     public final static Integer NOT_ASSIGN_STATUS = 0;
     public final static String CACHE_KEY = "timeSlots";
