@@ -54,14 +54,14 @@ public class CourseScheduleUpdatorServiceX {
     public void bathUpdateTeacherIntoSchedule() throws ParseException {
         List<CourseSchedule> courseScheduleList = courseScheduleService.findByTeacherId(CourseSchedule.NO_ASSIGN_TEACHER_ID.longValue());
         //向教师运营组发起请求获取教师
-        if(CollectionUtils.isEmpty(courseScheduleList)) {
+        if (CollectionUtils.isEmpty(courseScheduleList)) {
             return;
         }
 
         // 2 根据学生进行分组,生成获取老师的参数
         Map<Long, List<CourseSchedule>> groupCourseScheduleMap = groupByUserId(courseScheduleList);
         List<FetchTeacherParam> fetchTeacherParams = FetchTeacherParam.fetchTeacherParamList(groupCourseScheduleMap);
-        if(CollectionUtils.isEmpty(fetchTeacherParams)) {
+        if (CollectionUtils.isEmpty(fetchTeacherParams)) {
             return;
         }
 
@@ -71,9 +71,9 @@ public class CourseScheduleUpdatorServiceX {
 
     private static Map<Long, List<CourseSchedule>> groupByUserId(List<CourseSchedule> courseScheduleList) {
         Map<Long, List<CourseSchedule>> resultMap = Maps.newLinkedHashMap();
-        for(CourseSchedule courseSchedule: courseScheduleList) {
+        for (CourseSchedule courseSchedule : courseScheduleList) {
             List<CourseSchedule> studentCourseScheduleList = resultMap.get(courseSchedule.getStudentId());
-            if(studentCourseScheduleList == null) {
+            if (studentCourseScheduleList == null) {
                 studentCourseScheduleList = Lists.newArrayList();
                 resultMap.put(courseSchedule.getStudentId(), studentCourseScheduleList);
             }
@@ -90,23 +90,24 @@ public class CourseScheduleUpdatorServiceX {
 
     /**
      * 处理工单与排课表, 应该在同一个事务里面...
+     *
      * @param courseScheduleId
      * @param teacher
      */
     @Transactional
     public void handleWorkOrderAndCourseSchedule(Long courseScheduleId, TeacherView teacher) {
         // 没有分配到老师不处理
-        if(teacher.getTeacherId() == CourseSchedule.NO_ASSIGN_TEACHER_ID.longValue()) {
+        if (teacher.getTeacherId() == CourseSchedule.NO_ASSIGN_TEACHER_ID.longValue()) {
             return;
         }
 
         CourseSchedule courseSchedule = courseScheduleService.findOne(courseScheduleId);
-        if(courseSchedule == null) {
+        if (courseSchedule == null) {
             return;
         }
         // 修改排课表状态,保存排课表
         courseSchedule.setTeacherId(teacher.getTeacherId());
-        if(courseSchedule.getWorkorderId() == null) {
+        if (courseSchedule.getWorkorderId() == null) {
             logger.error("排课表{}没有对应的工单", courseSchedule.getId());
         }
         courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
@@ -117,7 +118,7 @@ public class CourseScheduleUpdatorServiceX {
         workOrder.setTeacherId(teacher.getTeacherId());
         workOrder.setTeacherName(teacher.getName());
         workOrder.setAssignTeacherTime(new Date());
-        if(!StringUtils.isEmpty(teacher.getTeacherName())){
+        if (!StringUtils.isEmpty(teacher.getTeacherName())) {
             workOrder.setTeacherName(teacher.getTeacherName());
         }
         workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
