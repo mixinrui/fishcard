@@ -75,7 +75,7 @@ public class CourseOnlineServiceX {
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
         CourseSchedule courseSchedule= courseScheduleService.findByWorkOrderId(workOrderId);
         if((status!=FishCardStatusEnum.COMPLETED.getCode())&&(status!=FishCardStatusEnum.COMPLETED_FORCE.getCode())) {
-            courseOnlineService.notAllowUpdateStatus(workOrder);
+            courseOnlineService.notAllowUpdateStatus(workOrder,status);
         }
         if (null == workOrder||null==courseSchedule) {
             String msg="无对应的鱼卡或课程schedule,请确认参数传入是否正确,鱼卡id[" + workOrderId + "]";

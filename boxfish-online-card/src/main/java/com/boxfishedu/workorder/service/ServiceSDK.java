@@ -94,7 +94,7 @@ public class ServiceSDK {
      * @param workOrder
      */
     public void createGroup(WorkOrder workOrder) {
-        logger.info("开始通知在线授课创建组,鱼卡号:[{}]",workOrder.getId());
+        logger.info("@createGroup开始通知在线授课创建组,鱼卡号:[{}]",workOrder.getId());
         Map map = new HashMap<String, Long>(3);
         map.put("studentId", workOrder.getStudentId());
         map.put("teacherId", workOrder.getTeacherId());
