@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,10 @@ public class CourseOnlineService {
 
     @Autowired
     private WorkOrderLogService workOrderLogService;
+
+    @Autowired
+    private CourseOnlineRequester courseOnlineRequester;
+
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -64,6 +69,8 @@ public class CourseOnlineService {
     public void handleException(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status){
         workOrder.setStatus(status);
         saveStatus4WorkOrderAndSchedule(workOrder,courseSchedule);
+        workOrderLogService.saveWorkOrderLog(workOrder,"师生上报消息不足一分钟,设置为系统异常");
+        courseOnlineRequester.releaseGroup(workOrder);
     }
 
     public void saveStatus4WorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){

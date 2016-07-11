@@ -126,6 +126,11 @@ public class FishCardUpdatorServiceX {
                     FishCardStatusEnum.getDesc(FishCardStatusEnum.STUDENT_ABSENT.getCode()));
             courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
         }
+        else if(fishCardDelayMessage.getStatus()==FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()
+                ||fishCardDelayMessage.getStatus()==FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()){
+            logger.info("@forceCompleteUpdator->将鱼卡[{}]状态[{}]的群解散",workOrder.getId(),workOrder.getStatus());
+            courseOnlineRequester.releaseGroup(workOrder);
+        }
         //处于学生接受请求或者ready状态,标记为系统异常
         else {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),

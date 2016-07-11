@@ -56,7 +56,7 @@ public class TeacherAppRelatedServiceX {
 
     //判断当前鱼卡的上课时间是否有效,上课时间有效时效为配置文件的parameter.workorder_valid_time_peroid,单位是分钟
     //目前按照开课前后的有效时间计算
-    public Map<String, Object> isWorkOrderTimeValid(Long workOrderId) throws BusinessException {
+    public Map<String, Object> isWorkOrderTimeValidOld(Long workOrderId) throws BusinessException {
         logger.info("老师请求上课,开始校验鱼卡:[{}]的有效性", workOrderId);
         Map<String, Object> map = new HashMap<>();
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
@@ -98,6 +98,34 @@ public class TeacherAppRelatedServiceX {
         return map;
     }
 
+    public Map<String, Object> isWorkOrderTimeValid(Long workOrderId) throws BusinessException {
+        logger.info("老师请求上课,开始校验鱼卡:[{}]的有效性", workOrderId);
+        Map<String, Object> map = new HashMap<>();
+        WorkOrder workOrder = workOrderService.findOne(workOrderId);
+        if (null == workOrder) {
+            map.put("valid", FishCardAuthEnum.NOT_EXISTS.getCode());
+            map.put("desc", FishCardAuthEnum.NOT_EXISTS.getDesc());
+            return map;
+        }
+
+        Date endDate = workOrder.getEndTime();
+        Date now = new Date();
+
+        if (workOrder.getStatus() == FishCardStatusEnum.TEACHER_ABSENT.getCode()
+                || now.after(endDate)
+                || workOrder.getStatus() == FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
+            logger.info("当前鱼卡[{}]课程的状态[{}]不允许上课", workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
+            map.put("valid", FishCardAuthEnum.TOO_LATE.getCode());
+            map.put("desc", FishCardAuthEnum.TOO_LATE.getDesc());
+            return map;
+        } else {
+            map.put("valid", FishCardAuthEnum.OK.getCode());
+            map.put("desc", FishCardAuthEnum.OK.getDesc());
+            logger.info("鱼卡:[{}]校验通过:", workOrderId);
+            return map;
+        }
+    }
+
     private Map<String, Object> tooLateValidation(Map<String, Object> map, WorkOrder workOrder) {
         map.put("valid", FishCardAuthEnum.TOO_LATE.getCode());
         map.put("desc", FishCardAuthEnum.TOO_LATE.getDesc());
@@ -108,7 +136,7 @@ public class TeacherAppRelatedServiceX {
     public MonthTimeSlots getScheduleByIdAndDateRange(Long teacherId, YearMonth yearMonth) {
         DateRangeForm dateRangeForm;
         // 如果没有指定查询的年月,则默认查询半年的数据
-        if(yearMonth == null) {
+        if (yearMonth == null) {
             dateRangeForm = DateUtil.createHalfYearDateRangeForm();
         } else {
             dateRangeForm = new DateRangeForm(
@@ -299,9 +327,9 @@ public class TeacherAppRelatedServiceX {
 
         // 历史日期时间片过滤
         dayTimeSlotsList = dayTimeSlotsList.parallelStream()
-                .map( dayTimeSLots-> dayTimeSLots.filter(
-                    d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
-                    t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()))
+                .map(dayTimeSLots -> dayTimeSLots.filter(
+                        d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                        t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()))
                 .filter(d -> d != null)
                 .collect(Collectors.toList());
 
@@ -343,10 +371,10 @@ public class TeacherAppRelatedServiceX {
     private boolean hasMoreHistory(Long teacherId, DateRangeForm dateRangeForm) {
         Long firstDayTimeStamp = null;
         Optional<Date> firstDay = courseScheduleService.findMaxClassDateByTeacherId(teacherId);
-        if(firstDay.isPresent()) {
+        if (firstDay.isPresent()) {
             firstDayTimeStamp = firstDay.get().getTime();
         }
-        return (firstDayTimeStamp !=null) && (dateRangeForm.getFrom().getTime() > firstDayTimeStamp);
+        return (firstDayTimeStamp != null) && (dateRangeForm.getFrom().getTime() > firstDayTimeStamp);
     }
 
 }

@@ -87,7 +87,7 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         logger.debug("@query db开始从数据库查询[[[需要强制下课]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
                 ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.ONCLASS.getCode());
         Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.READY.getCode()
-                ,FishCardStatusEnum.ONCLASS.getCode(),FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()
+                ,FishCardStatusEnum.ONCLASS.getCode(),FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode(),FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()
                 ,FishCardStatusEnum.CONNECTED.getCode(),FishCardStatusEnum.WAITFORSTUDENT.getCode()};
         List<WorkOrder> result= jpa.findByStatusInAndOrderIdLessThanAndEndTimeBetween(statuses,Long.MAX_VALUE, startDate, endDate);
         return result;
