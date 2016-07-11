@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 @Data
 public class DayTimeSlots implements Cloneable, Serializable {
 
+//    private final static long serialVersionUID = 1L;
+
     public final static String CACHE_KEY = "DayTimeSlots";
 
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -177,6 +179,10 @@ public class DayTimeSlots implements Cloneable, Serializable {
                 .filter(timePredicate)
                 .collect(Collectors.toList());
         return CollectionUtils.isEmpty(this.getDailyScheduleTime()) ? null : this;
+    }
+
+    public DayTimeSlots filter(Predicate<TimeSlots> timePredicate) {
+        return filter((d) -> true, timePredicate);
     }
 
 }

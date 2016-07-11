@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.boxfishedu.workorder.common.util.DateUtil.*;
 
@@ -149,7 +150,11 @@ public class TeacherAppRelatedServiceX {
         if (CollectionUtils.isEmpty(dayTimeSlotsList)) {
             DayTimeSlots dayTimeSlotsTemplate = teacherStudentRequester.dayTimeSlotsTemplate(teacherId, date);
             dayTimeSlotsTemplate.setDay(DateUtil.simpleDate2String(date));
-            return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(dayTimeSlotsTemplate));
+            return JsonResultModel.newJsonResultModel(
+                    timeLimitPolicy.limit(dayTimeSlotsTemplate).filter(
+                            d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                            t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()
+                    ));
         }
         DayTimeSlots dayTimeSlots = dayTimeSlotsList.get(0);
 
@@ -159,7 +164,10 @@ public class TeacherAppRelatedServiceX {
 
         // 3 覆盖
         dayTimeSlots.override(courseScheduleList, serviceSDK);
-        return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(dayTimeSlots));
+        return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(dayTimeSlots).filter(
+                d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()
+        ));
     }
 
 
@@ -216,7 +224,7 @@ public class TeacherAppRelatedServiceX {
     public JsonResultModel getInternationalDayTimeSlotsTemplate(Long teacherId, Date date) throws CloneNotSupportedException {
         DateRangeForm dateRangeForm = getInternationalDateRange(date);
         List<DayTimeSlots> results = dateRangeForm.collect(loopDate -> teacherStudentRequester.dayTimeSlotsTemplate(teacherId, loopDate));
-        filterDayTimeSlots(results, getInternationalDateTimeRange(date));
+        filterInternationalDayTimeSlots(results, getInternationalDateTimeRange(date));
         return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(results));
     }
 
@@ -250,7 +258,7 @@ public class TeacherAppRelatedServiceX {
      * @param results
      * @param dateTimeRangeForm
      */
-    private void filterDayTimeSlots(List<DayTimeSlots> results, DateRangeForm dateTimeRangeForm) {
+    private void filterInternationalDayTimeSlots(List<DayTimeSlots> results, DateRangeForm dateTimeRangeForm) {
         Iterator<DayTimeSlots> resultIterator = results.iterator();
         while (resultIterator.hasNext()) {
             DayTimeSlots dayTimeSlots = resultIterator.next();
@@ -286,8 +294,15 @@ public class TeacherAppRelatedServiceX {
         // 可选时间过滤,即北京时间周一到周五  周六到周日的时间规则
         dayTimeSlotsList = timeLimitPolicy.limit(dayTimeSlotsList);
 
-        // 可用时间过滤
-        filterDayTimeSlots(dayTimeSlotsList, getInternationalDateTimeRange(date));
+        // 国际化时间转换
+        filterInternationalDayTimeSlots(dayTimeSlotsList, getInternationalDateTimeRange(date));
+
+        // 历史日期时间片过滤
+        dayTimeSlotsList = dayTimeSlotsList.parallelStream().map( dayTimeSLots-> dayTimeSLots.filter(
+                d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()
+        )).collect(Collectors.toList());
+
 
         List<CourseSchedule> courseScheduleList = courseScheduleService.findByTeacherIdAndClassDateBetween(
                 teacherId, getInternationalDateRange(date));
