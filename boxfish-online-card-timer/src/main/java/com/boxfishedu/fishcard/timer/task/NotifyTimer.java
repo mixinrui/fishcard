@@ -24,7 +24,7 @@ public class NotifyTimer {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //定时任务，向师生运营组获取教师
-    @Scheduled(cron = "0 0 1 * * ?")
+   // @Scheduled(cron = "0 0 1 * * ?")
 //    @Scheduled(cron="0 0/1 * * * ?")//每30分钟执行一次ls
     public void notifyService() {
         logger.info("<<<<<<开始通知<<<开始通知向师生运营获取没有分配的教师>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
@@ -36,7 +36,7 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
-    @Scheduled(cron = "0 0 3 * * ?")
+   // @Scheduled(cron = "0 0 3 * * ?")
     public void teacherOutNumberNotifyService() {
         logger.info("<<<<<<开始通知<<<检查教师不足预警>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage();
@@ -52,7 +52,7 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
-    @Scheduled(cron = "0 0 18 * * ?")
+    //@Scheduled(cron = "0 0 18 * * ?")
     public void teacherNewClassNotifyService() {
         logger.info("<<<<<<开始通知<<<通知教师的新课程数量>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage();
@@ -67,7 +67,7 @@ public class NotifyTimer {
     /**
      * 教师上课前五分钟提醒定时器
      */
-    @Scheduled(cron="0 1/5 * * * ?")
+    //@Scheduled(cron="0 1/5 * * * ?")
     public void notifyTeacherPrepareClass() {
         logger.info("<<<<<<开始通知<<<通知教师准备上课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.TEACHER_PREPARE_CLASS_NOTIFY.value());
@@ -78,7 +78,7 @@ public class NotifyTimer {
     /**
      * 教师旷课通知定时器
      */
-    @Scheduled(cron="0 0/5 * * * ?")
+    //@Scheduled(cron="0 0/5 * * * ?")
     public void notifyTeacherAbsentService() {
         logger.info("<<<<<<开始通知<<<教师旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.TEACHER_ABSENT_QUERY_NOTIFY.value());
@@ -89,7 +89,7 @@ public class NotifyTimer {
     /**
      * 服务器强制下课定时器;从第三分钟开始,每五分钟;与上面区分开
      */
-    @Scheduled(cron="0 2/5 * * * ?")
+    //@Scheduled(cron="0 2/5 * * * ?")
     public void completeForceService() {
         logger.info("<<<<<<开始通知<<<服务端强制下课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMPLETE_FORCE_SERVER_NOTIFY.value());
@@ -118,4 +118,13 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
+
+    //@Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+    @Scheduled(cron = "0 0/10 16,17,18,19 * * ?")
+    public void testTask(){
+        logger.info("测试任务时间[{}]",DateUtil.date2SimpleDate(  new Date()));
+    }
+
+
+
 }
