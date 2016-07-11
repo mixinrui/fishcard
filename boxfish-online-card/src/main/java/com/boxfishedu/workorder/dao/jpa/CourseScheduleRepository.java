@@ -51,7 +51,8 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     List<CourseSchedule> findByTeacherId(Long teacherId);
 
-    Page<CourseSchedule> findByStudentIdAndStatus(Long studentId, Integer status, Pageable pageable);
+    @Query(value = "select s from CourseSchedule s where s.studentId=?1 and s.status>=40 and s.status<50")
+    Page<CourseSchedule> findFinishCourseScheduleByStudentId(Long studentId, Pageable pageable);
 
     Page<CourseSchedule> findByStudentIdAndStatusBefore(Long studentId, Integer status, Pageable pageable);
 
