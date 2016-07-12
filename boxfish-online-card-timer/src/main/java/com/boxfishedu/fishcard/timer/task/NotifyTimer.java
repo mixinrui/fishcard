@@ -119,12 +119,21 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
-    //@Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
-    @Scheduled(cron = "0 0/10 16,17,18,19 * * ?")
+    /**
+     * 抢单: 每天18点到 24点  每10分钟 轮训查询
+     */
+   // @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
     public void testTask(){
         logger.info("测试任务时间[{}]",DateUtil.date2SimpleDate(  new Date()));
     }
 
 
+    /**
+     * 抢单:每天17:40清理清理
+     */
+    //@Scheduled(cron = "0 40 17 * * ?")
+    public void clearGrabOrderData(){
+        logger.info("清理抢单数据开始");
+    }
 
 }

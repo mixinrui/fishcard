@@ -16,7 +16,11 @@ public enum TimerMessageType {
     //学生没有补课的清空操作定时器
     STUDENT_NOT_MAKEUP_NOTIFY(70),
     //教师当天新匹配到的课程
-    TEACHER_COURSE_NEW_ASSIGNEDED_DAY(80);
+    TEACHER_COURSE_NEW_ASSIGNEDED_DAY(80),
+    //抢单定时器(汇总抢单鱼卡)
+    WORK_ORDER_GRAB_DAY(90),
+    //抢单定时器(清扫数据)
+    WORK_ORDER_GRAB_CLEAR_DATA_DAY(100);
 
     private int code;
 
