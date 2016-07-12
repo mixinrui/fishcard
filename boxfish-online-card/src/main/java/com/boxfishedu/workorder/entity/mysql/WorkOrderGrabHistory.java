@@ -26,22 +26,29 @@ public class WorkOrderGrabHistory {
     private Long workorderId;
 
 
-
     @Column(name = "start_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
-
-
-    @Column(name = "create_time", nullable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
 
 
     @Column(name = "update_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
-     @Override
+
+    @Column(name = "flag", nullable = true)
+    private String flag;
+
+    @Column(name = "create_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createTime;
+
+    @Column(name = "real_create_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date realCreateTime;
+
+
+    @Override
     public String toString() {
         return "WorkOrder{" +
                 "id=" + id +
@@ -50,6 +57,8 @@ public class WorkOrderGrabHistory {
                 ", startTime='" + startTime + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime='" + updateTime + '\'' +
+                ", flag='" + flag + '\'' +
+                ", realCreateTime='" + realCreateTime + '\'' +
                 '}';
     }
 }

@@ -43,6 +43,9 @@ public class WorkOrderGrab {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
+    @Column(name = "flag", nullable = true)
+    private String flag;
+
      @Override
     public String toString() {
         return "WorkOrder{" +
@@ -52,6 +55,7 @@ public class WorkOrderGrab {
                 ", startTime='" + startTime + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime='" + updateTime + '\'' +
+                ", flag='" + flag + '\'' +
                 '}';
     }
 }
