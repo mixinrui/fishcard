@@ -41,8 +41,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
     public List<WorkOrder> findByTeacherIdAndStartTimeBetweenOrderByStartTime(){
         Date begin = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-1),0);
         Date end = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-2),1);
-        return null;
-       // return workOrderJpaRepository.findByTeacherIdAndStartTimeBetweenOrderByStartTime(0L,begin,end);
+       return workOrderJpaRepository.findByTeacherIdAndStartTimeBetweenOrderByStartTime(0L,begin,end);
     }
 
 
@@ -53,8 +52,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
     public List<WorkOrder> findWorkOrderContainTeachers(){
         Date begin = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-1),0);
         Date end = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-2),1);
-        return null;
-        //return workOrderJpaRepository.findWorkOrderContainTeachers(0L,begin,end);
+        return workOrderJpaRepository.findByTeacherIdGreaterThanAndStartTimeBetween(0L,begin,end);
     }
 
 
