@@ -48,6 +48,7 @@ public class CourseView implements Serializable {
         }
         courseView.setCourseType(courseTypeList);
         courseView.setDifficulty(difficultyList);
+        courseView.setLastModified(scheduleCourseInfo.getLastModified());
         logger.info("courseView []", courseView);
         return courseView;
     }

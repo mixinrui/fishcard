@@ -8,6 +8,8 @@ public enum FishCardAuthEnum {
     NOT_EXISTS(1,"不存在对应的工单",""),
     TOO_EARLY(10, "未到上课时间",""),
     TOO_LATE(20, "迟到未在上课时间",""),
+    STUDENT_ABSENT(21, "学生已旷课",""),
+    CLASS_OVER(22, "课程已结束",""),
     OK(30, "分配教师","");
 
 

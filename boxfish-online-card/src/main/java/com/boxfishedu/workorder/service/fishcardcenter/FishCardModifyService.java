@@ -43,6 +43,11 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
     private WorkOrderLogService workOrderLogService;
 
     public void changeCourse(WorkOrder workOrder) {
+        String oldCourseName=workOrder.getCourseName();
+
+        //取消老课程
+        recommandCourseRequester.cancelOldRecommandCourse(workOrder);
+
         RecommandCourseView recommandCourseView = recommandCourseRequester.getRecommandCourse(workOrder);
         workOrder.setCourseName(recommandCourseView.getCourseName());
         workOrder.setCourseId(recommandCourseView.getCourseId());
@@ -64,7 +69,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
 
         scheduleCourseInfoService.updateCourseIntoScheduleInfo(scheduleCourseInfo);
         workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
-        workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,新课程[" + workOrder.getCourseName() + "]");
+        workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,老课程[" + oldCourseName + "]");
     }
 
     public List<WorkOrder> findByStudentIdAndOrderIdAndStatusLessThan(Long studentId,Long orderId,Integer status){

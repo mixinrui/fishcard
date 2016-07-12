@@ -91,6 +91,7 @@ public class FishCardUpdatorServiceX {
             courseSchedule.setUpdateTime(new Date());
             courseScheduleService.save(courseSchedule);
             workOrderService.save(workOrder);
+            courseOnlineRequester.releaseGroup(workOrder);
             workOrderLogService.saveWorkOrderLog(workOrder);
         }
     }

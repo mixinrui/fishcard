@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -46,9 +47,6 @@ public class FishCardModifyServiceX {
 
     @Autowired
     private WorkOrderLogService workOrderLogService;
-
-    @Autowired
-    private CourseOnlineRequester courseOnlineRequester;
 
     @Autowired
     private ServiceSDK serviceSDK;
