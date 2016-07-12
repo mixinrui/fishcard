@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
@@ -88,5 +89,10 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByTeacherIdGreaterThanAndStartTimeBetween(Long teacherId, Date startDate, Date endDate);
 
     /** end 抢单接口 **/
+
+    // 抢单之后,给课程匹配相应的老师
+    @Modifying
+    @Query("update WorkOrder o set o.teacherId = ?1 where o.id = ?2")
+    int setTeacherId(Long teacherId , Long workorderId);
 
 }

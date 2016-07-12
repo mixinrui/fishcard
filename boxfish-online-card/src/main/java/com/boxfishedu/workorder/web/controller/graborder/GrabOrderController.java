@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
+import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.fishcard.GrabOrderView;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,32 +26,12 @@ public class GrabOrderController {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
+    @Autowired
+    private GrabOrderServiceX grabOrderServiceX;
+
     @RequestMapping(value = "/{teacher_id}/workorderlist", method = RequestMethod.GET)
     public JsonResultModel getWorkOrderListByTeacherId(@PathVariable("teacher_id") Long teacherId) {
-
-        List<WorkOrderGrab> fishCardList = Lists.newArrayList();
-        JSONArray jsonArray = new JSONArray();
-
-        Long workOrderId1 = 111111111L;
-        Long workOrderId2 = 222222222L;
-
-        WorkOrderGrab workOrderGrabMock1 = new WorkOrderGrab();
-        JSONObject jsonObject1 = new JSONObject();
-        jsonObject1.put("workorderId",workOrderId1);
-        jsonObject1.put("startTime","2016-06-13 21:00:00");
-        jsonArray.add(jsonObject1);
-
-        JSONObject jsonObject2 = new JSONObject();
-        jsonObject2.put("workorderId",workOrderId2);
-        jsonObject2.put("startTime","2016-06-13 21:30:00");
-        jsonArray.add(jsonObject2);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("msg", WorkOrderConstant.FISHCARD_LIST);
-        jsonObject.put("code",0);
-        jsonObject.put("workorderlist",jsonArray);
-
-        return JsonResultModel.newJsonResultModel(jsonObject);
+        return grabOrderServiceX.getWorkOrderListByTeacherId(teacherId);
     }
 
 
