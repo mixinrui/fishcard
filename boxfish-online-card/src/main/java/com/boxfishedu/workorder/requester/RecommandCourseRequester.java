@@ -56,7 +56,7 @@ public class RecommandCourseRequester {
         String url = String.format("%s/cancel/%s/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), workOrder.getCourseId());
         logger.debug("@<-<-<-<-<-<-向推荐课发起取消课程的请求,url:[{}]", url);
         try {
-            Object object = restTemplate.postForObject(url, null, Object.class);
+            restTemplate.postForObject(url, null, Object.class);
         } catch (Exception ex) {
             logger.error("!!!!!!!!!!!!!!向推荐课发起取消请求失败[{}]", ex.getMessage(), ex);
         }
