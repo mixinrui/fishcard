@@ -1,11 +1,14 @@
 package com.boxfishedu.workorder.servicex.graborder;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineListMsg;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
+import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -173,14 +176,16 @@ public class MakeWorkOrderServiceX{
      * @param map
      */
     public void pushTeacherList(Map<Long ,List<WorkOrder>>  map){
-        TeachingOnlineListMsg  teacherMsg = new TeachingOnlineListMsg();
+        List list = Lists.newArrayList();
         for(Long key :map.keySet()){
-            TeachingOnlineMsg tMsg = new TeachingOnlineMsg();
-            tMsg.setUser_id(key);
-            tMsg.setPush_title("有学生等待上课,打开app抢先上课");
-            teacherMsg.getTeachingOnlineMsg().add(tMsg);
+            Map map1 = Maps.newHashMap();
+            map1.put("user_id",key);
+            map1.put("push_type",WorkOrderConstant.SEND_GRAB_ORDER_TYPE);
+            map1.put("push_title",WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE);
+            list.add(map1);
         }
-        teacherStudentRequester.pushTeacherListOnlineMsg(teacherMsg);
+        teacherStudentRequester.pushTeacherListOnlineMsg(list);
     }
+
 
 }

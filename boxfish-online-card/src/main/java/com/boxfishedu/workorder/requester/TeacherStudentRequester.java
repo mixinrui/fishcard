@@ -223,8 +223,8 @@ public class TeacherStudentRequester {
     /**
      *  向在线教育push教师消息数据
      */
-    public void pushTeacherListOnlineMsg(TeachingOnlineListMsg teachingOnlineListMsg){
-        String url=String.format("%s/teaching/callback/push?user_id=%s&push_title=%s",
+    public void pushTeacherListOnlineMsg(List teachingOnlineListMsg){
+        String url=String.format("%s/teaching/callback/push",
                 urlConf.getCourse_online_service());
         logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起获取教师列表url[{}]",url);
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);}));

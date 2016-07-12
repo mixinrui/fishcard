@@ -67,7 +67,7 @@ public class NotifyTimer {
     /**
      * 教师上课前五分钟提醒定时器
      */
-    @Scheduled(cron="0 1/5 * * * ?")
+    @Scheduled(cron = "0 1/5 * * * ?")
     public void notifyTeacherPrepareClass() {
         logger.info("<<<<<<开始通知<<<通知教师准备上课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.TEACHER_PREPARE_CLASS_NOTIFY.value());
@@ -78,7 +78,7 @@ public class NotifyTimer {
     /**
      * 教师旷课通知定时器
      */
-    @Scheduled(cron="0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/5 * * * ?")
     public void notifyTeacherAbsentService() {
         logger.info("<<<<<<开始通知<<<教师旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.TEACHER_ABSENT_QUERY_NOTIFY.value());
@@ -89,7 +89,7 @@ public class NotifyTimer {
     /**
      * 服务器强制下课定时器;从第三分钟开始,每五分钟;与上面区分开
      */
-    @Scheduled(cron="0 2/5 * * * ?")
+    @Scheduled(cron = "0 2/5 * * * ?")
     public void completeForceService() {
         logger.info("<<<<<<开始通知<<<服务端强制下课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMPLETE_FORCE_SERVER_NOTIFY.value());
@@ -123,18 +123,24 @@ public class NotifyTimer {
     /**
      * 抢单: 每天18点到 24点  每10分钟 轮训查询
      */
-   // @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
-    public void testTask(){
-        logger.info("测试任务时间[{}]",DateUtil.date2SimpleDate(  new Date()));
+    @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+    public void initGrabOrderData() {
+        logger.info("<<<<<<开始通知<<<轮训抢单初始化数据>>>的消息,时间[{}]", DateUtil.date2SimpleDate(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
     }
 
 
     /**
-     * 抢单:每天17:40清理清理
+     * 抢单:每天17:40清理数据
      */
-    //@Scheduled(cron = "0 40 17 * * ?")
-    public void clearGrabOrderData(){
-        logger.info("清理抢单数据开始");
+    @Scheduled(cron = "0 40 17 * * ?")
+    public void clearGrabOrderData() {
+        logger.info("<<<<<<开始通知<<<清理昨天抢单历史数据>>>的消息,时间[{}]", DateUtil.date2SimpleDate(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
     }
 
 }
