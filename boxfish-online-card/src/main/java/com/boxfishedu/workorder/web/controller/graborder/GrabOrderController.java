@@ -18,7 +18,7 @@ import java.util.List;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/graporder")
+@RequestMapping("/graborder")
 public class GrabOrderController {
 
 
