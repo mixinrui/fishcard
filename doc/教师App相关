@@ -1,0 +1,3 @@
+#######获取教师课程表:
+http://101.201.239.116:8080/service/teacher/1028080/schedule/month?access_token=9G2mwa&test=true
+method:GET

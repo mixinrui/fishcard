@@ -1,0 +1,14 @@
+######课前验证
+localhost:8080/coursing/workorder/{workorder_id}/teacher/class
+Method:GET
+例:
+localhost:8080/coursing/workorder/3989/teacher/class
+返回:
+{
+  "data": {
+    "valid": 10,
+    "desc": "未到上课时间"
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}

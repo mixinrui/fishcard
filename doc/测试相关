@@ -1,0 +1,18 @@
+http://101.201.239.116:8080/test/fishcard
+method:put
+参数:
+{
+    "id": "111",
+    "begin": "2016-07-08 12:01:02",
+    "end": "2016-08-09 12:02:03",
+    "timeSlotId": "2",
+    "teacherId": "3",
+    "studentId": "4"
+}
+
+说明:更换上课时间:id,begin,end,timeSlotId为必填项;其他项不要
+    更换上课时间与学生:id,teacherId,studentId为必填项,其他不要
+
+
+获取时间片与时间对应关系:
+http://123.56.13.168:8099/timeslot/list/111

@@ -1,0 +1,2 @@
+1.将本地文件的allow_test值设置为true,
+2.在访问的url中添加test=true的参数

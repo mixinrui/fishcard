@@ -1,0 +1,74 @@
+###生成试讲课接口
+url:http://101.201.239.116:8080/service/trial/
+method:post
+参数:
+{"teacherId":13333,
+  "studentId":24444,
+  "courseId":"L3NoYXJlL3N2bi9UcmFpbmluZy8wMDEuQmFzaWMmQWR2YW5jZWQueGxzeA",
+  "courseName":"课程的名称",
+  "startTime":"2017-05-06 12:12:44",
+  "endTime":"2017-05-06 12:12:55",
+  "courseType":"coursetypeaaaaa",
+  "timeSlotId":23
+}
+返回:
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+#####修改试讲课接口:
+url:http://101.201.239.116:8080/service/trial/
+method:PUT
+参数:
+{
+    "before": {"teacherId":13333,
+                "studentId":24444,
+                "courseId":"L3NoYXJlL3N2bi9UcmFpbmluZy8wMDEuQmFzaWMmQWR2YW5jZWQueGxzeA",
+                "courseName":"课程的名称",
+                "startTime":"2017-05-06 12:12:44",
+                "endTime":"2017-05-06 12:12:55",
+                "courseType":"coursetypeaaaaa",
+                "timeSlotId":23
+              },
+    "after": {"teacherId":13333,
+               "studentId":24444,
+               "courseId":"L3NoYXJlL3N2bi9UcmFpbmluZy8wMDEuQmFzaWMmQWR2YW5jZWQueGxzeA",
+               "courseName":"课程的名称变革1 1 1 ",
+               "startTime":"2017-05-06 12:12:44",
+               "endTime":"2017-05-06 12:12:55",
+               "courseType":"coursetypeaaaaabbbbb",
+               "timeSlotId":23
+             }
+}
+
+返回:
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+
+######删除试讲课接口:
+url:http://101.201.239.116:8080/service/trial/
+method:delete
+参数:
+ {
+        "teacherId": 987654321,
+        "studentId": 1234567113,
+        "courseId": "wqqwwqwqkechengdeid",
+        "courseName": "课程的名称",
+        "startTime": "2017-05-06 12:12:44",
+        "endTime": "2017-05-06 12:12:55",
+        "courseType": "coursetypeaaaaa",
+        "timeSlotId": 1
+ }
+返回:
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
