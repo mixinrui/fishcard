@@ -1,0 +1,57 @@
+#######订单转为服务,答疑工单与规划工单
+url:http://192.168.77.102:8080/com.boxfishedu.order.service/order/services
+method:post
+参数:
+{
+    "id": 418,
+    "createTime": "2016-03-17 19:27:10",
+    "updateTime": "2016-03-17 19:27:10",
+    "userID": 485547,
+    "code": 2016031719271050592,
+    "status": 10,
+    "orderLogs": [
+      {
+        "id": 401,
+        "createTime": "2016-03-17 19:27:10",
+        "updateTime": "2016-03-17 19:27:10",
+        "userID": 485547,
+        "code": 2016031719271050592,
+        "status": 10
+      }
+    ],
+    "orderDetails": [
+      {
+        "id": 758,
+        "createTime": "2016-03-17 19:27:10",
+        "updateTime": "2016-03-17 19:27:10",
+        "productId": 2,
+        "name": "成长计划",
+        "originalPrice": 388,
+        "price": 388,
+        "amount": 1,
+        "description": "初中毕业过高中",
+        "skuDescription": "[{\"id\":33,\"createTime\":\"2016-03-14 17:14:18\",\"updateTime\":\"2016-03-14 17:14:18\",\"productSKU\":{\"id\":1,\"updateTime\":\"2016-03-16 10:51:26\",\"name\":\"超越传统一对一授课\",\"price\":199.00,\"stockNum\":9976,\"validityDay\":30,\"content\":\"星级教师1对1授课，每周1次，每次40min\",\"detailURL\":\"http://www.baidu.com\"},\"amount\":1},{\"id\":34,\"createTime\":\"2016-03-14 17:14:18\",\"updateTime\":\"2016-03-14 17:14:18\",\"productSKU\":{\"id\":2,\"updateTime\":\"2016-03-16 10:51:26\",\"name\":\"随时在线答疑评价\",\"price\":499.00,\"stockNum\":7953,\"validityDay\":30,\"content\":\"星级教师在线答疑。实时点评口语。\",\"detailURL\":\"http://www.baidu.com\"},\"amount\":1},{\"id\":35,\"createTime\":\"2016-03-14 17:14:18\",\"updateTime\":\"2016-03-14 17:14:18\",\"productSKU\":{\"id\":3,\"updateTime\":\"2016-03-16 10:51:26\",\"name\":\"专属学习规划老师\",\"price\":299.00,\"stockNum\":9024,\"validityDay\":30,\"content\":\"为你制定计划、监督学习!\",\"detailURL\":\"http://www.baidu.com\"},\"amount\":120},{\"id\":37,\"createTime\":\"2016-03-14 17:14:18\",\"updateTime\":\"2016-03-14 17:14:18\",\"productSKU\":{\"id\":4,\"updateTime\":\"2016-03-16 10:51:26\",\"name\":\"和欧美外教畅聊口语\",\"price\":399.00,\"stockNum\":9927,\"validityDay\":30,\"content\":\"英美Native Speaker陪你交流，每次15min。\",\"detailURL\":\"http://www.baidu.com\"},\"amount\":12}]"
+      }
+    ]
+  }
+返回结果:
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+#####获取订单的消费情况
+/service/order/{order_id}/info
+method:GET
+例:http://101.201.239.116:8080/service/order/397/info
+返回:
+{
+  "data": {
+    "unusedAmount": 6,
+    "chineseAmount": 7,
+    "foreignAmount": 1
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}

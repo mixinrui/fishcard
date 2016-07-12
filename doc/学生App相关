@@ -1,0 +1,1058 @@
+######选择可用时间列表:
+http://101.201.239.116:8080/service/student/time/available?studentId=1000922&isFree=true&orderId=1323&roleId=3
+返回内容:
+{
+  "data": [
+    {
+      "day": "2016-05-14",
+      "dailyScheduleTime": [
+        {
+          "slotId": 1,
+          "startTime": "08:00:00",
+          "endTime": "09:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 2,
+          "startTime": "09:00:00",
+          "endTime": "10:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 3,
+          "startTime": "10:00:00",
+          "endTime": "11:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 4,
+          "startTime": "11:00:00",
+          "endTime": "12:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 5,
+          "startTime": "12:00:00",
+          "endTime": "13:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 6,
+          "startTime": "13:00:00",
+          "endTime": "14:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 7,
+          "startTime": "14:00:00",
+          "endTime": "15:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 8,
+          "startTime": "15:00:00",
+          "endTime": "16:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 9,
+          "startTime": "16:00:00",
+          "endTime": "17:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 10,
+          "startTime": "17:00:00",
+          "endTime": "18:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 11,
+          "startTime": "18:00:00",
+          "endTime": "19:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 12,
+          "startTime": "19:00:00",
+          "endTime": "20:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 13,
+          "startTime": "20:00:00",
+          "endTime": "21:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 14,
+          "startTime": "21:00:00",
+          "endTime": "22:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        }
+      ]
+    },
+    {
+      "day": "2016-05-15",
+      "dailyScheduleTime": [
+        {
+          "slotId": 1,
+          "startTime": "08:00:00",
+          "endTime": "09:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 2,
+          "startTime": "09:00:00",
+          "endTime": "10:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 3,
+          "startTime": "10:00:00",
+          "endTime": "11:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 4,
+          "startTime": "11:00:00",
+          "endTime": "12:00:00",
+          "selected": true,
+          "status": 1,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 5,
+          "startTime": "12:00:00",
+          "endTime": "13:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 6,
+          "startTime": "13:00:00",
+          "endTime": "14:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 7,
+          "startTime": "14:00:00",
+          "endTime": "15:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 8,
+          "startTime": "15:00:00",
+          "endTime": "16:00:00",
+          "selected": true,
+          "status": 1,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 9,
+          "startTime": "16:00:00",
+          "endTime": "17:00:00",
+          "selected": true,
+          "status": 1,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 10,
+          "startTime": "17:00:00",
+          "endTime": "18:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 11,
+          "startTime": "18:00:00",
+          "endTime": "19:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 12,
+          "startTime": "19:00:00",
+          "endTime": "20:00:00",
+          "selected": true,
+          "status": 1,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 13,
+          "startTime": "20:00:00",
+          "endTime": "21:00:00",
+          "selected": true,
+          "status": 1,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 14,
+          "startTime": "21:00:00",
+          "endTime": "22:00:00",
+          "selected": true,
+          "status": 1,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        }
+      ]
+    },
+    {
+      "day": "2016-05-16",
+      "dailyScheduleTime": [
+        {
+          "slotId": 1,
+          "startTime": "08:00:00",
+          "endTime": "09:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 2,
+          "startTime": "09:00:00",
+          "endTime": "10:00:00",
+          "selected": true,
+          "status": 1,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 3,
+          "startTime": "10:00:00",
+          "endTime": "11:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 4,
+          "startTime": "11:00:00",
+          "endTime": "12:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 5,
+          "startTime": "12:00:00",
+          "endTime": "13:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 6,
+          "startTime": "13:00:00",
+          "endTime": "14:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 7,
+          "startTime": "14:00:00",
+          "endTime": "15:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 8,
+          "startTime": "15:00:00",
+          "endTime": "16:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 9,
+          "startTime": "16:00:00",
+          "endTime": "17:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 10,
+          "startTime": "17:00:00",
+          "endTime": "18:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 11,
+          "startTime": "18:00:00",
+          "endTime": "19:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 12,
+          "startTime": "19:00:00",
+          "endTime": "20:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 13,
+          "startTime": "20:00:00",
+          "endTime": "21:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 14,
+          "startTime": "21:00:00",
+          "endTime": "22:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        }
+      ]
+    },
+    {
+      "day": "2016-05-17",
+      "dailyScheduleTime": [
+        {
+          "slotId": 1,
+          "startTime": "08:00:00",
+          "endTime": "09:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 2,
+          "startTime": "09:00:00",
+          "endTime": "10:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 3,
+          "startTime": "10:00:00",
+          "endTime": "11:00:00",
+          "selected": true,
+          "status": 1,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 4,
+          "startTime": "11:00:00",
+          "endTime": "12:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 5,
+          "startTime": "12:00:00",
+          "endTime": "13:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 6,
+          "startTime": "13:00:00",
+          "endTime": "14:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 7,
+          "startTime": "14:00:00",
+          "endTime": "15:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 8,
+          "startTime": "15:00:00",
+          "endTime": "16:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 9,
+          "startTime": "16:00:00",
+          "endTime": "17:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 10,
+          "startTime": "17:00:00",
+          "endTime": "18:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 11,
+          "startTime": "18:00:00",
+          "endTime": "19:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 12,
+          "startTime": "19:00:00",
+          "endTime": "20:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 13,
+          "startTime": "20:00:00",
+          "endTime": "21:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 14,
+          "startTime": "21:00:00",
+          "endTime": "22:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        }
+      ]
+    },
+    {
+      "day": "2016-05-18",
+      "dailyScheduleTime": [
+        {
+          "slotId": 1,
+          "startTime": "08:00:00",
+          "endTime": "09:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 2,
+          "startTime": "09:00:00",
+          "endTime": "10:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 3,
+          "startTime": "10:00:00",
+          "endTime": "11:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 4,
+          "startTime": "11:00:00",
+          "endTime": "12:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 5,
+          "startTime": "12:00:00",
+          "endTime": "13:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 6,
+          "startTime": "13:00:00",
+          "endTime": "14:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 7,
+          "startTime": "14:00:00",
+          "endTime": "15:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 8,
+          "startTime": "15:00:00",
+          "endTime": "16:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 9,
+          "startTime": "16:00:00",
+          "endTime": "17:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 10,
+          "startTime": "17:00:00",
+          "endTime": "18:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 11,
+          "startTime": "18:00:00",
+          "endTime": "19:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 12,
+          "startTime": "19:00:00",
+          "endTime": "20:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 13,
+          "startTime": "20:00:00",
+          "endTime": "21:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 14,
+          "startTime": "21:00:00",
+          "endTime": "22:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        }
+      ]
+    },
+    {
+      "day": "2016-05-19",
+      "dailyScheduleTime": [
+        {
+          "slotId": 1,
+          "startTime": "08:00:00",
+          "endTime": "09:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 2,
+          "startTime": "09:00:00",
+          "endTime": "10:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 3,
+          "startTime": "10:00:00",
+          "endTime": "11:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 4,
+          "startTime": "11:00:00",
+          "endTime": "12:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 5,
+          "startTime": "12:00:00",
+          "endTime": "13:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 6,
+          "startTime": "13:00:00",
+          "endTime": "14:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 7,
+          "startTime": "14:00:00",
+          "endTime": "15:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 8,
+          "startTime": "15:00:00",
+          "endTime": "16:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 9,
+          "startTime": "16:00:00",
+          "endTime": "17:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 10,
+          "startTime": "17:00:00",
+          "endTime": "18:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 11,
+          "startTime": "18:00:00",
+          "endTime": "19:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 12,
+          "startTime": "19:00:00",
+          "endTime": "20:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 13,
+          "startTime": "20:00:00",
+          "endTime": "21:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 14,
+          "startTime": "21:00:00",
+          "endTime": "22:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        }
+      ]
+    },
+    {
+      "day": "2016-05-20",
+      "dailyScheduleTime": [
+        {
+          "slotId": 1,
+          "startTime": "08:00:00",
+          "endTime": "09:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 2,
+          "startTime": "09:00:00",
+          "endTime": "10:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 3,
+          "startTime": "10:00:00",
+          "endTime": "11:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 4,
+          "startTime": "11:00:00",
+          "endTime": "12:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 5,
+          "startTime": "12:00:00",
+          "endTime": "13:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 6,
+          "startTime": "13:00:00",
+          "endTime": "14:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 7,
+          "startTime": "14:00:00",
+          "endTime": "15:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 8,
+          "startTime": "15:00:00",
+          "endTime": "16:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 9,
+          "startTime": "16:00:00",
+          "endTime": "17:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 10,
+          "startTime": "17:00:00",
+          "endTime": "18:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 11,
+          "startTime": "18:00:00",
+          "endTime": "19:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 12,
+          "startTime": "19:00:00",
+          "endTime": "20:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 13,
+          "startTime": "20:00:00",
+          "endTime": "21:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        },
+        {
+          "slotId": 14,
+          "startTime": "21:00:00",
+          "endTime": "22:00:00",
+          "selected": false,
+          "status": 0,
+          "courseType": null,
+          "workOrderId": null,
+          "courseInfo": null
+        }
+      ]
+    }
+  ],
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+
+##############学生选时间接口:
+url:http://127.0.0.1:8080/service/student/workorders?access_token=2GQRkAffpx
+method:post
+参数:
+{
+    "orderId": 10031723,
+    "selectedTimes": [
+        {
+            "selectedDate": "2016-07-30",
+            "timeSlotId": 1
+        },
+        {
+            "selectedDate": "2016-07-30",
+            "timeSlotId": 2
+        },
+        {
+            "selectedDate": "2016-07-30",
+            "timeSlotId": 3
+        },
+        {
+            "selectedDate": "2016-07-30",
+            "timeSlotId": 4
+        }
+    ],
+    "type": 1
+}
+返回:
+{
+  "data": null,
+  "returnCode": 400,
+  "returnMsg": "无对应服务,请重试"
+}

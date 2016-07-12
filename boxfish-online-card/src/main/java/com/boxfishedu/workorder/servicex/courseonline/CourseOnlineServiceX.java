@@ -75,7 +75,7 @@ public class CourseOnlineServiceX {
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
         CourseSchedule courseSchedule= courseScheduleService.findByWorkOrderId(workOrderId);
         if((status!=FishCardStatusEnum.COMPLETED.getCode())&&(status!=FishCardStatusEnum.COMPLETED_FORCE.getCode())) {
-            courseOnlineService.notAllowUpdateStatus(workOrder);
+            courseOnlineService.notAllowUpdateStatus(workOrder,status);
         }
         if (null == workOrder||null==courseSchedule) {
             String msg="无对应的鱼卡或课程schedule,请确认参数传入是否正确,鱼卡id[" + workOrderId + "]";
@@ -86,9 +86,10 @@ public class CourseOnlineServiceX {
         if(status==FishCardStatusEnum.COMPLETED.getCode()||status==FishCardStatusEnum.COMPLETED_FORCE.getCode()){
             completeCourse(workOrder,courseSchedule, status);
         }
-        //终端目前暂时不会发送学生旷课的状态上报
-        else if(status==FishCardStatusEnum.STUDENT_ABSENT.getCode()){
-            completeCourse(workOrder,courseSchedule, status);
+        //学生旷课
+        else if(status==FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()){
+            workOrderLogService.saveWorkOrderLog(workOrder,FishCardStatusEnum.getDesc(status));
+            completeCourse(workOrder,courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
         }
         //处理早退的情况(定时器不到不应该减去服务)
         else if(status==FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()||status==FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()){

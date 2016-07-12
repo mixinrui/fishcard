@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,15 @@ public class CourseOnlineRequester {
     private RestTemplate restTemplate;
     @Autowired
     private ThreadPoolManager threadPoolManager;
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
     public void releaseGroup(WorkOrder workOrder){
         String url=String.format("%s/teaching/destroy_group?work_order_id=%s",urlConf.getCourse_online_service(),workOrder.getId());
         logger.debug("<<<<<<<<<<<<<@[releaseGroup]向在线教育发起[[[[释放师生关系]]]],url[{}]",url);
         threadPoolManager.execute(new Thread(()->{restTemplate.getForObject(url,Object.class);}));
+        workOrderLogService.saveWorkOrderLog(workOrder,"解散群组关系");
     }
 
     /**
