@@ -109,21 +109,26 @@ public class TeacherAppRelatedServiceX {
         }
 
         Date endDate = workOrder.getEndTime();
+        Date startDate = workOrder.getStartTime();
         Date now = new Date();
 
-        if (workOrder.getStatus() == FishCardStatusEnum.TEACHER_ABSENT.getCode()
+        if (now.before(startDate)) {
+            map.put("valid", FishCardAuthEnum.TOO_EARLY.getCode());
+            map.put("desc", FishCardAuthEnum.TOO_EARLY.getDesc());
+            logger.info("鱼卡:[{}]还未到上课时间的有效范围:", workOrderId);
+        }
+        else if (workOrder.getStatus() == FishCardStatusEnum.TEACHER_ABSENT.getCode()
                 || now.after(endDate)
                 || workOrder.getStatus() == FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
             logger.info("当前鱼卡[{}]课程的状态[{}]不允许上课", workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             map.put("valid", FishCardAuthEnum.TOO_LATE.getCode());
             map.put("desc", FishCardAuthEnum.TOO_LATE.getDesc());
-            return map;
         } else {
             map.put("valid", FishCardAuthEnum.OK.getCode());
             map.put("desc", FishCardAuthEnum.OK.getDesc());
             logger.info("鱼卡:[{}]校验通过:", workOrderId);
-            return map;
         }
+        return map;
     }
 
     private Map<String, Object> tooLateValidation(Map<String, Object> map, WorkOrder workOrder) {
