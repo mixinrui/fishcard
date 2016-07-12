@@ -40,7 +40,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
+
+import static com.boxfishedu.workorder.common.util.DateUtil.*;
 
 /**
  * Created by hucl on 16/3/31.
@@ -344,8 +347,11 @@ public class TimePickerServiceX {
             studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
             TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(courseSchedule.getTimeSlotId());
             if (timeSlot != null) {
-                Date time = DateUtil.merge(courseSchedule.getClassDate(), DateUtil.parseTime(timeSlot.getStartTime()));
-                studentCourseSchedule.setTime(DateUtil.dateFormat1.format(time));
+                // 日期转换
+                LocalDateTime time = merge(
+                        convertLocalDate(courseSchedule.getClassDate()),
+                        parseLocalTime(timeSlot.getStartTime()));
+                studentCourseSchedule.setTime(formatLocalDateTime(time));
             }
             studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()));
             result.add(studentCourseSchedule);

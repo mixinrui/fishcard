@@ -11,12 +11,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Created by LuoLiBing on 16/4/19.
@@ -24,6 +25,8 @@ import java.util.Map;
  */
 @Data
 public class DayTimeSlots implements Cloneable, Serializable {
+
+    private final static long serialVersionUID = 1L;
 
     public final static String CACHE_KEY = "DayTimeSlots";
 
@@ -39,14 +42,12 @@ public class DayTimeSlots implements Cloneable, Serializable {
             return -1;
         }
         try {
-            return df.parse(day).getTime();
+            return new SimpleDateFormat("yyyy-MM-dd").parse(day).getTime();
         } catch (ParseException e) {
             e.printStackTrace();
             return -1;
         }
     }
-
-    private final static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
     public DayTimeSlots(String day) {
         this.day = day;
@@ -163,4 +164,25 @@ public class DayTimeSlots implements Cloneable, Serializable {
     private boolean checkCourseSchedule(CourseSchedule courseSchedule) {
         return courseSchedule != null && DateUtil.simpleDate2String(courseSchedule.getClassDate()).equals(day);
     }
+
+    /**
+     * filter过滤
+     * @param timePredicate
+     * @param dayPredicate
+     * @return
+     */
+    public DayTimeSlots filter(Predicate<DayTimeSlots> dayPredicate, Predicate<TimeSlots> timePredicate) {
+        if(!dayPredicate.test(this)) {
+            return this;
+        }
+        this.dailyScheduleTime = dailyScheduleTime.stream()
+                .filter(timePredicate)
+                .collect(Collectors.toList());
+        return CollectionUtils.isEmpty(this.getDailyScheduleTime()) ? null : this;
+    }
+
+    public DayTimeSlots filter(Predicate<TimeSlots> timePredicate) {
+        return filter((d) -> true, timePredicate);
+    }
+
 }

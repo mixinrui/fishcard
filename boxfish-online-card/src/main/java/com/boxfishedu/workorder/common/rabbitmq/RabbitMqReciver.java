@@ -9,10 +9,7 @@ import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
-import com.boxfishedu.workorder.servicex.timer.CourseScheduleUpdatorServiceX;
-import com.boxfishedu.workorder.servicex.timer.FishCardStatusFinderServiceX;
-import com.boxfishedu.workorder.servicex.timer.FishCardUpdatorServiceX;
-import com.boxfishedu.workorder.servicex.timer.ScheduleTeachersStasticsServiceX;
+import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +40,9 @@ public class RabbitMqReciver {
     private ScheduleTeachersStasticsServiceX scheduleTeachersStasticsServiceX;
     @Autowired
     private FishCardUpdatorServiceX fishCardUpdatorServiceX;
+
+    @Autowired
+    private DailyCourseAssignedServiceX dailyCourseAssignedServiceX;
 
     @Autowired
     private FishCardStatusFinderServiceX fishCardStatusFinderServiceX;
@@ -117,11 +117,11 @@ public class RabbitMqReciver {
             }
             else if(serviceTimerMessage.getType()==TimerMessageType.TEACHER_COURSE_NEW_ASSIGNEDED_DAY.value()){
                 logger.info("@TIMER>>>>>TEACHER_COURSE_NEW_ASSIGNEDED_DAY>>>>检查教师当天新分课程,并发送相关通知消息");
-
+                dailyCourseAssignedServiceX.batchNotifyTeacherAssignedCourse();
             }
         } catch (Exception ex) {
             logger.error("检查教师失败",ex);
-            throw new AmqpRejectAndDontRequeueException("失败", ex);
+//            throw new AmqpRejectAndDontRequeueException("失败", ex);
         }
     }
 
@@ -154,6 +154,11 @@ public class RabbitMqReciver {
     @RabbitListener(queues = RabbitMqConstant.TEACHING_ONLINE_STATUS_QUEUE)
     public void updateWorkOrderStatus(Map<String,Object> map){
         logger.debug("@updateWorkOrderStatus接收来自在线教学组的更新状态请求,参数{}", JacksonUtil.toJSon(map));
-        courseOnlineServiceX.updateTeachingStatus(map);
+        try {
+            courseOnlineServiceX.updateTeachingStatus(map);
+        }
+        catch (Exception ex){
+            logger.error("@updateWorkOrderStatus,消息处理失败");
+        }
     }
 }

@@ -5,6 +5,8 @@ import com.google.common.collect.Lists;
 import lombok.Data;
 import org.apache.commons.lang.time.DateUtils;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,8 +36,9 @@ public class DateRangeForm {
         return DateUtils.isSameDay(from, to);
     }
 
-    public boolean isWithIn(Date date) {
-        return date.getTime() >= from.getTime() && date.getTime() < to.getTime();
+    public boolean isWithIn(LocalDateTime dateTime) {
+        return dateTime.isAfter(LocalDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault()))
+                && dateTime.isBefore(LocalDateTime.ofInstant(to.toInstant(), ZoneId.systemDefault()));
     }
 
     public <K> List<K> collect(Handle<? extends K> handle) throws CloneNotSupportedException {
