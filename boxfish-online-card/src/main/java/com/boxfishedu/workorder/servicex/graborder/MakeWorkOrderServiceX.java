@@ -177,7 +177,7 @@ public class MakeWorkOrderServiceX{
         for(Long key :map.keySet()){
             TeachingOnlineMsg tMsg = new TeachingOnlineMsg();
             tMsg.setUser_id(key);
-            tMsg.setPush_title("待定提醒显示消息内容");
+            tMsg.setPush_title("有学生等待上课,打开app抢先上课");
             teacherMsg.getTeachingOnlineMsg().add(tMsg);
         }
         teacherStudentRequester.pushTeacherListOnlineMsg(teacherMsg);
