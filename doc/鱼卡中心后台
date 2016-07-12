@@ -1,0 +1,154 @@
+#####根据订单id和服务类型获取工单列表
+url:/fishcard/list?page={当前page页，第一页参数为0，依次类推}&size={每页的记录数目}
+如：http://123.56.13.168:8080/backend/fishcard/list?page=0&size=10
+method:GET
+参数说明:
+{
+    "studentId":736986;
+     "orderCode":"";
+     "beginDate":"";
+     "endDate":"";
+     status:10;
+}
+
+参数说明:
+   orderCode:订单编号;选填
+   beginDate:开始日期,格式为:  2014-05-07:选填
+   endDate:结束日期,格式为: 2015-07-08:选填
+   status:
+                  10:"创建";
+                  20: "分配课程";
+                  21: "分配教师";
+                  30, "就绪";
+                  31: "等待学生上课应答";
+                  32, "正在上课";
+                  40, "完成";
+                  50:"异常";
+
+
+#####更换教师接口
+url:http://101.201.239.116:8080/backend/fishcard/teacher
+method:PUT
+参数:
+{
+    "workOrderId": 255,
+    "teacherId": 13,
+    "teacherName": "小李飞刀"
+}
+
+参数说明:
+   workOrderId:鱼卡id,
+   teacherId:新教师的id,
+   teacherName:新教师姓名
+
+返回值:
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+
+--------------------------------------------------------------------------------------------
+#####获取换课的可用时间片:
+url:http://101.201.239.116:8080/backend/makeup/{workorder_id}/slots
+例如:http://101.201.239.116:8080/backend/makeup/6809/slots
+method:GET
+参数说明:
+    workorder_id:鱼卡id
+
+
+#####补课接口
+url:http://101.201.239.116:8080/backend/makeup/modification
+method:POST
+参数:
+{
+    "worOrderId":6808,
+    "timeSlotId":25,
+    "startTime":"2016-06-21 19:00:00",
+    "endTime":"2016-06-21 19:30:00"
+}
+
+参数说明: workOrderId:鱼卡id;  timeSlotId:补课的时间片;   startTime:补课的开始上课时间;   endTime:补课的结束时间
+
+返回值:
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+
+
+######返回提供搜索的所有状态列表
+url:http://101.201.239.116:8080/backend/fishcard/status/list
+method:GET
+
+返回值:
+{
+  "data": {
+    "0": "未知",
+    "10": "创建",
+    "20": "分配课程",
+    "30": "分配教师",
+    "31": "等待学生上课应答",
+    "32": "学生接受上课请求",
+    "33": "就绪",
+    "34": "正在上课",
+    "40": "正常完成",
+    "41": "强制完成",
+    "42": "服务器强制完成",
+    "43": "超出补课期限,强制完成",
+    "50": "教师旷课",
+    "51": "学生旷课",
+    "52": "教师早退",
+    "53": "学生早退",
+    "54": "教师取消请求上课",
+    "55": "退课",
+    "60": "系统异常"
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+##########查看鱼卡的所有状态信息
+url:http://101.201.239.116:8080/backend/fishcard/{card_id}/details
+method:GET
+例如:http://123.56.13.168:8080/backend/fishcard/8227/details?test=true
+参数说明:
+card_id:鱼卡id
+返回值:
+{
+  "data": [
+    {
+      "seqNum": 1,
+      "status": 20,
+      "createTime": "2016-06-15 23:49:33",
+      "workOrderId": 8227,
+      "statusDesc": "分配课程"
+    },
+    {
+      "seqNum": 2,
+      "status": 31,
+      "createTime": "2016-06-15 23:49:33",
+      "workOrderId": 8227,
+      "statusDesc": "等待学生上课应答"
+    },
+    {
+      "seqNum": 3,
+      "status": 54,
+      "createTime": "2016-06-15 23:49:42",
+      "workOrderId": 8227,
+      "statusDesc": "未知"
+    },
+    {
+      "seqNum": 4,
+      "status": 54,
+      "createTime": "2016-06-15 23:49:42",
+      "workOrderId": 8227,
+      "statusDesc": "未知"
+    }
+  ],
+  "returnCode": 200,
+  "returnMsg": "success"
+}

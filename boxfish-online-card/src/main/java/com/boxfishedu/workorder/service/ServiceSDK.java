@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.CourseView;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
@@ -49,6 +50,9 @@ public class ServiceSDK {
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
 
     private final static Logger logger = LoggerFactory.getLogger(ServiceSDK.class);
 
@@ -94,12 +98,13 @@ public class ServiceSDK {
      * @param workOrder
      */
     public void createGroup(WorkOrder workOrder) {
-        logger.info("开始通知在线授课创建组,鱼卡号:[{}]",workOrder.getId());
+        logger.info("@createGroup开始通知在线授课创建组,鱼卡号:[{}]",workOrder.getId());
         Map map = new HashMap<String, Long>(3);
         map.put("studentId", workOrder.getStudentId());
         map.put("teacherId", workOrder.getTeacherId());
         map.put("id", workOrder.getId());
 
+        workOrderLogService.saveWorkOrderLog(workOrder,"创建群组关系");
         //使用mq向小马发送创组请求
         rabbitMqSender.send(map, QueueTypeEnum.CREATE_GROUP);
         logger.info("完成通知在线授课创建组,鱼卡号:[{}]",workOrder.getId());

@@ -87,8 +87,8 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         logger.debug("@query db开始从数据库查询[[[需要强制下课]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
                 ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.ONCLASS.getCode());
         Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.READY.getCode()
-                ,FishCardStatusEnum.ONCLASS.getCode(),FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()
-                ,FishCardStatusEnum.CONNECTED.getCode()};
+                ,FishCardStatusEnum.ONCLASS.getCode(),FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode(),FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()
+                ,FishCardStatusEnum.CONNECTED.getCode(),FishCardStatusEnum.WAITFORSTUDENT.getCode()};
         List<WorkOrder> result= jpa.findByStatusInAndOrderIdLessThanAndEndTimeBetween(statuses,Long.MAX_VALUE, startDate, endDate);
         return result;
     }
@@ -120,7 +120,7 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
                 break;
             }
             case FORCE_COMPLETE_SERVER: {
-                calendar.add(Calendar.SECOND,60*forceCompleteTimeLimit+15*passBeyondNormal);
+                calendar.add(Calendar.SECOND,60*forceCompleteTimeLimit+12*passBeyondNormal);
                 break;
             }
             case NOTIFY_TEACHER_PREPARE_CLASS:{

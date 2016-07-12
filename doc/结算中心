@@ -1,0 +1,16 @@
+1.获取一段时间的统计信息
+http://localhost:8080/balance/fishcard/list?page=0&size=30
+参数:
+{
+    "teacherId":736986,
+     "orderCode":null,
+     "beginDate":null,
+     "endDate":null,
+     "status":20
+}
+参数说明:
+studentId:为学生id,为必填信息
+orderCode:为订单的编号,注意不是订单的id;此为选填信息
+beginDate:开始时间,如果为null则表示结束日期之前所有的信息,此为选填信息
+endDate:结束时间,如果为null则默认为2199年
+status:为选填信息,如果为null表示所有

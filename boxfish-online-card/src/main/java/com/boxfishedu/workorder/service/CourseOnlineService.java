@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,10 @@ public class CourseOnlineService {
     @Autowired
     private WorkOrderLogService workOrderLogService;
 
+    @Autowired
+    private CourseOnlineRequester courseOnlineRequester;
+
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     //通知上课中心,添加学生和答疑老师做好友
@@ -41,7 +46,7 @@ public class CourseOnlineService {
 //        String url=String.format("%s/teaching/add_friends/{source_id}/{target_id}")
     }
 
-    public void notAllowUpdateStatus(WorkOrder workOrder){
+    public void notAllowUpdateStatus(WorkOrder workOrder,Integer newStatus){
         Integer savedStatus=workOrder.getStatus();
         boolean flag=(savedStatus== FishCardStatusEnum.COMPLETED.getCode())
                 ||(savedStatus==FishCardStatusEnum.COMPLETED_FORCE.getCode())
@@ -50,16 +55,21 @@ public class CourseOnlineService {
                 ||(savedStatus==FishCardStatusEnum.STUDENT_ABSENT.getCode());
         if(flag){
             //将接受到的消息加入到mongo中
-            workOrderLogService.saveWorkOrderLog(workOrder,"不能覆盖已有消息:"+FishCardStatusEnum.getDesc(workOrder.getStatus()));
+            workOrderLogService.saveWorkOrderLog(workOrder,"不能覆盖已有消息,新消息:"+FishCardStatusEnum.getDesc(newStatus));
             String tips="@notAllowUpdateStatus当前鱼卡["+workOrder.getId()+"]状态已经处于冻结状态["+FishCardStatusEnum.get(workOrder.getStatus())+"],不允许再做修改!";
             logger.error(tips);
             throw new BusinessException(tips);
         }
     }
 
+    public void notAllowUpdateStatus(WorkOrder workOrder){
+        notAllowUpdateStatus(workOrder,workOrder.getStatus());
+    }
+
     public void handleException(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status){
         workOrder.setStatus(status);
         saveStatus4WorkOrderAndSchedule(workOrder,courseSchedule);
+        courseOnlineRequester.releaseGroup(workOrder);
     }
 
     public void saveStatus4WorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){
