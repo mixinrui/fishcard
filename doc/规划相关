@@ -1,0 +1,191 @@
+####根据订单id获取服务列表
+url:/planner/order/{order_id}/services
+如：http://127.0.0.1:8080/planner/order/208/services
+请求方式：GET
+返回结果：
+{
+  "data": [
+    {
+      "id": 38,
+      "studentId": 48855,
+      "studentName": "虎同学",
+      "orderId": 158,
+      "originalAmount": 15208,
+      "amount": 15208,
+      "startTime": "2016-03-12 12:50:15",
+      "endTime": "2016-04-11 12:50:15",
+      "skuId": 1,
+      "skuName": "在线授课",
+      "validityDay": null,
+      "currDate": null,
+      "createTime": "2016-04-01 15:12:33",
+      "updateTime": "2016-04-02 15:12:38",
+    },
+    {
+      "id": 39,
+      "studentId": 48855,
+      "studentName": "虎同学",
+      "orderId": 158,
+      "originalAmount": 1,
+      "amount": 1,
+      "startTime": "2016-03-12 12:50:15",
+      "endTime": "2016-04-11 12:50:15",
+      "skuId": 3,
+      "skuName": "专属学习规划老师",
+      "validityDay": null,
+      "currDate": null,
+      "createTime": null,
+      "updateTime": null
+    }
+  ],
+  "return_code": "200",
+  "return_msg": "success"
+}
+
+#####根据订单id和服务类型获取工单列表
+url:/planner/order/{order_id}/com.boxfishedu.order.service/{service_type}/workorders?page={当前page页，第一页参数为0，依次类推}&size={每页的记录数目}
+如：http://localhost:8080/planner/order/101/com.boxfishedu.order.service/2/workorders?page=0&size=10
+参数说明：service_type:[1:在线授课  2:在线答疑 3: 课程规划 4: 欧美外教]
+
+返回结果：
+{
+  "data": {
+    "content": [
+      {
+        "id": 36,
+        "createTime": "2016-03-11 16:13:32",
+        "updateTime": null,
+        "orderId": 241,
+        "studentId": 1,
+        "serviceId": 20,
+        "studentName": "小李子",
+        "teacherId": 87,
+        "teacherName": "魏涛",
+        "startTime": "2016-03-10 16:13:08.0",
+        "endTime": "2016-03-12 16:13:11.0",
+        "status": 40,
+        "statusName": "完成",
+        "statusDesc": "完成",
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "courseId": null,
+        "courseName": "单词记忆在线答疑",
+        "com.boxfishedu.order.service": null,
+        "workOrderLogs": null
+      },
+      {
+        "id": 269,
+        "createTime": "2016-03-07 14:16:24",
+        "updateTime": null,
+        "orderId": 101,
+        "studentId": null,
+        "serviceId": 20,
+        "studentName": "",
+        "teacherId": 15,
+        "teacherName": "张答疑老师",
+        "startTime": "2016-03-10 16:13:08.0",
+        "endTime": "2016-04-06 14:16:25.0",
+        "status": 10,
+        "statusName": "已创建",
+        "statusDesc": "创建",
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "courseId": null,
+        "courseName": null,
+        "com.boxfishedu.order.service": null,
+        "workOrderLogs": null
+      }
+    ],
+    "totalElements": 2,
+    "last": true,
+    "totalPages": 1,
+    "size": 20,
+    "number": 0,
+    "sort": null,
+    "first": true,
+    "numberOfElements": 2
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+＃＃＃换课：根据workorder_id获取可用教师列表
+url:/planner/workorder/{workorder_id}/avaliable/teachers?page={当前page页，第一页参数为0，依次类推}}&size={每页的记录数目}
+method:get
+测试用例：http://192.168.77.102:8080/planner/workorder/21/avaliable/teachers?page=0&size=10
+参数说明：如果不加分页信息，默认返回20条记录
+存在的问题：本接口依赖于中外教管理的获取可用师资接口，目前没有和那边做联调，相关数据为假数据
+返回结果：
+{
+  "success": 1,
+  "error_code": null,
+  "error_message": null,
+  "data": [
+    {
+      "roles": null,
+      "times": null,
+      "courses": null,
+      "id": null,
+      "name": null,
+      "boxfish_id": null,
+      "avatar": null,
+      "nickname": null,
+      "gender": null,
+      "birthday": "1988-2-27",
+      "school": "南开中学",
+      "address_id": null,
+      "address": "清华科技园",
+      "telephone1": "52525252",
+      "telephone2": null,
+      "email": "1@1.com",
+      "qq": 1234567,
+      "weixin": "xiaomifeng",
+      "gps_longitude": null,
+      "gps_latitude": null,
+      "baidu_longitude": null,
+      "baidu_latitude": "122.2",
+      "pay_ali": "paid",
+      "pay_weiXin": null,
+      "create_time": "Fri Mar 11 17:05:30 PST 2016",
+      "update_time": null,
+      "identification_type": null,
+      "identification_value": null,
+      "flag_active": null,
+      "service_count": null
+    }
+  ],
+  "total_elements": 1,
+  "page": 0,
+  "size": 0,
+  "total_pages": 1
+}
+
+
+＃＃＃＃＃根据工单号，教师id，教师名称将教师信息更新到work_order表中去
+url:/workorder/{workorder_id}/teacher
+param:{teacherId:10,teacherName:"小张老师"}
+method:put
+测试用例：
+http://192.168.77.102:8080/planner/workorder/26/teacher
+param:{teacherId:10,teacherName:"小张老师"}
+返回：
+{
+  "data": null,
+  "return_code": "200",
+  "return_msg": "success"
+}
+
+＃＃＃＃根据工单号，替换课程
+url:/planner/workorder/courses
+参数:{"ids": [1,2,3,4,.......]}
+method:put
+参数说明:workorder_ids:工单id集合,每个工单id通过逗号分割
+测试用例：
+http://localhost:8080/planner/workorder/courses
+参数:{"ids": [1,2,3,4]}
+返回：
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}

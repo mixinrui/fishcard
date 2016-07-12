@@ -1,0 +1,627 @@
+
+
+＃＃＃换课：根据workorder_id获取可用教师列表
+url:／workorder/modification/teacher/list/{workorder_id}?page={当前page页，第一页参数为0，依次类推}}&size={每页的记录数目}
+method:get
+测试用例：http://192.168.77.102:8080/workorder/modification/teacher/1/?page=0&size=10
+参数说明：如果不加分页信息，默认返回20条记录
+存在的问题：本接口依赖于中外教管理的获取可用师资接口，目前没有和那边做联调，相关数据为假数据
+返回结果：
+{
+  "success": 1,
+  "error_code": null,
+  "error_message": null,
+  "data": [
+    {
+      "roles": null,
+      "times": null,
+      "courses": null,
+      "id": null,
+      "name": null,
+      "boxfish_id": null,
+      "avatar": null,
+      "nickname": null,
+      "gender": null,
+      "birthday": "1988-2-27",
+      "school": "南开中学",
+      "address_id": null,
+      "address": "清华科技园",
+      "telephone1": "52525252",
+      "telephone2": null,
+      "email": "1@1.com",
+      "qq": 1234567,
+      "weixin": "xiaomifeng",
+      "gps_longitude": null,
+      "gps_latitude": null,
+      "baidu_longitude": null,
+      "baidu_latitude": "122.2",
+      "pay_ali": "paid",
+      "pay_weiXin": null,
+      "create_time": "Fri Mar 11 17:05:30 PST 2016",
+      "update_time": null,
+      "identification_type": null,
+      "identification_value": null,
+      "flag_active": null,
+      "service_count": null
+    }
+  ],
+  "total_elements": 1,
+  "page": 0,
+  "size": 0,
+  "total_pages": 1
+}
+
+
+
+
+
+
+#####学生获取老师可用时间列表
+url:/com.boxfishedu.order.service/{service_id}/teacher/times
+method:Get
+参数说明:service_id:服务id
+测试用例:http://192.168.77.102:8080/com.boxfishedu.order.service/1/teacher/times
+返回值说明:count:表示当前的可用老师数量,为0表示没有资源可用
+返回:
+{
+    "data": {
+        "roleId": 94,
+        "days": {
+            "day1": [
+                {
+                    "id": 5263,
+                    "startTime": "08:00:00",
+                    "count": 1,
+                    "endTime": "08:20:00",
+                    "index": 24
+                },
+                {
+                    "id": 5264,
+                    "startTime": "08:20:00",
+                    "count": 1,
+                    "endTime": "08:40:00",
+                    "index": 25
+                },
+                {
+                    "id": 5265,
+                    "startTime": "08:40:00",
+                    "count": 1,
+                    "endTime": "09:00:00",
+                    "index": 26
+                },
+                {
+                    "id": 5266,
+                    "startTime": "09:00:00",
+                    "count": 1,
+                    "endTime": "09:20:00",
+                    "index": 27
+                },
+                {
+                    "id": 5267,
+                    "startTime": "09:20:00",
+                    "count": 1,
+                    "endTime": "09:40:00",
+                    "index": 29
+                },
+                {
+                    "id": 5268,
+                    "startTime": "09:40:00",
+                    "count": 1,
+                    "endTime": "10:00:00",
+                    "index": 30
+                },
+                {
+                    "id": 5269,
+                    "startTime": "10:00:00",
+                    "count": 1,
+                    "endTime": "10:20:00",
+                    "index": 31
+                },
+                {
+                    "id": 5270,
+                    "startTime": "10:20:00",
+                    "count": 1,
+                    "endTime": "10:40:00",
+                    "index": 32
+                },
+                {
+                    "id": 5271,
+                    "startTime": "10:40:00",
+                    "count": 2,
+                    "endTime": "11:00:00",
+                    "index": 33
+                },
+                {
+                    "id": 5272,
+                    "startTime": "11:00:00",
+                    "count": 1,
+                    "endTime": "11:20:00",
+                    "index": 34
+                },
+                {
+                    "id": 5273,
+                    "startTime": "11:20:00",
+                    "count": 2,
+                    "endTime": "11:40:00",
+                    "index": 35
+                },
+                {
+                    "id": 5274,
+                    "startTime": "11:40:00",
+                    "count": 1,
+                    "endTime": "12:00:00",
+                    "index": 36
+                },
+                {
+                    "id": 5275,
+                    "startTime": "12:00:00",
+                    "count": 1,
+                    "endTime": "12:20:00",
+                    "index": 37
+                },
+                {
+                    "id": 5276,
+                    "startTime": "12:20:00",
+                    "count": 1,
+                    "endTime": "12:40:00",
+                    "index": 38
+                },
+                {
+                    "id": 5277,
+                    "startTime": "12:40:00",
+                    "count": 1,
+                    "endTime": "13:00:00",
+                    "index": 39
+                },
+                {
+                    "id": 5278,
+                    "startTime": "13:00:00",
+                    "count": 1,
+                    "endTime": "13:20:00",
+                    "index": 40
+                },
+                {
+                    "id": 5279,
+                    "startTime": "13:20:00",
+                    "count": 1,
+                    "endTime": "13:40:00"
+                },
+                {
+                    "id": 5280,
+                    "startTime": "13:40:00",
+                    "count": 1,
+                    "endTime": "14:00:00"
+                },
+                {
+                    "id": 5281,
+                    "startTime": "14:00:00",
+                    "count": 1,
+                    "endTime": "14:20:00"
+                },
+                {
+                    "id": 5282,
+                    "startTime": "14:20:00",
+                    "count": 1,
+                    "endTime": "14:40:00"
+                },
+                {
+                    "id": 5283,
+                    "startTime": "14:40:00",
+                    "count": 1,
+                    "endTime": "15:00:00"
+                },
+                {
+                    "id": 5284,
+                    "startTime": "15:00:00",
+                    "count": 1,
+                    "endTime": "15:20:00"
+                },
+                {
+                    "id": 5285,
+                    "startTime": "15:20:00",
+                    "count": 1,
+                    "endTime": "15:40:00"
+                },
+                {
+                    "id": 5286,
+                    "startTime": "15:40:00",
+                    "count": 1,
+                    "endTime": "16:00:00"
+                },
+                {
+                    "id": 5287,
+                    "startTime": "16:00:00",
+                    "count": 1,
+                    "endTime": "16:20:00"
+                },
+                {
+                    "id": 5288,
+                    "startTime": "16:20:00",
+                    "count": 1,
+                    "endTime": "16:40:00"
+                },
+                {
+                    "id": 5289,
+                    "startTime": "16:40:00",
+                    "count": 1,
+                    "endTime": "17:00:00"
+                },
+                {
+                    "id": 5290,
+                    "startTime": "17:00:00",
+                    "count": 1,
+                    "endTime": "17:20:00"
+                },
+                {
+                    "id": 5291,
+                    "startTime": "17:20:00",
+                    "count": 1,
+                    "endTime": "17:40:00"
+                },
+                {
+                    "id": 5292,
+                    "startTime": "17:40:00",
+                    "count": 1,
+                    "endTime": "18:00:00"
+                },
+                {
+                    "id": 5293,
+                    "startTime": "18:00:00",
+                    "count": 1,
+                    "endTime": "18:20:00"
+                },
+                {
+                    "id": 5294,
+                    "startTime": "18:20:00",
+                    "count": 1,
+                    "endTime": "18:40:00"
+                },
+                {
+                    "id": 5295,
+                    "startTime": "18:40:00",
+                    "count": 1,
+                    "endTime": "19:00:00"
+                },
+                {
+                    "id": 5296,
+                    "startTime": "19:00:00",
+                    "count": 1,
+                    "endTime": "19:20:00"
+                },
+                {
+                    "id": 5297,
+                    "startTime": "19:20:00",
+                    "count": 1,
+                    "endTime": "19:40:00"
+                },
+                {
+                    "id": 5298,
+                    "startTime": "19:40:00",
+                    "count": 1,
+                    "endTime": "20:00:00"
+                },
+                {
+                    "id": 5299,
+                    "startTime": "20:00:00",
+                    "count": 1,
+                    "endTime": "20:20:00"
+                },
+                {
+                    "id": 5300,
+                    "startTime": "20:20:00",
+                    "count": 1,
+                    "endTime": "20:40:00"
+                },
+                {
+                    "id": 5301,
+                    "startTime": "20:40:00",
+                    "count": 1,
+                    "endTime": "21:00:00"
+                },
+                {
+                    "id": 5302,
+                    "startTime": "21:00:00",
+                    "count": 1,
+                    "endTime": "21:20:00"
+                },
+                {
+                    "id": 5303,
+                    "startTime": "21:20:00",
+                    "count": 1,
+                    "endTime": "21:40:00"
+                },
+                {
+                    "id": 5304,
+                    "startTime": "21:40:00",
+                    "count": 1,
+                    "endTime": "22:00:00"
+                }
+            ]
+            .........
+            "day5": [
+                {
+                    "id": 5487,
+                    "startTime": "08:00:00",
+                    "count": 1,
+                    "endTime": "08:20:00"
+                }
+            ],
+            "day6": [
+                {
+                    "id": 5543,
+                    "startTime": "08:00:00",
+                    "count": 1,
+                    "endTime": "08:20:00"
+                },
+                {
+                    "id": 5544,
+                    "startTime": "08:20:00",
+                    "count": 1,
+                    "endTime": "08:40:00"
+                }
+            ],
+            "day7": [
+                {
+                    "id": 5599,
+                    "startTime": "08:00:00",
+                    "count": 1,
+                    "endTime": "08:20:00"
+                },
+                {
+                    "id": 5600,
+                    "startTime": "08:20:00",
+                    "count": 1,
+                    "endTime": "08:40:00"
+                }
+            ]
+        }
+    },
+    "returnCode": 200,
+    "returnMsg": "success"
+}
+
+########学生选择一个确定的时间片,完成工单的创建
+url: /workorder/student/com.boxfishedu.order.service/{service_id}/date/{selected_date}/time/{time_slot_id}
+method:Post
+参数说明:service_id:服务id;
+        selected_date:学生选定的上课日期
+        time_slot_id:时间片的id
+测试用例:http://192.168.77.102:8080/workorder/student/com.boxfishedu.order.service/31/date/2012-12-12/time/5271
+返回:
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+
+=========================================学生上课流程=========================================
+####查看老师的鱼卡列表
+url:/courseonline/teacher/{teacher_id}/workorders/begin/{start_date}/end/{end_date}
+示例:127.0.0.1:8080/courseonline/teacher/3/workorders/begin/2012-5-10/end/2017-12-12?page=0&size=20
+参数说明:start_date:开始日期,不能包含是分秒;end_date:结束日期,不能包含是分秒;
+返回:
+{
+  "data": {
+    "content": [
+      {
+        "id": 219,
+        "orderId": 158,
+        "studentId": 1,
+        "studentName": "小李子",
+        "teacherId": 3,
+        "teacherName": "李政道",
+        "startTime": "2016-03-11 01:00:33",
+        "endTime": "2016-03-20 00:00:37",
+        "status": 30,
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "createTime": "2016-03-12 01:00:46",
+        "courseId": 3,
+        "courseName": "我在国外的生活",
+        "updateTime": null,
+        "workOrderLogs": []
+      },
+      {
+        "id": 154,
+        "orderId": 101,
+        "studentId": 1,
+        "studentName": "小李子",
+        "teacherId": 3,
+        "teacherName": "李政道",
+        "startTime": "2016-03-11 01:00:33",
+        "endTime": "2016-03-20 00:00:37",
+        "status": 30,
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "createTime": "2016-03-12 01:00:46",
+        "courseId": 3,
+        "courseName": "我在国外的生活",
+        "updateTime": null,
+        "workOrderLogs": []
+      },
+      {
+        "id": 159,
+        "orderId": 101,
+        "studentId": 1,
+        "studentName": "小李子",
+        "teacherId": 3,
+        "teacherName": "李政道",
+        "startTime": "2016-03-11 01:00:33",
+        "endTime": "2016-03-20 00:00:37",
+        "status": 30,
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "createTime": "2016-03-12 01:00:46",
+        "courseId": 3,
+        "courseName": "我在国外的生活",
+        "updateTime": null,
+        "workOrderLogs": []
+      },
+      {
+        "id": 164,
+        "orderId": 101,
+        "studentId": 1,
+        "studentName": "小李子",
+        "teacherId": 3,
+        "teacherName": "李政道",
+        "startTime": "2016-03-11 01:00:33",
+        "endTime": "2016-03-20 00:00:37",
+        "status": 30,
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "createTime": "2016-03-12 01:00:46",
+        "courseId": 3,
+        "courseName": "我在国外的生活",
+        "updateTime": null,
+        "workOrderLogs": []
+      },
+      {
+        "id": 169,
+        "orderId": 101,
+        "studentId": 1,
+        "studentName": "小李子",
+        "teacherId": 3,
+        "teacherName": "李政道",
+        "startTime": "2016-03-11 01:00:33",
+        "endTime": "2016-03-20 00:00:37",
+        "status": 30,
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "createTime": "2016-03-12 01:00:46",
+        "courseId": 3,
+        "courseName": "我在国外的生活",
+        "updateTime": null,
+        "workOrderLogs": []
+      },
+      {
+        "id": 81,
+        "orderId": 101,
+        "studentId": 1,
+        "studentName": "小李子",
+        "teacherId": 3,
+        "teacherName": "李政道",
+        "startTime": "2016-03-11 01:00:33",
+        "endTime": "2016-03-20 00:00:37",
+        "status": 30,
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "createTime": "2016-03-12 01:00:46",
+        "courseId": 3,
+        "courseName": "我在国外的生活",
+        "updateTime": null,
+        "workOrderLogs": []
+      },
+      {
+        "id": 86,
+        "orderId": 101,
+        "studentId": 1,
+        "studentName": "小李子",
+        "teacherId": 3,
+        "teacherName": "李政道",
+        "startTime": "2016-03-11 01:00:33",
+        "endTime": "2016-03-20 00:00:37",
+        "status": 30,
+        "evaluationToTeacher": null,
+        "evaluationToStudent": null,
+        "createTime": "2016-03-12 01:00:46",
+        "courseId": 3,
+        "courseName": "我在国外的生活",
+        "updateTime": null,
+        "workOrderLogs": []
+      }
+    ],
+    "totalElements": 30,
+    "last": false,
+    "totalPages": 2,
+    "size": 20,
+    "number": 0,
+    "numberOfElements": 20,
+    "sort": null,
+    "first": true
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+#######选择鱼卡后,返回鱼卡详细信息
+url:/workorder/{workorder_id}
+method:GET
+示例:127.0.0.1:8080/workorder/26
+返回:
+{
+  "data": {
+    "id": 26,
+    "createTime": "2016-03-09 16:58:53.0",
+    "updateTime": null,
+    "orderId": 158,
+    "studentId": 1,
+    "serviceId": null,
+    "studentName": "小李子",
+    "teacherId": 1,
+    "teacherName": "易中天",
+    "startTime": "2016-03-10 16:52:11.0",
+    "endTime": "2016-03-11 16:52:15.0",
+    "status": 10,
+    "statusDesc": null,
+    "evaluationToTeacher": "",
+    "evaluationToStudent": null,
+    "courseId": 1,
+    "courseName": "三国英语说",
+    "com.boxfishedu.order.service": null,
+    "workOrderLogs": null
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+#######老师请求上课,校验工单是否有效,如果在上课时间开始的前后[20]分钟开始,则表示不合法
+url:/courseonline/workorder/{workorder_id}/teacher/class
+method:POST
+示例:127.0.0.1:8080/courseonline/workorder/26/teacher/class
+#返回:校验失败
+{
+  "data": {
+    "valid": "false",
+    "desc": "预计上课时间为[2016-03-10 04:52:11],您的上课时间不应该延迟超过[20]分钟"
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+#返回:校验成功
+{
+  "data": {
+    "valid": "true",
+    "desc": null
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+########更新workorder的状态[成功]
+url:/courseonline/workorder/{workorder_id}/status/{status}
+method:put
+示例:127.0.0.1:8080/courseonline/workorder/26/status/40
+参数说明:
+老师等待学生上课状态值:31
+老师和学生正在上课:32
+上课结束成功的参数是:40
+返回:
+{
+     "data": null,
+     "returnCode": 200,
+     "returnMsg": "success"
+}
+
+########更新workorder的状态[异常情况]
+url:/courseonline/workorder/{workorder_id}/status/{status}/desc/{exception_desc}
+method:put
+参数说明:异常的参数是:50     异常描述:为用户的异常描述信息
+示例:127.0.0.1:8080/courseonline/workorder/26/status/50
+返回:
+{
+  "data": null,
+  "returnCode": 200,
+  "returnMsg": "success"
+}

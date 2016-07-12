@@ -80,13 +80,6 @@ public class FishCardModifyServiceX {
             throw new BusinessException("无对应的记录,请检查所传参数是否合法");
         }
 
-        WorkOrder oldWorkOrder = new WorkOrder();
-        try {
-            BeanUtils.copyProperties(oldWorkOrder, workOrder);
-        } catch (Exception ex) {
-            logger.error("复制鱼卡出错");
-        }
-
         //对workorder和courseschedule做控制
         workOrder.setTeacherId(teacherChangeParam.getTeacherId());
         workOrder.setTeacherName(teacherChangeParam.getTeacherName());

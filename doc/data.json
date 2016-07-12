@@ -1,0 +1,23 @@
+{
+  "id": 167,
+  "code": 2016031516402008300,
+  "status": 10,
+  "user_id": 485547,
+  "total_price": 388,
+  "create_time": "2016-03-15 16:40:20",
+  "order_channel": 10,
+  "order_details": [
+    {
+      "id": 539,
+      "name": "成长计划",
+      "price": 388,
+      "amount": 1,
+      "description": "初中毕业过高中",
+      "create_time": "2016-03-15 16:02:15",
+      "update_time": "2016-03-15 16:02:15",
+      "product_id": 2,
+      "original_price": 388,
+      "sku_description": "[{\"id\":32,\"amount\":8,\"create_time\":\"2016-03-14 17:14:18\",\"update_time\":\"2016-03-14 17:14:18\",\"product_sku\":{\"id\":4,\"name\":\"和欧美外教畅聊口语\",\"price\":399.00,\"content\":\"英美Native Speaker陪你交流，每次15min。\",\"update_time\":\"2016-03-16 10:51:26\",\"stock_num\":9967,\"validity_day\":30,\"detail_url\":\"http://www.baidu.com\"}},{\"id\":31,\"amount\":120,\"create_time\":\"2016-03-14 17:14:18\",\"update_time\":\"2016-03-14 17:14:18\",\"product_sku\":{\"id\":3,\"name\":\"专属学习规划老师\",\"price\":299.00,\"content\":\"为你制定计划、监督学习!\",\"update_time\":\"2016-03-16 10:51:26\",\"stock_num\":9624,\"validity_day\":30,\"detail_url\":\"http://www.baidu.com\"}},{\"id\":30,\"amount\":1,\"create_time\":\"2016-03-14 17:14:18\",\"update_time\":\"2016-03-14 17:14:18\",\"product_sku\":{\"id\":2,\"name\":\"随时在线答疑评价\",\"price\":499.00,\"content\":\"星级教师在线答疑。实时点评口语。\",\"update_time\":\"2016-03-16 10:51:26\",\"stock_num\":7958,\"validity_day\":30,\"detail_url\":\"http://www.baidu.com\"}},{\"id\":29,\"amount\":1,\"create_time\":\"2016-03-14 17:14:18\",\"update_time\":\"2016-03-14 17:14:18\",\"product_sku\":{\"id\":1,\"name\":\"超越传统一对一授课\",\"price\":199.00,\"content\":\"星级教师1对1授课，每周1次，每次40min\",\"update_time\":\"2016-03-16 10:51:26\",\"stock_num\":9981,\"validity_day\":30,\"detail_url\":\"http://www.baidu.com\"}}]"
+    }
+  ]
+}
