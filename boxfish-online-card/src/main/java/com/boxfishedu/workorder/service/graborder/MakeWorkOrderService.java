@@ -76,6 +76,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
                 wg.setCreateTime(new Date());
                 wg.setStartTime(wo.getStartTime());
                 wg.setWorkorderId(wo.getId());
+                wograb.add(wg);
             }
         }
 
@@ -91,7 +92,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
      */
     public List<WorkOrderGrab>   getGrabDataBeforeDay(){
         //今天的  00:00:00
-        Date date = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-1),0);
+        Date date = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),0),0);
         return  workOrderGrabJpaRepository.findByCreateTimeLessThan(new Date());
     }
 

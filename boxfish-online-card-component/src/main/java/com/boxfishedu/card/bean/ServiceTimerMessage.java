@@ -1,4 +1,4 @@
-package com.boxfishedu.card.bean;
+ package com.boxfishedu.card.bean;
 
 import lombok.Data;
 

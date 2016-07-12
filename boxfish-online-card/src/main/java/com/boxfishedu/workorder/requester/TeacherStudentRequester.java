@@ -224,28 +224,35 @@ public class TeacherStudentRequester {
      *  向在线教育push教师消息数据
      */
     public void pushTeacherListOnlineMsg(List teachingOnlineListMsg){
-        String url=String.format("%s/teaching/callback/push",
-                urlConf.getCourse_online_service());
+        String url=String.format("%s/teaching/callback/push", urlConf.getCourse_online_service());
+        //String url=String.format("http://123.56.13.168:9090/teaching/callback/push", urlConf.getCourse_online_service());
         logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起获取教师列表url[{}]",url);
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);}));
+        restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);
+        //JsonResultModel jsonResultModel = restTemplate.postForObject(url, teachingOnlineListMsg,JsonResultModel.class);
     }
 
 
 
     /**
      *  http调用师生运营 获取 教师列表
-     *  teacherType  teacher类型   {ct:1,wt:1}   需要中教 和  外教    0  表示不需要
+     *  teacherType  teacher类型   {chineseTeacher}/{foreignTeacher}    demo:  true/false
      */
-    public List<TeacherForm> pullTeacherListMsg(String teacherType){
+    public List pullTeacherListMsg(String teacherType){
         String url=String.format("%s/seckillteacher/query/%s",
-                urlConf.getTeacher_service(),teacherType);
-        logger.debug("<<<<<<<<<<<<<@[pullTeacherListMsg]向师生运营发起获取教师列表url[{}]",url);
+               urlConf.getTeacher_service(),teacherType);
+//        String url=String.format("http://192.168.77.186:8099/seckillteacher/demo/query/%s",
+//                teacherType);
+//        String url=String.format("http://192.168.77.186:8099/seckillteacher/query/true/false",
+//                teacherType);
+
+        logger.info("<<<<<<<<<<<<<@[pullTeacherListMsg]向师生运营发起获取教师列表url[{}]",url);
 
         JsonResultModel jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
-        Map beanMap = (Map) jsonResultModel.getData();
-//        return (Long) beanMap.get("day");
+        List  teacherList = (List) jsonResultModel.getData();
+        logger.info("<<<<<<<<<<<<<@[pullTeacherListMsg]向师生运营发起获取教师列表长度size[{}]",teacherList==null?0:teacherList.size());
 
-        return  null;
+        return  teacherList;
 
     }
 }

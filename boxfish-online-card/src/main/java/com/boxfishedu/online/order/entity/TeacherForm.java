@@ -11,6 +11,6 @@ public class TeacherForm {
 
     private  Long teacherId;
 
-    private String teacherType;
+    private int teacherType;
 
 }
