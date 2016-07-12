@@ -128,7 +128,7 @@ public class NotifyTimer {
         logger.info("<<<<<<开始通知<<<轮训抢单初始化数据>>>的消息,时间[{}]", DateUtil.date2SimpleDate(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
-        rabbitMqSender.send(serviceTimerMessage);
+        rabbitMqSender.sendGrabOrder(serviceTimerMessage);
     }
 
 
@@ -140,7 +140,7 @@ public class NotifyTimer {
         logger.info("<<<<<<开始通知<<<清理昨天抢单历史数据>>>的消息,时间[{}]", DateUtil.date2SimpleDate(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
-        rabbitMqSender.send(serviceTimerMessage);
+        rabbitMqSender.sendGrabOrder(serviceTimerMessage);
     }
 
 }

@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Date;
 import java.util.List;
 
+import java.util.Date;
+import java.util.List;
+
 
 /**
  * Created by jiaozijun on 16/7/11.
@@ -22,5 +25,11 @@ public interface WorkOrderGrabJpaRepository extends JpaRepository<WorkOrderGrab,
     @Modifying
     @Query("update WorkOrderGrab o set o.flag = '1' , o.teacherId = ?1 where o.workorderId = ?2")
     int setFlagAndTeacherId(Long teacherId , Long workorderId);
+
+    // 获取今天之前的数据
+    public List<WorkOrderGrab> findByLessThan(Date date);
+
+    // 删除今天之前的数据
+    public int deleteByLessThan(Date date);
 
 }
