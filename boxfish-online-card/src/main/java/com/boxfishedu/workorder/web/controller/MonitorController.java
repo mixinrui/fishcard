@@ -73,7 +73,7 @@ public class MonitorController {
 
     @RequestMapping(value = "/exception", method = RequestMethod.GET)
     public void exception() throws Exception {
-       throw new Exception("hahahhhahhsa");
+        throw new Exception("hahahhhahhsa");
     }
 
     @RequestMapping(value = "/delay", method = RequestMethod.GET)
@@ -83,15 +83,16 @@ public class MonitorController {
     }
 
     @RequestMapping(value = "/order/{order_id}/{status}", method = RequestMethod.POST)
-    public void updateOrderStatus(@PathVariable("order_id") Long orderId,@PathVariable("status") Integer status){
-        for(int i=0;i<20;i++) {
+    public void updateOrderStatus(@PathVariable("order_id") Long orderId, @PathVariable("status") Integer status) {
+        for (int i = 0; i < 20; i++) {
             serveService.notifyOrderUpdateStatus(orderId, status);
         }
     }
 
     @RequestMapping(value = "/card/daily/assign", method = RequestMethod.GET)
-    public JsonResultModel dailyAssignNotidy(){
-        return JsonResultModel.newJsonResultModel(dailyCourseAssignedServiceX.getCardAssignedDaily());
+    public JsonResultModel dailyAssignNotidy() {
+        dailyCourseAssignedServiceX.batchNotifyTeacherAssignedCourse();
+        return JsonResultModel.newJsonResultModel("ok");
     }
 
     public static void main(String[] args) throws Exception {

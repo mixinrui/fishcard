@@ -4,13 +4,17 @@ import com.boxfishedu.workorder.common.bean.TeachingNotificationEnum;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 /**
  * Created by hucl on 16/6/17.
@@ -49,9 +53,12 @@ public class CourseOnlineRequester {
      * 发送封装好的消息
      */
     public void pushWrappedMsg(TeachingOnlineMsg teachingOnlineMsg){
-        String url=String.format("%s/teaching/callback/push?user_id=%s&push_title=%s",
-                urlConf.getCourse_online_service(),teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title());
-        logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起通知操作,[[[[通知用户[{}]推送消息[{}]]]]],url[{}]",url,teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title());
-        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,null,Object.class);}));
+        List<TeachingOnlineMsg> requestBody= Lists.newArrayList();
+        requestBody.add(teachingOnlineMsg);
+        String url=String.format("%s/teaching/callback/push",
+                urlConf.getCourse_online_service());
+        logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起通知操作,[[[[通知用户[{}]推送消息[{}]]]]],url[{}],内容:{}",url,
+                teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title(), JacksonUtil.toJSon(requestBody));
+        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,requestBody,Object.class);}));
     }
 }

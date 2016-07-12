@@ -4,6 +4,8 @@ import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.timer.DailyCourseAssignedService;
 import com.boxfishedu.workorder.web.view.fishcard.TeacherAssignedCourseView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +22,10 @@ public class DailyCourseAssignedServiceX {
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
 
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
+
     public void batchNotifyTeacherAssignedCourse(){
+        logger.info("@batchNotifyTeacherAssignedCourse,向师生运营发起当天新匹配课程信息消息推送");
         this.notifyTeachingOnline(getCardAssignedDaily());
     }
 
