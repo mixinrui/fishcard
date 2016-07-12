@@ -146,8 +146,7 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     }
 
     public Page<CourseSchedule> findFinishCourseSchedulePage(Long userId, Pageable pageable) {
-        return courseScheduleRepository.findByStudentIdAndStatus(
-                userId, FishCardStatusEnum.COMPLETED.getCode(), pageable);
+        return courseScheduleRepository.findFinishCourseScheduleByStudentId(userId, pageable);
     }
 
     public Page<CourseSchedule> findUnfinishCourseSchedulePage(Long userId, Pageable pageable) {

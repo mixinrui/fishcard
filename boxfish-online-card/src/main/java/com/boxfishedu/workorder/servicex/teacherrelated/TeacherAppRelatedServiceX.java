@@ -298,11 +298,12 @@ public class TeacherAppRelatedServiceX {
         filterInternationalDayTimeSlots(dayTimeSlotsList, getInternationalDateTimeRange(date));
 
         // 历史日期时间片过滤
-        dayTimeSlotsList = dayTimeSlotsList.parallelStream().map( dayTimeSLots-> dayTimeSLots.filter(
-                d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
-                t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()
-        )).collect(Collectors.toList());
-
+        dayTimeSlotsList = dayTimeSlotsList.parallelStream()
+                .map( dayTimeSLots-> dayTimeSLots.filter(
+                    d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                    t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()))
+                .filter(d -> d != null)
+                .collect(Collectors.toList());
 
         List<CourseSchedule> courseScheduleList = courseScheduleService.findByTeacherIdAndClassDateBetween(
                 teacherId, getInternationalDateRange(date));

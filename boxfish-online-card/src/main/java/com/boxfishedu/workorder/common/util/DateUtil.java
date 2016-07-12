@@ -66,7 +66,7 @@ public class DateUtil {
     }
 
     public static LocalDate convertLocalDate(Date date) {
-        return LocalDate.from(date.toInstant());
+        return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     public static LocalDate parseLocalDate(String date) {

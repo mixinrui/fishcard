@@ -98,9 +98,6 @@ public class FishCardModifyServiceX {
         //更新新的教师到workorder和courseschedule,此处做事务控制
         workOrderService.updateWorkOrderAndSchedule(workOrder, courseSchedule);
 
-        //通知小马解散老群组
-        courseOnlineRequester.releaseGroup(oldWorkOrder);
-
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
 
