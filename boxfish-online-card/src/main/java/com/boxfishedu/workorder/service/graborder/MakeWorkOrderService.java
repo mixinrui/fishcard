@@ -1,10 +1,12 @@
 package com.boxfishedu.workorder.service.graborder;
 
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderGrabHistoryJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderGrabJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
+import com.boxfishedu.workorder.entity.mysql.WorkOrderGrabHistory;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -33,6 +35,8 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
     @Autowired
     private WorkOrderGrabJpaRepository workOrderGrabJpaRepository;
 
+    @Autowired
+    private WorkOrderGrabHistoryJpaRepository workOrderGrabHistoryJpaRepository;
 
     /**
      * 获取未来两天内 为匹配教师的鱼卡信息
@@ -81,9 +85,24 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
     }
 
 
-    @Transactional
-    public void clearGrabData(){
-        workOrderGrabJpaRepository.findByLessThan(new Date());
+    /**
+     * 获取今天之前的数据
+     * @return
+     */
+    public List<WorkOrderGrab>   getGrabDataBeforeDay(){
+        //今天的  00:00:00
+        Date date = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-1),0);
+        return  workOrderGrabJpaRepository.findByCreateTimeLessThan(new Date());
+    }
+
+    public void  deleteGrabData(List<WorkOrderGrab> list){
+        logger.info("删除grab数据");
+        workOrderGrabJpaRepository.delete(list);
+    }
+
+    public void initGrabOrderHistory(List<WorkOrderGrabHistory> list){
+        logger.info("新增grabHistory数据");
+        workOrderGrabHistoryJpaRepository.save(list);
     }
 
 

@@ -186,6 +186,7 @@ public class RabbitMqReciver {
             //定时查询教师不够的情况
             else if(serviceTimerMessage.getType()== TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value()){
                 logger.info("=========>清理抢单数据");
+                makeWorkOrderServiceX.clearGrabData();
 
             }
 

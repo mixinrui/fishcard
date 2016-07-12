@@ -237,12 +237,12 @@ public class TeacherStudentRequester {
      *  teacherType  teacher类型   {ct:1,wt:1}   需要中教 和  外教    0  表示不需要
      */
     public List<TeacherForm> pullTeacherListMsg(String teacherType){
-        String url=String.format("%s/teaching/callback/push?teacherType=%s",
-                urlConf.getCourse_online_service(),teacherType);
+        String url=String.format("%s/seckillteacher/query/%s",
+                urlConf.getTeacher_service(),teacherType);
         logger.debug("<<<<<<<<<<<<<@[pullTeacherListMsg]向师生运营发起获取教师列表url[{}]",url);
 
         JsonResultModel jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
-//        Map beanMap = (Map) jsonResultModel.getData();
+        Map beanMap = (Map) jsonResultModel.getData();
 //        return (Long) beanMap.get("day");
 
         return  null;

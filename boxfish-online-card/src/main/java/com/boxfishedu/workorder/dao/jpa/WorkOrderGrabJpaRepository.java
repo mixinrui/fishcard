@@ -13,8 +13,6 @@ import java.util.List;
 public interface WorkOrderGrabJpaRepository extends JpaRepository<WorkOrderGrab, Long> {
 
     // 获取今天之前的数据
-    public List<WorkOrderGrab> findByLessThan(Date date);
+    public List<WorkOrderGrab> findByCreateTimeLessThan(Date date);
 
-    // 删除今天之前的数据
-    public int deleteByLessThan(Date date);
 }

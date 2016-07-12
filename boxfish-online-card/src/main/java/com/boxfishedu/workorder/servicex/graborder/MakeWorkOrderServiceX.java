@@ -5,12 +5,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
+import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineListMsg;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
+import com.boxfishedu.workorder.entity.mysql.WorkOrderGrabHistory;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
@@ -21,8 +24,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -105,21 +110,19 @@ public class MakeWorkOrderServiceX{
      * @return
      */
     public String foreighAndChinesTeahcer( List<WorkOrder> workOrderNOteacher){
-        int chineseTeacherNum = 0;
-        int foreignTeahcerNum = 0;
+        boolean chineseTeacherflag =false;
+        boolean foreignTeahcerflag =false;
         for (WorkOrder wo: workOrderNOteacher){
             if(CourseTypeEnum.TALK.equals(wo.getCourseType())){
-                foreignTeahcerNum+=1;
+                foreignTeahcerflag =true;
             }else {
-                chineseTeacherNum+=1;
+                chineseTeacherflag = true;
             }
-            if(chineseTeacherNum>0 && foreignTeahcerNum >0)
+            if(foreignTeahcerflag  && chineseTeacherflag)
                 break;
         }
-        JSONObject json =new JSONObject();
-        json.put("chineseTeacherNum",chineseTeacherNum);
-        json.put("foreignTeahcerNum",foreignTeahcerNum);
-        return json.toJSONString();
+
+        return  chineseTeacherflag+"/"+foreignTeahcerflag;
     }
 
 
@@ -180,7 +183,7 @@ public class MakeWorkOrderServiceX{
         for(Long key :map.keySet()){
             Map map1 = Maps.newHashMap();
             map1.put("user_id",key);
-            map1.put("type",WorkOrderConstant.SEND_GRAB_ORDER_TYPE);
+            map1.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE);
             map1.put("push_title",WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE);
             list.add(map1);
         }
@@ -191,8 +194,29 @@ public class MakeWorkOrderServiceX{
     /**
      * 每天 17:40 清理前一天的数据进历史表
      */
+    @Transactional
     public void clearGrabData(){
 
+        List<WorkOrderGrab> workOrderGrabList = makeWorkOrderService.getGrabDataBeforeDay();
+        if(null!=workOrderGrabList && workOrderGrabList.size()>0){
+            // 1 组装 抢单鱼卡数据 到 历史数据中
+            List<WorkOrderGrabHistory> workOrderGrabHistoryList = Lists.newArrayList();
+            for(WorkOrderGrab wg : workOrderGrabList){
+                WorkOrderGrabHistory wgh = new WorkOrderGrabHistory();
+                wgh.setWorkorderId(wg.getWorkorderId());
+                wgh.setTeacherId(wg.getTeacherId());
+                wgh.setUpdateTime(wg.getUpdateTime());
+                wgh.setCreateTime(wg.getCreateTime());
+                wgh.setStartTime(wg.getStartTime());
+                wgh.setRealCreateTime(new Date());
+                workOrderGrabHistoryList.add(wgh);
+            }
+
+            // 2 删除数据
+            makeWorkOrderService.deleteGrabData(workOrderGrabList);
+            // 3 新增数据
+            makeWorkOrderService.initGrabOrderHistory(workOrderGrabHistoryList);
+        }
     }
 
 
