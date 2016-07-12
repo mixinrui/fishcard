@@ -323,7 +323,9 @@ interface:
   address:
     teacher_service: http://online-api.boxfish.cn/teacher
 #    course_recommended_service: http://base.boxfish.cn/recommend/core
-    course_recommended_service: http://114.55.40.98:8001/recommend/core
+#    course_recommended_service: http://114.55.40.98:8001/recommend/core
+
+    course_recommended_service: http://base.boxfish.cn/recommend/core
     fishcard_service: http://online-api.boxfish.cn/fishcard
     order_service: http://online-api.boxfish.cn/order
     course_online_service: http://online-api.boxfish.cn/teaching-service

@@ -37,7 +37,7 @@ public class FishCardModifyController {
     }
 
     @RequestMapping(value = "/courses/order", method = RequestMethod.PUT)
-    public JsonResultModel changerderCourses(@RequestBody CourseChangeParam courseChangeParam) {
+    public JsonResultModel changeOrderCourses(@RequestBody CourseChangeParam courseChangeParam) {
         fishCardModifyServiceX.changerderCourses(courseChangeParam.getStudentId());
         return JsonResultModel.newJsonResultModel("ok");
     }

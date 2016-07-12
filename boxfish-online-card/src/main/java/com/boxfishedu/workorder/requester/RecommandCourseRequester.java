@@ -32,11 +32,8 @@ public class RecommandCourseRequester {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
-    /****
-     * TODO:注释数据========
-     */
     public RecommandCourseView getRecommandCourse(WorkOrder workOrder, Integer index) {
-        String url = String.format("%s/online/user_id/%s/index/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), index);
+        String url = String.format("%s/online/%s/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), index);
         logger.debug("@<-<-<-<-<-<-向推荐课发起获取推荐课的请求,url:[{}]", url);
         RecommandCourseView recommandCourseView = null;
         try {
@@ -50,6 +47,19 @@ public class RecommandCourseRequester {
             throw new BusinessException("获取推荐课程失败:" + ex.getMessage());
         }
         return recommandCourseView;
+    }
+
+    /**
+     * 取消课程信息
+     */
+    public void cancelOldRecommandCourse(WorkOrder workOrder) {
+        String url = String.format("%s/cancel/%s/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), workOrder.getCourseId());
+        logger.debug("@<-<-<-<-<-<-向推荐课发起取消课程的请求,url:[{}]", url);
+        try {
+            Object object = restTemplate.postForObject(url, null, Object.class);
+        } catch (Exception ex) {
+            logger.error("!!!!!!!!!!!!!!向推荐课发起取消请求失败[{}]", ex.getMessage(), ex);
+        }
     }
 
     public String getThumbNailPath(RecommandCourseView courseView) {
