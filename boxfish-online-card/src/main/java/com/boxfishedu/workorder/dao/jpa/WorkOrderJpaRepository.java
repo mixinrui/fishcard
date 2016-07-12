@@ -93,6 +93,6 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     // 抢单之后,给课程匹配相应的老师
     @Modifying
     @Query("update WorkOrder o set o.teacherId = ?1 where o.id = ?2")
-    int setTeacherId(Long teacherId , Long workorderId);
+    int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId);
 
 }

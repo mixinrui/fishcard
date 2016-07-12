@@ -10,6 +10,6 @@ public class GrabOrderView {
 
     private Long teacherId;
 
-    private Long fishcardId;
+    private Long workOrderId;
 
 }
