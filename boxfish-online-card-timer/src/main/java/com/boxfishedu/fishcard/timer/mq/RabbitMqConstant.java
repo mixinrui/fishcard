@@ -16,4 +16,7 @@ public class RabbitMqConstant {
     //订单转换为服务和工单时候
     public static final String UNASSIGNED_TEACHER_TIMER_QUEUE="boxfish.fishcard.unsignedteacher.timer.queue";
     public static final String UNASSIGNED_TEACHER_REPLY_TIMER_QUEUE="boxfish.fishcard.unsignedteacher.timer.reply.queue";
+
+    //抢单队列
+    public static final String GRAB_WORKER_ORDER_TIME_QUEUE= "boxfish.fishcard.graborder.timer.queue";
 }

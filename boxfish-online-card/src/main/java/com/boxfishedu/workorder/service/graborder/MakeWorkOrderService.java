@@ -81,6 +81,13 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
     }
 
 
+    @Transactional
+    public void clearGrabData(){
+        workOrderGrabJpaRepository.findByLessThan(new Date());
+    }
+
+
+
 
 
 }

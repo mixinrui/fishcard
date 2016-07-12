@@ -180,11 +180,19 @@ public class MakeWorkOrderServiceX{
         for(Long key :map.keySet()){
             Map map1 = Maps.newHashMap();
             map1.put("user_id",key);
-            map1.put("push_type",WorkOrderConstant.SEND_GRAB_ORDER_TYPE);
+            map1.put("type",WorkOrderConstant.SEND_GRAB_ORDER_TYPE);
             map1.put("push_title",WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE);
             list.add(map1);
         }
         teacherStudentRequester.pushTeacherListOnlineMsg(list);
+    }
+
+
+    /**
+     * 每天 17:40 清理前一天的数据进历史表
+     */
+    public void clearGrabData(){
+
     }
 
 

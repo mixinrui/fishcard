@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
+import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -46,6 +47,10 @@ public class RabbitMqReciver {
 
     @Autowired
     private FishCardStatusFinderServiceX fishCardStatusFinderServiceX;
+
+    // 抢单服务层
+    @Autowired
+    private MakeWorkOrderServiceX makeWorkOrderServiceX;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -161,4 +166,33 @@ public class RabbitMqReciver {
             logger.error("@updateWorkOrderStatus,消息处理失败");
         }
     }
+
+    /**
+     * 抢单监听
+     *     1 初始化数据 生成能够抢单的工单
+     *     2 清理数据   每天清理一次
+     * @param serviceTimerMessage
+     * @throws Exception
+     */
+    @RabbitListener(queues = RabbitMqConstant.GRAB_WORKER_ORDER_TIME_QUEUE)
+    public void timerGrabOrder(ServiceTimerMessage serviceTimerMessage) throws Exception {
+        try {
+            logger.info("@TIMER->->->->->->->接收来自定时器的消息(抢单),参数:{},", JacksonUtil.toJSon(serviceTimerMessage));
+            if(serviceTimerMessage.getType()== TimerMessageType.GRAB_ORDER_DATA_INIT.value()) {
+                logger.info("=========>初始化抢单数据");
+                makeWorkOrderServiceX.makeSendWorkOrder();
+
+            }
+            //定时查询教师不够的情况
+            else if(serviceTimerMessage.getType()== TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value()){
+                logger.info("=========>清理抢单数据");
+
+            }
+
+        } catch (Exception ex) {
+            logger.error("检查抢单数据失败",ex);
+//            throw new AmqpRejectAndDontRequeueException("失败", ex);
+        }
+    }
+
 }

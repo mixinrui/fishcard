@@ -73,5 +73,7 @@ public class RabbitMqConstant {
     public static final String DELAY__NOTIFY_TEACHER_PREPARE_QUEUE="boxfish.delay.notify.teacher.prepare.queue";
     //通知上课准备处理
     public static final String DELAY_NOTIFY_TEACHER_PREPARE_DEALER_QUEUE="boxfish.delay.notify.teacher.prepare.dealer.queue";
+    //通知抢单
+    public static final String GRAB_WORKER_ORDER_TIME_QUEUE= "boxfish.fishcard.graborder.timer.queue";
 
 }
