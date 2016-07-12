@@ -69,7 +69,6 @@ public class CourseOnlineService {
     public void handleException(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status){
         workOrder.setStatus(status);
         saveStatus4WorkOrderAndSchedule(workOrder,courseSchedule);
-        workOrderLogService.saveWorkOrderLog(workOrder,"师生上报消息不足一分钟,设置为系统异常");
         courseOnlineRequester.releaseGroup(workOrder);
     }
 

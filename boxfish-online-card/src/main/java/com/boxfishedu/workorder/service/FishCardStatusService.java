@@ -120,7 +120,7 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
                 break;
             }
             case FORCE_COMPLETE_SERVER: {
-                calendar.add(Calendar.SECOND,60*forceCompleteTimeLimit+15*passBeyondNormal);
+                calendar.add(Calendar.SECOND,60*forceCompleteTimeLimit+12*passBeyondNormal);
                 break;
             }
             case NOTIFY_TEACHER_PREPARE_CLASS:{

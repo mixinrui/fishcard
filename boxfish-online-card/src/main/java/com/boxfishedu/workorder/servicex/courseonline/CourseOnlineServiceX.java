@@ -177,6 +177,7 @@ public class CourseOnlineServiceX {
         long timeDiff=new Date().getTime()-workOrder.getUpdateTime().getTime();
         //如果相差1,并且上报时间差小于3分钟
         if((Math.abs(diff)==1)&&(timeDiff/1000<180)){
+            workOrderLogService.saveWorkOrderLog(workOrder,"师生上报消息不足一分钟,设置为系统异常");
             courseOnlineService.handleException(workOrder,courseSchedule,status);
             logger.info("@handleLeaveEarly双方都上报异常情况,将鱼卡[{}]标记为[系统异常]", JacksonUtil.toJSon(workOrder));
             return;
