@@ -245,13 +245,13 @@ public class TeacherStudentRequester {
 //                teacherType);
 //        String url=String.format("http://192.168.77.186:8099/seckillteacher/query/true/false",
 //                teacherType);
-
+        logger.info("<<<<<<<<<<begin_pullTeacherListMsg");
         logger.info("<<<<<<<<<<<<<@[pullTeacherListMsg]向师生运营发起获取教师列表url[{}]",url);
 
         JsonResultModel jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
         List  teacherList = (List) jsonResultModel.getData();
         logger.info("<<<<<<<<<<<<<@[pullTeacherListMsg]向师生运营发起获取教师列表长度size[{}]",teacherList==null?0:teacherList.size());
-
+        logger.info("<<<<<<<<<<end_pullTeacherListMsg");
         return  teacherList;
 
     }

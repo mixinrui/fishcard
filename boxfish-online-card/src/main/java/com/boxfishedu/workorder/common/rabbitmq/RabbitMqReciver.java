@@ -117,12 +117,14 @@ public class RabbitMqReciver {
                 logger.info("@TIMER>>>>>TEACHER_COURSE_NEW_ASSIGNEDED_DAY>>>>检查教师当天新分课程,并发送相关通知消息");
                 dailyCourseAssignedServiceX.batchNotifyTeacherAssignedCourse();
             } else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT.value()) {
+                logger.info("=========>getGRAB_ORDER_DATA_INIT90message");
                 logger.info("=========>初始化抢单数据");
                 makeWorkOrderServiceX.makeSendWorkOrder();
 
             }
             //定时查询教师不够的情况
             else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value()) {
+                logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY100message");
                 logger.info("=========>清理抢单数据");
                 makeWorkOrderServiceX.clearGrabData();
 

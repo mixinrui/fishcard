@@ -123,8 +123,10 @@ public class NotifyTimer {
     /**
      * 抢单: 每天18点到 24点  每10分钟 轮训查询
      */
-   @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+//   @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+    @Scheduled(cron = "0 0/10 13,14,15,16,17,18,19,20,21,22,23 * * ?")
     public void initGrabOrderData() {
+        logger.info("<<<<<<graborder-initGrabOrderData<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<轮训抢单初始化数据>>>的消息,时间[{}]", DateUtil.date2SimpleDate(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
@@ -137,6 +139,7 @@ public class NotifyTimer {
      */
     @Scheduled(cron = "0 40 17 * * ?")
     public void clearGrabOrderData() {
+        logger.info("<<<<<<graborder-clearGrabOrderData<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<清理昨天抢单历史数据>>>的消息,时间[{}]", DateUtil.date2SimpleDate(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));

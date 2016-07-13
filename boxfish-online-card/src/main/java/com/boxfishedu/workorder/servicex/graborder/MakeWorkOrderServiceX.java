@@ -61,6 +61,7 @@ public class MakeWorkOrderServiceX {
      * 组合发送的鱼卡
      */
     public void makeSendWorkOrder() {
+        logger.info("--------------begin-------makeSendWorkOrder------------------");
         logger.info("开始定时轮训 生成需要匹配教师的鱼卡");
 
 
@@ -76,6 +77,7 @@ public class MakeWorkOrderServiceX {
         List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher));
 
         if (null == teacherForms || teacherForms.size() < 0) {
+            logger.info("thereisNOteacherList");
             logger.info("没有查询到符合条件的教师列表");
             return;
         }
@@ -101,7 +103,7 @@ public class MakeWorkOrderServiceX {
         // 7 向在线运营发送老师数据(能够获取抢单的老师名单)
         pushTeacherList(map);
 
-
+        logger.info("--------------end-------makeSendWorkOrder------------------");
         logger.info("结束定时轮训 生成需要匹配教师的鱼卡");
     }
 
@@ -223,9 +225,13 @@ public class MakeWorkOrderServiceX {
         for (Long key : map.keySet()) {
             Map map1 = Maps.newHashMap();
             map1.put("user_id", key);
-            map1.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE);
             map1.put("push_title", WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE);
-            map1.put("count", null == map.get(key) ? 0 : map.get(key).size());
+
+            JSONObject  jo = new JSONObject();
+            jo.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE);
+            jo.put("count", null == map.get(key) ? 0 : map.get(key).size());
+            map1.put("data",jo);
+
             list.add(map1);
         }
         teacherStudentRequester.pushTeacherListOnlineMsg(list);
@@ -259,6 +265,5 @@ public class MakeWorkOrderServiceX {
             makeWorkOrderService.initGrabOrderHistory(workOrderGrabHistoryList);
         }
     }
-
 
 }
