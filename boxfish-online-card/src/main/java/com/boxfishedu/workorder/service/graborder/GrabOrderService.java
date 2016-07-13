@@ -36,8 +36,8 @@ public class GrabOrderService extends BaseService<WorkOrderGrab, WorkOrderGrabJp
      * 根据teacherId获取鱼卡列表
      * @return
      */
-    public List<WorkOrderGrab> findByTeacherIdAndFlagAndStartTimeGreaterThan(WorkOrderGrab workOrderGrab){
-        return workOrderGrabJpaRepository.findByTeacherIdAndFlagAndStartTimeGreaterThan(workOrderGrab.getTeacherId(),workOrderGrab.getFlag(),new Date());
+    public List<WorkOrderGrab> findByTeacherId(WorkOrderGrab workOrderGrab){
+        return workOrderGrabJpaRepository.findByTeacherId(workOrderGrab.getTeacherId());
     }
 
     /**

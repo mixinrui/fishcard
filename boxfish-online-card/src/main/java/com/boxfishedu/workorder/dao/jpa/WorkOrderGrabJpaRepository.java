@@ -17,7 +17,7 @@ import java.util.List;
 public interface WorkOrderGrabJpaRepository extends JpaRepository<WorkOrderGrab, Long> {
 
     // 根据教师id,flag查询该老师可以抢的鱼卡信息
-    public List<WorkOrderGrab> findByTeacherIdAndFlagAndStartTimeGreaterThan(Long teacherId, String flag, Date date);
+    public List<WorkOrderGrab> findByTeacherId(Long teacherId);
 
     // 抢单之后,给课程匹配相应的老师,并且标记flag为1表示抢单-------------成功
     @Modifying

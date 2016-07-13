@@ -81,8 +81,7 @@ public class GrabOrderServiceX {
     private List<WorkOrderGrab> getFromMySql(Long teacherId){
         WorkOrderGrab workOrderGrab = new WorkOrderGrab();
         workOrderGrab.setTeacherId(teacherId);
-        workOrderGrab.setFlag("0");
-        return grabOrderService.findByTeacherIdAndFlagAndStartTimeGreaterThan(workOrderGrab);
+        return grabOrderService.findByTeacherId(workOrderGrab);
     }
 
     private List<WorkOrder> filterListByStartTime(List<WorkOrder> list){
@@ -110,17 +109,25 @@ public class GrabOrderServiceX {
     public JsonResultModel grabOrderByOneTeacher(GrabOrderView grabOrderView){
         JSONObject jsonObject = new JSONObject();
         if(!checkIfCanGrabOrderByOnlineTeacher(grabOrderView)||!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
+            grabOrderService.setFlagFailAndTeacherId(grabOrderView);
             jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
             jsonObject.put("code","0");
         }else{
-            grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
             WorkOrder workOrder = grabOrderService.findByIdForUpdate(grabOrderView.getWorkOrderId());
             if(workOrder!=null){
-                grabOrderService.setTeacherIdByWorkOrderId(grabOrderView);
+                if(compareDate(workOrder.getStartTime())){
+                    grabOrderService.setFlagFailAndTeacherId(grabOrderView);
+                    jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
+                    jsonObject.put("code","0");
+                    logger.info("::::::::::::::::::单子已过期,抢单失败::::::::::::::::::");
+                }else{
+                    grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
+                    grabOrderService.setTeacherIdByWorkOrderId(grabOrderView);
+                    jsonObject.put("msg",WorkOrderConstant.GRABORDER_SUCCESS);
+                    jsonObject.put("code","1");
+                    logger.info("::::::::::::::::::成功抢单::::::::::::::::::");
+                }
             }
-            jsonObject.put("msg",WorkOrderConstant.GRABORDER_SUCCESS);
-            jsonObject.put("code","1");
-            logger.info("::::::::::::::::::成功抢单::::::::::::::::::");
         }
         return JsonResultModel.newJsonResultModel(jsonObject);
     }
@@ -130,7 +137,6 @@ public class GrabOrderServiceX {
         if(workOrder!=null){
             if(workOrder.getTeacherId()!=null&&workOrder.getTeacherId()>0){    //该课程已经被其他老师抢了
                 logger.info("::::::::::::::::::OnlineFishcard验证----不能抢::::::::::::::::::");
-                grabOrderService.setFlagFailAndTeacherId(grabOrderView);
                 return false;
             }else{
                 logger.info("::::::::::::::::::OnlineFishcard验证----能抢::::::::::::::::::");
@@ -150,7 +156,6 @@ public class GrabOrderServiceX {
             return true;
         }else{
             logger.info("::::::::::::::::::OnlineTeacher验证----不能抢::::::::::::::::::");
-            grabOrderService.setFlagFailAndTeacherId(grabOrderView);
             return false;
         }
     }
