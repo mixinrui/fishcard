@@ -76,6 +76,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
                 wg.setCreateTime(new Date());
                 wg.setStartTime(wo.getStartTime());
                 wg.setWorkorderId(wo.getId());
+                wg.setFlag("0");
                 wograb.add(wg);
             }
         }

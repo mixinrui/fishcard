@@ -88,6 +88,7 @@ public class MakeWorkOrderServiceX {
         Map<Long, List<WorkOrder>> map = Maps.newConcurrentMap();
         map = getTeacherWorkOrderList(map, workOrderNOteacher, workOrderYESteacher, teacherForms);
 
+        logger.info("pipei_fishcard_map",map==null?0:map.size());
 
         // 5 把缓存数据放入redis
 
