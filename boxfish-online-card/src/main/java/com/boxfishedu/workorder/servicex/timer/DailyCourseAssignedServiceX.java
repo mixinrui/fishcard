@@ -40,7 +40,12 @@ public class DailyCourseAssignedServiceX {
             TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();
             teachingOnlineMsg.setPush_title("您今天有"+teacherAssignedCourseView.getCount()+"节新匹配的课程,详情请点击课表查看");
             teachingOnlineMsg.setUser_id(teacherAssignedCourseView.getTeacherId());
-            teachingOnlineMsg.setType(MessagePushTypeEnum.NEW_COURSES_ASSIGNED_DAILY.toString());
+
+            TeachingOnlineMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach=new TeachingOnlineMsg.TeachingOnlineMsgAttach();
+            teachingOnlineMsgAttach.setType(MessagePushTypeEnum.NEW_COURSES_ASSIGNED_DAILY.toString());
+
+            teachingOnlineMsg.setData(teachingOnlineMsgAttach);
+
             courseOnlineRequester.pushWrappedMsg(teachingOnlineMsg);
         });
     }
