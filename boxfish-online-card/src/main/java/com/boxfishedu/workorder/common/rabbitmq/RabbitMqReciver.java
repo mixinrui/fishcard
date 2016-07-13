@@ -63,9 +63,8 @@ public class RabbitMqReciver {
         logger.info("@orderConsumer");
         try {
             serveService.order2ServiceAndWorkOrder(orderView);
-        }
-        catch (Exception ex){
-            logger.error("订单[{}]转换失败",orderView.getId());
+        } catch (Exception ex) {
+            logger.error("订单[{}]转换失败", orderView.getId());
             throw new Exception("转换失败放回队列");
         }
 //        logger.info("收到来自订单中心的转换请求,订单id:[{}]",orderView.getId());
@@ -77,74 +76,78 @@ public class RabbitMqReciver {
 
 
     /**
-     *定时器消息监听
+     * 定时器消息监听
      */
     @RabbitListener(queues = RabbitMqConstant.UNASSIGNED_TEACHER_TIMER_QUEUE)
     public void timerMessageListener(ServiceTimerMessage serviceTimerMessage) throws Exception {
         try {
             logger.info("@TIMER->->->->->->->接收来自定时器的消息,参数:{},", JacksonUtil.toJSon(serviceTimerMessage));
-            if(serviceTimerMessage.getType()== TimerMessageType.TEACHER_ASSIGN_NOTIFY.value()) {
+            if (serviceTimerMessage.getType() == TimerMessageType.TEACHER_ASSIGN_NOTIFY.value()) {
                 logger.info("批量更新教师入库开始");
                 courseScheduleUpdatorServiceX.bathUpdateTeacherIntoSchedule();
-                ServiceTimerMessage result=new ServiceTimerMessage();
+                ServiceTimerMessage result = new ServiceTimerMessage();
                 result.setType(TimerMessageType.TEACHER_ASSIGN_NOTIFY_REPLY.value());
                 result.setStatus(0);
                 result.setBody(null);
-                Date date=new Date();
-                ServiceTimerMessage replay=new ServiceTimerMessage();
+                Date date = new Date();
+                ServiceTimerMessage replay = new ServiceTimerMessage();
                 replay.setTime(DateUtil.Date2String(new Date()));
                 replay.setType(TimerMessageType.TEACHER_ASSIGN_NOTIFY_REPLY.value());
                 rabbitMqSender.send(replay, QueueTypeEnum.ASSIGN_TEACHER_TIMER_REPLY);
             }
             //定时查询教师不够的情况
-            else if(serviceTimerMessage.getType()== TimerMessageType.TEACHER_OUT_NUM_NOTIFY.value()){
+            else if (serviceTimerMessage.getType() == TimerMessageType.TEACHER_OUT_NUM_NOTIFY.value()) {
                 logger.info("@TIMER>>>>QUERY_UNASSIGNED>>>检查教师的分配情况开始");
                 scheduleTeachersStasticsServiceX.teacherNumAlter(serviceTimerMessage);
-            }
-            else if(serviceTimerMessage.getType()==TimerMessageType.TEACHER_ABSENT_QUERY_NOTIFY.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.TEACHER_ABSENT_QUERY_NOTIFY.value()) {
                 logger.info("@TIMER>>>>>TEACHER_ABSENT>>>>>检查教师旷课情况开始");
                 fishCardStatusFinderServiceX.teacherAbsentFinder();
-            }
-            else if(serviceTimerMessage.getType()==TimerMessageType.STUDENT_ABSENT_QUERY_NOTIFY.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.STUDENT_ABSENT_QUERY_NOTIFY.value()) {
                 logger.info("@TIMER>>>>>STUDENT_ABSENT>>>>>>检查学生旷课情况开始");
                 fishCardStatusFinderServiceX.studentAbsentFinder();
-            }
-            else if(serviceTimerMessage.getType()==TimerMessageType.COMPLETE_FORCE_SERVER_NOTIFY.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.COMPLETE_FORCE_SERVER_NOTIFY.value()) {
                 logger.info("@TIMER>>>>>SERVER_FORCE_COMPLETED>>>>>检查服务端强制下课情况开始");
                 fishCardStatusFinderServiceX.forceCompleteFinder();
-            }
-            else if(serviceTimerMessage.getType()==TimerMessageType.TEACHER_PREPARE_CLASS_NOTIFY.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.TEACHER_PREPARE_CLASS_NOTIFY.value()) {
                 logger.info("@TIMER>>>>>TEACHER_PREPARE>>>>检查提醒教师准备上课的情况");
                 fishCardStatusFinderServiceX.teacherPrepareClassFinder();
-            }
-            else if(serviceTimerMessage.getType()==TimerMessageType.STUDENT_NOT_MAKEUP_NOTIFY.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.STUDENT_NOT_MAKEUP_NOTIFY.value()) {
                 logger.info("@TIMER>>>>>STUDENT_NOT_MAKEUP_NOTIFY>>>>检查学生超期未补课的情况");
-            }
-            else if(serviceTimerMessage.getType()==TimerMessageType.TEACHER_COURSE_NEW_ASSIGNEDED_DAY.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.TEACHER_COURSE_NEW_ASSIGNEDED_DAY.value()) {
                 logger.info("@TIMER>>>>>TEACHER_COURSE_NEW_ASSIGNEDED_DAY>>>>检查教师当天新分课程,并发送相关通知消息");
                 dailyCourseAssignedServiceX.batchNotifyTeacherAssignedCourse();
+            } else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT.value()) {
+                logger.info("=========>初始化抢单数据");
+                makeWorkOrderServiceX.makeSendWorkOrder();
+
+            }
+            //定时查询教师不够的情况
+            else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value()) {
+                logger.info("=========>清理抢单数据");
+                makeWorkOrderServiceX.clearGrabData();
+
             }
         } catch (Exception ex) {
-            logger.error("检查教师失败",ex);
+            logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);
         }
     }
 
     /**
-     *师生运营组发送的教师分配情况
+     * 师生运营组发送的教师分配情况
      */
     @RabbitListener(queues = RabbitMqConstant.ASSIGNED_TEACHER_REPLY_QUEUE)
     public void assignTeacher(Map data) {
-        if(data == null) {
+        if (data == null) {
             return;
         }
 
         logger.info("@assignTeacher接收分配老师Message:{},", JacksonUtil.toJSon(data));
-        data.forEach( (courseScheduleId, bean) -> {
+        data.forEach((courseScheduleId, bean) -> {
             TeacherView teacherView = new TeacherView();
             Map<String, Object> beanMap = (Map<String, Object>) bean;
 
-            if(!beanMap.get("teacherId").toString().equals("0")) {
+            if (!beanMap.get("teacherId").toString().equals("0")) {
                 logger.debug("发送群组添加请求给教学组:{}学生加老师{}", beanMap.get("studentId"), beanMap.get("teacherId"));
                 teacherView.setTeacherId(Long.valueOf(beanMap.get("teacherId").toString()));
                 teacherView.setTeacherName((String) beanMap.get("teacherName"));
@@ -157,41 +160,41 @@ public class RabbitMqReciver {
      * 小马更新状态
      */
     @RabbitListener(queues = RabbitMqConstant.TEACHING_ONLINE_STATUS_QUEUE)
-    public void updateWorkOrderStatus(Map<String,Object> map){
+    public void updateWorkOrderStatus(Map<String, Object> map) {
         logger.debug("@updateWorkOrderStatus接收来自在线教学组的更新状态请求,参数{}", JacksonUtil.toJSon(map));
         try {
             courseOnlineServiceX.updateTeachingStatus(map);
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             logger.error("@updateWorkOrderStatus,消息处理失败");
         }
     }
 
     /**
      * 抢单监听
-     *     1 初始化数据 生成能够抢单的工单
-     *     2 清理数据   每天清理一次
+     * 1 初始化数据 生成能够抢单的工单
+     * 2 清理数据   每天清理一次
+     *
      * @param serviceTimerMessage
      * @throws Exception
      */
-    @RabbitListener(queues = RabbitMqConstant.GRAB_WORKER_ORDER_TIME_QUEUE)
+    //@RabbitListener(queues = RabbitMqConstant.GRAB_WORKER_ORDER_TIME_QUEUE)
     public void timerGrabOrder(ServiceTimerMessage serviceTimerMessage) throws Exception {
         try {
             logger.info("@TIMER->->->->->->->接收来自定时器的消息(抢单),参数:{},", JacksonUtil.toJSon(serviceTimerMessage));
-            if(serviceTimerMessage.getType()== TimerMessageType.GRAB_ORDER_DATA_INIT.value()) {
+            if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT.value()) {
                 logger.info("=========>初始化抢单数据");
                 makeWorkOrderServiceX.makeSendWorkOrder();
 
             }
             //定时查询教师不够的情况
-            else if(serviceTimerMessage.getType()== TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value()){
+            else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value()) {
                 logger.info("=========>清理抢单数据");
                 makeWorkOrderServiceX.clearGrabData();
 
             }
 
         } catch (Exception ex) {
-            logger.error("检查抢单数据失败",ex);
+            logger.error("检查抢单数据失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);
         }
     }

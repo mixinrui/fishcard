@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +54,7 @@ public class MakeWorkOrderServiceX{
 
     // send to redis
     //cacheManager.getCache(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO).put(userName.trim(), json.toJSONString());
+
 
 
     /**
@@ -169,8 +171,16 @@ public class MakeWorkOrderServiceX{
      */
     public List getTeacherList(String parameter){
         // 获取教师列表
-        teacherStudentRequester.pullTeacherListMsg(parameter);
-        return null;
+        //teacherStudentRequester.pullTeacherListMsg(parameter);
+
+        // 等师生运营 提供真正接口
+        List list = Lists.newArrayList();
+        for(int i=0 ;i<50;i++){
+            TeacherForm teacherForm = new TeacherForm();
+            teacherForm.setTeacherId(323L+i);
+            list.add(teacherForm);
+        }
+        return list;
     }
 
 
@@ -185,6 +195,7 @@ public class MakeWorkOrderServiceX{
             map1.put("user_id",key);
             map1.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE);
             map1.put("push_title",WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE);
+            map1.put("count",null==map.get(key)?0: map.get(key).size());
             list.add(map1);
         }
         teacherStudentRequester.pushTeacherListOnlineMsg(list);

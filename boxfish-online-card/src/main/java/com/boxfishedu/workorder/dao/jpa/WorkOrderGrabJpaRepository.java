@@ -30,7 +30,7 @@ public interface WorkOrderGrabJpaRepository extends JpaRepository<WorkOrderGrab,
     public List<WorkOrderGrab> findByCreateTimeLessThan(Date date);
 
 
-    // 删除今天之前的数据
-    public int deleteByLessThan(Date date);
+//    // 删除今天之前的数据
+//    public int deleteByCreateTimeLessThan(Date date);
 
 }

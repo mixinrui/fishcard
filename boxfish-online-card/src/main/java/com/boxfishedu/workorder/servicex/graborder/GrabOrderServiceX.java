@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -27,6 +28,7 @@ import java.util.*;
 /**
  * Created by mk on 16/7/12.
  */
+@Component
 public class GrabOrderServiceX {
 
     //本地异常日志记录对象
