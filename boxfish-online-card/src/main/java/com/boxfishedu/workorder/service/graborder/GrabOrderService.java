@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service.graborder;
 
 import com.boxfishedu.workorder.dao.jpa.WorkOrderGrabJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.web.view.fishcard.GrabOrderView;
@@ -40,18 +41,30 @@ public class GrabOrderService extends BaseService<WorkOrderGrab, WorkOrderGrabJp
     }
 
     /**
-     * 抢单更新workordergrab 中的teacherId
+     * 抢单更新workordergrab 中的teacherId    ------------抢单成功
      * @return
      */
-    public int setFlagAndTeacherId(GrabOrderView grabOrderView){
-        return workOrderGrabJpaRepository.setFlagAndTeacherId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId());
+    public int setFlagSuccessAndTeacherId(GrabOrderView grabOrderView){
+        return workOrderGrabJpaRepository.setFlagSuccessAndTeacherId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId());
     }
 
     /**
-     * 抢单更新workorder 中的teacherId
+     * 抢单更新workorder 中的teacherId         ------抢单成功之后,更新work_order中的teacherId
      * @return
      */
     public int setTeacherIdByWorkOrderId(GrabOrderView grabOrderView){
         return workOrderJpaRepository.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId());
+    }
+
+    /**
+     * 抢单更新workordergrab 中的teacherId    ------------抢单失败
+     * @return
+     */
+    public int setFlagFailAndTeacherId(GrabOrderView grabOrderView){
+        return workOrderGrabJpaRepository.setFlagFailAndTeacherId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId());
+    }
+
+    public WorkOrder findByIdForUpdate(Long workorderId){
+        return workOrderJpaRepository.findByIdForUpdate(workorderId);
     }
 }
