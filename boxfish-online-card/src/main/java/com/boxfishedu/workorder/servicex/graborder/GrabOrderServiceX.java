@@ -154,7 +154,7 @@ public class GrabOrderServiceX {
     private boolean checkIfCanGrabOrderByOnlineTeacher(GrabOrderView grabOrderView) throws BoxfishException {
         Map<String,Object> mapParams = this.makeParams(grabOrderView);
 //      String url = "http://192.168.77.210:8099/order/course/schedule/add/order/time";   //TODO
-        String url=String.format("%s/order/course/schedule/add/order/time%s", urlConf.getTeacher_service());
+        String url=String.format("%s/order/course/schedule/add/order/time", urlConf.getTeacher_service());
         JsonResultModel jsonResultModel=restTemplate.postForObject(url,mapParams,JsonResultModel.class);
         if(jsonResultModel.getReturnCode()== HttpStatus.OK.value()){
             logger.info("::::::::::::::::::OnlineTeacher验证----能抢(returnCode==200)::::::::::::::::::");
