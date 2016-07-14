@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.RecommandedCourseService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,9 @@ public class RecommandCourseRequester {
 
     @Autowired
     private ThreadPoolManager threadPoolManager;
+
+    @Autowired
+    private RecommandedCourseService recommandedCourseService;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -68,7 +72,7 @@ public class RecommandCourseRequester {
 
 
     public RecommandCourseView getRecommandCourse(WorkOrder workOrder) {
-        return getRecommandCourse(workOrder, workOrder.getSeqNum());
+        return getRecommandCourse(workOrder, recommandedCourseService.getCourseIndex(workOrder));
     }
 
     public RecommandCourseView getRecommandCourse___________mock(WorkOrder workOrder, Integer index) {

@@ -109,15 +109,17 @@ public class FishCardUpdatorServiceX {
         if (null == courseSchedule) {
             throw new BusinessException("无对应的courseschedule,鱼卡[{" + fishCardDelayMessage.getId() + "}]");
         }
-        courseOnlineService.notAllowUpdateStatus(workOrder);
-        workOrder.setIsCourseOver((short)1);
         if (!workOrder.getStatus().equals(fishCardDelayMessage.getStatus())) {
             logger.info("鱼卡:[{}]的已经处理过,无需做强制下课处理,当前状态:[{}]",
                     workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             return;
         }
+        
+        courseOnlineService.notAllowUpdateStatus(workOrder);
+        workOrder.setIsCourseOver((short)1);
+
         //处于正在上课,标记为服务器强制完成
-        else if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.ONCLASS.getCode()) {
+        if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.ONCLASS.getCode()) {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
                     FishCardStatusEnum.getDesc(FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode()));
             courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode());

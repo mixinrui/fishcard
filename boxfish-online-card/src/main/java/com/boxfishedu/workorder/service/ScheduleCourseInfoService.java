@@ -127,7 +127,9 @@ public class ScheduleCourseInfoService {
         updateOperations.set("courseId", mewScheduleCourseInfo.getCourseId());
         updateOperations.set("name", mewScheduleCourseInfo.getName());
         updateOperations.set("courseType", mewScheduleCourseInfo.getCourseType());
-        updateOperations.set("difficulty", mewScheduleCourseInfo.getDifficulty());
+        if(null!=mewScheduleCourseInfo.getDifficulty()) {
+            updateOperations.set("difficulty", mewScheduleCourseInfo.getDifficulty());
+        }
         updateOperations.set("thumbnail", mewScheduleCourseInfo.getThumbnail());
         UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
         if (updateResults.getUpdatedCount() < 1) {
