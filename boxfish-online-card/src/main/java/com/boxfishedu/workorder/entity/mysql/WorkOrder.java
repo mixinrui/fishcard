@@ -135,6 +135,9 @@ public class WorkOrder{
     @Column(name="make_up_flag")
     private Short makeUpFlag;
 
+    @Column(name="is_course_over")
+    private Short isCourseOver;
+
     //order_code字段
     @Column(name="order_code", length = 128)
     private String orderCode;

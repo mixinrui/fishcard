@@ -63,6 +63,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStatusInAndOrderIdLessThanAndEndTimeBetween(Integer[] statuses, long orderId, Date startDate, Date endDate);
 
+    public List<WorkOrder> findByIsCourseOverAndStatusInAndOrderIdLessThanAndEndTimeBetween(Short isCourseOver,Integer[] statuses, long orderId, Date startDate, Date endDate);
+
     //按照订单id查找鱼卡
     public List<WorkOrder> findByOrderId(Long orderId);
 

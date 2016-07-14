@@ -152,3 +152,11 @@ card_id:鱼卡id
   "returnCode": 200,
   "returnMsg": "success"
 }
+
+#########修改学生课程
+url:   http://123.56.13.168:8080/backend/fishcard/courses/all
+method: put
+param:
+{
+    "studentId":1298839
+}
