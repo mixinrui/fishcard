@@ -53,7 +53,7 @@ public class GrabOrderService extends BaseService<WorkOrderGrab, WorkOrderGrabJp
      * @return
      */
     public int setTeacherIdByWorkOrderId(GrabOrderView grabOrderView){
-        return workOrderJpaRepository.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId());
+        return workOrderJpaRepository.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),0l);
     }
 
     /**

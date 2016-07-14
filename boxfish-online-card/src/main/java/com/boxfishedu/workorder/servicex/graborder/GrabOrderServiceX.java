@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
@@ -106,25 +108,27 @@ public class GrabOrderServiceX {
         }
     }
 
+    @Transactional
     public JsonResultModel grabOrderByOneTeacher(GrabOrderView grabOrderView){
         JSONObject jsonObject = new JSONObject();
-        if(!checkIfCanGrabOrderByOnlineTeacher(grabOrderView)||!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
+//        if(!checkIfCanGrabOrderByOnlineTeacher(grabOrderView)||!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
+       if(!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
             grabOrderService.setFlagFailAndTeacherId(grabOrderView);
             jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
-            jsonObject.put("code","0");
+            jsonObject.put("code","1");
         }else{
             WorkOrder workOrder = grabOrderService.findByIdForUpdate(grabOrderView.getWorkOrderId());
             if(workOrder!=null){
                 if(compareDate(workOrder.getStartTime())){
                     grabOrderService.setFlagFailAndTeacherId(grabOrderView);
                     jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
-                    jsonObject.put("code","0");
+                    jsonObject.put("code","1");
                     logger.info("::::::::::::::::::单子已过期,抢单失败::::::::::::::::::");
                 }else{
                     grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
                     grabOrderService.setTeacherIdByWorkOrderId(grabOrderView);
                     jsonObject.put("msg",WorkOrderConstant.GRABORDER_SUCCESS);
-                    jsonObject.put("code","1");
+                    jsonObject.put("code","0");
                     logger.info("::::::::::::::::::成功抢单::::::::::::::::::");
                 }
             }
@@ -136,7 +140,7 @@ public class GrabOrderServiceX {
         WorkOrder workOrder = workOrderService.findOne(grabOrderView.getWorkOrderId());
         if(workOrder!=null){
             if(workOrder.getTeacherId()!=null&&workOrder.getTeacherId()>0){    //该课程已经被其他老师抢了
-                logger.info("::::::::::::::::::OnlineFishcard验证----不能抢::::::::::::::::::");
+                logger.info("::::::::::::::::::OnlineFishcard验证----不能抢(teacherId>0)::::::::::::::::::");
                 return false;
             }else{
                 logger.info("::::::::::::::::::OnlineFishcard验证----能抢::::::::::::::::::");
@@ -152,7 +156,7 @@ public class GrabOrderServiceX {
         String url = "http://192.168.77.210:8099/order/course/schedule/add/order/time";   //TODO
         JsonResultModel jsonResultModel=restTemplate.postForObject(url,mapParams,JsonResultModel.class);
         if(jsonResultModel.getReturnCode()== HttpStatus.OK.value()){
-            logger.info("::::::::::::::::::OnlineTeacher验证----能抢::::::::::::::::::");
+            logger.info("::::::::::::::::::OnlineTeacher验证----能抢(returnCode==200)::::::::::::::::::");
             return true;
         }else{
             logger.info("::::::::::::::::::OnlineTeacher验证----不能抢::::::::::::::::::");
@@ -165,7 +169,7 @@ public class GrabOrderServiceX {
         Map<String,Object> mapParams =  Maps.newHashMap();
         mapParams.put("studentId",workOrder.getStudentId());
         mapParams.put("slotId",workOrder.getSlotId());
-        mapParams.put("startTime",workOrder.getStartTime());
+        mapParams.put("startTime", DateUtil.Date2String(workOrder.getStartTime()));
         mapParams.put("teacherId",grabOrderView.getTeacherId());
         return mapParams;
     }
