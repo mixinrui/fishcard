@@ -248,7 +248,7 @@ public class MakeWorkOrderServiceX {
             map1.put("push_title", WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE);
 
             JSONObject  jo = new JSONObject();
-            jo.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE);
+            jo.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE.toString());
             jo.put("count", null == map.get(key) ? "0" : map.get(key).size());
             map1.put("data",jo);
 
