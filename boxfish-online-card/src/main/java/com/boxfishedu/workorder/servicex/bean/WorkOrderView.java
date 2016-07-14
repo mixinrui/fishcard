@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.bean;
 
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Date;
  * 用于存储传输鱼卡
  * Created by jiaozijun on 16/7/12.
  */
+@Data
 public class WorkOrderView implements Cloneable, Serializable {
 
 

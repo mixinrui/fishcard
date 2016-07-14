@@ -1,6 +1,11 @@
 package com.boxfishedu.workorder.common.util;
 
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.servicex.bean.WorkOrderView;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Date;
 
 /**
  * 用于转换vo的常类
@@ -19,23 +24,40 @@ public class VoUtil {
         try {
             oB = B.newInstance();
             Class classA = A.getClass();
-            Field[] field = classA.getDeclaredFields();
+            Field[] field = B.getDeclaredFields();
 
             for(Field f : field){
-               if(     f.getClass() .equals("java.lang.String")
-                   ||  f.getClass() .equals("java.lang.Long")
-                   ||  f.getClass() .equals("java.util.Date")
-                   ||  f.getClass() .equals("java.lang.Integer")
-                   ||  f.getClass() .equals("java.lang.Short")
+                String fname = f.getType().getName();
+               if(     fname.equals("java.lang.String")
+                   ||  fname.equals("java.lang.Long")
+                   ||  fname.equals("java.util.Date")
+                   ||  fname.equals("java.lang.Integer")
+                   ||  fname.equals("java.lang.Short")
 
                        ){
+                   String name =  f.getName();
+                   Class types = f.getType();
+                   name = name.replaceFirst(name.substring(0, 1), name.substring(0, 1).toUpperCase());
+                   Method setMethodB = B.getDeclaredMethod("set" + name, types);
+                   Method getMethodA = classA.getDeclaredMethod("get" + name, types);
 
+                   setMethodB.invoke(oB, getMethodA.invoke(A) );
                }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return oB;
+    }
+
+
+    public static  void main(String args[]){
+        WorkOrder wo1 = new WorkOrder();
+        wo1.setTeacherId(3232L);
+        wo1.setStartTime(new Date());
+
+        WorkOrderView  wov   =  (WorkOrderView)VoUtil.reversValueA2B(wo1,WorkOrderView.class);
+        System.out.println(wov.getTeacherId());
     }
 }

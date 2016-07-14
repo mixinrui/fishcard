@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.requester;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.online.order.entity.TeacherForm;
@@ -224,9 +225,11 @@ public class TeacherStudentRequester {
      *  向在线教育push教师消息数据
      */
     public void pushTeacherListOnlineMsg(List teachingOnlineListMsg){
-        String url=String.format("%s/teaching/callback/push", urlConf.getCourse_online_service());
-        //String url=String.format("http://123.56.13.168:9090/teaching/callback/push", urlConf.getCourse_online_service());
-        logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起获取教师列表url[{}]",url);
+        //String url=String.format("%s/teaching/callback/push", urlConf.getCourse_online_service());
+        String url="http://192.168.77.37:9090/teaching/callback/push";
+        logger.debug("::::::::::::::::::::::::::::::::@[pushWrappedMsg]向在线教育发起获取教师列表url[{}]::::::::::::::::::::::::::::::::",url);
+
+        logger.info("::::::::::::::::::::::::::::::::sendDate[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(teachingOnlineListMsg));
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);}));
         restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);
         //JsonResultModel jsonResultModel = restTemplate.postForObject(url, teachingOnlineListMsg,JsonResultModel.class);
@@ -245,13 +248,12 @@ public class TeacherStudentRequester {
 //                teacherType);
 //        String url=String.format("http://192.168.77.186:8099/seckillteacher/query/true/false",
 //                teacherType);
-        logger.info("<<<<<<<<<<begin_pullTeacherListMsg");
-        logger.info("<<<<<<<<<<<<<@[pullTeacherListMsg]向师生运营发起获取教师列表url[{}]",url);
+        logger.info("::::::::::::::::::::::::::::::::@[pullTeacherListMsg]向师生运营发起获取教师列表url[{}]::::::::::::::::::::::::::::::::",url);
 
         JsonResultModel jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
         List  teacherList = (List) jsonResultModel.getData();
-        logger.info("<<<<<<<<<<<<<@[pullTeacherListMsg]向师生运营发起获取教师列表长度size[{}]",teacherList==null?0:teacherList.size());
-        logger.info("<<<<<<<<<<end_pullTeacherListMsg");
+        logger.info("::::::::::::::::::::::::::::::::@[pullTeacherListMsg]向师生运营发起获取教师列表长度size[{}]  Datais[{}]::::::::::::::::::::::::::::::::",
+                teacherList==null?0:teacherList.size(),JSON.toJSON(teacherList));
         return  teacherList;
 
     }
