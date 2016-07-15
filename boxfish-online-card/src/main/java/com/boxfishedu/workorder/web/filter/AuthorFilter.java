@@ -27,8 +27,9 @@ import java.util.Set;
  * Created by lauzhihao on 2016/05/17.
  * 拦截所有APP端调用的接口,校验用户是否有效
  * 因为它是A开头,所以比C开头的先执行 - [亲测有效]
+ * 新增鱼卡抢单过滤("/fishcard/graborder/*","/graborder/*")
  */
-@WebFilter(urlPatterns ={"/fishcard/service/student/*", "/fishcard/service/teacher/*", "/service/teacher/*", "/service/student/*"})
+@WebFilter(urlPatterns ={"/fishcard/service/student/*", "/fishcard/service/teacher/*", "/service/teacher/*", "/service/student/*","/fishcard/graborder/*","/graborder/*"})
 public class AuthorFilter extends OncePerRequestFilter {
 
     private Logger logger = LoggerFactory.getLogger(AuthorFilter.class);
