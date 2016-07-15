@@ -35,6 +35,14 @@ public class GrabOrderController {
         return grabOrderServiceX.grabOrderByOneTeacher(grabOrderView);
     }
 
+    @RequestMapping(value = "/graboneordertest", method = RequestMethod.GET)
+    public JsonResultModel grabOrderTest() {
+        GrabOrderView grabOrderView = new GrabOrderView();
+        grabOrderView.setTeacherId(1299167L);
+        grabOrderView.setWorkOrderId(8239L);
+        return grabOrderServiceX.grabOrderByOneTeacher(grabOrderView);
+    }
+
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public JsonResultModel test() {

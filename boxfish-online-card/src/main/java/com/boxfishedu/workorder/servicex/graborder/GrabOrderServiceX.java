@@ -112,7 +112,7 @@ public class GrabOrderServiceX {
     public JsonResultModel grabOrderByOneTeacher(GrabOrderView grabOrderView){
         JSONObject jsonObject = new JSONObject();
         if(!checkIfCanGrabOrderByOnlineTeacher(grabOrderView)||!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
-//       if(!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
+//      if(!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
             grabOrderService.setFlagFailAndTeacherId(grabOrderView);
             jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
             jsonObject.put("code","1");
