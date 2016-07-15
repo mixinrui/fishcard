@@ -7,9 +7,12 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import javax.persistence.LockModeType;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -63,4 +66,12 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     @Query(value = "select max(c.classDate) from CourseSchedule c where teacherId=?1")
     Optional<Date> findTop1ClassDateByTeacherId(Long teacherId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select wo from  CourseSchedule wo where wo.workorderId=?1 ")
+    public CourseSchedule findByWorkOrderIdForUpdate(Long workorderId);
+
+    @Modifying
+    @Query("update CourseSchedule o set o.teacherId = ?1 where o.workorderId = ?2 ")
+    int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId);
 }
