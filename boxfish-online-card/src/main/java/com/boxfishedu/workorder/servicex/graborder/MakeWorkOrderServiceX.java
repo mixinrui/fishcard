@@ -61,14 +61,14 @@ public class MakeWorkOrderServiceX {
      * 组合发送的鱼卡
      */
     public void makeSendWorkOrder() {
-        logger.info("--------------begin-------makeSendWorkOrder------------------");
+        logger.info("::::::::::::::::::::::::::::::::begin::::::::::::makeSendWorkOrder::::::::::::::::::::::::::::::::");
         logger.info("开始定时轮训 生成需要匹配教师的鱼卡");
 
 
         // 1 获取未来两天内未匹配老师的鱼卡
         List<WorkOrder> workOrderNOteacher = makeWorkOrderService.findByTeacherIdAndStartTimeBetweenOrderByStartTime();
         if (null == workOrderNOteacher || workOrderNOteacher.size() < 1) {
-            logger.info("没有需要补老师的课程");
+            logger.info("::::::::::::::::::::::::::::::::没有需要补老师的课程::::::::::::::::::::::::::::::::");
             return;
         }
 
@@ -77,10 +77,11 @@ public class MakeWorkOrderServiceX {
         List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher));
 
         if (null == teacherForms || teacherForms.size() < 0) {
-            logger.info("thereisNOteacherList");
+            logger.info("::::::::::::::::::::::::::::::::thereisNOteacherList::::::::::::::::::::::::::::::::");
             logger.info("没有查询到符合条件的教师列表");
             return;
         }
+
         // 3 获取未来两天内已经匹配老师的鱼卡
         List<WorkOrder> workOrderYESteacher = makeWorkOrderService.findWorkOrderContainTeachers();
 
@@ -88,12 +89,13 @@ public class MakeWorkOrderServiceX {
         Map<Long, List<WorkOrder>> map = Maps.newConcurrentMap();
         map = getTeacherWorkOrderList(map, workOrderNOteacher, workOrderYESteacher, teacherForms);
 
+        logger.info("::::::::::::::::::::::::::::::::pipei_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::",map==null?0:map.size());
 
         // 5 把缓存数据放入redis
 
-//           for(Long key:map.keySet()){
-//               cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(key, map.get(key));
-//           }
+           for(Long key:map.keySet()){
+               cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(key, JSON.toJSONString(map.get(key)));
+           }
 
 
         // 6 把缓存数据放入db中
@@ -103,7 +105,7 @@ public class MakeWorkOrderServiceX {
         // 7 向在线运营发送老师数据(能够获取抢单的老师名单)
         pushTeacherList(map);
 
-        logger.info("--------------end-------makeSendWorkOrder------------------");
+        logger.info("::::::::::::::::::::::::::::::::end-------makeSendWorkOrder::::::::::::::::::::::::::::::::");
         logger.info("结束定时轮训 生成需要匹配教师的鱼卡");
     }
 
@@ -132,7 +134,8 @@ public class MakeWorkOrderServiceX {
 
     /**
      * 过滤 获取最终发送老师鱼卡信息
-     *
+     *   未来两天是否含有匹配课程的老师
+     *   该老师在该时间片上 不能安排课程
      * @param map
      * @param workOrderNOteacher
      * @param workOrderYESteacher
@@ -140,7 +143,7 @@ public class MakeWorkOrderServiceX {
      * @return
      */
     public Map getTeacherWorkOrderList(Map map, List<WorkOrder> workOrderNOteacher, List<WorkOrder> workOrderYESteacher, List<TeacherForm> teacherForms) {
-        // 未来两天是否含有匹配课程的老师
+
         boolean workOrderYESteacherFlag = true;
         if (null == workOrderYESteacher || workOrderYESteacher.size() < 1) {
             workOrderYESteacherFlag = false;
@@ -192,26 +195,43 @@ public class MakeWorkOrderServiceX {
 
     /**
      * 获取教师信息列表
-     *
+     * TODO:reload()
      * @return
      */
     public List getTeacherList(String parameter) {
-        // 获取教师列表  TeacherForm
-        logger.info("=================>开始调用师生运营获取教师列表");
-        List teacherList = teacherStudentRequester.pullTeacherListMsg(parameter);
-        logger.info("=================>开始调用师生运营获取教师列表");
-        if(null == teacherList || teacherList.size() <1){
-            return null;
-        }
         List<TeacherForm> teacherListFromTeach = Lists.newArrayList();
-        for(Object o : teacherList){
-            TeacherForm tf = new TeacherForm();
-            Map m = (Map)o;
-            tf.setTeacherId(Long.parseLong( String.valueOf( m.get("teacherId"))));
-            tf.setTeacherType((Integer) m.get("teachingType"));
-            teacherListFromTeach.add(tf);
-        }
-        return teacherListFromTeach;
+
+        TeacherForm   tf1 = new TeacherForm();//IOS
+        tf1.setTeacherId(1298937L);
+        tf1.setTeacherType(1);
+
+        TeacherForm   tf2 = new TeacherForm();//安卓
+        tf2.setTeacherId(1298904L);
+        tf2.setTeacherType(1);
+
+        teacherListFromTeach.add(tf1);
+
+        teacherListFromTeach.add(tf2);
+
+        return  teacherListFromTeach;
+
+//
+//        // 获取教师列表  TeacherForm
+//        logger.info("=================>开始调用师生运营获取教师列表");
+//        List teacherList = teacherStudentRequester.pullTeacherListMsg(parameter);
+//        logger.info("=================>开始调用师生运营获取教师列表");
+//        if(null == teacherList || teacherList.size() <1){
+//            return null;
+//        }
+//
+//        for(Object o : teacherList){
+//            TeacherForm tf = new TeacherForm();
+//            Map m = (Map)o;
+//            tf.setTeacherId(Long.parseLong( String.valueOf( m.get("teacherId"))));
+//            tf.setTeacherType((Integer) m.get("teachingType"));
+//            teacherListFromTeach.add(tf);
+//        }
+//        return teacherListFromTeach;
     }
 
 
@@ -228,8 +248,8 @@ public class MakeWorkOrderServiceX {
             map1.put("push_title", WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE);
 
             JSONObject  jo = new JSONObject();
-            jo.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE);
-            jo.put("count", null == map.get(key) ? 0 : map.get(key).size());
+            jo.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE.toString());
+            jo.put("count", null == map.get(key) ? "0" : map.get(key).size());
             map1.put("data",jo);
 
             list.add(map1);

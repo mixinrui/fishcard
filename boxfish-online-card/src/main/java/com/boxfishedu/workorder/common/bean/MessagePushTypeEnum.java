@@ -6,7 +6,7 @@ package com.boxfishedu.workorder.common.bean;
  */
 public enum MessagePushTypeEnum {
     // 抢单发送消息类型
-    SEND_GRAB_ORDER_TYPE("GRABORDER"),
+    SEND_GRAB_ORDER_TYPE("SEND_GRAB_ORDER_TYPE"),
 
     //当天新匹配课程消息推送
     NEW_COURSES_ASSIGNED_DAILY("NEW_COURSES_ASSIGNED_DAILY");
