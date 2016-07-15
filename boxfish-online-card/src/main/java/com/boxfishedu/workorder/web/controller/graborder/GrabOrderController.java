@@ -50,7 +50,7 @@ public class GrabOrderController {
         //makeWorkOrderServiceX.getTeacherList("true/false");
 
         //makeWorkOrderServiceX.clearGrabData();
-        return null;
+        return new JsonResultModel();
     }
 
 
