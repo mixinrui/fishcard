@@ -21,13 +21,13 @@ public interface WorkOrderGrabJpaRepository extends JpaRepository<WorkOrderGrab,
 
     // 抢单之后,给课程匹配相应的老师,并且标记flag为1表示抢单-------------成功
     @Modifying
-    @Query("update WorkOrderGrab o set o.flag = '1' where o.workorderId = ?2 and o.teacherId = ?1 and o.flag='0'")
-    int setFlagSuccessAndTeacherId(Long teacherId , Long workorderId);
+    @Query("update WorkOrderGrab o set o.flag = '1', o.updateTime = ?3 where o.workorderId = ?2 and o.teacherId = ?1 and o.flag='0'")
+    int setFlagSuccessAndTeacherId(Long teacherId , Long workorderId, Date currDate);
 
     // 抢单之后,给课程匹配相应的老师,并且标记flag为2表示抢单-------------失败
     @Modifying
-    @Query("update WorkOrderGrab o set o.flag = '2' where o.workorderId = ?2 and o.teacherId = ?1 and o.flag='0'")
-    int setFlagFailAndTeacherId(Long teacherId , Long workorderId);
+    @Query("update WorkOrderGrab o set o.flag = '2',o.updateTime = ?3 where o.workorderId = ?2 and o.teacherId = ?1 and o.flag='0'")
+    int setFlagFailAndTeacherId(Long teacherId , Long workorderId , Date currDate);
 
     // 获取今天之前的数据
     public List<WorkOrderGrab> findByCreateTimeLessThan(Date date);

@@ -241,6 +241,7 @@ public class TimePickerServiceX {
                 workOrder.setOrderId(service.getOrderId());
                 workOrder.setStudentId(service.getStudentId());
                 workOrder.setStudentName(service.getStudentName());
+                workOrder.setIsCourseOver((short) 0);
                 workOrder.setSlotId(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
                 workOrder.setSeqNum((j + 1) + i * numPerWeek);
                 workOrder.setCreateTime(new Date());

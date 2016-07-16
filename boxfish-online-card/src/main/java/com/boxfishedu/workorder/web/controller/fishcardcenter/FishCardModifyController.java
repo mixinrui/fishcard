@@ -30,13 +30,13 @@ public class FishCardModifyController {
         return fishCardModifyServiceX.changeTeacher(teacherChangeParam);
     }
 
-    @RequestMapping(value = "/courses/all", method = RequestMethod.PUT)
+    @RequestMapping(value = "/courses/order", method = RequestMethod.PUT)
     public JsonResultModel changeSpecialOrderCourses(@RequestBody CourseChangeParam courseChangeParam) {
         fishCardModifyServiceX.changeSpecialOrderCourses(courseChangeParam.getStudentId(),courseChangeParam.getOrderId());
         return JsonResultModel.newJsonResultModel("ok");
     }
 
-    @RequestMapping(value = "/courses/order", method = RequestMethod.PUT)
+    @RequestMapping(value = "/courses/all", method = RequestMethod.PUT)
     public JsonResultModel changeOrderCourses(@RequestBody CourseChangeParam courseChangeParam) {
         fishCardModifyServiceX.changerderCourses(courseChangeParam.getStudentId());
         return JsonResultModel.newJsonResultModel("ok");
