@@ -93,9 +93,9 @@ public class MakeWorkOrderServiceX {
 
         // 5 把缓存数据放入redis  把能够分配的鱼卡放在缓存中
 
-        for (WorkOrder wo : workOrderNOteacher) {
-            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), JSON.toJSONString(wo));
-        }
+//        for (WorkOrder wo : workOrderNOteacher) {
+//            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), JSON.toJSONString(wo));
+//        }
 
 
         // 6 把缓存数据放入db中
