@@ -32,6 +32,7 @@ public class GrabOrderController {
 
     @RequestMapping(value = "/graboneorder", method = RequestMethod.POST)
     public JsonResultModel grabOrder(@RequestBody GrabOrderView grabOrderView) {
+        logger.info("::::::::::TeacherOnLine Post params::::::::::teacherId="+grabOrderView.getTeacherId()+"&&&&workOrderId="+grabOrderView.getWorkOrderId()+"::::");
         return grabOrderServiceX.grabOrderByOneTeacher(grabOrderView);
     }
 

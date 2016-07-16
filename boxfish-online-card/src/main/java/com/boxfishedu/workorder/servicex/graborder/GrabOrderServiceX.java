@@ -8,8 +8,10 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
+import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.graborder.GrabOrderService;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.fishcard.GrabOrderView;
 import com.google.common.collect.Lists;
@@ -51,6 +53,12 @@ public class GrabOrderServiceX {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private CourseScheduleService courseScheduleService;
+
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
 
 
     public JsonResultModel getWorkOrderListByTeacherId(Long teacherId){
@@ -112,7 +120,7 @@ public class GrabOrderServiceX {
     public JsonResultModel grabOrderByOneTeacher(GrabOrderView grabOrderView){
         JSONObject jsonObject = new JSONObject();
         if(!checkIfCanGrabOrderByOnlineTeacher(grabOrderView)||!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
-//      if(!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
+//     if(!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
             grabOrderService.setFlagFailAndTeacherId(grabOrderView);
             jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
             jsonObject.put("code","1");
@@ -127,6 +135,9 @@ public class GrabOrderServiceX {
                 }else{
                     grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
                     grabOrderService.setTeacherIdByWorkOrderId(grabOrderView);
+                    courseScheduleService.findByWorkOrderIdForUpdate(grabOrderView);
+                    courseScheduleService.setTeacherIdByWorkOrderId(grabOrderView);
+                    workOrderLogService.saveWorkOrderLog(workOrder);
                     jsonObject.put("msg",WorkOrderConstant.GRABORDER_SUCCESS);
                     jsonObject.put("code","0");
                     logger.info("::::::::::::::::::成功抢单::::::::::::::::::");
