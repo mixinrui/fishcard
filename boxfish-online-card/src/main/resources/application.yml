@@ -46,11 +46,11 @@ parameter:
   pass_beyond_normal: 5
 
   #教师超过上课时间的时长,标记为迟到(minute)
-  teacher_absent_time_limit: 5
+  teacher_absent_time_limit: 10
   #学生超过上课时间的时长,标记为迟到(minute)
   student_absent_time_limit: 10
   #超过课程结束时间的时长,标记为服务器强制结束(minute)
-  force_complete_time_limit: 5
+  force_complete_time_limit: 10
   #距离上课时间提醒教师,单位：minutes
   notify_teacher_prepare_class_limit: 5
 
