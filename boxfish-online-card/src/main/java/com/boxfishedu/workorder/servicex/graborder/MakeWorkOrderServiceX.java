@@ -206,37 +206,37 @@ public class MakeWorkOrderServiceX {
     public List getTeacherList(String parameter) {
         List<TeacherForm> teacherListFromTeach = Lists.newArrayList();
 
-        TeacherForm tf1 = new TeacherForm();//IOS
-        tf1.setTeacherId(1298937L);
-        tf1.setTeacherType(1);
-
-        TeacherForm tf2 = new TeacherForm();//安卓
-        tf2.setTeacherId(1298904L);
-        tf2.setTeacherType(1);
-
-        teacherListFromTeach.add(tf1);
-
-        teacherListFromTeach.add(tf2);
-
-        return teacherListFromTeach;
-
+//        TeacherForm tf1 = new TeacherForm();//IOS
+//        tf1.setTeacherId(1298937L);
+//        tf1.setTeacherType(1);
 //
-//        // 获取教师列表  TeacherForm
-//        logger.info("=================>开始调用师生运营获取教师列表");
-//        List teacherList = teacherStudentRequester.pullTeacherListMsg(parameter);
-//        logger.info("=================>开始调用师生运营获取教师列表");
-//        if(null == teacherList || teacherList.size() <1){
-//            return null;
-//        }
+//        TeacherForm tf2 = new TeacherForm();//安卓
+//        tf2.setTeacherId(1298904L);
+//        tf2.setTeacherType(1);
 //
-//        for(Object o : teacherList){
-//            TeacherForm tf = new TeacherForm();
-//            Map m = (Map)o;
-//            tf.setTeacherId(Long.parseLong( String.valueOf( m.get("teacherId"))));
-//            tf.setTeacherType((Integer) m.get("teachingType"));
-//            teacherListFromTeach.add(tf);
-//        }
+//        teacherListFromTeach.add(tf1);
+//
+//        teacherListFromTeach.add(tf2);
+//
 //        return teacherListFromTeach;
+
+
+        // 获取教师列表  TeacherForm
+        logger.info("=================>开始调用师生运营获取教师列表");
+        List teacherList = teacherStudentRequester.pullTeacherListMsg(parameter);
+        logger.info("=================>开始调用师生运营获取教师列表");
+        if(null == teacherList || teacherList.size() <1){
+            return null;
+        }
+
+        for(Object o : teacherList){
+            TeacherForm tf = new TeacherForm();
+            Map m = (Map)o;
+            tf.setTeacherId(Long.parseLong( String.valueOf( m.get("teacherId"))));
+            tf.setTeacherType((Integer) m.get("teachingType"));
+            teacherListFromTeach.add(tf);
+        }
+        return teacherListFromTeach;
     }
 
 
