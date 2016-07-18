@@ -53,7 +53,6 @@ public class MakeWorkOrderServiceX {
     private CacheManager cacheManager;
 
 
-
     // send to redis
     //cacheManager.getCache(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO).put(userName.trim(), json.toJSONString());
 
@@ -69,7 +68,7 @@ public class MakeWorkOrderServiceX {
         // 1 获取未来两天内未匹配老师的鱼卡
         List<WorkOrder> workOrderNOteacher = makeWorkOrderService.findByTeacherIdAndStartTimeBetweenOrderByStartTime();
         if (null == workOrderNOteacher || workOrderNOteacher.size() < 1) {
-            logger.info("::::::::::::::::::::::::::::::::没有需要补老师的课程::::::::::::::::::::::::::::::::");
+            logger.info("1111111111111111111111:::::::::::::没有需要补老师的课程::::::::::::::::::::::::::::::::");
             return;
         }
 
@@ -78,8 +77,7 @@ public class MakeWorkOrderServiceX {
         List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher));
 
         if (null == teacherForms || teacherForms.size() < 0) {
-            logger.info("::::::::::::::::::::::::::::::::thereisNOteacherList::::::::::::::::::::::::::::::::");
-            logger.info("没有查询到符合条件的教师列表");
+            logger.info("222222222222222:::::::::::::thereisNOteacherList:没有查询到符合条件的教师列表:::::::::::::::::::::::::::::::");
             return;
         }
 
@@ -90,20 +88,22 @@ public class MakeWorkOrderServiceX {
         Map<Long, List<WorkOrder>> map = Maps.newConcurrentMap();
         map = getTeacherWorkOrderList(map, workOrderNOteacher, workOrderYESteacher, teacherForms);
 
-        logger.info("::::::::::::::::::::::::::::::::pipei_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
+        logger.info("3333333333:::::::::::::::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
 
         // 5 把缓存数据放入redis  把能够分配的鱼卡放在缓存中
 
-//        for (WorkOrder wo : workOrderNOteacher) {
-//            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), JSON.toJSONString(wo));
-//        }
+        for (WorkOrder wo : workOrderNOteacher) {
+            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), JSON.toJSONString(wo));
+        }
 
 
         // 6 把缓存数据放入db中
+        logger.info("4444444444:::::::::::::::向db中放入缓存数据");
         makeWorkOrderService.saveCurrentworkOrderMap(map);
 
 
         // 7 向在线运营发送老师数据(能够获取抢单的老师名单)
+        logger.info("5555555555:::::::::::::向在线运营发送数据");
         pushTeacherList(map);
 
         logger.info("::::::::::::::::::::::::::::::::end-------makeSendWorkOrder::::::::::::::::::::::::::::::::");

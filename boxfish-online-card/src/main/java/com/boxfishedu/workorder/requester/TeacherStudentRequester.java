@@ -229,8 +229,9 @@ public class TeacherStudentRequester {
         String url="http://192.168.77.37:9090/teaching/callback/push";
         logger.debug("::::::::::::::::::::::::::::::::@[pushWrappedMsg]向在线教育发起获取教师列表url[{}]::::::::::::::::::::::::::::::::",url);
 
-        logger.info("::::::::::::::::::::::::::::::::sendDate[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(teachingOnlineListMsg));
+        logger.info("::::::::::::::::::::::::::::::::sendDate:begion::[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(teachingOnlineListMsg));
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);}));
+        logger.info("::::::::::::::::::::::::::::::::sendData:over::::::::::::::");
         restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);
         //JsonResultModel jsonResultModel = restTemplate.postForObject(url, teachingOnlineListMsg,JsonResultModel.class);
     }
