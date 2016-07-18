@@ -96,5 +96,6 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Modifying
     @Query("update WorkOrder o set o.teacherId = ?1 where o.id = ?2 and o.teacherId = ?3")
     int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId , Long teacherIdZero);
+    public List<WorkOrder> findByCourseType(String courseType);
 
 }

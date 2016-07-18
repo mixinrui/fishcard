@@ -41,4 +41,28 @@ public class FishCardModifyController {
         fishCardModifyServiceX.changerderCourses(courseChangeParam.getStudentId());
         return JsonResultModel.newJsonResultModel("ok");
     }
+
+    //修改鱼卡的课程
+    @RequestMapping(value = "/course", method = RequestMethod.PUT)
+    public JsonResultModel changeCourse(@RequestBody CourseChangeParam courseChangeParam){
+        fishCardModifyServiceX.changCourse(courseChangeParam.getWorkOrderId());
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
+
+    //修改鱼卡的课程,参数为一批列表
+    @RequestMapping(value = "/courses", method = RequestMethod.PUT)
+    public JsonResultModel changeCourses(@RequestBody CourseChangeParam courseChangeParam){
+        courseChangeParam.getWorkOrderIds().forEach(workOrderId->{
+            fishCardModifyServiceX.changCourse(workOrderId);
+        });
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
+    @RequestMapping(value = "/courses/phonics", method = RequestMethod.PUT)
+    public JsonResultModel changePhonicsCourses(){
+        fishCardModifyServiceX.changePhonicsCourses();
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
 }

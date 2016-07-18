@@ -67,7 +67,6 @@ public class CourseOnlineServiceX {
         return workOrders;
     }
 
-    //接收来自在线授课的,TODO:没有异常描述信息
     public void updateTeachingStatus(Map<String, Object> map) {
         logger.info("@updateTeachingStatus,参数{}",JacksonUtil.toJSon(map));
         Long workOrderId = Long.parseLong(map.get("id").toString());
@@ -85,11 +84,6 @@ public class CourseOnlineServiceX {
         //处理完成的情况
         if(status==FishCardStatusEnum.COMPLETED.getCode()||status==FishCardStatusEnum.COMPLETED_FORCE.getCode()){
             completeCourse(workOrder,courseSchedule, status);
-        }
-        //学生旷课
-        else if(status==FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()){
-            workOrderLogService.saveWorkOrderLog(workOrder,FishCardStatusEnum.getDesc(status));
-            completeCourse(workOrder,courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
         }
         //处理早退的情况(定时器不到不应该减去服务)
         else if(status==FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()||status==FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()){

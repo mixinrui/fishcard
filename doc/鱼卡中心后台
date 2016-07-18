@@ -160,3 +160,15 @@ param:
 {
     "studentId":1298839
 }
+
+########根据鱼卡id,批量修改课程
+http://123.56.13.168:8080/backend/fishcard/courses
+method:put
+参数:
+{
+    "workOrderIds":
+    [
+     10259,
+     10260
+    ]
+}

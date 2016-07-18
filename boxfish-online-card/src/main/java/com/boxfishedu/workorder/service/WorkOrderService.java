@@ -86,6 +86,10 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByTeacherIdAndStartTimeBetweenOrderByStartTime(teacherId, startDate, endDate, pageable);
     }
 
+    public List<WorkOrder> findByCourseType(String courseType){
+        return jpa.findByCourseType(courseType);
+    }
+
     @Transactional
     public void saveWorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){
         this.save(workOrder);
