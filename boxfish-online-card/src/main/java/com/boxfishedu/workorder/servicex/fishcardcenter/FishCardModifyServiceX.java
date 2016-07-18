@@ -120,4 +120,16 @@ public class FishCardModifyServiceX {
         });
     }
 
+    public void changCourse(Long workOrderId){
+        WorkOrder workOrder=workOrderService.findOne(workOrderId);
+        fishCardModifyService.changeCourse(workOrder);
+    }
+
+    public void changePhonicsCourses(){
+        List<WorkOrder> workOrders=workOrderService.findByCourseType("PHONICS");
+        for (WorkOrder workOrder : workOrders) {
+            fishCardModifyService.changeCourse(workOrder,7);
+        }
+    }
+
 }

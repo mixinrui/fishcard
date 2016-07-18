@@ -79,4 +79,31 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
     public List<WorkOrder> findByStudentIdAndStatusLessThan(Long studentId,Integer status){
         return jpa.findByStudentIdAndStatusLessThan(studentId,status);
     }
+
+    public void changeCourse(WorkOrder workOrder,Integer index) {
+        String oldCourseName=workOrder.getCourseName();
+
+        RecommandCourseView recommandCourseView = recommandCourseRequester.getRecommandCourse(workOrder,index);
+        workOrder.setCourseName(recommandCourseView.getCourseName());
+        workOrder.setCourseId(recommandCourseView.getCourseId());
+        workOrder.setCourseType(recommandCourseView.getCourseType());
+
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
+        courseSchedule.setCourseId(workOrder.getCourseId());
+        courseSchedule.setCourseName(workOrder.getCourseType());
+        courseSchedule.setCourseType(workOrder.getCourseType());
+
+        //修改课程信息
+        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(workOrder.getId());
+        scheduleCourseInfo.setCourseType(workOrder.getCourseType());
+        scheduleCourseInfo.setCourseId(workOrder.getCourseId());
+        scheduleCourseInfo.setName(workOrder.getCourseName());
+        scheduleCourseInfo.setDifficulty(recommandCourseView.getDifficulty());
+        scheduleCourseInfo.setPublicDate(recommandCourseView.getPublicDate());
+        scheduleCourseInfo.setThumbnail(recommandCourseRequester.getThumbNailPath(recommandCourseView));
+
+        scheduleCourseInfoService.updateCourseIntoScheduleInfo(scheduleCourseInfo);
+        workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
+        workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,老课程[" + oldCourseName + "]");
+    }
 }

@@ -78,4 +78,6 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStudentIdAndStatusLessThan(Long studentId,Integer status);
 
+    public List<WorkOrder> findByCourseType(String courseType);
+
 }
