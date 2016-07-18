@@ -69,6 +69,11 @@ public class Service {
     @JsonManagedReference
     private Set<WorkOrder> workOrders = new HashSet<WorkOrder>(0);
 
+    @OneToMany(fetch = FetchType.LAZY)//指向多的那方的pojo的关联外键字段
+    @JoinColumn(name = "service_id")
+    @JsonManagedReference
+    private Set<CommentCard> commentCards = new HashSet<CommentCard>(0);
+
     @Column(name = "validaty_day", nullable = true)
     private Integer validityDay;
 
