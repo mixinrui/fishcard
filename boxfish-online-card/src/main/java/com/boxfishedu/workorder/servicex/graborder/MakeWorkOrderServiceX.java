@@ -18,6 +18,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrderGrabHistory;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
+import com.boxfishedu.workorder.servicex.bean.WorkOrderView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.Date;
@@ -60,7 +62,7 @@ public class MakeWorkOrderServiceX {
     /**
      * 组合发送的鱼卡
      */
-    public void makeSendWorkOrder() {
+    public void makeSendWorkOrder(String flag) {
         logger.info("::::::::::::::::::::::::::::::::begin::::::::::::makeSendWorkOrder::::::::::::::::::::::::::::::::");
         logger.info("开始定时轮训 生成需要匹配教师的鱼卡");
 
@@ -74,7 +76,7 @@ public class MakeWorkOrderServiceX {
 
 
         // 2 向师生运营获取教师信息列表
-        List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher));
+        List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher),flag);
 
         if (null == teacherForms || teacherForms.size() < 0) {
             logger.info("222222222222222:::::::::::::thereisNOteacherList:没有查询到符合条件的教师列表:::::::::::::::::::::::::::::::");
@@ -93,7 +95,9 @@ public class MakeWorkOrderServiceX {
         // 5 把缓存数据放入redis  把能够分配的鱼卡放在缓存中
 
         for (WorkOrder wo : workOrderNOteacher) {
-            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), JSON.toJSONString(wo));
+            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), reverseWorkOrder(wo));
+       //   WorkOrderView json = (WorkOrderView) cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).get(wo.getId(),WorkOrderView.class);
+       //   cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).evict(wo.getId());
         }
 
 
@@ -110,6 +114,13 @@ public class MakeWorkOrderServiceX {
         logger.info("结束定时轮训 生成需要匹配教师的鱼卡");
     }
 
+    public WorkOrderView reverseWorkOrder(WorkOrder wo){
+        WorkOrderView wov =new WorkOrderView();
+        wov.setId(wo.getId());
+        wov.setTeacherId(wo.getTeacherId());
+        wov.setStartTime(wo.getStartTime());
+        return  wov;
+    }
 
     /**
      * 获取 获取查询教师列表 的条件
@@ -203,22 +214,25 @@ public class MakeWorkOrderServiceX {
      *
      * @return
      */
-    public List getTeacherList(String parameter) {
+    public List getTeacherList(String parameter,String flag) {
         List<TeacherForm> teacherListFromTeach = Lists.newArrayList();
 
-//        TeacherForm tf1 = new TeacherForm();//IOS
-//        tf1.setTeacherId(1298937L);
-//        tf1.setTeacherType(1);
-//
-//        TeacherForm tf2 = new TeacherForm();//安卓
-//        tf2.setTeacherId(1298904L);
-//        tf2.setTeacherType(1);
-//
-//        teacherListFromTeach.add(tf1);
-//
-//        teacherListFromTeach.add(tf2);
-//
-//        return teacherListFromTeach;
+        if(!StringUtils.isEmpty(flag)){
+
+            TeacherForm tf1 = new TeacherForm();//IOS
+            tf1.setTeacherId(1298937L);
+            tf1.setTeacherType(1);
+
+            TeacherForm tf2 = new TeacherForm();//安卓
+            tf2.setTeacherId(1298904L);
+            tf2.setTeacherType(1);
+
+            teacherListFromTeach.add(tf1);
+
+            teacherListFromTeach.add(tf2);
+
+            return teacherListFromTeach;
+        }
 
 
         // 获取教师列表  TeacherForm

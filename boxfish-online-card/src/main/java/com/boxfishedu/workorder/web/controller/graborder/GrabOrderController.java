@@ -47,7 +47,7 @@ public class GrabOrderController {
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public JsonResultModel test() {
-        makeWorkOrderServiceX.makeSendWorkOrder();
+        makeWorkOrderServiceX.makeSendWorkOrder("test");
         //makeWorkOrderServiceX.getTeacherList("true/false");
 
         //makeWorkOrderServiceX.clearGrabData();

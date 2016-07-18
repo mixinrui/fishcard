@@ -119,7 +119,7 @@ public class RabbitMqReciver {
             } else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_INIT90message");
                 logger.info("=========>初始化抢单数据");
-                makeWorkOrderServiceX.makeSendWorkOrder();
+                makeWorkOrderServiceX.makeSendWorkOrder(null);
 
             }
             //定时查询教师不够的情况
