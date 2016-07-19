@@ -10,17 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class ScheduleCourseInfoMorphiaRepository {
-    @Autowired
-    private Datastore datastore;
-
-    public void save(ScheduleCourseInfo scheduleCourseInfo) {
-        datastore.save(scheduleCourseInfo);
-    }
-
-    public void save(Iterable<ScheduleCourseInfo> scheduleCourseInfos){
-        datastore.save(scheduleCourseInfos);
-    }
+public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<ScheduleCourseInfo> {
 
     public Optional<ScheduleCourseInfo> getById(Long id) {
         Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
