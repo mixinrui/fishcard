@@ -3,7 +3,7 @@ package com.boxfishedu.workorder.web.controller.commentcard;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
-import com.boxfishedu.workorder.entity.mysql.CommentCardStatus;
+import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import org.springframework.beans.factory.annotation.Autowired;
