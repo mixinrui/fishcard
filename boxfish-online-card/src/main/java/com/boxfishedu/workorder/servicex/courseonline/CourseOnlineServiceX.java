@@ -157,18 +157,6 @@ public class CourseOnlineServiceX {
         recommandCourseRequester.notifyCompleteCourse(workOrder);
     }
 
-
-    public WorkOrderLog addWorkOrderLog(WorkOrder workWorder) throws BoxfishException {
-        logger.info("@addWorkOrderLog,添加鱼卡日志,鱼卡信息{}",JacksonUtil.toJSon(workWorder));
-        WorkOrderLog workOrderLog = new WorkOrderLog();
-        workOrderLog.setWorkOrderId(workWorder.getId());
-        workOrderLog.setStatus(workWorder.getStatus());
-        workOrderLog.setCreateTime(new Date());
-        workOrderLog.setContent(FishCardStatusEnum.getDesc(workWorder.getStatus()));
-        workOrderLogService.save(workOrderLog);
-        return workOrderLog;
-    }
-
     /**
      *处理早退情况,如果之前工单状态为早退,并且和当前的角色不相同,时间在7分钟以内的上报,则认为是系统异常
      */
