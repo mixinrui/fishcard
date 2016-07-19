@@ -1,12 +1,11 @@
 package com.boxfishedu.workorder.dao.jpa;
 
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
-import com.boxfishedu.workorder.entity.mysql.CommentCardStatus;
+import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.Predicate;

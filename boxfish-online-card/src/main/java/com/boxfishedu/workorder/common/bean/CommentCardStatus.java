@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.entity.mysql;
+package com.boxfishedu.workorder.common.bean;
 
 
 /**
