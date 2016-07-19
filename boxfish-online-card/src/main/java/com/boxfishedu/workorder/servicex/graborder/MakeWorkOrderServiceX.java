@@ -79,7 +79,7 @@ public class MakeWorkOrderServiceX {
         List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher),flag);
 
         if (null == teacherForms || teacherForms.size() < 0) {
-            logger.info("222222222222222:::::::::::::thereisNOteacherList:没有查询到符合条件的教师列表:::::::::::::::::::::::::::::::");
+            logger.info("222222222222222:::::::::::::thereisNOteacherList:没有查询到符合条件的教师列表::::: ::::::::::::::::::::::::::");
             return;
         }
 
@@ -248,9 +248,15 @@ public class MakeWorkOrderServiceX {
             tf2.setTeacherId(1298904L);
             tf2.setTeacherType(1);
 
+            TeacherForm tf3 = new TeacherForm();//安卓
+            tf3.setTeacherId(1243339L);
+            tf3.setTeacherType(1);
+
             teacherListFromTeach.add(tf1);
 
             teacherListFromTeach.add(tf2);
+
+            teacherListFromTeach.add(tf3);
 
             return teacherListFromTeach;
         }
