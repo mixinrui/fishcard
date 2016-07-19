@@ -10,17 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class TrialCourseMorphiaRepository {
-    @Autowired
-    private Datastore datastore;
-
-    public void save(TrialCourse trialCourse) {
-        datastore.save(trialCourse);
-    }
-
-    public void save(Iterable<TrialCourse> trialCourses){
-        datastore.save(trialCourses);
-    }
+public class TrialCourseMorphiaRepository extends BaseMorphiaRepository<TrialCourse>{
 
     public Optional<TrialCourse> getById(Long id) {
         Query<TrialCourse> query = datastore.createQuery(TrialCourse.class);
