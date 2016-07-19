@@ -78,7 +78,7 @@ public class NotifyTimer {
     /**
      * 教师旷课通知定时器
      */
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron="0 0/10 * * * ?")
     public void notifyTeacherAbsentService() {
         logger.info("<<<<<<开始通知<<<教师旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.TEACHER_ABSENT_QUERY_NOTIFY.value());
@@ -87,9 +87,9 @@ public class NotifyTimer {
     }
 
     /**
-     * 服务器强制下课定时器;从第三分钟开始,每五分钟;与上面区分开
+     * 服务器强制下课定时器;从第三分钟开始,每五分钟;与上面区分开;目前允许将拖堂时间上升为10分钟
      */
-    @Scheduled(cron = "0 2/5 * * * ?")
+    @Scheduled(cron="0 2/10 * * * ?")
     public void completeForceService() {
         logger.info("<<<<<<开始通知<<<服务端强制下课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMPLETE_FORCE_SERVER_NOTIFY.value());
@@ -100,7 +100,7 @@ public class NotifyTimer {
     /**
      * 学生旷课通知定时器;该功能并入强制完成
      */
-//    @Scheduled(cron="0 4/5 * * * ?")
+    @Scheduled(cron="0 4/10 * * * ?")
     public void notifyStudentAbsentService() {
         logger.info("<<<<<<开始通知<<<检查学生旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.STUDENT_ABSENT_QUERY_NOTIFY.value());

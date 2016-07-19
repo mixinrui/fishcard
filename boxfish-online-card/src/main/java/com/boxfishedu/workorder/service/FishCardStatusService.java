@@ -56,7 +56,7 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         Date endDate=DateUtil.localDate2Date(endLocalDate);
         logger.debug("@query db开始从数据库查询[[[教师旷课数据]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
                 ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate)
-                ,FishCardStatusEnum.TEACHER_ASSIGNED.getCode()+";"+FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode());
+                ,FishCardStatusEnum.TEACHER_ASSIGNED.getCode()+";"+FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
 //        Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()};
 //        List<WorkOrder> result= jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
         List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
@@ -73,7 +73,9 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         Date endDate=DateUtil.localDate2Date(endLocalDate);
         logger.debug("@query db开始从数据库查询[[[学生可能旷课]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
                 ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.WAITFORSTUDENT.getCode());
-        List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.WAITFORSTUDENT.getCode(), startDate, endDate);
+        Integer[] statuses=new Integer[]{FishCardStatusEnum.WAITFORSTUDENT.getCode(),
+                FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode(),FishCardStatusEnum.CONNECTED.getCode()};
+        List<WorkOrder> result= jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
         return result;
     }
 
@@ -113,7 +115,7 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         calendar.setTime(date);
         switch (fishCardDelayMsgType){
             case TEACHER_ABSENT: {
-                calendar.add(Calendar.SECOND,60*teacherAbsentTimeLimit+passBeyondNormal);
+                calendar.add(Calendar.SECOND,60*teacherAbsentTimeLimit);
                 break;
             }
             case STUDENT_ABSENT: {
