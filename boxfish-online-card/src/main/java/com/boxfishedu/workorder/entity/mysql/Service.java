@@ -16,8 +16,8 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "service")
-@ToString(exclude = "workOrders")
-@EqualsAndHashCode(exclude = "workOrders")
+@ToString(exclude = {"workOrders", "commentCards"})
+@EqualsAndHashCode(exclude = {"workOrders", "commentCards"})
 public class Service {
     @Id
     @Column(name = "id", nullable = false)

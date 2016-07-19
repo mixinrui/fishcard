@@ -82,7 +82,7 @@ public class CommentCard {
     private String courseName;
 
     @JoinColumn(name = "service_id", referencedColumnName = "id")//设置对应数据表的列名和引用的数据表的列名
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private Service service;
 

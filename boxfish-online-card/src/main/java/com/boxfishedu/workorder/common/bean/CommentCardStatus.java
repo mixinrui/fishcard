@@ -10,7 +10,8 @@ public enum CommentCardStatus {
     ASSIGNED_TEACHER("已分配教师",300),
     ANSWERED("已回答",400),
     UNREAD("未读取",500),
-    READ("已读取",600);
+    READ("已读取",600),
+    OVERTIME("教师超时未回答",700);
 
     private int code;
     private String status;

@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,9 @@ import java.util.List;
 public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherCommentCardService{
     @Autowired
     CommentCardJpaRepository commentCardJpaRepository;
+
+    @Autowired
+    ServiceJpaRepository serviceJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
@@ -57,7 +62,16 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Override
     public List<CommentCard> foreignTeacherCommentUnAnswer() {
         logger.info("调用查询外教未点评问题列表接口");
-        return commentCardJpaRepository.queryCommentNoAnswerList();
+        List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList();
+        for (CommentCard commentCard: list) {
+            commentCard.setStatus(CommentCardStatus.getCode("教师超时未回答"));
+            com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findOne(commentCard.getService().getId());
+            commentCard.setService(serviceTemp);
+            commentCardJpaRepository.save(commentCard);
+            serviceTemp.setAmount(serviceTemp.getAmount() + 1);
+            serviceJpaRepository.save(serviceTemp);
+        }
+        return null;
     }
 
 }

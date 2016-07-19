@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.Predicate;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,12 +40,14 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
             @Override
             public Predicate[] predicates() {
                 List<Predicate> predicateList = Lists.newArrayList();
-                //predicateList.add(criteriaBuilder.greaterThan(root.get()))
+                Date dateNow = new Date();
+                Long timeLong = dateNow.getTime() - 24 * 60 * 60 * 1000L;
+                dateNow.setTime(timeLong);
+                predicateList.add(criteriaBuilder.lessThan(root.get("studentAskTime"),dateNow));
                 predicateList.add(criteriaBuilder.between(root.get("status"),CommentCardStatus.getCode("已提问"),CommentCardStatus.getCode("已分配教师")));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };
-
         return entityQuery.list();
     }
 }

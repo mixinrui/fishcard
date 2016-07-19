@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.service.ServeService;
+import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
@@ -47,6 +48,8 @@ public class RabbitMqReciver {
     @Autowired
     private FishCardStatusFinderServiceX fishCardStatusFinderServiceX;
 
+    @Autowired
+    private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -118,6 +121,10 @@ public class RabbitMqReciver {
             else if(serviceTimerMessage.getType()==TimerMessageType.TEACHER_COURSE_NEW_ASSIGNEDED_DAY.value()){
                 logger.info("@TIMER>>>>>TEACHER_COURSE_NEW_ASSIGNEDED_DAY>>>>检查教师当天新分课程,并发送相关通知消息");
                 dailyCourseAssignedServiceX.batchNotifyTeacherAssignedCourse();
+            }
+            else if(serviceTimerMessage.getType()==TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
+                logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时内为点评的外教,并返回学生购买点评次数");
+                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
             }
         } catch (Exception ex) {
             logger.error("检查教师失败",ex);

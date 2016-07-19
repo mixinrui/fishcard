@@ -5,7 +5,9 @@ import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.entity.mysql.Service;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,24 +27,16 @@ public class ForeignTeacherCommentController {
     @Autowired
     CommentCardJpaRepository commentCardJpaRepository;
 
+    @Autowired
+    ServeService serveService;
+
     @RequestMapping(value = "add", method = RequestMethod.POST)
     public JsonResultModel addCommnetCard(@RequestBody CommentCard commentCardForm){
-        Service service = new Service();
-        service.setId(2L);
-        service.setStudentId(1298782L);
-        service.setStudentName("");
-        service.setOrderId(180L);
-        service.setOriginalAmount(8);
-        service.setAmount(8);
-        service.setSkuId(1L);
-        service.setSkuName("中教在线授课");
-        service.setValidityDay(365);
-        service.setRoleId(1);
-        service.setComboCycle(1);
-        service.setCountInMonth(8);
-        service.setOrderCode("16070115301593963077");
-        commentCardForm.setService(service);
-        return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCardForm);
+        CommentCard commentCard=new CommentCard();
+        BeanUtils.copyProperties(commentCardForm,commentCard);
+        Service service= serveService.findOne(2l);
+        commentCard.setService(service);
+        return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard);
     }
 
     @RequestMapping(value = "update_answer", method = RequestMethod.PUT)
@@ -57,20 +51,7 @@ public class ForeignTeacherCommentController {
         commentCardForm.setOrderId(commentCard.getOrderId());
         commentCardForm.setOrderCode(commentCard.getOrderCode());
         commentCardForm.setStatus(CommentCardStatus.getCode("未读取"));
-        Service service = new Service();
-        service.setId(2L);
-        service.setStudentId(1298782L);
-        service.setStudentName("");
-        service.setOrderId(180L);
-        service.setOriginalAmount(8);
-        service.setAmount(8);
-        service.setSkuId(1L);
-        service.setSkuName("中教在线授课");
-        service.setValidityDay(365);
-        service.setRoleId(1);
-        service.setComboCycle(1);
-        service.setCountInMonth(8);
-        service.setOrderCode("16070115301593963077");
+        Service service= serveService.findOne(2l);
         commentCardForm.setService(service);
         return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardForm);
     }
@@ -90,22 +71,7 @@ public class ForeignTeacherCommentController {
         CommentCard commentCardTemp = commentCardJpaRepository.findByStudentIdAndQuestionIdAndCourseId(
                 commentCard.getStudentId(),commentCard.getQuestionId(),commentCard.getCourseId()
         );
-        commentCardTemp.setStatus(CommentCardStatus.getCode("已读取"));
-        Service service = new Service();
-        service.setId(2L);
-        service.setStudentId(1298782L);
-        service.setStudentName("");
-        service.setOrderId(180L);
-        service.setOriginalAmount(8);
-        service.setAmount(8);
-        service.setSkuId(1L);
-        service.setSkuName("中教在线授课");
-        service.setValidityDay(365);
-        service.setRoleId(1);
-        service.setComboCycle(1);
-        service.setCountInMonth(8);
-        service.setOrderCode("16070115301593963077");
-        commentCardTemp.setService(service);
+        commentCardTemp.setStatus(CommentCardStatus.getCode("教师超时未回答"));
         return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardTemp);
     }
 

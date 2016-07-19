@@ -37,4 +37,6 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     @Query("select count(s) from Service s where s.studentId=?1 and s.skuId=?2 and s.amount>0")
     Integer getAvailableForeignCommentServiceCount(long studentId, long skuId);
+
+    public Service findByStudentId(Long studentId);
 }
