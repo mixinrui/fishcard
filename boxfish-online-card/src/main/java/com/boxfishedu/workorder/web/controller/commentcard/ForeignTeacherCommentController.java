@@ -7,6 +7,8 @@ import com.boxfishedu.workorder.entity.mysql.CommentCardStatus;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,7 +45,7 @@ public class ForeignTeacherCommentController {
         return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCardForm);
     }
 
-    @RequestMapping(value = "updateAnswer", method = RequestMethod.PUT)
+    @RequestMapping(value = "update_answer", method = RequestMethod.PUT)
     public JsonResultModel updateCommnetCard(@RequestBody CommentCard commentCardForm){
         CommentCard commentCard = commentCardJpaRepository.findByStudentIdAndQuestionIdAndCourseId(
                 commentCardForm.getStudentId(),commentCardForm.getQuestionId(),commentCardForm.getCourseId());
@@ -54,7 +56,7 @@ public class ForeignTeacherCommentController {
         commentCardForm.setAskVoicePath(commentCard.getAskVoicePath());
         commentCardForm.setOrderId(commentCard.getOrderId());
         commentCardForm.setOrderCode(commentCard.getOrderCode());
-        commentCardForm.setStatus(CommentCardStatus.getCode("未读"));
+        commentCardForm.setStatus(CommentCardStatus.getCode("未读取"));
         Service service = new Service();
         service.setId(2L);
         service.setStudentId(1298782L);
@@ -73,17 +75,22 @@ public class ForeignTeacherCommentController {
         return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardForm);
     }
 
-    @RequestMapping(value = "query/{studentId}",method = RequestMethod.GET)
-    public List<CommentCard> queryCommentList(@PathVariable Long studentId){
-        return foreignTeacherCommentCardService.foreignTeacherCommentQuery(studentId);
+    @RequestMapping(value = "query_all/{studentId}",method = RequestMethod.GET)
+    public Page<CommentCard> queryCommentList(Pageable pageable,@PathVariable Long studentId){
+        return foreignTeacherCommentCardService.foreignTeacherCommentQuery(pageable,studentId);
     }
 
-    @RequestMapping(value = "updateStatus", method = RequestMethod.PUT)
+    @RequestMapping(value = "query_one/{id}",method = RequestMethod.GET)
+    public CommentCard queryDetailComment(@PathVariable Long id){
+        return foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(id);
+    }
+
+    @RequestMapping(value = "update_status", method = RequestMethod.PUT)
     public JsonResultModel updateStatus(@RequestBody CommentCard commentCard){
         CommentCard commentCardTemp = commentCardJpaRepository.findByStudentIdAndQuestionIdAndCourseId(
                 commentCard.getStudentId(),commentCard.getQuestionId(),commentCard.getCourseId()
         );
-        commentCardTemp.setStatus(CommentCardStatus.getCode("已读"));
+        commentCardTemp.setStatus(CommentCardStatus.getCode("已读取"));
         Service service = new Service();
         service.setId(2L);
         service.setStudentId(1298782L);

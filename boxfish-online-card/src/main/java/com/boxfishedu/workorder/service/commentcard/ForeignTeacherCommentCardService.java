@@ -2,8 +2,8 @@ package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Created by ansel on 16/7/18.
@@ -11,5 +11,6 @@ import java.util.List;
 public interface ForeignTeacherCommentCardService {
     public JsonResultModel foreignTeacherCommentCardAdd(CommentCard commentCardForm);
     public JsonResultModel foreignTeacherCommentCardUpdate(CommentCard commentCardForm);
-    public List<CommentCard> foreignTeacherCommentQuery(Long studentId);
+    public Page<CommentCard> foreignTeacherCommentQuery(Pageable pageable,Long studentId);
+    public CommentCard foreignTeacherCommentDetailQuery(Long id);
 }

@@ -6,6 +6,8 @@ import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -40,8 +42,14 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
-    public List<CommentCard> foreignTeacherCommentQuery(Long studentId) {
-        logger.info("调用学生查询外教点评接口,其中studentId="+studentId);
-        return commentCardJpaRepository.findByStudentIdOrderByCreateTimeDesc(studentId);
+    public Page<CommentCard> foreignTeacherCommentQuery(Pageable pageable, Long studentId) {
+        logger.info("调用学生查询外教点评列表接口,其中studentId="+studentId+"pageable="+pageable);
+        return commentCardJpaRepository.queryCommentCardList(pageable,studentId);
+    }
+
+    @Override
+    public CommentCard foreignTeacherCommentDetailQuery(Long id) {
+        logger.info("调用学生查询某条外教点评具体信息接口,其中id="+id);
+        return commentCardJpaRepository.findById(id);
     }
 }

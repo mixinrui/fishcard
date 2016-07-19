@@ -5,8 +5,12 @@ package com.boxfishedu.workorder.entity.mysql;
  * Created by ansel on 16/7/18.
  */
 public enum CommentCardStatus {
-    READ("已读",1),
-    UNREAD("未读",0);
+    ASKED("已提问",100),
+    REQUEST_ASSIGN_TEACHER("请求分配教师",200),
+    ASSIGNED_TEACHER("已分配教师",300),
+    ANSWERED("已回答",400),
+    UNREAD("未读取",500),
+    READ("已读取",600);
 
     private int code;
     private String status;
@@ -22,20 +26,4 @@ public enum CommentCardStatus {
         }
         return -1;
     }
-
-//    public String getStatus() {
-//        return status;
-//    }
-//
-//    public void setStatus(String status) {
-//        this.status = status;
-//    }
-//
-//    public int getCode() {
-//        return code;
-//    }
-//
-//    public void setCode(int code) {
-//        this.code = code;
-//    }
 }
