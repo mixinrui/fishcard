@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.dao.jpa;
 
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.CommentCardStatus;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,5 +31,21 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
             }
         };
         return entityQuery.page();
+    }
+
+    @Override
+    public List<CommentCard> queryCommentNoAnswerList() {
+        EntityQuery entityQuery = new EntityQuery<CommentCard>(entityManager){
+
+            @Override
+            public Predicate[] predicates() {
+                List<Predicate> predicateList = Lists.newArrayList();
+                //predicateList.add(criteriaBuilder.greaterThan(root.get()))
+                predicateList.add(criteriaBuilder.between(root.get("status"),CommentCardStatus.getCode("已提问"),CommentCardStatus.getCode("已分配教师")));
+                return predicateList.toArray(new Predicate[predicateList.size()]);
+            }
+        };
+
+        return entityQuery.list();
     }
 }

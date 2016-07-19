@@ -12,4 +12,7 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     public List<CommentCard> findByStudentIdOrderByCreateTimeDesc(Long studentId);
 
     public CommentCard findById(Long id);
+
+    public List<CommentCard> findByStatusBetween(int startStatus,int endStatus);
+
 }

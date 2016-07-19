@@ -108,4 +108,9 @@ public class ForeignTeacherCommentController {
         commentCardTemp.setService(service);
         return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardTemp);
     }
+
+    @RequestMapping(value = "query_no_answer")
+    public List<CommentCard> queryUnAnswer(){
+        return foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
+    }
 }

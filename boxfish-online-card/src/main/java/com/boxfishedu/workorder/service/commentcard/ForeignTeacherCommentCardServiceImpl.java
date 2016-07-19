@@ -29,6 +29,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCardForm.setCreateTime(dateNow);
         commentCardJpaRepository.save(commentCardForm);
         logger.info("调用外教点评接口更新学生问题,其中commentCardForm="+commentCardForm);
+
         return new JsonResultModel();
     }
 
@@ -52,4 +53,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("调用学生查询某条外教点评具体信息接口,其中id="+id);
         return commentCardJpaRepository.findById(id);
     }
+
+    @Override
+    public List<CommentCard> foreignTeacherCommentUnAnswer() {
+        logger.info("调用查询外教未点评问题列表接口");
+        return commentCardJpaRepository.queryCommentNoAnswerList();
+    }
+
 }
