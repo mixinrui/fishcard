@@ -1,14 +1,14 @@
 package com.boxfishedu.workorder.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.exception.BoxfishException;
-import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.online.order.entity.OrderForm;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
+import com.boxfishedu.workorder.common.bean.SkuTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BoxfishException;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -18,6 +18,7 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.ResponseCourseView;
 import com.boxfishedu.workorder.web.view.order.OrderDetailView;
@@ -42,7 +43,8 @@ import java.util.*;
 public class ServeService extends BaseService<Service, ServiceJpaRepository, Long> {
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
-
+    @Autowired
+    private ServiceJpaRepository serviceJpaRepository;
     @Autowired
     private UrlConf urlConf;
 
@@ -378,6 +380,30 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfo.setWorkOrderId(workOrder.getId());
         scheduleCourseInfo.setScheduleId(courseSchedule.getId());
         scheduleCourseInfoService.save(scheduleCourseInfo);
+    }
+
+    public Map<String, Integer> getAvailableForeignCommentServiceCount(long studentId) {
+        List<Service> services = serviceJpaRepository.getAvailableForeignCommentServiceCounts(
+                studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value());
+        Integer originalAmount = services.stream().reduce(
+                0,
+                (total, service) -> total + service.getOriginalAmount(),
+                Integer::sum
+        );
+        Integer amount = services.stream().reduce(
+                0,
+                (total, service) -> total + service.getAmount(),
+                Integer::sum
+        );
+        Map<String, Integer> countMap = Maps.newHashMap();
+        countMap.put("originalAmount", originalAmount);
+        countMap.put("amount", amount);
+        return countMap;
+    }
+
+    public boolean haveAvailableForeignCommentService(long studentId) {
+        return serviceJpaRepository.getAvailableForeignCommentServiceCount(
+                studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value()) > 0;
     }
 
 //    @Transactional

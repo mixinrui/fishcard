@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -30,4 +31,10 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     public Service findByIdForUpdate(Long id);
 
     public Service findTop1ByOrderId(Long orderId);
+
+    @Query("select s from Service s where s.studentId=?1 and s.skuId=?2 and s.amount>0")
+    List<Service> getAvailableForeignCommentServiceCounts(long studentId, long skuId);
+
+    @Query("select count(s) from Service s where s.studentId=?1 and s.skuId=?2 and s.amount>0")
+    Integer getAvailableForeignCommentServiceCount(long studentId, long skuId);
 }
