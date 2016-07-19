@@ -92,6 +92,9 @@ public class MakeWorkOrderServiceX {
 
         logger.info("3333333333:::::::::::::::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
 
+        if(null ==map || map.isEmpty()){
+            return;
+        }
         // 5 把缓存数据放入redis  把能够分配的鱼卡放在缓存中
 
         for (WorkOrder wo : workOrderNOteacher) {
@@ -132,7 +135,7 @@ public class MakeWorkOrderServiceX {
         boolean chineseTeacherflag = false;
         boolean foreignTeahcerflag = false;
         for (WorkOrder wo : workOrderNOteacher) {
-            if (CourseTypeEnum.TALK.equals(wo.getCourseType())) {
+            if (CourseTypeEnum.TALK.toString().equals(wo.getCourseType())) {
                 foreignTeahcerflag = true;
             } else {
                 chineseTeacherflag = true;
@@ -149,6 +152,10 @@ public class MakeWorkOrderServiceX {
      * 过滤 获取最终发送老师鱼卡信息
      * 未来两天是否含有匹配课程的老师
      * 该老师在该时间片上 不能安排课程
+     *
+     * {
+     *     1 按照教师就行分配
+     * }
      *
      * @param map
      * @param workOrderNOteacher
@@ -169,10 +176,18 @@ public class MakeWorkOrderServiceX {
             } else {
                 List workOrder = Lists.newArrayList();
                 for (WorkOrder wono : workOrderNOteacher) {
+                    boolean woflag = true;
+
                     for (WorkOrder woyes : workOrderYESteacher) {
-                        if (teacher.getTeacherId() != woyes.getTeacherId() && !wono.getStartTime().equals(woyes.getStartTime())) {
-                            workOrder.add(wono);
+                        // 如果该教师在该鱼卡 时间片内有课 ,则不对该教师发送该鱼卡通知
+                        if (teacher.getTeacherId()==woyes.getTeacherId() &&   wono.getStartTime().equals(woyes.getStartTime())) {
+                            woflag = false;
+                            break;
                         }
+                    }
+
+                    if (woflag){
+                        workOrder.add(wono);
                     }
                 }
 
@@ -182,9 +197,15 @@ public class MakeWorkOrderServiceX {
             }
 
         }
-
         return map;
     }
+
+
+    public static  void  main(String args[]){
+
+    }
+
+
 
     /**
      * 根据教师类型  返回相应的 鱼卡列表
@@ -196,11 +217,11 @@ public class MakeWorkOrderServiceX {
     public List<WorkOrder> getTeacherListByType(List<WorkOrder> workOrderNOteacher, int type) {
         List<WorkOrder> list = Lists.newArrayList();
         for (WorkOrder wo : workOrderNOteacher) {
-            if (TeachingType.WAIJIAO.getCode() == type && CourseTypeEnum.TALK.equals(wo.getCourseType())) {
+            if (TeachingType.WAIJIAO.getCode() == type && CourseTypeEnum.TALK.toString().equals(wo.getCourseType())) {
                 list.add(wo);
             }
 
-            if (TeachingType.ZHONGJIAO.getCode() == type && !CourseTypeEnum.TALK.equals(wo.getCourseType())) {
+            if (TeachingType.ZHONGJIAO.getCode() == type && !CourseTypeEnum.TALK.toString().equals(wo.getCourseType())) {
                 list.add(wo);
             }
         }
