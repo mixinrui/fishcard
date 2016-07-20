@@ -1,30 +1,36 @@
 package com.boxfishedu.workorder.common.bean;
 
 
+import com.boxfishedu.workorder.entity.mysql.CommentCard;
+
 /**
  * Created by ansel on 16/7/18.
  */
 public enum CommentCardStatus {
-    ASKED("已提问",100),
-    REQUEST_ASSIGN_TEACHER("请求分配教师",200),
-    ASSIGNED_TEACHER("已分配教师",300),
-    ANSWERED("已回答",400),
-    UNREAD("未读取",500),
-    READ("已读取",600),
-    OVERTIME("教师超时未回答",700);
+
+    ASKED(100,"已提问"),
+    REQUEST_ASSIGN_TEACHER(200,"请求分配教师"),
+    ASSIGNED_TEACHER(300,"已分配教师"),
+    ANSWERED(400,"已回答"),
+    UNREAD(500,"未读取"),
+    READ(600,"已读取"),
+    OVERTIME(700,"教师超时未回答");
 
     private int code;
     private String status;
 
-    CommentCardStatus(String status,int code){
+    CommentCardStatus(int code,String status){
         this.status = status;
         this.code = code;
     }
-    public static int getCode(String status){
+    public int getCode(){
+        return this.code;
+    }
+    public static String getStatus(int code){
         for (CommentCardStatus commentCardStatus: CommentCardStatus.values()){
-            if (commentCardStatus.status == status)
-                return commentCardStatus.code;
+            if (commentCardStatus.code == code)
+                return commentCardStatus.status;
         }
-        return -1;
+        return null;
     }
 }

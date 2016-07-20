@@ -50,7 +50,7 @@ public class ForeignTeacherCommentController {
         commentCardForm.setAskVoicePath(commentCard.getAskVoicePath());
         commentCardForm.setOrderId(commentCard.getOrderId());
         commentCardForm.setOrderCode(commentCard.getOrderCode());
-        commentCardForm.setStatus(CommentCardStatus.getCode("未读取"));
+        commentCardForm.setStatus(CommentCardStatus.UNREAD.getCode());
         Service service= serveService.findOne(2l);
         commentCardForm.setService(service);
         return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardForm);
@@ -71,7 +71,7 @@ public class ForeignTeacherCommentController {
         CommentCard commentCardTemp = commentCardJpaRepository.findByStudentIdAndQuestionIdAndCourseId(
                 commentCard.getStudentId(),commentCard.getQuestionId(),commentCard.getCourseId()
         );
-        commentCardTemp.setStatus(CommentCardStatus.getCode("教师超时未回答"));
+        commentCardTemp.setStatus(CommentCardStatus.OVERTIME.getCode());
         return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardTemp);
     }
 

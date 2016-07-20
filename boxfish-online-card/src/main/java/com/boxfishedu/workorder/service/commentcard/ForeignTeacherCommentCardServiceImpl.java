@@ -61,10 +61,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Override
     public List<CommentCard> foreignTeacherCommentUnAnswer() {
-        logger.info("调用查询外教未点评问题列表接口");
+        logger.info("调用查询外教未点评问题数据库接口");
         List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList();
         for (CommentCard commentCard: list) {
-            commentCard.setStatus(CommentCardStatus.getCode("教师超时未回答"));
+            commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
             com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findOne(commentCard.getService().getId());
             commentCard.setService(serviceTemp);
             commentCardJpaRepository.save(commentCard);
@@ -73,5 +73,4 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }
         return null;
     }
-
 }
