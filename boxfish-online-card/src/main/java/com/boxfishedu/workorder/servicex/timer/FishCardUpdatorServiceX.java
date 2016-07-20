@@ -99,18 +99,8 @@ public class FishCardUpdatorServiceX {
 
     /**
      * 学生旷课逻辑处理
-     *
-     * @param fishCardDelayMessage
      */
-    public void studentAbsentUpdator(FishCardDelayMessage fishCardDelayMessage) {
-        logger.debug("@absentUpdator,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
-        WorkOrder workOrder = workOrderService.findByIdForUpdate(fishCardDelayMessage.getId());
-        if (null == workOrder) {
-            throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
-        }
-
-        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
-        courseOnlineService.notAllowUpdateStatus(workOrder);
+    public boolean studentAbsentUpdator(WorkOrder workOrder, CourseSchedule courseSchedule) {
 
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
 
@@ -124,9 +114,9 @@ public class FishCardUpdatorServiceX {
         if (!isExceptionFlag) {
             logger.warn("[studentAbsentUpdator]鱼卡:[{}]的状态为学生旷课,开始处理", workOrder.getId());
             courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
+            workOrderLogService.saveWorkOrderLog(workOrder);
         }
-
-        workOrderLogService.saveWorkOrderLog(workOrder);
+        return isExceptionFlag;
     }
 
     /**
@@ -151,10 +141,14 @@ public class FishCardUpdatorServiceX {
         courseOnlineService.notAllowUpdateStatus(workOrder);
         workOrder.setIsCourseOver((short) 1);
 
-        //对于不包含学生接受请求的消息,视为旷课处理;其他视为系统异常
-//        if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()) {
-//            handleStudentAbsent(fishCardDelayMessage, workOrder, courseSchedule);
-//        }
+        //  对于不包含学生接受请求的消息,视为旷课处理;其他视为系统异常
+        if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()
+                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()
+                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.CONNECTED.getCode()) {
+            if (!studentAbsentUpdator(workOrder, courseSchedule)) {
+                return;
+            }
+        }
         //处于正在上课,标记为服务器强制完成
         if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.ONCLASS.getCode()) {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
