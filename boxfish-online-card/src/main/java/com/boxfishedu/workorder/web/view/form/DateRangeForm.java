@@ -6,7 +6,6 @@ import lombok.Data;
 import org.apache.commons.lang.time.DateUtils;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,8 +36,10 @@ public class DateRangeForm {
     }
 
     public boolean isWithIn(LocalDateTime dateTime) {
-        return dateTime.isAfter(LocalDateTime.ofInstant(from.toInstant(), ZoneId.systemDefault()))
-                && dateTime.isBefore(LocalDateTime.ofInstant(to.toInstant(), ZoneId.systemDefault()));
+        LocalDateTime fromLocalDateTime = DateUtil.convertLocalDateTime(from);
+        LocalDateTime toLocalDateTime = DateUtil.convertLocalDateTime(to);
+        return (dateTime.isAfter(fromLocalDateTime) || dateTime.equals(fromLocalDateTime))
+                && dateTime.isBefore(toLocalDateTime);
     }
 
     public <K> List<K> collect(Handle<? extends K> handle) throws CloneNotSupportedException {

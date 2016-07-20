@@ -91,8 +91,6 @@ public class MonthTimeSlots extends ResponseBaseView implements Serializable {
         }
     }
 
-
-    // TODO 添加过滤器
     public MonthTimeSlots filter(Predicate<DayTimeSlots> dayPredicate, Predicate<TimeSlots> timePredicate) {
 
         this.data = data.parallelStream()
