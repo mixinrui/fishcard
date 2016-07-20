@@ -179,7 +179,7 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     }
 
     public int setTeacherIdByWorkOrderId(GrabOrderView grabOrderView){
-        int lineNo = jpa.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId());
+        int lineNo = jpa.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),grabOrderView.getState());
         return lineNo;
     }
 }

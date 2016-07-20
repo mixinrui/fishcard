@@ -12,4 +12,6 @@ public class GrabOrderView {
 
     private Long workOrderId;
 
+    private Integer state;
+
 }

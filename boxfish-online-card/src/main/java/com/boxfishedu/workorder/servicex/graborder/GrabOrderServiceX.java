@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.graborder;
 
 import com.alibaba.fastjson.JSONObject;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
@@ -133,6 +134,7 @@ public class GrabOrderServiceX {
                     jsonObject.put("code","1");
                     logger.info("::::::::::::::::::单子已过期,抢单失败::::::::::::::::::");
                 }else{
+                    grabOrderView.setState(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
                     grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
                     grabOrderService.setTeacherIdByWorkOrderId(grabOrderView);
                     courseScheduleService.findByWorkOrderIdForUpdate(grabOrderView);

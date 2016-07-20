@@ -72,6 +72,6 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     public CourseSchedule findByWorkOrderIdForUpdate(Long workorderId);
 
     @Modifying
-    @Query("update CourseSchedule o set o.teacherId = ?1 where o.workorderId = ?2 ")
-    int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId);
+    @Query("update CourseSchedule o set o.teacherId = ?1 ,o.state=?3 where o.workorderId = ?2 ")
+    int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId, Integer state);
 }
