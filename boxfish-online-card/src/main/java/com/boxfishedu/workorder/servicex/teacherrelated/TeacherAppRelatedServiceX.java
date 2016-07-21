@@ -262,6 +262,7 @@ public class TeacherAppRelatedServiceX {
      * @return
      */
     public JsonResultModel getInternationalDayTimeSlotsTemplate(Long teacherId, Date date) throws CloneNotSupportedException {
+
         // 日期范围
         DateRangeForm dateRangeForm = getInternationalDateRange(date);
         // 具体时间范围
@@ -269,8 +270,14 @@ public class TeacherAppRelatedServiceX {
         List<DayTimeSlots> result = dateRangeForm
                 .collect(loopDate -> teacherStudentRequester.dayTimeSlotsTemplate(teacherId, loopDate))
                 .stream()
+                // 国际化时间
                 .map(d -> this.filterInternationalDayTimeSlots(d, dateTimeRangeForm))
-                .map(timeLimitPolicy::limit)
+                // 过滤历史日期
+                .map(dayTimeSlots -> timeLimitPolicy.limit(dayTimeSlots).filter(
+                        d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                        t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()
+                ))
+                // 非空
                 .filter(this::notEmptyPredicate)
                 .collect(Collectors.toList());
         return JsonResultModel.newJsonResultModel(result);
