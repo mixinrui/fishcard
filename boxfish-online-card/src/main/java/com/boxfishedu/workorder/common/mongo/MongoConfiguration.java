@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.common.mongo;
 
+import com.boxfishedu.workorder.entity.mongo.CommentCardLog;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mongo.TrialCourse;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
@@ -72,7 +73,7 @@ public class MongoConfiguration {
     @Bean
     Datastore datastore() {
         Morphia morphia = morphia();
-        morphia.map(CommentCard.class);
+        morphia.map(CommentCardLog.class);
         morphia.map(WorkOrderLog.class);
         morphia.map(ScheduleCourseInfo.class);
         morphia.map(TrialCourse.class);
