@@ -7,12 +7,15 @@ import com.boxfishedu.workorder.common.rabbitmq.RabbitMqDelaySender;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.threadpool.ParameterThread;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.timer.DailyCourseAssignedServiceX;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.DateFormat;
@@ -41,6 +44,9 @@ public class MonitorController {
     private ServeService serveService;
     @Autowired
     private RabbitMqDelaySender rabbitMqDelaySender;
+
+    @Autowired
+    private ServiceJpaRepository serviceJpaRepository;
 
     @Autowired
     private DailyCourseAssignedServiceX dailyCourseAssignedServiceX;
@@ -99,6 +105,16 @@ public class MonitorController {
         System.out.println(Long.MAX_VALUE);
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         System.out.println(DateUtil.String2SimpleDate("2016-09-12").getTime());
+    }
+
+    @RequestMapping(value = "/lock", method = RequestMethod.GET)
+    @Transactional
+    public void testGetTeachersByOrder() throws Exception {
+        Service service=serviceJpaRepository.findByIdForUpdate(5072L);
+        service.setAmount(service.getAmount() - 1);
+        service.setUpdateTime(new Date());
+        Thread.sleep(60*1000);
+        serviceJpaRepository.save(service);
     }
 
 
