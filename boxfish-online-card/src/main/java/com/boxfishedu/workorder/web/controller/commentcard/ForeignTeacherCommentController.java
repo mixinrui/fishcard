@@ -1,16 +1,19 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.exception.OutTimeException;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.sun.javadoc.ThrowsTag;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,21 +34,22 @@ public class ForeignTeacherCommentController {
     ServeService serveService;
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public JsonResultModel addCommentCard(@RequestBody CommentCard commentCardForm){
+    @Transactional
+    public JsonResultModel addCommentCard(@RequestBody CommentCard commentCardForm) throws Exception {
         CommentCard commentCard=new CommentCard();
         BeanUtils.copyProperties(commentCardForm,commentCard);
-        Service service= serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).get();
-        if(service.getAmount() <= 0){
-            JsonResultModel jsonResultModel = new JsonResultModel();
-            jsonResultModel.setReturnCode(500);
-            jsonResultModel.setReturnMsg("error");
-            jsonResultModel.setData("学生点评次数用尽");
-            return jsonResultModel;
+        if(serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).isPresent()){
+            Service service= serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).get();
+            if(service.getAmount() <= 0){
+                throw new OutTimeException();
+            }else {
+                service.setAmount(service.getAmount() - 1);
+                foreignTeacherCommentCardService.updateCommentAmount(service);
+                commentCard.setService(service);
+                return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard);
+            }
         }else {
-            service.setAmount(service.getAmount() - 1);
-            foreignTeacherCommentCardService.updateCommentAmount(service);
-            commentCard.setService(service);
-            return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard);
+                throw new OutTimeException();
         }
     }
 
