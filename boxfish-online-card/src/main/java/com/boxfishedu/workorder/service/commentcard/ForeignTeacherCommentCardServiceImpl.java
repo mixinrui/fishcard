@@ -2,6 +2,8 @@ package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
+import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
@@ -24,17 +26,21 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     CommentCardJpaRepository commentCardJpaRepository;
 
     @Autowired
+    RabbitMqSender rabbitMqSender;
+
+    @Autowired
     ServiceJpaRepository serviceJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
     @Override
     public JsonResultModel foreignTeacherCommentCardAdd(CommentCard commentCardForm) {
+        logger.info("调用外教点评接口更新学生问题,其中commentCardForm="+commentCardForm);
         Date dateNow = new Date();
         commentCardForm.setCreateTime(dateNow);
         commentCardJpaRepository.save(commentCardForm);
-        logger.info("调用外教点评接口更新学生问题,其中commentCardForm="+commentCardForm);
-
+        logger.info("向师生运营发生消息,通知分配外教进行点评...");
+        rabbitMqSender.send(commentCardForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
         return new JsonResultModel();
     }
 

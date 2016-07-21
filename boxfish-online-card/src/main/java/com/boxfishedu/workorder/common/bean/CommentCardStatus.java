@@ -1,8 +1,5 @@
 package com.boxfishedu.workorder.common.bean;
 
-
-import com.boxfishedu.workorder.entity.mysql.CommentCard;
-
 /**
  * Created by ansel on 16/7/18.
  */

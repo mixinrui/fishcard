@@ -30,6 +30,8 @@ public class RabbitMqSender {
     private @Qualifier(RabbitMqConstant.ASSIGN_TEACHER_REPLY_TEMPLATE_NAME) RabbitTemplate assignTeacherReplyRabbitTemplate;
     @Autowired
     private @Qualifier(RabbitMqConstant.CREATE_GROUP_TEMPLATE_NAME) RabbitTemplate createGroupTemplate;
+    @Autowired
+    private @Qualifier(RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME) RabbitTemplate assignForeignTeacherCommentRabbitTemlate;
 
 
     public void send(Object object, QueueTypeEnum queueTypeEnum) {
@@ -66,9 +68,13 @@ public class RabbitMqSender {
                 createGroupTemplate.convertAndSend(object);
                 break;
             }
-            case ASSIGN_TEACHER_TIMER_REPLY:
-                logger.info("@<-<-<-<-<-<-<-处理完定时任务的请求,参数:{}",JacksonUtil.toJSon(object));
+            case ASSIGN_TEACHER_TIMER_REPLY: {
+                logger.info("@<-<-<-<-<-<-<-处理完定时任务的请求,参数:{}", JacksonUtil.toJSon(object));
                 notifyTimerTemplate.convertAndSend(object);
+            }
+            case ASSIGN_FOREIGN_TEACHER_COMMENT:
+                logger.debug("@<-<-<-<-<-<-<-向师生运营发送获取外教点评教师请求,参数{}",JacksonUtil.toJSon(object));
+                assignForeignTeacherCommentRabbitTemlate.convertAndSend(object);
             default:
                 break;
         }

@@ -108,6 +108,13 @@ public class RabbitMqConfiguration {
         Binding assignTeacherReplyBinding = BindingBuilder.bind(assignTeacherReplyQueue).to(scheduleExchange()).with(RabbitMqConstant.ASSIGNED_TEACHER_REPLY_QUEUE).noargs();
 
         /**
+         * 外教点评分配教师通知
+         */
+        Queue assignForeignTeacherCommentQueue = new Queue(RabbitMqConstant.ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE, true);
+        rabbitAdmin.declareQueue(assignForeignTeacherCommentQueue);
+        Binding assignForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(scheduleExchange()).with(RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME).noargs();
+
+        /**
          * 创建组
          */
         Queue createGroupQueue = new Queue(RabbitMqConstant.CREATE_GROUP_QUEUE, true);
