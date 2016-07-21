@@ -96,7 +96,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
     public List<WorkOrderGrab>   getGrabDataBeforeDay(){
         //今天的  00:00:00
         Date date = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),0),0);
-        return  workOrderGrabJpaRepository.findByCreateTimeLessThan(new Date());
+        return  workOrderGrabJpaRepository.findByCreateTimeLessThan(date);
     }
 
     public void  deleteGrabData(List<WorkOrderGrab> list){
