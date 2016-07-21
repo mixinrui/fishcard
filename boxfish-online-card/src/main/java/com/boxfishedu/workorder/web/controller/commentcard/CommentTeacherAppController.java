@@ -39,7 +39,7 @@ public class CommentTeacherAppController {
     }
 
     @RequestMapping(value = "/card", method = RequestMethod.POST)
-    public JsonResultModel submitComment(CommentCardSubmitParam commentCardSubmitParam,Long userId){
+    public JsonResultModel submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam,Long userId){
         commonServeServiceX.checkToken(commentCardSubmitParam.getTeacherId(),userId);
         commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
         return JsonResultModel.newJsonResultModel(null);

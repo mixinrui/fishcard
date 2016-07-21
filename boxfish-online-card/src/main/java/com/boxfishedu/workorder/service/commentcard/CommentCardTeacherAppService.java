@@ -27,7 +27,7 @@ public class CommentCardTeacherAppService {
     }
 
     public void save(CommentCard commentCard){
-        this.save(commentCard);
+        commentCardJpaRepository.save(commentCard);
     }
 
 }

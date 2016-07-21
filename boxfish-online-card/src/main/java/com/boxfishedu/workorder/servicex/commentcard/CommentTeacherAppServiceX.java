@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
 
@@ -33,7 +34,7 @@ public class CommentTeacherAppServiceX {
         return commentCardTeacherAppService.findById(cardId);
     }
 
-    public void submitComment(CommentCardSubmitParam commentCardSubmitParam){
+    public void submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam){
         CommentCard commentCard=commentCardTeacherAppService.findById(commentCardSubmitParam.getCommentcardId());
         if(null==commentCard){
             throw new BusinessException("不存在对应的点评卡");
