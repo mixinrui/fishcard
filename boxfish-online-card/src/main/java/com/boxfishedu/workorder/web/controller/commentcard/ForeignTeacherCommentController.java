@@ -1,14 +1,13 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.workorder.common.exception.OutTimeException;
+import com.boxfishedu.workorder.common.exception.UseUpException;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
-import com.sun.javadoc.ThrowsTag;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,7 +41,7 @@ public class ForeignTeacherCommentController {
         if(serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).isPresent()){
             Service service= serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).get();
             if(service.getAmount() <= 0){
-                throw new OutTimeException();
+                throw new UseUpException();
             }else {
                 service.setAmount(service.getAmount() - 1);
                 foreignTeacherCommentCardService.updateCommentAmount(service);
@@ -50,7 +49,7 @@ public class ForeignTeacherCommentController {
                 return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard);
             }
         }else {
-                throw new OutTimeException();
+                throw new UseUpException();
         }
     }
 

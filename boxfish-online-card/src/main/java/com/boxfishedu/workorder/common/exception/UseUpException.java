@@ -9,16 +9,16 @@ import org.apache.http.HttpStatus;
  */
 @Data
 @EqualsAndHashCode
-public class OutTimeException extends BoxfishException{
+public class UseUpException extends BoxfishException{
     public final Integer returnCode = HttpStatus.SC_UNAUTHORIZED;
 
     private String returnMsg;
 
-    public OutTimeException(String returnMsg) {
+    public UseUpException(String returnMsg) {
         this.returnMsg = returnMsg;
     }
 
-    public OutTimeException() {
+    public UseUpException() {
         returnMsg = "外教点评次数用尽,请先购买点评!!!";
     }
 }
