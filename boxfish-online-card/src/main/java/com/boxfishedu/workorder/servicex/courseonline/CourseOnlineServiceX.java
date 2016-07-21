@@ -71,10 +71,18 @@ public class CourseOnlineServiceX {
         logger.info("@updateTeachingStatus,参数{}",JacksonUtil.toJSon(map));
         Long workOrderId = Long.parseLong(map.get("id").toString());
         Integer status = Integer.parseInt(map.get("status").toString());
+        String reportTime=StringUtils.EMPTY;
+        try {
+            reportTime=map.get("report_time").toString();
+        }
+        catch (Exception ex){
+            logger.info("updateTeachingStatus#no_report_time,终端没有上报上传时间");
+        }
+
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
         CourseSchedule courseSchedule= courseScheduleService.findByWorkOrderId(workOrderId);
         if((status!=FishCardStatusEnum.COMPLETED.getCode())&&(status!=FishCardStatusEnum.COMPLETED_FORCE.getCode())) {
-            courseOnlineService.notAllowUpdateStatus(workOrder,status);
+            courseOnlineService.notAllowUpdateStatus(workOrder,"不能覆盖已有消息,新消息:"+FishCardStatusEnum.getDesc(status)+"@@reportTime"+reportTime);
         }
         if (null == workOrder||null==courseSchedule) {
             String msg="无对应的鱼卡或课程schedule,请确认参数传入是否正确,鱼卡id[" + workOrderId + "]";
@@ -89,7 +97,6 @@ public class CourseOnlineServiceX {
         else if(status==FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()||status==FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()){
             handleLeaveEarly(workOrder,courseSchedule,status);
         }
-        //TODO:异常情况分哪些;哪些异常上报给我;在哪些情况下需要扣除上课的情况.没有确定
         else {
             if(status==FishCardStatusEnum.ONCLASS.getCode()){
                 workOrder.setActualStartTime(new Date());
@@ -98,7 +105,7 @@ public class CourseOnlineServiceX {
             workOrder.setUpdateTime(new Date());
             workOrderService.save(workOrder);
         }
-        addWorkOrderLog(workOrder);
+        workOrderLogService.saveWorkOrderLog(workOrder,FishCardStatusEnum.getDesc(workOrder.getStatus())+"@reporttime->"+reportTime);
     }
 
     //更新WorkOrder的状态
@@ -148,18 +155,6 @@ public class CourseOnlineServiceX {
         serveService.notifyOrderUpdateStatus(workOrder, ConstantUtil.WORKORDER_COMPLETED);
         //通知推荐课服务
         recommandCourseRequester.notifyCompleteCourse(workOrder);
-    }
-
-
-    public WorkOrderLog addWorkOrderLog(WorkOrder workWorder) throws BoxfishException {
-        logger.info("@addWorkOrderLog,添加鱼卡日志,鱼卡信息{}",JacksonUtil.toJSon(workWorder));
-        WorkOrderLog workOrderLog = new WorkOrderLog();
-        workOrderLog.setWorkOrderId(workWorder.getId());
-        workOrderLog.setStatus(workWorder.getStatus());
-        workOrderLog.setCreateTime(new Date());
-        workOrderLog.setContent(FishCardStatusEnum.getDesc(workWorder.getStatus()));
-        workOrderLogService.save(workOrderLog);
-        return workOrderLog;
     }
 
     /**
