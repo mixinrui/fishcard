@@ -25,6 +25,7 @@ import com.boxfishedu.workorder.web.view.order.OrderDetailView;
 import com.boxfishedu.workorder.web.view.order.ProductSKUView;
 import com.boxfishedu.workorder.web.view.order.ServiceSKU;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -404,6 +405,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     public boolean haveAvailableForeignCommentService(long studentId) {
         return serviceJpaRepository.getAvailableForeignCommentServiceCount(
                 studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value()) > 0;
+    }
+
+    public Optional<Service> findFirstAvailableForeignCommentService(long studentId) {
+        List<Service> services = serviceJpaRepository.getAvailableForeignCommentServiceCounts(
+                studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value());
+        return (CollectionUtils.isNotEmpty(services)) ? Optional.of(services.get(0)) : Optional.empty();
     }
 
 //    @Transactional
