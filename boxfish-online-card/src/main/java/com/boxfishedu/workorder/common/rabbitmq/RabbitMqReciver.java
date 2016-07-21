@@ -123,7 +123,7 @@ public class RabbitMqReciver {
                 dailyCourseAssignedServiceX.batchNotifyTeacherAssignedCourse();
             }
             else if(serviceTimerMessage.getType()==TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
-                logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时内为点评的外教,并返回学生购买点评次数");
+                logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时内为点评的外教,判定返还学生购买点评次数");
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
             }
         } catch (Exception ex) {

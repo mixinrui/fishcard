@@ -31,7 +31,7 @@ public class RabbitMqSender {
     @Autowired
     private @Qualifier(RabbitMqConstant.CREATE_GROUP_TEMPLATE_NAME) RabbitTemplate createGroupTemplate;
     @Autowired
-    private @Qualifier(RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME) RabbitTemplate assignForeignTeacherCommentRabbitTemlate;
+    private @Qualifier(RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME) RabbitTemplate assignForeignTeacherCommentRabbitTemplate;
 
 
     public void send(Object object, QueueTypeEnum queueTypeEnum) {
@@ -74,7 +74,7 @@ public class RabbitMqSender {
             }
             case ASSIGN_FOREIGN_TEACHER_COMMENT:
                 logger.debug("@<-<-<-<-<-<-<-向师生运营发送获取外教点评教师请求,参数{}",JacksonUtil.toJSon(object));
-                assignForeignTeacherCommentRabbitTemlate.convertAndSend(object);
+                assignForeignTeacherCommentRabbitTemplate.convertAndSend(object);
             default:
                 break;
         }

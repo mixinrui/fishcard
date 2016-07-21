@@ -79,4 +79,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }
         return null;
     }
+
+    @Override
+    public JsonResultModel updateCommentAmount(com.boxfishedu.workorder.entity.mysql.Service service) {
+        logger.info("调用修改学生点评次数接口,其中service="+service);
+        serviceJpaRepository.save(service);
+        return new JsonResultModel();
+    }
 }

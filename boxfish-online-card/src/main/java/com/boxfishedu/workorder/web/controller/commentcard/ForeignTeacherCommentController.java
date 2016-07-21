@@ -34,9 +34,19 @@ public class ForeignTeacherCommentController {
     public JsonResultModel addCommentCard(@RequestBody CommentCard commentCardForm){
         CommentCard commentCard=new CommentCard();
         BeanUtils.copyProperties(commentCardForm,commentCard);
-        Service service= serveService.findOne(2l);
-        commentCard.setService(service);
-        return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard);
+        Service service= serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).get();
+        if(service.getAmount() <= 0){
+            JsonResultModel jsonResultModel = new JsonResultModel();
+            jsonResultModel.setReturnCode(500);
+            jsonResultModel.setReturnMsg("error");
+            jsonResultModel.setData("学生点评次数用尽");
+            return jsonResultModel;
+        }else {
+            service.setAmount(service.getAmount() - 1);
+            foreignTeacherCommentCardService.updateCommentAmount(service);
+            commentCard.setService(service);
+            return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard);
+        }
     }
 
     @RequestMapping(value = "update_answer", method = RequestMethod.PUT)
@@ -51,7 +61,9 @@ public class ForeignTeacherCommentController {
         commentCardForm.setOrderId(commentCard.getOrderId());
         commentCardForm.setOrderCode(commentCard.getOrderCode());
         commentCardForm.setStatus(CommentCardStatus.UNREAD.getCode());
-        Service service= serveService.findOne(2l);
+        Service service= serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).get();
+        service.setAmount(service.getAmount() - 1);
+        foreignTeacherCommentCardService.updateCommentAmount(service);
         commentCardForm.setService(service);
         return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardForm);
     }

@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,4 +22,6 @@ public interface ForeignTeacherCommentCardService {
     public CommentCard foreignTeacherCommentDetailQuery(Long id);
 
     public List<CommentCard> foreignTeacherCommentUnAnswer();
+
+    public JsonResultModel updateCommentAmount(Service service);
 }

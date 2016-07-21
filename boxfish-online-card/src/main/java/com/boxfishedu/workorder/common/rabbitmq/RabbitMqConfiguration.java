@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.common.rabbitmq;
 
 import com.boxfishedu.workorder.common.util.ConstantUtil;
+import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
@@ -276,6 +277,19 @@ public class RabbitMqConfiguration {
     @Bean(name = RabbitMqConstant.ASSIGN_TEACHER_TEMPLATE_NAME)
     public RabbitTemplate assignTeacherRabbitTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
         RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.ASSIGNED_TEACHER_REQUEST_QUEUE);
+        template.setExchange(SCHEDULE_EXCHANGE);
+        return template;
+    }
+
+    /**
+     * 通知外教点评分配老师MQ
+     * @param factory
+     * @param messageConverter
+     * @return
+     */
+    @Bean(name = RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME)
+    public RabbitTemplate assignForeignTeacherCommentTemplate(ConnectionFactory factory, MessageConverter messageConverter){
+        RabbitTemplate template = getRabbitTemplate(factory,messageConverter,RabbitMqConstant.ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE);
         template.setExchange(SCHEDULE_EXCHANGE);
         return template;
     }
