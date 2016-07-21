@@ -31,7 +31,7 @@ public class ForeignTeacherCommentController {
     ServeService serveService;
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public JsonResultModel addCommnetCard(@RequestBody CommentCard commentCardForm){
+    public JsonResultModel addCommentCard(@RequestBody CommentCard commentCardForm){
         CommentCard commentCard=new CommentCard();
         BeanUtils.copyProperties(commentCardForm,commentCard);
         Service service= serveService.findOne(2l);
@@ -40,7 +40,7 @@ public class ForeignTeacherCommentController {
     }
 
     @RequestMapping(value = "update_answer", method = RequestMethod.PUT)
-    public JsonResultModel updateCommnetCard(@RequestBody CommentCard commentCardForm){
+    public JsonResultModel updateCommentCard(@RequestBody CommentCard commentCardForm){
         CommentCard commentCard = commentCardJpaRepository.findByStudentIdAndQuestionIdAndCourseId(
                 commentCardForm.getStudentId(),commentCardForm.getQuestionId(),commentCardForm.getCourseId());
         commentCardForm.setId(commentCard.getId());
