@@ -73,13 +73,13 @@ public class ForeignTeacherCommentController {
     }
 
     @RequestMapping(value = "query_all/{studentId}",method = RequestMethod.GET)
-    public Page<CommentCard> queryCommentList(Pageable pageable,@PathVariable Long studentId){
-        return foreignTeacherCommentCardService.foreignTeacherCommentQuery(pageable,studentId);
+    public JsonResultModel queryCommentList(Pageable pageable,@PathVariable Long studentId){
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentQuery(pageable,studentId));
     }
 
     @RequestMapping(value = "query_one/{id}",method = RequestMethod.GET)
-    public CommentCard queryDetailComment(@PathVariable Long id){
-        return foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(id);
+    public JsonResultModel queryDetailComment(@PathVariable Long id){
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(id));
     }
 
     @RequestMapping(value = "update_status", method = RequestMethod.PUT)
@@ -88,12 +88,12 @@ public class ForeignTeacherCommentController {
                 commentCard.getStudentId(),commentCard.getQuestionId(),commentCard.getCourseId()
         );
         commentCardTemp.setStatus(CommentCardStatus.OVERTIME.getCode());
-        return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardTemp);
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardTemp));
     }
 
     @RequestMapping(value = "query_no_answer")
-    public List<CommentCard> queryUnAnswer(){
-        return foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
+    public JsonResultModel queryUnAnswer(){
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer());
     }
 
     @RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
