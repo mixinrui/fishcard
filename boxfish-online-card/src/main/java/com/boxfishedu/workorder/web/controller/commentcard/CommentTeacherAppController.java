@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
+import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,8 +22,12 @@ public class CommentTeacherAppController {
     @Autowired
     private CommentTeacherAppServiceX commentTeacherAppServiceX;
 
+    @Autowired
+    private CommonServeServiceX commonServeServiceX;
+
     @RequestMapping(value = "/teacher/{teacher_id}/list", method = RequestMethod.GET)
-    public JsonResultModel list(@PathVariable("teacher_id") long teacherId, Pageable pageable){
+    public JsonResultModel list(@PathVariable("teacher_id") long teacherId,Long userId, Pageable pageable){
+        commonServeServiceX.checkToken(teacherId,userId);
         Page<CommentCard> commentCardPage= commentTeacherAppServiceX.findByTeacherIdOrderByAssignTeacherTimeDesc(teacherId,pageable);
         return JsonResultModel.newJsonResultModel(commentCardPage);
     }
@@ -32,8 +38,10 @@ public class CommentTeacherAppController {
         return JsonResultModel.newJsonResultModel(commentCard);
     }
 
-    @RequestMapping(value = "/card", method = RequestMethod.GET)
-    public JsonResultModel submitComment(){
+    @RequestMapping(value = "/card", method = RequestMethod.POST)
+    public JsonResultModel submitComment(CommentCardSubmitParam commentCardSubmitParam,Long userId){
+        commonServeServiceX.checkToken(commentCardSubmitParam.getTeacherId(),userId);
+        commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
         return JsonResultModel.newJsonResultModel(null);
     }
 }
