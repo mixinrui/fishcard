@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -78,5 +79,16 @@ public class ForeignTeacherCommentController {
     @RequestMapping(value = "query_no_answer")
     public List<CommentCard> queryUnAnswer(){
         return foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
+    }
+
+    @RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
+    public JsonResultModel haveAvailableForeignCommentService(long userId) {
+        return JsonResultModel.newJsonResultModel(
+                Collections.singletonMap("available", serveService.haveAvailableForeignCommentService(userId)));
+    }
+
+    @RequestMapping(value = "/count", method = RequestMethod.GET)
+    public JsonResultModel getAvailableForeignCommentServiceCount(long userId) {
+        return JsonResultModel.newJsonResultModel(serveService.getAvailableForeignCommentServiceCount(userId));
     }
 }
