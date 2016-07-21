@@ -42,7 +42,6 @@ public class WorkOrderServiceTest {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Test
     @Transactional
     public void testGetTeachersByOrder() throws Exception {
         Service service=serviceJpaRepository.findByIdForUpdate(22L);
