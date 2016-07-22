@@ -75,7 +75,7 @@ public class CourseOnlineService {
     public void handleException(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status){
         workOrder.setStatus(status);
         saveStatus4WorkOrderAndSchedule(workOrder,courseSchedule);
-        courseOnlineRequester.releaseGroup(workOrder);
+//        courseOnlineRequester.releaseGroup(workOrder);
     }
 
     public void saveStatus4WorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){
