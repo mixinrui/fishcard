@@ -68,44 +68,44 @@ public class CourseOnlineServiceX {
     }
 
     public void updateTeachingStatus(Map<String, Object> map) {
-        logger.info("@updateTeachingStatus,参数{}",JacksonUtil.toJSon(map));
+        logger.info("@updateTeachingStatus,参数{}", JacksonUtil.toJSon(map));
         Long workOrderId = Long.parseLong(map.get("id").toString());
         Integer status = Integer.parseInt(map.get("status").toString());
-        String reportTime=StringUtils.EMPTY;
+        String reportTime = StringUtils.EMPTY;
         try {
-            reportTime=map.get("report_time").toString();
-        }
-        catch (Exception ex){
+            reportTime = map.get("report_time").toString();
+        } catch (Exception ex) {
             logger.info("updateTeachingStatus#no_report_time,终端没有上报上传时间");
         }
 
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
-        CourseSchedule courseSchedule= courseScheduleService.findByWorkOrderId(workOrderId);
-        if((status!=FishCardStatusEnum.COMPLETED.getCode())&&(status!=FishCardStatusEnum.COMPLETED_FORCE.getCode())) {
-            courseOnlineService.notAllowUpdateStatus(workOrder,"不能覆盖已有消息,新消息:"+FishCardStatusEnum.getDesc(status)+"@@reportTime"+reportTime);
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrderId);
+        if ((status != FishCardStatusEnum.COMPLETED.getCode()) && (status != FishCardStatusEnum.COMPLETED_FORCE.getCode())) {
+            courseOnlineService.notAllowUpdateStatus(workOrder, "不能覆盖已有消息,新消息:" + FishCardStatusEnum.getDesc(status) + "@@reportTime" + reportTime);
         }
-        if (null == workOrder||null==courseSchedule) {
-            String msg="无对应的鱼卡或课程schedule,请确认参数传入是否正确,鱼卡id[" + workOrderId + "]";
+        if (null == workOrder || null == courseSchedule) {
+            String msg = "无对应的鱼卡或课程schedule,请确认参数传入是否正确,鱼卡id[" + workOrderId + "]";
             logger.info(msg);
             throw new BusinessException(msg);
         }
         //处理完成的情况
-        if(status==FishCardStatusEnum.COMPLETED.getCode()||status==FishCardStatusEnum.COMPLETED_FORCE.getCode()){
-            completeCourse(workOrder,courseSchedule, status);
+        if (status == FishCardStatusEnum.COMPLETED.getCode() || status == FishCardStatusEnum.COMPLETED_FORCE.getCode()) {
+            completeCourse(workOrder, courseSchedule, status);
         }
         //处理早退的情况(定时器不到不应该减去服务)
-        else if(status==FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()||status==FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()){
-            handleLeaveEarly(workOrder,courseSchedule,status);
-        }
-        else {
-            if(status==FishCardStatusEnum.ONCLASS.getCode()){
+        else if (status == FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode() || status == FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()) {
+            if (!handleLeaveEarly(workOrder, courseSchedule, status)) {
+                return;
+            }
+        } else {
+            if (status == FishCardStatusEnum.ONCLASS.getCode()) {
                 workOrder.setActualStartTime(new Date());
             }
             workOrder.setStatus(status);
             workOrder.setUpdateTime(new Date());
             workOrderService.save(workOrder);
         }
-        workOrderLogService.saveWorkOrderLog(workOrder,FishCardStatusEnum.getDesc(workOrder.getStatus())+"@reporttime->"+reportTime);
+        workOrderLogService.saveWorkOrderLog(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()) + "@reporttime->" + reportTime);
     }
 
     //更新WorkOrder的状态
@@ -143,10 +143,10 @@ public class CourseOnlineServiceX {
         logger.info("鱼卡id为:[{}]开始状态更新成功,新生成的鱼卡日志id为:[{}]", workOrderView.getId(), workOrderLog.getId());
     }
 
-    public void completeCourse(WorkOrder workOrder,CourseSchedule courseSchedule,Integer status) throws BoxfishException {
-        logger.info("@completeCourse,开始做课程完成处理;鱼卡状态将被设置为:[{}]",FishCardStatusEnum.getDesc(status));
+    public void completeCourse(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status) throws BoxfishException {
+        logger.info("@completeCourse,开始做课程完成处理;鱼卡状态将被设置为:[{}]", FishCardStatusEnum.getDesc(status));
         // 服务消费扣除
-        serveService.decreaseService(workOrder,courseSchedule,status);
+        serveService.decreaseService(workOrder, courseSchedule, status);
         //通知师生运营释放教师资源
         teacherStudentRequester.releaseTeacher(workOrder);
         //通知小马解散师生关系
@@ -158,20 +158,22 @@ public class CourseOnlineServiceX {
     }
 
     /**
-     *处理早退情况,如果之前工单状态为早退,并且和当前的角色不相同,时间在7分钟以内的上报,则认为是系统异常
+     * 处理早退情况,如果之前工单状态为早退,并且和当前的角色不相同,时间在7分钟以内的上报,则认为是系统异常
+     * 如果为异常,返回错误,如果不为异常则为true
      */
-    private void handleLeaveEarly(WorkOrder workOrder,CourseSchedule courseSchedule,Integer status){
-        logger.debug("@handleLeaveEarly收到早退信息,鱼卡[{}],状态[{}],状态描述[{}]",workOrder.getId(),status,FishCardStatusEnum.getDesc(status));
-        int diff=workOrder.getStatus()-status;
-        long timeDiff=new Date().getTime()-workOrder.getUpdateTime().getTime();
+    private boolean handleLeaveEarly(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status) {
+        logger.debug("@handleLeaveEarly收到早退信息,鱼卡[{}],状态[{}],状态描述[{}]", workOrder.getId(), status, FishCardStatusEnum.getDesc(status));
+        int diff = workOrder.getStatus() - status;
+        long timeDiff = new Date().getTime() - workOrder.getUpdateTime().getTime();
         //如果相差1,并且上报时间差小于3分钟
-        if((Math.abs(diff)==1)&&(timeDiff/1000<180)){
-            workOrderLogService.saveWorkOrderLog(workOrder,"师生上报消息不足一分钟,设置为系统异常");
-            courseOnlineService.handleException(workOrder,courseSchedule,status);
+        if ((Math.abs(diff) == 1) && (timeDiff / 1000 < 60)) {
+            workOrderLogService.saveWorkOrderLog(workOrder, "师生上报消息不足一分钟,设置为系统异常");
+            courseOnlineService.handleException(workOrder, courseSchedule, status);
             logger.info("@handleLeaveEarly双方都上报异常情况,将鱼卡[{}]标记为[系统异常]", JacksonUtil.toJSon(workOrder));
-            return;
+            return false;
         }
         workOrder.setStatus(status);
-        courseOnlineService.saveStatus4WorkOrderAndSchedule(workOrder,courseSchedule);
+        courseOnlineService.saveStatus4WorkOrderAndSchedule(workOrder, courseSchedule);
+        return true;
     }
 }

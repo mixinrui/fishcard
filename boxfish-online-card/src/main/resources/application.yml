@@ -166,8 +166,8 @@ interface:
     course_recommended_service: http://114.55.40.98:8001
     fishcard_service: http://127.0.0.1:8080
     order_service: http://101.201.237.252:8082
-#    course_online_service: http://101.201.239.116:9090
-    course_online_service: http://online-api.boxfish.cn/teaching-service
+    course_online_service: http://101.201.239.116:9090
+#    course_online_service: http://online-api.boxfish.cn/teaching-service
     auth_user: http://114.55.58.184:8099
 server.port: 8080
 
