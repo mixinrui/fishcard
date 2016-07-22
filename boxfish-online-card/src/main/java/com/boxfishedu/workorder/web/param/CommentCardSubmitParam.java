@@ -1,0 +1,13 @@
+package com.boxfishedu.workorder.web.param;
+
+import lombok.Data;
+
+/**
+ * Created by hucl on 16/7/21.
+ */
+@Data
+public class CommentCardSubmitParam {
+    private String videoPath;
+    private Long teacherId;
+    private Long commentcardId;
+}
