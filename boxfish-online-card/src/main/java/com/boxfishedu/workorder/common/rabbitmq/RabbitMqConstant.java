@@ -42,7 +42,9 @@ public class RabbitMqConstant {
     public static final String ASSIGNED_TEACHER_REPLY_QUEUE = "boxfish.schedule.send.queue.name.development";
 
     //请求分配外教点评老师
-    public static final String ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE = "boxfish.fishcard.comment.send.queue";
+    public static final String ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE = "boxfish.fishcard.comment.queue";
+    //响应分配外教点评老师
+    public static final String ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE = "boxfish.teacher.student.comment.queue";
 
     //发送到小马的创建组的队列
     public static final String CREATE_GROUP_QUEUE = "com.boxfishedu.creategroup.queue";

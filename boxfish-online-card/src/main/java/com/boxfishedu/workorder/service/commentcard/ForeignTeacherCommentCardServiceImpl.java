@@ -54,6 +54,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCardJpaRepository.save(commentCard);
         logger.info("向师生运营发生消息,通知分配外教进行点评...");
         rabbitMqSender.send(commentCard, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+//          以下为4行为测 试数据
+        commentCard.setTeacherId(110110110L);
+        commentCard.setTeacherName("Tom");
+        commentCard.setAnswerVideoPath("www.boxfish.com.cn");
+        foreignTeacherCommentUpdateAnswer(commentCard);
     }
 
     @Override
