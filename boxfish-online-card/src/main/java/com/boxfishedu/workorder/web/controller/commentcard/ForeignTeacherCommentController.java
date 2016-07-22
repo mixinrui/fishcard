@@ -1,10 +1,13 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.exception.UseUpException;
+import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
+import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
@@ -21,6 +24,7 @@ import java.util.List;
 /**
  * Created by ansel on 16/7/18.
  */
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/comment_card")
 public class ForeignTeacherCommentController {
@@ -35,65 +39,87 @@ public class ForeignTeacherCommentController {
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
     @Transactional
-    public JsonResultModel addCommentCard(@RequestBody CommentCard commentCardForm) throws Exception {
-        CommentCard commentCard=new CommentCard();
-        BeanUtils.copyProperties(commentCardForm,commentCard);
-        if(serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).isPresent()){
-            Service service= serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).get();
+    public JsonResultModel addCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId) throws Exception {
+        CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
+        if(serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
+            Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
             if(service.getAmount() <= 0){
-                throw new UseUpException();
+                throw new UseUpException("学生的外教点评次数已经用尽,请先购买!");
             }else {
                 service.setAmount(service.getAmount() - 1);
                 foreignTeacherCommentCardService.updateCommentAmount(service);
+                commentCard.setStudentId(userId);
                 commentCard.setService(service);
-                return foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard);
+                commentCard.setOrderId(service.getOrderId());
+                commentCard.setOrderCode(service.getOrderCode());
+                foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard);
+                return new JsonResultModel();
             }
         }else {
-                throw new UseUpException();
+                throw new UseUpException("学生的外教点评次数已经用尽,请先购买!");
         }
     }
 
-    @RequestMapping(value = "update_answer", method = RequestMethod.PUT)
-    public JsonResultModel updateCommentCard(@RequestBody CommentCard commentCardForm){
+    @RequestMapping(value = "update_student_question", method = RequestMethod.PUT)
+    public JsonResultModel updateStudentQuestion(@RequestBody CommentCardForm commentCardForm, Long userId){
+        if(!userId.equals(commentCardForm.getStudentId())){
+            throw new UnauthorizedException("用户认证失败!");
+        }else {
+            CommentCard commentCard = commentCardJpaRepository.findByStudentIdAndQuestionIdAndCourseId(
+                    commentCardForm.getStudentId(),commentCardForm.getQuestionId(),commentCardForm.getCourseId());
+            commentCard.setAskVoiceId(commentCardForm.getAskVoiceId());
+            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
+            foreignTeacherCommentCardService.foreignTeacherCommentUpdateQuestion(commentCard);
+            return new JsonResultModel();
+        }
+    }
+
+    @RequestMapping(value = "update_teacher_answer", method = RequestMethod.PUT)
+    public JsonResultModel updateCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId){
         CommentCard commentCard = commentCardJpaRepository.findByStudentIdAndQuestionIdAndCourseId(
                 commentCardForm.getStudentId(),commentCardForm.getQuestionId(),commentCardForm.getCourseId());
-        commentCardForm.setId(commentCard.getId());
-        commentCardForm.setCreateTime(commentCard.getCreateTime());
-        commentCardForm.setStudentAskTime(commentCard.getStudentAskTime());
-        commentCardForm.setAskVoiceId(commentCard.getAskVoiceId());
-        commentCardForm.setAskVoicePath(commentCard.getAskVoicePath());
-        commentCardForm.setOrderId(commentCard.getOrderId());
-        commentCardForm.setOrderCode(commentCard.getOrderCode());
-        commentCardForm.setStatus(CommentCardStatus.UNREAD.getCode());
-        Service service= serveService.findFirstAvailableForeignCommentService(commentCard.getStudentId()).get();
-        service.setAmount(service.getAmount() - 1);
-        foreignTeacherCommentCardService.updateCommentAmount(service);
-        commentCardForm.setService(service);
-        return foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardForm);
+       if(commentCard != null){
+           commentCard.setTeacherId(userId);
+           commentCard.setTeacherName(commentCardForm.getTeacherName());
+           commentCard.setAnswerVideoPath(commentCardForm.getAnswerVideoPath());
+           foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(commentCard);
+           return new JsonResultModel();
+       }else {
+           throw new UnauthorizedException("用户认证失败!");
+       }
+
     }
 
-    @RequestMapping(value = "query_all/{studentId}",method = RequestMethod.GET)
-    public JsonResultModel queryCommentList(Pageable pageable,@PathVariable Long studentId){
-        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentQuery(pageable,studentId));
+    @RequestMapping(value = "query_all",method = RequestMethod.GET)
+    public JsonResultModel queryCommentList(Pageable pageable, Long userId){
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentQuery(pageable,userId));
     }
 
-    @RequestMapping(value = "query_one/{id}",method = RequestMethod.GET)
-    public JsonResultModel queryDetailComment(@PathVariable Long id){
-        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(id));
+    @RequestMapping(value = "query_one",method = RequestMethod.GET)
+    public JsonResultModel queryDetailComment(Long id, Long userId){
+        CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(id,userId);
+        if(commentCard == null){
+            throw new ValidationException("所查找的点评不存在!");
+        }else {
+            return JsonResultModel.newJsonResultModel(commentCard);
+        }
     }
 
     @RequestMapping(value = "update_status", method = RequestMethod.PUT)
-    public JsonResultModel updateStatus(@RequestBody CommentCard commentCard){
-        CommentCard commentCardTemp = commentCardJpaRepository.findByStudentIdAndQuestionIdAndCourseId(
-                commentCard.getStudentId(),commentCard.getQuestionId(),commentCard.getCourseId()
-        );
-        commentCardTemp.setStatus(CommentCardStatus.OVERTIME.getCode());
-        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardUpdate(commentCardTemp));
+    public JsonResultModel updateStatus(Long id, Long userId){
+        CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
+        if (commentCard == null){
+            throw new ValidationException("所修改的点评不存在!");
+        }else {
+            foreignTeacherCommentCardService.foreignTeacherCommentUpdateStatusRead(commentCard);
+            return JsonResultModel.newJsonResultModel();
+        }
     }
 
-    @RequestMapping(value = "query_no_answer")
+    //@RequestMapping(value = "query_no_answer")
     public JsonResultModel queryUnAnswer(){
-        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer());
+        foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
+        return JsonResultModel.newJsonResultModel();
     }
 
     @RequestMapping(value = "/isAvailable", method = RequestMethod.GET)

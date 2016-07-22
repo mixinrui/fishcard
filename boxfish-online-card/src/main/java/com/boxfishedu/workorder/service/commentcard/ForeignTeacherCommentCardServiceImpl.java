@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -34,23 +35,43 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
     @Override
-    public JsonResultModel foreignTeacherCommentCardAdd(CommentCard commentCardForm) {
-        logger.info("调用外教点评接口更新学生问题,其中commentCardForm="+commentCardForm);
+    public void foreignTeacherCommentCardAdd(CommentCard commentCard) {
+        logger.info("调用外教点评接口新增学生问题,其中commentCard="+commentCard);
         Date dateNow = new Date();
-        commentCardForm.setCreateTime(dateNow);
-        commentCardJpaRepository.save(commentCardForm);
-        logger.info("向师生运营发生消息,通知分配外教进行点评...");
-        rabbitMqSender.send(commentCardForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
-        return new JsonResultModel();
+        commentCard.setStudentAskTime(dateNow);
+        commentCard.setCreateTime(dateNow);
+        commentCard.setUpdateTime(dateNow);
+        commentCard.setStatus(CommentCardStatus.ASKED.getCode());
+        commentCardJpaRepository.save(commentCard);
     }
 
     @Override
-    public JsonResultModel foreignTeacherCommentCardUpdate(CommentCard commentCardForm) {
+    public void foreignTeacherCommentUpdateQuestion(CommentCard commentCard) {
+        logger.info("调用外教点评接口更新学生问题,其中commentCard="+commentCard);
         Date dateNow = new Date();
-        commentCardForm.setUpdateTime(dateNow);
-        commentCardJpaRepository.save(commentCardForm);
-        logger.info("调用外教点评接口更新外教点评,其中commentCardForm="+commentCardForm);
-        return new JsonResultModel();
+        commentCard.setUpdateTime(dateNow);
+        commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+        commentCardJpaRepository.save(commentCard);
+        logger.info("向师生运营发生消息,通知分配外教进行点评...");
+        rabbitMqSender.send(commentCard, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+    }
+
+    @Override
+    public void foreignTeacherCommentUpdateAnswer(CommentCard commentCard) {
+        Date dateNow = new Date();
+        commentCard.setUpdateTime(dateNow);
+        commentCard.setStatus(CommentCardStatus.UNREAD.getCode());
+        commentCardJpaRepository.save(commentCard);
+        logger.info("调用外教点评接口更新点评卡中外教点评内容,其中commentCard="+commentCard);
+    }
+
+    @Override
+    public void foreignTeacherCommentUpdateStatusRead(CommentCard commentCard) {
+        Date dateNow = new Date();
+        commentCard.setUpdateTime(dateNow);
+        commentCard.setStatus(CommentCardStatus.READ.getCode());
+        commentCardJpaRepository.save(commentCard);
+        logger.info("调用外教点评接口更新点评卡状态为已读,其中commentCard="+commentCard);
     }
 
     @Override
@@ -60,24 +81,25 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
-    public CommentCard foreignTeacherCommentDetailQuery(Long id) {
+    public CommentCard foreignTeacherCommentDetailQuery(Long id, Long studentId) {
         logger.info("调用学生查询某条外教点评具体信息接口,其中id="+id);
-        return commentCardJpaRepository.findById(id);
+        return commentCardJpaRepository.findByIdAndStudentId(id,studentId);
     }
 
     @Override
-    public List<CommentCard> foreignTeacherCommentUnAnswer() {
+    @Transactional
+    public void foreignTeacherCommentUnAnswer() {
         logger.info("调用查询外教未点评问题数据库接口");
         List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList();
         for (CommentCard commentCard: list) {
             commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
-            com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findOne(commentCard.getService().getId());
+            com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
             commentCard.setService(serviceTemp);
             commentCardJpaRepository.save(commentCard);
             serviceTemp.setAmount(serviceTemp.getAmount() + 1);
             serviceJpaRepository.save(serviceTemp);
         }
-        return null;
+        logger.info("所有学生外教点评次数返还完毕,一共返回次数为:"+list.size());
     }
 
     @Override

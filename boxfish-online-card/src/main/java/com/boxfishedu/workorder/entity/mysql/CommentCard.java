@@ -91,4 +91,14 @@ public class CommentCard {
 
     @Column(name="order_code", length = 128)
     private String orderCode;
+
+    public static CommentCard getCommentCard(CommentCardForm commentCardForm){
+        CommentCard commentCard = new CommentCard();
+        commentCard.setStudentName(commentCardForm.getStudentName());
+        commentCard.setQuestionId(commentCardForm.getQuestionId());
+        commentCard.setQuestionName(commentCardForm.getQuestionName());
+        commentCard.setCourseId(commentCardForm.getCourseId());
+        commentCard.setCourseName(commentCardForm.getCourseName());
+        return commentCard;
+    }
 }

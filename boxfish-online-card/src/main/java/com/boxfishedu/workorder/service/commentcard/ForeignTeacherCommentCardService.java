@@ -13,15 +13,19 @@ import java.util.List;
  */
 public interface ForeignTeacherCommentCardService {
 
-    public JsonResultModel foreignTeacherCommentCardAdd(CommentCard commentCardForm);
+    public void foreignTeacherCommentCardAdd(CommentCard commentCard);
 
-    public JsonResultModel foreignTeacherCommentCardUpdate(CommentCard commentCardForm);
+    public void foreignTeacherCommentUpdateQuestion(CommentCard commentCard);
+
+    public void foreignTeacherCommentUpdateAnswer(CommentCard commentCard);
+
+    public void foreignTeacherCommentUpdateStatusRead(CommentCard commentCard);
 
     public Page<CommentCard> foreignTeacherCommentQuery(Pageable pageable,Long studentId);
 
-    public CommentCard foreignTeacherCommentDetailQuery(Long id);
+    public CommentCard foreignTeacherCommentDetailQuery(Long id, Long studentId);
 
-    public List<CommentCard> foreignTeacherCommentUnAnswer();
+    public void foreignTeacherCommentUnAnswer();
 
     public JsonResultModel updateCommentAmount(Service service);
 }
