@@ -97,8 +97,7 @@ public class CourseOnlineServiceX {
             if (!handleLeaveEarly(workOrder, courseSchedule, status)) {
                 return;
             }
-        }
-        else {
+        } else {
             if (status == FishCardStatusEnum.ONCLASS.getCode()) {
                 workOrder.setActualStartTime(new Date());
             }
