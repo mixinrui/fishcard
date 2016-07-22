@@ -30,7 +30,8 @@ import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.boxfishedu.workorder.common.util.DateUtil.*;
+import static com.boxfishedu.workorder.common.util.DateUtil.parseLocalDate;
+import static com.boxfishedu.workorder.common.util.DateUtil.parseLocalTime;
 
 
 /**
@@ -261,10 +262,25 @@ public class TeacherAppRelatedServiceX {
      * @return
      */
     public JsonResultModel getInternationalDayTimeSlotsTemplate(Long teacherId, Date date) throws CloneNotSupportedException {
+
+        // 日期范围
         DateRangeForm dateRangeForm = getInternationalDateRange(date);
-        List<DayTimeSlots> results = dateRangeForm.collect(loopDate -> teacherStudentRequester.dayTimeSlotsTemplate(teacherId, loopDate));
-        filterInternationalDayTimeSlots(results, getInternationalDateTimeRange(date));
-        return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(results));
+        // 具体时间范围
+        DateRangeForm dateTimeRangeForm = getInternationalDateTimeRange(date);
+        List<DayTimeSlots> result = dateRangeForm
+                .collect(loopDate -> teacherStudentRequester.dayTimeSlotsTemplate(teacherId, loopDate))
+                .stream()
+                // 国际化时间
+                .map(d -> this.filterInternationalDayTimeSlots(d, dateTimeRangeForm))
+                // 过滤历史日期
+                .map(dayTimeSlots -> timeLimitPolicy.limit(dayTimeSlots).filter(
+                        d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                        t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()
+                ))
+                // 非空
+                .filter(this::notEmptyPredicate)
+                .collect(Collectors.toList());
+        return JsonResultModel.newJsonResultModel(result);
     }
 
     /**
@@ -291,33 +307,20 @@ public class TeacherAppRelatedServiceX {
         return new DateRangeForm(from, to);
     }
 
-    /**
-     * 国际化时间过滤
-     *
-     * @param results
-     * @param dateTimeRangeForm
-     */
-    private void filterInternationalDayTimeSlots(List<DayTimeSlots> results, DateRangeForm dateTimeRangeForm) {
-        Iterator<DayTimeSlots> resultIterator = results.iterator();
-        while (resultIterator.hasNext()) {
-            DayTimeSlots dayTimeSlots = resultIterator.next();
-            List<TimeSlots> dailyScheduleTime = dayTimeSlots.getDailyScheduleTime();
-            Iterator<TimeSlots> iterator = dailyScheduleTime.iterator();
-            while (iterator.hasNext()) {
-                TimeSlots timeSlots = iterator.next();
-                LocalDateTime startTime = DateUtil.merge(
-                        parseLocalDate(dayTimeSlots.getDay()),
-                        parseLocalTime(timeSlots.getStartTime()));
-                if (!dateTimeRangeForm.isWithIn(startTime)) {
-                    iterator.remove();
-                }
-            }
-            if (dailyScheduleTime.isEmpty()) {
-                resultIterator.remove();
+    private DayTimeSlots filterInternationalDayTimeSlots(DayTimeSlots dayTimeSlots, DateRangeForm dateTimeRangeForm) {
+        List<TimeSlots> dailyScheduleTime = dayTimeSlots.getDailyScheduleTime();
+        Iterator<TimeSlots> iterator = dailyScheduleTime.iterator();
+        while (iterator.hasNext()) {
+            TimeSlots timeSlots = iterator.next();
+            LocalDateTime startTime = DateUtil.merge(
+                    parseLocalDate(dayTimeSlots.getDay()),
+                    parseLocalTime(timeSlots.getStartTime()));
+            if (!dateTimeRangeForm.isWithIn(startTime)) {
+                iterator.remove();
             }
         }
+        return dayTimeSlots;
     }
-
 
     public JsonResultModel getInternationalScheduleByIdAndDate(Long teacherId, Date date) throws CloneNotSupportedException {
         logger.info("用户[{}]发起获取{}课程请求", teacherId, date);
@@ -330,29 +333,34 @@ public class TeacherAppRelatedServiceX {
             return getInternationalDayTimeSlotsTemplate(teacherId, date);
         }
 
-        // 可选时间过滤,即北京时间周一到周五  周六到周日的时间规则
-        dayTimeSlotsList = timeLimitPolicy.limit(dayTimeSlotsList);
-
-        // 国际化时间转换
-        filterInternationalDayTimeSlots(dayTimeSlotsList, getInternationalDateTimeRange(date));
-
-        // 历史日期时间片过滤
-        dayTimeSlotsList = dayTimeSlotsList.parallelStream()
-                .map(dayTimeSLots -> dayTimeSLots.filter(
-                        d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
-                        t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()))
-                .filter(d -> d != null)
-                .collect(Collectors.toList());
-
         List<CourseSchedule> courseScheduleList = courseScheduleService.findByTeacherIdAndClassDateBetween(
                 teacherId, getInternationalDateRange(date));
 
-        // 2 获取老师遮天选的课
-        for (DayTimeSlots dayTimeSlots : dayTimeSlotsList) {
-            // 3 覆盖
-            dayTimeSlots.override(courseScheduleList, serviceSDK);
-        }
-        return JsonResultModel.newJsonResultModel(dayTimeSlotsList);
+        List<DayTimeSlots> result = dayTimeSlotsList.parallelStream()
+                // 可选时间过滤,即北京时间周一到周五  周六到周日的时间规则
+                .map(timeLimitPolicy::limit)
+                // 判空
+                .filter(this::notEmptyPredicate)
+                // 国际化时间转换
+                .map(d -> this.filterInternationalDayTimeSlots(d, getInternationalDateTimeRange(date)))
+                .filter(this::notEmptyPredicate)
+                // 3 覆盖,课程信息覆盖
+                .peek(d -> d.override(courseScheduleList, serviceSDK))
+                // 历史日期时间片过滤,只显示有课的
+                .map(dayTimeSLots -> dayTimeSLots.filter(
+                        d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                        t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()))
+                // 非空
+                .filter(d -> d != null)
+                // 排序
+                //.sorted((f, s) -> Long.compare(f.getDayStamp(), s.getDayStamp()))
+                .collect(Collectors.toList());
+        return JsonResultModel.newJsonResultModel(result);
+    }
+
+
+    private boolean notEmptyPredicate(DayTimeSlots d) {
+        return d != null && CollectionUtils.isNotEmpty(d.getDailyScheduleTime());
     }
 
 
