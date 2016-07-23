@@ -30,7 +30,7 @@ import java.util.Set;
  */
 @WebFilter(urlPatterns ={
         "/fishcard/service/student/*", "/fishcard/service/teacher/*",
-        "/service/teacher/*", "/service/student/*", "/comment_card/*"})
+        "/service/teacher/*", "/service/student/*", "/comment_card/*", "/comment/foreign/*"})
 public class AuthorFilter extends OncePerRequestFilter {
 
     private Logger logger = LoggerFactory.getLogger(AuthorFilter.class);
