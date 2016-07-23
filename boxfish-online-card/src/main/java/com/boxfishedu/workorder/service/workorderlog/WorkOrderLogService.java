@@ -2,9 +2,11 @@ package com.boxfishedu.workorder.service.workorderlog;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.WorkOrderLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import org.apache.log4j.spi.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +38,8 @@ public class WorkOrderLogService {
         return workOrderLogMorphiaRepository.getById(id);
     }
 
+    private org.slf4j.Logger logger= org.slf4j.LoggerFactory.getLogger(this.getClass());
+
     public List<WorkOrderLog> queryByWorkId(Long workId) {
         List<WorkOrderLog> workOrderLogs=workOrderLogMorphiaRepository.queryByWorkId(workId);
         return workOrderLogs;
@@ -54,6 +58,7 @@ public class WorkOrderLogService {
         workOrderLog.setStatus(workOrder.getStatus());
         workOrderLog.setCreateTime(new Date());
         workOrderLog.setContent(FishCardStatusEnum.getDesc(workOrder.getStatus()));
+        logger.debug("保存日志到mongo,参数[{}]", JacksonUtil.toJSon(workOrderLog));
         save(workOrderLog);
     }
 
@@ -63,6 +68,7 @@ public class WorkOrderLogService {
         workOrderLog.setStatus(workOrder.getStatus());
         workOrderLog.setCreateTime(new Date());
         workOrderLog.setContent(desc);
+        logger.debug("保存日志到mongo,参数[{}]", JacksonUtil.toJSon(workOrderLog));
         save(workOrderLog);
     }
 

@@ -25,4 +25,5 @@ public class RabbitMqSender {
         logger.info("开始发送通知请求:" + DateUtil.Date2String(new Date()));
         rabbitTemplate.convertAndSend(object);
     }
+
 }

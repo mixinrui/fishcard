@@ -9,6 +9,7 @@ import lombok.Data;
 public class TeachingOnlineMsg {
     private Long user_id;
     private String push_title;
+    private String push_type;// 推送消息类型
     private TeachingOnlineMsgAttach data;
 
     @Data

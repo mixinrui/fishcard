@@ -46,11 +46,11 @@ parameter:
   pass_beyond_normal: 5
 
   #教师超过上课时间的时长,标记为迟到(minute)
-  teacher_absent_time_limit: 5
+  teacher_absent_time_limit: 10
   #学生超过上课时间的时长,标记为迟到(minute)
   student_absent_time_limit: 10
   #超过课程结束时间的时长,标记为服务器强制结束(minute)
-  force_complete_time_limit: 5
+  force_complete_time_limit: 10
   #距离上课时间提醒教师,单位：minutes
   notify_teacher_prepare_class_limit: 5
 
@@ -133,7 +133,7 @@ interface:
 #    course_online_service: http://online-api.boxfish.cn/teaching-service
     auth_user: http://114.55.58.184:8099
 
-#===============================================================development环境:101.201.239.116   密码:Box12345678===============================================================
+#===============================================================development环境:101.201.239.116 密码:Box12345678 ===============================================================
 ---
 spring:
   datasource:
@@ -166,8 +166,8 @@ interface:
     course_recommended_service: http://114.55.40.98:8001
     fishcard_service: http://127.0.0.1:8080
     order_service: http://101.201.237.252:8082
-#    course_online_service: http://101.201.239.116:9090
-    course_online_service: http://online-api.boxfish.cn/teaching-service
+    course_online_service: http://101.201.239.116:9090
+#    course_online_service: http://online-api.boxfish.cn/teaching-service
     auth_user: http://114.55.58.184:8099
 server.port: 8080
 

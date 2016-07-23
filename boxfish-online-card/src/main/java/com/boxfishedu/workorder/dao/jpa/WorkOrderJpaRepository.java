@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
@@ -78,6 +79,23 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStudentIdAndStatusLessThan(Long studentId,Integer status);
 
+
+
+
+    /** begin 抢单接口 **/
+
+    //  获取未来两天内 未安排教师的鱼卡信息  teacherid =0
+    public List<WorkOrder> findByTeacherIdAndStartTimeBetweenOrderByStartTime(Long teacherId, Date startDate, Date endDate);
+
+    //  获取未来两天内 未安排教师的鱼卡信息 teacherid >0
+    public List<WorkOrder> findByTeacherIdGreaterThanAndStartTimeBetween(Long teacherId, Date startDate, Date endDate);
+
+    /** end 抢单接口 **/
+
+    // 抢单之后,给课程匹配相应的老师
+    @Modifying
+    @Query("update WorkOrder o set o.teacherId = ?1 ,o.status = ?4  where o.id = ?2 and o.teacherId = ?3")
+    int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId , Long teacherIdZero,Integer status);
     public List<WorkOrder> findByCourseType(String courseType);
 
 }

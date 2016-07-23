@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
+import com.boxfishedu.workorder.web.view.fishcard.GrabOrderView;
 import com.boxfishedu.workorder.web.view.fishcard.TeacherAlterView;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import com.boxfishedu.workorder.web.view.teacher.MonthScheduleDataView;
@@ -170,5 +171,15 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
 
     public Optional<Date> findMaxClassDateByTeacherId(Long teacherId) {
         return jpa.findTop1ClassDateByTeacherId(teacherId);
+    }
+
+    public CourseSchedule findByWorkOrderIdForUpdate(GrabOrderView grabOrderView){
+        CourseSchedule courseSchedule = jpa.findByWorkOrderIdForUpdate(grabOrderView.getWorkOrderId());
+        return courseSchedule;
+    }
+
+    public int setTeacherIdByWorkOrderId(GrabOrderView grabOrderView){
+        int lineNo = jpa.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),grabOrderView.getState());
+        return lineNo;
     }
 }

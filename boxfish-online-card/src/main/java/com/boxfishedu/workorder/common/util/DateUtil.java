@@ -3,7 +3,6 @@ package com.boxfishedu.workorder.common.util;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -67,6 +66,10 @@ public class DateUtil {
 
     public static LocalDate convertLocalDate(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    public static LocalDateTime convertLocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
     public static LocalDate parseLocalDate(String date) {
@@ -140,12 +143,9 @@ public class DateUtil {
         return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-
-    public final static DateFormat HHmmss = new SimpleDateFormat("HH:mm:ss");
-
     public static Date parseTime(String time) {
         try {
-            return HHmmss.parse(time);
+            return new SimpleDateFormat("HH:mm:ss").parse(time);
         } catch (ParseException e) {
             throw new RuntimeException(time + "时间转换错误!!" + e.getMessage());
         }

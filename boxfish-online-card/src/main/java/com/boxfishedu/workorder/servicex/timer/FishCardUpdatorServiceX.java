@@ -63,12 +63,12 @@ public class FishCardUpdatorServiceX {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+
     /**
-     * 更新器:检测教师旷课消费者
+     * 教师旷课逻辑处理
      */
-    @Transactional
-    public void absentUpdator(FishCardDelayMessage fishCardDelayMessage) {
-        logger.debug("@absentUpdator,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
+    public void teacherAbsentUpdator(FishCardDelayMessage fishCardDelayMessage) {
+        logger.debug("@teacherAbsentUpdator,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
         WorkOrder workOrder = workOrderService.findByIdForUpdate(fishCardDelayMessage.getId());
         if (null == workOrder) {
             throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
@@ -81,22 +81,42 @@ public class FishCardUpdatorServiceX {
             CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
             courseOnlineService.notAllowUpdateStatus(workOrder);
             workOrder.setUpdateTime(new Date());
-            if (fishCardDelayMessage.getType() == FishCardDelayMsgType.TEACHER_ABSENT.value()) {
-                logger.warn("@[absentUpdator.teacher]鱼卡:[{}]的状态为教师旷课,开始处理", workOrder.getId());
-                courseOnlineRequester.notifyTeachingOnlinePushMessage(fishCardDelayMessage.getId(), TeachingNotificationEnum.TEACHER_ABSENT);
-                workOrder.setStatus(FishCardStatusEnum.TEACHER_ABSENT.getCode());
-                courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ABSENT.getCode());
-            } else {
-                logger.warn("[absentUpdator.student]鱼卡:[{}]的状态为学生旷课,开始处理", workOrder.getId());
-                workOrder.setStatus(FishCardStatusEnum.STUDENT_ABSENT.getCode());
-                courseSchedule.setStatus(FishCardStatusEnum.STUDENT_ABSENT.getCode());
-            }
+
+            logger.warn("@[absentUpdator.teacher]鱼卡:[{}]的状态为教师旷课,开始处理", workOrder.getId());
+            courseOnlineRequester.notifyTeachingOnlinePushMessage(fishCardDelayMessage.getId(), TeachingNotificationEnum.TEACHER_ABSENT);
+            workOrder.setStatus(FishCardStatusEnum.TEACHER_ABSENT.getCode());
+            courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ABSENT.getCode());
+
+            workOrder.setUpdateTime(new Date());
             courseSchedule.setUpdateTime(new Date());
-            courseScheduleService.save(courseSchedule);
-            workOrderService.save(workOrder);
+
+            workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
+
             courseOnlineRequester.releaseGroup(workOrder);
             workOrderLogService.saveWorkOrderLog(workOrder);
         }
+    }
+
+    /**
+     * 学生旷课逻辑处理
+     */
+    public boolean studentAbsentUpdator(WorkOrder workOrder, CourseSchedule courseSchedule) {
+
+        List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
+
+        boolean isExceptionFlag = true;
+        for (WorkOrderLog workOrderLog : workOrderLogs) {
+            if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
+                isExceptionFlag = true;
+                break;
+            }
+        }
+        if (!isExceptionFlag) {
+            logger.warn("[studentAbsentUpdator]鱼卡:[{}]的状态为学生旷课,开始处理", workOrder.getId());
+            courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
+            workOrderLogService.saveWorkOrderLog(workOrder);
+        }
+        return isExceptionFlag;
     }
 
     /**
@@ -117,26 +137,28 @@ public class FishCardUpdatorServiceX {
                     workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             return;
         }
-        
-        courseOnlineService.notAllowUpdateStatus(workOrder);
-        workOrder.setIsCourseOver((short)1);
 
-        //对于不包含学生接受请求的消息,视为旷课处理;其他视为系统异常
-        if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()) {
-            handleStudentAbsent(fishCardDelayMessage,workOrder,courseSchedule);
+        courseOnlineService.notAllowUpdateStatus(workOrder);
+        workOrder.setIsCourseOver((short) 1);
+
+        //  对于不包含学生接受请求的消息,视为旷课处理;其他视为系统异常
+        if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()
+                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()
+                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.CONNECTED.getCode()) {
+            if (!studentAbsentUpdator(workOrder, courseSchedule)) {
+                return;
+            }
         }
         //处于正在上课,标记为服务器强制完成
         if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.ONCLASS.getCode()) {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
                     FishCardStatusEnum.getDesc(FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode()));
             courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode());
-        }
-        else if(fishCardDelayMessage.getStatus()==FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()){
-            logger.info("@forceCompleteUpdator->将鱼卡[{}]状态[{}]的群解散",workOrder.getId(),workOrder.getStatus());
+        } else if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()) {
+            logger.info("@forceCompleteUpdator->将鱼卡[{}]状态[{}]的群解散", workOrder.getId(), workOrder.getStatus());
             courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode());
-        }
-        else if(fishCardDelayMessage.getStatus()==FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()){
-            logger.info("@forceCompleteUpdator->将鱼卡[{}]状态[{}]的群解散",workOrder.getId(),workOrder.getStatus());
+        } else if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()) {
+            logger.info("@forceCompleteUpdator->将鱼卡[{}]状态[{}]的群解散", workOrder.getId(), workOrder.getStatus());
             workOrderService.save(workOrder);
             courseOnlineRequester.releaseGroup(workOrder);
         }
@@ -165,19 +187,8 @@ public class FishCardUpdatorServiceX {
         logger.info("@teacherPrepareClassUpdator->在redis中存在通知教师上课记录,不需要再次通知");
     }
 
-    private void handleStudentAbsent(FishCardDelayMessage fishCardDelayMessage,WorkOrder workOrder,CourseSchedule courseSchedule){
-        logger.info("@forceCompleteUpdator->鱼卡[{}]处理TEACHER_CANCEL_PUSH", fishCardDelayMessage.getId());
-        List<WorkOrderLog> workOrderLogs=workOrderLogService.queryByWorkId(workOrder.getId());
+    private void handleStudentAbsent(FishCardDelayMessage fishCardDelayMessage, WorkOrder workOrder, CourseSchedule courseSchedule) {
+        logger.info("@handleStudentAbsent->鱼卡[{}]处理TEACHER_CANCEL_PUSH", fishCardDelayMessage.getId());
 
-        boolean isExceptionFlag=true;
-        for (WorkOrderLog workOrderLog:workOrderLogs){
-            if(workOrderLog.getStatus()==FishCardStatusEnum.STUDENT_ACCEPTED.getCode()){
-                isExceptionFlag=true;
-                break;
-            }
-        }
-        if(!isExceptionFlag) {
-            courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
-        }
     }
 }

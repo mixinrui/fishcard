@@ -47,6 +47,12 @@ public class CourseOnlineService {
     }
 
     public void notAllowUpdateStatus(WorkOrder workOrder,Integer newStatus){
+        notAllowUpdateStatus(workOrder,"不能覆盖已有消息,新消息:"+FishCardStatusEnum.getDesc(newStatus));
+    }
+
+
+
+    public void notAllowUpdateStatus(WorkOrder workOrder,String desc){
         Integer savedStatus=workOrder.getStatus();
         boolean flag=(savedStatus== FishCardStatusEnum.COMPLETED.getCode())
                 ||(savedStatus==FishCardStatusEnum.COMPLETED_FORCE.getCode())
@@ -55,7 +61,7 @@ public class CourseOnlineService {
                 ||(savedStatus==FishCardStatusEnum.STUDENT_ABSENT.getCode());
         if(flag){
             //将接受到的消息加入到mongo中
-            workOrderLogService.saveWorkOrderLog(workOrder,"不能覆盖已有消息,新消息:"+FishCardStatusEnum.getDesc(newStatus));
+            workOrderLogService.saveWorkOrderLog(workOrder,desc);
             String tips="@notAllowUpdateStatus当前鱼卡["+workOrder.getId()+"]状态已经处于冻结状态["+FishCardStatusEnum.get(workOrder.getStatus())+"],不允许再做修改!";
             logger.error(tips);
             throw new BusinessException(tips);
@@ -69,7 +75,7 @@ public class CourseOnlineService {
     public void handleException(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status){
         workOrder.setStatus(status);
         saveStatus4WorkOrderAndSchedule(workOrder,courseSchedule);
-        courseOnlineRequester.releaseGroup(workOrder);
+//        courseOnlineRequester.releaseGroup(workOrder);
     }
 
     public void saveStatus4WorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){

@@ -68,7 +68,6 @@ public class FishCardModifyServiceX {
         return JsonResultModel.newJsonResultModel(courseViews);
     }
 
-    //TODO:目前为假数据,需要进一步联调
     public JsonResultModel changeTeacher(TeacherChangeParam teacherChangeParam) {
         //获取对应的workorder和courseschedule
         WorkOrder workOrder = workOrderService.findOne(teacherChangeParam.getWorkOrderId());
@@ -80,6 +79,7 @@ public class FishCardModifyServiceX {
 
         //对workorder和courseschedule做控制
         workOrder.setTeacherId(teacherChangeParam.getTeacherId());
+        workOrder.setAssignTeacherTime(new Date());
         workOrder.setTeacherName(teacherChangeParam.getTeacherName());
         courseSchedule.setTeacherId(teacherChangeParam.getTeacherId());
 
