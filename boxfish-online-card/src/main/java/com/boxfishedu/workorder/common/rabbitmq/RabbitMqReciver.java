@@ -6,6 +6,7 @@ import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
@@ -155,6 +156,17 @@ public class RabbitMqReciver {
         });
     }
 
+    /**
+     *师生运营组发送的外教点评教师分配情况
+     */
+    @RabbitListener(queues = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE)
+    public void assignForeignTeacher(FromTeacherStudentForm fromTeacherStudentForm) {
+        if(fromTeacherStudentForm == null) {
+            return;
+        }
+        logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", JacksonUtil.toJSon(fromTeacherStudentForm));
+
+    }
     /**
      * 小马更新状态
      */

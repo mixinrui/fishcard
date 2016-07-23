@@ -18,6 +18,7 @@ public class RabbitMqConstant {
     public static final String UNASSIGNED_TEACHER_TIMER_REPLY_TEMPLATE_NAME="boxfish.fishcard.unsignedteacher.timer.reply.template";
     public static final String CREATE_GROUP_TEMPLATE_NAME = "com.boxfishedu.creategroup.template";
     public static final String ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME="boxfish.fishcard.workorder.commentcard.template";
+    public static final String ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME="boxfish.fishcard.student.teacher.commentcard.template";
 
 
     public static final String ASSIGN_TEACHER_TEMPLATE_NAME = "boxfish.assign.teacher.template";

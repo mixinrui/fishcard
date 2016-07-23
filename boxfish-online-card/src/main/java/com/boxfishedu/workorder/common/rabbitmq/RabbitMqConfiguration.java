@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.common.rabbitmq;
 
 import com.boxfishedu.workorder.common.util.ConstantUtil;
-import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
@@ -116,6 +115,13 @@ public class RabbitMqConfiguration {
         Binding assignForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(scheduleExchange()).with(RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME).noargs();
 
         /**
+         * 响应外教点评分配教师
+         */
+        Queue allotForeignTeacherCommentQueue = new Queue(RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE, true);
+        rabbitAdmin.declareQueue(allotForeignTeacherCommentQueue);
+        Binding allotForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(scheduleExchange()).with(RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME).noargs();
+
+        /**
          * 创建组
          */
         Queue createGroupQueue = new Queue(RabbitMqConstant.CREATE_GROUP_QUEUE, true);
@@ -194,6 +200,8 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareBinding(unassignedTeacherFailQueueBinding);
         rabbitAdmin.declareBinding(notifyOrderQueueBinding);
         rabbitAdmin.declareBinding(assignTeacherBinding);
+        rabbitAdmin.declareBinding(assignForeignTeacherCommentBinding);
+        rabbitAdmin.declareBinding(allotForeignTeacherCommentBinding);
         rabbitAdmin.declareBinding(assignTeacherReplyBinding);
         rabbitAdmin.declareBinding(createGroupQueueBinding);
         rabbitAdmin.declareBinding(delayQueueBinding);
@@ -204,6 +212,7 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareBinding(delayForceCompleteDealerQueueBinding);
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareQueueBinding);
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareDealerQueueBinding);
+
         return rabbitAdmin;
     }
 
@@ -290,6 +299,19 @@ public class RabbitMqConfiguration {
     @Bean(name = RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME)
     public RabbitTemplate assignForeignTeacherCommentTemplate(ConnectionFactory factory, MessageConverter messageConverter){
         RabbitTemplate template = getRabbitTemplate(factory,messageConverter,RabbitMqConstant.ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE);
+        template.setExchange(SCHEDULE_EXCHANGE);
+        return template;
+    }
+
+    /**
+     * 响应外教点评分配老师MQ 
+     * @param factory 
+     * @param messageConverter 
+     * @return 
+     */
+    @Bean(name = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME)
+    public RabbitTemplate allotTeacherReplyRabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter){
+        RabbitTemplate template = getRabbitTemplate(connectionFactory,messageConverter,RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE);
         template.setExchange(SCHEDULE_EXCHANGE);
         return template;
     }
