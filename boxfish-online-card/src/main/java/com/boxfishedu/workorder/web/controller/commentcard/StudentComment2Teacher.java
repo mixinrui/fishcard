@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class StudentComment2Teacher {
     @RequestMapping(value = "/student/comment", method = RequestMethod.POST)
     public JsonResultModel studentComment2Teacher(@RequestBody Student2TeacherCommentParam student2TeacherCommentParam) {
-
+        student2TeacherCommentParam.getCommentCardId();
         return null;
     }
 }
