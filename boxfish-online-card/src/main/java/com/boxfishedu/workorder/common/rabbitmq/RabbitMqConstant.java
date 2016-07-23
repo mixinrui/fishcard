@@ -18,6 +18,7 @@ public class RabbitMqConstant {
     public static final String UNASSIGNED_TEACHER_TIMER_REPLY_TEMPLATE_NAME="boxfish.fishcard.unsignedteacher.timer.reply.template";
     public static final String CREATE_GROUP_TEMPLATE_NAME = "com.boxfishedu.creategroup.template";
     public static final String ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME="boxfish.fishcard.workorder.commentcard.template";
+    public static final String ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME="boxfish.fishcard.student.teacher.commentcard.template";
 
 
     public static final String ASSIGN_TEACHER_TEMPLATE_NAME = "boxfish.assign.teacher.template";
@@ -42,7 +43,9 @@ public class RabbitMqConstant {
     public static final String ASSIGNED_TEACHER_REPLY_QUEUE = "boxfish.schedule.send.queue.name.development";
 
     //请求分配外教点评老师
-    public static final String ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE = "boxfish.fishcard.comment.send.queue";
+    public static final String ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE = "boxfish.fishcard.comment.queue";
+    //响应分配外教点评老师
+    public static final String ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE = "boxfish.teacher.student.comment.queue";
 
     //发送到小马的创建组的队列
     public static final String CREATE_GROUP_QUEUE = "com.boxfishedu.creategroup.queue";

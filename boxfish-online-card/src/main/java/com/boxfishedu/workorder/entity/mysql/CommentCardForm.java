@@ -7,6 +7,7 @@ import lombok.Data;
  */
 @Data
 public class CommentCardForm {
+    private Long id;
     private Long studentId;
     private String studentName;
     private Long questionId;

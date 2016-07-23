@@ -3,10 +3,13 @@ package com.boxfishedu.workorder.service.commentcard;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
+import com.boxfishedu.workorder.entity.mysql.ToTeacherStudentForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +38,14 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
     @Override
-    public void foreignTeacherCommentCardAdd(CommentCard commentCard) {
+    public CommentCard foreignTeacherCommentCardAdd(CommentCard commentCard) {
         logger.info("调用外教点评接口新增学生问题,其中commentCard="+commentCard);
         Date dateNow = new Date();
         commentCard.setStudentAskTime(dateNow);
         commentCard.setCreateTime(dateNow);
         commentCard.setUpdateTime(dateNow);
         commentCard.setStatus(CommentCardStatus.ASKED.getCode());
-        commentCardJpaRepository.save(commentCard);
+        return commentCardJpaRepository.save(commentCard);
     }
 
     @Override
@@ -52,17 +55,25 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCard.setUpdateTime(dateNow);
         commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
         commentCardJpaRepository.save(commentCard);
+        ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
         logger.info("向师生运营发生消息,通知分配外教进行点评...");
-        rabbitMqSender.send(commentCard, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+        rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
     }
 
     @Override
-    public void foreignTeacherCommentUpdateAnswer(CommentCard commentCard) {
-        Date dateNow = new Date();
-        commentCard.setUpdateTime(dateNow);
-        commentCard.setStatus(CommentCardStatus.UNREAD.getCode());
-        commentCardJpaRepository.save(commentCard);
-        logger.info("调用外教点评接口更新点评卡中外教点评内容,其中commentCard="+commentCard);
+    public void foreignTeacherCommentUpdateAnswer(FromTeacherStudentForm fromTeacherStudentForm) {
+        CommentCard commentCard = commentCardJpaRepository.findOne(fromTeacherStudentForm.getFishCardId());
+        if (commentCard == null){
+            throw new UnauthorizedException("不存在的点评卡!");
+        }else {
+            Date dateNow = new Date();
+            commentCard.setTeacherId(fromTeacherStudentForm.getTeacherId());
+            commentCard.setTeacherName(fromTeacherStudentForm.getTeacherName());
+            commentCard.setUpdateTime(dateNow);
+            commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
+            commentCardJpaRepository.save(commentCard);
+            logger.info("调用外教点评接口更新点评卡中外教点评内容,其中commentCard=" + commentCard);
+        }
     }
 
     @Override
