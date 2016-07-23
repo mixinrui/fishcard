@@ -93,12 +93,13 @@ public class DayTimeSlots implements Cloneable, Serializable {
         if(CollectionUtils.isEmpty(courseScheduleList)) {
             return;
         }
-        Map<Integer, CourseSchedule> courseScheduleMap = groupByTimeSlotId(courseScheduleList);
+        Map<String, CourseSchedule> courseScheduleMap = groupByTimeSlotId(courseScheduleList);
 
         dailyScheduleTime.forEach( timeSlots -> {
             if(! timeSlots.free()) {
                 timeSlots.setStatus(TimeSlotsStatus.SELECTED);
-                CourseSchedule courseSchedule = courseScheduleMap.get(timeSlots.getSlotId().intValue());
+                CourseSchedule courseSchedule = courseScheduleMap.get(
+                        String.join("", this.day, timeSlots.getSlotId().toString()));
                 if (checkCourseSchedule(courseSchedule)) {
                     timeSlots.initTimeSlots(courseSchedule);
                     if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
@@ -148,10 +149,11 @@ public class DayTimeSlots implements Cloneable, Serializable {
     }
 
 
-    public static Map<Integer, CourseSchedule> groupByTimeSlotId(List<CourseSchedule> courseScheduleList) {
-        Map<Integer, CourseSchedule> resultMap = Maps.newLinkedHashMap();
+    public static Map<String, CourseSchedule> groupByTimeSlotId(List<CourseSchedule> courseScheduleList) {
+        Map<String, CourseSchedule> resultMap = Maps.newLinkedHashMap();
         for(CourseSchedule courseSchedule: courseScheduleList) {
-            resultMap.put(courseSchedule.getTimeSlotId(), courseSchedule);
+            resultMap.put(String.join("", DateUtil.simpleDate2String(courseSchedule.getClassDate())
+                    + courseSchedule.getTimeSlotId()), courseSchedule);
         }
         return resultMap;
     }
