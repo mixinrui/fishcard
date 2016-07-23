@@ -92,6 +92,12 @@ public class CommentCard {
     @Column(name="order_code", length = 128)
     private String orderCode;
 
+    @Column(name="student_comment_tag_code", length = 64)
+    private String studentCommentTagCode;
+
+    @Column(name="assign_teahcer_count", nullable = true)
+    private Integer assignTeacherCount;
+
     public static CommentCard getCommentCard(CommentCardForm commentCardForm){
         CommentCard commentCard = new CommentCard();
         commentCard.setStudentName(commentCardForm.getStudentName());
