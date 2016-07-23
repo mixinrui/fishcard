@@ -2,7 +2,9 @@ package com.boxfishedu.workorder.servicex.commentcard;
 
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
@@ -22,10 +24,17 @@ import java.util.Date;
 @Service
 public class StudentComment2TeacherServiceX {
 
-    CommentCardTeacherAppService commentCardTeacherAppService;
+    @Autowired
+    private CommentCardTeacherAppService commentCardTeacherAppService;
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
     public void studentComment2Teacher(Student2TeacherCommentParam student2TeacherCommentParam){
-
-        CommentCardTeacherAppService commentCardTeacherAppService;
+        CommentCard commentCard=commentCardTeacherAppService.findById(student2TeacherCommentParam.getCommentCardId());
+        if(null==commentCard){
+            throw new BusinessException("不存在对应的点评卡");
+        }
+        commentCard.setStudentCommentTagCode(JacksonUtil.toJSon(student2TeacherCommentParam.getCommentTags()));
     }
 }

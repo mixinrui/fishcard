@@ -1,7 +1,11 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
+import com.boxfishedu.workorder.servicex.CommonServeServiceX;
+import com.boxfishedu.workorder.servicex.commentcard.StudentComment2TeacherServiceX;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -12,9 +16,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/comment/foreign")
 
 public class StudentComment2Teacher {
-    @RequestMapping(value = "/student/comment", method = RequestMethod.POST)
-    public JsonResultModel studentComment2Teacher(@RequestBody Student2TeacherCommentParam student2TeacherCommentParam) {
-        student2TeacherCommentParam.getCommentCardId();
-        return null;
+
+    @Autowired
+    private StudentComment2TeacherServiceX studentComment2TeacherServiceX;
+
+    @Autowired
+    private CommonServeServiceX commonServeServiceX;
+
+    @RequestMapping(value = "/student", method = RequestMethod.POST)
+    public JsonResultModel studentComment2Teacher(@RequestBody Student2TeacherCommentParam student2TeacherCommentParam,Long userId) {
+        commonServeServiceX.checkToken(student2TeacherCommentParam.getStudentId(),userId);
+        studentComment2TeacherServiceX.studentComment2Teacher(student2TeacherCommentParam);
+        return JsonResultModel.newJsonResultModel(null);
     }
 }
