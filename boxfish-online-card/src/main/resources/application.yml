@@ -163,7 +163,7 @@ spring:
 interface:
   address:
     teacher_service: http://101.201.237.252:8099
-    course_recommended_service: http://114.55.40.98:8001
+    course_recommended_service: http://101.201.239.116:8001
     fishcard_service: http://127.0.0.1:8080
     order_service: http://101.201.237.252:8082
     course_online_service: http://101.201.239.116:9090
