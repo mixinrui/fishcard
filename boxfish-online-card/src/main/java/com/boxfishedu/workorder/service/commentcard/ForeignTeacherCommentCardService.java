@@ -28,5 +28,9 @@ public interface ForeignTeacherCommentCardService {
 
     public void foreignTeacherCommentUnAnswer();
 
+    public void foreignTeacherCommentUnAnswer2();
+
     public JsonResultModel updateCommentAmount(Service service);
+
+    public CommentCard getAssignTeacherCount(Long id);
 }

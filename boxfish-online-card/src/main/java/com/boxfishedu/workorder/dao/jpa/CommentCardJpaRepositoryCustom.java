@@ -14,4 +14,6 @@ public interface CommentCardJpaRepositoryCustom {
     public Page<CommentCard> queryCommentCardList(Pageable pageable,Long studentId);
 
     public List<CommentCard> queryCommentNoAnswerList();
+
+    public List<CommentCard> queryCommentNoAnswerList2();
 }
