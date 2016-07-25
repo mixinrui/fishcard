@@ -26,6 +26,11 @@ public class FishCardModifyController {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
+    @RequestMapping(value = "/teacher", method = RequestMethod.PUT)
+    public JsonResultModel changeTeacher(@RequestBody TeacherChangeParam teacherChangeParam) {
+        return fishCardModifyServiceX.changeTeacher(teacherChangeParam);
+    }
+
     @RequestMapping(value = "/courses/order", method = RequestMethod.PUT)
     public JsonResultModel changeSpecialOrderCourses(@RequestBody CourseChangeParam courseChangeParam) {
         fishCardModifyServiceX.changeSpecialOrderCourses(courseChangeParam.getStudentId(),courseChangeParam.getOrderId());
