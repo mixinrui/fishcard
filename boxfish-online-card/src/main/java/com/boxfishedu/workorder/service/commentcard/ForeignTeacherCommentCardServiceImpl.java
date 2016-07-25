@@ -44,6 +44,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCard.setStudentAskTime(dateNow);
         commentCard.setCreateTime(dateNow);
         commentCard.setUpdateTime(dateNow);
+        commentCard.setAssignTeacherCount(0);
         commentCard.setStatus(CommentCardStatus.ASKED.getCode());
         return commentCardJpaRepository.save(commentCard);
     }
@@ -109,7 +110,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setAssignTeacherTime(dateNow);
             commentCard.setUpdateTime(dateNow);
             commentCardJpaRepository.save(commentCard);
-
+            ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
+            logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+commentCard);
+            rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
         }
         logger.info("所有在24小时内为被点评的学生已重新求情分配外教完毕,一共重新分配的学生个数为:"+list.size());
     }
