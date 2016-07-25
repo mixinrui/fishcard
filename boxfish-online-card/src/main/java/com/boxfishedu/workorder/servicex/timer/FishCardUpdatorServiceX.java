@@ -69,7 +69,7 @@ public class FishCardUpdatorServiceX {
      */
     public void teacherAbsentUpdator(FishCardDelayMessage fishCardDelayMessage) {
         logger.debug("@teacherAbsentUpdator,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
-        WorkOrder workOrder = workOrderService.findByIdForUpdate(fishCardDelayMessage.getId());
+        WorkOrder workOrder = workOrderService.findOne(fishCardDelayMessage.getId());
         if (null == workOrder) {
             throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
         }
@@ -102,14 +102,14 @@ public class FishCardUpdatorServiceX {
      */
     public void studentAbsentUpdator(FishCardDelayMessage fishCardDelayMessage) {
         logger.debug("@studentAbsentUpdator#FishCardDelayMessage,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
-        WorkOrder workOrder = workOrderService.findByIdForUpdate(fishCardDelayMessage.getId());
+        WorkOrder workOrder = workOrderService.findOne(fishCardDelayMessage.getId());
         if (null == workOrder) {
             throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
         }
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
 
-        boolean isExceptionFlag = true;
+        boolean isExceptionFlag = false;
         for (WorkOrderLog workOrderLog : workOrderLogs) {
             if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
                 isExceptionFlag = true;
@@ -132,7 +132,7 @@ public class FishCardUpdatorServiceX {
 
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
 
-        boolean isExceptionFlag = true;
+        boolean isExceptionFlag = false;
         for (WorkOrderLog workOrderLog : workOrderLogs) {
             if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
                 isExceptionFlag = true;

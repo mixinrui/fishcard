@@ -37,6 +37,7 @@ import static com.boxfishedu.workorder.common.util.DateUtil.parseLocalTime;
 /**
  * Created by hucl on 16/3/31.
  */
+@SuppressWarnings("ALL")
 @org.springframework.stereotype.Service
 public class TeacherAppRelatedServiceX {
     @Autowired

@@ -81,7 +81,7 @@ public class CourseOnlineServiceX {
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrderId);
         if ((status != FishCardStatusEnum.COMPLETED.getCode()) && (status != FishCardStatusEnum.COMPLETED_FORCE.getCode())) {
-            courseOnlineService.notAllowUpdateStatus(workOrder, "不能覆盖已有消息,新消息:" + FishCardStatusEnum.getDesc(status) + "@@reportTime" + reportTime);
+            courseOnlineService.notAllowUpdateStatus(workOrder, "不能覆盖已有消息"+"###reportTime::" + reportTime+"####新消息:" + FishCardStatusEnum.getDesc(status));
         }
         if (null == workOrder || null == courseSchedule) {
             String msg = "无对应的鱼卡或课程schedule,请确认参数传入是否正确,鱼卡id[" + workOrderId + "]";
@@ -105,7 +105,7 @@ public class CourseOnlineServiceX {
             workOrder.setUpdateTime(new Date());
             workOrderService.save(workOrder);
         }
-        workOrderLogService.saveWorkOrderLog(workOrder, "reporttime:::" + reportTime + "#########" + FishCardStatusEnum.getDesc(workOrder.getStatus()));
+        workOrderLogService.saveWorkOrderLog(workOrder, "reporttime::" + reportTime + "#########" + FishCardStatusEnum.getDesc(workOrder.getStatus()));
     }
 
     //更新WorkOrder的状态
