@@ -69,7 +69,7 @@ public class FishCardUpdatorServiceX {
      */
     public void teacherAbsentUpdator(FishCardDelayMessage fishCardDelayMessage) {
         logger.debug("@teacherAbsentUpdator,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
-        WorkOrder workOrder = workOrderService.findByIdForUpdate(fishCardDelayMessage.getId());
+        WorkOrder workOrder = workOrderService.findOne(fishCardDelayMessage.getId());
         if (null == workOrder) {
             throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
         }
@@ -98,13 +98,41 @@ public class FishCardUpdatorServiceX {
     }
 
     /**
+     * 学生中途旷课逻辑处理
+     */
+    public void studentAbsentUpdator(FishCardDelayMessage fishCardDelayMessage) {
+        logger.debug("@studentAbsentUpdator#FishCardDelayMessage,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
+        WorkOrder workOrder = workOrderService.findOne(fishCardDelayMessage.getId());
+        if (null == workOrder) {
+            throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
+        }
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
+        List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
+
+        boolean isExceptionFlag = false;
+        for (WorkOrderLog workOrderLog : workOrderLogs) {
+            if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
+                isExceptionFlag = true;
+                break;
+            }
+        }
+        if (!isExceptionFlag) {
+            workOrder.setStatus(FishCardStatusEnum.STUDENT_ABSENT.getCode());
+            courseSchedule.setStatus(workOrder.getStatus());
+            workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
+            workOrderLogService.saveWorkOrderLog(workOrder);
+        }
+    }
+
+
+    /**
      * 学生旷课逻辑处理
      */
     public boolean studentAbsentUpdator(WorkOrder workOrder, CourseSchedule courseSchedule) {
 
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
 
-        boolean isExceptionFlag = true;
+        boolean isExceptionFlag = false;
         for (WorkOrderLog workOrderLog : workOrderLogs) {
             if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
                 isExceptionFlag = true;
@@ -144,7 +172,8 @@ public class FishCardUpdatorServiceX {
         //  对于不包含学生接受请求的消息,视为旷课处理;其他视为系统异常
         if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()
                 || fishCardDelayMessage.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()
-                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.CONNECTED.getCode()) {
+                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
+                || fishCardDelayMessage.getStatus() == FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
             if (!studentAbsentUpdator(workOrder, courseSchedule)) {
                 return;
             }
