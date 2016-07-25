@@ -105,7 +105,7 @@ public class CourseOnlineServiceX {
             workOrder.setUpdateTime(new Date());
             workOrderService.save(workOrder);
         }
-        workOrderLogService.saveWorkOrderLog(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()) + "@reporttime->" + reportTime);
+        workOrderLogService.saveWorkOrderLog(workOrder, "reporttime:::" + reportTime + "#########" + FishCardStatusEnum.getDesc(workOrder.getStatus()));
     }
 
     //更新WorkOrder的状态
