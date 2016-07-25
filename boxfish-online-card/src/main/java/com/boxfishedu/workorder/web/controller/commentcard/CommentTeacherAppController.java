@@ -44,4 +44,9 @@ public class CommentTeacherAppController {
         commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
         return JsonResultModel.newJsonResultModel(null);
     }
+
+    @RequestMapping(value = "/update_status", method = RequestMethod.PUT)
+    public JsonResultModel markReadFlag(){
+        return null;
+    }
 }
