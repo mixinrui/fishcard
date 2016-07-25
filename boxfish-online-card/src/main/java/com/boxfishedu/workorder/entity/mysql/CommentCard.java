@@ -2,7 +2,6 @@ package com.boxfishedu.workorder.entity.mysql;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -96,7 +95,7 @@ public class CommentCard {
     private String studentCommentTagCode;
 
     @Column(name="assign_teahcer_count", nullable = true)
-    private Integer assignTeacherCount;
+    private Integer assignTeacherCount = 0;
 
     public static CommentCard getCommentCard(CommentCardForm commentCardForm){
         CommentCard commentCard = new CommentCard();
