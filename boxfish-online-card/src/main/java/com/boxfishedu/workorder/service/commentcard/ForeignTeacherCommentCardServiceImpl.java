@@ -141,12 +141,4 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         serviceJpaRepository.save(service);
         return new JsonResultModel();
     }
-
-    @Override
-    public CommentCard getAssignTeacherCount(Long id) {
-        CommentCard commentCard = commentCardJpaRepository.findOne(id);
-
-        return null;
-    }
-
 }
