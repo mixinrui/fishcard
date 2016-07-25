@@ -24,7 +24,7 @@ public class StudentComment2Teacher {
     private CommonServeServiceX commonServeServiceX;
 
     @RequestMapping(value = "/student", method = RequestMethod.POST)
-    public JsonResultModel studentComment2Teacher(@RequestBody Student2TeacherCommentParam student2TeacherCommentParam,Long userId) {
+    public JsonResultModel studentCommentForTeacher(@RequestBody Student2TeacherCommentParam student2TeacherCommentParam,Long userId) {
         commonServeServiceX.checkToken(student2TeacherCommentParam.getStudentId(),userId);
         studentComment2TeacherServiceX.studentComment2Teacher(student2TeacherCommentParam);
         return JsonResultModel.newJsonResultModel(null);

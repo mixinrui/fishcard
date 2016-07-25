@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +31,22 @@ public class StudentComment2TeacherServiceX {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
+    private Logger logger=LoggerFactory.getLogger(this.getClass());
+
     public void studentComment2Teacher(Student2TeacherCommentParam student2TeacherCommentParam){
         CommentCard commentCard=commentCardTeacherAppService.findById(student2TeacherCommentParam.getCommentCardId());
         if(null==commentCard){
             throw new BusinessException("不存在对应的点评卡");
         }
-        commentCard.setStudentCommentTagCode(JacksonUtil.toJSon(student2TeacherCommentParam.getCommentTags()));
+        if(!StringUtils.isEmpty(student2TeacherCommentParam.getForGoodReviews())){
+            commentCard.setStudentCommentTagCode(student2TeacherCommentParam.getForGoodReviews());
+        }
+        else if(!StringUtils.isEmpty(student2TeacherCommentParam.getForBadReviews())){
+            commentCard.setStudentCommentTagCode(student2TeacherCommentParam.getForBadReviews());
+        }
+        else{
+            logger.info("@studentComment2Teacher获取到的评价为空,不做处理");
+        }
+
     }
 }
