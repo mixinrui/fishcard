@@ -100,10 +100,29 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Override
     @Transactional
     public void foreignTeacherCommentUnAnswer() {
-        logger.info("调用查询外教未点评问题数据库接口");
+        Date dateNow = new Date();
+        logger.info("调用查询外教24小时未点评问题数据库接口");
         List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList();
         for (CommentCard commentCard: list) {
-            commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
+            commentCard.setStatus(CommentCardStatus.OVERTIME_ONE.getCode());
+            commentCard.setAssignTeacherCount(1);
+            commentCard.setAssignTeacherTime(dateNow);
+            commentCard.setUpdateTime(dateNow);
+            commentCardJpaRepository.save(commentCard);
+
+        }
+        logger.info("所有在24小时内为被点评的学生已重新求情分配外教完毕,一共重新分配的学生个数为:"+list.size());
+    }
+
+    @Override
+    @Transactional
+    public void foreignTeacherCommentUnAnswer2() {
+        Date dateNow = new Date();
+        logger.info("调用查询外教48小时未点评问题数据库接口");
+        List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList2();
+        for (CommentCard commentCard: list) {
+            commentCard.setStatus(CommentCardStatus.OVERTIME_TWO.getCode());
+            commentCard.setUpdateTime(dateNow);
             com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
             commentCard.setService(serviceTemp);
             commentCardJpaRepository.save(commentCard);
@@ -119,4 +138,12 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         serviceJpaRepository.save(service);
         return new JsonResultModel();
     }
+
+    @Override
+    public CommentCard getAssignTeacherCount(Long id) {
+        CommentCard commentCard = commentCardJpaRepository.findOne(id);
+
+        return null;
+    }
+
 }

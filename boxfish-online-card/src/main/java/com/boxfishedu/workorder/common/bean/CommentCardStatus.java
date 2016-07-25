@@ -12,7 +12,8 @@ public enum CommentCardStatus {
     TEACHER_UNREADED(510,"教师未读取"),
     READ(600,"已读取"),
     TEACHER_READED(610,"教师已读取"),
-    OVERTIME(700,"教师超时未回答"),
+    OVERTIME_ONE(710,"教师24小时未回答"),
+    OVERTIME_TWO(720,"教师48小时超时未回答"),
     STUDENT_COMMENT_TO_TEACHER(800,"学生评价教师"),
     STUDENT_COMMENT_UNREADED(810,"教师未读取学生评价"),
     STUDENT_COMMENT_READED(820,"教师已读取教师评价");
