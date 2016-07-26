@@ -11,4 +11,6 @@ public class MakeUpCourseParam {
     private Integer timeSlotId;
     private String startTime;
     private String endTime;
+    /** 更改课程类型 **/
+    private String courseType;
 }
