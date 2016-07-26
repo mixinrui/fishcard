@@ -15,6 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * 线程池管理(线程统一调度管理)
  */
+@SuppressWarnings("ALL")
 @Component
 public class ThreadPoolManager<T extends Runnable> {
     @Autowired
