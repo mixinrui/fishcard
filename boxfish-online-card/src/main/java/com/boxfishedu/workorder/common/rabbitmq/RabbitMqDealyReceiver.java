@@ -28,7 +28,7 @@ public class RabbitMqDealyReceiver {
             try {
                 fishCardUpdatorServiceX.teacherAbsentUpdator(fishCardDelayMessage);
             } catch (Exception ex) {
-                logger.error("@teacherAbsentDealer更新旷课情况失败");
+                logger.error("@teacherAbsentDealer更新旷课情况失败",ex);
             }
 
         }
@@ -39,8 +39,8 @@ public class RabbitMqDealyReceiver {
         logger.info("@============>[studentAbsentDealer]开始接收delay message{}", fishCardDelayMessage);
         if (fishCardDelayMessage.getType() == FishCardDelayMsgType.STUDENT_ABSENT.value()) {
             try {
-                //将学生旷课逻辑加到课程结束以后再做判断
-//                fishCardUpdatorServiceX.studentAbsentUpdator(fishCardDelayMessage);
+//                将学生旷课逻辑加到课程结束以后再做判断
+                fishCardUpdatorServiceX.studentAbsentUpdator(fishCardDelayMessage);
             } catch (Exception ex) {
                 logger.error("@studentAbsentDealer更新旷课情况失败");
             }

@@ -29,6 +29,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
@@ -410,9 +412,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     }
 
     public Optional<Service> findFirstAvailableForeignCommentService(long studentId) {
-        List<Service> services = serviceJpaRepository.getAvailableForeignCommentServiceCounts(
-                studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value());
-        return (CollectionUtils.isNotEmpty(services)) ? Optional.of(services.get(0)) : Optional.empty();
+        Page<Service> servicePage = serviceJpaRepository.getFirstAvailableForeignCommentService(
+                studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value(), new PageRequest(0, 1));
+        return CollectionUtils.isEmpty(servicePage.getContent()) ?
+                Optional.empty() : Optional.of(servicePage.getContent().get(0));
     }
 
 //    @Transactional

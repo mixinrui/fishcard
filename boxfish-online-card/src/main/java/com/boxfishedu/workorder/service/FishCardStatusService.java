@@ -91,7 +91,7 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.READY.getCode()
                 ,FishCardStatusEnum.ONCLASS.getCode(),FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode(),FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()
                 ,FishCardStatusEnum.CONNECTED.getCode(),FishCardStatusEnum.WAITFORSTUDENT.getCode()
-                ,FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode(),FishCardStatusEnum.EXCEPTION.getCode()};
+                ,FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode(),FishCardStatusEnum.EXCEPTION.getCode(),FishCardStatusEnum.STUDENT_ABSENT.getCode()};
         List<WorkOrder> result= jpa.findByIsCourseOverAndStatusInAndOrderIdLessThanAndEndTimeBetween((short)0,statuses,Long.MAX_VALUE, startDate, endDate);
         return result;
     }
