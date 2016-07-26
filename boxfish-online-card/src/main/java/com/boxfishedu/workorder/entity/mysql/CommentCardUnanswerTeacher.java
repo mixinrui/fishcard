@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -19,12 +20,18 @@ public class CommentCardUnanswerTeacher {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "card_id", nullable = true)
-    private Long cardId;
+//    @Column(name = "card_id", nullable = true)
+//    private Long cardId;
 
     @Column(name = "teacher_id", nullable = true)
     private Long teacherId;
 
     @Column(name = "create_time", nullable = true)
     private Date createTime;
+
+    @JoinColumn(name = "card_id", referencedColumnName = "id")//设置对应数据表的列名和引用的数据表的列名
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonBackReference
+    private CommentCard commentCard;
+
 }

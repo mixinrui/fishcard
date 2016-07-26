@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
+import com.boxfishedu.workorder.web.param.commentcard.TeacherReadMsgParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,8 +46,10 @@ public class CommentTeacherAppController {
         return JsonResultModel.newJsonResultModel(null);
     }
 
-    @RequestMapping(value = "/update_status", method = RequestMethod.PUT)
-    public JsonResultModel markReadFlag(){
-        return null;
+    @RequestMapping(value = "/teacher/read_message", method = RequestMethod.PUT)
+    public JsonResultModel markReadFlag(@RequestBody TeacherReadMsgParam teacherReadMsgParam,Long userId){
+        commonServeServiceX.checkToken(teacherReadMsgParam.getTeacherId(),userId);
+        commentTeacherAppServiceX.markTeacherRead(teacherReadMsgParam);
+        return JsonResultModel.newJsonResultModel(null);
     }
 }

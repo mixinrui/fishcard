@@ -3,8 +3,12 @@ package com.boxfishedu.workorder.servicex.commentcard;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.requester.TeacherStudentCommentCardRequester;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
+import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
+import com.boxfishedu.workorder.web.param.commentcard.TeacherReadMsgParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,9 @@ public class CommentTeacherAppServiceX {
     @Autowired
     private CommentCardTeacherAppService commentCardTeacherAppService;
 
+    @Autowired
+    private TeacherStudentCommentCardRequester teacherStudentCommentCardRequester;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public Page<CommentCard> findByTeacherIdOrderByAssignTeacherTimeDesc(Long teacherId, Pageable pageable){
@@ -32,6 +39,15 @@ public class CommentTeacherAppServiceX {
 
     public CommentCard findById(Long cardId){
         return commentCardTeacherAppService.findById(cardId);
+    }
+
+    public void markTeacherRead(TeacherReadMsgParam teacherReadMsgParam){
+        CommentCard commentCard=this.findById(teacherReadMsgParam.getCommentCardId());
+        if(null==commentCard){
+            logger.error("不存在对应的点评卡,点评卡id[{}]",teacherReadMsgParam.getCommentCardId());
+            throw new BusinessException("不存在对应的点评卡");
+        }
+        commentCard.setTeacherReadFlag(1);
     }
 
     public void submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam){

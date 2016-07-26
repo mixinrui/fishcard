@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.requester.TeacherStudentCommentCardRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
@@ -31,6 +32,9 @@ public class StudentComment2TeacherServiceX {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
+    @Autowired
+    private TeacherStudentCommentCardRequester teacherStudentCommentCardRequester;
+
     private Logger logger=LoggerFactory.getLogger(this.getClass());
 
     public void studentComment2Teacher(Student2TeacherCommentParam student2TeacherCommentParam){
@@ -40,13 +44,15 @@ public class StudentComment2TeacherServiceX {
         }
         if(!StringUtils.isEmpty(student2TeacherCommentParam.getForGoodReviews())){
             commentCard.setStudentCommentTagCode(student2TeacherCommentParam.getForGoodReviews());
+            teacherStudentCommentCardRequester.sendStudentComment2Teacher(student2TeacherCommentParam);
         }
         else if(!StringUtils.isEmpty(student2TeacherCommentParam.getForBadReviews())){
             commentCard.setStudentCommentTagCode(student2TeacherCommentParam.getForBadReviews());
+            teacherStudentCommentCardRequester.sendStudentComment2Teacher(student2TeacherCommentParam);
         }
         else{
             logger.info("@studentComment2Teacher获取到的评价为空,不做处理");
         }
-
+        commentCardTeacherAppService.save(commentCard);
     }
 }
