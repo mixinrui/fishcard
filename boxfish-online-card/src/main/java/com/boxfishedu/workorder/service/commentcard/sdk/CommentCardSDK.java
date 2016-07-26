@@ -32,7 +32,7 @@ public class CommentCardSDK {
         MultiValueMap<String,String> paramMap = new LinkedMultiValueMap<>();
         paramMap.add("teacherId",teacherId.toString());
         paramMap.add("fishCardId",id.toString());
-        return UriComponentsBuilder.fromUriString("http://host")
+        return UriComponentsBuilder.fromUriString("http://192.168.88.210:8099")
                 .path("/f_teacher_review/set_truant")
                 .queryParams(paramMap)
                 .build()
