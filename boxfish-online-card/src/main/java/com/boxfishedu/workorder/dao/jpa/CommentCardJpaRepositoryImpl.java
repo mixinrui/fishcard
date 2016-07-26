@@ -44,8 +44,7 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
                 Long timeLong = dateNow.getTime() - 24 * 60 * 60 * 1000L;
                 dateNow.setTime(timeLong);
                 predicateList.add(criteriaBuilder.lessThan(root.get("studentAskTime"),dateNow));
-                predicateList.add(criteriaBuilder.or(criteriaBuilder.between(root.get("status"),CommentCardStatus.ASKED.getCode(),CommentCardStatus.ASSIGNED_TEACHER.getCode()),
-                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.TEACHER_UNREADED.getCode()),criteriaBuilder.equal(root.get("status"),CommentCardStatus.TEACHER_READED.getCode())));
+                predicateList.add(criteriaBuilder.between(root.get("status"),CommentCardStatus.ASKED.getCode(),CommentCardStatus.ASSIGNED_TEACHER.getCode()));
                 predicateList.add(criteriaBuilder.equal(root.get("assignTeacherCount"),0));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
@@ -64,7 +63,7 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
                 Long timeLong = dateNow.getTime() - 48 * 60 * 60 * 1000L;
                 dateNow.setTime(timeLong);
                 predicateList.add(criteriaBuilder.lessThan(root.get("studentAskTime"),dateNow));
-                predicateList.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME_ONE.getCode()),criteriaBuilder.equal(root.get("status"),CommentCardStatus.TEACHER_UNREADED.getCode())));
+                predicateList.add(criteriaBuilder.between(root.get("status"),CommentCardStatus.ASKED.getCode(),CommentCardStatus.ASSIGNED_TEACHER.getCode()));
                 predicateList.add(criteriaBuilder.equal(root.get("assignTeacherCount"),1));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }

@@ -100,6 +100,13 @@ public class CommentCard {
     @Column(name="assign_teahcer_count", nullable = true)
     private Integer assignTeacherCount = 0;
 
+
+    @Column(name = "teacher_read_flag", nullable = true)
+    private int teacherReadFlag;
+
+    @Column(name = "student_read_flag", nullable = true)
+    private int studentReadFlag;
+
     public static CommentCard getCommentCard(CommentCardForm commentCardForm){
         CommentCard commentCard = new CommentCard();
         commentCard.setStudentName(commentCardForm.getStudentName());

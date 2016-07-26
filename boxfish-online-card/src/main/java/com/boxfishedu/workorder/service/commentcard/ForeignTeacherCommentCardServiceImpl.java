@@ -6,8 +6,10 @@ import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.CommentCardUnanswerTeacherJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.CommentCardUnanswerTeacher;
 import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.ToTeacherStudentForm;
 import org.slf4j.Logger;
@@ -35,6 +37,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Autowired
     ServiceJpaRepository serviceJpaRepository;
 
+    @Autowired
+    CommentCardUnanswerTeacherJpaRepository commentCardUnanswerTeacherJpaRepository;
+
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
     @Override
@@ -55,6 +60,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         Date dateNow = new Date();
         commentCard.setUpdateTime(dateNow);
         commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+        commentCard.setTeacherReadFlag(0);
         commentCardJpaRepository.save(commentCard);
         ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
         logger.info("向师生运营发生消息,通知分配外教进行点评...");
@@ -81,7 +87,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public void foreignTeacherCommentUpdateStatusRead(CommentCard commentCard) {
         Date dateNow = new Date();
         commentCard.setUpdateTime(dateNow);
-        commentCard.setStatus(CommentCardStatus.READ.getCode());
+        commentCard.setStudentReadFlag(1);
         commentCardJpaRepository.save(commentCard);
         logger.info("调用外教点评接口更新点评卡状态为已读,其中commentCard="+commentCard);
     }
@@ -105,12 +111,17 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("调用查询外教24小时未点评问题数据库接口");
         List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList();
         for (CommentCard commentCard: list) {
-            commentCard.setStatus(CommentCardStatus.OVERTIME_ONE.getCode());
+            commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
             commentCard.setAssignTeacherCount(1);
             commentCard.setAssignTeacherTime(dateNow);
             commentCard.setUpdateTime(dateNow);
             commentCardJpaRepository.save(commentCard);
             ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
+            CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
+            commentCardUnanswerTeacher.setCardId(commentCard.getId());
+            commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
+            commentCardUnanswerTeacher.setCreateTime(dateNow);
+            commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
             logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+commentCard);
             rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
         }
@@ -124,7 +135,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("调用查询外教48小时未点评问题数据库接口");
         List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList2();
         for (CommentCard commentCard: list) {
-            commentCard.setStatus(CommentCardStatus.OVERTIME_TWO.getCode());
+            commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
             commentCard.setUpdateTime(dateNow);
             com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
             commentCard.setService(serviceTemp);
