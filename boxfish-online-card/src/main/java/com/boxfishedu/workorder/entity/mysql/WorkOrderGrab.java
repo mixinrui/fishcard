@@ -46,6 +46,10 @@ public class WorkOrderGrab {
     @Column(name = "flag", nullable = true)
     private String flag;
 
+
+    @Column(name = "course_type")
+    private String courseType;
+
      @Override
     public String toString() {
         return "WorkOrder{" +
@@ -56,6 +60,7 @@ public class WorkOrderGrab {
                 ", createTime=" + createTime +
                 ", updateTime='" + updateTime + '\'' +
                 ", flag='" + flag + '\'' +
+                ", couserType='" + courseType + '\'' +
                 '}';
     }
 }

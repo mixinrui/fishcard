@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.graborder;
 
+import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -47,7 +48,7 @@ public class GrabOrderController {
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public JsonResultModel test() {
-        makeWorkOrderServiceX.makeSendWorkOrder(null);
+        makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.FUNCTION.toString());
         //makeWorkOrderServiceX.getTeacherList("true/false");
 
         //makeWorkOrderServiceX.clearGrabData();
@@ -56,7 +57,26 @@ public class GrabOrderController {
 
     @RequestMapping(value = "/testreal", method = RequestMethod.GET)
     public JsonResultModel testreal() {
-        makeWorkOrderServiceX.makeSendWorkOrder("testreal");
+        makeWorkOrderServiceX.makeSendWorkOrder("testreal",CourseTypeEnum.FUNCTION.toString());
+        //makeWorkOrderServiceX.getTeacherList("true/false");
+
+        //makeWorkOrderServiceX.clearGrabData();
+        return new JsonResultModel();
+    }
+
+
+    @RequestMapping(value = "/testforeigh", method = RequestMethod.GET)
+    public JsonResultModel testforeigh() {
+        makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.TALK.toString());
+        //makeWorkOrderServiceX.getTeacherList("true/false");
+
+        //makeWorkOrderServiceX.clearGrabData();
+        return new JsonResultModel();
+    }
+
+    @RequestMapping(value = "/testrealforeigh", method = RequestMethod.GET)
+    public JsonResultModel testrealforeigh() {
+        makeWorkOrderServiceX.makeSendWorkOrder("testreal",CourseTypeEnum.TALK.toString());
         //makeWorkOrderServiceX.getTeacherList("true/false");
 
         //makeWorkOrderServiceX.clearGrabData();

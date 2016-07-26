@@ -19,8 +19,12 @@ public enum TimerMessageType {
     TEACHER_COURSE_NEW_ASSIGNEDED_DAY(80),
     //抢单初始化数据队列
     GRAB_ORDER_DATA_INIT(90),
-    //抢单格式化数据队列(清理历史数据)
-    GRAB_ORDER_DATA_CLEAR_DAY(100);
+    GRAB_ORDER_DATA_INIT_FOREIGH(91),
+    //抢单格式化数据队列(清理历史数据中教)
+    GRAB_ORDER_DATA_CLEAR_DAY(100),
+
+    //抢单格式化数据队列(清理历史数据外教)
+    GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH(101);
 
 
 

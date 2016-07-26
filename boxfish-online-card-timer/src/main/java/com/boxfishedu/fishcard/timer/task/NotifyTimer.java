@@ -125,7 +125,7 @@ public class NotifyTimer {
      */
 //   @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
     @Scheduled(cron = "0 0/5 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
-    public void initGrabOrderData() {
+    public void initGrabOrderDataChinese() {
         logger.info("<<<<<<graborder-initGrabOrderData<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<轮训抢单初始化数据>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT.value());
@@ -138,10 +138,34 @@ public class NotifyTimer {
      * 抢单:每天17:40清理数据
      */
     @Scheduled(cron = "0 40 17 * * ?")
-    public void clearGrabOrderData() {
+    public void clearGrabOrderDataChinese() {
         logger.info("<<<<<<graborder-clearGrabOrderData<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<清理昨天抢单历史数据>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+
+    //   @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+   // @Scheduled(cron = "0 0/5 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
+    public void initGrabOrderDataForeigh() {
+        logger.info("<<<<<<graborder-initGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<开始通知<<<轮训抢单初始化数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGH.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+
+    /**
+     * 抢单:每天17:40清理数据
+     */
+   // @Scheduled(cron = "0 40 17 * * ?")
+    public void clearGrabOrderDataForeigh() {
+        logger.info("<<<<<<graborder-clearGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<开始通知<<<清理昨天抢单历史数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

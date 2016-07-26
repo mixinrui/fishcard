@@ -47,6 +47,8 @@ public class WorkOrderGrabHistory {
     @Temporal(TemporalType.TIMESTAMP)
     private Date realCreateTime;
 
+    @Column(name = "course_type")
+    private String courseType;
 
     @Override
     public String toString() {
@@ -59,6 +61,7 @@ public class WorkOrderGrabHistory {
                 ", updateTime='" + updateTime + '\'' +
                 ", flag='" + flag + '\'' +
                 ", realCreateTime='" + realCreateTime + '\'' +
+                ", courseType='" + courseType + '\'' +
                 '}';
     }
 }

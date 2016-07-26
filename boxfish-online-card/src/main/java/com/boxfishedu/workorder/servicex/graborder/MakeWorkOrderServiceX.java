@@ -61,22 +61,24 @@ public class MakeWorkOrderServiceX {
 
     /**
      * 组合发送的鱼卡
+     * @param flag   flag  真假数据标示  方便测试使用
+     * @param teacherType  TALK 外教  CourseTypeEnum.FUNCTION.toString()  统一代表中教
      */
-    public void makeSendWorkOrder(String flag) {
-        logger.info("::::::::::::::::::::::::::::::::begin::::::::::::makeSendWorkOrder::::::::::::::::::::::::::::::::");
+    public void makeSendWorkOrder(String flag,String teacherType) {
+        logger.info("::::::::::::::::::::::::::::::::begin::::::::::::makeSendWorkOrder:::teacherType[{}]:::::::::::::::::::::::::::::",teacherType);
         logger.info("开始定时轮训 生成需要匹配教师的鱼卡");
 
 
         // 1 获取未来两天内未匹配老师的鱼卡
         List<WorkOrder> workOrderNOteacher = makeWorkOrderService.findByTeacherIdAndStartTimeBetweenOrderByStartTime();
         if (null == workOrderNOteacher || workOrderNOteacher.size() < 1) {
-            logger.info("1111111111111111111111:::::::::::::没有需要补老师的课程::::::::::::::::::::::::::::::::");
+            logger.info("1111111111111111111111:::::::::::::没有需要补老师的课程:::teacherType[{}]:::::::::::::::::::::::::::::",teacherType);
             return;
         }
 
 
         // 2 向师生运营获取教师信息列表
-        List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher),flag);
+        List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher,teacherType),flag);
 
         if (null == teacherForms || teacherForms.size() < 0) {
             logger.info("222222222222222:::::::::::::thereisNOteacherList:没有查询到符合条件的教师列表::::: ::::::::::::::::::::::::::");
@@ -113,7 +115,7 @@ public class MakeWorkOrderServiceX {
         logger.info("5555555555:::::::::::::向在线运营发送数据");
         pushTeacherList(map);
 
-        logger.info("::::::::::::::::::::::::::::::::end-------makeSendWorkOrder::::::::::::::::::::::::::::::::");
+        logger.info("::::::::::::::::::::::::::::::::end-------makeSendWorkOrder:::teacherType[{}]:::::::::::::::::::::::::::::",teacherType);
         logger.info("结束定时轮训 生成需要匹配教师的鱼卡");
     }
 
@@ -131,13 +133,13 @@ public class MakeWorkOrderServiceX {
      * @param workOrderNOteacher
      * @return
      */
-    public String foreighAndChinesTeahcer(List<WorkOrder> workOrderNOteacher) {
+    public String foreighAndChinesTeahcer(List<WorkOrder> workOrderNOteacher,String teacherType) {
         boolean chineseTeacherflag = false;
         boolean foreignTeahcerflag = false;
         for (WorkOrder wo : workOrderNOteacher) {
-            if (CourseTypeEnum.TALK.toString().equals(wo.getCourseType())) {
+            if (CourseTypeEnum.TALK.toString().equals(wo.getCourseType())  && CourseTypeEnum.TALK.toString().equals(teacherType)) {
                 foreignTeahcerflag = true;
-            } else {
+            } else if(CourseTypeEnum.FUNCTION.toString().equals(teacherType)){// FUNCTION 代表中教
                 chineseTeacherflag = true;
             }
             if (foreignTeahcerflag && chineseTeacherflag)
@@ -318,6 +320,7 @@ public class MakeWorkOrderServiceX {
                 WorkOrderGrabHistory wgh = new WorkOrderGrabHistory();
                 wgh.setWorkorderId(wg.getWorkorderId());
                 wgh.setTeacherId(wg.getTeacherId());
+                wgh.setCourseType(wg.getCourseType());
                 wgh.setUpdateTime(wg.getUpdateTime());
                 wgh.setCreateTime(wg.getCreateTime());
                 wgh.setStartTime(wg.getStartTime());
