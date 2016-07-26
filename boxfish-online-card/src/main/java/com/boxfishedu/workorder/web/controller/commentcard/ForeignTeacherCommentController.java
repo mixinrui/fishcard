@@ -115,11 +115,11 @@ public class ForeignTeacherCommentController {
         }
     }
 
-//    @RequestMapping(value = "query_no_answer")
-//    public JsonResultModel queryUnAnswer(){
-//        foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
-//        return JsonResultModel.newJsonResultModel();
-//    }
+    @RequestMapping(value = "query_no_answer")
+    public JsonResultModel queryUnAnswer(){
+        foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
+        return JsonResultModel.newJsonResultModel();
+    }
 
     @RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
     public JsonResultModel haveAvailableForeignCommentService(long userId) {
