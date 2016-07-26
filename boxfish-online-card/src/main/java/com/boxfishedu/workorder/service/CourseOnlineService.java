@@ -57,7 +57,8 @@ public class CourseOnlineService {
         boolean flag=(savedStatus== FishCardStatusEnum.COMPLETED.getCode())
                 ||(savedStatus==FishCardStatusEnum.COMPLETED_FORCE.getCode())
                 ||(savedStatus==FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode())
-                ||(savedStatus==FishCardStatusEnum.TEACHER_ABSENT.getCode());
+                ||(savedStatus==FishCardStatusEnum.TEACHER_ABSENT.getCode()
+                ||(1==workOrder.getIsCourseOver()));
         if(flag){
             //将接受到的消息加入到mongo中
             workOrderLogService.saveWorkOrderLog(workOrder,desc);
