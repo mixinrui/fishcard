@@ -117,7 +117,7 @@ public class ForeignTeacherCommentController {
 
     @RequestMapping(value = "query_no_answer")
     public JsonResultModel queryUnAnswer(){
-        foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
+        foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
         return JsonResultModel.newJsonResultModel();
     }
 

@@ -149,6 +149,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCardJpaRepository.save(commentCard);
             serviceTemp.setAmount(serviceTemp.getAmount() + 1);
             serviceJpaRepository.save(serviceTemp);
+            CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
+            commentCardUnanswerTeacher.setCardId(commentCard.getId());
+            commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
+            commentCardUnanswerTeacher.setCreateTime(dateNow);
+            commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
         }
         logger.info("所有学生外教点评次数返还完毕,一共返回次数为:"+list.size());
     }
