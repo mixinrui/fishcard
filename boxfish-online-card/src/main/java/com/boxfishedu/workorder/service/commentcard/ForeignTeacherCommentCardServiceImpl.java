@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardUnanswerTeacher;
 import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.ToTeacherStudentForm;
+import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Autowired
     ServiceJpaRepository serviceJpaRepository;
+
+    @Autowired
+    CommentCardSDK commentCardSDK;
 
     @Autowired
     CommentCardUnanswerTeacherJpaRepository commentCardUnanswerTeacherJpaRepository;
@@ -124,8 +128,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
             logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+commentCard);
             rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+            logger.info("调用师生运营接口,将{}对应的外教标注为旷课......",commentCard);
+            JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getId());
+            logger.info("此外教标注旷课状态情况{}",jsonResultModel);
         }
-        logger.info("所有在24小时内为被点评的学生已重新求情分配外教完毕,一共重新分配的学生个数为:"+list.size());
+        logger.info("所有在24小时内为被点评的学生已重新请求分配外教完毕,一共重新分配的学生个数为:"+list.size());
     }
 
     @Override
