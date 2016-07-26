@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Created by hucl on 16/5/10.
- * 供内部接口更换课程
+ * 供内部接口更换课程使用
  */
 @CrossOrigin
 @RestController
