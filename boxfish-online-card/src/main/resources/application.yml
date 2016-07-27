@@ -203,6 +203,7 @@ server.port: 8080
 interface:
   address:
     teacher_service: http://127.0.0.1:8099
+    teacher_service_admin: http://127.0.0.1:8098
     course_recommended_service: http://127.0.0.1:8001/recommend/core
     fishcard_service: http://127.0.0.1:8080
     order_service: http://127.0.0.1:8082
