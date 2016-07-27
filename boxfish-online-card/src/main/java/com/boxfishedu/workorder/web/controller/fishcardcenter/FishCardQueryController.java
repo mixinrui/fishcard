@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
+import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 此接口主要提供给鱼卡中心的管理后台使用,主要包括:鱼卡列表,换课,换教师,换时间
+ * 此接口主要提供给鱼卡中心的管理后台使用,主要包括:鱼卡列表,换课,换教师,换时间,
  */
 @CrossOrigin
 @RestController
@@ -61,5 +62,17 @@ public class FishCardQueryController {
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(cardId);
         return JsonResultModel.newJsonResultModel(workOrderLogs);
     }
+
+
+    /**
+     * 获取课程类型(给张一前段提供)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/courseType/list", method = RequestMethod.GET)
+    public JsonResultModel listCourseType() throws Exception {
+        return JsonResultModel.newJsonResultModel( CourseTypeEnum.values());
+    }
+
 
 }
