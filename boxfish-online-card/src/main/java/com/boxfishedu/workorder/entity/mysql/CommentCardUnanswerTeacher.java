@@ -30,8 +30,17 @@ public class CommentCardUnanswerTeacher {
     private Date createTime;
 
     @JoinColumn(name = "card_id", referencedColumnName = "id")//设置对应数据表的列名和引用的数据表的列名
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     private CommentCard commentCard;
 
+    @Override
+    public String toString() {
+        return "CommentCardUnanswerTeacher{" +
+                "id=" + id +
+                ", teacherId=" + teacherId +
+                ", createTime=" + createTime +
+                ", commentCard=" + commentCard +
+                '}';
+    }
 }

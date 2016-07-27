@@ -125,7 +125,7 @@ public class RabbitMqConfiguration {
          */
         Queue allotForeignTeacherCommentQueue = new Queue(RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE, true);
         rabbitAdmin.declareQueue(allotForeignTeacherCommentQueue);
-        Binding allotForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(foreignCommentExchange()).with(RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME).noargs();
+        Binding allotForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(scheduleExchange()).with(RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME).noargs();
 
         /**
          * 创建组

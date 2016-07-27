@@ -3,6 +3,8 @@ package com.boxfishedu.workorder.entity.mysql;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -18,6 +20,8 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "comment_card")
+@ToString(exclude = {"unAnswerTeacherCards"})
+@EqualsAndHashCode(exclude = {"unAnswerTeacherCards"})
 public class CommentCard {
     @Id
     @Column(name = "id", nullable = false)
@@ -125,4 +129,6 @@ public class CommentCard {
         commentCard.setCover(commentCardForm.getCover());
         return commentCard;
     }
+
+
 }
