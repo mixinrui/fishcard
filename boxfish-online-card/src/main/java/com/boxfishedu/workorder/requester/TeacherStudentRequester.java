@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,6 +214,22 @@ public class TeacherStudentRequester {
                 .toUri();
         logger.debug("<==============@createGetTeacherFirstDayURI向师生运营发送获取教师第一个时间片请求,[{}]",uri.getPath());
         return uri;
+    }
+
+    public void notifyCancelTeacher(WorkOrder workOrder) {
+        String url = String.format("%s/course/schedule/teacher/course/cancel",urlConf.getTeacher_service_admin());
+        logger.info("鱼卡[{}]向师生运营发起取消教师的请求[{}]",workOrder.getId(),url);
+
+        Map map= Maps.newHashMap();
+        map.put("day", DateUtil.date2SimpleDate(workOrder.getStartTime()).getTime());
+        map.put("timeSlotId",workOrder.getSlotId());
+        map.put("teacherId",workOrder.getTeacherId());
+        map.put("studentId",workOrder.getStudentId());
+
+        threadPoolManager.execute(new Thread(()->{
+            restTemplate.postForObject(url,map,JsonResultModel.class);})
+        );
+
     }
 
 }

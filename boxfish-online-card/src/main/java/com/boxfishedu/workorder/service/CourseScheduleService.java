@@ -64,6 +64,10 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
         return jpa.findByWorkorderId(workOrderId);
     }
 
+    public List<CourseSchedule> findByWorkorderIdIn(Long[] workOrderIds) {
+        return jpa.findByWorkorderIdIn(workOrderIds);
+    }
+
     public List<CourseSchedule> findByTeacherIdAndClassDateBetween(Long teacherId, DateRangeForm dateRangeForm) {
         return jpa.findByTeacherIdAndClassDateBetween(teacherId, dateRangeForm.getFrom(), dateRangeForm.getTo());
     }
