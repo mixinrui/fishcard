@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.WorkOrderLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.apache.log4j.spi.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,20 @@ public class WorkOrderLogService {
         workOrderLog.setContent(FishCardStatusEnum.getDesc(workOrder.getStatus()));
         logger.debug("保存日志到mongo,参数[{}]", JacksonUtil.toJSon(workOrderLog));
         save(workOrderLog);
+    }
+
+    public void saveDeleteWorkOrderLog(WorkOrder workOrder, CourseSchedule courseSchedule){
+        logPoolManager.execute(new Thread(() -> {
+            WorkOrderLog workOrderLog = new WorkOrderLog();
+            workOrderLog.setWorkOrderId(workOrder.getId());
+            workOrderLog.setCreateTime(new Date());
+            workOrderLog.setDeleteFlag("DELETED");
+            workOrderLog.setWorkOrderJson(JacksonUtil.toJSon(workOrder));
+            workOrderLog.setCourseScheduleJson(JacksonUtil.toJSon(courseSchedule));
+            logger.debug("保存日志到mongo,参数[{}]", JacksonUtil.toJSon(workOrderLog));
+            save(workOrderLog);
+        }));
+
     }
 
     public void saveWorkOrderLog(WorkOrder workOrder,String desc){

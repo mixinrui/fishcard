@@ -15,7 +15,9 @@ import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -105,5 +107,19 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         scheduleCourseInfoService.updateCourseIntoScheduleInfo(scheduleCourseInfo);
         workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
         workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,老课程[" + oldCourseName + "]");
+    }
+
+    public List<WorkOrder> findByStudentIdAndStatusLessThanAndStartTimeAfter(Long studentId,Integer status,Date beginDate){
+        return jpa.findByStudentIdAndStatusLessThanAndStartTimeAfter(studentId,status,beginDate);
+    }
+
+    public List<CourseSchedule> findCourseSchedulesByWorkOrders(List<Long> workOrderIds){
+        return courseScheduleService.findByWorkorderIdIn((Long[])workOrderIds.toArray());
+    }
+
+    @Transactional
+    public void deleteCardsAndSchedules(List<WorkOrder> workOrders,List<CourseSchedule> courseSchedules){
+        this.delete(workOrders);
+        courseScheduleService.delete(courseSchedules);
     }
 }
