@@ -20,9 +20,6 @@ public class CommentCardUnanswerTeacher {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-//    @Column(name = "card_id", nullable = true)
-//    private Long cardId;
-
     @Column(name = "teacher_id", nullable = true)
     private Long teacherId;
 

@@ -20,8 +20,6 @@ public interface ForeignTeacherCommentCardService {
 
     public void foreignTeacherCommentUpdateAnswer(FromTeacherStudentForm fromTeacherStudentForm);
 
-    public void foreignTeacherCommentUpdateStatusRead(CommentCard commentCard);
-
     public Page<CommentCard> foreignTeacherCommentQuery(Pageable pageable,Long studentId);
 
     public CommentCard foreignTeacherCommentDetailQuery(Long id, Long studentId);

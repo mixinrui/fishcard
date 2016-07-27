@@ -88,15 +88,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
-    public void foreignTeacherCommentUpdateStatusRead(CommentCard commentCard) {
-        Date dateNow = new Date();
-        commentCard.setUpdateTime(dateNow);
-        commentCard.setStudentReadFlag(1);
-        commentCardJpaRepository.save(commentCard);
-        logger.info("调用外教点评接口更新点评卡状态为已读,其中"+commentCard);
-    }
-
-    @Override
     public Page<CommentCard> foreignTeacherCommentQuery(Pageable pageable, Long studentId) {
         logger.info("调用学生查询外教点评列表接口,其中studentId="+studentId+"pageable="+pageable);
         return commentCardJpaRepository.queryCommentCardList(pageable,studentId);

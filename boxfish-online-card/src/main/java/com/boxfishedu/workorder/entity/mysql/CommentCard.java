@@ -63,9 +63,6 @@ public class CommentCard {
     @Temporal(TemporalType.TIMESTAMP)
     private Date teacherAnswerTime;
 
-    @Column(name = "question_id", nullable = true, length = 20)
-    private Long questionId;
-
     @Column(name = "question_name", nullable = true, length = 255)
     private String questionName;
 
@@ -122,7 +119,6 @@ public class CommentCard {
     public static CommentCard getCommentCard(CommentCardForm commentCardForm){
         CommentCard commentCard = new CommentCard();
         commentCard.setStudentName(commentCardForm.getStudentName());
-        commentCard.setQuestionId(commentCardForm.getQuestionId());
         commentCard.setQuestionName(commentCardForm.getQuestionName());
         commentCard.setCourseId(commentCardForm.getCourseId());
         commentCard.setCourseName(commentCardForm.getCourseName());
