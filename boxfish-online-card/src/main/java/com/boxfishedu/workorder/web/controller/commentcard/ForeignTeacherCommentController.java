@@ -104,20 +104,20 @@ public class ForeignTeacherCommentController {
         }
     }
 
-    @RequestMapping(value = "update_notice_status", method = RequestMethod.PUT)
-    public JsonResultModel updateStatus(Long id, Long userId){
-        CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
-        if (commentCard == null){
-            throw new ValidationException("所修改的点评不存在!");
-        }else {
-            foreignTeacherCommentCardService.foreignTeacherCommentUpdateStatusRead(commentCard);
-            return JsonResultModel.newJsonResultModel();
-        }
-    }
+//    @RequestMapping(value = "update_notice_status", method = RequestMethod.PUT)
+//    public JsonResultModel updateStatus(Long id, Long userId){
+//        CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
+//        if (commentCard == null){
+//            throw new ValidationException("所修改的点评不存在!");
+//        }else {
+//            foreignTeacherCommentCardService.foreignTeacherCommentUpdateStatusRead(commentCard);
+//            return JsonResultModel.newJsonResultModel();
+//        }
+//    }
 
     @RequestMapping(value = "query_no_answer")
     public JsonResultModel queryUnAnswer(){
-        foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
+        foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
         return JsonResultModel.newJsonResultModel();
     }
 

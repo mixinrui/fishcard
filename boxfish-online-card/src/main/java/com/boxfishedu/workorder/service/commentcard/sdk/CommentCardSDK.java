@@ -4,6 +4,8 @@ import com.boxfishedu.beans.view.JsonResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -11,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by ansel on 16/7/26.
@@ -23,18 +27,19 @@ public class CommentCardSDK {
     @Autowired
     private RestTemplate restTemplate;
 
-    public JsonResultModel setTeacherAbsence(Long teacherId, Long id){
-        return restTemplate.getForObject(createTeacherAbsenceURI(teacherId,id),JsonResultModel.class);
+    public JsonResultModel setTeacherAbsence(Long teacherId,Long studentId, Long id){
+        Map<String,String> paramMap = new HashMap<>();
+        paramMap.put("teacherId",teacherId.toString());
+        paramMap.put("studentId",studentId.toString());
+        paramMap.put("fishCardId",id.toString());
+        return restTemplate.postForObject(createTeacherAbsenceURI(), paramMap,JsonResultModel.class);
     }
 
-    private URI createTeacherAbsenceURI(Long teacherId,Long id){
+    private URI createTeacherAbsenceURI(){
         logger.info("Accessing createTeacherAbsenceURI in CommentCardSDK......");
-        MultiValueMap<String,String> paramMap = new LinkedMultiValueMap<>();
-        paramMap.add("teacherId",teacherId.toString());
-        paramMap.add("fishCardId",id.toString());
-        return UriComponentsBuilder.fromUriString("http://host")
+        return UriComponentsBuilder.fromUriString("http://192.168.88.210:8099")
                 .path("/f_teacher_review/set_truant")
-                .queryParams(paramMap)
+                .queryParam("")
                 .build()
                 .toUri();
     }

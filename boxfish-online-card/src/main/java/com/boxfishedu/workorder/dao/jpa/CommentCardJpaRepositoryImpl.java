@@ -63,7 +63,7 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
                 Long timeLong = dateNow.getTime() - 48 * 60 * 60 * 1000L;
                 dateNow.setTime(timeLong);
                 predicateList.add(criteriaBuilder.lessThan(root.get("studentAskTime"),dateNow));
-                predicateList.add(criteriaBuilder.between(root.get("status"),CommentCardStatus.ASKED.getCode(),CommentCardStatus.ASSIGNED_TEACHER.getCode()));
+                predicateList.add(criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME.getCode()));
                 predicateList.add(criteriaBuilder.equal(root.get("assignTeacherCount"),1));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
