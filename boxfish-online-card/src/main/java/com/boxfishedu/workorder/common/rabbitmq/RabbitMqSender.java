@@ -74,7 +74,7 @@ public class RabbitMqSender {
             }
             case ASSIGN_FOREIGN_TEACHER_COMMENT:
                 logger.debug("@<-<-<-<-<-<-<-向师生运营发送获取外教点评教师请求,参数{}",JacksonUtil.toJSon(object));
-                assignForeignTeacherCommentRabbitTemplate.convertAndSend(object.toString());
+                assignForeignTeacherCommentRabbitTemplate.convertAndSend(JacksonUtil.toJSon(object));
             default:
                 break;
         }

@@ -4,6 +4,7 @@ import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
 import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
@@ -13,11 +14,14 @@ import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import org.apache.http.io.SessionOutputBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -168,12 +172,13 @@ public class RabbitMqReciver {
      *师生运营组发送的外教点评教师分配情况
      */
     @RabbitListener(queues = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE)
-    public void assignForeignTeacher(FromTeacherStudentForm fromTeacherStudentForm) {
-        if(fromTeacherStudentForm == null) {
-            return;
+    public void assignForeignTeacher(String param) {
+        if(param == null){
+            throw new ValidationException();
         }
-        logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", JacksonUtil.toJSon(fromTeacherStudentForm));
-
+        FromTeacherStudentForm fromTeacherStudentForm = JacksonUtil.readValue(param,FromTeacherStudentForm.class);
+        foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
+        logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
     }
     /**
      * 小马更新状态
