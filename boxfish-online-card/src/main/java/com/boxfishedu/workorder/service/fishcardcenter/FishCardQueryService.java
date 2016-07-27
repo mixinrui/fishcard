@@ -146,6 +146,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         if(null!=fishCardFilterParam.getStudentId()){
             query.setParameter("studentId",fishCardFilterParam.getStudentId());
         }
+        if(null!=fishCardFilterParam.getTeacherId()){
+            query.setParameter("teacherId",fishCardFilterParam.getTeacherId());
+        }
 //        if(null!=fishCardFilterParam.getTeacherName()){
 //            query.setParameter("teacherName",fishCardFilterParam.getTeacherName());
 //        }
