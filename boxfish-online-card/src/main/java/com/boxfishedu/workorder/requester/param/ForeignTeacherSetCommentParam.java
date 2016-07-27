@@ -25,13 +25,17 @@ public class ForeignTeacherSetCommentParam {
         foreignTeacherSetCommentParam.setFishCardId(student2TeacherCommentParam.getCommentCardId());
         foreignTeacherSetCommentParam.setTeacherId(commentCard.getTeacherId());
 
-        List<String> forGoodReviews= Lists.newArrayList();
-        forGoodReviews.add(student2TeacherCommentParam.getForGoodReviews());
-        foreignTeacherSetCommentParam.setForGoodReviews(forGoodReviews);
+        if(null!=student2TeacherCommentParam.getForGoodReviews()) {
+            List<String> forGoodReviews = Lists.newArrayList();
+            forGoodReviews.add(student2TeacherCommentParam.getForGoodReviews());
+            foreignTeacherSetCommentParam.setForGoodReviews(forGoodReviews);
+        }
 
-        List<String> forBadReviews=Lists.newArrayList();
-        forBadReviews.add(student2TeacherCommentParam.getForBadReviews());
-        foreignTeacherSetCommentParam.setForBadReviews(forBadReviews);
+        if(null!=student2TeacherCommentParam.getForBadReviews()) {
+            List<String> forBadReviews = Lists.newArrayList();
+            forBadReviews.add(student2TeacherCommentParam.getForBadReviews());
+            foreignTeacherSetCommentParam.setForBadReviews(forBadReviews);
+        }
 
         return foreignTeacherSetCommentParam;
     }
