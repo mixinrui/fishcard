@@ -35,6 +35,7 @@ public class RabbitMqConfiguration {
     public static final String SCHEDULE_EXCHANGE = "boxfish.schedule";
     public static final String DELAY_QUEUE_EXCHANGE="boxfish.delay.exchange";
     public static final String DEAD_LETTER_EXCHANGE="x-dead-letter-exchange";
+    public static final String FOREIGN_COMMENT_EXCHANGE="foreign-comment-exchange";
     public static final String DEAD_LETTER_EXCHANGE_ROUTING_KEY="x-dead-letter-routing-key";
     public static final String AMQ_DIRECT_EXCHANGE="amq.direct";
 
@@ -69,6 +70,10 @@ public class RabbitMqConfiguration {
         return new DirectExchange(ONLINE_TEACHING_EXCHANGE, true, false);
     }
 
+    @Bean(name=FOREIGN_COMMENT_EXCHANGE)
+    public Exchange foreignCommentExchange(){
+        return new DirectExchange(FOREIGN_COMMENT_EXCHANGE, true, false);
+    }
 
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory, Exchange exchange) {
@@ -78,6 +83,7 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareExchange(directCreateGroupExchange());
         rabbitAdmin.declareExchange(scheduleExchange());
         rabbitAdmin.declareExchange(delayExchange());
+        rabbitAdmin.declareExchange(foreignCommentExchange());
 
         /**
          * 通知定时器
@@ -112,14 +118,14 @@ public class RabbitMqConfiguration {
          */
         Queue assignForeignTeacherCommentQueue = new Queue(RabbitMqConstant.ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE, true);
         rabbitAdmin.declareQueue(assignForeignTeacherCommentQueue);
-        Binding assignForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(scheduleExchange()).with(RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME).noargs();
+        Binding assignForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(foreignCommentExchange()).with(RabbitMqConstant.ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE).noargs();
 
         /**
          * 响应外教点评分配教师
          */
         Queue allotForeignTeacherCommentQueue = new Queue(RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE, true);
         rabbitAdmin.declareQueue(allotForeignTeacherCommentQueue);
-        Binding allotForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(scheduleExchange()).with(RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME).noargs();
+        Binding allotForeignTeacherCommentBinding = BindingBuilder.bind(assignForeignTeacherCommentQueue).to(foreignCommentExchange()).with(RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME).noargs();
 
         /**
          * 创建组
@@ -299,7 +305,7 @@ public class RabbitMqConfiguration {
     @Bean(name = RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME)
     public RabbitTemplate assignForeignTeacherCommentTemplate(ConnectionFactory factory, MessageConverter messageConverter){
         RabbitTemplate template = getRabbitTemplate(factory,messageConverter,RabbitMqConstant.ASSIGNED_FOREIGN_TEACHER_COMMENT_QUEUE);
-        template.setExchange(SCHEDULE_EXCHANGE);
+        template.setExchange(FOREIGN_COMMENT_EXCHANGE);
         return template;
     }
 
@@ -312,7 +318,7 @@ public class RabbitMqConfiguration {
     @Bean(name = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME)
     public RabbitTemplate allotTeacherReplyRabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter){
         RabbitTemplate template = getRabbitTemplate(connectionFactory,messageConverter,RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE);
-        template.setExchange(SCHEDULE_EXCHANGE);
+        template.setExchange(FOREIGN_COMMENT_EXCHANGE);
         return template;
     }
 
