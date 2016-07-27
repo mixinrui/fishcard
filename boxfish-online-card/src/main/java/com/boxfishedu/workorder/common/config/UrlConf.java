@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 public class UrlConf {
     @Value("${interface.address.teacher_service}")
     private String teacher_service;
+    @Value("${interface.address.teacher_service_admin}")
+    private String teacher_service_admin;
     @Value("${interface.address.course_recommended_service}")
     private String course_recommended_service;
     @Value("${interface.address.fishcard_service}")

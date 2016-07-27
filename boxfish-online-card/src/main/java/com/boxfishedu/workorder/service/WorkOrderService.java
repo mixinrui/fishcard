@@ -257,6 +257,16 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         } else {
             fishCardFilterParam.setEndDateFormat(DateUtil.String2Date(fishCardFilterParam.getEndDate()));
         }
+
+        if(null != fishCardFilterParam.getCreateBeginDate()){
+            fishCardFilterParam.setCreateBeginDateFormat(  DateUtil.String2Date(fishCardFilterParam.getCreateBeginDate()));
+        }
+
+        if(null != fishCardFilterParam.getCreateEndDate()){
+            fishCardFilterParam.setCreateEndDateFormat(DateUtil.String2Date(fishCardFilterParam.getCreateEndDate()));
+        }
+
+
     }
 
     //查找出教师所有状态的工单

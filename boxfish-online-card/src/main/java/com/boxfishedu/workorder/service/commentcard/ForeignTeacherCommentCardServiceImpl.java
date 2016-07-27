@@ -130,7 +130,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+commentCard);
             rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
             CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
-            commentCardUnanswerTeacher.setCardId(commentCard.getId());
+            commentCardUnanswerTeacher.setCommentCard(commentCard);
             commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
             commentCardUnanswerTeacher.setCreateTime(dateNow);
             logger.info("记录超时未点评的外教,同时调用师生运营接口,设置该外教为旷课......",commentCard);
@@ -156,7 +156,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             serviceTemp.setAmount(serviceTemp.getAmount() + 1);
             serviceJpaRepository.save(serviceTemp);
             CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
-            commentCardUnanswerTeacher.setCardId(commentCard.getId());
+            commentCardUnanswerTeacher.setCommentCard(commentCard);
             commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
             commentCardUnanswerTeacher.setCreateTime(dateNow);
             commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);

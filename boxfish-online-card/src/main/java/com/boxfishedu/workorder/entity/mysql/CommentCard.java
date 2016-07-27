@@ -1,11 +1,14 @@
 package com.boxfishedu.workorder.entity.mysql;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -106,6 +109,11 @@ public class CommentCard {
 
     @Column(name = "student_read_flag", nullable = true)
     private int studentReadFlag;
+
+    @OneToMany(fetch = FetchType.LAZY)//指向多的那方的pojo的关联外键字段
+    @JoinColumn(name = "card_id")
+    @JsonManagedReference
+    private Set<CommentCardUnanswerTeacher> unAnswerTeacherCards = new HashSet<CommentCardUnanswerTeacher>(0);
 
     public static CommentCard getCommentCard(CommentCardForm commentCardForm){
         CommentCard commentCard = new CommentCard();

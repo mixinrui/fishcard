@@ -142,6 +142,10 @@ public class WorkOrder{
     @Column(name="order_code", length = 128)
     private String orderCode;
 
+    //0 True 1 False  是否手动修改过
+    @Column(name="update_manul_flag", length = 1)
+    private String updateManulFlag;
+
     @Override
     public String toString() {
         return "WorkOrder{" +
@@ -162,6 +166,7 @@ public class WorkOrder{
                 ", courseId=" + courseId +
                 ", courseName='" + courseName + '\'' +
                 ", updateTime=" + updateTime +
+                ", updateMauulFlag=" + updateManulFlag +
                 '}';
     }
 }
