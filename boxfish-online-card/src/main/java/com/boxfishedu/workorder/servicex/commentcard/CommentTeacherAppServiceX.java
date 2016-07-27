@@ -48,6 +48,7 @@ public class CommentTeacherAppServiceX {
             throw new BusinessException("不存在对应的点评卡");
         }
         commentCard.setTeacherReadFlag(1);
+        commentCardTeacherAppService.save(commentCard);
     }
 
     public void submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam){

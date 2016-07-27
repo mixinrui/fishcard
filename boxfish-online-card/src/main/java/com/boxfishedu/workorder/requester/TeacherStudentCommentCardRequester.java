@@ -65,7 +65,7 @@ public class TeacherStudentCommentCardRequester {
         }
         ForeignTeacherSetCommentParam foreignTeacherSetCommentParam=ForeignTeacherSetCommentParam.paramAdapter(student2TeacherCommentParam,commentCard);
         String url = String.format("%s/f_teacher_review/set_review", urlConf.getTeacher_service());
-        logger.debug("<<<<<<<<<<<<<@[sendStudentComment2Teaxcher]向师生运营发起[[[[设置鱼卡的点评信息]]]],url[{}]", url);
+        logger.debug("<<<<<<<<<<<<<@[sendStudentComment2Teaxcher]向师生运营发起[[[[设置鱼卡的点评信息]]]],url[{}];;;参数;[{}]", url,JacksonUtil.toJSon(foreignTeacherSetCommentParam));
         threadPoolManager.execute(new Thread(() -> {
             restTemplate.postForObject(url, foreignTeacherSetCommentParam, JsonResultModel.class);
         }));
