@@ -187,4 +187,54 @@ public class MakeUpLessionServiceX {
         return JsonResultModel.newJsonResultModel(resultMap);
     }
 
+
+    /**
+     * 鱼卡删除(用于后台操作)
+     * @param makeUpCourseParam
+     * @return
+     */
+    public JsonResultModel  deleteFishCard(MakeUpCourseParam makeUpCourseParam){
+
+        Map<String,String> resultMap = Maps.newHashMap();
+        if(null == makeUpCourseParam.getWorkOrderId()){
+            resultMap.put("1","请输入鱼卡id");
+            return  JsonResultModel.newJsonResultModel(resultMap);
+        }
+        WorkOrder workOrder = workOrderService.findOne(makeUpCourseParam.getWorkOrderId());
+
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
+
+        if(null == workOrder  || null == courseSchedule){
+            resultMap.put("2","鱼卡为空或者课程为空,请检查数据");
+            return  JsonResultModel.newJsonResultModel(resultMap);
+        }
+        // 未知  创建 分配课程 分配教师
+        if(workOrder.getStatus()==FishCardStatusEnum.UNKNOWN.getCode()
+                ||
+                workOrder.getStatus()==FishCardStatusEnum.CREATED.getCode()
+                ||
+                workOrder.getStatus()==FishCardStatusEnum.COURSE_ASSIGNED.getCode()
+                ||
+                workOrder.getStatus()==FishCardStatusEnum.TEACHER_ASSIGNED.getCode()
+
+                ){
+
+        }else {
+            resultMap.put("3","鱼卡状态不正确,请误删除"+FishCardStatusEnum.get( workOrder.getStatus())+"的鱼卡");
+            return  JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+
+
+        // 删除鱼卡
+        workOrderService.delete(workOrder.getId());
+        // 删除课程
+        courseScheduleService.delete(courseSchedule.getId());
+
+        // 记录日志(鱼卡 课程)
+        workOrderLogService.saveWorkOrderLog(workOrder);
+
+        resultMap.put("0","删除成功");
+        return  JsonResultModel.newJsonResultModel(resultMap);
+    }
 }
