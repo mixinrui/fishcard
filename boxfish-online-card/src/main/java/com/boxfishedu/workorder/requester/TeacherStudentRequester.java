@@ -161,7 +161,7 @@ public class TeacherStudentRequester {
 
     //TODO:此处的url换为师生运营的url
     public void notifyChangeTeacher(WorkOrder workOrder) {
-        StringBuilder builder=new StringBuilder(urlConf.getTeacher_service());
+        StringBuilder builder=new StringBuilder(urlConf.getTeacher_service_admin());// jiaozijun 配合  haijiang  更改师生运营接口
         builder.append("/course/schedule/teacher/change");
         String url=builder.toString();
         logger.info("鱼卡[{}]向师生运营发起换教师的请求[{}]",workOrder.getId(),url);

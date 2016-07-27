@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.common.rabbitmq;
 
+import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
 import com.boxfishedu.online.order.entity.OrderForm;
@@ -125,13 +126,21 @@ public class RabbitMqReciver {
                 dailyCourseAssignedServiceX.batchNotifyTeacherAssignedCourse();
             } else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_INIT90message");
-                logger.info("=========>初始化抢单数据");
-                makeWorkOrderServiceX.makeSendWorkOrder(null);
+                logger.info("=========>初始化抢单数据(中教)");
+                makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.FUNCTION.toString());
+            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGH.value()) {
+                logger.info("=========>getGRAB_ORDER_DATA_INIT91message");
+                logger.info("=========>初始化抢单数据(外教)");
+                makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.TALK.toString());
             }
             //定时查询教师不够的情况
             else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY100message");
-                logger.info("=========>清理抢单数据");
+                logger.info("=========>清理抢单数据(中教)");
+                makeWorkOrderServiceX.clearGrabData();
+            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH.value()) {
+                logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY101message");
+                logger.info("=========>清理抢单数据(外教)");
                 makeWorkOrderServiceX.clearGrabData();
             }
             else if(serviceTimerMessage.getType()==TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){

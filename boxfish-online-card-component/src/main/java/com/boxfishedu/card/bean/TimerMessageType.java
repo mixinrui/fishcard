@@ -20,8 +20,12 @@ public enum TimerMessageType {
     COMMENT_CARD_NO_ANSWER(90),
     //抢单初始化数据队列
     GRAB_ORDER_DATA_INIT(90),
-    //抢单格式化数据队列(清理历史数据)
-    GRAB_ORDER_DATA_CLEAR_DAY(100);
+    GRAB_ORDER_DATA_INIT_FOREIGH(91),
+    //抢单格式化数据队列(清理历史数据中教)
+    GRAB_ORDER_DATA_CLEAR_DAY(100),
+
+    //抢单格式化数据队列(清理历史数据外教)
+    GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH(101);
 
 
     private int code;
