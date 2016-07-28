@@ -131,7 +131,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         query.setParameter("end",fishCardFilterParam.getEndDateFormat());
 
         if(null!=fishCardFilterParam.getCreateBeginDateFormat()){
-            query.setParameter("createbegin",fishCardFilterParam.getBeginDateFormat());
+            query.setParameter("createbegin",fishCardFilterParam.getCreateBeginDateFormat());
         }
         if(null!=fishCardFilterParam.getCreateEndDateFormat()){
             query.setParameter("createend",fishCardFilterParam.getCreateEndDateFormat());
