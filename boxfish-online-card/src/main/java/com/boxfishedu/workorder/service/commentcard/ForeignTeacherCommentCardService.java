@@ -22,7 +22,7 @@ public interface ForeignTeacherCommentCardService {
 
     public Page<CommentCard> foreignTeacherCommentQuery(Pageable pageable,Long studentId);
 
-    public CommentCard foreignTeacherCommentDetailQuery(Long id, Long studentId);
+    public CommentCard foreignTeacherCommentDetailQuery(Long id);
 
     public void foreignTeacherCommentUnAnswer();
 

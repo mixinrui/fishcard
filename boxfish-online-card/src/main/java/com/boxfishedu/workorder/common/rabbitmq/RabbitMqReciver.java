@@ -41,7 +41,7 @@ public class RabbitMqReciver {
     private CourseOnlineServiceX courseOnlineServiceX;
     @Autowired
     private ServeService serveService;
-    @Autowired
+    @Autowired                                      
     private RabbitMqSender rabbitMqSender;
     @Autowired
     private ScheduleTeachersStasticsServiceX scheduleTeachersStasticsServiceX;
@@ -134,7 +134,7 @@ public class RabbitMqReciver {
                 logger.info("=========>清理抢单数据");
                 makeWorkOrderServiceX.clearGrabData();
             }
-            else if(serviceTimerMessage.getType()==TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
+            else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
                 logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();

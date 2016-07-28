@@ -17,11 +17,11 @@ public enum TimerMessageType {
     STUDENT_NOT_MAKEUP_NOTIFY(70),
     //教师当天新匹配到的课程
     TEACHER_COURSE_NEW_ASSIGNEDED_DAY(80),
-    COMMENT_CARD_NO_ANSWER(90),
     //抢单初始化数据队列
     GRAB_ORDER_DATA_INIT(90),
     //抢单格式化数据队列(清理历史数据)
-    GRAB_ORDER_DATA_CLEAR_DAY(100);
+    GRAB_ORDER_DATA_CLEAR_DAY(100),
+    COMMENT_CARD_NO_ANSWER(110);
 
 
     private int code;

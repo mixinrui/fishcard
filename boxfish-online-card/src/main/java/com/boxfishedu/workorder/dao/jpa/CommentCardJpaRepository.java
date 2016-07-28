@@ -11,6 +11,6 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
 
     public Page<CommentCard> findByTeacherIdOrderByAssignTeacherTimeDesc(Long teacherId, Pageable pageable);
 
-    public CommentCard findByIdAndStudentId(Long id, Long studentId);
+    public CommentCard findById(Long id);
 
 }
