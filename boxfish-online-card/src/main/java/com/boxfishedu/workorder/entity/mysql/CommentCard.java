@@ -69,6 +69,9 @@ public class CommentCard {
     @Column(name = "ask_voice_id", nullable = true, length = 20)
     private Long askVoiceId;
 
+    @Column(name = "voice_time", nullable = true, length = 20)
+    private Long voiceTime;
+
     @Column(name = "ask_voice_path", nullable = true, length = 255)
     private String askVoicePath;
 

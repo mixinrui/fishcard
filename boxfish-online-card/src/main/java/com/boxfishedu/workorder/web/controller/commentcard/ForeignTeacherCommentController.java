@@ -61,10 +61,11 @@ public class ForeignTeacherCommentController {
     }
 
     @RequestMapping(value = "update_student_question", method = RequestMethod.PUT)
-    public JsonResultModel updateStudentQuestion(@RequestBody CommentCardForm commentCardForm, Long userId){
-            CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(commentCardForm.getId(),userId);
+    public JsonResultModel updateStudentQuestion(@RequestBody CommentCardForm commentCardForm){
+            CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(commentCardForm.getId());
             commentCard.setAskVoiceId(commentCardForm.getAskVoiceId());
             commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
+            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
             foreignTeacherCommentCardService.foreignTeacherCommentUpdateQuestion(commentCard);
             return new JsonResultModel();
     }
@@ -75,8 +76,8 @@ public class ForeignTeacherCommentController {
     }
 
     @RequestMapping(value = "query_one",method = RequestMethod.GET)
-    public JsonResultModel queryDetailComment(Long id, Long userId){
-        CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(id,userId);
+    public JsonResultModel queryDetailComment(Long id){
+        CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(id);
         if(commentCard == null){
             throw new ValidationException("所查找的点评不存在!");
         }else {

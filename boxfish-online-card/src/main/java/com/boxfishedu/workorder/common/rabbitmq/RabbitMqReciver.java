@@ -128,7 +128,7 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_INIT90message");
                 logger.info("=========>初始化抢单数据(中教)");
                 makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.FUNCTION.toString());
-            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGH.value()) {
+            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGN.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_INIT91message");
                 logger.info("=========>初始化抢单数据(外教)");
                 makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.TALK.toString());
@@ -138,12 +138,12 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY100message");
                 logger.info("=========>清理抢单数据(中教)");
                 makeWorkOrderServiceX.clearGrabData();
-            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH.value()) {
+            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGN.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY101message");
                 logger.info("=========>清理抢单数据(外教)");
                 makeWorkOrderServiceX.clearGrabData();
             }
-            else if(serviceTimerMessage.getType()==TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
+            else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
                 logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
