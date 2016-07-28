@@ -16,6 +16,7 @@ public class CommentCardForm {
     private String cover;
     private Long askVoiceId;
     private String askVoicePath;
+    private Long voiceTime;
     private String teacherName;
     private String answerVideoPath;
 }

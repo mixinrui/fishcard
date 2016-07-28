@@ -65,6 +65,7 @@ public class ForeignTeacherCommentController {
             CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(commentCardForm.getId());
             commentCard.setAskVoiceId(commentCardForm.getAskVoiceId());
             commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
+            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
             foreignTeacherCommentCardService.foreignTeacherCommentUpdateQuestion(commentCard);
             return new JsonResultModel();
     }
