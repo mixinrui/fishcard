@@ -47,14 +47,4 @@ public class FishCardMakeUpController {
     }
 
 
-    /**
-     * 删除鱼卡(用于鱼卡后台)
-     * @param makeUpCourseParam
-     * @return
-     */
-    @RequestMapping(value = "/fishcard/delete", method = RequestMethod.POST)
-    public JsonResultModel fishcardDelete(@RequestBody MakeUpCourseParam makeUpCourseParam){
-        return makeUpLessionServiceX.deleteFishCard(makeUpCourseParam);
-    }
-
 }
