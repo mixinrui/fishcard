@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.graborder.GrabOrderService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -39,6 +40,9 @@ public class GrabOrderServiceX {
 
     //本地异常日志记录对象
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private ServiceSDK serviceSDK;
 
     @Autowired
     private CacheManager cacheManager;
@@ -142,6 +146,9 @@ public class GrabOrderServiceX {
                     workOrderLogService.saveWorkOrderLog(workOrder);
                     jsonObject.put("msg",WorkOrderConstant.GRABORDER_SUCCESS);
                     jsonObject.put("code","0");
+
+                    // 向在线运营发送建组(小马)
+                    serviceSDK.createGroup(workOrder);
                     logger.info("::::::::::::::::::成功抢单::::::::::::::::::");
                 }
             }
