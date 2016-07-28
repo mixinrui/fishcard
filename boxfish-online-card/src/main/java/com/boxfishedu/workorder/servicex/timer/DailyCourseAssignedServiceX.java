@@ -3,7 +3,9 @@ package com.boxfishedu.workorder.servicex.timer;
 import com.boxfishedu.workorder.common.bean.FishCardAuthEnum;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.timer.DailyCourseAssignedService;
 import com.boxfishedu.workorder.web.view.fishcard.TeacherAssignedCourseView;
 import org.slf4j.Logger;
@@ -24,6 +26,9 @@ public class DailyCourseAssignedServiceX {
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
 
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public void batchNotifyTeacherAssignedCourse(){
@@ -38,7 +43,13 @@ public class DailyCourseAssignedServiceX {
     private void notifyTeachingOnline(List<TeacherAssignedCourseView> teacherAssignedCourseViews){
         teacherAssignedCourseViews.forEach(teacherAssignedCourseView -> {
             TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();
-            teachingOnlineMsg.setPush_title("您今天有"+teacherAssignedCourseView.getCount()+"节新匹配的课程,详情请点击课表查看");
+            int teacherType=teacherStudentRequester.getTeacherType(teacherAssignedCourseView.getTeacherId());
+            if(teacherType == TeachingType.ZHONGJIAO.getCode()) {
+                teachingOnlineMsg.setPush_title("您有" + teacherAssignedCourseView.getCount() + "节新匹配的课程,详情请查看[我的课表]");
+            }
+            else if(teacherType==TeachingType.WAIJIAO.getCode()){
+                teachingOnlineMsg.setPush_title("Some more lessons are scheduled for you; You can view details in Schedule.");
+            }
             teachingOnlineMsg.setUser_id(teacherAssignedCourseView.getTeacherId());
 
             TeachingOnlineMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach=new TeachingOnlineMsg.TeachingOnlineMsgAttach();
