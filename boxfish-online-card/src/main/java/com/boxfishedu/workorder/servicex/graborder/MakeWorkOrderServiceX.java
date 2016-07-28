@@ -130,7 +130,7 @@ public class MakeWorkOrderServiceX {
     /**
      * 获取 获取查询教师列表 的条件
      *
-     * @param workOrderNOteacher
+     * @param workOrderNOteacher teacherType 分为中教和外教   如果为空标示中教外教都含有
      * @return
      */
     public String foreighAndChinesTeahcer(List<WorkOrder> workOrderNOteacher,String teacherType) {
