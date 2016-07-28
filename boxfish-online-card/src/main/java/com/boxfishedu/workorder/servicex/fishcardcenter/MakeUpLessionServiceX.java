@@ -15,6 +15,7 @@ import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -147,7 +148,7 @@ public class MakeUpLessionServiceX {
 
         // 不存在该课程
         if(null == workOrder){
-            resultMap.put("1","该课程已经更改过");
+            resultMap.put("1","该课程不存在");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
 
@@ -171,7 +172,7 @@ public class MakeUpLessionServiceX {
         }
         // 课程
         courseSchedule.setStatus(makeUpCourseParam.getFishStatus());
-        courseSchedule.setUpdateTime(new Date());
+        courseSchedule.setUpdateTime(DateTime.now().toDate());
 
         // 鱼卡
         workOrder.setStatus(makeUpCourseParam.getFishStatus());
