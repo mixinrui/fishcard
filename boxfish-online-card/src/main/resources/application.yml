@@ -163,6 +163,7 @@ spring:
 interface:
   address:
     teacher_service: http://101.201.237.252:8099
+    teacher_service_admin: http://101.201.237.252:8099
     course_recommended_service: http://114.55.40.98:8001
     fishcard_service: http://127.0.0.1:8080
     order_service: http://101.201.237.252:8082
@@ -242,6 +243,7 @@ server.port: 8080
 interface:
   address:
     teacher_service: http://localhost:8099
+    teacher_service_admin: http://localhost:8099
     course_recommended_service: http://114.55.40.98:8001
     fishcard_service: http://localhost:8080
     order_service: http://localhost:8082
@@ -283,6 +285,7 @@ server.port: 8080
 interface:
   address:
     teacher_service: http://localhost:8099
+    teacher_service_admin: http://localhost:8099
     course_recommended_service: http://114.55.40.98:8001
     fishcard_service: http://localhost:8080
     order_service: http://localhost:8082
@@ -324,6 +327,7 @@ server.port: 9999
 interface:
   address:
     teacher_service: http://online-api.boxfish.cn/teacher
+    teacher_service_admin: http://online-api.boxfish.cn/teacher
 #    course_recommended_service: http://base.boxfish.cn/recommend/core
 #    course_recommended_service: http://114.55.40.98:8001/recommend/core
 
