@@ -46,40 +46,35 @@ public class GrabOrderController {
     }
 
 
+    /**
+     * 提供手动触发抢课接口
+     * @return
+     */
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public JsonResultModel test() {
         makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.FUNCTION.toString());
+        makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.TALK.toString());
         //makeWorkOrderServiceX.getTeacherList("true/false");
-
-        //makeWorkOrderServiceX.clearGrabData();
         return new JsonResultModel();
     }
 
+    /**
+     * 提供假数据提供接口(供app端测试用,正式不用)
+     * @return
+     */
     @RequestMapping(value = "/testreal", method = RequestMethod.GET)
     public JsonResultModel testreal() {
         makeWorkOrderServiceX.makeSendWorkOrder("testreal",CourseTypeEnum.FUNCTION.toString());
-        //makeWorkOrderServiceX.getTeacherList("true/false");
-
-        //makeWorkOrderServiceX.clearGrabData();
-        return new JsonResultModel();
-    }
-
-
-    @RequestMapping(value = "/testforeigh", method = RequestMethod.GET)
-    public JsonResultModel testforeigh() {
-        makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.TALK.toString());
-        //makeWorkOrderServiceX.getTeacherList("true/false");
-
-        //makeWorkOrderServiceX.clearGrabData();
-        return new JsonResultModel();
-    }
-
-    @RequestMapping(value = "/testrealforeigh", method = RequestMethod.GET)
-    public JsonResultModel testrealforeigh() {
         makeWorkOrderServiceX.makeSendWorkOrder("testreal",CourseTypeEnum.TALK.toString());
         //makeWorkOrderServiceX.getTeacherList("true/false");
 
         //makeWorkOrderServiceX.clearGrabData();
+        return new JsonResultModel();
+    }
+
+    @RequestMapping(value = "/clearGrabData", method = RequestMethod.GET)
+    public JsonResultModel clearGrabData() {
+        makeWorkOrderServiceX.clearGrabData();
         return new JsonResultModel();
     }
 
