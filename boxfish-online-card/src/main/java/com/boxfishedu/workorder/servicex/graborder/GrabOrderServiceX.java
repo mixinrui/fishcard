@@ -143,6 +143,8 @@ public class GrabOrderServiceX {
                     grabOrderService.setTeacherIdByWorkOrderId(grabOrderView);
                     courseScheduleService.findByWorkOrderIdForUpdate(grabOrderView);
                     courseScheduleService.setTeacherIdByWorkOrderId(grabOrderView);
+                    // 纪录日志
+                    workOrder = grabOrderService.findByIdForUpdate(grabOrderView.getWorkOrderId());
                     workOrderLogService.saveWorkOrderLog(workOrder);
                     jsonObject.put("msg",WorkOrderConstant.GRABORDER_SUCCESS);
                     jsonObject.put("code","0");
