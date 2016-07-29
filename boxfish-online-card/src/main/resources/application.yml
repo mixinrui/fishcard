@@ -125,6 +125,8 @@ server.port: 8080
 interface:
   address:
     teacher_service: http://101.201.237.252:8099
+    teacher_service_admin: http://192.168.88.210:8099
+
     course_recommended_service: http://base.boxfish.cn/recommend/core
 #    course_recommended_service: http://114.55.40.98:8001
     fishcard_service: http://127.0.0.1:8080

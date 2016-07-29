@@ -256,6 +256,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
         //修改WorkOrder的状态
         workOrder.setUpdateTime(new Date());
+        workOrder.setIsCourseOver((short)1);
         if(status!=FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
             workOrder.setActualEndTime(new Date());
         }

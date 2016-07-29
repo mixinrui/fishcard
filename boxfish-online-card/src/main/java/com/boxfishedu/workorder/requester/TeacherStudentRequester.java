@@ -6,6 +6,7 @@ import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.online.order.entity.TeacherForm;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineListMsg;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -20,6 +21,7 @@ import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -258,4 +260,36 @@ public class TeacherStudentRequester {
         return  teacherList;
 
     }
+
+    public void notifyCancelTeacher(WorkOrder workOrder) {
+        String url = String.format("%s/course/schedule/teacher/course/cancel",urlConf.getTeacher_service_admin());
+        logger.info("鱼卡[{}]向师生运营发起取消教师的请求[{}]",workOrder.getId(),url);
+
+        Map map= Maps.newHashMap();
+        map.put("day", DateUtil.date2SimpleDate(workOrder.getStartTime()).getTime());
+        map.put("timeSlotId",workOrder.getSlotId());
+        map.put("teacherId",workOrder.getTeacherId());
+        map.put("studentId",workOrder.getStudentId());
+
+        threadPoolManager.execute(new Thread(()->{
+            restTemplate.postForObject(url,map,JsonResultModel.class);})
+        );
+
+    }
+
+    //发起教师类型请求,失败则返回默认的中教
+    public int getTeacherType(Long teacherId){
+        try {
+            String url = String.format("%s/teacher/%s", urlConf.getTeacher_service(), teacherId);
+            logger.info("向师生运营发起获取教师信息请求,url:[{}]", url);
+            JsonResultModel teacherResult = restTemplate.getForObject(url, JsonResultModel.class);
+            Map<String, Object> map = (Map) teacherResult.getData();
+            return Integer.parseInt(map.get("teachingType").toString());
+        }
+        catch (Exception ex){
+            logger.error("向师生运营发起教师类型请求失败",ex);
+        }
+        return TeachingType.ZHONGJIAO.getCode();
+    }
+
 }
