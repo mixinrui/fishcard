@@ -93,17 +93,17 @@ public class MakeWorkOrderServiceX {
         map = getTeacherWorkOrderList(map, workOrderNOteacher, workOrderYESteacher, teacherForms);
 
         logger.info("3333333333:::::::::::::::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
-
+        logger.info("3333333333111111::::::::::::sendToTeahcerInfo [{}]::::::::::::::::::::::::::::::::", JSON.toJSON(map));
         if(null ==map || map.isEmpty()){
             return;
         }
         // 5 把缓存数据放入redis  把能够分配的鱼卡放在缓存中
 
-        for (WorkOrder wo : workOrderNOteacher) {
-            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), reverseWorkOrder(wo));
-       //   WorkOrderView json = (WorkOrderView) cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).get(wo.getId(),WorkOrderView.class);
-       //   cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).evict(wo.getId());
-        }
+//        for (WorkOrder wo : workOrderNOteacher) {
+//            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), reverseWorkOrder(wo));
+//       //   WorkOrderView json = (WorkOrderView) cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).get(wo.getId(),WorkOrderView.class);
+//       //   cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).evict(wo.getId());
+//        }
 
 
         // 6 把缓存数据放入db中
