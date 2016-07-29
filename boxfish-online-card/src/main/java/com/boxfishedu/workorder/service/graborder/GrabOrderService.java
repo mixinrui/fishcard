@@ -52,8 +52,12 @@ public class GrabOrderService extends BaseService<WorkOrderGrab, WorkOrderGrabJp
      * 抢单更新workorder 中的teacherId         ------抢单成功之后,更新work_order中的teacherId
      * @return
      */
-    public int setTeacherIdByWorkOrderId(GrabOrderView grabOrderView){
-        return workOrderJpaRepository.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),0l,grabOrderView.getState());
+//    public int setTeacherIdByWorkOrderId(GrabOrderView grabOrderView){
+//        return workOrderJpaRepository.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),0l,grabOrderView.getState());
+//    }
+    public WorkOrder setTeacherIdByWorkOrderId(WorkOrder workOrder){
+        return  workOrderJpaRepository.save(workOrder);
+         // workOrderJpaRepository.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),0l,grabOrderView.getState());
     }
 
     /**
