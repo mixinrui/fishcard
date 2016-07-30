@@ -97,6 +97,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public CommentCard foreignTeacherCommentDetailQuery(Long id,Long userId) {
         logger.info("调用学生查询某条外教点评具体信息接口,并将此条设置为已读,其中id="+id);
         CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
+        if(commentCard == null){
+            throw new UnauthorizedException();
+        }
         if(commentCard.getStudentReadFlag() == 0){
             Date dateNow = new Date();
             commentCard.setUpdateTime(dateNow);
