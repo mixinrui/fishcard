@@ -57,9 +57,12 @@ public class GrabOrderService extends BaseService<WorkOrderGrab, WorkOrderGrabJp
 //    }
     public WorkOrder setTeacherIdByWorkOrderId(WorkOrder workOrder){
         return  workOrderJpaRepository.save(workOrder);
-         // workOrderJpaRepository.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),0l,grabOrderView.getState());
+        // workOrderJpaRepository.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),0l,grabOrderView.getState());
     }
 
+    public int updateTestGrab(GrabOrderView grabOrderView){
+        return   workOrderJpaRepository.setFixedTeacherIdAndStatusFor(grabOrderView.getTeacherId(),grabOrderView.getState(),grabOrderView.getWorkOrderId(),0L);
+    }
     /**
      * 抢单更新workordergrab 中的teacherId    ------------抢单失败
      * @return

@@ -138,23 +138,26 @@ public class GrabOrderServiceX {
                     jsonObject.put("code","1");
                     logger.info("::::::::::::::::::单子已过期,抢单失败::::::::::::::::::");
                 }else{
-                    workOrder.setStatus( FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
-                    workOrder.setTeacherId(grabOrderView.getTeacherId());
-                    workOrder.setUpdateTime(new Date());
-                    workOrder.setAssignTeacherTime(new Date());
+
 
                     grabOrderView.setState(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+
+                    //更新鱼卡(状态  教师id)
+                    int updateCount = grabOrderService.updateTestGrab(grabOrderView);
+
+                    if(updateCount!=1){
+                        jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
+                        jsonObject.put("code","1");
+                        return JsonResultModel.newJsonResultModel(jsonObject);
+                    }
+
+                    // 更新鱼卡
                     grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
-                    //更新鱼卡
-                    workOrder =grabOrderService.setTeacherIdByWorkOrderId(workOrder);
 
-
-                    /** 防止db可重复读**/
                     workOrder.setStatus( FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
                     workOrder.setTeacherId(grabOrderView.getTeacherId());
                     workOrder.setUpdateTime(new Date());
                     workOrder.setAssignTeacherTime(new Date());
-                    /**防止db可重复读**/
 
                     logger.info("::::::::::::::::changeFishCardStatusForGrab::::::::[{}]:::",workOrder);
                     courseScheduleService.findByWorkOrderIdForUpdate(grabOrderView);
