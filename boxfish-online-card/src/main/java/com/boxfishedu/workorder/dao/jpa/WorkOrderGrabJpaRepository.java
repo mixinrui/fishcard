@@ -34,10 +34,10 @@ public interface WorkOrderGrabJpaRepository extends JpaRepository<WorkOrderGrab,
     public List<WorkOrderGrab> findByCreateTimeLessThan(Date date);
 
 
-//    /**  抢单成功 和 失败  均可以调用该接口  调用必须包含  @Transactional 事物标注 **/
-//    @Modifying
-//    @Query("update WorkOrderGrab o set o.flag = ?1 , o.updateTime = current_timestamp  where  o.teacherId = ?2 and o.workorderId = ?3  and o.flag= '0'")
-//    int setFixedFlagFor(String flag,Long teacherId , Long workorderId);
+    /**  抢单成功 和 失败  均可以调用该接口  调用必须包含  @Transactional 事物标注 **/
+    @Modifying
+    @Query("update WorkOrderGrab o set o.flag = ?1 , o.updateTime = current_timestamp  where  o.teacherId = ?2 and o.workorderId = ?3  and o.flag= '0'")
+    int setFixedFlagFor(String flag,Long teacherId , Long workorderId);
 
 
 //    // 删除今天之前的数据

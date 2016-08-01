@@ -45,7 +45,8 @@ public class GrabOrderService extends BaseService<WorkOrderGrab, WorkOrderGrabJp
      * @return
      */
     public int setFlagSuccessAndTeacherId(GrabOrderView grabOrderView){
-        return workOrderGrabJpaRepository.setFlagSuccessAndTeacherId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),new Date());
+        return workOrderGrabJpaRepository.setFixedFlagFor("1",grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId());
+//        return workOrderGrabJpaRepository.setFlagSuccessAndTeacherId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),new Date());
     }
 
     /**
@@ -68,7 +69,8 @@ public class GrabOrderService extends BaseService<WorkOrderGrab, WorkOrderGrabJp
      * @return
      */
     public int setFlagFailAndTeacherId(GrabOrderView grabOrderView){
-        return workOrderGrabJpaRepository.setFlagFailAndTeacherId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),new Date());
+        return workOrderGrabJpaRepository.setFixedFlagFor("2",grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId());
+//        return workOrderGrabJpaRepository.setFlagFailAndTeacherId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),new Date());
     }
 
     public WorkOrder findByIdForUpdate(Long workorderId){
