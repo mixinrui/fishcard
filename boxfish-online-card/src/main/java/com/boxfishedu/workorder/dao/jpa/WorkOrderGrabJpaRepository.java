@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.LockModeType;
 import java.util.Date;
@@ -31,6 +32,12 @@ public interface WorkOrderGrabJpaRepository extends JpaRepository<WorkOrderGrab,
 
     // 获取今天之前的数据
     public List<WorkOrderGrab> findByCreateTimeLessThan(Date date);
+
+
+//    /**  抢单成功 和 失败  均可以调用该接口  调用必须包含  @Transactional 事物标注 **/
+//    @Modifying
+//    @Query("update WorkOrderGrab o set o.flag = ?1 , o.updateTime = current_timestamp  where  o.teacherId = ?2 and o.workorderId = ?3  and o.flag= '0'")
+//    int setFixedFlagFor(String flag,Long teacherId , Long workorderId);
 
 
 //    // 删除今天之前的数据
