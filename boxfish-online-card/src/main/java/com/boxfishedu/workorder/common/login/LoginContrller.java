@@ -43,7 +43,7 @@ public class LoginContrller {
 
     /** 初始化用户 **/
     @RequestMapping(value = "/inituser", method = RequestMethod.POST)
-    public JsonResultModel initUser(UserInfo userInfo) throws Exception{
+    public JsonResultModel initUser(@RequestBody  UserInfo userInfo) throws Exception{
         return  loginService.initData(userInfo);
     }
 

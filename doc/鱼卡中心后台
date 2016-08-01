@@ -172,3 +172,12 @@ method:put
      10260
     ]
 }
+
+##########鱼卡后台用户注册接口
+http://127.0.0.1:8080/backend/login/inituser
+method:post
+参数:
+{
+    "userName":"boxfishcard007",
+    "passWord":"fishcard0000007a"
+}
