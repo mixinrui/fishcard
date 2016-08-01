@@ -27,6 +27,7 @@ import java.util.Map;
 /**
  * Created by LuoLiBing on 16/4/25.
  */
+@SuppressWarnings("ALL")
 @Service
 public class ServiceSDK {
 
