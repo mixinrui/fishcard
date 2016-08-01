@@ -78,5 +78,11 @@ public class GrabOrderController {
         return new JsonResultModel();
     }
 
+    @RequestMapping(value = "/zhaojian", method = RequestMethod.GET)
+    public JsonResultModel zhaojian() {
+        makeWorkOrderServiceX.makeTest();
+        return new JsonResultModel();
+    }
+
 
 }

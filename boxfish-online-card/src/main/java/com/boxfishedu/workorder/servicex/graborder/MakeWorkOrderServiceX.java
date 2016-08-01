@@ -59,6 +59,29 @@ public class MakeWorkOrderServiceX {
     //cacheManager.getCache(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO).put(userName.trim(), json.toJSONString());
 
 
+
+    public void makeTest(){
+        List<WorkOrder> workOrderNOteacher = makeWorkOrderService.findByTeacherIdAndStartTimeBetweenOrderByStartTime();
+
+
+        List<TeacherForm> teacherForms = Lists.newArrayList();
+        TeacherForm  tf = new TeacherForm();
+        tf.setTeacherId(1298976L);
+        tf.setTeacherType(TeachingType.WAIJIAO.getCode());
+        teacherForms.add(tf);
+
+        Map map = Maps.newConcurrentMap();
+        map.put(tf.getTeacherId(),workOrderNOteacher);
+
+
+        makeWorkOrderService.saveCurrentworkOrderMap(map);
+
+        pushTeacherList(map);
+
+
+    }
+
+    
     /**
      * 组合发送的鱼卡
      * @param flag   flag  真假数据标示  方便测试使用
