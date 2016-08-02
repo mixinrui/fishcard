@@ -7,6 +7,8 @@ import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
+import org.apache.commons.lang.StringUtils;
+import org.jboss.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -66,6 +68,14 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
 
     private String getFilterSql(FishCardFilterParam fishCardFilterParam){
         StringBuilder sql=new StringBuilder("from WorkOrder wo where wo.startTime between :begin and :end ");
+
+        if(null!=fishCardFilterParam.getCreateBeginDateFormat()){
+            sql.append(" and wo.createTime>=:createbegin ");
+        }
+        if(null!=fishCardFilterParam.getCreateEndDateFormat()){
+            sql.append(" and wo.createTime<=:createend ");
+        }
+
         if(null!=fishCardFilterParam.getStatus()){
             sql.append("and status=:status ");
         }
@@ -75,15 +85,58 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         if(null!=fishCardFilterParam.getStudentId()){
             sql.append("and studentId=:studentId ");
         }
+
+        if(null!=fishCardFilterParam.getTeacherId()){
+            sql.append("and teacherId=:teacherId ");
+        }
+
+        if(null!=fishCardFilterParam.getTeacherName() && StringUtils.isNotEmpty(fishCardFilterParam.getTeacherName().trim())){
+            sql.append("and teacherName like '%").append(fishCardFilterParam.getTeacherName()).append("%' ");
+        }
+
+        if(null!=fishCardFilterParam.getCourseType() &&  StringUtils.isNotEmpty(  fishCardFilterParam.getCourseType() )){
+            sql.append("and courseType in (").append(splitCourseType(fishCardFilterParam.getCourseType())).append(")");
+        }
+
         sql.append("and orderId !=:orderId ");
-        sql.append("order by wo.createTime desc");
+
+
+        if(null!=fishCardFilterParam.getStartTimeSort()){
+            sql.append("order by wo.startTime   ").append(fishCardFilterParam.getStartTimeSort().toLowerCase());
+        }
+
+        if( null!=fishCardFilterParam.getActualStartTimeSort()){
+            sql.append("order by wo.actualStartTime ").append(fishCardFilterParam.getActualStartTimeSort());
+        }
+
+        if(null!=fishCardFilterParam.getStartTimeSort()  &&  null!=fishCardFilterParam.getActualStartTimeSort()){
+            sql.append("order by wo.teacherId asc , wo.createTime desc");
+        }
+
         return sql.toString();
+    }
+
+    private String splitCourseType(String courseType){
+        String condition = "";
+        String[] course = courseType.split(",");
+        for(String s: course){
+            condition+="'"+s.toUpperCase()+"',";
+        }
+        return condition.substring(0,condition.length()-1);
     }
 
     private Query getFilterQuery(String sql, FishCardFilterParam fishCardFilterParam, EntityManager entityManager){
         Query query = entityManager.createQuery(sql);
         query.setParameter("begin",fishCardFilterParam.getBeginDateFormat());
         query.setParameter("end",fishCardFilterParam.getEndDateFormat());
+
+        if(null!=fishCardFilterParam.getCreateBeginDateFormat()){
+            query.setParameter("createbegin",fishCardFilterParam.getCreateBeginDateFormat());
+        }
+        if(null!=fishCardFilterParam.getCreateEndDateFormat()){
+            query.setParameter("createend",fishCardFilterParam.getCreateEndDateFormat());
+        }
+
         if(null!=fishCardFilterParam.getStatus()){
             query.setParameter("status",fishCardFilterParam.getStatus());
         }
@@ -93,6 +146,12 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         if(null!=fishCardFilterParam.getStudentId()){
             query.setParameter("studentId",fishCardFilterParam.getStudentId());
         }
+        if(null!=fishCardFilterParam.getTeacherId()){
+            query.setParameter("teacherId",fishCardFilterParam.getTeacherId());
+        }
+//        if(null!=fishCardFilterParam.getTeacherName()){
+//            query.setParameter("teacherName",fishCardFilterParam.getTeacherName());
+//        }
         query.setParameter("orderId",Long.MAX_VALUE);
         return query;
     }
