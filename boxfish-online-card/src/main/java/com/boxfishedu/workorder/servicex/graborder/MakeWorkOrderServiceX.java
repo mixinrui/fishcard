@@ -60,13 +60,13 @@ public class MakeWorkOrderServiceX {
 
 
 
-    public void makeTest(){
+    public void makeTest(Long teacherId){
         List<WorkOrder> workOrderNOteacher = makeWorkOrderService.findByTeacherIdAndStartTimeBetweenOrderByStartTime();
 
 
         List<TeacherForm> teacherForms = Lists.newArrayList();
         TeacherForm  tf = new TeacherForm();
-        tf.setTeacherId(1298976L);
+        tf.setTeacherId(teacherId);
         tf.setTeacherType(TeachingType.WAIJIAO.getCode());
         teacherForms.add(tf);
 

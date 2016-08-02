@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.graborder;
 
 import com.boxfishedu.card.bean.CourseTypeEnum;
+import com.boxfishedu.online.order.entity.TeacherForm;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -78,9 +79,9 @@ public class GrabOrderController {
         return new JsonResultModel();
     }
 
-    @RequestMapping(value = "/zhaojian", method = RequestMethod.GET)
-    public JsonResultModel zhaojian() {
-        makeWorkOrderServiceX.makeTest();
+    @RequestMapping(value = "/zhaojian", method = RequestMethod.POST)
+    public JsonResultModel zhaojian(@RequestBody TeacherForm teacherForm) {
+        makeWorkOrderServiceX.makeTest(teacherForm.getTeacherId());
         return new JsonResultModel();
     }
 
