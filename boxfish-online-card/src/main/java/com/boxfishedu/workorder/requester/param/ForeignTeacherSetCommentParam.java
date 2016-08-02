@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.requester.param;
 
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.google.common.collect.Lists;
@@ -26,15 +27,11 @@ public class ForeignTeacherSetCommentParam {
         foreignTeacherSetCommentParam.setTeacherId(commentCard.getTeacherId());
 
         if(null!=student2TeacherCommentParam.getForGoodReviews()) {
-            List<String> forGoodReviews = Lists.newArrayList();
-            forGoodReviews.add(student2TeacherCommentParam.getForGoodReviews());
-            foreignTeacherSetCommentParam.setForGoodReviews(forGoodReviews);
+            foreignTeacherSetCommentParam.setForGoodReviews(student2TeacherCommentParam.getForGoodReviews());
         }
 
         if(null!=student2TeacherCommentParam.getForBadReviews()) {
-            List<String> forBadReviews = Lists.newArrayList();
-            forBadReviews.add(student2TeacherCommentParam.getForBadReviews());
-            foreignTeacherSetCommentParam.setForBadReviews(forBadReviews);
+            foreignTeacherSetCommentParam.setForBadReviews(student2TeacherCommentParam.getForBadReviews());
         }
 
         return foreignTeacherSetCommentParam;
