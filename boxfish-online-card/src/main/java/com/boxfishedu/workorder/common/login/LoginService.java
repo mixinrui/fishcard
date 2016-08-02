@@ -306,21 +306,19 @@ public class LoginService {
             resultMap.put("msg","用户名或者密码为空");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
-        String userInfoInRedis = this.getUserInfo(userName);
-
-        if(!StringUtils.isEmpty(userInfoInRedis)){
-            resultMap.put("code","2");
-            resultMap.put("msg","该用户已经注册过");
-            return JsonResultModel.newJsonResultModel(resultMap);
-        }
+//        String userInfoInRedis = this.getUserInfo(userName);
+//
+//        if(!StringUtils.isEmpty(userInfoInRedis)){
+//
+//        }
 
         JSONObject jsonObject = new JSONObject();
 
 
         String pd = tokenUtils.getPassword(passWord.trim());
 
-        jsonObject.put("password",pd);
-        cacheManager.getCache(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO).put(userName, jsonObject.toString());
+//        jsonObject.put("password",pd);
+//        cacheManager.getCache(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO).put(userName, jsonObject.toString());
 
 
         WorkOrderUser workOrderUser =  workOrderUserService.findByUserCodeAndFlag(userName,"1");
@@ -330,6 +328,12 @@ public class LoginService {
             workOrderUser.setUserCode(userName);
             workOrderUser.setPassword(pd);
             workOrderUser.setUserName(userInfo.getRealName());
+            workOrderUser.setFlag("1");
+            workOrderUserService.save(workOrderUser);
+        }else {
+            resultMap.put("code","2");
+            resultMap.put("msg","该用户已经注册过");
+            return JsonResultModel.newJsonResultModel(resultMap);
         }
 
         resultMap.put("code","3");

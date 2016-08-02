@@ -318,7 +318,7 @@ public class RabbitMqConfiguration {
     @Bean(name = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME)
     public RabbitTemplate allotTeacherReplyRabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter){
         RabbitTemplate template = getRabbitTemplate(connectionFactory,messageConverter,RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE);
-        template.setExchange(FOREIGN_COMMENT_EXCHANGE);
+        template.setExchange(SCHEDULE_EXCHANGE);
         return template;
     }
 

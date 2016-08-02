@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.requester;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.online.order.entity.OrderForm;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -217,8 +218,6 @@ public class TeacherStudentRequester {
         return uri;
     }
 
-
-
     /**
      *  向在线教育push教师消息数据
      */
@@ -271,5 +270,20 @@ public class TeacherStudentRequester {
             restTemplate.postForObject(url,map,JsonResultModel.class);})
         );
 
+    }
+
+    //发起教师类型请求,失败则返回默认的中教
+    public int getTeacherType(Long teacherId){
+        try {
+            String url = String.format("%s/teacher/%s", urlConf.getTeacher_service(), teacherId);
+            logger.info("向师生运营发起获取教师信息请求,url:[{}]", url);
+            JsonResultModel teacherResult = restTemplate.getForObject(url, JsonResultModel.class);
+            Map<String, Object> map = (Map) teacherResult.getData();
+            return Integer.parseInt(map.get("teachingType").toString());
+        }
+        catch (Exception ex){
+            logger.error("向师生运营发起教师类型请求失败",ex);
+        }
+        return TeachingType.ZHONGJIAO.getCode();
     }
 }

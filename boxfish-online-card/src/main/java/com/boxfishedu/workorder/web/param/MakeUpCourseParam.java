@@ -11,6 +11,4 @@ public class MakeUpCourseParam {
     private Integer timeSlotId;
     private String startTime;
     private String endTime;
-    /** 更改鱼卡状态 **/
-    private Integer fishStatus;
 }

@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class Student2TeacherCommentParam {
     private Long commentCardId;
-    private String forGoodReviews;
-    private String forBadReviews;
+    private List<String> forGoodReviews;
+    private List<String> forBadReviews;
     private Long studentId;
 }

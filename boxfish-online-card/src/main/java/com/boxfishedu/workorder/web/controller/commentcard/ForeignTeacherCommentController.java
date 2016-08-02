@@ -53,6 +53,9 @@ public class ForeignTeacherCommentController {
                 commentCard.setService(service);
                 commentCard.setOrderId(service.getOrderId());
                 commentCard.setOrderCode(service.getOrderCode());
+                commentCard.setAskVoiceId(commentCardForm.getAskVoiceId());
+                commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
+                commentCard.setVoiceTime(commentCardForm.getVoiceTime());
                 return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard));
             }
         }else {
@@ -60,14 +63,15 @@ public class ForeignTeacherCommentController {
         }
     }
 
-    @RequestMapping(value = "update_student_question", method = RequestMethod.PUT)
-    public JsonResultModel updateStudentQuestion(@RequestBody CommentCardForm commentCardForm, Long userId){
-            CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(commentCardForm.getId(),userId);
-            commentCard.setAskVoiceId(commentCardForm.getAskVoiceId());
-            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
-            foreignTeacherCommentCardService.foreignTeacherCommentUpdateQuestion(commentCard);
-            return new JsonResultModel();
-    }
+//    @RequestMapping(value = "update_student_question", method = RequestMethod.PUT)
+//    public JsonResultModel updateStudentQuestion(@RequestBody CommentCardForm commentCardForm,Long userId){
+//            CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(commentCardForm.getId(),userId);
+//            commentCard.setAskVoiceId(commentCardForm.getAskVoiceId());
+//            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
+//            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
+//            foreignTeacherCommentCardService.foreignTeacherCommentUpdateQuestion(commentCard);
+//            return new JsonResultModel();
+//    }
 
     @RequestMapping(value = "query_all",method = RequestMethod.GET)
     public JsonResultModel queryCommentList(Pageable pageable, Long userId){
@@ -75,7 +79,7 @@ public class ForeignTeacherCommentController {
     }
 
     @RequestMapping(value = "query_one",method = RequestMethod.GET)
-    public JsonResultModel queryDetailComment(Long id, Long userId){
+    public JsonResultModel queryDetailComment(Long id,Long userId){
         CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(id,userId);
         if(commentCard == null){
             throw new ValidationException("所查找的点评不存在!");

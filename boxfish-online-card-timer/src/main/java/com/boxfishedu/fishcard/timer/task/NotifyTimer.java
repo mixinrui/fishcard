@@ -122,7 +122,7 @@ public class NotifyTimer {
     /**
      * 检查24小时内没有点评学生的外教。。每天凌晨1点、早晨9点和下午5点定时执行
      */
-    @Scheduled(cron = "0 0 1,9,11,17 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void judgeCommentCard(){
         logger.info("<<<<<<开始通知<<<获取在24小时内未评论的外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMMENT_CARD_NO_ANSWER.value());
@@ -133,8 +133,8 @@ public class NotifyTimer {
     /**
      * 抢单: 每天18点到 24点  每10分钟 轮训查询
      */
-//   @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
-    @Scheduled(cron = "0 0/5 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
+    @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+   //   @Scheduled(cron = "0 0/5 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
     public void initGrabOrderDataChinese() {
         logger.info("<<<<<<graborder-initGrabOrderData<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<轮训抢单初始化数据>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
@@ -157,12 +157,12 @@ public class NotifyTimer {
     }
 
 
-    //   @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
-   // @Scheduled(cron = "0 0/5 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
+    @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+    //@Scheduled(cron = "0 0/5 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
     public void initGrabOrderDataForeigh() {
         logger.info("<<<<<<graborder-initGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<轮训抢单初始化数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGH.value());
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGN.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
@@ -175,7 +175,7 @@ public class NotifyTimer {
     public void clearGrabOrderDataForeigh() {
         logger.info("<<<<<<graborder-clearGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<清理昨天抢单历史数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH.value());
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGN.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

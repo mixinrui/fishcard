@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
@@ -42,12 +43,12 @@ public class StudentComment2TeacherServiceX {
         if(null==commentCard){
             throw new BusinessException("不存在对应的点评卡");
         }
-        if(!StringUtils.isEmpty(student2TeacherCommentParam.getForGoodReviews())){
-            commentCard.setStudentCommentTagCode(student2TeacherCommentParam.getForGoodReviews());
+        if(!CollectionUtils.isEmpty(student2TeacherCommentParam.getForGoodReviews())){
+            commentCard.setStudentCommentGoodTagCode(JacksonUtil.toJSon(student2TeacherCommentParam.getForGoodReviews()));
             teacherStudentCommentCardRequester.sendStudentComment2Teacher(student2TeacherCommentParam);
         }
-        else if(!StringUtils.isEmpty(student2TeacherCommentParam.getForBadReviews())){
-            commentCard.setStudentCommentTagCode(student2TeacherCommentParam.getForBadReviews());
+        else if(!CollectionUtils.isEmpty(student2TeacherCommentParam.getForBadReviews())){
+            commentCard.setStudentCommentBadTagCode(JacksonUtil.toJSon(student2TeacherCommentParam.getForBadReviews()));
             teacherStudentCommentCardRequester.sendStudentComment2Teacher(student2TeacherCommentParam);
         }
         else{

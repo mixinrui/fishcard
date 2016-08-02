@@ -54,7 +54,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCard.setCreateTime(dateNow);
         commentCard.setUpdateTime(dateNow);
         commentCard.setAssignTeacherCount(0);
-        commentCard.setStatus(CommentCardStatus.ASKED.getCode());
+        commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+        ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
+        logger.info("向师生运营发生消息,通知分配外教进行点评...");
+        rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
         return commentCardJpaRepository.save(commentCard);
     }
 
@@ -94,9 +97,12 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
-    public CommentCard foreignTeacherCommentDetailQuery(Long id, Long studentId) {
+    public CommentCard foreignTeacherCommentDetailQuery(Long id,Long userId) {
         logger.info("调用学生查询某条外教点评具体信息接口,并将此条设置为已读,其中id="+id);
-        CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,studentId);
+        CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
+        if(commentCard == null){
+            throw new UnauthorizedException();
+        }
         if(commentCard.getStudentReadFlag() == 0){
             Date dateNow = new Date();
             commentCard.setUpdateTime(dateNow);
