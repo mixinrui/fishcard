@@ -78,6 +78,9 @@ public class CommentCard {
     @Column(name = "answer_video_path", nullable = true, length = 255)
     private String answerVideoPath;
 
+    @Column(name = "answer_video_thumbnail", nullable = true, length = 255)
+    private String answerVideoThumbnail;
+
     @Column(name = "evaluation_to_teacher", nullable = true, length = 11)
     private Integer evaluationToTeacher;
 
@@ -101,8 +104,15 @@ public class CommentCard {
     @Column(name="order_code", length = 128)
     private String orderCode;
 
-    @Column(name="student_comment_tag_code", length = 64)
-    private String studentCommentTagCode;
+    @Column(name="student_comment_good_tag_code", length = 128)
+    private String studentCommentGoodTagCode;
+
+    @Column(name="student_comment_bad_tag_code", length = 128)
+    private String studentCommentBadTagCode;
+
+    @Column(name = "student_comment_teacher_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date studentCommentTeacherTime;
 
     @Column(name="assign_teahcer_count", nullable = true)
     private Integer assignTeacherCount = 0;
