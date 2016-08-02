@@ -58,7 +58,6 @@ public class StudentComment2Teacher {
                 return jsonResultModel;
             }
         }
-        studentComment2TeacherServiceX.studentComment2Teacher(student2TeacherCommentParam);
-        return JsonResultModel.newJsonResultModel(null);
+        return JsonResultModel.newJsonResultModel(studentComment2TeacherServiceX.studentComment2Teacher(student2TeacherCommentParam));
     }
 }
