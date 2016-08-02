@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.bean.TeachingOnlineListMsg;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -108,6 +109,9 @@ public class MakeWorkOrderServiceX {
             return;
         }
 
+
+        logger.info("33333333330000000::::::教师列表:[{}]",teacherForms);
+
         // 3 获取未来两天内已经匹配老师的鱼卡
         List<WorkOrder> workOrderYESteacher = makeWorkOrderService.findWorkOrderContainTeachers();
 
@@ -115,11 +119,14 @@ public class MakeWorkOrderServiceX {
         Map<Long, List<WorkOrder>> map = Maps.newConcurrentMap();
         map = getTeacherWorkOrderList(map, workOrderNOteacher, workOrderYESteacher, teacherForms);
 
-        logger.info("3333333333:::::::::::::::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
-        logger.info("3333333333111111::::::::::::sendToTeahcerInfo [{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(map));
+
         if(null ==map || map.isEmpty()){
             return;
         }
+
+        logger.info("3333333333:::::::::::::::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
+        logger.info("3333333333111111::::::::::::sendToTeahcerInfo [{}]::::::::::::::::::::::::::::::::", map);
+
         // 5 把缓存数据放入redis  把能够分配的鱼卡放在缓存中
 
 //        for (WorkOrder wo : workOrderNOteacher) {
@@ -162,7 +169,7 @@ public class MakeWorkOrderServiceX {
         for (WorkOrder wo : workOrderNOteacher) {
             if (CourseTypeEnum.TALK.toString().equals(wo.getCourseType())  && CourseTypeEnum.TALK.toString().equals(teacherType)) {
                 foreignTeahcerflag = true;
-            } else if(CourseTypeEnum.FUNCTION.toString().equals(teacherType)){// FUNCTION 代表中教
+            } else if( !CourseTypeEnum.TALK.toString().equals(wo.getCourseType())  &&   CourseTypeEnum.FUNCTION.toString().equals(teacherType)){// FUNCTION 代表中教
                 chineseTeacherflag = true;
             }
             if (foreignTeahcerflag && chineseTeacherflag)
@@ -197,7 +204,10 @@ public class MakeWorkOrderServiceX {
         for (TeacherForm teacher : teacherForms) {
 
             if (workOrderYESteacherFlag) {
-                map.put(teacher.getTeacherId(), getTeacherListByType(workOrderNOteacher, teacher.getTeacherType()));
+                List workOrderteacherList = getTeacherListByType(workOrderNOteacher, teacher.getTeacherType());
+                if(null !=null && workOrderteacherList.size()>0){
+                    map.put(teacher.getTeacherId(), workOrderteacherList);
+                }
             } else {
                 List workOrder = Lists.newArrayList();
                 for (WorkOrder wono : workOrderNOteacher) {
@@ -217,7 +227,11 @@ public class MakeWorkOrderServiceX {
                 }
 
                 if (workOrder.size() > 0) {
-                    map.put(teacher.getTeacherId(), getTeacherListByType(workOrder, teacher.getTeacherType()));
+                    List workOrderteacherList = getTeacherListByType(workOrder, teacher.getTeacherType());
+                    if(null !=null && workOrderteacherList.size()>0){
+                        map.put(teacher.getTeacherId(),workOrderteacherList);
+                    }
+
                 }
             }
 
@@ -302,6 +316,8 @@ public class MakeWorkOrderServiceX {
             tf.setTeacherType((Integer) m.get("teachingType"));
             teacherListFromTeach.add(tf);
         }
+
+        logger.info(":::::::::::::::99999999999:[{}]",teacherListFromTeach);
         return teacherListFromTeach;
     }
 
