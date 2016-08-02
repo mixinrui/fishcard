@@ -26,8 +26,8 @@ public class CommentCardTeacherAppService {
         return commentCardJpaRepository.findOne(id);
     }
 
-    public void save(CommentCard commentCard){
-        commentCardJpaRepository.save(commentCard);
+    public CommentCard save(CommentCard commentCard){
+        return commentCardJpaRepository.save(commentCard);
     }
 
 }

@@ -38,7 +38,7 @@ public class StudentComment2TeacherServiceX {
 
     private Logger logger=LoggerFactory.getLogger(this.getClass());
 
-    public void studentComment2Teacher(Student2TeacherCommentParam student2TeacherCommentParam){
+    public CommentCard studentComment2Teacher(Student2TeacherCommentParam student2TeacherCommentParam){
         CommentCard commentCard=commentCardTeacherAppService.findById(student2TeacherCommentParam.getCommentCardId());
         if(null==commentCard){
             throw new BusinessException("不存在对应的点评卡");
@@ -54,6 +54,8 @@ public class StudentComment2TeacherServiceX {
         else{
             logger.info("@studentComment2Teacher获取到的评价为空,不做处理");
         }
-        commentCardTeacherAppService.save(commentCard);
+        Date dateNow = new Date();
+        commentCard.setStudentCommentTeacherTime(dateNow);
+        return commentCardTeacherAppService.save(commentCard);
     }
 }
