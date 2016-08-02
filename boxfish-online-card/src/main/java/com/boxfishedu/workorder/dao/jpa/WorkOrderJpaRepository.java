@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.LockModeType;
 import java.util.Date;
@@ -94,8 +95,13 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     // 抢单之后,给课程匹配相应的老师
     @Modifying
-    @Query("update WorkOrder o set o.teacherId = ?1 ,o.status = ?4  where o.id = ?2 and o.teacherId = ?3")
-    int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId , Long teacherIdZero,Integer status);
+    @Query("update WorkOrder o set o.teacherId = ?1 ,o.status = ?2 ,updateTime=current_timestamp ,assignTeacherTime=current_timestamp   where o.id = ?3 and o.teacherId = ?4")
+    int setFixedTeacherIdAndStatusFor(Long teacherId ,Integer status, Long workorderId , Long teacherIdZero );
+
+
+
+
+
     public List<WorkOrder> findByCourseType(String courseType);
 
     public List<WorkOrder> findByStudentIdAndStatusLessThanAndStartTimeAfter(Long studentId,Integer status,Date beginDate);

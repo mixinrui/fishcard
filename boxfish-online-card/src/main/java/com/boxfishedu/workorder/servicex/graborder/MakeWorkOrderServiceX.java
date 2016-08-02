@@ -59,6 +59,29 @@ public class MakeWorkOrderServiceX {
     //cacheManager.getCache(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO).put(userName.trim(), json.toJSONString());
 
 
+
+    public void makeTest(Long teacherId){
+        List<WorkOrder> workOrderNOteacher = makeWorkOrderService.findByTeacherIdAndStartTimeBetweenOrderByStartTime();
+
+
+        List<TeacherForm> teacherForms = Lists.newArrayList();
+        TeacherForm  tf = new TeacherForm();
+        tf.setTeacherId(teacherId);
+        tf.setTeacherType(TeachingType.WAIJIAO.getCode());
+        teacherForms.add(tf);
+
+        Map map = Maps.newConcurrentMap();
+        map.put(tf.getTeacherId(),workOrderNOteacher);
+
+
+        makeWorkOrderService.saveCurrentworkOrderMap(map);
+
+        pushTeacherList(map);
+
+
+    }
+
+    
     /**
      * 组合发送的鱼卡
      * @param flag   flag  真假数据标示  方便测试使用
@@ -93,17 +116,17 @@ public class MakeWorkOrderServiceX {
         map = getTeacherWorkOrderList(map, workOrderNOteacher, workOrderYESteacher, teacherForms);
 
         logger.info("3333333333:::::::::::::::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
-
+        logger.info("3333333333111111::::::::::::sendToTeahcerInfo [{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(map));
         if(null ==map || map.isEmpty()){
             return;
         }
         // 5 把缓存数据放入redis  把能够分配的鱼卡放在缓存中
 
-        for (WorkOrder wo : workOrderNOteacher) {
-            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), reverseWorkOrder(wo));
-       //   WorkOrderView json = (WorkOrderView) cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).get(wo.getId(),WorkOrderView.class);
-       //   cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).evict(wo.getId());
-        }
+//        for (WorkOrder wo : workOrderNOteacher) {
+//            cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).put(wo.getId(), reverseWorkOrder(wo));
+//       //   WorkOrderView json = (WorkOrderView) cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).get(wo.getId(),WorkOrderView.class);
+//       //   cacheManager.getCache(CacheKeyConstant.FISHCARD_WORKORDER_GRAB_KEY).evict(wo.getId());
+//        }
 
 
         // 6 把缓存数据放入db中
@@ -130,7 +153,7 @@ public class MakeWorkOrderServiceX {
     /**
      * 获取 获取查询教师列表 的条件
      *
-     * @param workOrderNOteacher
+     * @param workOrderNOteacher teacherType 分为中教和外教   如果为空标示中教外教都含有
      * @return
      */
     public String foreighAndChinesTeahcer(List<WorkOrder> workOrderNOteacher,String teacherType) {

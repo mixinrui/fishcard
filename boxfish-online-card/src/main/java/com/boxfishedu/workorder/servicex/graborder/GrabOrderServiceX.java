@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.graborder.GrabOrderService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -39,6 +40,9 @@ public class GrabOrderServiceX {
 
     //本地异常日志记录对象
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private ServiceSDK serviceSDK;
 
     @Autowired
     private CacheManager cacheManager;
@@ -134,14 +138,40 @@ public class GrabOrderServiceX {
                     jsonObject.put("code","1");
                     logger.info("::::::::::::::::::单子已过期,抢单失败::::::::::::::::::");
                 }else{
+
+
                     grabOrderView.setState(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+
+                    //更新鱼卡(状态  教师id)
+                    int updateCount = grabOrderService.updateTestGrab(grabOrderView);
+
+                    if(updateCount!=1){
+                        jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
+                        jsonObject.put("code","1");
+                        return JsonResultModel.newJsonResultModel(jsonObject);
+                    }
+
+                    // 更新鱼卡
                     grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
-                    grabOrderService.setTeacherIdByWorkOrderId(grabOrderView);
+
+                    workOrder.setStatus( FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+                    workOrder.setTeacherId(grabOrderView.getTeacherId());
+                    workOrder.setUpdateTime(new Date());
+                    workOrder.setAssignTeacherTime(new Date());
+
+                    logger.info("::::::::::::::::changeFishCardStatusForGrab::::::::[{}]:::",workOrder);
                     courseScheduleService.findByWorkOrderIdForUpdate(grabOrderView);
                     courseScheduleService.setTeacherIdByWorkOrderId(grabOrderView);
+                    // 纪录日志
+
+
+
                     workOrderLogService.saveWorkOrderLog(workOrder);
                     jsonObject.put("msg",WorkOrderConstant.GRABORDER_SUCCESS);
                     jsonObject.put("code","0");
+
+                    // 向在线运营发送建组(小马)
+                    serviceSDK.createGroup(workOrder);
                     logger.info("::::::::::::::::::成功抢单::::::::::::::::::");
                 }
             }

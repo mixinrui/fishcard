@@ -14,7 +14,6 @@ public class UrlConf {
     private String teacher_service;
     @Value("${interface.address.teacher_service_admin}")
     private String teacher_service_admin;//师生运营后台服务
-
     @Value("${interface.address.course_recommended_service}")
     private String course_recommended_service;
     @Value("${interface.address.fishcard_service}")
