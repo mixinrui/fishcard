@@ -54,7 +54,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCard.setCreateTime(dateNow);
         commentCard.setUpdateTime(dateNow);
         commentCard.setAssignTeacherCount(0);
-        commentCard.setStatus(CommentCardStatus.ASKED.getCode());
+        commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+        ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
+        logger.info("向师生运营发生消息,通知分配外教进行点评...");
+        rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
         return commentCardJpaRepository.save(commentCard);
     }
 
