@@ -124,8 +124,14 @@ public class MakeWorkOrderServiceX {
             return;
         }
 
-        logger.info("3333333333:::::::::::::::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
-        logger.info("3333333333111111::::::::::::sendToTeahcerInfo [{}]::::::::::::::::::::::::::::::::", map);
+        try {
+
+            logger.info("3333333333:::::::::::::::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", map == null ? 0 : map.size());
+            logger.info("3333333333111111::::::::::::sendToTeahcerInfo [{}]::::::::::::::::::::::::::::::::", map);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         // 5 把缓存数据放入redis  把能够分配的鱼卡放在缓存中
 
