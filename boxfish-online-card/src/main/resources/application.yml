@@ -26,7 +26,7 @@ choiceTime:
   # 免费体验天数
   freeExperienceDay: 7
   # 默认为购买后第二天生效
-  consumerStartDay: 1
+  consumerStartDay: 2
   #服务端允许补课的时间范围,单位:天
   durationAllowMakeUp: 14
   #补课距离当前课的可开始时间

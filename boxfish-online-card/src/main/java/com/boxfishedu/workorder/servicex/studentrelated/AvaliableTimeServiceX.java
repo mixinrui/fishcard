@@ -45,7 +45,7 @@ public class AvaliableTimeServiceX {
     /**
      * 选时间生效天数,默认为第二天生效
      */
-    @Value("${choiceTime.consumerStartDay:1}")
+    @Value("${choiceTime.consumerStartDay:2}")
     private Integer consumerStartDay;
     private final static Integer daysOfWeek = 7;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
