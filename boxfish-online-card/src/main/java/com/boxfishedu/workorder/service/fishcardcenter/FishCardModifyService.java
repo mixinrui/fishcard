@@ -71,6 +71,8 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
 
         /** 换课更新  换课时间  jiaozijun **/
         workOrder.setUpdatetimeChangecourse(new Date());
+        /** 换课 1 换课消息未发送 jiaozijun **/
+        workOrder.setSendflagcc("1");
 
         scheduleCourseInfoService.updateCourseIntoScheduleInfo(scheduleCourseInfo);
         workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);

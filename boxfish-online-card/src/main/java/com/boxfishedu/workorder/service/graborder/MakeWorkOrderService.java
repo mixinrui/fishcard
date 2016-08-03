@@ -114,14 +114,28 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
 
 
     /**
-     *
-     * @return  鱼卡列表
+     * 获取 每天18点  到 后天 24点 (startTime) 的鱼卡信息
+     * @return
      */
     public List<WorkOrder> findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween(){
-        Date end = new Date();
-        Date begin = DateUtil.getBeforeDays( end,1);
+        Date date = new Date();
+
+        Date begin  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*18);
+        Date end  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*24*2);
+
         logger.info(":::::findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween:::From{[]}:::::To{[]}",DateUtil.Date2String(begin),DateUtil.Date2String(end));
-        return workOrderJpaRepository.findByTeacherIdGreaterThanAndStatusAndUpdatetimeChangecourseBetween(0L, FishCardStatusEnum.TEACHER_ASSIGNED.getCode(),begin,end);
+        return workOrderJpaRepository.findByTeacherIdGreaterThanAndStatusAndSendflagccAndUpdatetimeChangecourseNotNullAndStartTimeBetween(0L, FishCardStatusEnum.TEACHER_ASSIGNED.getCode(),"1aaaa",begin,end);
+    }
+
+    public static void main(String[] args) {
+        Date date = new Date();
+
+        Date begin  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*18);
+        Date end  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*24*2);
+
+
+        System.out.print(begin);
+        System.out.print(end);
     }
 
 

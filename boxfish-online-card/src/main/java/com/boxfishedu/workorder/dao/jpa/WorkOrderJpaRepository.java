@@ -95,9 +95,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     /** end 抢单接口 **/
 
 
-    // 获取当前时间往前一整天(24小时)有换课纪录的鱼卡 状态30 updatetime不为空 teacherid>0
+    // 获取当前时间往前一整天(24小时)有换课纪录的鱼卡 状态30 updatetime不为空 teacherid>0    sendFlagCC  1 未发送
     public List<WorkOrder> findByTeacherIdGreaterThanAndStatusAndUpdatetimeChangecourseBetween(Long teacherId,Integer status,Date begin ,Date end);
-
+    public List<WorkOrder> findByTeacherIdGreaterThanAndStatusAndSendflagccAndUpdatetimeChangecourseNotNullAndStartTimeBetween(Long teacherId,Integer status,String sendFlagCC,Date begin ,Date end);
 
     // 抢单之后,给课程匹配相应的老师
     @Modifying
