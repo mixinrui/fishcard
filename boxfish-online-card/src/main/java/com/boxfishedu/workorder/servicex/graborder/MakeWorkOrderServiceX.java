@@ -337,13 +337,36 @@ public class MakeWorkOrderServiceX {
     public void pushTeacherList(Map<Long, List<WorkOrder>> map) {
         List list = Lists.newArrayList();
         for (Long key : map.keySet()) {
+            String pushTitle = WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE;
             Map map1 = Maps.newHashMap();
             map1.put("user_id", key);
-            map1.put("push_title", WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE);
+
+            if(null == map.get(key)){
+                continue;
+            }
+
+            WorkOrder workOrder =    map.get(key).get(0);
+            if(null ==workOrder){
+                continue;
+            }
+
+            if( CourseTypeEnum.TALK.toString().equals(  workOrder.getCourseType())){
+                pushTitle = WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
+            }
+
+
+            map1.put("push_title", pushTitle);
 
             JSONObject jo = new JSONObject();
             jo.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE.toString());
             jo.put("count", null == map.get(key) ? "0" : map.get(key).size());
+
+            try{
+                logger.info(":::::::sendToTecherContent::::pushTitle:[{}]:size[{}]",pushTitle,map.get(key).size());
+            }catch (Exception e){
+                logger.error("::::::::dataError::::::::");
+            }
+
             map1.put("data", jo);
 
             list.add(map1);

@@ -8,6 +8,10 @@ public  class WorkOrderConstant {
 
     // 抢单发送消息内容
     public final  static String SEND_GRAB_ORDER_MESSAGE="有学生等待上课,打开app抢先上课";
+
+    // 抢单发送消息内容外教
+    public final  static String SEND_GRAB_ORDER_MESSAGE_FOREIGH="A student is waiting for the class; Open the APP, and enjoy your class now！";
+
     // 鱼卡信息列表
     public final  static String FISHCARD_LIST="鱼卡信息列表";
     // 抢单成功
