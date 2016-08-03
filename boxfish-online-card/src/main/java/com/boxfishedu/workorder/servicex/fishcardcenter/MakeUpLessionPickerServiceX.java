@@ -75,7 +75,6 @@ public class MakeUpLessionPickerServiceX {
                 logger.error("鱼卡[{}]获取可用时间片失败", workOrderId, ex);
                 throw new BusinessException("鱼卡[" + workOrderId + "]获取可用时间片失败");
             }
-
         }
 
         AvaliableTimeParam avaliableTimeParam = new AvaliableTimeParam();

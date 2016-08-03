@@ -127,10 +127,10 @@ public class TeacherAppRelatedServiceX {
             map.put("valid", FishCardAuthEnum.CLASS_OVER.getCode());
             map.put("desc", FishCardAuthEnum.CLASS_OVER.getDesc());
         }
-        else if(workOrder.getStatus() == FishCardStatusEnum.STUDENT_ABSENT.getCode()){
-            map.put("valid", FishCardAuthEnum.STUDENT_ABSENT.getCode());
-            map.put("desc", FishCardAuthEnum.STUDENT_ABSENT.getDesc());
-        }
+//        else if(workOrder.getStatus() == FishCardStatusEnum.STUDENT_ABSENT.getCode()){
+//            map.put("valid", FishCardAuthEnum.STUDENT_ABSENT.getCode());
+//            map.put("desc", FishCardAuthEnum.STUDENT_ABSENT.getDesc());
+//        }
         else {
             map.put("valid", FishCardAuthEnum.OK.getCode());
             map.put("desc", FishCardAuthEnum.OK.getDesc());

@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
+import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -60,6 +61,17 @@ public class FishCardQueryController {
     public JsonResultModel listCardDetail(@PathVariable("card_id") Long cardId) throws Exception {
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(cardId);
         return JsonResultModel.newJsonResultModel(workOrderLogs);
+    }
+
+
+    /**
+     * 获取课程类型(给张一前段提供)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/courseType/list", method = RequestMethod.GET)
+    public JsonResultModel listCourseType() throws Exception {
+        return JsonResultModel.newJsonResultModel( CourseTypeEnum.values());
     }
 
 }

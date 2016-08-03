@@ -9,8 +9,13 @@ import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.*;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardMakeUpService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.JsonObject;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/6/14.
@@ -27,6 +33,7 @@ import java.util.List;
  */
 @Component
 public class MakeUpLessionServiceX {
+
     @Autowired
     private WorkOrderService workOrderService;
     @Autowired
@@ -42,11 +49,16 @@ public class MakeUpLessionServiceX {
     @Autowired
     private FishCardMakeUpService fishCardMakeUpService;
 
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
+
     @Value("${choiceTime.durationAllowMakeUp}")
     private Integer durationAllowMakeUp;
 
     @Value("${choiceTime.durationFromParentCourse}")
     private Integer durationFromParentCourse;
+
+
 
     /**
      * 补课逻辑
@@ -122,4 +134,58 @@ public class MakeUpLessionServiceX {
         newCourseSchedule.setUpdateTime(null);
         return newCourseSchedule;
     }
+
+
+
+    /**
+     * 更改鱼卡状态
+     * @param makeUpCourseParam
+     * @return
+     */
+    public JsonResultModel fishcardStatusChange(MakeUpCourseParam makeUpCourseParam){
+        WorkOrder workOrder = workOrderService.findOne(makeUpCourseParam.getWorkOrderId());
+        Map<String,String> resultMap = Maps.newHashMap();
+
+        // 不存在该课程
+        if(null == workOrder){
+            resultMap.put("1","该课程不存在");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        // 该课程已经更改过一次
+        if(workOrder.getUpdateManulFlag().equals("0")){
+            resultMap.put("2","该课程已经更改过");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        // 该课程状态未进行变更
+        if(workOrder.getStatus() == makeUpCourseParam.getFishStatus()){
+            resultMap.put("3","该课程状态未进行变更");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
+
+        // 该课程状态未进行变更
+        if(null == courseSchedule){
+            resultMap.put("4","该课程不存在");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+        // 课程
+        courseSchedule.setStatus(makeUpCourseParam.getFishStatus());
+        courseSchedule.setUpdateTime(DateTime.now().toDate());
+
+        // 鱼卡
+        workOrder.setStatus(makeUpCourseParam.getFishStatus());
+        workOrder.setUpdateManulFlag("0");// 已经更新过
+        workOrder.setUpdateTime(new Date());
+        // 更新课程  鱼卡
+        workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
+
+        // 记录日志
+        workOrderLogService.saveWorkOrderLog(workOrder);
+
+        resultMap.put("0","更新成功");
+        return JsonResultModel.newJsonResultModel(resultMap);
+    }
+
 }

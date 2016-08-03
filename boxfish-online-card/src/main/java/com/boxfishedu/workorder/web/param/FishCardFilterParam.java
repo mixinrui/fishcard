@@ -17,4 +17,16 @@ public class FishCardFilterParam {
     private Date beginDateFormat;
     private Date endDateFormat;
     private Integer status;
+
+    private String teacherName;
+    private String createBeginDate;
+    private String createEndDate;
+    private Date createBeginDateFormat;
+    private Date createEndDateFormat;
+    /** desc asc **/
+    private String startTimeSort;
+    /** desc asc **/
+    private String actualStartTimeSort;
+    /** 课程类型 数组形式 **/
+    private String courseType;
 }
