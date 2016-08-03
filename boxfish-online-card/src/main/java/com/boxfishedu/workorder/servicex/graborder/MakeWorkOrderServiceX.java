@@ -211,9 +211,9 @@ public class MakeWorkOrderServiceX {
         }
         for (TeacherForm teacher : teacherForms) {
 
-            if (workOrderYESteacherFlag) {
+            if (!workOrderYESteacherFlag) {
                 List workOrderteacherList = getTeacherListByType(workOrderNOteacher, teacher.getTeacherType());
-                if(null !=null && workOrderteacherList.size()>0){
+                if(workOrderteacherList !=null && workOrderteacherList.size()>0){
                     map.put(teacher.getTeacherId(), workOrderteacherList);
                 }
             } else {
