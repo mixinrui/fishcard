@@ -121,6 +121,7 @@ public class MakeWorkOrderServiceX {
 
 
         if(null ==map || map.isEmpty()){
+            logger.info(":::::::::::MapIsNull");
             return;
         }
 
