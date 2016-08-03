@@ -69,6 +69,9 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         scheduleCourseInfo.setPublicDate(recommandCourseView.getPublicDate());
         scheduleCourseInfo.setThumbnail(recommandCourseRequester.getThumbNailPath(recommandCourseView));
 
+        /** 换课更新  换课时间  jiaozijun **/
+        workOrder.setUpdatetimeChangecourse(new Date());
+
         scheduleCourseInfoService.updateCourseIntoScheduleInfo(scheduleCourseInfo);
         workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
         workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,老课程[" + oldCourseName + "]");

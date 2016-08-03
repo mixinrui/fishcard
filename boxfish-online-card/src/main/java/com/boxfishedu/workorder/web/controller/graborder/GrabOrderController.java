@@ -2,6 +2,8 @@ package com.boxfishedu.workorder.web.controller.graborder;
 
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -10,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 抢单
@@ -26,6 +30,9 @@ public class GrabOrderController {
 
     @Autowired
     private MakeWorkOrderServiceX makeWorkOrderServiceX;
+
+    @Autowired
+    private MakeWorkOrderService makeWorkOrderService;
 
     @RequestMapping(value = "/{teacher_id}/workorderlist", method = RequestMethod.GET)
     public JsonResultModel getWorkOrderListByTeacherId(@PathVariable("teacher_id") Long teacherId) {
@@ -85,5 +92,13 @@ public class GrabOrderController {
         return new JsonResultModel();
     }
 
+
+
+
+    @RequestMapping(value = "/testnew", method = RequestMethod.GET)
+    public JsonResultModel testnew() {
+       List<WorkOrder> list =  makeWorkOrderService.findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween();
+        return new JsonResultModel();
+    }
 
 }

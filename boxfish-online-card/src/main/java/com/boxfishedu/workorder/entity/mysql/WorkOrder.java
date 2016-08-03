@@ -145,6 +145,10 @@ public class WorkOrder{
     @Column(name="update_manul_flag", length = 1)
     private String updateManulFlag;
 
+    @Column(name = "updatetime_changecourse", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatetimeChangecourse;
+
     @Override
     public String toString() {
         return "WorkOrder{" +
@@ -166,6 +170,7 @@ public class WorkOrder{
                 ", courseName='" + courseName + '\'' +
                 ", updateTime=" + updateTime +
                 ", updateMauulFlag=" + updateManulFlag +
+                ", updatetimeChangecourse=" + updatetimeChangecourse +
                 '}';
     }
 }
