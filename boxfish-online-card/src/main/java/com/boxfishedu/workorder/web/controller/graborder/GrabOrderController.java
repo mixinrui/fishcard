@@ -4,6 +4,7 @@ import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
+import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -33,6 +34,9 @@ public class GrabOrderController {
 
     @Autowired
     private MakeWorkOrderService makeWorkOrderService;
+
+    @Autowired
+    private CourseChangeServiceX courseChangeServiceX;
 
     @RequestMapping(value = "/{teacher_id}/workorderlist", method = RequestMethod.GET)
     public JsonResultModel getWorkOrderListByTeacherId(@PathVariable("teacher_id") Long teacherId) {
@@ -100,5 +104,18 @@ public class GrabOrderController {
        List<WorkOrder> list =  makeWorkOrderService.findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween();
         return new JsonResultModel();
     }
+
+
+    /**
+     * 方便测试测试  每天18:00 向教师发送 从现在开始  未来48+6小时内 变更课程的数量  的消息
+     * @return
+     */
+    @RequestMapping(value = "/testforcoursechange", method = RequestMethod.GET)
+    public JsonResultModel testforcoursechange() {
+        courseChangeServiceX.sendCourseChangeWorkOrders();
+        return new JsonResultModel();
+    }
+
+
 
 }

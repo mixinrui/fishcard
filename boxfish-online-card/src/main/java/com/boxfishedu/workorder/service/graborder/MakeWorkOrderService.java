@@ -121,21 +121,10 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
         Date date = new Date();
 
         Date begin  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*18);
-        Date end  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*24*2);
+        Date end  = DateUtil.addMinutes(DateUtil.parseTime(date,1),60*24*2);
 
         logger.info(":::::findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween:::From{[]}:::::To{[]}",DateUtil.Date2String(begin),DateUtil.Date2String(end));
         return workOrderJpaRepository.findByTeacherIdGreaterThanAndStatusAndSendflagccAndUpdatetimeChangecourseNotNullAndStartTimeBetween(0L, FishCardStatusEnum.TEACHER_ASSIGNED.getCode(),"1aaaa",begin,end);
-    }
-
-    public static void main(String[] args) {
-        Date date = new Date();
-
-        Date begin  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*18);
-        Date end  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*24*2);
-
-
-        System.out.print(begin);
-        System.out.print(end);
     }
 
 
