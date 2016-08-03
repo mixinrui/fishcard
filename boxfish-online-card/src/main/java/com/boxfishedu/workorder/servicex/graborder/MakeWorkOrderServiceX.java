@@ -130,6 +130,7 @@ public class MakeWorkOrderServiceX {
             logger.info("3333333333111111::::::::::::sendToTeahcerInfo [{}]::::::::::::::::::::::::::::::::", map);
 
         }catch (Exception e){
+            logger.error("lazyLoadError");
             e.printStackTrace();
         }
 
