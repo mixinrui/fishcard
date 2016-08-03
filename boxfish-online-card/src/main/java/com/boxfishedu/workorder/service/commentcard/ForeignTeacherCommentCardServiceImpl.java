@@ -145,6 +145,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("调用查询48小时未点评的外教接口");
         List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList2();
         for (CommentCard commentCard: list) {
+            commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
             commentCard.setUpdateTime(dateNow);
             com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
             commentCard.setService(serviceTemp);

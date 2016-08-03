@@ -56,6 +56,8 @@ public class StudentComment2TeacherServiceX {
         }
         Date dateNow = new Date();
         commentCard.setStudentCommentTeacherTime(dateNow);
+        commentCard.setStatus(CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode());
+        commentCard.setTeacherReadFlag(0);
         return commentCardTeacherAppService.save(commentCard);
     }
 }
