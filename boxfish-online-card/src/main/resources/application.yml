@@ -93,17 +93,17 @@ spring:
     username: service
     password: Box123456
 
-#  mongo:
-#    serverAddress: 101.201.239.116:27017
-#    dbName: fishcard
-#    username: root
-#    password: Boxfish2016
-
   mongo:
-    serverAddress: 123.56.13.168:27017
+    serverAddress: 101.201.239.116:27017
     dbName: fishcard
     username: root
     password: Boxfish2016
+
+#  mongo:
+#    serverAddress: 123.56.13.168:27017
+#    dbName: fishcard
+#    username: root
+#    password: Boxfish2016
 
   redis:
     hostName: 127.0.0.1
@@ -111,8 +111,8 @@ spring:
     port: 6379
     timeout: 10000
   rabbitmq:
-    address: 101.201.239.116:5672
-#    address: 101.201.237.252:5672
+#    address: 101.201.239.116:5672
+    address: 101.201.237.252:5672
     username: boxfish
     password: boxfish
     virtualHost: local

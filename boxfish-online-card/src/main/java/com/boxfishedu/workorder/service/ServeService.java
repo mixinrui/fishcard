@@ -1,14 +1,15 @@
 package com.boxfishedu.workorder.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.boxfishedu.mall.domain.order.OrderForm;
+import com.boxfishedu.mall.domain.product.ProductCombo;
+import com.boxfishedu.mall.domain.product.ProductComboDetail;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.exception.BoxfishException;
-import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BoxfishException;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -18,11 +19,13 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.ResponseCourseView;
 import com.boxfishedu.workorder.web.view.order.OrderDetailView;
 import com.boxfishedu.workorder.web.view.order.ProductSKUView;
 import com.boxfishedu.workorder.web.view.order.ServiceSKU;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -268,10 +271,56 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         courseScheduleService.save(courseSchedule);
     }
 
-    //根据订单生成服务列表
+    /**
+     * 订单转换为服务
+     * TODO 志浩修改了订单结构
+     * @param orderView
+     * @throws Exception
+     */
     private void order2Service(OrderForm orderView) throws Exception {
-        //订单中的商品列表
-        Set<OrderDetailView> orderProducts = orderView.getOrderDetails();
+        //订单中的商品列表 TODO
+        String orderRemark = orderView.getOrderRemark();
+        ProductCombo productCombo = new ObjectMapper().readValue(orderRemark, ProductCombo.class);
+        List<ProductComboDetail> comboDetails = productCombo.getComboDetails();
+
+        comboDetails.forEach(c -> );
+
+        List<OrderDetailView> orderProducts = null;
+        //List<OrderDetailView> orderProducts = orderView.getOrderDetails();
+        Iterator<OrderDetailView> productsIterator = orderProducts.iterator();
+        List<Service> services = new ArrayList<>();
+        //服务信息容器
+        Map<Long, Service> serviceHashMap = new HashMap<>();
+
+        //遍历订单中的商品列表
+        while (productsIterator.hasNext()) {
+            //获取其中一个商品
+            OrderDetailView orderDetailView = productsIterator.next();
+            ProductSKUView productSKUView = skuDesc2ProductHasSKUViews(orderDetailView);
+            //如果存在相同类型的产品,则叠加
+            if (null != serviceHashMap.get(productSKUView.getId())) {
+                Service service = serviceHashMap.get(productSKUView.getId());
+                //增加有效期,数量
+                setServiceExistedSpecs(service, orderDetailView, productSKUView);
+            } else {
+                Service service = getServiceByOrderView(orderView, orderDetailView, productSKUView);
+                services.add(service);
+                serviceHashMap.put(productSKUView.getId(), service);
+            }
+        }
+        // service的开始日期,结束日期设置
+        addValidTimeForServices(services);
+        save(services);
+        for (Service service:services){
+            logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
+        }
+    }
+
+    //根据订单生成服务列表
+    private void order2Service1(OrderForm orderView) throws Exception {
+        //订单中的商品列表 TODO
+        List<OrderDetailView> orderProducts = null;
+                //List<OrderDetailView> orderProducts = orderView.getOrderDetails();
         Iterator<OrderDetailView> productsIterator = orderProducts.iterator();
         List<Service> services = new ArrayList<>();
         //服务信息容器
@@ -329,7 +378,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         ServiceSKU serviceSKU = productSKUView.getServiceSKU();
         Service service = new Service();
         service.setStudentId(orderView.getUserId());
-        service.setStudentName(orderView.getUserName());
+        // TODO 没有username
+//        service.setStudentName(orderView.getUserName());
         service.setOrderId(orderView.getId());
         if (productSKUView.getSkuCycle() == -1) {
             service.setOriginalAmount(productSKUView.getSkuAmount());
