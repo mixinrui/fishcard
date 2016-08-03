@@ -73,6 +73,7 @@ spring.datasource:
   max-idle: 20
   connection-timeout: 5000
   autoReconnect: true
+  #log character "Slow Query Report"
   jdbc-interceptors: SlowQueryReport(threshold=1000)
 
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
