@@ -52,7 +52,12 @@ spring:
   rabbitmq:
 #    host: 192.168.77.91
 #    port: 5672
-    address: 101.201.239.116:5672
+#    address: 101.201.239.116:5672
+#    username: boxfish
+#    password: boxfish
+#    virtualHost: local
+    address: 101.201.237.252
+#    port: 5672
     username: boxfish
     password: boxfish
     virtualHost: local
