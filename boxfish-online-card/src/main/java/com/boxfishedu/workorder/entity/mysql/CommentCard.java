@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -139,5 +141,26 @@ public class CommentCard {
         return commentCard;
     }
 
+    public String[] getStudentCommentGoodTagCode() {
+        if(StringUtils.isNotEmpty(studentCommentGoodTagCode)) {
+            return studentCommentGoodTagCode.split(",");
+        }
+        return null;
+    }
+
+    public void setStudentCommentGoodTagCode(List studentCommentGoodTagCode) {
+        this.studentCommentGoodTagCode = String.join(",", studentCommentGoodTagCode);
+    }
+
+    public String[] getStudentCommentBadTagCode() {
+        if(StringUtils.isNotEmpty(studentCommentBadTagCode)) {
+            return studentCommentBadTagCode.split(",");
+        }
+        return null;
+    }
+
+    public void setStudentCommentBadTagCode(List studentCommentBadTagCode) {
+        this.studentCommentBadTagCode = String.join(",", studentCommentBadTagCode);
+    }
 
 }

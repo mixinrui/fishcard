@@ -44,11 +44,11 @@ public class StudentComment2TeacherServiceX {
             throw new BusinessException("不存在对应的点评卡");
         }
         if(!CollectionUtils.isEmpty(student2TeacherCommentParam.getForGoodReviews())){
-            commentCard.setStudentCommentGoodTagCode(JacksonUtil.toJSon(student2TeacherCommentParam.getForGoodReviews()));
+            commentCard.setStudentCommentGoodTagCode(student2TeacherCommentParam.getForGoodReviews());
             teacherStudentCommentCardRequester.sendStudentComment2Teacher(student2TeacherCommentParam);
         }
         else if(!CollectionUtils.isEmpty(student2TeacherCommentParam.getForBadReviews())){
-            commentCard.setStudentCommentBadTagCode(JacksonUtil.toJSon(student2TeacherCommentParam.getForBadReviews()));
+            commentCard.setStudentCommentBadTagCode(student2TeacherCommentParam.getForBadReviews());
             teacherStudentCommentCardRequester.sendStudentComment2Teacher(student2TeacherCommentParam);
         }
         else{
