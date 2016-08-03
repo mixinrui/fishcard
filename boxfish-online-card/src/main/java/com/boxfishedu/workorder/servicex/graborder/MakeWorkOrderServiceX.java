@@ -236,7 +236,7 @@ public class MakeWorkOrderServiceX {
 
                 if (workOrder.size() > 0) {
                     List workOrderteacherList = getTeacherListByType(workOrder, teacher.getTeacherType());
-                    if(null !=null && workOrderteacherList.size()>0){
+                    if(workOrderteacherList !=null && workOrderteacherList.size()>0){
                         map.put(teacher.getTeacherId(),workOrderteacherList);
                     }
 
