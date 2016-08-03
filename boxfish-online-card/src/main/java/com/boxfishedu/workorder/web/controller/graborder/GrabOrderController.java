@@ -27,11 +27,21 @@ public class GrabOrderController {
     @Autowired
     private MakeWorkOrderServiceX makeWorkOrderServiceX;
 
+    /**
+     * 根据老师获取抢单列表
+     * @param teacherId
+     * @return
+     */
     @RequestMapping(value = "/{teacher_id}/workorderlist", method = RequestMethod.GET)
     public JsonResultModel getWorkOrderListByTeacherId(@PathVariable("teacher_id") Long teacherId) {
         return grabOrderServiceX.getWorkOrderListByTeacherId(teacherId);
     }
 
+    /**
+     * 抢单接口
+     * @param grabOrderView
+     * @return
+     */
     @RequestMapping(value = "/graboneorder", method = RequestMethod.POST)
     public JsonResultModel grabOrder(@RequestBody GrabOrderView grabOrderView) {
         logger.info("::::::::::TeacherOnLine Post params::::::::::teacherId="+grabOrderView.getTeacherId()+"&&&&workOrderId="+grabOrderView.getWorkOrderId()+"::::");
