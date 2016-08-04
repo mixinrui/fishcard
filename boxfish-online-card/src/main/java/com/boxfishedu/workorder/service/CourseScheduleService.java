@@ -159,6 +159,10 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
                 userId, FishCardStatusEnum.COMPLETED.getCode(), pageable);
     }
 
+    public Page<CourseSchedule> findByStudentId(Long studentId, Pageable pageable) {
+        return courseScheduleRepository.findByStudentId(studentId, pageable);
+    }
+
     public List<TeacherAlterView> getOutNumOfTeacher(Date beginDate, Date endDate){
         String sql = "select new com.boxfishedu.workorder.web.view.fishcard.TeacherAlterView" +
                 "(count(cs.id),cs.roleId)" +

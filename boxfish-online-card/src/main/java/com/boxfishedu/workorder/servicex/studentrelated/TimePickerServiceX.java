@@ -1,10 +1,9 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
@@ -22,6 +21,7 @@ import com.boxfishedu.workorder.servicex.bean.StudentCourseSchedule;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
@@ -33,9 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -306,26 +304,7 @@ public class TimePickerServiceX {
     public JsonResultModel getByStudentIdAndDateRange(Long studentId, DateRangeForm dateRangeForm) {
         List<CourseSchedule> courseSchedules =
                 courseScheduleService.findByStudentIdAndClassDateBetween(studentId, dateRangeForm);
-
-        Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
-        courseSchedules.forEach(courseSchedule -> {
-            String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
-            List<StudentCourseSchedule> studentCourseScheduleList = courseScheduleMap.get(date);
-            if (studentCourseScheduleList == null) {
-                studentCourseScheduleList = Lists.newArrayList();
-                courseScheduleMap.put(date, studentCourseScheduleList);
-            }
-            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule));
-        });
-
-        List<Map<String, Object>> result = Lists.newArrayList();
-        courseScheduleMap.forEach((key, val) -> {
-            Map<String, Object> beanMap = Maps.newHashMap();
-            beanMap.put("day", key);
-            beanMap.put("dailyScheduleTime", val);
-            result.add(beanMap);
-        });
-        return JsonResultModel.newJsonResultModel(result);
+        return JsonResultModel.newJsonResultModel(adapterCourseScheduleList(courseSchedules));
     }
 
     public JsonResultModel getFinishCourseSchedulePage(Long userId, Pageable pageable) {
@@ -368,9 +347,38 @@ public class TimePickerServiceX {
         studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
         studentCourseSchedule.setTime(timeSlots.getStartTime());
         studentCourseSchedule.setWorkOrderId(courseSchedule.getWorkorderId());
+        studentCourseSchedule.setStatus(courseSchedule.getStatus());
         if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
             studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()));
         }
         return studentCourseSchedule;
+    }
+
+    public JsonResultModel getCourseSchedulePage(Long studentId, Pageable pageable) {
+        Page<CourseSchedule> page = courseScheduleService.findByStudentId(studentId, pageable);
+        List<Map<String, Object>> result = adapterCourseScheduleList(page.getContent());
+        return JsonResultModel.newJsonResultModel(new PageImpl<>(result, pageable, page.getTotalElements()));
+    }
+
+    private List<Map<String, Object>> adapterCourseScheduleList(List<CourseSchedule> courseScheduleList) {
+        Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
+        courseScheduleList.forEach(courseSchedule -> {
+            String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
+            List<StudentCourseSchedule> studentCourseScheduleList = courseScheduleMap.get(date);
+            if (studentCourseScheduleList == null) {
+                studentCourseScheduleList = Lists.newArrayList();
+                courseScheduleMap.put(date, studentCourseScheduleList);
+            }
+            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule));
+        });
+
+        List<Map<String, Object>> result = Lists.newArrayList();
+        courseScheduleMap.forEach((key, val) -> {
+            Map<String, Object> beanMap = Maps.newHashMap();
+            beanMap.put("day", key);
+            beanMap.put("dailyScheduleTime", val);
+            result.add(beanMap);
+        });
+        return result;
     }
 }
