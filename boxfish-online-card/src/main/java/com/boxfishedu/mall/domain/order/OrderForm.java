@@ -54,7 +54,4 @@ public class OrderForm extends BaseEntity {
     @Transient
     private List<OrderDetail> orderDetails;
 
-    @Transient
-    private List<OrderLog> orderLogs;
-
 }
