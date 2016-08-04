@@ -70,4 +70,34 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
         };
         return entityQuery.list();
     }
+
+    @Override
+    public Page<CommentCard> queryTeacherAnsweredList(Pageable pageable,Long teacherId) {
+        EntityQuery entityQuery = new EntityQuery<CommentCard>(entityManager,pageable) {
+            @Override
+            public Predicate[] predicates() {
+                List<Predicate> predicateList = Lists.newArrayList();
+                predicateList.add(criteriaBuilder.equal(root.get("teacherId"),teacherId));
+                predicateList.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("status"),CommentCardStatus.ANSWERED.getCode()),
+                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())));
+                return predicateList.toArray(new Predicate[predicateList.size()]);
+            }
+        };
+        return entityQuery.page();
+    }
+
+    @Override
+    public Page<CommentCard> queryTeacherUnAnsweredList(Pageable pageable,Long teacherId) {
+        EntityQuery entityQuery = new EntityQuery<CommentCard>(entityManager,pageable) {
+            @Override
+            public Predicate[] predicates() {
+                List<Predicate> predicateList = Lists.newArrayList();
+                predicateList.add(criteriaBuilder.equal(root.get("teacherId"),teacherId));
+                predicateList.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("status"),CommentCardStatus.ASSIGNED_TEACHER.getCode()),
+                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME.getCode())));
+                return predicateList.toArray(new Predicate[predicateList.size()]);
+            }
+        };
+        return entityQuery.page();
+    }
 }

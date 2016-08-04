@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
@@ -26,11 +27,24 @@ public class CommentTeacherAppController {
     @Autowired
     private CommonServeServiceX commonServeServiceX;
 
+    @Autowired
+    private CommentCardTeacherAppService commentCardTeacherAppService;
+
     @RequestMapping(value = "/teacher/{teacher_id}/list", method = RequestMethod.GET)
     public JsonResultModel list(@PathVariable("teacher_id") long teacherId,Long userId, Pageable pageable){
         commonServeServiceX.checkToken(teacherId,userId);
         Page<CommentCard> commentCardPage= commentTeacherAppServiceX.findByTeacherIdOrderByAssignTeacherTimeDesc(teacherId,pageable);
         return JsonResultModel.newJsonResultModel(commentCardPage);
+    }
+
+    @RequestMapping(value = "/teacher/answer_list", method = RequestMethod.GET)
+    public JsonResultModel teacherAnswerList(Pageable pageable,Long teacherId){
+        return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherAnswerList(pageable,teacherId));
+    }
+
+    @RequestMapping(value = "/teacher/unanswer_list", method = RequestMethod.GET)
+    public JsonResultModel teacherUnAnswerList(Pageable pageable,Long teacherId){
+        return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherUnanswerList(pageable,teacherId));
     }
 
     @RequestMapping(value = "/card/{card_id}/detail", method = RequestMethod.GET)

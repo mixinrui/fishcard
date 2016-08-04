@@ -30,4 +30,11 @@ public class CommentCardTeacherAppService {
         return commentCardJpaRepository.save(commentCard);
     }
 
+    public Page<CommentCard> queryTeacherAnswerList(Pageable pageable, Long teacherId){
+        return commentCardJpaRepository.queryTeacherAnsweredList(pageable,teacherId);
+    }
+
+    public Page<CommentCard> queryTeacherUnanswerList(Pageable pageable, Long teacherId){
+        return commentCardJpaRepository.queryTeacherUnAnsweredList(pageable,teacherId);
+    }
 }
