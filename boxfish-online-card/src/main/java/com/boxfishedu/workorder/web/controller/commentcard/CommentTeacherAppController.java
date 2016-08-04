@@ -38,13 +38,13 @@ public class CommentTeacherAppController {
     }
 
     @RequestMapping(value = "/teacher/answer_list", method = RequestMethod.GET)
-    public JsonResultModel teacherAnswerList(Pageable pageable,Long teacherId){
-        return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherAnswerList(pageable,teacherId));
+    public JsonResultModel teacherAnswerList(Pageable pageable,Long userId){
+        return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherAnswerList(pageable,userId));
     }
 
     @RequestMapping(value = "/teacher/unanswer_list", method = RequestMethod.GET)
-    public JsonResultModel teacherUnAnswerList(Pageable pageable,Long teacherId){
-        return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherUnanswerList(pageable,teacherId));
+    public JsonResultModel teacherUnAnswerList(Pageable pageable,Long userId){
+        return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherUnanswerList(pageable,userId));
     }
 
     @RequestMapping(value = "/card/{card_id}/detail", method = RequestMethod.GET)
