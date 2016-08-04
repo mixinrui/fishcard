@@ -146,6 +146,8 @@ public class GrabOrderServiceX {
                     int updateCount = grabOrderService.updateTestGrab(grabOrderView);
 
                     if(updateCount!=1){
+                        //抢单失败
+                        grabOrderService.setFlagFailAndTeacherId(grabOrderView);
                         jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
                         jsonObject.put("code","1");
                         return JsonResultModel.newJsonResultModel(jsonObject);
