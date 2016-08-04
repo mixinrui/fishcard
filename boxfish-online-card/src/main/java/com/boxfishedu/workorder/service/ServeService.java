@@ -283,14 +283,17 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         ProductCombo productCombo = new ObjectMapper().readValue(orderRemark, ProductCombo.class);
         List<ProductComboDetail> comboDetails = productCombo.getComboDetails();
 
-        comboDetails.forEach(c -> );
+        List<Service> services = new ArrayList<>();
+        //服务信息容器
+        Map<Long, Service> serviceHashMap = new HashMap<>();
+        comboDetails.forEach( productComboDetail -> {
+
+        });
 
         List<OrderDetailView> orderProducts = null;
         //List<OrderDetailView> orderProducts = orderView.getOrderDetails();
         Iterator<OrderDetailView> productsIterator = orderProducts.iterator();
-        List<Service> services = new ArrayList<>();
-        //服务信息容器
-        Map<Long, Service> serviceHashMap = new HashMap<>();
+
 
         //遍历订单中的商品列表
         while (productsIterator.hasNext()) {
