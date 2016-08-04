@@ -142,13 +142,7 @@ public class CourseChangeServiceX {
             JSONObject jo = new JSONObject();
             jo.put("type", MessagePushTypeEnum.SEND_TEASTU_ASSESS_TYPE.toString());
             jo.put("count", null == map.get(key) ? "0" : map.get(key).size());
-
-            try {
-                logger.info(":::::::sendToTecherContent::::pushTitle:[{}]:size[{}]", pushTitle, map.get(key).size());
-            } catch (Exception e) {
-                logger.error("::::::::dataError::::::::");
-            }
-
+            logger.info(":::::::sendToTecherContent::::pushTitle:[{}]:size[{}]", pushTitle, map.get(key).size());
             map1.put("data", jo);
 
             list.add(map1);
