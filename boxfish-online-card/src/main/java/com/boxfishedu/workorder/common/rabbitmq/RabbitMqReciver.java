@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
+import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
@@ -56,7 +57,13 @@ public class RabbitMqReciver {
     private FishCardStatusFinderServiceX fishCardStatusFinderServiceX;
 
     @Autowired
+
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
+
+    @Autowired
+    private CourseChangeServiceX courseChangeServiceX;
+
+
     // 抢单服务层
     @Autowired
     private MakeWorkOrderServiceX makeWorkOrderServiceX;
@@ -138,10 +145,12 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY100message");
                 logger.info("=========>清理抢单数据(中教)");
                 makeWorkOrderServiceX.clearGrabData();
-            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGN.value()) {
+            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY101message");
                 logger.info("=========>清理抢单数据(外教)");
                 makeWorkOrderServiceX.clearGrabData();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.COURSE_CHANGER_WORKORDER.value()){
+                courseChangeServiceX.sendCourseChangeWorkOrders();
             }
             else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
                 logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
