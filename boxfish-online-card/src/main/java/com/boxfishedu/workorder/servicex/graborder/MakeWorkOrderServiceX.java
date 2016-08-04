@@ -394,6 +394,7 @@ public class MakeWorkOrderServiceX {
                 wgh.setUpdateTime(wg.getUpdateTime());
                 wgh.setCreateTime(wg.getCreateTime());
                 wgh.setStartTime(wg.getStartTime());
+                wgh.setFlag(wg.getFlag());
                 wgh.setRealCreateTime(new Date());
                 workOrderGrabHistoryList.add(wgh);
             }
