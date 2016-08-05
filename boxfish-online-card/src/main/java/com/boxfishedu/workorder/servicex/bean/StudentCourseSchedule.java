@@ -31,6 +31,8 @@ public class StudentCourseSchedule implements Serializable {
 
     private Long workOrderId;
 
+    private Integer status;
+
     public String getCourseType() {
         if(courseView == null || CollectionUtils.isEmpty(courseView.getCourseType())) {
             return courseType;

@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.persistence.LockModeType;
+import javax.persistence.OrderBy;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -76,4 +77,6 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     @Modifying
     @Query("update CourseSchedule o set o.teacherId = ?1,o.status=?3 where o.workorderId = ?2 ")
     int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId, Integer status);
+
+    Page<CourseSchedule> findByStudentId(Long studentId, Pageable pageable);
 }
