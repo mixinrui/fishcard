@@ -48,6 +48,18 @@ public class FishCardQueryServiceX {
         return JsonResultModel.newJsonResultModel(page);
     }
 
+
+    /**
+     * Excel导出
+     * @param fishCardFilterParam
+     * @param pageable
+     * @return
+     */
+    public List<WorkOrder>  listFishCardsByUnlimitedUserCondForExcel(FishCardFilterParam fishCardFilterParam,Pageable pageable){
+        workOrderService.processDateParam(fishCardFilterParam);
+        return fishCardQueryService.filterFishCards(fishCardFilterParam,pageable);
+    }
+
     //带用户的访问.这个接口在规划管理的页面做出来后会使用
     public JsonResultModel listFishCardsByCond(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         workOrderService.processFilterParam(fishCardFilterParam, false);
