@@ -38,7 +38,14 @@ public class MethodInvokeInterceptor {
         Object[] args = joinPoint.getArgs();
         if (null != args && args.length > 0) {
             for (int i = 0; i < args.length; i++) {
-                if(null==args[i]||ClassTypeJudge.isBaseDataType(args[i].getClass())){
+
+                if(null!=args[i] && args[i].getClass().getName().toLowerCase().contains("response")){
+                    /**
+                     * 防止  传入参数HttpServletResponse  logger.info response  flush两次
+                     *
+                     * java.lang.IllegalStateException :getWriter() has already been called for this response
+                     */
+                }else if(null==args[i]||ClassTypeJudge.isBaseDataType(args[i].getClass()) ){
                     logger.debug(">>>参数[{}]: {}", i, args[i]);
                 }
                 else {
