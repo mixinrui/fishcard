@@ -417,6 +417,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOrderId(orderView.getId());
         service.setOriginalAmount(productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
+        // 由于志浩那不再传递这个值,商量之后这个地方取默认值1
+        service.setComboCycle(ProductComboDetail.DEFAULT_COMBO_CYCLE);
         service.setSkuId(productComboDetail.getComboId());
         service.setRoleId(productComboDetail.getComboId().intValue());
         service.setCreateTime(new Date());
