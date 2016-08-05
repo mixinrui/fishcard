@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -42,11 +44,21 @@ StudentAppRelatedController {
         return jsonResultModel;
     }
 
-    //    @Cacheable(value = "teacher_schedule_assigned", key = "T(java.util.Objects).hash(#studentId,#dateIntervalView)")
     @RequestMapping(value = "{student_Id}/schedule/month", method = RequestMethod.GET)
     public JsonResultModel courseScheduleList(@PathVariable("student_Id") Long studentId,Long userId) {
         commonServeServiceX.checkToken(studentId,userId);
         return timePickerServiceX.getByStudentIdAndDateRange(studentId, DateUtil.createDateRangeForm());
+    }
+
+
+    @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
+    public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
+                                              @PageableDefault(
+                                                      value = 15,
+                                                      sort = {"classDate", "timeSlotId"},
+                                                      direction = Sort.Direction.DESC) Pageable pageable) {
+        commonServeServiceX.checkToken(studentId,userId);
+        return timePickerServiceX.getCourseSchedulePage(studentId, pageable);
     }
 
 
@@ -58,12 +70,18 @@ StudentAppRelatedController {
     }
 
     @RequestMapping(value = "schedule/finish/page")
-    public JsonResultModel getFinishCourseSchedulePage(Long userId, Pageable pageable) {
+    public JsonResultModel getFinishCourseSchedulePage(Long userId, @PageableDefault(
+                                                        value = 10,
+                                                        sort = {"classDate", "timeSlotId"},
+                                                        direction = Sort.Direction.DESC) Pageable pageable) {
         return timePickerServiceX.getFinishCourseSchedulePage(userId, pageable);
     }
 
     @RequestMapping(value = "schedule/unfinish/page")
-    public JsonResultModel getUnFinishCourseSchedulePage(Long userId, Pageable pageable) {
+    public JsonResultModel getUnFinishCourseSchedulePage(Long userId, @PageableDefault(
+                                                        value = 10,
+                                                        sort = {"classDate", "timeSlotId"},
+                                                        direction = Sort.Direction.DESC) Pageable pageable) {
         return timePickerServiceX.getUnFinishCourseSchedulePage(userId, pageable);
     }
 }

@@ -1,14 +1,16 @@
 package com.boxfishedu.workorder.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.boxfishedu.mall.domain.order.OrderDetail;
+import com.boxfishedu.mall.domain.order.OrderForm;
+import com.boxfishedu.mall.domain.product.ProductCombo;
+import com.boxfishedu.mall.domain.product.ProductComboDetail;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.exception.BoxfishException;
-import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BoxfishException;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -18,11 +20,14 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.ResponseCourseView;
 import com.boxfishedu.workorder.web.view.order.OrderDetailView;
 import com.boxfishedu.workorder.web.view.order.ProductSKUView;
-import com.boxfishedu.workorder.web.view.order.ServiceSKU;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -63,6 +69,11 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     private ScheduleCourseInfoService scheduleCourseInfoService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    static ObjectMapper objectMapper = new ObjectMapper()
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)       // 属性为空（“”）或者为 NULL 都不序列化
+            .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     public boolean isServiceExists(Service service) {
         return (null != service);
@@ -268,31 +279,36 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         courseScheduleService.save(courseSchedule);
     }
 
-    //根据订单生成服务列表
+    /**
+     * 订单转换为服务
+     * TODO 志浩修改了订单结构
+     * @param orderView
+     * @throws Exception
+     */
     private void order2Service(OrderForm orderView) throws Exception {
-        //订单中的商品列表
-        Set<OrderDetailView> orderProducts = orderView.getOrderDetails();
-        Iterator<OrderDetailView> productsIterator = orderProducts.iterator();
+        //订单中的商品列表 TODO
+        String orderRemark = orderView.getOrderRemark();
+        List<OrderDetail> orderDetails = orderView.getOrderDetails();
+
+        ProductCombo productCombo = objectMapper.readValue(orderRemark, ProductCombo.class);
         List<Service> services = new ArrayList<>();
         //服务信息容器
         Map<Long, Service> serviceHashMap = new HashMap<>();
+        orderDetails.forEach( orderDetail -> {
+            try {
+                ProductComboDetail productInfo = objectMapper.readValue(orderDetail.getProductInfo(), ProductComboDetail.class);
+                if (null != serviceHashMap.get(productInfo.getComboId())) {
+                    Service service = serviceHashMap.get(productCombo.getId());
+                    //增加有效期,数量
+                    setServiceExistedSpecs(service, productInfo, orderDetail);
+                } else {
+                    Service service = getServiceByOrderView(orderView, productInfo, orderDetail);
+                    services.add(service);
+                    serviceHashMap.put(productInfo.getComboId(), service);
+                }
+            } catch (Exception e) {}
+        });
 
-        //遍历订单中的商品列表
-        while (productsIterator.hasNext()) {
-            //获取其中一个商品
-            OrderDetailView orderDetailView = productsIterator.next();
-            ProductSKUView productSKUView = skuDesc2ProductHasSKUViews(orderDetailView);
-            //如果存在相同类型的产品,则叠加
-            if (null != serviceHashMap.get(productSKUView.getId())) {
-                Service service = serviceHashMap.get(productSKUView.getId());
-                //增加有效期,数量
-                setServiceExistedSpecs(service, orderDetailView, productSKUView);
-            } else {
-                Service service = getServiceByOrderView(orderView, orderDetailView, productSKUView);
-                services.add(service);
-                serviceHashMap.put(productSKUView.getId(), service);
-            }
-        }
         // service的开始日期,结束日期设置
         addValidTimeForServices(services);
         save(services);
@@ -300,6 +316,40 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
         }
     }
+
+    //根据订单生成服务列表
+//    private void order2Service1(OrderForm orderView) throws Exception {
+//        //订单中的商品列表 TODO
+//        List<OrderDetailView> orderProducts = null;
+//                //List<OrderDetailView> orderProducts = orderView.getOrderDetails();
+//        Iterator<OrderDetailView> productsIterator = orderProducts.iterator();
+//        List<Service> services = new ArrayList<>();
+//        //服务信息容器
+//        Map<Long, Service> serviceHashMap = new HashMap<>();
+//
+//        //遍历订单中的商品列表
+//        while (productsIterator.hasNext()) {
+//            //获取其中一个商品
+//            OrderDetailView orderDetailView = productsIterator.next();
+//            ProductSKUView productSKUView = skuDesc2ProductHasSKUViews(orderDetailView);
+//            //如果存在相同类型的产品,则叠加
+//            if (null != serviceHashMap.get(productSKUView.getId())) {
+//                Service service = serviceHashMap.get(productSKUView.getId());
+//                //增加有效期,数量
+//                setServiceExistedSpecs(service, orderDetailView, productSKUView);
+//            } else {
+//                Service service = getServiceByOrderView(orderView, orderDetailView, productSKUView);
+//                services.add(service);
+//                serviceHashMap.put(productSKUView.getId(), service);
+//            }
+//        }
+//        // service的开始日期,结束日期设置
+//        addValidTimeForServices(services);
+//        save(services);
+//        for (Service service:services){
+//            logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
+//        }
+//    }
 
     private ProductSKUView skuDesc2ProductHasSKUViews(OrderDetailView orderDetailView) throws Exception {
         return JSONObject.parseObject(orderDetailView.getProductInfo(), ProductSKUView.class);
@@ -310,40 +360,67 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             service.setStartTime(Calendar.getInstance().getTime());
             Calendar calendar = Calendar.getInstance();
             //service的validate day来自sku的validate day
-            calendar.add(Calendar.DAY_OF_YEAR, service.getValidityDay());
+            // 暂时没有validatyDay这个字段了
+//            calendar.add(Calendar.DAY_OF_YEAR, service.getValidityDay());
             service.setEndTime(calendar.getTime());
             logger.info("订单[{}]生成服务类型[{}]成功]", service.getOrderId(), service.getSkuName());
         }
     }
 
-    private void setServiceExistedSpecs(Service service, OrderDetailView orderDetailView
-            , ProductSKUView productSKUView) {
-        ServiceSKU serviceSKU = productSKUView.getServiceSKU();
-        service.setOriginalAmount(service.getOriginalAmount() + orderDetailView.getAmount());
+//    private void setServiceExistedSpecs(Service service, OrderDetailView orderDetailView
+//            , ProductSKUView productSKUView) {
+//        ServiceSKU serviceSKU = productSKUView.getServiceSKU();
+//        service.setOriginalAmount(service.getOriginalAmount() + orderDetailView.getAmount());
+//        service.setAmount(service.getOriginalAmount());
+//        service.setValidityDay(service.getValidityDay() + serviceSKU.getValidDay());
+//    }
+
+    private void setServiceExistedSpecs(Service service, ProductComboDetail productComboDetail, OrderDetail orderDetail) {
+        service.setOriginalAmount(service.getOriginalAmount() + productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
-        service.setValidityDay(service.getValidityDay() + serviceSKU.getValidDay());
+        // TODO 长期有效service.getValidityDay() + serviceSKU.getValidDay()
+        service.setValidityDay(365);
     }
 
-    private Service getServiceByOrderView(OrderForm orderView, OrderDetailView orderDetailView,
-                                          ProductSKUView productSKUView) throws BoxfishException {
-        ServiceSKU serviceSKU = productSKUView.getServiceSKU();
+
+//    private Service getServiceByOrderView(OrderForm orderView, OrderDetailView orderDetailView,
+//                                          ProductSKUView productSKUView) throws BoxfishException {
+//        ServiceSKU serviceSKU = productSKUView.getServiceSKU();
+//        Service service = new Service();
+//        service.setStudentId(orderView.getUserId());
+//        // TODO 没有username
+////        service.setStudentName(orderView.getUserName());
+//        service.setOrderId(orderView.getId());
+//        if (productSKUView.getSkuCycle() == -1) {
+//            service.setOriginalAmount(productSKUView.getSkuAmount());
+//        } else {
+//            service.setOriginalAmount(orderDetailView.getAmount() * productSKUView.getSkuAmount() * productSKUView.getSkuCycle());
+//        }
+//        service.setAmount(service.getOriginalAmount());
+//        service.setAmount(service.getOriginalAmount());
+//        service.setValidityDay(serviceSKU.getValidDay());
+//        service.setSkuId(Long.parseLong(serviceSKU.getServiceType()));
+//        service.setRoleId(Integer.parseInt(serviceSKU.getServiceType()));
+//        service.setSkuName(serviceSKU.getSkuName());
+//        service.setComboCycle(productSKUView.getSkuCycle());
+//        service.setCountInMonth(productSKUView.getSkuAmount());
+//        service.setCreateTime(new Date());
+//        service.setOrderCode(orderView.getOrderCode());
+//        service.setCoursesSelected(0);
+//        return service;
+//    }
+
+
+    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail, OrderDetail orderDetail) throws BoxfishException {
         Service service = new Service();
         service.setStudentId(orderView.getUserId());
-        service.setStudentName(orderView.getUserName());
         service.setOrderId(orderView.getId());
-        if (productSKUView.getSkuCycle() == -1) {
-            service.setOriginalAmount(productSKUView.getSkuAmount());
-        } else {
-            service.setOriginalAmount(orderDetailView.getAmount() * productSKUView.getSkuAmount() * productSKUView.getSkuCycle());
-        }
+        service.setOriginalAmount(productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
-        service.setAmount(service.getOriginalAmount());
-        service.setValidityDay(serviceSKU.getValidDay());
-        service.setSkuId(Long.parseLong(serviceSKU.getServiceType()));
-        service.setRoleId(Integer.parseInt(serviceSKU.getServiceType()));
-        service.setSkuName(serviceSKU.getSkuName());
-        service.setComboCycle(productSKUView.getSkuCycle());
-        service.setCountInMonth(productSKUView.getSkuAmount());
+        // 由于志浩那不再传递这个值,商量之后这个地方取默认值1
+        service.setComboCycle(ProductComboDetail.DEFAULT_COMBO_CYCLE);
+        service.setSkuId(productComboDetail.getComboId());
+        service.setRoleId(productComboDetail.getComboId().intValue());
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);
