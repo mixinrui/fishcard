@@ -55,22 +55,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCard.setUpdateTime(dateNow);
         commentCard.setAssignTeacherCount(0);
         commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
-        ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
+        CommentCard temp = commentCardJpaRepository.save(commentCard);
+        ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(temp);
         logger.info("向师生运营发生消息,通知分配外教进行点评...");
         rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
-        return commentCardJpaRepository.save(commentCard);
-    }
-
-    @Override
-    public void foreignTeacherCommentUpdateQuestion(CommentCard commentCard) {
-        logger.info("调用外教点评接口更新学生问题,其中"+commentCard);
-        Date dateNow = new Date();
-        commentCard.setUpdateTime(dateNow);
-        commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
-        commentCardJpaRepository.save(commentCard);
-        ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
-        logger.info("向师生运营发生消息,通知分配外教进行点评...");
-        rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+        return temp;
     }
 
     @Override
@@ -85,6 +74,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setUpdateTime(dateNow);
             commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
             commentCard.setTeacherReadFlag(0);
+            if(commentCard.getAssignTeacherCount().equals(0)){
+                commentCard.setAssignTeacherCount(1);
+            }else{
+                commentCard.setAssignTeacherCount(2);
+            }
             commentCardJpaRepository.save(commentCard);
             logger.info("调用外教点评接口更新点评卡中外教点评内容,其中" + commentCard);
         }
@@ -120,7 +114,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         List<CommentCard> list = commentCardJpaRepository.queryCommentNoAnswerList();
         for (CommentCard commentCard: list) {
             commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
-            commentCard.setAssignTeacherCount(1);
             commentCard.setUpdateTime(dateNow);
             commentCardJpaRepository.save(commentCard);
             ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
@@ -149,7 +142,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setUpdateTime(dateNow);
             com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
             commentCard.setService(serviceTemp);
-            commentCard.setAssignTeacherCount(2);
             commentCardJpaRepository.save(commentCard);
             serviceTemp.setAmount(serviceTemp.getAmount() + 1);
             serviceJpaRepository.save(serviceTemp);

@@ -22,7 +22,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "comment_card")
-@ToString(exclude = {"unAnswerTeacherCards"})
+@ToString(exclude = {"unAnswerTeacherCards","service"})
 @EqualsAndHashCode(exclude = {"unAnswerTeacherCards"})
 public class CommentCard {
     @Id
@@ -65,7 +65,7 @@ public class CommentCard {
     @Temporal(TemporalType.TIMESTAMP)
     private Date teacherAnswerTime;
 
-    @Column(name = "question_name", nullable = true, length = 255)
+    @Column(name = "question_name", nullable = true, length = 1024)
     private String questionName;
 
     @Column(name = "ask_voice_id", nullable = true, length = 20)
@@ -89,7 +89,7 @@ public class CommentCard {
     @Column(name = "course_id", nullable = true, length = 255)
     private String courseId;
 
-    @Column(name = "course_name", nullable = true, length = 128)
+    @Column(name = "course_name", nullable = true, length = 500)
     private String courseName;
 
     @Column(name = "cover", nullable = true, length = 50)
