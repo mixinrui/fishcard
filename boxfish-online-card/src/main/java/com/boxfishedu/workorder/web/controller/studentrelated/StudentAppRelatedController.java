@@ -52,7 +52,7 @@ StudentAppRelatedController {
 
 
     @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
-    public JsonResultModel courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
+    public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
                                               @PageableDefault(
                                                       value = 15,
                                                       sort = {"classDate", "timeSlotId"},

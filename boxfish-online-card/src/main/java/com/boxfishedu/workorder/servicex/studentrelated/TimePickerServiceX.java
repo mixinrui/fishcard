@@ -29,6 +29,7 @@ import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -354,10 +355,17 @@ public class TimePickerServiceX {
         return studentCourseSchedule;
     }
 
-    public JsonResultModel getCourseSchedulePage(Long studentId, Pageable pageable) {
+    public Object getCourseSchedulePage(Long studentId, Pageable pageable) {
         Page<CourseSchedule> page = courseScheduleService.findByStudentId(studentId, pageable);
         List<Map<String, Object>> result = adapterCourseScheduleList(page.getContent());
-        return JsonResultModel.newJsonResultModel(new PageImpl<>(result, pageable, page.getTotalElements()));
+        HashMap<String, Object> resultMap = Maps.newHashMap();
+        resultMap.put("data", result);
+        resultMap.put("returnCode", HttpStatus.SC_OK);
+        resultMap.put("totalElements", page.getTotalElements());
+        resultMap.put("number", page.getNumber());
+        resultMap.put("totalPages", page.getTotalPages());
+        resultMap.put("size", page.getSize());
+        return resultMap;
     }
 
     private List<Map<String, Object>> adapterCourseScheduleList(List<CourseSchedule> courseScheduleList) {
