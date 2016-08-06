@@ -24,6 +24,7 @@ public class DataAnalysisRequester {
 
     /**
      * 向数据分析组发送获取相关日志接口
+     * 目前应该是20秒一次心跳
      */
     public EventResultBean fetchHeartBeatLog(DataAnalysisLogParam dataAnalysisLogParam) {
         String url = String.format("%s/api/log/query/condition?userId=%s&startTime=%s&endTime=%s&event=%s",
