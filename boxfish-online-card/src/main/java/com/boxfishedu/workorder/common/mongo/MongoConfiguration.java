@@ -19,6 +19,7 @@ import java.util.List;
 /**
  * Created by shichao on 15/11/30.
  */
+@SuppressWarnings("ALL")
 @Configuration
 @EnableConfigurationProperties(MongoProperties.class)
 public class MongoConfiguration {

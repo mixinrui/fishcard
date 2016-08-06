@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.bean.AppPointRecordEventEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.config.PoolConf;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqDelaySender;
@@ -8,15 +9,20 @@ import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.threadpool.ParameterThread;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.requester.DataAnalysisRequester;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.timer.DailyCourseAssignedServiceX;
+import com.boxfishedu.workorder.web.param.requester.DataAnalysisLogParam;
 import com.google.common.collect.Maps;
+import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -41,6 +47,8 @@ public class MonitorController {
     private ServeService serveService;
     @Autowired
     private RabbitMqDelaySender rabbitMqDelaySender;
+    @Autowired
+    private DataAnalysisRequester dataAnalysisRequester;
 
     @Autowired
     private DailyCourseAssignedServiceX dailyCourseAssignedServiceX;
@@ -95,11 +103,24 @@ public class MonitorController {
         return JsonResultModel.newJsonResultModel("ok");
     }
 
+    @RequestMapping(value = "/heartbeat", method = RequestMethod.GET)
+    public JsonResultModel heartBeat() {
+        Date date = new Date();
+        LocalDateTime endLocalDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).plusDays(3);
+        LocalDateTime startLocalDate = endLocalDate.minusDays(6);
+        Date startDate = DateUtil.localDate2Date(startLocalDate);
+        Date endDate = DateUtil.localDate2Date(endLocalDate);
+        DataAnalysisLogParam dataAnalysisLogParam = new DataAnalysisLogParam();
+        dataAnalysisLogParam.setStartTime(startDate.getTime());
+        dataAnalysisLogParam.setEndTime(endDate.getTime());
+        dataAnalysisLogParam.setEvent(AppPointRecordEventEnum.ONLINE_COURSE_HEARTBEAT.value());
+        dataAnalysisLogParam.setUserId(386l);
+        return JsonResultModel.newJsonResultModel(dataAnalysisRequester.fetchHeartBeatLog(dataAnalysisLogParam));
+    }
+
     public static void main(String[] args) throws Exception {
         System.out.println(Long.MAX_VALUE);
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         System.out.println(DateUtil.String2SimpleDate("2016-09-12").getTime());
     }
-
-
 }
