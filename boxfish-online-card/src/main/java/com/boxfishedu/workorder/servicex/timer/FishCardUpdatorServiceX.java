@@ -104,7 +104,14 @@ public class FishCardUpdatorServiceX {
         logger.debug("@studentAbsentUpdator#FishCardDelayMessage,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
         WorkOrder workOrder = workOrderService.findOne(fishCardDelayMessage.getId());
         if (null == workOrder) {
+            logger.debug("@studentAbsentUpdator#无对应的鱼卡");
             throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
+        }
+        if ((workOrder.getStatus() != FishCardStatusEnum.WAITFORSTUDENT.getCode()) && (workOrder.getStatus() != FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode())
+                && (workOrder.getStatus() != FishCardStatusEnum.CONNECTED.getCode())) {
+            logger.info("@studentAbsentUpdator#status_changed#学生当前的鱼卡[{}]状态[{}]已经不是旷课需要处理的状态,暂不做处理",
+                    workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
+            return;
         }
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
@@ -113,10 +120,14 @@ public class FishCardUpdatorServiceX {
         for (WorkOrderLog workOrderLog : workOrderLogs) {
             if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
                 isExceptionFlag = true;
+                logger.info("@studentAbsentUpdator#status_changed#学生鱼卡[{}]状态[{}]已经属于[异常]的状态,不做处理",
+                        workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
                 break;
             }
         }
         if (!isExceptionFlag) {
+            logger.info("@studentAbsentUpdator#set_student_absent#学生鱼卡[{}]状态[{}]作旷课处理",
+                    workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             workOrder.setStatus(FishCardStatusEnum.STUDENT_ABSENT.getCode());
             courseSchedule.setStatus(workOrder.getStatus());
             workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);

@@ -101,9 +101,9 @@ public class TeacherAppRelatedServiceX {
     }
 
     public Map<String, Object> isWorkOrderTimeValid(Long workOrderId) throws BusinessException {
-        logger.info("老师请求上课,开始校验鱼卡:[{}]的有效性", workOrderId);
         Map<String, Object> map = new HashMap<>();
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
+        logger.info("@isWorkOrderTimeValid老师请求上课,开始校验鱼卡:[{}]的有效性;鱼卡当前状态#[{}]", workOrderId, FishCardStatusEnum.getDesc(workOrder.getStatus()));
         if (null == workOrder) {
             map.put("valid", FishCardAuthEnum.NOT_EXISTS.getCode());
             map.put("desc", FishCardAuthEnum.NOT_EXISTS.getDesc());
@@ -117,13 +117,11 @@ public class TeacherAppRelatedServiceX {
             map.put("valid", FishCardAuthEnum.TOO_EARLY.getCode());
             map.put("desc", FishCardAuthEnum.TOO_EARLY.getDesc());
             logger.info("鱼卡:[{}]还未到上课时间的有效范围:", workOrderId);
-        }
-        else if (workOrder.getStatus() == FishCardStatusEnum.TEACHER_ABSENT.getCode()) {
+        } else if (workOrder.getStatus() == FishCardStatusEnum.TEACHER_ABSENT.getCode()) {
             logger.info("当前鱼卡[{}]课程的状态[{}]不允许上课", workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             map.put("valid", FishCardAuthEnum.TOO_LATE.getCode());
             map.put("desc", FishCardAuthEnum.TOO_LATE.getDesc());
-        }
-        else if(now.after(endDate)){
+        } else if (now.after(endDate)) {
             map.put("valid", FishCardAuthEnum.CLASS_OVER.getCode());
             map.put("desc", FishCardAuthEnum.CLASS_OVER.getDesc());
         }

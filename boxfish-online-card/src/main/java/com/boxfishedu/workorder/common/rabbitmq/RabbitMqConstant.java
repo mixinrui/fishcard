@@ -18,10 +18,8 @@ public class RabbitMqConstant {
     public static final String UNASSIGNED_TEACHER_TIMER_REPLY_TEMPLATE_NAME="boxfish.fishcard.unsignedteacher.timer.reply.template";
     public static final String CREATE_GROUP_TEMPLATE_NAME = "com.boxfishedu.creategroup.template";
 
-
     public static final String ASSIGN_TEACHER_TEMPLATE_NAME = "boxfish.assign.teacher.template";
     public static final String ASSIGN_TEACHER_REPLY_TEMPLATE_NAME = "boxfish.assign.teacher.reply.template";
-
 
     //与教学中心组的交互
     public static final String FISHCARD_CREATED_QUEUE ="boxfish.finishcard.created.queue";
