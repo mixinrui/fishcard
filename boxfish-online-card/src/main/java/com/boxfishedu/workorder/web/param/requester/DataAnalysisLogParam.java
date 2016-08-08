@@ -11,4 +11,15 @@ public class DataAnalysisLogParam {
     private Long startTime;
     private Long endTime;
     private String event;
+
+    public DataAnalysisLogParam(){
+
+    }
+
+    public DataAnalysisLogParam(Long userId,Long startTime,Long endTime,String event){
+        this.userId=userId;
+        this.startTime=startTime;
+        this.endTime=endTime;
+        this.event=event;
+    }
 }
