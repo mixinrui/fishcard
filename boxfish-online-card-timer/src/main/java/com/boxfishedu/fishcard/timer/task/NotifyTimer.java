@@ -121,18 +121,28 @@ public class NotifyTimer {
 
 
     /**
-     * 抢单: 每天18点到 24点  每10分钟 轮训查询
+     * 抢单: 每天18点到 24点  每10分钟 轮训查询(中教)
      */
-    @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
-   //   @Scheduled(cron = "0 0/5 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
+   @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
     public void initGrabOrderDataChinese() {
-        logger.info("<<<<<<graborder-initGrabOrderData<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<graborder-initGrabOrderDataChinese<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<轮训抢单初始化数据>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
 
+    /**
+     * 抢单: 每天18点到 24点  每10分钟 轮训查询(外教)
+     */
+    @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+    public void initGrabOrderDataForeigh() {
+        logger.info("<<<<<<graborder-initGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<开始通知<<<轮训抢单初始化数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGH.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 
     /**
      * 抢单:每天17:40清理数据
@@ -146,16 +156,22 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
-
-    @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
-    //@Scheduled(cron = "0 0/5 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23 * * ?")
-    public void initGrabOrderDataForeigh() {
-        logger.info("<<<<<<graborder-initGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
-        logger.info("<<<<<<开始通知<<<轮训抢单初始化数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGH.value());
+    /**
+     * 每天18:00 向教师发送 从现在开始  未来48+6小时内 变更课程的数量  的消息
+     */
+    @Scheduled(cron = "0 0 18 * * ?")
+    public void courseChangeSendMessage() {
+        logger.info("<<<<<<courseChangeSendMessage<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<开始通知<<< 变更课程的数量  >>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COURSE_CHANGER_WORKORDER.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
+
+
+
+
+
 
 
     /**
