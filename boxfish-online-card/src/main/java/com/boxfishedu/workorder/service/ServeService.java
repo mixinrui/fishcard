@@ -388,8 +388,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfoService.save(scheduleCourseInfo);
     }
 
-    public Map<String, Integer> getAvailableForeignCommentServiceCount(long studentId) {
-        List<Service> services = serviceJpaRepository.getAvailableForeignCommentServiceCounts(
+    public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
+        List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
                 studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value());
         Integer originalAmount = services.stream().reduce(
                 0,

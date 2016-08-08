@@ -34,8 +34,8 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     public Service findTop1ByOrderId(Long orderId);
 
-    @Query("select s from Service s where s.studentId=?1 and s.skuId=?2 and s.amount>0")
-    List<Service> getAvailableForeignCommentServiceCounts(long studentId, long skuId);
+    @Query("select s from Service s where s.studentId=?1 and s.skuId=?2")
+    List<Service> getForeignCommentServiceCount(long studentId, long skuId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Service s where s.studentId=?1 and s.skuId=?2 and s.amount>0")

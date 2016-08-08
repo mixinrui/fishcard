@@ -1,26 +1,20 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.exception.UseUpException;
 import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
-import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
-import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by ansel on 16/7/18.
@@ -102,6 +96,6 @@ public class ForeignTeacherCommentController {
 
     @RequestMapping(value = "/count", method = RequestMethod.GET)
     public JsonResultModel getAvailableForeignCommentServiceCount(long userId) {
-        return JsonResultModel.newJsonResultModel(serveService.getAvailableForeignCommentServiceCount(userId));
+        return JsonResultModel.newJsonResultModel(serveService.getForeignCommentServiceCount(userId));
     }
 }
