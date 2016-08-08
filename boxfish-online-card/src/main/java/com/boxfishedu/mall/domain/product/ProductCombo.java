@@ -1,6 +1,7 @@
 package com.boxfishedu.mall.domain.product;
 
 import com.boxfishedu.mall.common.BaseEntity;
+import com.boxfishedu.mall.enums.ComboType;
 import com.boxfishedu.mall.enums.Flag;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,8 @@ public class ProductCombo extends BaseEntity {
 
     private static final long serialVersionUID = 884403589206290959L;
 
-    private String comboType;
+    @Enumerated(EnumType.STRING)
+    private ComboType comboType;
 
     private Integer originalFee;
 
@@ -28,8 +30,12 @@ public class ProductCombo extends BaseEntity {
 
     private String comboDesc;
 
+    private String comboUnit;
+
+    private Integer comboCycle;//限制该套餐在几周内完成,不需要限制的标识为-1,用于需要选时间的订单在生成服务时计算选时间的次数
+
     @Enumerated(EnumType.STRING)
-    private Flag flagEnable = Flag.ENABLE;
+    private Flag flagEnable;
 
     @Transient
     private List<ProductComboDetail> comboDetails;

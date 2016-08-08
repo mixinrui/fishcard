@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.boxfishedu.mall.domain.order.OrderDetail;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
@@ -281,33 +280,26 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     /**
      * 订单转换为服务
-     * TODO 志浩修改了订单结构
      * @param orderView
      * @throws Exception
      */
     private void order2Service(OrderForm orderView) throws Exception {
-        //订单中的商品列表 TODO
+        //订单中的商品列表
         String orderRemark = orderView.getOrderRemark();
-        List<OrderDetail> orderDetails = orderView.getOrderDetails();
-
         ProductCombo productCombo = objectMapper.readValue(orderRemark, ProductCombo.class);
-        List<Service> services = new ArrayList<>();
         //服务信息容器
         Map<Long, Service> serviceHashMap = new HashMap<>();
-        orderDetails.forEach( orderDetail -> {
-            try {
-                ProductComboDetail productInfo = objectMapper.readValue(orderDetail.getProductInfo(), ProductComboDetail.class);
-                if (null != serviceHashMap.get(productInfo.getComboId())) {
+        List<Service> services = new ArrayList<>();
+        productCombo.getComboDetails().forEach( productComboDetail -> {
+                    // map.compute(key, (key,val) -> {}) 当存在时与不存在时如何处理
                     Service service = serviceHashMap.get(productCombo.getId());
-                    //增加有效期,数量
-                    setServiceExistedSpecs(service, productInfo, orderDetail);
-                } else {
-                    Service service = getServiceByOrderView(orderView, productInfo, orderDetail);
-                    services.add(service);
-                    serviceHashMap.put(productInfo.getComboId(), service);
-                }
-            } catch (Exception e) {}
-        });
+                    if(service != null) {
+                        //增加有效期,数量
+                        setServiceExistedSpecs(service, productComboDetail);
+                    } else {
+                        service = getServiceByOrderView(orderView, productComboDetail);
+                        serviceHashMap.put(productCombo.getId(), service);
+                    }});
 
         // service的开始日期,结束日期设置
         addValidTimeForServices(services);
@@ -361,7 +353,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             Calendar calendar = Calendar.getInstance();
             //service的validate day来自sku的validate day
             // 暂时没有validatyDay这个字段了
-//            calendar.add(Calendar.DAY_OF_YEAR, service.getValidityDay());
+            calendar.add(Calendar.DAY_OF_YEAR, service.getValidityDay());
             service.setEndTime(calendar.getTime());
             logger.info("订单[{}]生成服务类型[{}]成功]", service.getOrderId(), service.getSkuName());
         }
@@ -375,7 +367,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 //        service.setValidityDay(service.getValidityDay() + serviceSKU.getValidDay());
 //    }
 
-    private void setServiceExistedSpecs(Service service, ProductComboDetail productComboDetail, OrderDetail orderDetail) {
+    private void setServiceExistedSpecs(Service service, ProductComboDetail productComboDetail) {
         service.setOriginalAmount(service.getOriginalAmount() + productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
         // TODO 长期有效service.getValidityDay() + serviceSKU.getValidDay()
@@ -411,7 +403,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 //    }
 
 
-    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail, OrderDetail orderDetail) throws BoxfishException {
+    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail) throws BoxfishException {
         Service service = new Service();
         service.setStudentId(orderView.getUserId());
         service.setOrderId(orderView.getId());

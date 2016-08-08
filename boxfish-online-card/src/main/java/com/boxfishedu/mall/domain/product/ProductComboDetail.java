@@ -14,5 +14,7 @@ public class ProductComboDetail extends BaseEntity {
 
     private Long skuId;
 
+    private ProductSku productSku;
+
     private Integer skuAmount;
 }

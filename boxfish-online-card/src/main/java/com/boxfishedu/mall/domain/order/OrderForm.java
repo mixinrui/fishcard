@@ -10,8 +10,6 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Transient;
-import java.util.List;
 
 @Data(staticConstructor = "getInstance")
 @EqualsAndHashCode(callSuper = true)
@@ -51,7 +49,7 @@ public class OrderForm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Flag flagDropped;
 
-    @Transient
-    private List<OrderDetail> orderDetails;
+//    @Transient
+//    private List<OrderDetail> orderDetails;
 
 }

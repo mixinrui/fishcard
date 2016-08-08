@@ -151,6 +151,7 @@ public class TimePickerServiceX {
         for (WorkOrder workOrder : workOrders) {
             logger.debug("鱼卡序号{}",workOrder.getSeqNum());
             Integer index=recommandedCourseService.getCourseIndex(workOrder);
+            workOrder.getSkuId();
             RecommandCourseView recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
             courseViewMap.put(workOrder.getSeqNum(),recommandCourseView);
 //            courseViewMap.put(workOrder.getSeqNum(), courseView);
