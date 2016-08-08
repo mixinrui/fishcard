@@ -83,6 +83,12 @@ public class CommentCard {
     @Column(name = "answer_video_thumbnail", nullable = true, length = 255)
     private String answerVideoThumbnail;
 
+    @Column(name = "answer_video_time", nullable = true, length = 20)
+    private Long answer_video_time;
+
+    @Column(name = "answer_video_size",nullable = true, length = 20)
+    private Long answer_video_size;
+
     @Column(name = "evaluation_to_teacher", nullable = true, length = 11)
     private Integer evaluationToTeacher;
 

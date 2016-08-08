@@ -46,7 +46,7 @@ public class CommentTeacherAppController {
     public JsonResultModel teacherUnAnswerList(Pageable pageable,Long userId){
         return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherUnanswerList(pageable,userId));
     }
-
+    {}{}
     @RequestMapping(value = "/card/{card_id}/detail", method = RequestMethod.GET)
     public JsonResultModel listOne(@PathVariable("card_id") Long cardId){
         CommentCard commentCard = commentTeacherAppServiceX.findById(cardId);
@@ -65,5 +65,20 @@ public class CommentTeacherAppController {
         commonServeServiceX.checkToken(teacherReadMsgParam.getTeacherId(),userId);
         commentTeacherAppServiceX.markTeacherRead(teacherReadMsgParam);
         return JsonResultModel.newJsonResultModel(null);
+    }
+
+    @RequestMapping(value = "/check_teacher/{cardId}", method = RequestMethod.GET)
+    public JsonResultModel checkTeacher(@PathVariable Long cardId,Long userId){
+        JsonResultModel jsonResultModel = new JsonResultModel();
+        if (commentTeacherAppServiceX.checkTeacher(cardId,userId) != null){
+            jsonResultModel.setReturnMsg("允许该外教进行点评。");
+            jsonResultModel.setData("OK");
+            jsonResultModel.setReturnCode(200);
+        }else {
+            jsonResultModel.setReturnMsg("禁止该外教进行点评!");
+            jsonResultModel.setData("Unauthorized");
+            jsonResultModel.setReturnCode(401);
+        }
+        return jsonResultModel;
     }
 }

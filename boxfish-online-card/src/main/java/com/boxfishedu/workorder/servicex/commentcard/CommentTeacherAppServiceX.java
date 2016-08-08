@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.commentcard;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.CommentCardUnanswerTeacher;
 import com.boxfishedu.workorder.requester.TeacherStudentCommentCardRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.commentcard.CommentCardLogService;
@@ -64,8 +65,14 @@ public class CommentTeacherAppServiceX {
         commentCard.setStatus(CommentCardStatus.ANSWERED.getCode());
         commentCard.setUpdateTime(new Date());
         commentCard.setAnswerVideoPath(commentCardSubmitParam.getVideoPath());
+        commentCard.setAnswer_video_time(commentCardSubmitParam.getAnswerVideoTime());
+        commentCard.setAnswer_video_size(commentCardSubmitParam.getAnswerVideoSize());
         commentCard.setTeacherAnswerTime(new Date());
         commentCardTeacherAppService.save(commentCard);
         commentCardLogService.saveCommentCardLog(commentCard);
+    }
+
+    public CommentCard checkTeacher(Long id, Long teacherId){
+        return commentCardTeacherAppService.checkTeacher(id, teacherId);
     }
 }

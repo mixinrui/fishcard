@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.CommentCardUnanswerTeacherJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.CommentCardUnanswerTeacher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,9 @@ public class CommentCardTeacherAppService {
 
     @Autowired
     private CommentCardJpaRepository commentCardJpaRepository;
+
+    @Autowired
+    private CommentCardUnanswerTeacherJpaRepository commentCardUnanswerTeacherJpaRepository;
 
     public Page<CommentCard> findByTeacherIdOrderByAssignTeacherTimeDesc(Long teacherId, Pageable pageable){
         return commentCardJpaRepository.findByTeacherIdOrderByAssignTeacherTimeDesc(teacherId,pageable);
@@ -36,5 +41,9 @@ public class CommentCardTeacherAppService {
 
     public Page<CommentCard> queryTeacherUnanswerList(Pageable pageable, Long teacherId){
         return commentCardJpaRepository.queryTeacherUnAnsweredList(pageable,teacherId);
+    }
+
+    public CommentCard checkTeacher(Long id, Long teacherId){
+        return commentCardJpaRepository.findByIdAndTeacherIdAndStatus(id, teacherId,300);
     }
 }

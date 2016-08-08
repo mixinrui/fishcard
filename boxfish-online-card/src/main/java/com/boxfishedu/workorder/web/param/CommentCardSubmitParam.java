@@ -8,6 +8,8 @@ import lombok.Data;
 @Data
 public class CommentCardSubmitParam {
     private String videoPath;
+    private Long answerVideoTime;
+    private Long answerVideoSize;
     private Long teacherId;
     private Long commentcardId;
 }

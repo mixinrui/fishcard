@@ -41,12 +41,15 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
             public Predicate[] predicates() {
                 List<Predicate> predicateList = Lists.newArrayList();
                 Date dateNow = new Date();
+                Date dateNow2 = new Date();
                 Long timeLong = dateNow.getTime() - 24 * 60 * 60 * 1000L;
                 dateNow.setTime(timeLong);
+                timeLong = dateNow2.getTime() - 48 * 60 * 60 * 1000L;
+                dateNow2.setTime(timeLong);
                 predicateList.add(criteriaBuilder.lessThan(root.get("studentAskTime"),dateNow));
+                predicateList.add(criteriaBuilder.greaterThan(root.get("studentAskTime"),dateNow2));
                 predicateList.add(criteriaBuilder.between(root.get("status"),CommentCardStatus.ASKED.getCode(),CommentCardStatus.ASSIGNED_TEACHER.getCode()));
-                predicateList.add(criteriaBuilder.equal(root.get("assignTeacherCount"),0));
-                predicateList.add(criteriaBuilder.isNotNull(root.get("teacherId")));
+                predicateList.add(criteriaBuilder.equal(root.get("assignTeacherCount"),1));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };
@@ -61,11 +64,15 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
             public Predicate[] predicates() {
                 List<Predicate> predicateList = Lists.newArrayList();
                 Date dateNow = new Date();
+                Date dateNow2 = new Date();
                 Long timeLong = dateNow.getTime() - 48 * 60 * 60 * 1000L;
                 dateNow.setTime(timeLong);
+                timeLong = dateNow.getTime() - 72 * 60 * 60 * 1000L;
+                dateNow2.setTime(timeLong);
                 predicateList.add(criteriaBuilder.lessThan(root.get("studentAskTime"),dateNow));
+                predicateList.add(criteriaBuilder.greaterThan(root.get("studentAskTime"),dateNow2));
                 predicateList.add(criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME.getCode()));
-                predicateList.add(criteriaBuilder.equal(root.get("assignTeacherCount"),1));
+                predicateList.add(criteriaBuilder.equal(root.get("assignTeacherCount"),2));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };
@@ -80,7 +87,8 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
                 List<Predicate> predicateList = Lists.newArrayList();
                 predicateList.add(criteriaBuilder.equal(root.get("teacherId"),teacherId));
                 predicateList.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("status"),CommentCardStatus.ANSWERED.getCode()),
-                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())));
+                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode()),
+                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME)));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };

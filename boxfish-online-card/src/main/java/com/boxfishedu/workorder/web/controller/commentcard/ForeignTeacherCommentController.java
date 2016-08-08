@@ -63,16 +63,6 @@ public class ForeignTeacherCommentController {
         }
     }
 
-//    @RequestMapping(value = "update_student_question", method = RequestMethod.PUT)
-//    public JsonResultModel updateStudentQuestion(@RequestBody CommentCardForm commentCardForm,Long userId){
-//            CommentCard commentCard = foreignTeacherCommentCardService.foreignTeacherCommentDetailQuery(commentCardForm.getId(),userId);
-//            commentCard.setAskVoiceId(commentCardForm.getAskVoiceId());
-//            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
-//            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
-//            foreignTeacherCommentCardService.foreignTeacherCommentUpdateQuestion(commentCard);
-//            return new JsonResultModel();
-//    }
-
     @RequestMapping(value = "query_all",method = RequestMethod.GET)
     public JsonResultModel queryCommentList(Pageable pageable, Long userId){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentQuery(pageable,userId));
@@ -103,5 +93,15 @@ public class ForeignTeacherCommentController {
     @RequestMapping(value = "/count", method = RequestMethod.GET)
     public JsonResultModel getAvailableForeignCommentServiceCount(long userId) {
         return JsonResultModel.newJsonResultModel(serveService.getAvailableForeignCommentServiceCount(userId));
+    }
+
+    @RequestMapping(value = "test_teacher_comment", method = RequestMethod.POST)
+    public JsonResultModel testTeacherComment(@RequestBody CommentCardForm commentCardForm, Long userId){
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testTeacherComment(commentCardForm,userId));
+    }
+
+    @RequestMapping(value = "test_query_all", method = RequestMethod.GET)
+    public JsonResultModel testQueryAll(Pageable pageable){
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
 }

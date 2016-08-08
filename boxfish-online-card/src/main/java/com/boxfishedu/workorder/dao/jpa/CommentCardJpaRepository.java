@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 
 public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Long>, CommentCardJpaRepositoryCustom{
 
@@ -13,4 +12,5 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
 
     public CommentCard findByIdAndStudentId(Long id,Long studentId);
 
+    public CommentCard findByIdAndTeacherIdAndStatus(Long id, Long teacherId, Integer status);
 }
