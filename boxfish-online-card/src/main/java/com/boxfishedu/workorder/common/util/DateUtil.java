@@ -248,5 +248,4 @@ public class DateUtil {
         Date to = convertToDate(now.plusMonths(6).atEndOfMonth());
         return new DateRangeForm(from, to);
     }
-
 }

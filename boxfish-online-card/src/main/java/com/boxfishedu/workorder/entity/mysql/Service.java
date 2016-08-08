@@ -89,4 +89,10 @@ public class Service {
 
     @Column(name = "courses_selected", nullable = false)
     private Integer coursesSelected;
+
+    /**
+     * 新增字段套餐类型
+     */
+    @Column(name = "combo_type")
+    private String comboType;
 }

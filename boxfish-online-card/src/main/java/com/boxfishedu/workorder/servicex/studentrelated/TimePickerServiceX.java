@@ -1,10 +1,9 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -34,7 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -58,19 +59,13 @@ public class TimePickerServiceX {
     @Autowired
     private CourseScheduleService courseScheduleService;
     @Autowired
-    private UrlConf urlConf;
-    @Autowired
     private LogPoolManager logPoolManager;
     @Autowired
     private ServiceSDK serviceSDK;
     @Autowired
     private TimePickerService timePickerService;
-
     @Autowired
     RestTemplate restTemplate;
-
-    @Autowired
-    private RabbitMqSender rabbitMqSender;
 
     @Autowired
     private RecommandedCourseService recommandedCourseService;
@@ -87,9 +82,6 @@ public class TimePickerServiceX {
      */
     @Value("${choiceTime.consumerStartDay:1}")
     private Integer consumerStartDay;
-    private final static Integer daysOfWeek = 7;
-    @Autowired
-    private CourseType2TeachingTypeService courseType2TeachingTypeService;
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
@@ -113,8 +105,11 @@ public class TimePickerServiceX {
 
         workOrderService.batchSaveCoursesIntoCard(workOrders,recommandCoursesMap);
 
+        // 返回学生当前选择的课程日期和时间片
+        Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(service.getStudentId());
         //入库,workorder和coursechedule的插入放入一个事务中,保证数据的一致性
-        List<CourseSchedule> courseSchedules=workOrderService.persistCardInfos(service,workOrders,recommandCoursesMap);
+        List<CourseSchedule> courseSchedules=workOrderService.persistCardInfos(
+                service,workOrders,recommandCoursesMap, classDateTimeslotsSet);
 
         //TODO:等测
         workOrderLogService.batchSaveWorkOrderLogs(workOrders);
@@ -127,6 +122,7 @@ public class TimePickerServiceX {
         logger.info("学生[{}]选课结束", service.getStudentId());
         return JsonResultModel.newJsonResultModel(null);
     }
+
 
     private void validateTimeSlotParam(TimeSlotParam timeSlotParam,Service service) {
         List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
@@ -151,9 +147,20 @@ public class TimePickerServiceX {
         for (WorkOrder workOrder : workOrders) {
             logger.debug("鱼卡序号{}",workOrder.getSeqNum());
             Integer index=recommandedCourseService.getCourseIndex(workOrder);
-            workOrder.getSkuId();
-            RecommandCourseView recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
-            courseViewMap.put(workOrder.getSeqNum(),recommandCourseView);
+            String comboType = workOrder.getService().getComboType();
+            RecommandCourseView recommandCourseView = null;
+            // 不同类型的套餐对应不同类型的课程推荐
+            if(Objects.equals(comboType, ComboTypeToRoleId.OVERALL.name())) {
+                recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
+            } else if(Objects.equals(comboType, ComboTypeToRoleId.FOREIGN.name())) {
+                recommandCourseView = recommandCourseRequester.getForeignRecomandCourse(workOrder);
+            } else {
+
+            }
+
+            if(!Objects.isNull(recommandCourseView)) {
+                courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
+            }
 //            courseViewMap.put(workOrder.getSeqNum(), courseView);
         }
         return courseViewMap;
@@ -272,7 +279,8 @@ public class TimePickerServiceX {
 
     private Service ensureConvertOver(TimeSlotParam timeSlotParam, int pivot) {
         pivot++;
-        Service service = serveService.findTop1ByOrderIdAndSkuId(timeSlotParam.getOrderId(), timeSlotParam.getType());
+        Service service = serveService.findTop1ByOrderIdAndComboType(
+                timeSlotParam.getOrderId(), timeSlotParam.getComboType().name());
         if (null == service) {
             if (pivot > 2) {
                 logger.error("重试两次后发现仍然不存在对应的服务,直接返回给前端,当前pivot[{}]",pivot);

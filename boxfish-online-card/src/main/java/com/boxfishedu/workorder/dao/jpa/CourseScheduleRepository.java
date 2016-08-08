@@ -13,10 +13,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.persistence.LockModeType;
-import javax.persistence.OrderBy;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created with Intellij IDEA
@@ -79,4 +79,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId, Integer status);
 
     Page<CourseSchedule> findByStudentId(Long studentId, Pageable pageable);
+
+    @Query("select concat(c.classDate,' ',c.timeSlotId) from CourseSchedule c where c.studentId=?1 and c.classDate>=?2 and c.status<40")
+    Set<String> findUnfinishByStudentIdAndAfterDate(Long studentId, Date afterDate);
 }

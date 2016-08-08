@@ -27,10 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by hucl on 16/4/9.
@@ -189,5 +186,15 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     public int setTeacherIdByWorkOrderId(GrabOrderView grabOrderView){
         int lineNo = jpa.setTeacherIdByWorkOrderId(grabOrderView.getTeacherId(),grabOrderView.getWorkOrderId(),grabOrderView.getState());
         return lineNo;
+    }
+
+    /**
+     * 返回上课日期时间片字符串set
+     * ["$classDate $timeslotsId", "$classDate $timeslotsId"]
+     * @param studentId
+     * @return
+     */
+    public Set<String> findByStudentIdAndAfterDate(Long studentId) {
+        return jpa.findUnfinishByStudentIdAndAfterDate(studentId, new Date());
     }
 }

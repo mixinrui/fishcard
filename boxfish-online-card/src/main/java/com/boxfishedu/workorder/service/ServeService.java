@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
@@ -185,6 +186,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return jpa.findTop1ByOrderIdAndSkuId(orderId, skuId);
     }
 
+    public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
+        return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
+    }
+
     public Service findByIdForUpdate(Long id) {
         return jpa.findByIdForUpdate(id);
     }
@@ -297,7 +302,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                         //增加有效期,数量
                         setServiceExistedSpecs(service, productComboDetail);
                     } else {
-                        service = getServiceByOrderView(orderView, productComboDetail);
+                        service = getServiceByOrderView(orderView, productComboDetail, productCombo.getComboType());
                         serviceHashMap.put(productCombo.getId(), service);
                     }});
 
@@ -403,7 +408,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 //    }
 
 
-    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail) throws BoxfishException {
+    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail, ComboTypeToRoleId comboType) throws BoxfishException {
         Service service = new Service();
         service.setStudentId(orderView.getUserId());
         service.setOrderId(orderView.getId());
@@ -412,6 +417,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         // 由于志浩那不再传递这个值,商量之后这个地方取默认值1
         service.setComboCycle(ProductComboDetail.DEFAULT_COMBO_CYCLE);
         service.setSkuId(productComboDetail.getComboId());
+        // 新增的套餐类型字段
+        service.setComboType(comboType.name());
         service.setRoleId(productComboDetail.getComboId().intValue());
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());

@@ -1,7 +1,7 @@
 package com.boxfishedu.mall.domain.product;
 
 import com.boxfishedu.mall.common.BaseEntity;
-import com.boxfishedu.mall.enums.ComboType;
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.Flag;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +18,7 @@ public class ProductCombo extends BaseEntity {
     private static final long serialVersionUID = 884403589206290959L;
 
     @Enumerated(EnumType.STRING)
-    private ComboType comboType;
+    private ComboTypeToRoleId comboType;
 
     private Integer originalFee;
 

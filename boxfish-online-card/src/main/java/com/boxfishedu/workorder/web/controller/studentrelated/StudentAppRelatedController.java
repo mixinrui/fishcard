@@ -1,14 +1,12 @@
 package com.boxfishedu.workorder.web.controller.studentrelated;
 
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,8 +30,6 @@ StudentAppRelatedController {
     @Autowired
     private CommonServeServiceX commonServeServiceX;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
-
     /**
      * 学生端批量选择课程的接口
      * TODO:1.获取课程的接口为假数据 2.获取教师的时候需要根据coursetype把外教区分出来,并且体现到workorder和course_schedule的冗余表里
@@ -43,6 +39,7 @@ StudentAppRelatedController {
         JsonResultModel jsonResultModel= timePickerServiceX.ensureCourseTimes(timeSlotParam);
         return jsonResultModel;
     }
+
 
     @RequestMapping(value = "{student_Id}/schedule/month", method = RequestMethod.GET)
     public JsonResultModel courseScheduleList(@PathVariable("student_Id") Long studentId,Long userId) {
