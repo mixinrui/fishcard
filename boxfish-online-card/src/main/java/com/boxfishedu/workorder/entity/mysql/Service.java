@@ -93,6 +93,6 @@ public class Service {
     /**
      * 新增字段套餐类型
      */
-    @Column(name = "combo_type")
+    @Column(name = "combo_type", nullable = false)
     private String comboType;
 }

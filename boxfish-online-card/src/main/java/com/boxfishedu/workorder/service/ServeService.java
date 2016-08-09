@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
-import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
@@ -141,22 +140,37 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     }
 
 
+    /**
+     * 每周选几次课
+     * @param service
+     * @return
+     */
     public int getNumPerWeek(Service service) {
+        // 兼容之前的逻辑
         if (service.getComboCycle() == -1) {
 //            return service.getAmount();
             return 2;
         } else {
-            return service.getAmount() >> 2;
+            // 每周选课次数
+            int numPerWeek = service.getAmount() / service.getComboCycle();
+            return numPerWeek == 0 ? 1 : numPerWeek;
         }
     }
 
+    /**
+     * 几周上完
+     * @param service
+     * @return
+     */
     public int getLoopOfWeek(Service service) {
+        // 兼容之前的业务逻辑
         if (service.getComboCycle() == -1) {
 //            return 1;
             return 4;
         } else {
-            int loopOfMonth = service.getComboCycle();
-            return loopOfMonth << 2;
+            int comboCycle = service.getComboCycle();
+            return service.getAmount() % comboCycle == 0
+                    ? comboCycle : service.getAmount() / getNumPerWeek(service);
         }
     }
 
@@ -302,7 +316,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                         //增加有效期,数量
                         setServiceExistedSpecs(service, productComboDetail);
                     } else {
-                        service = getServiceByOrderView(orderView, productComboDetail, productCombo.getComboType());
+                        service = getServiceByOrderView(orderView, productComboDetail, productCombo);
+                        services.add(service);
                         serviceHashMap.put(productCombo.getId(), service);
                     }});
 
@@ -408,7 +423,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 //    }
 
 
-    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail, ComboTypeToRoleId comboType) throws BoxfishException {
+    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail, ProductCombo productCombo) throws BoxfishException {
         Service service = new Service();
         service.setStudentId(orderView.getUserId());
         service.setOrderId(orderView.getId());
@@ -418,11 +433,14 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setComboCycle(ProductComboDetail.DEFAULT_COMBO_CYCLE);
         service.setSkuId(productComboDetail.getComboId());
         // 新增的套餐类型字段
-        service.setComboType(comboType.name());
+        service.setComboType(productCombo.getComboType().name());
+        // 几周消费完
+        service.setComboCycle(productCombo.getComboCycle());
         service.setRoleId(productComboDetail.getComboId().intValue());
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);
+        service.setValidityDay(365);
         return service;
     }
 

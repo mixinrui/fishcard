@@ -185,7 +185,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Transactional
     public List<CourseSchedule> persistCardInfos(Service service,List<WorkOrder> workOrders,Map<Integer,
-            RecommandCourseView> recommandCoursesMap, Set<String> classDateTimeSlotsSet){
+            RecommandCourseView> recommandCoursesMap){
         service=serveService.findByIdForUpdate(service.getId());
         if(service.getCoursesSelected()==1){
             throw new BusinessException("您已选过课程,请勿重复选课");
@@ -194,32 +194,8 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         serveService.save(service);
         this.save(workOrders);
         List<CourseSchedule> courseSchedules=batchUpdateCourseSchedule(service, workOrders);
-        // unique课程验证
-        checkUniqueCourseSchedules(classDateTimeSlotsSet, courseSchedules);
         scheduleCourseInfoService.batchSaveCourseInfos(workOrders,courseSchedules, recommandCoursesMap);
         return courseSchedules;
-    }
-
-    private void checkUniqueCourseSchedules(Set<String> classDateTimeSlotsList, List<CourseSchedule> courseSchedules) {
-        for(CourseSchedule courseSchedule : courseSchedules) {
-            checkUniqueCourseSchedule(
-                    classDateTimeSlotsList,
-                    courseSchedule,
-                    () -> {
-                        TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(courseSchedule.getTimeSlotId());
-                        return String.join(" ", DateUtil.simpleDate2String(courseSchedule.getClassDate()), timeSlot.getStartTime())
-                                + "已经安排了课程,请重新选择!";
-                    });
-        }
-    }
-
-    private void checkUniqueCourseSchedule(
-            Set<String> classDateTimeSlotsList, CourseSchedule courseSchedule, Supplier<String> exceptionProducer) {
-        if(classDateTimeSlotsList.contains(
-                String.join(" ",DateUtil.simpleDate2String(courseSchedule.getClassDate()),
-                        courseSchedule.getTimeSlotId().toString()))) {
-            throw new BusinessException(exceptionProducer.get());
-        }
     }
 
     @Transactional

@@ -42,6 +42,7 @@ import org.springframework.web.client.RestTemplate;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 
 import static com.boxfishedu.workorder.common.util.DateUtil.*;
 
@@ -96,6 +97,11 @@ public class TimePickerServiceX {
 
         validateTimeSlotParam(timeSlotParam,service);
 
+        // 返回学生当前选择的课程日期和时间片
+        Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(service.getStudentId());
+        // unique课程验证
+        checkUniqueCourseSchedules(classDateTimeslotsSet, timeSlotParam.getSelectedTimes());
+
         logger.info("选课开始,service的id为:[{}]", service.getId());
 
         List<WorkOrder> workOrders = batchInitWorkorders(timeSlotParam, service);
@@ -105,11 +111,10 @@ public class TimePickerServiceX {
 
         workOrderService.batchSaveCoursesIntoCard(workOrders,recommandCoursesMap);
 
-        // 返回学生当前选择的课程日期和时间片
-        Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(service.getStudentId());
+
         //入库,workorder和coursechedule的插入放入一个事务中,保证数据的一致性
         List<CourseSchedule> courseSchedules=workOrderService.persistCardInfos(
-                service,workOrders,recommandCoursesMap, classDateTimeslotsSet);
+                service,workOrders,recommandCoursesMap);
 
         //TODO:等测
         workOrderLogService.batchSaveWorkOrderLogs(workOrders);
@@ -124,12 +129,38 @@ public class TimePickerServiceX {
     }
 
 
+    private void checkUniqueCourseSchedules(Set<String> classDateTimeSlotsList, List<SelectedTime> selectedTimes) {
+        for(SelectedTime selectedTime : selectedTimes) {
+            checkUniqueCourseSchedule(
+                    classDateTimeSlotsList,
+                    selectedTime,
+                    () -> {
+                        TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(selectedTime.getTimeSlotId());
+                        return String.join(" ", selectedTime.getSelectedDate(), timeSlot.getStartTime())
+                                + "已经安排了课程,请重新选择!";
+                    });
+        }
+    }
+
+    private void checkUniqueCourseSchedule(
+            Set<String> classDateTimeSlotsList, SelectedTime selectedTime, Supplier<String> exceptionProducer) {
+        if(classDateTimeSlotsList.contains(
+                String.join(" ", selectedTime.getSelectedDate(),
+                        selectedTime.getTimeSlotId().toString()))) {
+            throw new BusinessException(exceptionProducer.get());
+        }
+    }
+
+
     private void validateTimeSlotParam(TimeSlotParam timeSlotParam,Service service) {
         List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
-        if (service.getComboCycle() != -1) {
-            if (selectedTimes.size() != (service.getAmount() >> 2)) {
-                throw new BusinessException("选择的上课次数不符合规范");
-            }
+//        if (service.getComboCycle() != -1) {
+//            if (selectedTimes.size() != (service.getAmount() >> 2)) {
+//                throw new BusinessException("选择的上课次数不符合规范");
+//            }
+//        }
+        if(serveService.getNumPerWeek(service) != selectedTimes.size()) {
+            throw new BusinessException("选择的上课次数不符合规范");
         }
         if(service.getCoursesSelected()==1){
             throw new BusinessException("该订单已经完成选课,请勿重复选课");

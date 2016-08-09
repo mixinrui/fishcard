@@ -3,9 +3,6 @@ package com.boxfishedu.workorder.requester;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.online.order.entity.OrderForm;
-import com.boxfishedu.online.order.entity.TeacherForm;
-import com.boxfishedu.workorder.common.bean.TeachingOnlineListMsg;
-import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
@@ -94,10 +91,10 @@ public class TeacherStudentRequester {
         return plannerAssignView;
     }
 
-    @Cacheable(value = DayTimeSlots.CACHE_KEY, key = "#teacherId.toString()")
-    public DayTimeSlots dayTimeSlotsTemplate(Long teacherId) {
+    @Cacheable(value = DayTimeSlots.CACHE_KEY, key = "#roleId.toString()")
+    public DayTimeSlots dayTimeSlotsTemplate(Long roleId) {
         // 1 从师生运营获取一天时间片模板列表
-        String url = String.format("%s/timeslot/list/%s", urlConf.getTeacher_service(), teacherId);
+        String url = String.format("%s/timeslot/list/%s", urlConf.getTeacher_service(), roleId);
         logger.info("<-<-<-<-<-<-<-<-向师生运营组发送获取时间片请求,url[{}]",url);
         JsonResultModel jsonResultModel = null;
         try {

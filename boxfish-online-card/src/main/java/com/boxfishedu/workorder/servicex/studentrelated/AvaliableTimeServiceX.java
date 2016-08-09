@@ -3,9 +3,8 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.ServiceSDK;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
-import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
@@ -28,11 +27,6 @@ import java.util.Set;
  */
 @Component
 public class AvaliableTimeServiceX {
-    @Autowired
-    private ServiceSDK serviceSDK;
-
-    @Autowired
-    private WorkOrderService workOrderService;
 
     @Autowired
     private TimeLimitPolicy timeLimitPolicy;
@@ -42,6 +36,9 @@ public class AvaliableTimeServiceX {
 
     @Autowired
     private CourseScheduleService courseScheduleService;
+
+    @Autowired
+    private ServeService serveService;
 
     /**
      * 免费体验的天数
