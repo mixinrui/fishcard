@@ -9,7 +9,9 @@ import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
@@ -27,7 +29,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Created by hucl on 16/3/31.
@@ -51,6 +55,9 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    TeacherStudentRequester  teacherStudentRequester;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -314,4 +321,5 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             workOrder.setSkuId(new Long(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType())));
         }
     }
+
 }

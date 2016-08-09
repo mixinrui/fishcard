@@ -1,5 +1,6 @@
 package workorder.controller;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.base.ReturnCode;
@@ -63,7 +64,7 @@ public class StudentAppRelateControllerTest {
 
         TimeSlotParam timeSlotParam = new TimeSlotParam();
         timeSlotParam.setOrderId(232l);
-        timeSlotParam.setType(1l);
+        timeSlotParam.setComboType(ComboTypeToRoleId.OVERALL.name());
 
 
         List<SelectedTime> selectedTimes = Lists.newArrayList();

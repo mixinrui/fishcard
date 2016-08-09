@@ -155,7 +155,7 @@ spring:
     port: 6379
     timeout: 10000
   rabbitmq:
-    address: 101.201.237.252
+    address: 127.0.0.1
 #    port: 5672
     username: boxfish
     password: boxfish
@@ -167,7 +167,7 @@ interface:
   address:
     teacher_service: http://101.201.237.252:8099
     teacher_service_admin: http://101.201.237.252:8099
-    course_recommended_service: http://114.55.40.98:8001
+    course_recommended_service: http://123.56.13.168:8001/recommend/core
     fishcard_service: http://127.0.0.1:8080
     order_service: http://101.201.237.252:8082
     course_online_service: http://101.201.239.116:9090

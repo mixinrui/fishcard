@@ -1,8 +1,6 @@
 package com.boxfishedu.workorder.service.graborder;
 
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.common.util.SystemUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderGrabHistoryJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderGrabJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -113,22 +111,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
     }
 
 
-    /**
-     * 获取 每天18点  到 后天 24点 (startTime) 的鱼卡信息
-     * @return
-     */
-    public List<WorkOrder> findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween(){
-        Date date = new Date();
 
-        Date begin  = DateUtil.addMinutes(DateUtil.parseTime(date,0),60*18);
-        Date end  = DateUtil.addMinutes(DateUtil.parseTime(date,1),60*24*2);
-
-        logger.info(":::::findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween:::From{[]}:::::To{[]}",DateUtil.Date2String(begin),DateUtil.Date2String(end));
-        return workOrderJpaRepository.findByTeacherIdGreaterThanAndStatusAndSendflagccAndUpdatetimeChangecourseNotNullAndStartTimeBetween(
-                0L,
-                FishCardStatusEnum.TEACHER_ASSIGNED.getCode(),
-                "1",begin,end);
-    }
 
 
 }

@@ -24,10 +24,7 @@ public enum TimerMessageType {
     GRAB_ORDER_DATA_CLEAR_DAY(100),
 
     //抢单格式化数据队列(清理历史数据外教)
-    GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH(101),
-    
-    //每天6点向老师发送课程变化的消息
-    COURSE_CHANGER_WORKORDER(102);
+    GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH(101);
 
 
 

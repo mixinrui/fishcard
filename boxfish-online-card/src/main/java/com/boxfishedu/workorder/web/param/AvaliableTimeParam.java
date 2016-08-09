@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.param;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -10,7 +11,7 @@ import java.io.Serializable;
 @Data
 public class AvaliableTimeParam implements Serializable {
     private Long studentId;
-    private Long roleId;
+    private String comboType;
     //是否免费
     private Boolean isFree;
     private Long orderId;
@@ -18,4 +19,7 @@ public class AvaliableTimeParam implements Serializable {
 
     //给换课时候判断换课的可用时间使用
     private Long workOrderId;
+    public ComboTypeToRoleId getComboType() {
+        return ComboTypeToRoleId.resolve(comboType);
+    }
 }

@@ -157,24 +157,6 @@ public class NotifyTimer {
     }
 
     /**
-     * 每天18:00 向教师发送 从现在开始  未来48+6小时内 变更课程的数量  的消息
-     */
-    @Scheduled(cron = "0 0 18 * * ?")
-    public void courseChangeSendMessage() {
-        logger.info("<<<<<<courseChangeSendMessage<<<<<<<<<<<<<<<<");
-        logger.info("<<<<<<开始通知<<< 变更课程的数量  >>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COURSE_CHANGER_WORKORDER.value());
-        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
-        rabbitMqSender.send(serviceTimerMessage);
-    }
-
-
-
-
-
-
-
-    /**
      * 抢单:每天17:40清理数据
      */
    // @Scheduled(cron = "0 40 17 * * ?")

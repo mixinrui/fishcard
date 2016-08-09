@@ -3,20 +3,18 @@ package com.boxfishedu.workorder.common.rabbitmq;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
-import com.boxfishedu.online.order.entity.OrderForm;
+import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
-import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,10 +48,6 @@ public class RabbitMqReciver {
     @Autowired
     private FishCardStatusFinderServiceX fishCardStatusFinderServiceX;
 
-    @Autowired
-    private CourseChangeServiceX courseChangeServiceX;
-
-
     // 抢单服务层
     @Autowired
     private MakeWorkOrderServiceX makeWorkOrderServiceX;
@@ -68,6 +62,7 @@ public class RabbitMqReciver {
     public void orderConsumer(OrderForm orderView) throws Exception {
         logger.info("@orderConsumer");
         try {
+            System.out.println(orderView);
             serveService.order2ServiceAndWorkOrder(orderView);
         } catch (Exception ex) {
             logger.error("订单[{}]转换失败", orderView.getId());
@@ -140,8 +135,6 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY101message");
                 logger.info("=========>清理抢单数据(外教)");
                 makeWorkOrderServiceX.clearGrabData();
-            }else if(serviceTimerMessage.getType() == TimerMessageType.COURSE_CHANGER_WORKORDER.value()){
-                courseChangeServiceX.sendCourseChangeWorkOrders();
             }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
