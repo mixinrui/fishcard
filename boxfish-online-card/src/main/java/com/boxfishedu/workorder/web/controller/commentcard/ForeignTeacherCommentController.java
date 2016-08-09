@@ -98,4 +98,10 @@ public class ForeignTeacherCommentController {
     public JsonResultModel testQueryAll(Pageable pageable){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
+
+    @RequestMapping(value = "get_user_picture", method = RequestMethod.GET)
+    public JsonResultModel getUserPicture(String access_token){
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.getUserPicture(access_token));
+    }
+    
 }

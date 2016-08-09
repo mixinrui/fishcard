@@ -35,11 +35,24 @@ public class CommentCardSDK {
         return restTemplate.postForObject(createTeacherAbsenceURI(), paramMap,JsonResultModel.class);
     }
 
+    public String getUserPicture(String access_token){
+        return restTemplate.getForObject(createGetPictureURI(access_token),String.class);
+    }
+
     private URI createTeacherAbsenceURI(){
         logger.info("Accessing createTeacherAbsenceURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString("http://192.168.88.210:8099")
                 .path("/f_teacher_review/set_truant")
                 .queryParam("")
+                .build()
+                .toUri();
+    }
+
+    private URI createGetPictureURI(String access_token){
+        logger.info("Accessing createGetPictureURI in CommentCardSDK......");
+        return UriComponentsBuilder.fromUriString("http://114.55.58.184:8099")
+                .path("/user/me")
+                .queryParam("access_token",access_token)
                 .build()
                 .toUri();
     }

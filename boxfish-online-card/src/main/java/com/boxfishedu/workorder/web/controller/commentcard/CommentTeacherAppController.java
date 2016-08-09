@@ -46,7 +46,6 @@ public class CommentTeacherAppController {
     public JsonResultModel teacherUnAnswerList(Pageable pageable,Long userId){
         return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherUnanswerList(pageable,userId));
     }
-    {}{}
     @RequestMapping(value = "/card/{card_id}/detail", method = RequestMethod.GET)
     public JsonResultModel listOne(@PathVariable("card_id") Long cardId){
         CommentCard commentCard = commentTeacherAppServiceX.findById(cardId);

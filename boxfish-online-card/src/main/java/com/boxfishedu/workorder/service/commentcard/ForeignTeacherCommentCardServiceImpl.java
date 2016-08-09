@@ -5,6 +5,8 @@ import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.util.JSONParser;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.CommentCardUnanswerTeacherJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
@@ -176,6 +178,12 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public Page<CommentCard> testQueryAll(Pageable pageable) {
         logger.info("!!!!!!调用测试接口---->教师端查询所有存在的点评卡");
         return commentCardJpaRepository.findAll(pageable);
+    }
+
+    @Override
+    public String getUserPicture(String access_token) {
+        UserInfo userInfo = JSONParser.fromJson(commentCardSDK.getUserPicture(access_token),UserInfo.class);
+        return userInfo.getFigure_url();
     }
 
 }
