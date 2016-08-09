@@ -39,7 +39,7 @@ parameter:
   #超过上课时间的时长(minute):
   pass_card_start_peroid: 2
   #超过上课时间时长(minute):
-  pass_card_wait_peroid: 5
+  pass_card_wait_peroid: 3
   #超过应该结束时间时长(minute):
   pass_card_end_time: 2
   #允许出现的偏差(seconds):
