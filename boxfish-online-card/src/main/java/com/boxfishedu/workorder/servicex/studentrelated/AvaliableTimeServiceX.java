@@ -73,7 +73,7 @@ public class AvaliableTimeServiceX {
             DayTimeSlots result = timeLimitPolicy.limit(clone);
             result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
                     .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()));
             return result;
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
