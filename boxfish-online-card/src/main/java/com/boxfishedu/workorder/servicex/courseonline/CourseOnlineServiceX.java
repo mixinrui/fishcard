@@ -71,23 +71,25 @@ public class CourseOnlineServiceX {
         logger.info("@updateTeachingStatus,参数{}", JacksonUtil.toJSon(map));
         Long workOrderId = Long.parseLong(map.get("id").toString());
         Integer status = Integer.parseInt(map.get("status").toString());
+
         String reportTime = StringUtils.EMPTY;
-        try {
-            reportTime = map.get("report_time").toString();
-        } catch (Exception ex) {
-            logger.info("updateTeachingStatus#no_report_time,终端没有上报上传时间");
-        }
+        reportTime = getReportTime(map, reportTime);
 
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrderId);
-        if ((status != FishCardStatusEnum.COMPLETED.getCode()) && (status != FishCardStatusEnum.COMPLETED_FORCE.getCode())) {
-            courseOnlineService.notAllowUpdateStatus(workOrder, "不能覆盖已有消息"+"###reportTime::" + reportTime+"####新消息:" + FishCardStatusEnum.getDesc(status));
+
+        courseOnlineService.notAllowUpdateStatus(workOrder, "不能覆盖已有消息" + "###reportTime::" + reportTime + "####新消息:" + FishCardStatusEnum.getDesc(status));
+
+        //处理参数问题
+        dealNullFishCard(workOrderId, workOrder, courseSchedule);
+
+        //未到上课时间尝试更新,不做处理
+        Date now = new Date();
+        if (now.before(workOrder.getStartTime())) {
+            tooEarlyReport(status, workOrder);
+            return;
         }
-        if (null == workOrder || null == courseSchedule) {
-            String msg = "无对应的鱼卡或课程schedule,请确认参数传入是否正确,鱼卡id[" + workOrderId + "]";
-            logger.info(msg);
-            throw new BusinessException(msg);
-        }
+
         //处理完成的情况
         if (status == FishCardStatusEnum.COMPLETED.getCode() || status == FishCardStatusEnum.COMPLETED_FORCE.getCode()) {
             completeCourse(workOrder, courseSchedule, status);
@@ -103,14 +105,39 @@ public class CourseOnlineServiceX {
             }
             workOrder.setStatus(status);
             workOrder.setUpdateTime(new Date());
-            workOrderService.save(workOrder);
+            courseSchedule.setStatus(status);
+            courseSchedule.setUpdateTime(new Date());
+            workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
         }
         workOrderLogService.saveWorkOrderLog(workOrder, "reporttime::" + reportTime + "#########" + FishCardStatusEnum.getDesc(workOrder.getStatus()));
     }
 
-    //更新WorkOrder的状态
+    private void tooEarlyReport(Integer status, WorkOrder workOrder) {
+        logger.error("@updateWorkOrderStatus,没有到上课时间;尝试更新鱼卡[{}]状态失败", workOrder.getId());
+        workOrderLogService.saveWorkOrderLog(workOrder, "没有到上课时间,尝试更新鱼卡状态被拒,尝试更新状态为:[" + status + "]");
+    }
+
+    private String getReportTime(Map<String, Object> map, String reportTime) {
+        try {
+            reportTime = map.get("report_time").toString();
+        } catch (Exception ex) {
+            logger.info("updateTeachingStatus#no_report_time,终端没有上报上传时间");
+        }
+        return reportTime;
+    }
+
+    private void dealNullFishCard(Long workOrderId, WorkOrder workOrder, CourseSchedule courseSchedule) {
+        if (null == workOrder || null == courseSchedule) {
+            String msg = "无对应的鱼卡或课程schedule,请确认参数传入是否正确,鱼卡id[" + workOrderId + "]";
+            logger.info(msg);
+            throw new BusinessException(msg);
+        }
+    }
+
+
+    //更新WorkOrder的状态;已弃用,改为mq的方式
     public void updateWorkOrderStatus(WorkOrderView workOrderView) throws BusinessException {
-        logger.info("鱼卡id为:[{}]开始状态更新", workOrderView.getId());
+        logger.info("@updateWorkOrderStatus鱼卡id为:[{}]开始状态更新", workOrderView.getId());
         boolean pivot = false;
         for (FishCardStatusEnum fishCardStatusEnum : FishCardStatusEnum.values()) {
             if (workOrderView.getStatus() == fishCardStatusEnum.getCode()) {
@@ -125,6 +152,7 @@ public class CourseOnlineServiceX {
         if (null == workOrder) {
             throw new BusinessException("找不到对应的鱼卡");
         }
+
         workOrder.setStatus(workOrderView.getStatus());
         workOrder.setUpdateTime(new Date());
         workOrderService.save(workOrder);

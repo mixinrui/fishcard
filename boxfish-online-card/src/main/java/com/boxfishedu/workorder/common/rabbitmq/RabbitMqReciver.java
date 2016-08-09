@@ -174,7 +174,7 @@ public class RabbitMqReciver {
         try {
             courseOnlineServiceX.updateTeachingStatus(map);
         } catch (Exception ex) {
-            logger.error("@updateWorkOrderStatus,消息处理失败");
+            logger.error("@updateWorkOrderStatus,消息[{}]处理失败",JacksonUtil.toJSon(map));
         }
     }
 

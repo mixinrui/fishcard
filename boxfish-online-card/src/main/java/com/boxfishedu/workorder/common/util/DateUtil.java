@@ -33,6 +33,17 @@ public class DateUtil {
         return date;
     }
 
+    public static Date String2DateBack(String str) throws RuntimeException {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(str);
+        } catch (Exception ex) {
+            throw new RuntimeException("日期格式不合法");
+        }
+        return date;
+    }
+
     /**
      * yyyy-MM-dd
      * @param str

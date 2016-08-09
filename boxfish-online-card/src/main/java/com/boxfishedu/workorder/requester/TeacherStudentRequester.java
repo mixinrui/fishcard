@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.common.util.RestTemplateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
@@ -30,7 +31,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -48,20 +55,20 @@ public class TeacherStudentRequester {
     @Autowired
     private CacheManager cacheManager;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //从师生运营组批量获取教师列表,key为coursechedule的id
     //url:http://192.168.77.233:8099/course/schedule/add/student/time
     //参数:{"userId":10001,"scheduleModelList":[{"day":1460390400000,"slotId":1,"courseType":"词汇","roleId":1,"id":1}]}
-    public Map<String,TeacherView> getTeacherList(FetchTeacherParam fetchTeacherParam){
+    public Map<String, TeacherView> getTeacherList(FetchTeacherParam fetchTeacherParam) {
         String url = String.format("%s/course/schedule/add/student/time", urlConf.getTeacher_service());
-        JsonResultModel jsonResultModel=restTemplate.postForObject(url,fetchTeacherParam,JsonResultModel.class);
-        logger.info("========获取教师=======url:{};;;;;;;;参数:{}",url, JSONObject.toJSONString(fetchTeacherParam));
-        Map<String,TeacherView> teacherViewMap=new LinkedHashMap<>();
-        Map<String,Object> map=((LinkedHashMap)jsonResultModel.getData());
-        for(Map.Entry<String,Object> entry:map.entrySet()){
+        JsonResultModel jsonResultModel = restTemplate.postForObject(url, fetchTeacherParam, JsonResultModel.class);
+        logger.info("========获取教师=======url:{};;;;;;;;参数:{}", url, JSONObject.toJSONString(fetchTeacherParam));
+        Map<String, TeacherView> teacherViewMap = new LinkedHashMap<>();
+        Map<String, Object> map = ((LinkedHashMap) jsonResultModel.getData());
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
             TeacherView teacherView = JSONObject.parseObject(JSONObject.toJSONString(entry.getValue()), TeacherView.class);
-            teacherViewMap.put(entry.getKey(),teacherView);
+            teacherViewMap.put(entry.getKey(), teacherView);
         }
         return teacherViewMap;
     }
@@ -99,11 +106,10 @@ public class TeacherStudentRequester {
         JsonResultModel jsonResultModel = null;
         try {
             jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
-            if(HttpStatus.OK.value()!=jsonResultModel.getReturnCode()){
-                throw  new BusinessException("向师生运营组获取时间片失败"+jsonResultModel.getReturnMsg());
+            if (HttpStatus.OK.value() != jsonResultModel.getReturnCode()) {
+                throw new BusinessException("向师生运营组获取时间片失败" + jsonResultModel.getReturnMsg());
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             logger.error("向师生运营组发送获取时间片失败");
             throw new BusinessException("向师生运营组发送获取时间片失败");
         }
@@ -119,6 +125,7 @@ public class TeacherStudentRequester {
 
     /**
      * 获取单个时间片
+     *
      * @param id
      * @return
      */
@@ -131,13 +138,14 @@ public class TeacherStudentRequester {
 
     /**
      * 天时间片模板
+     *
      * @param teacherId
      * @return
      */
     //@Retryable(value = { RestClientException.class, ResourceAccessException.class }, maxAttempts = 3, backoff=@Backoff(delay = 10, maxDelay = 100))
     public DayTimeSlots dayTimeSlotsTemplate(Long teacherId, Date date) {
         DayTimeSlots dayTimeSlots = cacheManager.getCache(DayTimeSlots.CACHE_KEY).get(teacherId.toString(), DayTimeSlots.class);
-        if(dayTimeSlots == null) {
+        if (dayTimeSlots == null) {
             dayTimeSlots = dayTimeSlotsTemplate(teacherId);
             cacheManager.getCache(DayTimeSlots.CACHE_KEY).put(teacherId.toString(), dayTimeSlots);
         }
@@ -148,45 +156,44 @@ public class TeacherStudentRequester {
     //TODO:增加教师与学生的上课记录关系
     public void releaseTeacher(WorkOrder workOrder) throws BoxfishException {
         String url = String.format("%s/studentTeacher/add", urlConf.getTeacher_service());
-        Map<String,Long> mapParam=new HashMap<>();
-        mapParam.put("teacherId",workOrder.getTeacherId());
-        mapParam.put("studentId",workOrder.getStudentId());
-        logger.debug("<-<-<-<-<-<-@releaseTeacher鱼卡[{}]向师生运营发起释放资源请求,参数{}",workOrder.getId(), JacksonUtil.toJSon(mapParam));
-        JsonResultModel jsonResultModel=restTemplate.postForObject(url,mapParam,JsonResultModel.class);
-        if(jsonResultModel.getReturnCode()!= HttpStatus.OK.value()){
-            logger.error("鱼卡[{}]通知师生运营组释放资源失败!!!!",workOrder.getId());
+        Map<String, Long> mapParam = new HashMap<>();
+        mapParam.put("teacherId", workOrder.getTeacherId());
+        mapParam.put("studentId", workOrder.getStudentId());
+        logger.debug("<-<-<-<-<-<-@releaseTeacher鱼卡[{}]向师生运营发起释放资源请求,参数{}", workOrder.getId(), JacksonUtil.toJSon(mapParam));
+        JsonResultModel jsonResultModel = restTemplate.postForObject(url, mapParam, JsonResultModel.class);
+        if (jsonResultModel.getReturnCode() != HttpStatus.OK.value()) {
+            logger.error("鱼卡[{}]通知师生运营组释放资源失败!!!!", workOrder.getId());
             return;
         }
-        logger.info("@releaseTeacher鱼卡[{}]向师生运营发送释放资源成功",workOrder.getId());
+        logger.info("@releaseTeacher鱼卡[{}]向师生运营发送释放资源成功", workOrder.getId());
     }
 
     //TODO:此处的url换为师生运营的url
     public void notifyChangeTeacher(WorkOrder workOrder) {
-        StringBuilder builder=new StringBuilder(urlConf.getTeacher_service_admin());// jiaozijun 配合  haijiang  更改师生运营接口
+        StringBuilder builder = new StringBuilder(urlConf.getTeacher_service_admin());// jiaozijun 配合  haijiang  更改师生运营接口
         builder.append("/course/schedule/teacher/change");
-        String url=builder.toString();
-        logger.info("鱼卡[{}]向师生运营发起换教师的请求[{}]",workOrder.getId(),url);
-        Map map=new HashMap<>();
+        String url = builder.toString();
+        logger.info("鱼卡[{}]向师生运营发起换教师的请求[{}]", workOrder.getId(), url);
+        Map map = new HashMap<>();
         map.put("day", DateUtil.date2SimpleDate(workOrder.getStartTime()).getTime());
-        map.put("timeSlotId",workOrder.getSlotId());
-        map.put("teacherId",workOrder.getTeacherId());
-        map.put("studentId",workOrder.getStudentId());
+        map.put("timeSlotId", workOrder.getSlotId());
+        map.put("teacherId", workOrder.getTeacherId());
+        map.put("studentId", workOrder.getStudentId());
         logger.debug("参数{}", JacksonUtil.toJSon(map));
-        JsonResultModel jsonResultModel=null;
+        JsonResultModel jsonResultModel = null;
         try {
-            jsonResultModel=restTemplate.postForObject(url,map,JsonResultModel.class);
-        }
-        catch (Exception ex){
-            logger.error("向师生运营发送更换老师失败",ex);
+            jsonResultModel = restTemplate.postForObject(url, map, JsonResultModel.class);
+        } catch (Exception ex) {
+            logger.error("向师生运营发送更换老师失败", ex);
             throw new BusinessException("向师生运营请求更换教师失败");
         }
-        if(HttpStatus.OK.value()!=jsonResultModel.getReturnCode()){
-            logger.error("向师生运营获取教师失败,失败原因:[{}]",jsonResultModel.getReturnMsg());
-            throw new BusinessException("教师更换失败:"+jsonResultModel.getReturnMsg());
+        if (HttpStatus.OK.value() != jsonResultModel.getReturnCode()) {
+            logger.error("向师生运营获取教师失败,失败原因:[{}]", jsonResultModel.getReturnMsg());
+            throw new BusinessException("教师更换失败:" + jsonResultModel.getReturnMsg());
         }
     }
 
-    public JsonResultModel getPageableTeachers(CourseSchedule courseSchedule,Pageable pageable){
+    public JsonResultModel getPageableTeachers(CourseSchedule courseSchedule, Pageable pageable) {
         String url = String.format(
                 "%s/teacher/query/%s/%s?page=%s&size=%s",
                 urlConf.getTeacher_service(),
@@ -202,91 +209,90 @@ public class TeacherStudentRequester {
 //        if(day != null) {
 //            return day;
 //        } else {
-            JsonResultModel jsonResultModel = restTemplate.getForObject(createGetTeacherFirstDayURI(teacherId), JsonResultModel.class);
-            Map beanMap = (Map) jsonResultModel.getData();
-            return (Long) beanMap.get("day");
+        JsonResultModel jsonResultModel = restTemplate.getForObject(createGetTeacherFirstDayURI(teacherId), JsonResultModel.class);
+        Map beanMap = (Map) jsonResultModel.getData();
+        return (Long) beanMap.get("day");
 //        }
     }
 
     private URI createGetTeacherFirstDayURI(Long teacherId) {
-        URI uri= UriComponentsBuilder
+        URI uri = UriComponentsBuilder
                 .fromUriString(urlConf.getTeacher_service())
                 .path("/course/schedule/teacher/first/" + teacherId)
                 .build()
                 .toUri();
-        logger.debug("<==============@createGetTeacherFirstDayURI向师生运营发送获取教师第一个时间片请求,[{}]",uri.getPath());
+        logger.debug("<==============@createGetTeacherFirstDayURI向师生运营发送获取教师第一个时间片请求,[{}]", uri.getPath());
         return uri;
     }
 
 
-
     /**
-     *  向在线教育push教师消息数据
+     * 向在线教育push教师消息数据
      */
-    public void pushTeacherListOnlineMsg(List teachingOnlineListMsg){
-        String url=String.format("%s/teaching/callback/push", urlConf.getCourse_online_service());
+    public void pushTeacherListOnlineMsg(List teachingOnlineListMsg) {
+        String url = String.format("%s/teaching/callback/push", urlConf.getCourse_online_service());
         // String url="http://192.168.77.37:9090/teaching/callback/push";
-        logger.debug("::::::::::::::::::::::::::::::::@[pushWrappedMsg]向在线教育发起获取教师列表url[{}]::::::::::::::::::::::::::::::::",url);
+        logger.debug("::::::::::::::::::::::::::::::::@[pushWrappedMsg]向在线教育发起获取教师列表url[{}]::::::::::::::::::::::::::::::::", url);
 
         logger.info("::::::::::::::::::::::::::::::::sendDate:begion::[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(teachingOnlineListMsg));
-        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);}));
+        threadPoolManager.execute(new Thread(() -> {
+            restTemplate.postForObject(url, teachingOnlineListMsg, Object.class);
+        }));
         logger.info("::::::::::::::::::::::::::::::::sendData:over::::::::::::::");
         //restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);
         //JsonResultModel jsonResultModel = restTemplate.postForObject(url, teachingOnlineListMsg,JsonResultModel.class);
     }
 
 
-
     /**
-     *  http调用师生运营 获取 教师列表
-     *  teacherType  teacher类型   {chineseTeacher}/{foreignTeacher}    demo:  true/false
+     * http调用师生运营 获取 教师列表
+     * teacherType  teacher类型   {chineseTeacher}/{foreignTeacher}    demo:  true/false
      */
-    public List pullTeacherListMsg(String teacherType){
-        String url=String.format("%s/seckillteacher/query/%s",
-               urlConf.getTeacher_service(),teacherType);
+    public List pullTeacherListMsg(String teacherType) {
+        String url = String.format("%s/seckillteacher/query/%s",
+                urlConf.getTeacher_service(), teacherType);
 //        String url=String.format("http://192.168.77.186:8099/seckillteacher/demo/query/%s",
 //                teacherType);
 //        String url=String.format("http://192.168.77.186:8099/seckillteacher/query/true/false",
 //                teacherType);
-        logger.info("::::::::::::::::::::::::::::::::@[pullTeacherListMsg]向师生运营发起获取教师列表url[{}]::::::::::::::::::::::::::::::::",url);
+        logger.info("::::::::::::::::::::::::::::::::@[pullTeacherListMsg]向师生运营发起获取教师列表url[{}]::::::::::::::::::::::::::::::::", url);
 
         JsonResultModel jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
-        List  teacherList = (List) jsonResultModel.getData();
+        List teacherList = (List) jsonResultModel.getData();
         logger.info("::::::::::::::::::::::::::::::::@[pullTeacherListMsg]向师生运营发起获取教师列表长度size[{}]  Datais[{}]::::::::::::::::::::::::::::::::",
-                teacherList==null?0:teacherList.size(),JSON.toJSON(teacherList));
-        return  teacherList;
+                teacherList == null ? 0 : teacherList.size(), JSON.toJSON(teacherList));
+        return teacherList;
 
     }
 
     public void notifyCancelTeacher(WorkOrder workOrder) {
-        String url = String.format("%s/course/schedule/teacher/course/cancel",urlConf.getTeacher_service_admin());
-        logger.info("鱼卡[{}]向师生运营发起取消教师的请求[{}]",workOrder.getId(),url);
+        String url = String.format("%s/course/schedule/teacher/course/cancel", urlConf.getTeacher_service_admin());
+        logger.info("鱼卡[{}]向师生运营发起取消教师的请求[{}]", workOrder.getId(), url);
 
-        Map map= Maps.newHashMap();
+        Map map = Maps.newHashMap();
         map.put("day", DateUtil.date2SimpleDate(workOrder.getStartTime()).getTime());
-        map.put("timeSlotId",workOrder.getSlotId());
-        map.put("teacherId",workOrder.getTeacherId());
-        map.put("studentId",workOrder.getStudentId());
+        map.put("timeSlotId", workOrder.getSlotId());
+        map.put("teacherId", workOrder.getTeacherId());
+        map.put("studentId", workOrder.getStudentId());
 
-        threadPoolManager.execute(new Thread(()->{
-            restTemplate.postForObject(url,map,JsonResultModel.class);})
+        threadPoolManager.execute(new Thread(() -> {
+                    restTemplate.postForObject(url, map, JsonResultModel.class);
+                })
         );
 
     }
 
     //发起教师类型请求,失败则返回默认的中教
-    public int getTeacherType(Long teacherId){
+    public int getTeacherType(Long teacherId) {
         try {
             String url = String.format("%s/teacher/%s", urlConf.getTeacher_service(), teacherId);
             logger.info("向师生运营发起获取教师信息请求,url:[{}]", url);
             JsonResultModel teacherResult = restTemplate.getForObject(url, JsonResultModel.class);
             Map<String, Object> map = (Map) teacherResult.getData();
             return Integer.parseInt(map.get("teachingType").toString());
-        }
-        catch (Exception ex){
-            logger.error("向师生运营发起教师类型请求失败",ex);
+        } catch (Exception ex) {
+            logger.error("向师生运营发起教师类型请求失败", ex);
         }
         return TeachingType.ZHONGJIAO.getCode();
     }
-
 }
