@@ -151,32 +151,33 @@ public class FishCardUpdatorServiceX {
      */
     public boolean studentForceAbsentUpdator(WorkOrder workOrder, CourseSchedule courseSchedule) {
         //默认不为异常
-        boolean isExceptionFlag=false;
+        boolean isExceptionFlag = false;
 
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
-        if(CollectionUtils.isEmpty(workOrderLogs)){
+        if (CollectionUtils.isEmpty(workOrderLogs)) {
             return false;
         }
 
         boolean containConnectedFlag = false;
         LocalDateTime startLocalDate = LocalDateTime.ofInstant(workOrder.getStartTime().toInstant(), ZoneId.systemDefault());
-        LocalDateTime endLocalDate=startLocalDate.plusMinutes(studentAbsentTimeLimit);
-        Date startDate=DateUtil.localDate2Date(startLocalDate);
-        Date endDate= DateUtil.localDate2Date(endLocalDate);
+        LocalDateTime endLocalDate = startLocalDate.plusMinutes(studentAbsentTimeLimit);
+        Date startDate = DateUtil.localDate2Date(startLocalDate);
+        Date endDate = DateUtil.localDate2Date(endLocalDate);
 
         for (WorkOrderLog workOrderLog : workOrderLogs) {
-           if(workOrderLog.getStatus()==FishCardStatusEnum.CONNECTED.getCode()
-                   &&workOrderLog.getCreateTime().after(startDate)
-                   &&workOrderLog.getCreateTime().before(endDate)){
-               containConnectedFlag=true;
-           }
+            if (workOrderLog.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
+                    && workOrderLog.getCreateTime().after(startDate)
+                    && workOrderLog.getCreateTime().before(endDate)) {
+                containConnectedFlag = true;
+            }
         }
 
-        boolean isOnline=fetchHeartBeatServiceX.isOnline(new DataAnalysisLogParam(workOrder.getStudentId(),
-                startDate.getTime(),endDate.getTime(), AppPointRecordEventEnum.ONLINE_COURSE_HEARTBEAT.value()));
+        boolean isOnline = fetchHeartBeatServiceX.isOnline(new DataAnalysisLogParam(workOrder.getStudentId(),
+                startDate.getTime(), endDate.getTime(), AppPointRecordEventEnum.ONLINE_COURSE_HEARTBEAT.value()));
         //没有联通但是在线,则表示为系统异常
-        if(!containConnectedFlag&&isOnline){
-            isExceptionFlag=true;
+        if (!containConnectedFlag && isOnline) {
+            isExceptionFlag = true;
+            logger.info("判断鱼卡[{}]是否由于终端异常导致,判断结果[{}]", workOrder.getId(), isOnline);
         }
         if (!isExceptionFlag) {
             logger.warn("[studentAbsentUpdator]鱼卡:[{}]的状态为学生旷课,开始处理", workOrder.getId());
