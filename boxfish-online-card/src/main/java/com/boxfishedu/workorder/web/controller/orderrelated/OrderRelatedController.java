@@ -25,10 +25,4 @@ public class OrderRelatedController {
         JsonResultModel jsonResultModel = orderConsumeInfoServiceX.getOrderConsumeInfo(orderId);
         return jsonResultModel;
     }
-
-
-
-
-
-
 }
