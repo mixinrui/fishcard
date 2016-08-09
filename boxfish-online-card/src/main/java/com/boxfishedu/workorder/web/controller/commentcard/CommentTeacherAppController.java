@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
+import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
@@ -30,6 +31,9 @@ public class CommentTeacherAppController {
     @Autowired
     private CommentCardTeacherAppService commentCardTeacherAppService;
 
+    @Autowired
+    private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
+
     @RequestMapping(value = "/teacher/{teacher_id}/list", method = RequestMethod.GET)
     public JsonResultModel list(@PathVariable("teacher_id") long teacherId,Long userId, Pageable pageable){
         commonServeServiceX.checkToken(teacherId,userId);
@@ -53,8 +57,9 @@ public class CommentTeacherAppController {
     }
 
     @RequestMapping(value = "/card", method = RequestMethod.POST)
-    public JsonResultModel submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam,Long userId){
+    public JsonResultModel submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam,Long userId,String access_token){
         commonServeServiceX.checkToken(commentCardSubmitParam.getTeacherId(),userId);
+        commentCardSubmitParam.setTeacherPicturePath(foreignTeacherCommentCardService.getUserPicture(access_token));
         commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
         return JsonResultModel.newJsonResultModel(null);
     }

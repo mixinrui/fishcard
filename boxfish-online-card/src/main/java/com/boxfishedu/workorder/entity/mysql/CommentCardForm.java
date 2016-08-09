@@ -9,12 +9,10 @@ import lombok.Data;
 public class CommentCardForm {
     private Long id;
     private Long studentId;
-    private String studentName;
     private String questionName;
     private String courseId;
     private String courseName;
     private String cover;
-    private Long askVoiceId;
     private String askVoicePath;
     private Long voiceTime;
     private String teacherName;

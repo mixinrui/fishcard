@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.commentcard;
 
+import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
@@ -8,6 +9,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentCommentCardRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.commentcard.CommentCardLogService;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
+import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.boxfishedu.workorder.web.param.commentcard.TeacherReadMsgParam;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -35,6 +38,9 @@ public class CommentTeacherAppServiceX {
 
     @Autowired
     private TeacherStudentCommentCardRequester teacherStudentCommentCardRequester;
+
+    @Autowired
+    private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -65,11 +71,18 @@ public class CommentTeacherAppServiceX {
         commentCard.setStatus(CommentCardStatus.ANSWERED.getCode());
         commentCard.setUpdateTime(new Date());
         commentCard.setAnswerVideoPath(commentCardSubmitParam.getVideoPath());
-        commentCard.setAnswer_video_time(commentCardSubmitParam.getAnswerVideoTime());
-        commentCard.setAnswer_video_size(commentCardSubmitParam.getAnswerVideoSize());
+        commentCard.setAnswerVideoTime(commentCardSubmitParam.getAnswerVideoTime());
+        commentCard.setAnswerVideoSize(commentCardSubmitParam.getAnswerVideoSize());
         commentCard.setTeacherAnswerTime(new Date());
+        commentCard.setTeacherPicturePath(commentCardSubmitParam.getTeacherPicturePath());
         commentCardTeacherAppService.save(commentCard);
         commentCardLogService.saveCommentCardLog(commentCard);
+        JsonResultModel jsonResultModel = foreignTeacherCommentCardService.pushInfoToStudentAndTeacher(commentCard.getStudentId(),"老师已经对你的提问做出点评!","FOREIGNCOMMENT");
+        if (jsonResultModel.getReturnCode().equals(HttpStatus.OK.value())){
+            logger.info("已经向学生端推送消息,推送的学生studentId=" + commentCard.getStudentId());
+        }else {
+            logger.info("向学生端推送消息失败,推送失败的学生studentId=" + commentCard.getStudentId());
+        }
     }
 
     public CommentCard checkTeacher(Long id, Long teacherId){

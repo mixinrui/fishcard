@@ -41,8 +41,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Autowired
     CommentCardSDK commentCardSDK;
 
-    @Autowired
-    CommentCardUnanswerTeacherJpaRepository commentCardUnanswerTeacherJpaRepository;
+//    @Autowired
+//    CommentCardUnanswerTeacherJpaRepository commentCardUnanswerTeacherJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
@@ -70,13 +70,18 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }else {
             Date dateNow = new Date();
             commentCard.setTeacherId(fromTeacherStudentForm.getTeacherId());
-            commentCard.setTeacherName(fromTeacherStudentForm.getTeacherName());
             commentCard.setUpdateTime(dateNow);
             commentCard.setAssignTeacherTime(dateNow);
             commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
             commentCard.setTeacherReadFlag(0);
             commentCardJpaRepository.save(commentCard);
             logger.info("调用外教点评接口更新点评卡中外教点评内容,其中" + commentCard);
+            JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(fromTeacherStudentForm.getTeacherId(),"有需要您在24小时内完成的点评","FOREIGNCOMMENT");
+            if (jsonResultModel.getReturnCode().equals(200)){
+                logger.info("已经向教师端推送消息,推送的教师teacherId=" + fromTeacherStudentForm.getTeacherId());
+            }else {
+                logger.info("向教师端推送消息失败,推送失败的教师teacherId=" + fromTeacherStudentForm.getTeacherId());
+            }
         }
     }
 
@@ -112,20 +117,25 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
             commentCard.setUpdateTime(dateNow);
             commentCard.setAssignTeacherCount(2);
-            commentCardJpaRepository.save(commentCard);
-            ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
-            logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+commentCard);
-            rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
             if(!StringUtils.isEmpty(commentCard.getTeacherId())){
-                CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
-                commentCardUnanswerTeacher.setCommentCard(commentCard);
-                commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
-                commentCardUnanswerTeacher.setCreateTime(dateNow);
+//                CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
+//                commentCardUnanswerTeacher.setCommentCard(commentCard);
+//                commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
+//                commentCardUnanswerTeacher.setCreateTime(dateNow);
                 logger.info("记录超时未点评的外教,同时调用师生运营接口,设置该外教为旷课......",commentCard);
-                commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
+//                commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
                 JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
                 logger.info("此外教标注旷课状态情况{}",jsonResultModel);
             }
+            commentCard.setId(null);
+            commentCard.setTeacherId(null);
+            commentCard.setAssignTeacherTime(null);
+            commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+            CommentCard commentCardNew = commentCardJpaRepository.save(commentCard);
+            ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCardNew);
+            logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+commentCardNew);
+            rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+
         }
         logger.info("所有在24小时内为被点评的学生已重新请求分配外教完毕,一共重新分配外教点评的个数为:"+list.size());
     }
@@ -144,11 +154,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCardJpaRepository.save(commentCard);
             serviceTemp.setAmount(serviceTemp.getAmount() + 1);
             serviceJpaRepository.save(serviceTemp);
-            CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
-            commentCardUnanswerTeacher.setCommentCard(commentCard);
-            commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
-            commentCardUnanswerTeacher.setCreateTime(dateNow);
-            commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
+//            CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
+//            commentCardUnanswerTeacher.setCommentCard(commentCard);
+//            commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
+//            commentCardUnanswerTeacher.setCreateTime(dateNow);
+//            commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
         }
         logger.info("所有学生外教点评次数返还完毕,一共返回次数为:"+list.size());
     }
@@ -184,6 +194,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public String getUserPicture(String access_token) {
         UserInfo userInfo = JSONParser.fromJson(commentCardSDK.getUserPicture(access_token),UserInfo.class);
         return userInfo.getFigure_url();
+    }
+
+    @Override
+    public JsonResultModel pushInfoToStudentAndTeacher(Long userId, String title, String type) {
+        return commentCardSDK.pushToStudentAndTeacher(userId,title,type);
     }
 
 }

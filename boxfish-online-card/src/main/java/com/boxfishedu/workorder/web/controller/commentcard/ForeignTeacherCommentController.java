@@ -34,7 +34,7 @@ public class ForeignTeacherCommentController {
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
     @Transactional
-    public JsonResultModel addCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId) throws Exception {
+    public JsonResultModel addCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId, String access_token) throws Exception {
         CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
         if(serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
             Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
@@ -47,9 +47,9 @@ public class ForeignTeacherCommentController {
                 commentCard.setService(service);
                 commentCard.setOrderId(service.getOrderId());
                 commentCard.setOrderCode(service.getOrderCode());
-                commentCard.setAskVoiceId(commentCardForm.getAskVoiceId());
                 commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
                 commentCard.setVoiceTime(commentCardForm.getVoiceTime());
+                commentCard.setStudentPicturePath(foreignTeacherCommentCardService.getUserPicture(access_token));
                 return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard));
             }
         }else {
@@ -89,19 +89,21 @@ public class ForeignTeacherCommentController {
         return JsonResultModel.newJsonResultModel(serveService.getForeignCommentServiceCount(userId));
     }
 
+
+    //测试用接口
     @RequestMapping(value = "test_teacher_comment", method = RequestMethod.POST)
     public JsonResultModel testTeacherComment(@RequestBody CommentCardForm commentCardForm, Long userId){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testTeacherComment(commentCardForm,userId));
     }
 
+    //测试用接口
     @RequestMapping(value = "test_query_all", method = RequestMethod.GET)
     public JsonResultModel testQueryAll(Pageable pageable){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
 
-    @RequestMapping(value = "get_user_picture", method = RequestMethod.GET)
-    public JsonResultModel getUserPicture(String access_token){
-        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.getUserPicture(access_token));
-    }
-    
+//    @RequestMapping(value = "/get_user_picture", method = RequestMethod.GET)
+//    public JsonResultModel getUserPicture(String access_token){
+//        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.getUserPicture(access_token));
+//    }
 }

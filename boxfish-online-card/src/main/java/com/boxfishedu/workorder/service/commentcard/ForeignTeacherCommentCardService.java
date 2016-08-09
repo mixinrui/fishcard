@@ -34,4 +34,6 @@ public interface ForeignTeacherCommentCardService {
     public Page<CommentCard> testQueryAll(Pageable pageable);
 
     public String getUserPicture(String access_token);
+
+    public JsonResultModel pushInfoToStudentAndTeacher(Long userId, String title, String type);
 }

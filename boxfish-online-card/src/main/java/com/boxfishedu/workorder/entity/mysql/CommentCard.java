@@ -33,14 +33,14 @@ public class CommentCard {
     @Column(name = "student_id", nullable = true)
     private Long studentId;
 
-    @Column(name = "student_name", nullable = true, length = 20)
-    private String studentName;
+    @Column(name = "student_picture_path")
+    private String studentPicturePath;
 
     @Column(name = "teacher_id", nullable = true)
     private Long teacherId;
 
-    @Column(name = "teacher_name", nullable = true, length = 20)
-    private String teacherName;
+    @Column(name = "teacher_picture_path")
+    private String teacherPicturePath;
 
     @Column(name = "status", nullable = true)
     private Integer status;
@@ -68,9 +68,6 @@ public class CommentCard {
     @Column(name = "question_name", nullable = true, length = 1024)
     private String questionName;
 
-    @Column(name = "ask_voice_id", nullable = true, length = 20)
-    private Long askVoiceId;
-
     @Column(name = "voice_time", nullable = true, length = 20)
     private Long voiceTime;
 
@@ -84,10 +81,10 @@ public class CommentCard {
     private String answerVideoThumbnail;
 
     @Column(name = "answer_video_time", nullable = true, length = 20)
-    private Long answer_video_time;
+    private Long answerVideoTime;
 
     @Column(name = "answer_video_size",nullable = true, length = 20)
-    private Long answer_video_size;
+    private Long answerVideoSize;
 
     @Column(name = "evaluation_to_teacher", nullable = true, length = 11)
     private Integer evaluationToTeacher;
@@ -139,7 +136,6 @@ public class CommentCard {
 
     public static CommentCard getCommentCard(CommentCardForm commentCardForm){
         CommentCard commentCard = new CommentCard();
-        commentCard.setStudentName(commentCardForm.getStudentName());
         commentCard.setQuestionName(commentCardForm.getQuestionName());
         commentCard.setCourseId(commentCardForm.getCourseId());
         commentCard.setCourseName(commentCardForm.getCourseName());

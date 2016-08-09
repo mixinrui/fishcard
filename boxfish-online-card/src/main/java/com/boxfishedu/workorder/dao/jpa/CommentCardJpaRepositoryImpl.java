@@ -88,7 +88,7 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
                 predicateList.add(criteriaBuilder.equal(root.get("teacherId"),teacherId));
                 predicateList.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("status"),CommentCardStatus.ANSWERED.getCode()),
                         criteriaBuilder.equal(root.get("status"),CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode()),
-                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME)));
+                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME.getCode())));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };
