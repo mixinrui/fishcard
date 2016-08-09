@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service;
 
+import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -15,6 +16,7 @@ import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -268,7 +270,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     //查找出教师所有状态的工单
-    public List<WorkOrderView> findByQueryCondAllStatusForTeacher(Long teacherId, Date beginDate, Date endDate, Integer status) {
+    public List<WorkOrderView> findByQueryCondAllStatusForTeacher(Long teacherId, Date beginDate, Date endDate, Integer[] status) {
         String sqlOriginal = "select new com.boxfishedu.workorder.web.view.fishcard.WorkOrderView" +
                 "(wo.id,sv.orderId, wo.studentId, sv.id, wo.studentName, wo.teacherId, wo.teacherName, wo.startTime, wo.endTime, wo.status, wo.courseId, wo.courseName, sv.skuId, sv.orderCode)" +
                 " from  WorkOrder wo,Service sv where wo.service.id=sv.id and (wo.teacherId=? and wo.endTime between ? and ?) ";
@@ -314,4 +316,27 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             workOrder.setSkuId(new Long(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType())));
         }
     }
+
+
+
+    @Transactional
+    public void updateWorkStatusRechargeOrderByIds(List<WorkOrder> workOrders){
+        jpa.save(workOrders);
+        logger.info("||||updateWorkStatusRechargeOrderByIds||鱼卡更新成功 ");
+    }
+
+
+
+    public List<WorkOrder> getAllWorkOrdersByIds(Long[] ids){
+        return jpa.findWorkOrderAll(ids);
+    }
+
+    public String trimArry(Long [] ids){
+        StringBuffer sb = new StringBuffer();
+        for(Long id :ids){
+            sb.append(id).append(",");
+        }
+        return sb.toString().substring(0,sb.toString().length()-1);
+    }
+
 }

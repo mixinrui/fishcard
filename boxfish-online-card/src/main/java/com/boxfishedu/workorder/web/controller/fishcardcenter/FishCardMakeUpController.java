@@ -45,4 +45,38 @@ public class FishCardMakeUpController {
     public JsonResultModel fishcardStatusChange(@RequestBody MakeUpCourseParam makeUpCourseParam){
         return makeUpLessionServiceX.fishcardStatusChange(makeUpCourseParam);
     }
+
+    /**
+     * 批量确认鱼卡  确认状态
+     * @param makeUpCourseParam
+     * @return
+     */
+    @RequestMapping(value = "/fishcard/confirmstatus/change", method = RequestMethod.POST)
+    public JsonResultModel fishcardConfirmStatusChange(@RequestBody MakeUpCourseParam makeUpCourseParam){
+        return makeUpLessionServiceX.fishcardStatusRechargeChange(makeUpCourseParam);
+    }
+
+
+    /**
+     * 页面触发退款申请
+     * @param makeUpCourseParam
+     * @return
+     */
+    @RequestMapping(value = "/fishcard/confirm/recharge", method = RequestMethod.POST)
+    public JsonResultModel fishcardConfirmStatusRecharge(@RequestBody MakeUpCourseParam makeUpCourseParam){
+        return makeUpLessionServiceX.fishcardConfirmStatusRecharge(makeUpCourseParam);
+    }
+
+
+    /**
+     * 订单系统调用http方式进行退款状态回馈
+     * @param makeUpCourseParam
+     * @return
+     */
+    @RequestMapping(value = "/fishcard/laststate/change", method = RequestMethod.POST)
+    public JsonResultModel fixedStateFromOrder(@RequestBody MakeUpCourseParam makeUpCourseParam){
+        return makeUpLessionServiceX.fixedStateFromOrder(makeUpCourseParam);
+    }
+
+
 }

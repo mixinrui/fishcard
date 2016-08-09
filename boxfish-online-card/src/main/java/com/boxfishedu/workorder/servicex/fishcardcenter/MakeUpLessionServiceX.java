@@ -1,7 +1,12 @@
 package com.boxfishedu.workorder.servicex.fishcardcenter;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -14,6 +19,7 @@ import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.math.LongMath;
 import com.google.gson.JsonObject;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -23,9 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hucl on 16/6/14.
@@ -57,6 +61,9 @@ public class MakeUpLessionServiceX {
 
     @Value("${choiceTime.durationFromParentCourse}")
     private Integer durationFromParentCourse;
+
+    @Autowired
+    private RabbitMqSender rabbitMqSender;
 
 
 
@@ -187,5 +194,185 @@ public class MakeUpLessionServiceX {
         resultMap.put("0","更新成功");
         return JsonResultModel.newJsonResultModel(resultMap);
     }
+
+    /**
+     * 批量确认按钮
+     * @param makeUpCourseParam
+     * @return
+     */
+    public JsonResultModel fishcardStatusRechargeChange(MakeUpCourseParam makeUpCourseParam){
+        Map<String,String> resultMap = Maps.newHashMap();
+        if(null == makeUpCourseParam || null ==makeUpCourseParam.getWorkOrderIds()|| makeUpCourseParam.getWorkOrderIds().length<1){
+            resultMap.put("1","参数有错误");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
+
+        if(null==workOrders || workOrders.size()<1){
+            resultMap.put("1","参数有错误");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        for(WorkOrder wo:workOrders){
+            // 1 正常  0  未开始 或者正在进行
+            if("0".equals(wo.getIsCourseOver())){
+                resultMap.put("2","请核实鱼卡信息,该课程未开始或者已经正在进行中!");
+                return JsonResultModel.newJsonResultModel(resultMap);
+            }
+            wo.setConfirmFlag("0");
+            wo.setStatusRecharge(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
+            wo.setUpdatetimeRecharge(new Date());
+        }
+
+        //更新已经确认
+        workOrderService.updateWorkStatusRechargeOrderByIds(workOrders);
+
+        // 记录日志
+        workOrderLogService.batchSaveWorkOrderLogs(workOrders);
+        resultMap.put("0","更新成功");
+        return JsonResultModel.newJsonResultModel(resultMap);
+    }
+
+
+    /**
+     * 页面发起退款申请
+     * @param makeUpCourseParam
+     * @return
+     */
+    public JsonResultModel fishcardConfirmStatusRecharge(MakeUpCourseParam makeUpCourseParam){
+        Map<String,String> resultMap = Maps.newHashMap();
+        if(null == makeUpCourseParam || null ==makeUpCourseParam.getWorkOrderIds()|| makeUpCourseParam.getWorkOrderIds().length<1){
+            resultMap.put("1","参数有错误");
+        }
+
+        List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
+
+        if(null==workOrders || workOrders.size()<1){
+            resultMap.put("1","参数有错误");
+        }
+
+        Long orderId = workOrders.get(0).getOrderId();
+        for(WorkOrder wo:workOrders){
+//            if(!orderId.equals(   wo.getOrderId())){
+//                resultMap.put("3","退款的鱼卡应该在同一个订单里!");
+//                return JsonResultModel.newJsonResultModel(resultMap);
+//            }
+            // 1 正常  0  未开始 或者正在进行
+            if("0".equals(wo.getIsCourseOver())){
+                resultMap.put("2","请核实鱼卡信息,该课程未开始或者已经正在进行中!");
+                return JsonResultModel.newJsonResultModel(resultMap);
+            }
+            wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGBACKING.getCode());
+            wo.setUpdatetimeRecharge(new Date());
+        }
+
+        //更新已经确认
+        workOrderService.updateWorkStatusRechargeOrderByIds(workOrders);
+
+
+        // 记录日志
+        workOrderLogService.batchSaveWorkOrderLogs(workOrders);
+        resultMap.put("0","更新成功");
+
+
+        /**
+         * 向订单发送Q消息
+         * 目前针对多个鱼卡  每个鱼卡 单次发送请求确认退款
+         */
+
+        workOrders.forEach(workOrderMessage -> {
+           JSONObject message =generator(workOrderMessage);logger.info("::::::fishcardConfirmStatusRecharge:::::[{}]",message);
+            rabbitMqSender.send(message.toJSONString(), QueueTypeEnum.RECHARGE_ORDER);
+        });
+
+
+
+
+        return JsonResultModel.newJsonResultModel(resultMap);
+    }
+
+    /**
+     * 订单发送退款最终状态确认
+     * @param makeUpCourseParam
+     * @return
+     */
+    public JsonResultModel fixedStateFromOrder(MakeUpCourseParam makeUpCourseParam){
+        Map<String,String> resultMap = Maps.newHashMap();
+        if(null == makeUpCourseParam || null ==makeUpCourseParam.getWorkOrderIds()|| makeUpCourseParam.getWorkOrderIds().length<1 ){
+            resultMap.put("1","参数有错误");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
+
+        if(null==workOrders || workOrders.size()<1){
+            resultMap.put("2","参数有错误");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        Long orderId = workOrders.get(0).getOrderId();
+        Boolean successFlag = makeUpCourseParam.getSuccessFlag();
+        if(null==successFlag){
+            resultMap.put("3","无成功失败标示");
+            logger.info("fixedStateFromOrder订单id[{}],无成功失败标示",orderId);
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+        for(WorkOrder wo:workOrders){
+
+           if(successFlag){
+               wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGEBACK_SUCCESS.getCode());
+           }else{
+               wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGEBACK_FAILED.getCode());
+           }
+            wo.setUpdatetimeRecharge(new Date());
+        }
+        //更新已经确认
+        workOrderService.updateWorkStatusRechargeOrderByIds(workOrders);
+
+
+        // 记录日志
+        workOrderLogService.batchSaveWorkOrderLogs(workOrders);
+        resultMap.put("0","更新成功");
+        return JsonResultModel.newJsonResultModel(resultMap);
+    }
+
+
+
+    public String generator(List<WorkOrder> workOrders){
+        WorkOrder workOrder = workOrders.get(0);
+        JSONObject json =new JSONObject();
+        json.put("orderId",workOrder.getOrderId());
+        json.put("orderCode",workOrder.getOrderCode());
+
+        JSONArray  jsonArray = new JSONArray();
+        for(WorkOrder wo:workOrders){
+            JSONObject jsinner =new JSONObject();
+            jsinner.put("workOrderId",wo.getId());
+            jsinner.put("skuId","??????????skuid待定???????");
+            jsinner.put("orderType","???????订单类型待定?????????");
+            jsinner.put("courseType",wo.getCourseType());
+            jsinner.put("reason",FishCardStatusEnum.get(wo.getStatus()).getDesc());
+            jsonArray.add(jsinner);
+        }
+
+        json.put("fishCardIds",jsonArray);
+        return json.toString();
+
+    }
+    public JSONObject generator(WorkOrder workOrder){
+        JSONObject json =new JSONObject();
+        json.put("orderId",workOrder.getOrderId());
+        json.put("orderCode",workOrder.getOrderCode()==null?"":workOrder.getOrderCode());
+        json.put("skuId",232323L);
+        json.put("refundReason",FishCardStatusEnum.get(workOrder.getStatus()).getDesc());
+        json.put("courseType",workOrder.getCourseType());
+        json.put("fishCardId",workOrder.getId());
+        return json;
+
+    }
+
+
+
 
 }

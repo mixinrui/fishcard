@@ -30,6 +30,8 @@ public class RabbitMqSender {
     private @Qualifier(RabbitMqConstant.ASSIGN_TEACHER_REPLY_TEMPLATE_NAME) RabbitTemplate assignTeacherReplyRabbitTemplate;
     @Autowired
     private @Qualifier(RabbitMqConstant.CREATE_GROUP_TEMPLATE_NAME) RabbitTemplate createGroupTemplate;
+    @Autowired
+    private @Qualifier(RabbitMqConstant.RECHARGE_WORKORDER_QUEUE_TEMPLATE_NAME)RabbitTemplate rechargeWorkOrderTemplate;// 订单退款
 
 
     public void send(Object object, QueueTypeEnum queueTypeEnum) {
@@ -66,9 +68,14 @@ public class RabbitMqSender {
                 createGroupTemplate.convertAndSend(object);
                 break;
             }
-            case ASSIGN_TEACHER_TIMER_REPLY:
-                logger.info("@<-<-<-<-<-<-<-处理完定时任务的请求,参数:{}",JacksonUtil.toJSon(object));
+            case ASSIGN_TEACHER_TIMER_REPLY: {
+                logger.info("@<-<-<-<-<-<-<-处理完定时任务的请求,参数:{}", JacksonUtil.toJSon(object));
                 notifyTimerTemplate.convertAndSend(object);
+            }
+            case RECHARGE_ORDER:{
+                logger.info("@<-<-<-<-<-<-<orderRecharge-订单退款的请求,参数:{}", JacksonUtil.toJSon(object));
+                rechargeWorkOrderTemplate.convertAndSend(object);
+            }
             default:
                 break;
         }

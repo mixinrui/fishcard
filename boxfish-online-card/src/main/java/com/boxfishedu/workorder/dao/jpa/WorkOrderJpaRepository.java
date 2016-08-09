@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.LockModeType;
@@ -43,8 +44,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public Page<WorkOrder> findByQueryCondAllStatus(Long[] ids, Date beginDate, Date endDate, Pageable pageable);
 
     //查找出学生所有状态的工单
-    @Query("select wo from  WorkOrder wo where wo.service.id in (?1) and (wo.startTime between ?2 and ?3) and status=?4 order by wo.endTime desc ")
-    public Page<WorkOrder> findByQueryCondSpecialStatus(Long[] ids, Date beginDate, Date endDate, Integer status, Pageable pageable);
+    @Query("select wo from  WorkOrder wo where wo.service.id in (?1) and (wo.startTime between ?2 and ?3) and status in (?4) order by wo.endTime desc ")
+    public Page<WorkOrder> findByQueryCondSpecialStatus(Long[] ids, Date beginDate, Date endDate, Integer[] status, Pageable pageable);
 
     //查找出教师所有状态的工单
     @Query("select wo from  WorkOrder wo where wo.teacherId=?1 and (wo.endTime between ?2 and ?3) order by wo.startTime ")
@@ -105,6 +106,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     int setFixedTeacherIdAndStatusFor(Long teacherId ,Integer status, Long workorderId , Long teacherIdZero );
 
 
+    @Query("select wo from WorkOrder wo where wo.id in (?1) ")
+    public List<WorkOrder> findWorkOrderAll(Long [] ids);
 
 
 

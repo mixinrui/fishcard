@@ -154,6 +154,24 @@ public class WorkOrder{
     @Column(name = "sendflagcc", nullable = true)
     private String sendflagcc;
 
+
+    /** 关于更改课程 是否发送过消息   1 未确认  0 已经确认 **/
+    @Column(name = "confirm_flag", nullable = true)
+    private String confirmFlag;
+
+    /**  鱼卡退款状态  **/
+    @Column(name = "status_recharge", nullable = true)
+    private Integer    statusRecharge;
+
+    /**  退款原因  **/
+    @Column(name = "reason_recharge", nullable = true)
+    private String reasonRecharge;
+
+    /**  鱼卡退款状态变更时间  **/;
+    @Column(name = "updatetime_recharge", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatetimeRecharge;
+
     @Override
     public String toString() {
         return "WorkOrder{" +

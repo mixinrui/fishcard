@@ -13,4 +13,7 @@ public class MakeUpCourseParam {
     private String endTime;
     /** 更改鱼卡状态 **/
     private Integer fishStatus;
+    private Long workOrderIds[];
+    private String orderCode;
+    private Boolean successFlag;
 }
