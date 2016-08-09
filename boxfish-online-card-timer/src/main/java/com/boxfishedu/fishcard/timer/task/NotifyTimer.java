@@ -100,7 +100,7 @@ public class NotifyTimer {
     /**
      * 学生旷课通知定时器;该功能并入强制完成
      */
-//    @Scheduled(cron="0 4/10 * * * ?")
+    @Scheduled(cron="0 4/10 * * * ?")
     public void notifyStudentAbsentService() {
         logger.info("<<<<<<开始通知<<<检查学生旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.STUDENT_ABSENT_QUERY_NOTIFY.value());

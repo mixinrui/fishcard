@@ -50,14 +50,13 @@ public class CourseOnlineService {
         notAllowUpdateStatus(workOrder,"不能覆盖已有消息,新消息:"+FishCardStatusEnum.getDesc(newStatus));
     }
 
-
-
     public void notAllowUpdateStatus(WorkOrder workOrder,String desc){
         Integer savedStatus=workOrder.getStatus();
         boolean flag=(savedStatus== FishCardStatusEnum.COMPLETED.getCode())
                 ||(savedStatus==FishCardStatusEnum.COMPLETED_FORCE.getCode())
                 ||(savedStatus==FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode())
                 ||(savedStatus==FishCardStatusEnum.TEACHER_ABSENT.getCode()
+                ||(savedStatus==FishCardStatusEnum.STUDENT_ABSENT.getCode())
                 ||(1==workOrder.getIsCourseOver()));
         if(flag){
             //将接受到的消息加入到mongo中
@@ -66,6 +65,7 @@ public class CourseOnlineService {
             logger.error(tips);
             throw new BusinessException(tips);
         }
+
     }
 
     public void notAllowUpdateStatus(WorkOrder workOrder){

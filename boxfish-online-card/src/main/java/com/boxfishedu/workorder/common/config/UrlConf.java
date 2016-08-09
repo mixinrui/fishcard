@@ -28,4 +28,7 @@ public class UrlConf {
     private String thumbnail_server;
     @Value("${interface.address.auth_user}")
     private String auth_user;
+
+    @Value("${interface.address.data_analysis_service}")
+    private String data_analysis_service;
 }
