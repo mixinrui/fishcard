@@ -21,6 +21,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/5/17.
@@ -70,8 +71,9 @@ public class AvaliableTimeServiceX {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
             DayTimeSlots result = timeLimitPolicy.limit(clone);
-            result.getDailyScheduleTime().stream().filter(
-                    t -> ! classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())));
+            result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+                    .collect(Collectors.toList());
             return result;
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
