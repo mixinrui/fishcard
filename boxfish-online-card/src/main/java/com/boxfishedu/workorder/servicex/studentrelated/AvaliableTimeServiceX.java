@@ -95,11 +95,16 @@ public class AvaliableTimeServiceX {
             logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");
         }
         Date date = new Date();
+        int afterDays = consumerStartDay;
+        // 同类型工单的最后一个工单
         if (null != workOrder && workOrder.getEndTime().after(date)) {
             date = workOrder.getEndTime();
+            afterDays = 1;
         }
         LocalDateTime startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-        startDate = startDate.plusDays(consumerStartDay);
+        if(afterDays > 0) {
+            startDate = startDate.plusDays(consumerStartDay);
+        }
         return new DateRange(startDate, days);
     }
 
