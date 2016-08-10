@@ -206,8 +206,9 @@ public class FishCardUpdatorServiceX {
                     workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             return;
         }
-
-        courseOnlineService.notAllowUpdateStatus(workOrder);
+        if(fishCardDelayMessage.getStatus() != FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
+            courseOnlineService.notAllowUpdateStatus(workOrder);
+        }
         workOrder.setIsCourseOver((short) 1);
 
         //  对于不包含学生接受请求的消息,视为旷课处理;其他视为系统异常
