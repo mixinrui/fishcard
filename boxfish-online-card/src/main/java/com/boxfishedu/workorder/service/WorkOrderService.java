@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -305,8 +306,11 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
 
     public WorkOrder getLatestWorkOrderByStudentIdAndComboType(Long studentId, String comboType) {
-        String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.comboType=? order by wo.endTime desc";
-        Query query = entityManager.createQuery(sql).setParameter(1, studentId).setParameter(2, comboType);
+        int teachingType = ComboTypeToRoleId.resolve(comboType).getValue();
+        String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.service.teachingType=? order by wo.endTime desc";
+        Query query = entityManager.createQuery(sql)
+                .setParameter(1, studentId)
+                .setParameter(2, teachingType);
         query.setMaxResults(1);
         return (WorkOrder) query.getSingleResult();
     }
