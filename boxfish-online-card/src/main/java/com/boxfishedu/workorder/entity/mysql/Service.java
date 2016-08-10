@@ -95,4 +95,10 @@ public class Service {
      */
     @Column(name = "combo_type", nullable = false)
     private String comboType;
+
+    /**
+     * 订单类型
+     */
+    @Column(name = "order_channel", nullable = false)
+    private String orderChannel;
 }

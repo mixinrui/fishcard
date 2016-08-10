@@ -303,12 +303,12 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentIdAndStartTimeBetween(studentId, beginDate, endDate);
     }
 
-    public WorkOrder getLatestWorkOrder(Long studentId){
-        String sql = "select wo from WorkOrder wo where wo.studentId=? order by wo.endTime desc";
-        Query query = entityManager.createQuery(sql).setParameter(1, studentId);
+
+    public WorkOrder getLatestWorkOrderByStudentIdAndComboType(Long studentId, String comboType) {
+        String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.comboType=? order by wo.endTime desc";
+        Query query = entityManager.createQuery(sql).setParameter(1, studentId).setParameter(2, comboType);
         query.setMaxResults(1);
-        WorkOrder workOrder= (WorkOrder) query.getSingleResult();
-        return workOrder;
+        return (WorkOrder) query.getSingleResult();
     }
 
     public void batchSaveCoursesIntoCard(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommandCoursesMap){
