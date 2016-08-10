@@ -54,7 +54,7 @@ public class RabbitMqDealyReceiver {
             try {
                 fishCardUpdatorServiceX.forceCompleteUpdator(fishCardDelayMessage);
             } catch (Exception ex) {
-                logger.error("@forceCompleteDealer强制完成处理失败");
+                logger.error("@forceCompleteDealer#exception强制完成处理失败",ex);
             }
         }
     }
