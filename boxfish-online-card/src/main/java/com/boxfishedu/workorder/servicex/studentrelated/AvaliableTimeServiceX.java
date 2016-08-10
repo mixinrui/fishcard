@@ -67,7 +67,7 @@ public class AvaliableTimeServiceX {
         // TODO
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(avaliableTimeParam.getStudentId());
         // 获取时间片模板,并且复制
-        DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(avaliableTimeParam.getComboType().getValue());
+        DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate((long) avaliableTimeParam.getComboType().getValue());
         List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(dayTimeSlots, (localDateTime, d) -> {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
@@ -103,7 +103,7 @@ public class AvaliableTimeServiceX {
         }
         LocalDateTime startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
         if(afterDays > 0) {
-            startDate = startDate.plusDays(consumerStartDay);
+            startDate = startDate.plusDays(afterDays);
         }
         return new DateRange(startDate, days);
     }

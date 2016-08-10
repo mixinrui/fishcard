@@ -16,13 +16,13 @@ public enum ComboTypeToRoleId {
     CRITIQUE(2),
     UNKNOW(-1);
 
-    private long value;
+    private int value;
 
-    ComboTypeToRoleId(long value) {
+    ComboTypeToRoleId(int value) {
         this.value = value;
     }
 
-    public long getValue() {
+    public int getValue() {
         return this.value;
     }
 
