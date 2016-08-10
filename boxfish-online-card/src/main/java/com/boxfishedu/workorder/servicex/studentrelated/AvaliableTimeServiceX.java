@@ -1,10 +1,11 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
@@ -21,6 +22,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/5/17.
@@ -38,7 +40,7 @@ public class AvaliableTimeServiceX {
     private CourseScheduleService courseScheduleService;
 
     @Autowired
-    private ServeService serveService;
+    private WorkOrderService workOrderService;
 
     /**
      * 免费体验的天数
@@ -70,8 +72,9 @@ public class AvaliableTimeServiceX {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
             DayTimeSlots result = timeLimitPolicy.limit(clone);
-            result.getDailyScheduleTime().stream().filter(
-                    t -> ! classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())));
+            result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+                    .collect(Collectors.toList()));
             return result;
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
@@ -84,19 +87,24 @@ public class AvaliableTimeServiceX {
      */
     private DateRange getEnableDateRange(AvaliableTimeParam avaliableTimeParam, Integer days) {
         // 如果没有未消费的订单,则取得当前时间;否则换成订单的最后结束时间
-//        WorkOrder workOrder = null;
-//        try {
-//            workOrder = workOrderService.getLatestWorkOrder(avaliableTimeParam.getStudentId());
-//        } catch (Exception ex) {
-//            logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");
-//        }
-//        Date date = new Date();
-//        if (null != workOrder && workOrder.getEndTime().after(date)) {
-//            date = workOrder.getEndTime();
-//        }
+        WorkOrder workOrder = null;
+        try {
+            workOrder = workOrderService.getLatestWorkOrderByStudentIdAndComboType(
+                    avaliableTimeParam.getStudentId(), avaliableTimeParam.getComboType().name());
+        } catch (Exception ex) {
+            logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");
+        }
         Date date = new Date();
+        int afterDays = consumerStartDay;
+        // 同类型工单的最后一个工单
+        if (null != workOrder && workOrder.getEndTime().after(date)) {
+            date = workOrder.getEndTime();
+            afterDays = 1;
+        }
         LocalDateTime startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-        startDate = startDate.plusDays(consumerStartDay);
+        if(afterDays > 0) {
+            startDate = startDate.plusDays(consumerStartDay);
+        }
         return new DateRange(startDate, days);
     }
 

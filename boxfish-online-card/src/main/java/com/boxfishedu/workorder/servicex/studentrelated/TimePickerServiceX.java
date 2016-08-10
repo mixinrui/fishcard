@@ -284,6 +284,9 @@ public class TimePickerServiceX {
                 workOrder.setSeqNum((j + 1) + i * numPerWeek);
                 workOrder.setCreateTime(new Date());
                 workOrder.setOrderCode(service.getOrderCode());
+                // skuIdExtra 字段
+                workOrder.setSkuIdExtra(service.getSkuId().intValue());
+                workOrder.setOrderChannel(service.getOrderChannel());
                 TimeSlots timeSlots = getTimeSlotById(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
                 String startTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getStartTime();
                 String endTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getEndTime();

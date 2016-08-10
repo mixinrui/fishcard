@@ -441,6 +441,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);
         service.setValidityDay(365);
+        service.setOrderChannel(orderView.getOrderChannel().name());
         return service;
     }
 
