@@ -76,7 +76,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setTeacherReadFlag(0);
             commentCardJpaRepository.save(commentCard);
             logger.info("调用外教点评接口更新点评卡中外教点评内容,其中" + commentCard);
-            JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(fromTeacherStudentForm.getTeacherId(),"有需要您在24小时内完成的点评","FOREIGNCOMMENT");
+            JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(fromTeacherStudentForm.getTeacherId(),"学生发来一次求点评，点击查看。\n" +
+                    "You’ve got a new answer to access; Do it now~","FOREIGNCOMMENT");
             if (jsonResultModel.getReturnCode().equals(200)){
                 logger.info("已经向教师端推送消息,推送的教师teacherId=" + fromTeacherStudentForm.getTeacherId());
             }else {
@@ -116,24 +117,20 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         for (CommentCard commentCard: list) {
             commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
             commentCard.setUpdateTime(dateNow);
-            commentCard.setAssignTeacherCount(2);
             if(!StringUtils.isEmpty(commentCard.getTeacherId())){
-//                CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
-//                commentCardUnanswerTeacher.setCommentCard(commentCard);
-//                commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
-//                commentCardUnanswerTeacher.setCreateTime(dateNow);
-                logger.info("记录超时未点评的外教,同时调用师生运营接口,设置该外教为旷课......",commentCard);
-//                commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
+                logger.info("调用师生运营接口,设置该外教为旷课......",commentCard);
                 JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
                 logger.info("此外教标注旷课状态情况{}",jsonResultModel);
             }
-            commentCard.setId(null);
-            commentCard.setTeacherId(null);
-            commentCard.setAssignTeacherTime(null);
-            commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
-            CommentCard commentCardNew = commentCardJpaRepository.save(commentCard);
-            ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCardNew);
-            logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+commentCardNew);
+            CommentCard oldCommentCard = commentCardJpaRepository.save(commentCard);
+            oldCommentCard.setId(null);
+            oldCommentCard.setTeacherId(null);
+            oldCommentCard.setAssignTeacherTime(null);
+            oldCommentCard.setAssignTeacherCount(2);
+            oldCommentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+            CommentCard newCommentCard = commentCardJpaRepository.save(oldCommentCard);
+            ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(newCommentCard);
+            logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+newCommentCard);
             rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
 
         }
@@ -154,11 +151,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCardJpaRepository.save(commentCard);
             serviceTemp.setAmount(serviceTemp.getAmount() + 1);
             serviceJpaRepository.save(serviceTemp);
-//            CommentCardUnanswerTeacher commentCardUnanswerTeacher = new CommentCardUnanswerTeacher();
-//            commentCardUnanswerTeacher.setCommentCard(commentCard);
-//            commentCardUnanswerTeacher.setTeacherId(commentCard.getTeacherId());
-//            commentCardUnanswerTeacher.setCreateTime(dateNow);
-//            commentCardUnanswerTeacherJpaRepository.save(commentCardUnanswerTeacher);
         }
         logger.info("所有学生外教点评次数返还完毕,一共返回次数为:"+list.size());
     }

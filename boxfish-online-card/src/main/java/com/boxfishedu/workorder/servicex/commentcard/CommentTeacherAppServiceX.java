@@ -77,7 +77,7 @@ public class CommentTeacherAppServiceX {
         commentCard.setTeacherPicturePath(commentCardSubmitParam.getTeacherPicturePath());
         commentCardTeacherAppService.save(commentCard);
         commentCardLogService.saveCommentCardLog(commentCard);
-        JsonResultModel jsonResultModel = foreignTeacherCommentCardService.pushInfoToStudentAndTeacher(commentCard.getStudentId(),"老师已经对你的提问做出点评!","FOREIGNCOMMENT");
+        JsonResultModel jsonResultModel = foreignTeacherCommentCardService.pushInfoToStudentAndTeacher(commentCard.getStudentId(),"收到一条外教点评，去查看。","FOREIGNCOMMENT");
         if (jsonResultModel.getReturnCode().equals(HttpStatus.OK.value())){
             logger.info("已经向学生端推送消息,推送的学生studentId=" + commentCard.getStudentId());
         }else {

@@ -34,12 +34,12 @@ public class CommentTeacherAppController {
     @Autowired
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
 
-    @RequestMapping(value = "/teacher/{teacher_id}/list", method = RequestMethod.GET)
-    public JsonResultModel list(@PathVariable("teacher_id") long teacherId,Long userId, Pageable pageable){
-        commonServeServiceX.checkToken(teacherId,userId);
-        Page<CommentCard> commentCardPage= commentTeacherAppServiceX.findByTeacherIdOrderByAssignTeacherTimeDesc(teacherId,pageable);
-        return JsonResultModel.newJsonResultModel(commentCardPage);
-    }
+//    @RequestMapping(value = "/teacher/{teacher_id}/list", method = RequestMethod.GET)
+//    public JsonResultModel list(@PathVariable("teacher_id") long teacherId,Long userId, Pageable pageable){
+//        commonServeServiceX.checkToken(teacherId,userId);
+//        Page<CommentCard> commentCardPage= commentTeacherAppServiceX.findByTeacherIdOrderByAssignTeacherTimeDesc(teacherId,pageable);
+//        return JsonResultModel.newJsonResultModel(commentCardPage);
+//    }
 
     @RequestMapping(value = "/teacher/answer_list", method = RequestMethod.GET)
     public JsonResultModel teacherAnswerList(Pageable pageable,Long userId){

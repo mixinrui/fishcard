@@ -36,49 +36,35 @@ public class CommentCard {
     @Column(name = "student_picture_path")
     private String studentPicturePath;
 
+    @Column(name = "ask_voice_path", nullable = true, length = 255)
+    private String askVoicePath;
+
+    @Column(name = "voice_time", nullable = true, length = 20)
+    private Long voiceTime;
+
+    @Column(name = "student_ask_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date studentAskTime;
+
     @Column(name = "teacher_id", nullable = true)
     private Long teacherId;
 
     @Column(name = "teacher_picture_path")
     private String teacherPicturePath;
 
-    @Column(name = "status", nullable = true)
-    private Integer status;
-
-    @Column(name = "create_time", nullable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    @Column(name = "update_time", nullable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
+    @Column(name="assign_teacher_count", nullable = true)
+    private Integer assignTeacherCount = 0;
 
     @Column(name = "assign_teacher_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date assignTeacherTime;
 
-    @Column(name = "student_ask_time", nullable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date studentAskTime;
-
     @Column(name = "teacher_answer_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date teacherAnswerTime;
 
-    @Column(name = "question_name", nullable = true, length = 1024)
-    private String questionName;
-
-    @Column(name = "voice_time", nullable = true, length = 20)
-    private Long voiceTime;
-
-    @Column(name = "ask_voice_path", nullable = true, length = 255)
-    private String askVoicePath;
-
     @Column(name = "answer_video_path", nullable = true, length = 255)
     private String answerVideoPath;
-
-    @Column(name = "answer_video_thumbnail", nullable = true, length = 255)
-    private String answerVideoThumbnail;
 
     @Column(name = "answer_video_time", nullable = true, length = 20)
     private Long answerVideoTime;
@@ -86,14 +72,17 @@ public class CommentCard {
     @Column(name = "answer_video_size",nullable = true, length = 20)
     private Long answerVideoSize;
 
-    @Column(name = "evaluation_to_teacher", nullable = true, length = 11)
-    private Integer evaluationToTeacher;
+    @Column(name = "answer_video_thumbnail", nullable = true, length = 255)
+    private String answerVideoThumbnail;
 
     @Column(name = "course_id", nullable = true, length = 255)
     private String courseId;
 
     @Column(name = "course_name", nullable = true, length = 500)
     private String courseName;
+
+    @Column(name = "question_name", nullable = true, length = 1024)
+    private String questionName;
 
     @Column(name = "cover", nullable = true, length = 50)
     private String cover;
@@ -109,6 +98,12 @@ public class CommentCard {
     @Column(name="order_code", length = 128)
     private String orderCode;
 
+    @Column(name = "student_read_flag", nullable = true, columnDefinition = "1")
+    private int studentReadFlag;
+
+    @Column(name = "teacher_read_flag", nullable = true, columnDefinition = "1")
+    private int teacherReadFlag;
+
     @Column(name="student_comment_good_tag_code", length = 128)
     private String studentCommentGoodTagCode;
 
@@ -119,15 +114,16 @@ public class CommentCard {
     @Temporal(TemporalType.TIMESTAMP)
     private Date studentCommentTeacherTime;
 
-    @Column(name="assign_teahcer_count", nullable = true)
-    private Integer assignTeacherCount = 0;
+    @Column(name = "status", nullable = true)
+    private Integer status;
 
+    @Column(name = "create_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createTime;
 
-    @Column(name = "teacher_read_flag", nullable = true)
-    private int teacherReadFlag;
-
-    @Column(name = "student_read_flag", nullable = true)
-    private int studentReadFlag;
+    @Column(name = "update_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updateTime;
 
     @OneToMany(fetch = FetchType.LAZY)//指向多的那方的pojo的关联外键字段
     @JoinColumn(name = "card_id")
