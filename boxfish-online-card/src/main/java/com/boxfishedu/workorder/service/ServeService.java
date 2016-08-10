@@ -169,8 +169,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             return 4;
         } else {
             int comboCycle = service.getComboCycle();
-            return service.getAmount() % comboCycle == 0
-                    ? comboCycle : service.getAmount() / getNumPerWeek(service);
+            return (getNumPerWeek(service) -1 + service.getAmount()) / getNumPerWeek(service);
+//            return service.getAmount() % comboCycle == 0
+//                    ? comboCycle : service.getAmount() / getNumPerWeek(service);
         }
     }
 

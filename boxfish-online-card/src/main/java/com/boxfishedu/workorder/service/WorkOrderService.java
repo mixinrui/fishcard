@@ -312,7 +312,8 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
                 .setParameter(1, studentId)
                 .setParameter(2, teachingType);
         query.setMaxResults(1);
-        return (WorkOrder) query.getSingleResult();
+        List resultList = query.getResultList();
+        return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
     }
 
     public void batchSaveCoursesIntoCard(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommandCoursesMap){
