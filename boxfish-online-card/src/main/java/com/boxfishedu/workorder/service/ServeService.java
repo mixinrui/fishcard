@@ -434,6 +434,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setSkuId(productComboDetail.getComboId());
         // 新增的套餐类型字段
         service.setComboType(productCombo.getComboType().name());
+        // 课程类型
+        service.setTeachingType(productCombo.getComboType().getValue());
         // 几周消费完
         service.setComboCycle(productCombo.getComboCycle());
         service.setRoleId(productComboDetail.getComboId().intValue());

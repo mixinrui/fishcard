@@ -93,12 +93,18 @@ public class Service {
     /**
      * 新增字段套餐类型
      */
-    @Column(name = "combo_type", nullable = false)
+    @Column(name = "combo_type", nullable = true)
     private String comboType;
 
     /**
      * 订单类型
      */
-    @Column(name = "order_channel", nullable = false)
+    @Column(name = "order_channel", nullable = true)
     private String orderChannel;
+
+    /**
+     * 课程类型
+     */
+    @Column(name = "teaching_type", nullable = true)
+    private Integer teachingType;
 }
