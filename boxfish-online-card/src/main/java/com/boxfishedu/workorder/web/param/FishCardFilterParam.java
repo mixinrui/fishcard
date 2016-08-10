@@ -17,6 +17,7 @@ public class FishCardFilterParam {
     private Date beginDateFormat;
     private Date endDateFormat;
     private Integer[] status;
+    private String statuses;// 以数组的方式传递
 
     private String teacherName;
     private String createBeginDate;

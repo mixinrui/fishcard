@@ -97,9 +97,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             sql.append(" and wo.createTime<=:createend ");
         }
 
-        if(null!=fishCardFilterParam.getStatus()){
-            sql.append("and status in (:status )");
-        }
+//        if(null!=fishCardFilterParam.getStatus()){
+//            sql.append("and status in (:status )");
+//        }
         if(null!=fishCardFilterParam.getOrderCode()){
             sql.append("and orderCode=:orderCode ");
         }
@@ -116,7 +116,11 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         }
 
         if(null!=fishCardFilterParam.getCourseType() &&  StringUtils.isNotEmpty(  fishCardFilterParam.getCourseType() )){
-            sql.append("and courseType in (").append(splitCourseType(fishCardFilterParam.getCourseType())).append(")");
+            sql.append("and courseType in (").append(splitCourseType(fishCardFilterParam.getCourseType())).append(") ");
+        }
+
+        if(null!=fishCardFilterParam.getStatuses() &&  StringUtils.isNotEmpty(  fishCardFilterParam.getStatuses() )){
+            sql.append("and status in (").append(splitCourseTypeString(fishCardFilterParam.getStatuses())).append(") ");
         }
 
         sql.append("and orderId !=:orderId ");
@@ -146,6 +150,15 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         return condition.substring(0,condition.length()-1);
     }
 
+    private String splitCourseTypeString(String courseType){
+        String condition = "";
+        String[] course = courseType.split(",");
+        for(String s: course){
+            condition+=s.toUpperCase()+",";
+        }
+        return condition.substring(0,condition.length()-1);
+    }
+
     private Query getFilterQuery(String sql, FishCardFilterParam fishCardFilterParam, EntityManager entityManager){
         Query query = entityManager.createQuery(sql);
         query.setParameter("begin",fishCardFilterParam.getBeginDateFormat());
@@ -158,9 +171,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             query.setParameter("createend",fishCardFilterParam.getCreateEndDateFormat());
         }
 
-        if(null!=fishCardFilterParam.getStatus()){
-            query.setParameter("status",fishCardFilterParam.getStatus());
-        }
+//        if(null!=fishCardFilterParam.getStatus()){
+//            query.setParameter("status",fishCardFilterParam.getStatus());
+//        }
         if(null!=fishCardFilterParam.getOrderCode()){
             query.setParameter("orderCode",fishCardFilterParam.getOrderCode());
         }
