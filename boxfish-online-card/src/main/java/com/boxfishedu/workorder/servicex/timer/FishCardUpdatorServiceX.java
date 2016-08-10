@@ -150,6 +150,7 @@ public class FishCardUpdatorServiceX {
      * 最终的学生旷课逻辑处理
      */
     public boolean studentForceAbsentUpdator(WorkOrder workOrder, CourseSchedule courseSchedule) {
+        logger.info("@studentForceAbsentUpdator#强制鱼卡[{}]旷课结束",workOrder.getId());
         //默认不为异常
         boolean isExceptionFlag = false;
 
