@@ -119,8 +119,11 @@ public class MonitorController {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(Long.MAX_VALUE);
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        System.out.println(DateUtil.String2SimpleDate("2016-09-12").getTime());
+        Date now=new Date();
+        LocalDateTime endLocalDate = LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault());
+        LocalDateTime startLocalDate = endLocalDate.minusMinutes(20);
+        Date startDate = DateUtil.localDate2Date(startLocalDate);
+        System.out.println("开始时间:"+startDate.getTime());
+        System.out.println("结束时间:"+now.getTime());
     }
 }

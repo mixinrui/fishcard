@@ -159,7 +159,7 @@ public class FishCardUpdatorServiceX {
         }
 
         boolean containConnectedFlag = false;
-        LocalDateTime startLocalDate = LocalDateTime.ofInstant(workOrder.getStartTime().toInstant(), ZoneId.systemDefault());
+        LocalDateTime startLocalDate = LocalDateTime.ofInstant(workOrder.getStartTime().toInstant(), ZoneId.systemDefault()).minusMinutes(2);
         LocalDateTime endLocalDate = startLocalDate.plusMinutes(studentAbsentTimeLimit);
         Date startDate = DateUtil.localDate2Date(startLocalDate);
         Date endDate = DateUtil.localDate2Date(endLocalDate);
@@ -172,8 +172,9 @@ public class FishCardUpdatorServiceX {
             }
         }
 
+
         boolean isOnline = fetchHeartBeatServiceX.isOnline(new DataAnalysisLogParam(workOrder.getStudentId(),
-                startDate.getTime(), endDate.getTime(), AppPointRecordEventEnum.ONLINE_COURSE_HEARTBEAT.value()));
+                startDate.getTime(), endDate.getTime(), AppPointRecordEventEnum.STUDENT_ONLINE_STATUS.value()));
         //没有联通但是在线,则表示为系统异常
         if (!containConnectedFlag && isOnline) {
             isExceptionFlag = true;

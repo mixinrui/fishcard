@@ -4,7 +4,8 @@ package com.boxfishedu.workorder.common.bean;
  * Created by hucl on 16/8/4.
  */
 public enum AppPointRecordEventEnum {
-    ONLINE_COURSE_HEARTBEAT("online_course_heartbeat");
+    ONLINE_COURSE_HEARTBEAT("online_course_heartbeat"),
+    STUDENT_ONLINE_STATUS("student_online_status");
 
     private String code;
 
