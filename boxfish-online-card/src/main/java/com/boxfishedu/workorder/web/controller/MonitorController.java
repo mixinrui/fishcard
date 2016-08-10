@@ -120,10 +120,10 @@ public class MonitorController {
 
     public static void main(String[] args) throws Exception {
         Date now=new Date();
-        LocalDateTime endLocalDate = LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault());
-        LocalDateTime startLocalDate = endLocalDate.minusMinutes(20);
+        LocalDateTime endLocalDate = LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault()).plusMinutes(100);
+        System.out.println("结束时间:"+DateUtil.localDate2Date(endLocalDate).getTime());
+        LocalDateTime startLocalDate = endLocalDate.minusMinutes(105);
         Date startDate = DateUtil.localDate2Date(startLocalDate);
         System.out.println("开始时间:"+startDate.getTime());
-        System.out.println("结束时间:"+now.getTime());
     }
 }

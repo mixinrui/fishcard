@@ -174,7 +174,6 @@ public class FishCardUpdatorServiceX {
             }
         }
 
-
         boolean isOnline = fetchHeartBeatServiceX.isOnline(new DataAnalysisLogParam(workOrder.getStudentId(),
                 startDate.getTime(), endDate.getTime(), AppPointRecordEventEnum.STUDENT_ONLINE_STATUS.value()));
         //没有联通但是在线,则表示为系统异常

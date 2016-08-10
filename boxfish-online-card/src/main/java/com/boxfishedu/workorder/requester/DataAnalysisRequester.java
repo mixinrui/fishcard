@@ -39,7 +39,7 @@ public class DataAnalysisRequester {
             }
         }
         catch (Exception ex){
-            logger.error("@fetchHeartBeatLog#fail_invoke调用数据分析失败,url[{}]",url);
+            logger.error("@fetchHeartBeatLog#fail_invoke调用数据分析失败,url[{}]#将会影响判断的结果",url);
         }
         return eventResultBean;
     }
