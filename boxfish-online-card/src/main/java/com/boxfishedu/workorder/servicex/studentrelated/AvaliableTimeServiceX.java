@@ -92,6 +92,7 @@ public class AvaliableTimeServiceX {
             workOrder = workOrderService.getLatestWorkOrderByStudentIdAndComboType(
                     avaliableTimeParam.getStudentId(), avaliableTimeParam.getComboType().name());
         } catch (Exception ex) {
+            ex.printStackTrace();
             logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");
         }
         Date date = new Date();

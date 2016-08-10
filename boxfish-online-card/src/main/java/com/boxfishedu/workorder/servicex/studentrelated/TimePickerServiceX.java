@@ -271,6 +271,10 @@ public class TimePickerServiceX {
 
         for (int i = 0; i < loopOfWeek; i++) {
             for (int j = 0; j < numPerWeek; j++) {
+                int index = (j + 1) + i * numPerWeek;
+                if(index > service.getAmount()) {
+                    break;
+                }
                 List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
                 WorkOrder workOrder = new WorkOrder();
                 workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
@@ -281,7 +285,7 @@ public class TimePickerServiceX {
                 workOrder.setStudentName(service.getStudentName());
                 workOrder.setIsCourseOver((short) 0);
                 workOrder.setSlotId(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
-                workOrder.setSeqNum((j + 1) + i * numPerWeek);
+                workOrder.setSeqNum(index);
                 workOrder.setCreateTime(new Date());
                 workOrder.setOrderCode(service.getOrderCode());
                 // skuIdExtra 字段
