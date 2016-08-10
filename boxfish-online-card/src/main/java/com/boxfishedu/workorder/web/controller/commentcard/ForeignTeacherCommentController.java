@@ -1,7 +1,7 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.workorder.common.exception.UseUpException;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
@@ -36,24 +36,23 @@ public class ForeignTeacherCommentController {
     @Transactional
     public JsonResultModel addCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId, String access_token) throws Exception {
         CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
-        if(serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
-            Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
-            if(service.getAmount() <= 0){
-                throw new UseUpException("学生的外教点评次数已经用尽,请先购买!");
-            }else {
-                service.setAmount(service.getAmount() - 1);
-                foreignTeacherCommentCardService.updateCommentAmount(service);
-                commentCard.setStudentId(userId);
-                commentCard.setService(service);
-                commentCard.setOrderId(service.getOrderId());
-                commentCard.setOrderCode(service.getOrderCode());
-                commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
-                commentCard.setVoiceTime(commentCardForm.getVoiceTime());
-                commentCard.setStudentPicturePath(foreignTeacherCommentCardService.getUserPicture(access_token));
-                return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard));
-            }
+        if(! serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
+            throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
+        }
+        Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
+        if(service.getAmount() <= 0){
+            throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
         }else {
-                throw new UseUpException("学生的外教点评次数已经用尽,请先购买!");
+            service.setAmount(service.getAmount() - 1);
+            foreignTeacherCommentCardService.updateCommentAmount(service);
+            commentCard.setStudentId(userId);
+            commentCard.setService(service);
+            commentCard.setOrderId(service.getOrderId());
+            commentCard.setOrderCode(service.getOrderCode());
+            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
+            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
+            commentCard.setStudentPicturePath(foreignTeacherCommentCardService.getUserPicture(access_token));
+            return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard));
         }
     }
 
