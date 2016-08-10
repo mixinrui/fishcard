@@ -215,7 +215,7 @@ interface:
     order_service: http://127.0.0.1:8082
     course_online_service: http://127.0.0.1:9090
     auth_user: http://114.55.58.184:8099
-    data_analysis_service: http://192.168.0.126:9301
+    data_analysis_service: http://120.27.244.103:9301
 #===============================================================demo环境=====101.201.66.32===============================================================
 #==================mongo:     mongo --host dds-2zeab46e2bd819e41.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p
 ---
@@ -343,4 +343,4 @@ interface:
     auth_user: http://base.boxfish.cn/passbook
 #鱼卡管理后台的页面地址
     fishcard_page: http://101.201.66.109:94/
-    data_analysis_service: http://192.168.0.126:9301
+    data_analysis_service: http://120.27.244.103:9301

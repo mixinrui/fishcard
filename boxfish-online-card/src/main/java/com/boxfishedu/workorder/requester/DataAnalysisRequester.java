@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.requester.resultbean.EventResultBean;
 import com.boxfishedu.workorder.web.param.requester.DataAnalysisLogParam;
 import org.slf4j.Logger;
@@ -29,7 +30,17 @@ public class DataAnalysisRequester {
     public EventResultBean fetchHeartBeatLog(DataAnalysisLogParam dataAnalysisLogParam) {
         String url = String.format("%s/api/log/query/condition?userId=%s&startTime=%s&endTime=%s&event=%s",
                 urlConf.getData_analysis_service(), dataAnalysisLogParam.getUserId(), dataAnalysisLogParam.getStartTime(), dataAnalysisLogParam.getEndTime(), dataAnalysisLogParam.getEvent());
-        EventResultBean eventResultBean=restTemplate.getForObject(url,EventResultBean.class);
+        EventResultBean eventResultBean= null;
+        try {
+            logger.info("@fetchHeartBeatLog#invoke开始调用数据分析组数据,url[{}]",url);
+            eventResultBean=restTemplate.getForObject(url,EventResultBean.class);
+            if(null==eventResultBean){
+                throw new BusinessException("@fetchHeartBeatLog#null返回数据为空");
+            }
+        }
+        catch (Exception ex){
+            logger.error("@fetchHeartBeatLog#fail_invoke调用数据分析失败,url[{}]",url);
+        }
         return eventResultBean;
     }
 }

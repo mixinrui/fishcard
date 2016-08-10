@@ -97,6 +97,7 @@ public class FishCardUpdatorServiceX {
             workOrder.setStatus(FishCardStatusEnum.TEACHER_ABSENT.getCode());
             courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ABSENT.getCode());
 
+            workOrder.setIsCourseOver((short)1);
             workOrder.setUpdateTime(new Date());
             courseSchedule.setUpdateTime(new Date());
 
@@ -150,7 +151,7 @@ public class FishCardUpdatorServiceX {
      * 最终的学生旷课逻辑处理
      */
     public boolean studentForceAbsentUpdator(WorkOrder workOrder, CourseSchedule courseSchedule) {
-        logger.info("@studentForceAbsentUpdator#强制鱼卡[{}]旷课结束",workOrder.getId());
+        logger.info("@studentForceAbsentUpdator#强制鱼卡[{}]旷课开始",workOrder.getId());
         //默认不为异常
         boolean isExceptionFlag = false;
 
@@ -179,10 +180,10 @@ public class FishCardUpdatorServiceX {
         //没有联通但是在线,则表示为系统异常
         if (!containConnectedFlag && isOnline) {
             isExceptionFlag = true;
-            logger.info("判断鱼卡[{}]是否由于终端异常导致,判断结果[{}]", workOrder.getId(), isOnline);
+            logger.info("studentForceAbsentUpdator判断鱼卡[{}]是否由于终端异常导致,判断结果[{}]", workOrder.getId(), isOnline);
         }
         if (!isExceptionFlag) {
-            logger.warn("[studentAbsentUpdator]鱼卡:[{}]的状态为学生旷课,开始处理", workOrder.getId());
+            logger.warn("[studentForceAbsentUpdator]鱼卡:[{}]的状态为学生旷课,开始处理", workOrder.getId());
             courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
             workOrderLogService.saveWorkOrderLog(workOrder);
         }
