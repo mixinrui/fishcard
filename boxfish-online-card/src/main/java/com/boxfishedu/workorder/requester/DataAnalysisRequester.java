@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.requester.resultbean.EventResultBean;
 import com.boxfishedu.workorder.web.param.requester.DataAnalysisLogParam;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class DataAnalysisRequester {
         try {
             logger.info("@fetchHeartBeatLog#invoke开始调用数据分析组数据,url[{}]",url);
             eventResultBean=restTemplate.getForObject(url,EventResultBean.class);
+            logger.info("@fetchHeartBeatLog#result开始调用数据分析组数据,result[{}]", JacksonUtil.toJSon(eventResultBean));
             if(null==eventResultBean){
                 throw new BusinessException("@fetchHeartBeatLog#null返回数据为空");
             }
