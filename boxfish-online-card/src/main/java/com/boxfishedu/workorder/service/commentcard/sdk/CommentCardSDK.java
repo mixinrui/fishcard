@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service.commentcard.sdk;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.config.CommentCardUrlConf;
 import com.boxfishedu.workorder.entity.mysql.PushToStudentAndTeacher;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +33,9 @@ public class CommentCardSDK {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private CommentCardUrlConf commentCardUrlConf;
+
     public JsonResultModel setTeacherAbsence(Long teacherId,Long studentId, Long id){
         Map<String,String> paramMap = new HashMap<>();
         paramMap.put("teacherId",teacherId.toString());
@@ -56,7 +60,7 @@ public class CommentCardSDK {
 
     private URI createTeacherAbsenceURI(){
         logger.info("Accessing createTeacherAbsenceURI in CommentCardSDK......");
-        return UriComponentsBuilder.fromUriString("http://192.168.88.210:8099")
+        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getTeacherAbsenceUrl())
                 .path("/f_teacher_review/set_truant")
                 .queryParam("")
                 .build()
@@ -65,7 +69,7 @@ public class CommentCardSDK {
 
     private URI createGetPictureURI(String access_token){
         logger.info("Accessing createGetPictureURI in CommentCardSDK......");
-        return UriComponentsBuilder.fromUriString("http://114.55.58.184:8099")
+        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getGetPictureUrl())
                 .path("/user/me")
                 .queryParam("access_token",access_token)
                 .build()
@@ -74,7 +78,7 @@ public class CommentCardSDK {
 
     private URI createPushURI(){
         logger.info("Accessing createPushURI in CommentCardSDK......");
-        return UriComponentsBuilder.fromUriString("http://101.201.239.116:9090")
+        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getPushInfoIrl())
                 .path("/teaching/callback/push")
                 .queryParam("")
                 .build()
