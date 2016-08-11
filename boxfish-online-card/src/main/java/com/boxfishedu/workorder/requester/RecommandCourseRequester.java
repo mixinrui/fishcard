@@ -1,7 +1,7 @@
 package com.boxfishedu.workorder.requester;
 
-import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -10,9 +10,12 @@ import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +54,20 @@ public class RecommandCourseRequester {
             throw new BusinessException("获取推荐课程失败:" + ex.getMessage());
         }
         return recommandCourseView;
+    }
+
+    public RecommandCourseView getForeignRecomandCourse(WorkOrder workOrder) {
+        try {
+            RecommandCourseView recommandCourseView = restTemplate.postForObject(
+                    createForeignRecommendUri(workOrder.getStudentId()),
+                    HttpEntity.EMPTY,
+                    RecommandCourseView.class);
+            logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
+            return recommandCourseView;
+        } catch (Exception ex) {
+            logger.error("!!!!!!!!!!!!!!向推荐课发起请求失败[{}]", ex.getMessage(), ex);
+            throw new BusinessException("获取推荐课程失败:" + ex.getMessage());
+        }
     }
 
     /**
@@ -163,6 +180,14 @@ public class RecommandCourseRequester {
             }
 
         }));
+    }
+
+    private URI createForeignRecommendUri(Long studentId) {
+        return UriComponentsBuilder
+                .fromUriString(urlConf.getCourse_recommended_service())
+                .path("/online/foreigner/" + studentId)
+                .build()
+                .toUri();
     }
 
 }

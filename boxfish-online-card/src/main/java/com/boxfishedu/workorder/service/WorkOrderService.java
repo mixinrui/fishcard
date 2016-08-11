@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -9,7 +10,9 @@ import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
@@ -27,7 +30,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * Created by hucl on 16/3/31.
@@ -51,6 +56,9 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    TeacherStudentRequester  teacherStudentRequester;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -296,12 +304,16 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentIdAndStartTimeBetween(studentId, beginDate, endDate);
     }
 
-    public WorkOrder getLatestWorkOrder(Long studentId){
-        String sql = "select wo from WorkOrder wo where wo.studentId=? order by wo.endTime desc";
-        Query query = entityManager.createQuery(sql).setParameter(1, studentId);
+
+    public WorkOrder getLatestWorkOrderByStudentIdAndComboType(Long studentId, String comboType) {
+        int teachingType = ComboTypeToRoleId.resolve(comboType).getValue();
+        String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.service.teachingType=? order by wo.endTime desc";
+        Query query = entityManager.createQuery(sql)
+                .setParameter(1, studentId)
+                .setParameter(2, teachingType);
         query.setMaxResults(1);
-        WorkOrder workOrder= (WorkOrder) query.getSingleResult();
-        return workOrder;
+        List resultList = query.getResultList();
+        return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
     }
 
     public void batchSaveCoursesIntoCard(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommandCoursesMap){
@@ -314,4 +326,5 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             workOrder.setSkuId(new Long(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType())));
         }
     }
+
 }

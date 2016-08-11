@@ -27,6 +27,11 @@ public class GrabOrderController {
     @Autowired
     private MakeWorkOrderServiceX makeWorkOrderServiceX;
 
+    /**
+     * 根据老师获取抢单列表
+     * @param teacherId
+     * @return
+     */
     @RequestMapping(value = "/{teacher_id}/workorderlist", method = RequestMethod.GET)
     public JsonResultModel getWorkOrderListByTeacherId(@PathVariable("teacher_id") Long teacherId) {
         return grabOrderServiceX.getWorkOrderListByTeacherId(teacherId);

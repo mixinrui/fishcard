@@ -91,10 +91,10 @@ public class TeacherStudentRequester {
         return plannerAssignView;
     }
 
-    @Cacheable(value = DayTimeSlots.CACHE_KEY, key = "#teacherId.toString()")
-    public DayTimeSlots dayTimeSlotsTemplate(Long teacherId) {
+    @Cacheable(value = DayTimeSlots.CACHE_KEY, key = "#roleId.toString()")
+    public DayTimeSlots dayTimeSlotsTemplate(Long roleId) {
         // 1 从师生运营获取一天时间片模板列表
-        String url = String.format("%s/timeslot/list/%s", urlConf.getTeacher_service(), teacherId);
+        String url = String.format("%s/timeslot/list/%s", urlConf.getTeacher_service(), roleId);
         logger.info("<-<-<-<-<-<-<-<-向师生运营组发送获取时间片请求,url[{}]",url);
         JsonResultModel jsonResultModel = null;
         try {

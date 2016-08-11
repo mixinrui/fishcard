@@ -16,6 +16,7 @@ import javax.persistence.LockModeType;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created with Intellij IDEA
@@ -76,4 +77,9 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     @Modifying
     @Query("update CourseSchedule o set o.teacherId = ?1,o.status=?3 where o.workorderId = ?2 ")
     int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId, Integer status);
+
+    Page<CourseSchedule> findByStudentId(Long studentId, Pageable pageable);
+
+    @Query("select concat(c.classDate,' ',c.timeSlotId) from CourseSchedule c where c.studentId=?1 and c.classDate>=?2 and c.status<40")
+    Set<String> findUnfinishByStudentIdAndAfterDate(Long studentId, Date afterDate);
 }

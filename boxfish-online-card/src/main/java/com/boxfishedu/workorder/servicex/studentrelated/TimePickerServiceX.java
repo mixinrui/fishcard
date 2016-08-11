@@ -1,11 +1,9 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.workorder.common.config.UrlConf;
-import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -22,6 +20,7 @@ import com.boxfishedu.workorder.servicex.bean.StudentCourseSchedule;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
@@ -29,6 +28,7 @@ import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +42,7 @@ import org.springframework.web.client.RestTemplate;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 
 import static com.boxfishedu.workorder.common.util.DateUtil.*;
 
@@ -59,19 +60,13 @@ public class TimePickerServiceX {
     @Autowired
     private CourseScheduleService courseScheduleService;
     @Autowired
-    private UrlConf urlConf;
-    @Autowired
     private LogPoolManager logPoolManager;
     @Autowired
     private ServiceSDK serviceSDK;
     @Autowired
     private TimePickerService timePickerService;
-
     @Autowired
     RestTemplate restTemplate;
-
-    @Autowired
-    private RabbitMqSender rabbitMqSender;
 
     @Autowired
     private RecommandedCourseService recommandedCourseService;
@@ -88,9 +83,6 @@ public class TimePickerServiceX {
      */
     @Value("${choiceTime.consumerStartDay:1}")
     private Integer consumerStartDay;
-    private final static Integer daysOfWeek = 7;
-    @Autowired
-    private CourseType2TeachingTypeService courseType2TeachingTypeService;
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
@@ -105,6 +97,11 @@ public class TimePickerServiceX {
 
         validateTimeSlotParam(timeSlotParam,service);
 
+        // 返回学生当前选择的课程日期和时间片
+        Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(service.getStudentId());
+        // unique课程验证
+        checkUniqueCourseSchedules(classDateTimeslotsSet, timeSlotParam.getSelectedTimes());
+
         logger.info("选课开始,service的id为:[{}]", service.getId());
 
         List<WorkOrder> workOrders = batchInitWorkorders(timeSlotParam, service);
@@ -114,8 +111,10 @@ public class TimePickerServiceX {
 
         workOrderService.batchSaveCoursesIntoCard(workOrders,recommandCoursesMap);
 
+
         //入库,workorder和coursechedule的插入放入一个事务中,保证数据的一致性
-        List<CourseSchedule> courseSchedules=workOrderService.persistCardInfos(service,workOrders,recommandCoursesMap);
+        List<CourseSchedule> courseSchedules=workOrderService.persistCardInfos(
+                service,workOrders,recommandCoursesMap);
 
         //TODO:等测
         workOrderLogService.batchSaveWorkOrderLogs(workOrders);
@@ -129,12 +128,39 @@ public class TimePickerServiceX {
         return JsonResultModel.newJsonResultModel(null);
     }
 
+
+    private void checkUniqueCourseSchedules(Set<String> classDateTimeSlotsList, List<SelectedTime> selectedTimes) {
+        for(SelectedTime selectedTime : selectedTimes) {
+            checkUniqueCourseSchedule(
+                    classDateTimeSlotsList,
+                    selectedTime,
+                    () -> {
+                        TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(selectedTime.getTimeSlotId());
+                        return String.join(" ", selectedTime.getSelectedDate(), timeSlot.getStartTime())
+                                + "已经安排了课程,请重新选择!";
+                    });
+        }
+    }
+
+    private void checkUniqueCourseSchedule(
+            Set<String> classDateTimeSlotsList, SelectedTime selectedTime, Supplier<String> exceptionProducer) {
+        if(classDateTimeSlotsList.contains(
+                String.join(" ", selectedTime.getSelectedDate(),
+                        selectedTime.getTimeSlotId().toString()))) {
+            throw new BusinessException(exceptionProducer.get());
+        }
+    }
+
+
     private void validateTimeSlotParam(TimeSlotParam timeSlotParam,Service service) {
         List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
-        if (service.getComboCycle() != -1) {
-            if (selectedTimes.size() != (service.getAmount() >> 2)) {
-                throw new BusinessException("选择的上课次数不符合规范");
-            }
+//        if (service.getComboCycle() != -1) {
+//            if (selectedTimes.size() != (service.getAmount() >> 2)) {
+//                throw new BusinessException("选择的上课次数不符合规范");
+//            }
+//        }
+        if(serveService.getNumPerWeek(service) != selectedTimes.size()) {
+            throw new BusinessException("选择的上课次数不符合规范");
         }
         if(service.getCoursesSelected()==1){
             throw new BusinessException("该订单已经完成选课,请勿重复选课");
@@ -152,8 +178,20 @@ public class TimePickerServiceX {
         for (WorkOrder workOrder : workOrders) {
             logger.debug("鱼卡序号{}",workOrder.getSeqNum());
             Integer index=recommandedCourseService.getCourseIndex(workOrder);
-            RecommandCourseView recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
-            courseViewMap.put(workOrder.getSeqNum(),recommandCourseView);
+            String comboType = workOrder.getService().getComboType();
+            RecommandCourseView recommandCourseView = null;
+            // 不同类型的套餐对应不同类型的课程推荐
+            if(Objects.equals(comboType, ComboTypeToRoleId.OVERALL.name())) {
+                recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
+            } else if(Objects.equals(comboType, ComboTypeToRoleId.FOREIGN.name())) {
+                recommandCourseView = recommandCourseRequester.getForeignRecomandCourse(workOrder);
+            } else {
+
+            }
+
+            if(!Objects.isNull(recommandCourseView)) {
+                courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
+            }
 //            courseViewMap.put(workOrder.getSeqNum(), courseView);
         }
         return courseViewMap;
@@ -233,6 +271,10 @@ public class TimePickerServiceX {
 
         for (int i = 0; i < loopOfWeek; i++) {
             for (int j = 0; j < numPerWeek; j++) {
+                int index = (j + 1) + i * numPerWeek;
+                if(index > service.getAmount()) {
+                    break;
+                }
                 List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
                 WorkOrder workOrder = new WorkOrder();
                 workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
@@ -243,9 +285,12 @@ public class TimePickerServiceX {
                 workOrder.setStudentName(service.getStudentName());
                 workOrder.setIsCourseOver((short) 0);
                 workOrder.setSlotId(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
-                workOrder.setSeqNum((j + 1) + i * numPerWeek);
+                workOrder.setSeqNum(index);
                 workOrder.setCreateTime(new Date());
                 workOrder.setOrderCode(service.getOrderCode());
+                // skuIdExtra 字段
+                workOrder.setSkuIdExtra(service.getSkuId().intValue());
+                workOrder.setOrderChannel(service.getOrderChannel());
                 TimeSlots timeSlots = getTimeSlotById(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
                 String startTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getStartTime();
                 String endTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getEndTime();
@@ -272,7 +317,8 @@ public class TimePickerServiceX {
 
     private Service ensureConvertOver(TimeSlotParam timeSlotParam, int pivot) {
         pivot++;
-        Service service = serveService.findTop1ByOrderIdAndSkuId(timeSlotParam.getOrderId(), timeSlotParam.getType());
+        Service service = serveService.findTop1ByOrderIdAndComboType(
+                timeSlotParam.getOrderId(), timeSlotParam.getComboType().name());
         if (null == service) {
             if (pivot > 2) {
                 logger.error("重试两次后发现仍然不存在对应的服务,直接返回给前端,当前pivot[{}]",pivot);
@@ -306,26 +352,7 @@ public class TimePickerServiceX {
     public JsonResultModel getByStudentIdAndDateRange(Long studentId, DateRangeForm dateRangeForm) {
         List<CourseSchedule> courseSchedules =
                 courseScheduleService.findByStudentIdAndClassDateBetween(studentId, dateRangeForm);
-
-        Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
-        courseSchedules.forEach(courseSchedule -> {
-            String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
-            List<StudentCourseSchedule> studentCourseScheduleList = courseScheduleMap.get(date);
-            if (studentCourseScheduleList == null) {
-                studentCourseScheduleList = Lists.newArrayList();
-                courseScheduleMap.put(date, studentCourseScheduleList);
-            }
-            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule));
-        });
-
-        List<Map<String, Object>> result = Lists.newArrayList();
-        courseScheduleMap.forEach((key, val) -> {
-            Map<String, Object> beanMap = Maps.newHashMap();
-            beanMap.put("day", key);
-            beanMap.put("dailyScheduleTime", val);
-            result.add(beanMap);
-        });
-        return JsonResultModel.newJsonResultModel(result);
+        return JsonResultModel.newJsonResultModel(adapterCourseScheduleList(courseSchedules));
     }
 
     public JsonResultModel getFinishCourseSchedulePage(Long userId, Pageable pageable) {
@@ -368,9 +395,45 @@ public class TimePickerServiceX {
         studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
         studentCourseSchedule.setTime(timeSlots.getStartTime());
         studentCourseSchedule.setWorkOrderId(courseSchedule.getWorkorderId());
+        studentCourseSchedule.setStatus(courseSchedule.getStatus());
         if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
             studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()));
         }
         return studentCourseSchedule;
+    }
+
+    public Object getCourseSchedulePage(Long studentId, Pageable pageable) {
+        Page<CourseSchedule> page = courseScheduleService.findByStudentId(studentId, pageable);
+        List<Map<String, Object>> result = adapterCourseScheduleList(page.getContent());
+        HashMap<String, Object> resultMap = Maps.newHashMap();
+        resultMap.put("data", result);
+        resultMap.put("returnCode", HttpStatus.SC_OK);
+        resultMap.put("totalElements", page.getTotalElements());
+        resultMap.put("number", page.getNumber());
+        resultMap.put("totalPages", page.getTotalPages());
+        resultMap.put("size", page.getSize());
+        return resultMap;
+    }
+
+    private List<Map<String, Object>> adapterCourseScheduleList(List<CourseSchedule> courseScheduleList) {
+        Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
+        courseScheduleList.forEach(courseSchedule -> {
+            String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
+            List<StudentCourseSchedule> studentCourseScheduleList = courseScheduleMap.get(date);
+            if (studentCourseScheduleList == null) {
+                studentCourseScheduleList = Lists.newArrayList();
+                courseScheduleMap.put(date, studentCourseScheduleList);
+            }
+            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule));
+        });
+
+        List<Map<String, Object>> result = Lists.newArrayList();
+        courseScheduleMap.forEach((key, val) -> {
+            Map<String, Object> beanMap = Maps.newHashMap();
+            beanMap.put("day", key);
+            beanMap.put("dailyScheduleTime", val);
+            result.add(beanMap);
+        });
+        return result;
     }
 }

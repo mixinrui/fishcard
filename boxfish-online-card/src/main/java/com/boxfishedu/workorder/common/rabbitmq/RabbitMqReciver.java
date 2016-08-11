@@ -3,7 +3,7 @@ package com.boxfishedu.workorder.common.rabbitmq;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
-import com.boxfishedu.online.order.entity.OrderForm;
+import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -21,7 +21,6 @@ import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import org.apache.http.io.SessionOutputBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,10 +56,7 @@ public class RabbitMqReciver {
     private FishCardStatusFinderServiceX fishCardStatusFinderServiceX;
 
     @Autowired
-
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
-
-
 
     // 抢单服务层
     @Autowired
@@ -75,6 +71,7 @@ public class RabbitMqReciver {
     public void orderConsumer(OrderForm orderView) throws Exception {
         logger.info("@orderConsumer");
         try {
+            System.out.println(orderView);
             serveService.order2ServiceAndWorkOrder(orderView);
         } catch (Exception ex) {
             logger.error("订单[{}]转换失败", orderView.getId());
