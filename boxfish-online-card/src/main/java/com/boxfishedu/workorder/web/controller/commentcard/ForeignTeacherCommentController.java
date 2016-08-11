@@ -73,8 +73,8 @@ public class ForeignTeacherCommentController {
 
     //测试用接口
     @RequestMapping(value = "test_teacher_comment", method = RequestMethod.POST)
-    public JsonResultModel testTeacherComment(@RequestBody CommentCardForm commentCardForm, Long userId){
-        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testTeacherComment(commentCardForm,userId));
+    public JsonResultModel testTeacherComment(@RequestBody CommentCardForm commentCardForm, Long userId,String access_token){
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testTeacherComment(commentCardForm,userId,access_token));
     }
 
     //测试用接口
