@@ -37,16 +37,9 @@ public class CommentTeacherAppServiceX {
     private CommentCardLogService commentCardLogService;
 
     @Autowired
-    private TeacherStudentCommentCardRequester teacherStudentCommentCardRequester;
-
-    @Autowired
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
-
-    public Page<CommentCard> findByTeacherIdOrderByAssignTeacherTimeDesc(Long teacherId, Pageable pageable){
-        return commentCardTeacherAppService.findByTeacherIdOrderByAssignTeacherTimeDesc(teacherId,pageable);
-    }
 
     public CommentCard findById(Long cardId){
         return commentCardTeacherAppService.findById(cardId);

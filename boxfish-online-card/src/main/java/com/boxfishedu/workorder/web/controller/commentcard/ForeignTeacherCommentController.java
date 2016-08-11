@@ -1,17 +1,14 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
-import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -33,27 +30,8 @@ public class ForeignTeacherCommentController {
     ServeService serveService;
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    @Transactional
     public JsonResultModel addCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId, String access_token) throws Exception {
-        CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
-        if(! serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
-            throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
-        }
-        Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
-        if(service.getAmount() <= 0){
-            throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
-        }else {
-            service.setAmount(service.getAmount() - 1);
-            foreignTeacherCommentCardService.updateCommentAmount(service);
-            commentCard.setStudentId(userId);
-            commentCard.setService(service);
-            commentCard.setOrderId(service.getOrderId());
-            commentCard.setOrderCode(service.getOrderCode());
-            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
-            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
-            commentCard.setStudentPicturePath(foreignTeacherCommentCardService.getUserPicture(access_token));
-            return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCard));
-        }
+        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCardForm,userId,access_token));
     }
 
     @RequestMapping(value = "query_all",method = RequestMethod.GET)
@@ -88,6 +66,10 @@ public class ForeignTeacherCommentController {
         return JsonResultModel.newJsonResultModel(serveService.getForeignCommentServiceCount(userId));
     }
 
+    @RequestMapping(value = "count_student_unread", method = RequestMethod.GET)
+    public JsonResultModel countStudentUnreadCommentCards(Long userId){
+        return foreignTeacherCommentCardService.countStudentUnreadCommentCards(userId);
+    }
 
     //测试用接口
     @RequestMapping(value = "test_teacher_comment", method = RequestMethod.POST)
@@ -100,9 +82,4 @@ public class ForeignTeacherCommentController {
     public JsonResultModel testQueryAll(Pageable pageable){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
-
-//    @RequestMapping(value = "/get_user_picture", method = RequestMethod.GET)
-//    public JsonResultModel getUserPicture(String access_token){
-//        return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.getUserPicture(access_token));
-//    }
 }

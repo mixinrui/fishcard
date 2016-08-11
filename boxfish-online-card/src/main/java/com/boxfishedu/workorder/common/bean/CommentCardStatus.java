@@ -14,7 +14,10 @@ public enum CommentCardStatus {
     STUDENT_READ(1,"学生已读"),
     STUDENT_UNREAD(0,"学生未读"),
     TEACHER_READ(1,"外教已读"),
-    TEACHER_UNREAD(0,"外教未读");
+    TEACHER_UNREAD(0,"外教未读"),
+
+    ASSIGN_TEACHER_ONCE(1,"第一次分配外教"),
+    ASSIGN_TEACHER_TWICE(2,"第二次分配外教");
     private int code;
     private String status;
 
