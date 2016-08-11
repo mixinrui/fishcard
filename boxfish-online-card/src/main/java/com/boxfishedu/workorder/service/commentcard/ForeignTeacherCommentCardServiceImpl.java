@@ -198,9 +198,17 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCard.setTeacherId(userId);
         commentCard.setUpdateTime(dateNow);
         commentCard.setAnswerVideoPath(commentCardForm.getAnswerVideoPath());
-        commentCard.setStatus(CommentCardStatus.ANSWERED.getCode());
-        commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
-        commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
+        commentCard.setAnswerVideoTime(commentCardForm.getAnswerVideoTime());
+        commentCard.setAnswerVideoSize(commentCardForm.getAnswerVideoSize());
+        commentCard.setStatus(commentCardForm.getStatus());
+        if (commentCardForm.getStatus() == CommentCardStatus.ASSIGNED_TEACHER.getCode() || commentCardForm.getStatus() == CommentCardStatus.OVERTIME.getCode()){
+            commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
+            commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
+        }else {
+            commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
+            commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
+        }
+
         return commentCardJpaRepository.save(commentCard);
     }
 
@@ -227,5 +235,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         jsonResultModel.setReturnCode(HttpStatus.SC_OK);
         jsonResultModel.setReturnMsg("success");
         return jsonResultModel;
+    }
+
+    @Override
+    public void updateCommentCardsPictures(UpdatePicturesForm updatePicturesForm) {
+
     }
 }

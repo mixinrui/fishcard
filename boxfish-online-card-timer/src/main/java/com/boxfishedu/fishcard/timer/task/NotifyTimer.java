@@ -6,6 +6,7 @@ import com.boxfishedu.fishcard.timer.common.util.DateUtil;
 import com.boxfishedu.fishcard.timer.mq.RabbitMqSender;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -119,18 +120,18 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
-    /**
-     * 检查24小时内没有点评学生的外教。。每天凌晨0点定时执行
-     * 测试时为5分钟检查一次
-     */
-    @Scheduled(cron = "0 0/5 * * * ?")
+//    /**
+//     * 检查24小时内没有点评学生的外教。。每天凌晨0点定时执行
+//     * 测试时为5分钟检查一次
+//     */
+//    @Scheduled(cron = "0 0/5 * * * ?")
 //    @Scheduled(cron = "0 0 0 * * ?")
-    public void judgeCommentCard(){
-        logger.info("<<<<<<开始通知<<<获取在24小时内未评论的外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMMENT_CARD_NO_ANSWER.value());
-        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
-        rabbitMqSender.send(serviceTimerMessage);
-    }
+//    public void judgeCommentCard(){
+//        logger.info("<<<<<<开始通知<<<获取在24小时内未评论的外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+//        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMMENT_CARD_NO_ANSWER.value());
+//        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+//        rabbitMqSender.send(serviceTimerMessage);
+//    }
 
     /**
      * 抢单: 每天18点到 24点  每10分钟 轮训查询

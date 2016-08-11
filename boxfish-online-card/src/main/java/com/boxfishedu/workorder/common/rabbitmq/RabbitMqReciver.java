@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
+import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
@@ -142,11 +143,12 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY101message");
                 logger.info("=========>清理抢单数据(外教)");
                 makeWorkOrderServiceX.clearGrabData();
-            }else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
-                logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
-                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
-                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
             }
+//            else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
+//                logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
+//                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
+//                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
+//            }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);
@@ -188,6 +190,20 @@ public class RabbitMqReciver {
         foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
         logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
     }
+
+    /**
+     * 种老师通知外教点评卡头像更新
+     */
+    //@RabbitListener(queues = "")
+    public void updateCommentCardsPictures(String param){
+        if(param == null){
+            throw new ValidationException();
+        }
+        UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
+        foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
+        logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
+    }
+
     /**
      * 小马更新状态
      */
