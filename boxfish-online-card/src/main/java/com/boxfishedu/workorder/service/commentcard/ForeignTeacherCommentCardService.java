@@ -27,7 +27,7 @@ public interface ForeignTeacherCommentCardService {
 
     public void foreignTeacherCommentUnAnswer2();
 
-    public CommentCard testTeacherComment(CommentCardForm commentCardForm,Long userId);
+    public CommentCard testTeacherComment(CommentCardForm commentCardForm,Long userId,String access_token);
 
     public Page<CommentCard> testQueryAll(Pageable pageable);
 

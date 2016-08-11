@@ -191,11 +191,12 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
-    public CommentCard testTeacherComment(CommentCardForm commentCardForm,Long userId) {
+    public CommentCard testTeacherComment(CommentCardForm commentCardForm,Long userId,String access_token) {
         logger.info("!!!!!!调用测试接口---->commentCardForm: "+commentCardForm.toString());
         Date dateNow = new Date();
         CommentCard commentCard = commentCardJpaRepository.findOne(commentCardForm.getId());
         commentCard.setTeacherId(userId);
+        commentCard.setTeacherPicturePath(getUserPicture(access_token));
         commentCard.setUpdateTime(dateNow);
         commentCard.setAnswerVideoPath(commentCardForm.getAnswerVideoPath());
         commentCard.setAnswerVideoTime(commentCardForm.getAnswerVideoTime());
