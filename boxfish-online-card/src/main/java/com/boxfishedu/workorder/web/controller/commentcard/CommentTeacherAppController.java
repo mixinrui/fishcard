@@ -53,6 +53,7 @@ public class CommentTeacherAppController {
     public JsonResultModel submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam,Long userId,String access_token){
         commonServeServiceX.checkToken(commentCardSubmitParam.getTeacherId(),userId);
         commentCardSubmitParam.setTeacherPicturePath(foreignTeacherCommentCardService.getUserPicture(access_token));
+        commentCardSubmitParam.setTeacherId(userId);//测试时使用,正式去掉
         commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
         return JsonResultModel.newJsonResultModel(null);
     }

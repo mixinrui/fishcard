@@ -12,5 +12,5 @@ public class CommentCardSubmitParam {
     private Long answerVideoSize;
     private Long teacherId;
     private String teacherPicturePath;
-    private Long commentcardId;
+    private Long commentCardId;
 }

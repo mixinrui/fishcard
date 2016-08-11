@@ -154,7 +154,7 @@ spring:
     port: 6379
     timeout: 10000
   rabbitmq:
-    address: 127.0.0.1
+    address: 101.201.237.252
 #    port: 5672
     username: boxfish
     password: boxfish

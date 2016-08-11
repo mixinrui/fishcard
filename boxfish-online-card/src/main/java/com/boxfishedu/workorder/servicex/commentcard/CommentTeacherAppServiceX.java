@@ -56,18 +56,20 @@ public class CommentTeacherAppServiceX {
     }
 
     public void submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam){
-        CommentCard commentCard=commentCardTeacherAppService.findById(commentCardSubmitParam.getCommentcardId());
+        CommentCard commentCard=commentCardTeacherAppService.findById(commentCardSubmitParam.getCommentCardId());
         if(null==commentCard){
             throw new BusinessException("不存在对应的点评卡");
         }
         commentCard.setStudentReadFlag(0);
         commentCard.setStatus(CommentCardStatus.ANSWERED.getCode());
         commentCard.setUpdateTime(new Date());
+        commentCard.setTeacherId(commentCardSubmitParam.getTeacherId());//测试时使用,正式去掉
         commentCard.setAnswerVideoPath(commentCardSubmitParam.getVideoPath());
         commentCard.setAnswerVideoTime(commentCardSubmitParam.getAnswerVideoTime());
         commentCard.setAnswerVideoSize(commentCardSubmitParam.getAnswerVideoSize());
         commentCard.setTeacherAnswerTime(new Date());
         commentCard.setTeacherPicturePath(commentCardSubmitParam.getTeacherPicturePath());
+        commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
         commentCardTeacherAppService.save(commentCard);
         commentCardLogService.saveCommentCardLog(commentCard);
         JsonResultModel jsonResultModel = foreignTeacherCommentCardService.pushInfoToStudentAndTeacher(commentCard.getStudentId(),"收到一条外教点评，去查看。","FOREIGNCOMMENT");
