@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
-import com.boxfishedu.workorder.common.bean.SkuTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -488,7 +488,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
         List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
-                studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value());
+                studentId, ComboTypeToRoleId.CRITIQUE.name());
         Integer originalAmount = services.stream().reduce(
                 0,
                 (total, service) -> total + service.getOriginalAmount(),
@@ -507,12 +507,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     public boolean haveAvailableForeignCommentService(long studentId) {
         return serviceJpaRepository.getAvailableForeignCommentServiceCount(
-                studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value()) > 0;
+                studentId, ComboTypeToRoleId.CRITIQUE.name()) > 0;
     }
 
     public Optional<Service> findFirstAvailableForeignCommentService(long studentId) {
         Page<Service> servicePage = serviceJpaRepository.getFirstAvailableForeignCommentService(
-                studentId, SkuTypeEnum.SKU_FOREIGN_COMMENT.value(), new PageRequest(0, 1));
+                studentId, ComboTypeToRoleId.CRITIQUE.name(), new PageRequest(0, 1));
         return CollectionUtils.isEmpty(servicePage.getContent()) ?
                 Optional.empty() : Optional.of(servicePage.getContent().get(0));
     }
