@@ -161,6 +161,12 @@ spring:
     virtualHost: local
   profiles: development
 
+service:
+  sdk:
+    teacherAbsenceUrl: http://101.201.237.252:8099
+    getPictureUrl: http://114.55.58.184:8099
+    pushInfoIrl: http://101.201.239.116:9090
+
 ##################接口调用地址
 interface:
   address:
