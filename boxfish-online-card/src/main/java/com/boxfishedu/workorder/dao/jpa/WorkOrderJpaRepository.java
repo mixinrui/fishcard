@@ -93,6 +93,12 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     /** end 抢单接口 **/
 
+
+    // 获取当前时间往前一整天(24小时)有换课纪录的鱼卡 状态30 updatetime不为空 teacherid>0    sendFlagCC  1 未发送
+    //public List<WorkOrder> findByTeacherIdGreaterThanAndStatusAndUpdatetimeChangecourseBetween(Long teacherId,Integer status,Date begin ,Date end);
+    public List<WorkOrder> findByTeacherIdGreaterThanAndStatusAndSendflagccAndUpdatetimeChangecourseNotNullAndStartTimeBetween(Long teacherId,Integer status,String sendFlagCC,Date begin ,Date end);
+
+
     // 抢单之后,给课程匹配相应的老师
     @Modifying
     @Query("update WorkOrder o set o.teacherId = ?1 ,o.status = ?2 ,updateTime=current_timestamp ,assignTeacherTime=current_timestamp   where o.id = ?3 and o.teacherId = ?4")

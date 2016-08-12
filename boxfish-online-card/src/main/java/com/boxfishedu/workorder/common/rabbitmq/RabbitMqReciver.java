@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
+import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
@@ -51,6 +52,11 @@ public class RabbitMqReciver {
     // 抢单服务层
     @Autowired
     private MakeWorkOrderServiceX makeWorkOrderServiceX;
+
+    @Autowired
+    private CourseChangeServiceX courseChangeServiceX;
+
+
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -135,6 +141,8 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY101message");
                 logger.info("=========>清理抢单数据(外教)");
                 makeWorkOrderServiceX.clearGrabData();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.COURSE_CHANGER_WORKORDER.value()){
+                courseChangeServiceX.sendCourseChangeWorkOrders();
             }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);

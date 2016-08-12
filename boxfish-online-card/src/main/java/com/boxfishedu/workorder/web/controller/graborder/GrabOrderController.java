@@ -2,6 +2,9 @@ package com.boxfishedu.workorder.web.controller.graborder;
 
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
+import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -10,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 抢单
@@ -26,6 +31,13 @@ public class GrabOrderController {
 
     @Autowired
     private MakeWorkOrderServiceX makeWorkOrderServiceX;
+
+    @Autowired
+    private MakeWorkOrderService makeWorkOrderService;
+
+    @Autowired
+    private CourseChangeServiceX courseChangeServiceX;
+
 
     /**
      * 根据老师获取抢单列表
@@ -94,6 +106,27 @@ public class GrabOrderController {
         makeWorkOrderServiceX.makeTest(teacherForm.getTeacherId());
         return new JsonResultModel();
     }
+
+
+
+    @RequestMapping(value = "/testnew", method = RequestMethod.GET)
+    public JsonResultModel testnew() {
+        List<WorkOrder> list =  makeWorkOrderService.findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween();
+        return new JsonResultModel();
+    }
+
+
+    /**
+     * 方便测试测试  每天18:00 向教师发送 从现在开始  未来48+6小时内 变更课程的数量  的消息
+     * @return
+     */
+    @RequestMapping(value = "/testforcoursechange", method = RequestMethod.GET)
+    public JsonResultModel testforcoursechange() {
+        courseChangeServiceX.sendCourseChangeWorkOrders();
+        return new JsonResultModel();
+    }
+
+
 
 
 }

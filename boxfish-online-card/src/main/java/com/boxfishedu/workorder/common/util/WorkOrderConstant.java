@@ -18,4 +18,16 @@ public  class WorkOrderConstant {
     public final  static String GRABORDER_SUCCESS="抢单成功";
     // 抢单失败
     public final  static String GRABORDER_FAIL="抢单失败";
+
+
+
+    /** begin 课程变更消息发送 **/
+    public final  static String SEND_CHANGE_COURSE_MESSAGE_BEGIN="您的课表有 [";
+
+    public final  static String SEND_CHANGE_COURSE_MESSAGE_END="]节课程更新了,请提前下载.";
+
+    public final  static String SEND_CHANGE_COURSE_MESSAGE_FOREIGN_BEGIN="您的课表有 [";
+
+    public final  static String SEND_CHANGE_COURSE_MESSAGE_FOREIGN_END="]节课程更新了,请提前下载.";
+    /** end 课程变更消息发送 **/
 }

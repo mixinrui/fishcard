@@ -148,6 +148,18 @@ public class WorkOrder{
     @Column(name="update_manul_flag", length = 1)
     private String updateManulFlag;
 
+
+    /** 更改课程时间  **/
+    @Column(name = "updatetime_changecourse", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatetimeChangecourse;
+
+    /** 关于更改课程 是否发送过消息   1 未发送  0 表示已经发送 **/
+    @Column(name = "sendflagcc", nullable = true)
+    private String sendflagcc;
+
+
+
     @Override
     public String toString() {
         return "WorkOrder{" +
