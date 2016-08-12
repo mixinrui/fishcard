@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.bean;
 
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.List;
  * Created by LuoLiBing on 16/4/25.
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourseView implements Serializable {
 
     private final static Logger logger = LoggerFactory.getLogger(CourseView.class);
