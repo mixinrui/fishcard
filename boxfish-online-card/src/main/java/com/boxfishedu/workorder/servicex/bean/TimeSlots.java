@@ -3,7 +3,6 @@ package com.boxfishedu.workorder.servicex.bean;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
@@ -15,7 +14,6 @@ import java.io.Serializable;
  * 时间片
  */
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TimeSlots implements Cloneable, Serializable {
 
     private final static long serialVersionUID = 1L;
