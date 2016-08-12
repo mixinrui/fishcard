@@ -193,7 +193,7 @@ public class RabbitMqReciver {
     /**
      * 种老师通知外教点评卡头像更新
      */
-    //@RabbitListener(queues = "")
+    @RabbitListener(queues = RabbitMqConstant.UPDATE_PICTURE_QUEUE)
     public void updateCommentCardsPictures(String param){
         if(param == null){
             throw new ValidationException();
