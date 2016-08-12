@@ -89,8 +89,10 @@ public class FishCardModifyServiceX {
         //对workorder和courseschedule做控制
         workOrder.setTeacherId(teacherChangeParam.getTeacherId());
         workOrder.setAssignTeacherTime(new Date());
+        workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
         workOrder.setTeacherName(teacherChangeParam.getTeacherName());
         courseSchedule.setTeacherId(teacherChangeParam.getTeacherId());
+        courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
 
         //通知师生运营更换老师
         teacherStudentRequester.notifyChangeTeacher(workOrder);
