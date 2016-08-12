@@ -157,7 +157,7 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     }
 
     public Page<CourseSchedule> findByStudentId(Long studentId, Pageable pageable) {
-        return courseScheduleRepository.findByStudentId(studentId, pageable);
+        return courseScheduleRepository.findByStudentIdAfterClassDate(studentId, new Date(), pageable);
     }
 
     public List<TeacherAlterView> getOutNumOfTeacher(Date beginDate, Date endDate){
