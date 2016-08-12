@@ -47,8 +47,8 @@ parameter:
 
   #教师超过上课时间的时长,标记为迟到(minute)
   teacher_absent_time_limit: 10
-  #学生超过上课时间的时长,标记为迟到(minute)
-  student_absent_time_limit: 10
+  #学生超过上课时间的时长,往后增加一分钟,标记为迟到(minute)
+  student_absent_time_limit: 11
   #超过课程结束时间的时长,标记为服务器强制结束(minute)
   force_complete_time_limit: 10
   #距离上课时间提醒教师,单位：minutes
@@ -215,7 +215,7 @@ interface:
     order_service: http://127.0.0.1:8082
     course_online_service: http://127.0.0.1:9090
     auth_user: http://114.55.58.184:8099
-    data_analysis_service: http://120.27.244.103:9301
+    data_analysis_service: http://120.27.244.103:9301/log/mongo
 #===============================================================demo环境=====101.201.66.32===============================================================
 #==================mongo:     mongo --host dds-2zeab46e2bd819e41.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p
 ---
@@ -343,4 +343,4 @@ interface:
     auth_user: http://base.boxfish.cn/passbook
 #鱼卡管理后台的页面地址
     fishcard_page: http://101.201.66.109:94/
-    data_analysis_service: http://120.27.244.103:9301
+    data_analysis_service: http://online-api.log.boxfish.cn/log/mongo
