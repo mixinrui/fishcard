@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -187,4 +188,18 @@ public class DayTimeSlots implements Cloneable, Serializable {
         return filter((d) -> true, timePredicate);
     }
 
+    /**
+     * 返回待完成总数
+     * @return
+     */
+    public int getTodoCount() {
+        if(CollectionUtils.isEmpty(dailyScheduleTime)
+                || LocalDate.now().isAfter(DateUtil.parseLocalDate(day))) {
+            return 0;
+        }
+        return (int) dailyScheduleTime.stream()
+                // 0 < status < 40 防止有脏数据
+                .filter(t -> t.getCourseScheduleStatus() < 40 && t.getCourseScheduleStatus() > 0)
+                .count();
+    }
 }

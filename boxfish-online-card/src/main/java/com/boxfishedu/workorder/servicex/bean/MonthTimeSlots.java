@@ -99,5 +99,4 @@ public class MonthTimeSlots extends ResponseBaseView implements Serializable {
                 .collect(Collectors.toList());
         return this;
     }
-
 }
