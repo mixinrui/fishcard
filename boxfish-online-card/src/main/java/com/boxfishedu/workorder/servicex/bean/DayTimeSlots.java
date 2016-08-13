@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.bean;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.service.ServiceSDK;
@@ -198,8 +199,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
             return 0;
         }
         return (int) dailyScheduleTime.stream()
-                // 0 < status < 40 防止有脏数据
-                .filter(t -> t.getCourseScheduleStatus() < 40 && t.getCourseScheduleStatus() > 0)
+                .filter(t -> t.getCourseScheduleStatus() == FishCardStatusEnum.TEACHER_ASSIGNED.getCode())
                 .count();
     }
 }
