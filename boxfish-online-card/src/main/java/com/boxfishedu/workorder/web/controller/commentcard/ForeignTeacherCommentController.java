@@ -7,11 +7,13 @@ import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Created by ansel on 16/7/18.
@@ -28,6 +30,9 @@ public class ForeignTeacherCommentController {
 
     @Autowired
     ServeService serveService;
+
+    @Autowired
+    CommentCardSDK commentCardSDK;
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
     public JsonResultModel addCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId, String access_token) throws Exception {
@@ -81,5 +86,11 @@ public class ForeignTeacherCommentController {
     @RequestMapping(value = "test_query_all", method = RequestMethod.GET)
     public JsonResultModel testQueryAll(Pageable pageable){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
+    }
+
+    //测试获取内部账号
+    @RequestMapping(value = "test_get_inner_teacher_id", method = RequestMethod.GET)
+    public JsonResultModel getInnerTeacherId(){
+        return commentCardSDK.getInnerTeacherId();
     }
 }

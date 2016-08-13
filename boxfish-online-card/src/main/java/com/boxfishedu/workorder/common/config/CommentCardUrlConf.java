@@ -14,4 +14,5 @@ public class CommentCardUrlConf {
     private String teacherAbsenceUrl;
     private String getPictureUrl;
     private String pushInfoIrl;
+    private String innerTeacherUrl;
 }

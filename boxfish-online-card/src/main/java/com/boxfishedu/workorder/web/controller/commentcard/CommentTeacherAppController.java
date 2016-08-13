@@ -80,5 +80,9 @@ public class CommentTeacherAppController {
         return jsonResultModel;
     }
 
+    @RequestMapping(value = "count_teacher_unread", method = RequestMethod.GET)
+    public com.boxfishedu.beans.view.JsonResultModel countTeacherUnreadCommentCards(Long userId){
+        return foreignTeacherCommentCardService.countTeacherUnreadCommentCards(userId);
+    }
 
 }
