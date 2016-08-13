@@ -208,7 +208,7 @@ public class RabbitMqConfiguration {
          */
         Queue updatePictureQueue = new Queue(RabbitMqConstant.UPDATE_PICTURE_QUEUE, true);
         rabbitAdmin.declareQueue(updatePictureQueue);
-        Binding updatePictureQueueBinding = BindingBuilder.bind(updatePictureQueue).to(foreignCommentExchange()).with(RabbitMqConstant.UNASSIGNED_TEACHER_QUEUE).noargs();
+        Binding updatePictureQueueBinding = BindingBuilder.bind(updatePictureQueue).to(foreignCommentExchange()).with(RabbitMqConstant.UPDATE_PICTURE_QUEUE).noargs();
 
         rabbitAdmin.declareBinding(unassignedTeacherFailQueueBinding);
         rabbitAdmin.declareBinding(notifyOrderQueueBinding);

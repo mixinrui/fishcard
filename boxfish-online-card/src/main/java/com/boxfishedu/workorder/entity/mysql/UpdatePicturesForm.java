@@ -7,8 +7,9 @@ import lombok.Data;
  */
 @Data
 public class UpdatePicturesForm {
-    Long userId;
-    String role;
+    Long id;
+    String type;
     String accessToken;
-    String picturePath;
+    String nickname;
+    String figure_url;
 }
