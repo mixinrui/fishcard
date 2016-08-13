@@ -58,6 +58,10 @@ public class CommentCardSDK {
         return restTemplate.postForObject(createPushURI(), Arrays.asList(pushToStudentAndTeacher),JsonResultModel.class);
     }
 
+    public JsonResultModel getInnerTeacherId(){
+        return restTemplate.getForObject(getInnerTeacherURI(),JsonResultModel.class);
+    }
+
     private URI createTeacherAbsenceURI(){
         logger.info("Accessing createTeacherAbsenceURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getTeacherAbsenceUrl())
@@ -80,6 +84,15 @@ public class CommentCardSDK {
         logger.info("Accessing createPushURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getPushInfoIrl())
                 .path("/teaching/callback/push")
+                .queryParam("")
+                .build()
+                .toUri();
+    }
+
+    private URI getInnerTeacherURI(){
+        logger.info("Accessing getInnerTeacher in CommentCardSDK......");
+        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getInnerTeacherUrl())
+                .path("/f_teacher_review/get_inner_f_review_teacher")
                 .queryParam("")
                 .build()
                 .toUri();

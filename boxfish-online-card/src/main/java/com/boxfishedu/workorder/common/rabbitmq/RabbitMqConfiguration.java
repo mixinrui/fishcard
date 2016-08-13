@@ -203,6 +203,13 @@ public class RabbitMqConfiguration {
         Binding delayNotifyTeacherPrepareDealerQueueBinding;
         delayNotifyTeacherPrepareDealerQueueBinding = BindingBuilder.bind(delayNotifyTeacherPrepareDealerQueue).to(amqDirectExchange()).with(RabbitMqConstant.DELAY_NOTIFY_TEACHER_PREPARE_DEALER_QUEUE).noargs();
 
+        /**
+         * 通知外教点评卡修改学生或老师头像
+         */
+        Queue updatePictureQueue = new Queue(RabbitMqConstant.UPDATE_PICTURE_QUEUE, true);
+        rabbitAdmin.declareQueue(updatePictureQueue);
+        Binding updatePictureQueueBinding = BindingBuilder.bind(updatePictureQueue).to(foreignCommentExchange()).with(RabbitMqConstant.UPDATE_PICTURE_QUEUE).noargs();
+
         rabbitAdmin.declareBinding(unassignedTeacherFailQueueBinding);
         rabbitAdmin.declareBinding(notifyOrderQueueBinding);
         rabbitAdmin.declareBinding(assignTeacherBinding);
@@ -218,6 +225,7 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareBinding(delayForceCompleteDealerQueueBinding);
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareQueueBinding);
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareDealerQueueBinding);
+        rabbitAdmin.declareBinding(updatePictureQueueBinding);
 
         return rabbitAdmin;
     }

@@ -37,5 +37,7 @@ public interface ForeignTeacherCommentCardService {
 
     public JsonResultModel countStudentUnreadCommentCards(Long userId);
 
+    public JsonResultModel countTeacherUnreadCommentCards(Long userId);
+
     public void updateCommentCardsPictures(UpdatePicturesForm updatePicturesForm);
 }

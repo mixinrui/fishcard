@@ -17,4 +17,13 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
 
     @Query("select count(c) as count from CommentCard c where c.studentId=?1 and c.studentReadFlag = 0")
     public long countStudentUnreadCommentCards(Long studentId);
+
+    @Query("select count(c) as count from CommentCard c where c.teacherId=?1 and c.teacherReadFlag = 0")
+    public long countTeacherUnreadCommentCards(Long teacherId);
+
+    @Query("update CommentCard c set c.studentPicturePath =?1 where c.studentId = ?2")
+    public int updateStudentPicture(String studentPicturePath, Long studentId);
+
+    @Query("update CommentCard c set c.teacherPicturePath =?1 where c.teacherId = ?2")
+    public int updateTeacherPicture(String teacherPicturePath, Long teacherId);
 }
