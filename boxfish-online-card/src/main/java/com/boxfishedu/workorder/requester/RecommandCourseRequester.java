@@ -51,7 +51,7 @@ public class RecommandCourseRequester {
             logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
         } catch (Exception ex) {
             logger.error("!!!!!!!!!!!!!!向推荐课发起请求失败[{}]", ex.getMessage(), ex);
-            throw new BusinessException("获取推荐课程失败:" + ex.getMessage());
+            throw new BusinessException("获取推荐课程失败");
         }
         return recommandCourseView;
     }
@@ -66,7 +66,7 @@ public class RecommandCourseRequester {
             return recommandCourseView;
         } catch (Exception ex) {
             logger.error("!!!!!!!!!!!!!!向推荐课发起请求失败[{}]", ex.getMessage(), ex);
-            throw new BusinessException("获取推荐课程失败:" + ex.getMessage());
+            throw new BusinessException("获取推荐课程失败");
         }
     }
 
