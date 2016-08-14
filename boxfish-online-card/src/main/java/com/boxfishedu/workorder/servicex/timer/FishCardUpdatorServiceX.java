@@ -101,9 +101,8 @@ public class FishCardUpdatorServiceX {
             workOrder.setUpdateTime(new Date());
             courseSchedule.setUpdateTime(new Date());
 
-            workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
+            courseOnlineServiceX.completeCourse(workOrder,courseSchedule,FishCardStatusEnum.TEACHER_ABSENT.getCode());
 
-            courseOnlineRequester.releaseGroup(workOrder);
             workOrderLogService.saveWorkOrderLog(workOrder);
         }
     }
@@ -228,14 +227,14 @@ public class FishCardUpdatorServiceX {
             courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode());
         } else if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()) {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]状态[{}]的群解散", workOrder.getId(), workOrder.getStatus());
-            workOrderService.save(workOrder);
-            courseOnlineRequester.releaseGroup(workOrder);
+            courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode());
         }
         //处于学生接受请求或者ready状态,标记为系统异常
         else {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
                     FishCardStatusEnum.getDesc(FishCardStatusEnum.EXCEPTION.getCode()));
-            courseOnlineService.handleException(workOrder, courseSchedule, FishCardStatusEnum.EXCEPTION.getCode());
+//            courseOnlineService.handleException(workOrder, courseSchedule, FishCardStatusEnum.EXCEPTION.getCode());
+            courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.EXCEPTION.getCode());
         }
         workOrderLogService.saveWorkOrderLog(workOrder);
     }
