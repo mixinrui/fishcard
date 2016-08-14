@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
@@ -160,5 +161,45 @@ public class CommentCard {
     public void setStudentCommentBadTagCode(List studentCommentBadTagCode) {
         this.studentCommentBadTagCode = String.join(",", studentCommentBadTagCode);
     }
+
+    public CommentCard cloneCommentCard() {
+        CommentCard temp = new CommentCard();
+        temp.setStudentId(this.studentId);
+        temp.setStudentPicturePath(studentPicturePath);
+        temp.setAskVoicePath(askVoicePath);
+        temp.setVoiceTime(voiceTime);
+        temp.setStudentAskTime(studentAskTime);
+        temp.setCourseId(courseId);
+        temp.setCourseName(courseName);
+        temp.setQuestionName(questionName);
+        temp.setCover(cover);
+        temp.setService(service);
+        temp.setOrderId(orderId);
+        temp.setOrderCode(orderCode);
+        temp.setCreateTime(createTime);
+        temp.setUpdateTime(new Date());
+        return temp;
+    }
+
+    /**
+     * 超过24小时换老师
+     */
+    public void changeToOverTime() {
+        setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode());
+        setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
+        setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
+        setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+    }
+
+    /**
+     * 超过48小时退换次数
+     */
+    public void changeToReturn() {
+        setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
+        setAssignTeacherCount(CommentCardStatus.ASSIGN_INNER_TEACHER.getCode());
+        setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
+        setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
+    }
+
 
 }

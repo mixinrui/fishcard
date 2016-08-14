@@ -25,7 +25,7 @@ public class CommentCardTimer {
       * 测试时为5分钟检查一次
       */
     @Scheduled(cron = "0 0/5 * * * ?")
-//    @Scheduled(cron = "0 0 0 * * ?")
+//    @Scheduled(cron = "0/5 * * * * ?")
     public void judgeCommentCard(){
         logger.info("@CommentCardTimer>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
         foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
