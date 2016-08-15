@@ -126,6 +126,7 @@ public class GrabOrderServiceX {
         JSONObject jsonObject = new JSONObject();
         if(!checkIfCanGrabOrderByOnlineTeacher(grabOrderView)||!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
 //     if(!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
+            logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:1");
             grabOrderService.setFlagFailAndTeacherId(grabOrderView);
             jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
             jsonObject.put("code","1");
@@ -133,6 +134,7 @@ public class GrabOrderServiceX {
             WorkOrder workOrder = grabOrderService.findByIdForUpdate(grabOrderView.getWorkOrderId());
             if(workOrder!=null){
                 if(compareDate(workOrder.getStartTime())){
+                    logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:2");
                     grabOrderService.setFlagFailAndTeacherId(grabOrderView);
                     jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
                     jsonObject.put("code","1");
@@ -147,6 +149,7 @@ public class GrabOrderServiceX {
 
                     if(updateCount!=1){
                         //抢单失败
+                        logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:3");
                         grabOrderService.setFlagFailAndTeacherId(grabOrderView);
                         jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
                         jsonObject.put("code","1");

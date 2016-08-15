@@ -41,13 +41,15 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
 
     /**
      * 获取未来两天内 为匹配教师的鱼卡信息
+     * 鱼卡创建时间 大于 当前时间+10分钟
      * @return
      */
     public List<WorkOrder> findByTeacherIdAndStartTimeBetweenOrderByStartTime(){
         Date begin = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-1),0);
         Date end = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-2),1);
+        Date createTime =DateUtil.addSecond(new Date(),-10);
         logger.info(":::::findByTeacherIdAndStartTimeBetweenOrderByStartTime:::conditionDateFrom{[]}:::::To{[]}",DateUtil.Date2String(begin),DateUtil.Date2String(end));
-       return workOrderJpaRepository.findByTeacherIdAndStartTimeBetweenOrderByStartTime(0L,begin,end);
+       return workOrderJpaRepository.findByTeacherIdAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(0L,begin,end,createTime);
     }
 
 

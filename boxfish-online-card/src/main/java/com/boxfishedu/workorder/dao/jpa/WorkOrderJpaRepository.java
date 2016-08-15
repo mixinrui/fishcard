@@ -86,7 +86,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     /** begin 抢单接口 **/
 
     //  获取未来两天内 未安排教师的鱼卡信息  teacherid =0
-    public List<WorkOrder> findByTeacherIdAndStartTimeBetweenOrderByStartTime(Long teacherId, Date startDate, Date endDate);
+    public List<WorkOrder> findByTeacherIdAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(Long teacherId, Date startDate, Date endDate,Date createTime);
 
     //  获取未来两天内 未安排教师的鱼卡信息 teacherid >0
     public List<WorkOrder> findByTeacherIdGreaterThanAndStartTimeBetween(Long teacherId, Date startDate, Date endDate);

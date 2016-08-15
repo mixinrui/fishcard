@@ -259,4 +259,16 @@ public class DateUtil {
         Date to = convertToDate(now.plusMonths(6).atEndOfMonth());
         return new DateRangeForm(from, to);
     }
+
+
+    /**
+     * 当前时间 加 几分钟
+     * @param now
+     * @param second
+     * @return
+     */
+    public static Date addSecond(Date now ,int second) {
+        return new Date(now .getTime() + second*1000*60);
+    }
+
 }
