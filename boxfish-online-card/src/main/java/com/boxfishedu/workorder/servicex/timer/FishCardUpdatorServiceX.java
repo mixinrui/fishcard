@@ -160,7 +160,7 @@ public class FishCardUpdatorServiceX {
         }
 
         boolean containConnectedFlag = false;
-        LocalDateTime startLocalDate = LocalDateTime.ofInstant(workOrder.getStartTime().toInstant(), ZoneId.systemDefault()).minusMinutes(2);
+        LocalDateTime startLocalDate = LocalDateTime.ofInstant(workOrder.getStartTime().toInstant(), ZoneId.systemDefault()).minusMinutes(3);
         LocalDateTime endLocalDate = startLocalDate.plusMinutes(studentAbsentTimeLimit);
         Date startDate = DateUtil.localDate2Date(startLocalDate);
         Date endDate = DateUtil.localDate2Date(endLocalDate);

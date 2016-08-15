@@ -35,7 +35,7 @@ public class WorkOrder{
     @Column(name = "teacher_id", nullable = true)
     private Long teacherId;
 
-    @Column(name = "teacher_name", nullable = true, length = 20)
+    @Column(name = "teacher_name", nullable = true, length = 64)
     private String teacherName;
 
     @Column(name = "start_time", nullable = true)
