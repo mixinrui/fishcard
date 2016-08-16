@@ -143,11 +143,12 @@ public class RabbitMqReciver {
                 logger.info("=========>清理抢单数据(外教)");
                 makeWorkOrderServiceX.clearGrabData();
             }
-//            else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
-//                logger.info("@TIMER>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
-//                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
-//                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
-//            }
+            else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
+                logger.info("@CommentCardTimer>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
+                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
+                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
+                foreignTeacherCommentCardService.foreignUndistributedTeacherCommentCards();
+            }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);

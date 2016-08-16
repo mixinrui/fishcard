@@ -14,6 +14,8 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
 
     public Page<CommentCard> findByTeacherIdOrderByAssignTeacherTimeDesc(Long teacherId, Pageable pageable);
 
+    public CommentCard findById(Long id);
+
     public CommentCard findByIdAndStudentId(Long id,Long studentId);
 
     public CommentCard findByIdAndTeacherIdAndStatus(Long id, Long teacherId, Integer status);
@@ -36,10 +38,23 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
      * @param to
      * @param status
      * @return
-     */
-    @Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=?3")
+    */
+    @Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=?3 and c.assignTeacherCount = 1")
     List<CommentCard> findByDateRangeAndStatus(Date from, Date to, Integer status);
 
-    @Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status=?3")
+    /**
+     * 提问超过48小时还未回答
+     * @param from
+     * @param to
+     * @param status
+     * @return
+     */
+    @Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=?3 and c.assignTeacherCount = 2")
     List<CommentCard> findByDateRangeAndStatus2(Date from, Date to, Integer status);
+
+    /**
+     * 为分配到老师
+     */
+    @Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=?3 and c.teacherId is null")
+    List<CommentCard> findUndistributedTeacher(Date from, Date to, Integer status);
 }

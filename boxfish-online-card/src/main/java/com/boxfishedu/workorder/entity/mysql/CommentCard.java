@@ -17,7 +17,6 @@ import java.util.Set;
 
 /**
  * Created by oyjun on 16/2/29.
- * TODO:需要增加实际上课时间,实际结束时间;评价字段应该单独出表
  */
 @Component
 @Data
@@ -73,9 +72,6 @@ public class CommentCard {
     @Column(name = "answer_video_size",nullable = true, length = 20)
     private Long answerVideoSize;
 
-    @Column(name = "answer_video_thumbnail", nullable = true, length = 255)
-    private String answerVideoThumbnail;
-
     @Column(name = "course_id", nullable = true, length = 255)
     private String courseId;
 
@@ -125,11 +121,6 @@ public class CommentCard {
     @Column(name = "update_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
-
-    @OneToMany(fetch = FetchType.LAZY)//指向多的那方的pojo的关联外键字段
-    @JoinColumn(name = "card_id")
-    @JsonManagedReference
-    private Set<CommentCardUnanswerTeacher> unAnswerTeacherCards = new HashSet<CommentCardUnanswerTeacher>(0);
 
     public static CommentCard getCommentCard(CommentCardForm commentCardForm){
         CommentCard commentCard = new CommentCard();
@@ -196,10 +187,7 @@ public class CommentCard {
      */
     public void changeToReturn() {
         setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
-        setAssignTeacherCount(CommentCardStatus.ASSIGN_INNER_TEACHER.getCode());
         setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
-        setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        setStatus(CommentCardStatus.OVERTIME.getCode());
     }
-
-
 }
