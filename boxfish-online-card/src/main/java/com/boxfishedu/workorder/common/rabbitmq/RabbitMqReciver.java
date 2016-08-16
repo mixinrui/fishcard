@@ -197,11 +197,16 @@ public class RabbitMqReciver {
     @RabbitListener(queues = RabbitMqConstant.UPDATE_PICTURE_QUEUE)
     public void updateCommentCardsPictures(String param){
         if(param == null){
+            logger.info("接收头像更新通知,接收参数为:"+param);
             throw new ValidationException();
         }
         UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
-        foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
-        logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
+        if(updatePicturesForm.getFigure_url().isEmpty()){
+            throw new ValidationException();
+        }else {
+            foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
+            logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
+        }
     }
 
     /**

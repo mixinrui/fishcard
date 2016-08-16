@@ -139,7 +139,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             throw new UnauthorizedException();
         }
         if(commentCard.getStudentReadFlag() == CommentCardStatus.STUDENT_UNREAD.getCode()){
-            commentCard.setUpdateTime(new Date());
             commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
             commentCardJpaRepository.save(commentCard);
         }
@@ -167,9 +166,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCard.setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode());
                 commentCard.setAssignTeacherTime(updateDate);
                 commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
-                commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
+                commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
                 commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
-                commentCard.setUpdateTime(updateDate);
                 commentCardJpaRepository.save(commentCard);
                 JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(Long.parseLong(innerTeacherMap.get("teacherId").toString()),"学生发来一次求点评，点击查看。\n" +
                         "You’ve got a new answer to access; Do it now~","FOREIGNCOMMENT");
@@ -220,7 +218,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             serviceTemp.setAmount(serviceTemp.getAmount() + 1);
             serviceTemp.setUpdateTime(updateDate);
             serviceJpaRepository.save(serviceTemp);
-            logger.info("外教在48小时内未点评,为学生返还1次点评次数...");
+            logger.info("外教在48小时内未点评,为学生返还点评次数...");
         }
         logger.info("所有学生外教点评次数返还完毕,一共返回次数为:"+list.size());
     }

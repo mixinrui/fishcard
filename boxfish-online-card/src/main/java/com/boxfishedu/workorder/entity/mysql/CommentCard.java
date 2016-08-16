@@ -177,7 +177,7 @@ public class CommentCard {
      */
     public void changeToOverTime() {
         setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode());
-        setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
+        setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
         setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
         setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
     }

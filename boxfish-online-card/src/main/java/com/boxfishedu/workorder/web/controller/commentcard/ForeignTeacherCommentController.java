@@ -60,7 +60,7 @@ public class ForeignTeacherCommentController {
         return JsonResultModel.newJsonResultModel();
     }
 
-    @RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
+    //@RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
     public JsonResultModel haveAvailableForeignCommentService(long userId) {
         return JsonResultModel.newJsonResultModel(
                 Collections.singletonMap("available", serveService.haveAvailableForeignCommentService(userId)));

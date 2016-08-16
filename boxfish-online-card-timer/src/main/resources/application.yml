@@ -104,7 +104,7 @@ spring:
     password: Boxfish123
     tousers: huchunlinnk@163.com,393269748@qq.com,huchunlin@boxfish.cn
   rabbitmq:
-    address: 101.201.237.252
+    address: 101.201.239.116
 #    port:5672
     username: boxfish
     password: boxfish

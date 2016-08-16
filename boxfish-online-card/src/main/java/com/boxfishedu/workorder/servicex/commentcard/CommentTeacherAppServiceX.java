@@ -51,7 +51,7 @@ public class CommentTeacherAppServiceX {
             logger.error("不存在对应的点评卡,点评卡id[{}]",teacherReadMsgParam.getCommentCardId());
             throw new BusinessException("不存在对应的点评卡");
         }
-        commentCard.setTeacherReadFlag(1);
+        commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
         commentCardTeacherAppService.save(commentCard);
     }
 

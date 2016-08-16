@@ -9,7 +9,6 @@ import lombok.Data;
 public class UpdatePicturesForm {
     Long id;
     String type;
-    String accessToken;
     String nickname;
     String figure_url;
 }

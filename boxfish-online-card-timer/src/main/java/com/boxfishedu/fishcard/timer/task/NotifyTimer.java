@@ -125,7 +125,7 @@ public class NotifyTimer {
      */
     @Scheduled(cron = "0 0/1 * * * ?")
     public void judgeCommentCard(){
-        logger.info("<<<<<<开始通知<<<获取在24小时内未评论的外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        logger.info("<<<<<<开始通知<<<获取在24/48小时内未评论的外教或没分配到老师的点评卡>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMMENT_CARD_NO_ANSWER.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
