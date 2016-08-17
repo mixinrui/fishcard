@@ -123,7 +123,7 @@ public class NotifyTimer {
     /**
      * 外教点评定时检查
      */
-    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void judgeCommentCard(){
         logger.info("<<<<<<开始通知<<<获取在24/48小时内未评论的外教或没分配到老师的点评卡>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMMENT_CARD_NO_ANSWER.value());

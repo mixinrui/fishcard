@@ -311,18 +311,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public void updateCommentCardsPictures(UpdatePicturesForm updatePicturesForm) {
         if(updatePicturesForm.getType().equals("STUDENT")){
             logger.info("调用点评卡修改头像接口---->修改的角色为:学生,userId="+updatePicturesForm.getId());
-            if(commentCardJpaRepository.updateStudentPicture(updatePicturesForm.getFigure_url(),updatePicturesForm.getId()) != 0){
-                logger.info("修改学生头像成功!");
-            }else {
-                logger.info("修改学生头像失败或不存在该学生的点评卡!");
-            }
+            commentCardJpaRepository.updateStudentPicture(updatePicturesForm.getFigure_url(),updatePicturesForm.getId());
         }else if (updatePicturesForm.getType().equals("TEACHER")){
             logger.info("调用点评卡修改头像接口---->修改的角色为:外教,userId="+updatePicturesForm.getId());
-            if(commentCardJpaRepository.updateTeacherPicture(updatePicturesForm.getFigure_url(),updatePicturesForm.getId()) != 0){
-                logger.info("修改外教头像成功!");
-            }else {
-                logger.info("修改外教头像失败或不存在该外教的点评卡!");
-            }
+            commentCardJpaRepository.updateTeacherPicture(updatePicturesForm.getFigure_url(),updatePicturesForm.getId());
         }
     }
 }
