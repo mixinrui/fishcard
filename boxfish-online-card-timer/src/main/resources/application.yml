@@ -102,7 +102,7 @@ spring:
     port: 25
     username: nobody@send.boxfish.cn
     password: Boxfish123
-    tousers: huchunlinnk@163.com,393269748@qq.com,huchunlin@boxfish.cn
+    tousers: 393269748@qq.com
   rabbitmq:
     address: 101.201.237.252:5672
     username: boxfish
@@ -139,5 +139,5 @@ spring:
     port: 25
     username: nobody@send.boxfish.cn
     password: Boxfish123
-    tousers: huchunlinnk@163.com,fenglei@boxfish.cn
+    tousers: huchunlin@boxfish.cn,fenglei@boxfish.cn,suhaijiang@boxfish.cn,jiaozijun@boxfish.cn
   profiles: product
