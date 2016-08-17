@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.course.ServiceWorkOrderCombination;
 import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import javax.persistence.Query;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/3/31.
@@ -154,7 +156,6 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
                 courseSchedule.setCourseType(courseView.getCourseType().get(0));
             }
             courseSchedule.setClassDate(workOrder.getStartTime());
-            courseSchedule.setRoleId(service.getRoleId());
             courseSchedule.setTimeSlotId(workOrder.getSlotId());
             courseSchedule.setWorkorderId(workOrder.getId());
             courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
@@ -182,6 +183,14 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedules.add(courseSchedule);
         }
         return courseScheduleService.save(courseSchedules);
+    }
+
+    @Transactional
+    public List<ServiceWorkOrderCombination> persistCardInfos(List<ServiceWorkOrderCombination> workOrderCombinations) {
+        for(ServiceWorkOrderCombination serviceWorkOrderCombination : workOrderCombinations) {
+            serviceWorkOrderCombination.generateCourseSchedules(this::persistCardInfos);
+        }
+        return workOrderCombinations;
     }
 
     @Transactional
@@ -316,9 +325,9 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
     }
 
-    public void batchSaveCoursesIntoCard(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommandCoursesMap){
+    public void batchSetCourseInfo(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommendCoursesMap){
         for (WorkOrder workOrder : workOrders) {
-            RecommandCourseView courseView=recommandCoursesMap.get(workOrder.getSeqNum());
+            RecommandCourseView courseView = recommendCoursesMap.get(workOrder.getSeqNum());
             workOrder.setCourseId(courseView.getCourseId());
             workOrder.setCourseName(courseView.getCourseName());
             workOrder.setCourseType(courseView.getCourseType());
