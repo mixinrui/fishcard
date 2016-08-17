@@ -31,4 +31,8 @@ public class UrlConf {
 
     @Value("${interface.address.data_analysis_service}")
     private String data_analysis_service;
+
+    /** zhong老师接口 **/
+    @Value("${interface.address.student_teacher_relation}")
+    private String student_teacher_relation;
 }

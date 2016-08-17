@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderGrab;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
@@ -64,6 +65,9 @@ public class GrabOrderServiceX {
 
     @Autowired
     private WorkOrderLogService workOrderLogService;
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
 
     public JsonResultModel getWorkOrderListByTeacherId(Long teacherId){
@@ -139,6 +143,13 @@ public class GrabOrderServiceX {
                     jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
                     jsonObject.put("code","1");
                     logger.info("::::::::::::::::::单子已过期,抢单失败::::::::::::::::::");
+                // 判断该学生 是否在该老师 所在的班级
+                }else if(studentBelongToStudent(grabOrderView,workOrder)){ //该学生属于改老师所在的班级
+                    logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:4");
+                    grabOrderService.setFlagFailAndTeacherId(grabOrderView);
+                    jsonObject.put("msg",WorkOrderConstant.GRABORDER_FAIL);
+                    jsonObject.put("code","1");
+                    logger.info("::::::::::::::::::该学生属于改老师所在的班级::::::::::::::::::");
                 }else{
 
 
@@ -223,7 +234,40 @@ public class GrabOrderServiceX {
         return mapParams;
     }
 
+    /**
+     * 获取学生是否属于该教师
+     * @param grabOrderView
+     * @param workOrder
+     * @return  true  该学生属于该老师所在班级
+     *          false 该学生不属于该老师所在班级
+     */
+    public boolean studentBelongToStudent(GrabOrderView grabOrderView,WorkOrder workOrder){
+        if(null == workOrder || null ==workOrder.getStudentId()){
+            logger.info(":::::grabOrderByOneTeacher::studentBelongToStudent:鱼卡为空或者学生id不存在");
+            return true;
+        }
+        List  list = null;
+        try {
+            list= teacherStudentRequester.getTeachersBelongToStudent(workOrder.getStudentId());
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("::::::::grabOrderByOneTeacher:调用学生所属老师接口异常");
+            return true;
+        }
+        if(null==list || list.isEmpty()){
+            return true;
+        }
 
+        for(Object o : list){
+            Map m = (Map)o;
+            Long teacherId = Long.parseLong( String.valueOf( m.get("teacherId")));
+            if(teacherId.equals(grabOrderView.getTeacherId())){
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
 }

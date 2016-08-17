@@ -295,4 +295,22 @@ public class TeacherStudentRequester {
         }
         return TeachingType.ZHONGJIAO.getCode();
     }
+
+
+    /**
+     * 根据学生id  ,获取属于该学生所在班级的 所有老师id
+     * @param studentId
+     * @return
+     */
+    public List getTeachersBelongToStudent(Long studentId) {
+        String url = String.format("%s/user/%s/teacher", urlConf.getStudent_teacher_relation(), studentId);
+        logger.info(":::::::::::::::::::::::::::::::makeSendWorkOrder:@[getTeachersBelongToStudent]获取属于该学生所在班级的 所有老师url[{}]::::::::::::::::::::::::::::::::", url);
+
+        JsonResultModel jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
+        List teacherList = (List) jsonResultModel.getData();
+        logger.info("::::::::::::::::::::::::::::::::@[getTeachersBelongToStudent]向师生运营发起获取教师列表长度size[{}]  Datais[{}]::::::::::::::::::::::::::::::::",
+                teacherList == null ? 0 : teacherList.size(), JSON.toJSON(teacherList));
+        return teacherList;
+
+    }
 }
