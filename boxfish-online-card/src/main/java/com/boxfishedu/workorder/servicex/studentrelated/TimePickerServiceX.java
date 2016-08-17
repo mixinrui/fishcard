@@ -291,6 +291,7 @@ public class TimePickerServiceX {
                 // skuIdExtra 字段
                 workOrder.setSkuIdExtra(service.getSkuId().intValue());
                 workOrder.setOrderChannel(service.getOrderChannel());
+                workOrder.setSendflagcc("1");// 师生互评 发送状态 默认1 为 未发送
                 TimeSlots timeSlots = getTimeSlotById(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
                 String startTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getStartTime();
                 String endTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getEndTime();
