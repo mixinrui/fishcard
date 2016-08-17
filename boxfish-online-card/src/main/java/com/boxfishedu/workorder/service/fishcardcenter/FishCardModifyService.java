@@ -45,7 +45,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
     private WorkOrderLogService workOrderLogService;
 
     public void changeCourse(WorkOrder workOrder) {
-        String oldCourseName=workOrder.getCourseName();
+        String oldCourseName = workOrder.getCourseName();
 
         //取消老课程
         recommandCourseRequester.cancelOldRecommandCourse(workOrder);
@@ -74,18 +74,18 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,老课程[" + oldCourseName + "]");
     }
 
-    public List<WorkOrder> findByStudentIdAndOrderIdAndStatusLessThan(Long studentId,Long orderId,Integer status){
-        return jpa.findByStudentIdAndOrderIdAndStatusLessThan(studentId,orderId,status);
+    public List<WorkOrder> findByStudentIdAndOrderIdAndStatusLessThan(Long studentId, Long orderId, Integer status) {
+        return jpa.findByStudentIdAndOrderIdAndStatusLessThan(studentId, orderId, status);
     }
 
-    public List<WorkOrder> findByStudentIdAndStatusLessThan(Long studentId,Integer status){
-        return jpa.findByStudentIdAndStatusLessThan(studentId,status);
+    public List<WorkOrder> findByStudentIdAndStatusLessThan(Long studentId, Integer status) {
+        return jpa.findByStudentIdAndStatusLessThan(studentId, status);
     }
 
-    public void changeCourse(WorkOrder workOrder,Integer index) {
-        String oldCourseName=workOrder.getCourseName();
+    public void changeCourse(WorkOrder workOrder, Integer index) {
+        String oldCourseName = workOrder.getCourseName();
 
-        RecommandCourseView recommandCourseView = recommandCourseRequester.getRecommandCourse(workOrder,index);
+        RecommandCourseView recommandCourseView = recommandCourseRequester.getRecommandCourse(workOrder, index);
         workOrder.setCourseName(recommandCourseView.getCourseName());
         workOrder.setCourseId(recommandCourseView.getCourseId());
         workOrder.setCourseType(recommandCourseView.getCourseType());
@@ -115,16 +115,16 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,老课程[" + oldCourseName + "]");
     }
 
-    public List<WorkOrder> findByStudentIdAndStatusLessThanAndStartTimeAfter(Long studentId,Integer status,Date beginDate){
-        return jpa.findByStudentIdAndStatusLessThanAndStartTimeAfter(studentId,status,beginDate);
+    public List<WorkOrder> findByStudentIdAndStatusLessThanAndStartTimeAfter(Long studentId, Integer status, Date beginDate) {
+        return jpa.findByStudentIdAndStatusLessThanAndStartTimeAfter(studentId, status, beginDate);
     }
 
-    public List<CourseSchedule> findCourseSchedulesByWorkOrders(List<Long> workOrderIds){
-        return courseScheduleService.findByWorkorderIdIn((Long[])workOrderIds.toArray());
+    public List<CourseSchedule> findCourseSchedulesByWorkOrders(List<Long> workOrderIds) {
+        return courseScheduleService.findByWorkorderIdIn((Long[]) workOrderIds.toArray());
     }
 
     @Transactional
-    public void deleteCardsAndSchedules(List<WorkOrder> workOrders,List<CourseSchedule> courseSchedules){
+    public void deleteCardsAndSchedules(List<WorkOrder> workOrders, List<CourseSchedule> courseSchedules) {
         this.delete(workOrders);
         courseScheduleService.delete(courseSchedules);
     }
