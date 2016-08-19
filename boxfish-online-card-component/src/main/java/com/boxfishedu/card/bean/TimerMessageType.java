@@ -30,10 +30,6 @@ public enum TimerMessageType {
     COURSE_CHANGER_WORKORDER(102);
 
 
-    //每天6点向老师发送课程变化的消息
-    COURSE_CHANGER_WORKORDER(102);
-
-
     private int code;
 
     private TimerMessageType(int code) {
