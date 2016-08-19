@@ -181,8 +181,8 @@ public class CourseOnlineServiceX {
         courseOnlineRequester.releaseGroup(workOrder);
         //通知订单修改状态
         serveService.notifyOrderUpdateStatus(workOrder, ConstantUtil.WORKORDER_COMPLETED);
-        //通知推荐课服务
-        recommandCourseRequester.notifyCompleteCourse(workOrder);
+        //通知推荐课服务,目前由App调用
+//        recommandCourseRequester.notifyCompleteCourse(workOrder);
     }
 
     /**
