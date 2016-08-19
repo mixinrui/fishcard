@@ -49,11 +49,6 @@ public class GrabOrderController {
         return grabOrderServiceX.getWorkOrderListByTeacherId(teacherId);
     }
 
-    /**
-     * 抢单接口
-     * @param grabOrderView
-     * @return
-     */
     @RequestMapping(value = "/graboneorder", method = RequestMethod.POST)
     public JsonResultModel grabOrder(@RequestBody GrabOrderView grabOrderView) {
         logger.info("::::::::::TeacherOnLine Post params::::::::::teacherId="+grabOrderView.getTeacherId()+"&&&&workOrderId="+grabOrderView.getWorkOrderId()+"::::");

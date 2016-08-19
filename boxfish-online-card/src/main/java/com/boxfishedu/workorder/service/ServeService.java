@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
@@ -28,9 +29,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
@@ -47,7 +51,8 @@ import java.util.*;
 public class ServeService extends BaseService<Service, ServiceJpaRepository, Long> {
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
-
+    @Autowired
+    private ServiceJpaRepository serviceJpaRepository;
     @Autowired
     private UrlConf urlConf;
 
@@ -479,6 +484,37 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfo.setWorkOrderId(workOrder.getId());
         scheduleCourseInfo.setScheduleId(courseSchedule.getId());
         scheduleCourseInfoService.save(scheduleCourseInfo);
+    }
+
+    public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
+        List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
+                studentId, ComboTypeToRoleId.CRITIQUE.name());
+        Integer originalAmount = services.stream().reduce(
+                0,
+                (total, service) -> total + service.getOriginalAmount(),
+                Integer::sum
+        );
+        Integer amount = services.stream().reduce(
+                0,
+                (total, service) -> total + service.getAmount(),
+                Integer::sum
+        );
+        Map<String, Integer> countMap = Maps.newHashMap();
+        countMap.put("originalAmount", originalAmount);
+        countMap.put("amount", amount);
+        return countMap;
+    }
+
+    public boolean haveAvailableForeignCommentService(long studentId) {
+        return serviceJpaRepository.getAvailableForeignCommentServiceCount(
+                studentId, ComboTypeToRoleId.CRITIQUE.name()) > 0;
+    }
+
+    public Optional<Service> findFirstAvailableForeignCommentService(long studentId) {
+        Page<Service> servicePage = serviceJpaRepository.getFirstAvailableForeignCommentService(
+                studentId, ComboTypeToRoleId.CRITIQUE.name(), new PageRequest(0, 1));
+        return CollectionUtils.isEmpty(servicePage.getContent()) ?
+                Optional.empty() : Optional.of(servicePage.getContent().get(0));
     }
 
 //    @Transactional

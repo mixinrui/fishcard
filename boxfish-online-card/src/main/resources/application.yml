@@ -73,15 +73,14 @@ spring.datasource:
   max-idle: 20
   connection-timeout: 5000
   autoReconnect: true
-  #log character "Slow Query Report"
   jdbc-interceptors: SlowQueryReport(threshold=1000)
 
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
 
 #spring.profiles.active: product
-spring.profiles.active: local
-#spring.profiles.active: development
+#spring.profiles.active: local
+spring.profiles.active: development
 #spring.profiles.active: test
 #spring.profiles.active: demo
 
@@ -89,8 +88,8 @@ spring.profiles.active: local
 ---
 spring:
   datasource:
+#    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
     url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
-#    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
     username: service
     password: Box123456
 
@@ -142,12 +141,12 @@ interface:
 ---
 spring:
   datasource:
-    url: jdbc:mysql://boxfish2016inside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
     username: service
     password: Box123456
 
   mongo:
-    serverAddress: 127.0.0.1:27017
+    serverAddress: 101.201.239.116:27017
     dbName: fishcard
     username: root
     password: Boxfish2016
@@ -157,12 +156,19 @@ spring:
     port: 6379
     timeout: 10000
   rabbitmq:
-    address: 127.0.0.1
+    address: 101.201.239.116
 #    port: 5672
     username: boxfish
     password: boxfish
     virtualHost: local
   profiles: development
+
+service:
+  sdk:
+    teacherAbsenceUrl: http://101.201.237.252:8099
+    getPictureUrl: http://114.55.58.184:8099
+    pushInfoIrl: http://101.201.239.116:9090
+    innerTeacherUrl: http://101.201.237.252:8099
 
 ##################接口调用地址
 interface:
@@ -179,12 +185,12 @@ interface:
     student_teacher_relation: http://api.online.demo.boxfish.cn
 server.port: 8080
 
-#===============================================================test环境:123.56.13.168 机器密码:Boxfish016===============================================================
+#===============================================================test环境:123.56.13.168 机器密码:Boxfish2016===============================================================
 ---
 spring:
   datasource:
-    url: jdbc:mysql://boxfish2016inside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
-#    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
+#    url: jdbc:mysql://boxfish2016inside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
     username: service
     password: Box123456
   mongo:
@@ -198,7 +204,7 @@ spring:
     port: 6379
     timeout: 10000
   rabbitmq:
-    address: 127.0.0.1:5672
+    address: 123.56.13.168:5672
 #    port: 5672
     username: admin
     password: boxfish123

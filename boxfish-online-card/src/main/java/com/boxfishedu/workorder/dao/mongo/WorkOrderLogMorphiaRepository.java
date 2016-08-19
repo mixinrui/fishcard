@@ -10,17 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class WorkOrderLogMorphiaRepository {
-    @Autowired
-    private Datastore datastore;
-
-    public void save(WorkOrderLog workOrderLog) {
-        datastore.save(workOrderLog);
-    }
-
-    public void save(Iterable<WorkOrderLog> workOrderLogs){
-        datastore.save(workOrderLogs);
-    }
+public class WorkOrderLogMorphiaRepository extends BaseMorphiaRepository<WorkOrderLog>{
 
     public Optional<WorkOrderLog> getById(Long id) {
         Query<WorkOrderLog> query = datastore.createQuery(WorkOrderLog.class);

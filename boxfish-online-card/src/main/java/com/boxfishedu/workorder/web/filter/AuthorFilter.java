@@ -29,7 +29,9 @@ import java.util.Set;
  * 因为它是A开头,所以比C开头的先执行 - [亲测有效]
  * 新增鱼卡抢单过滤("/fishcard/graborder/*","/graborder/*")
  */
-@WebFilter(urlPatterns ={"/fishcard/service/student/*", "/fishcard/service/teacher/*", "/service/teacher/*", "/service/student/*","/fishcard/graborder/*","/graborder/*"})
+@WebFilter(urlPatterns ={
+        "/fishcard/service/student/*", "/fishcard/service/teacher/*",
+        "/service/teacher/*", "/service/student/*", "/comment_card/*", "/comment/foreign/*", "/fishcard/graborder/*","/graborder/*"})
 public class AuthorFilter extends OncePerRequestFilter {
 
     private Logger logger = LoggerFactory.getLogger(AuthorFilter.class);

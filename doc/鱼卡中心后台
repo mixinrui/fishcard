@@ -153,13 +153,24 @@ card_id:鱼卡id
   "returnMsg": "success"
 }
 
-#########修改学生课程
-url:   http://123.56.13.168:8080/backend/fishcard/courses/all
+#########修改学生课程;更换学生未上课的所有课程
+url:   http://123.56.13.168:8080/backend/fishcard/courses/all?test=true
 method: put
 param:
 {
     "studentId":1298839
 }
+
+#########修改学生课程;更换学生未上课的指定订单课程
+url:   http://123.56.13.168:8080/backend/fishcard/courses/order?test=true
+method: put
+参数说明
+param:
+{
+    "studentId":1298839,
+    "orderId":123456
+}
+
 
 ########根据鱼卡id,批量修改课程
 http://123.56.13.168:8080/backend/fishcard/courses

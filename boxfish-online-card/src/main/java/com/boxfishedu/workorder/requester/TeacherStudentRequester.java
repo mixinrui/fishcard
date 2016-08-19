@@ -225,7 +225,6 @@ public class TeacherStudentRequester {
         return uri;
     }
 
-
     /**
      * 向在线教育push教师消息数据
      */
@@ -295,7 +294,6 @@ public class TeacherStudentRequester {
         }
         return TeachingType.ZHONGJIAO.getCode();
     }
-
 
     /**
      * 根据学生id  ,获取属于该学生所在班级的 所有老师id

@@ -168,7 +168,7 @@ public class CourseOnlineServiceX {
         }
         workOrderLog.setCreateTime(new Date());
         workOrderLogService.save(workOrderLog);
-        logger.info("鱼卡id为:[{}]开始状态更新成功,新生成的鱼卡日志id为:[{}]", workOrderView.getId(), workOrderLog.getId());
+        logger.info("鱼卡id为:[{}]开始状态更新成功,新生成的鱼卡日志id为:[{}]",workOrderView.getId(),workOrderLog.getId());
     }
 
     public void completeCourse(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status) throws BoxfishException {

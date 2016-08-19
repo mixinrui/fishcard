@@ -16,8 +16,8 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "service")
-@ToString(exclude = "workOrders")
-@EqualsAndHashCode(exclude = "workOrders")
+@ToString(exclude = {"workOrders", "commentCards"})
+@EqualsAndHashCode(exclude = {"workOrders", "commentCards"})
 public class Service {
     @Id
     @Column(name = "id", nullable = false)
@@ -68,6 +68,11 @@ public class Service {
     @JoinColumn(name = "service_id")
     @JsonManagedReference
     private Set<WorkOrder> workOrders = new HashSet<WorkOrder>(0);
+
+    @OneToMany(fetch = FetchType.LAZY)//指向多的那方的pojo的关联外键字段
+    @JoinColumn(name = "service_id")
+    @JsonManagedReference
+    private Set<CommentCard> commentCards = new HashSet<CommentCard>(0);
 
     @Column(name = "validaty_day", nullable = true)
     private Integer validityDay;

@@ -5,9 +5,14 @@ import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
+import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
+import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
@@ -49,15 +54,15 @@ public class RabbitMqReciver {
     @Autowired
     private FishCardStatusFinderServiceX fishCardStatusFinderServiceX;
 
+    @Autowired
+    private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
+
     // 抢单服务层
     @Autowired
     private MakeWorkOrderServiceX makeWorkOrderServiceX;
 
     @Autowired
     private CourseChangeServiceX courseChangeServiceX;
-
-
-
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -127,7 +132,7 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_INIT90message");
                 logger.info("=========>初始化抢单数据(中教)");
                 makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.FUNCTION.toString());
-            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGH.value()) {
+            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGN.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_INIT91message");
                 logger.info("=========>初始化抢单数据(外教)");
                 makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.TALK.toString());
@@ -143,6 +148,12 @@ public class RabbitMqReciver {
                 makeWorkOrderServiceX.clearGrabData();
             }else if(serviceTimerMessage.getType() == TimerMessageType.COURSE_CHANGER_WORKORDER.value()){
                 courseChangeServiceX.sendCourseChangeWorkOrders();
+            }
+            else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
+                logger.info("@CommentCardTimer>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
+                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
+                foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
+                foreignTeacherCommentCardService.foreignUndistributedTeacherCommentCards();
             }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
@@ -171,6 +182,37 @@ public class RabbitMqReciver {
                 courseScheduleUpdatorServiceX.handleWorkOrderAndCourseSchedule(Long.valueOf(courseScheduleId.toString()), teacherView);
             }
         });
+    }
+
+    /**
+     *师生运营组发送的外教点评教师分配情况
+     */
+    @RabbitListener(queues = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE)
+    public void assignForeignTeacher(String param) {
+        if(param == null){
+            throw new ValidationException();
+        }
+        FromTeacherStudentForm fromTeacherStudentForm = JSONParser.fromJson(param,FromTeacherStudentForm.class);
+        foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
+        logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
+    }
+
+    /**
+     * 种老师通知外教点评卡头像更新
+     */
+    @RabbitListener(queues = RabbitMqConstant.UPDATE_PICTURE_QUEUE)
+    public void updateCommentCardsPictures(String param){
+        if(param == null){
+            logger.info("接收头像更新通知,接收参数为:"+param);
+            throw new ValidationException();
+        }
+        UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
+        if(updatePicturesForm.getFigure_url().isEmpty()){
+            throw new ValidationException();
+        }else {
+            foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
+            logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
+        }
     }
 
     /**

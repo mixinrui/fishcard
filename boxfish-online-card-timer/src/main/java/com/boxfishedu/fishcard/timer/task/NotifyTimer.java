@@ -6,6 +6,7 @@ import com.boxfishedu.fishcard.timer.common.util.DateUtil;
 import com.boxfishedu.fishcard.timer.mq.RabbitMqSender;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -119,6 +120,16 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
+    /**
+     * 外教点评定时检查
+     */
+    @Scheduled(cron = "0 0/2 * * * ?")
+    public void judgeCommentCard(){
+        logger.info("<<<<<<开始通知<<<获取在24/48小时内未评论的外教或没分配到老师的点评卡>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMMENT_CARD_NO_ANSWER.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 
     /**
      * 抢单: 每天18点到 24点  每10分钟 轮训查询(中教)
@@ -139,7 +150,7 @@ public class NotifyTimer {
     public void initGrabOrderDataForeigh() {
         logger.info("<<<<<<graborder-initGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<轮训抢单初始化数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGH.value());
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGN.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

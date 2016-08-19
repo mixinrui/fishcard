@@ -8,8 +8,10 @@ import com.boxfishedu.workorder.common.rabbitmq.RabbitMqDelaySender;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.threadpool.ParameterThread;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.requester.DataAnalysisRequester;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.timer.DailyCourseAssignedServiceX;
@@ -17,6 +19,7 @@ import com.boxfishedu.workorder.web.param.requester.DataAnalysisLogParam;
 import com.google.common.collect.Maps;
 import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.DateFormat;
@@ -49,6 +52,9 @@ public class MonitorController {
     private RabbitMqDelaySender rabbitMqDelaySender;
     @Autowired
     private DataAnalysisRequester dataAnalysisRequester;
+
+    @Autowired
+    private ServiceJpaRepository serviceJpaRepository;
 
     @Autowired
     private DailyCourseAssignedServiceX dailyCourseAssignedServiceX;
@@ -118,12 +124,13 @@ public class MonitorController {
         return JsonResultModel.newJsonResultModel(dataAnalysisRequester.fetchHeartBeatLog(dataAnalysisLogParam));
     }
 
-    public static void main(String[] args) throws Exception {
-        Date now=new Date();
-        LocalDateTime endLocalDate = LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault()).plusMinutes(100);
-        System.out.println("结束时间:"+DateUtil.localDate2Date(endLocalDate).getTime());
-        LocalDateTime startLocalDate = endLocalDate.minusMinutes(105);
-        Date startDate = DateUtil.localDate2Date(startLocalDate);
-        System.out.println("开始时间:"+startDate.getTime());
+    @RequestMapping(value = "/lock", method = RequestMethod.GET)
+    @Transactional
+    public void testGetTeachersByOrder() throws Exception {
+        Service service=serviceJpaRepository.findByIdForUpdate(5072L);
+        service.setAmount(service.getAmount() - 1);
+        service.setUpdateTime(new Date());
+        Thread.sleep(60*1000);
+        serviceJpaRepository.save(service);
     }
 }

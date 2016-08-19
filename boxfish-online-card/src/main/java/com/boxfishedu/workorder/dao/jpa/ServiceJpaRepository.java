@@ -1,12 +1,15 @@
 package com.boxfishedu.workorder.dao.jpa;
 
 import com.boxfishedu.workorder.entity.mysql.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -32,4 +35,17 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     public Service findByIdForUpdate(Long id);
 
     public Service findTop1ByOrderId(Long orderId);
+
+    @Query("select s from Service s where s.studentId=?1 and s.comboType=?2")
+    List<Service> getForeignCommentServiceCount(long studentId, String comboType);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select s from Service s where s.studentId=?1 and s.comboType=?2 and s.amount>0")
+    Page<Service> getFirstAvailableForeignCommentService(long studentId, String comboType, Pageable pageable);
+
+    @Query("select count(s) from Service s where s.studentId=?1 and s.comboType=?2 and s.amount>0")
+    Integer getAvailableForeignCommentServiceCount(long studentId, String comboType);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public Service findById(Long id);
 }
