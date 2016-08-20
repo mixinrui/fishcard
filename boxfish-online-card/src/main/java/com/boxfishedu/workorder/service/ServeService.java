@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
@@ -318,19 +319,28 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         String orderRemark = orderView.getOrderRemark();
         ProductCombo productCombo = objectMapper.readValue(orderRemark, ProductCombo.class);
         //服务信息容器
-        Map<TutorType, Service> serviceHashMap = new HashMap<>();
+        Map<Object, Service> serviceHashMap = new HashMap<>();
         List<Service> services = new ArrayList<>();
 
+        // 混合型套餐特殊处理,合并为一个service
+        boolean isOverAll = Objects.equals(productCombo.getComboType(), ComboTypeToRoleId.OVERALL);
+
         productCombo.getComboDetails().forEach( productComboDetail -> {
-                    // 根据
-                    Service service = serviceHashMap.get(productComboDetail.getTutorType());
+                    // 课程
+                    Object key;
+                    if(isOverAll) {
+                        key = productCombo.getComboType();
+                    } else {
+                        key = productComboDetail.getTutorType();
+                    }
+                    Service service = serviceHashMap.get(key);
                     if(service != null) {
                         //增加有效期,数量
                         setServiceExistedSpecs(service, productComboDetail);
                     } else {
-                        service = getServiceByOrderView(orderView, productComboDetail, productCombo);
+                        service = getServiceByOrderView(orderView, productComboDetail, productCombo, isOverAll);
                         services.add(service);
-                        serviceHashMap.put(productComboDetail.getTutorType(), service);
+                        serviceHashMap.put(key, service);
                     }});
 
         // service的开始日期,结束日期设置
@@ -435,7 +445,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 //    }
 
 
-    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail, ProductCombo productCombo) throws BoxfishException {
+    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail,
+                                          ProductCombo productCombo, boolean isOverAll) throws BoxfishException {
         Service service = new Service();
         service.setStudentId(orderView.getUserId());
         service.setOrderId(orderView.getId());
@@ -443,11 +454,16 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setAmount(service.getOriginalAmount());
         service.setSkuId(productComboDetail.getComboId());
         // 课程类型
-        service.setTutorType(productComboDetail.getTutorType().name());
+        if(isOverAll) {
+            service.setTutorType(TutorType.MIXED.name());
+        } else {
+            service.setTutorType(productComboDetail.getTutorType().name());
+        }
         // 几周消费完
         service.setComboCycle(productCombo.getComboCycle());
         // 产品类型
         service.setProductType(productComboDetail.getProductCode());
+        service.setComboType(productCombo.getComboType().name());
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);

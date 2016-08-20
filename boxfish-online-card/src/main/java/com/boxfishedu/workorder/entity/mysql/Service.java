@@ -108,6 +108,12 @@ public class Service {
     private String orderChannel;
 
     /**
+     * comboType
+     */
+    @Column(name = "combo_type", nullable = true)
+    private String comboType;
+
+    /**
      * 产品分类: 1001为上课,  1002为外教点评
      */
     @Column(name = "product_type", nullable = true)
