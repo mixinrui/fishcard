@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -170,5 +172,12 @@ public class WorkOrder{
                 ", updateTime=" + updateTime +
                 ", updateMauulFlag=" + updateManulFlag +
                 '}';
+    }
+
+    public void initCourseInfo(RecommandCourseView courseView) {
+        setCourseId(courseView.getCourseId());
+        setCourseName(courseView.getCourseName());
+        setCourseType(courseView.getCourseType());
+        setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
     }
 }

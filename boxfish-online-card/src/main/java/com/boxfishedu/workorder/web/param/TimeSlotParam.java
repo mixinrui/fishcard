@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.web.param;
 
-import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import lombok.Data;
 
 import java.util.List;
@@ -11,9 +10,6 @@ import java.util.List;
 @Data
 public class TimeSlotParam {
     private Long orderId;
-    private String comboType;
+    private Integer productType;
     private List<SelectedTime> selectedTimes;
-    public ComboTypeToRoleId getComboType() {
-        return ComboTypeToRoleId.resolve(comboType);
-    }
 }

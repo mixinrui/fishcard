@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.requester;
 
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -56,10 +57,10 @@ public class RecommandCourseRequester {
         return recommandCourseView;
     }
 
-    public RecommandCourseView getForeignRecomandCourse(WorkOrder workOrder) {
+    public RecommandCourseView getRecomendCourse(WorkOrder workOrder, TutorType tutorType) {
         try {
             RecommandCourseView recommandCourseView = restTemplate.postForObject(
-                    createForeignRecommendUri(workOrder.getStudentId()),
+                    createRecommendUri(workOrder.getStudentId(), tutorType.name()),
                     HttpEntity.EMPTY,
                     RecommandCourseView.class);
             logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
@@ -182,10 +183,10 @@ public class RecommandCourseRequester {
         }));
     }
 
-    private URI createForeignRecommendUri(Long studentId) {
+    private URI createRecommendUri(Long studentId, String tutorType) {
         return UriComponentsBuilder
                 .fromUriString(urlConf.getCourse_recommended_service())
-                .path("/online/foreigner/" + studentId)
+                .path("/online/" + tutorType + "/" + studentId)
                 .build()
                 .toUri();
     }

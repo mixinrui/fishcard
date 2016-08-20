@@ -78,16 +78,16 @@ public class Service {
     private Integer validityDay;
 
 
-    @Column(name = "role_id", nullable = true)
-    private Integer roleId;
+//    @Column(name = "role_id", nullable = true)
+//    private Integer roleId;
 
     //一共几个月
     @Column(name = "combo_cycle", nullable = true)
     private Integer comboCycle;
 
     //每月的的上课次数
-    @Column(name = "count_in_month", nullable = true)
-    private Integer countInMonth;
+//    @Column(name = "count_in_month", nullable = true)
+//    private Integer countInMonth;
 
     @Transient
     private Date currDate;
@@ -96,20 +96,27 @@ public class Service {
     private Integer coursesSelected;
 
     /**
-     * 新增字段套餐类型
+     * 课程推荐时使用: CN, FRN, MIXED 分别推中教\外教\中外教
      */
-    @Column(name = "combo_type", nullable = true)
-    private String comboType;
+    @Column(name = "tutor_type", nullable = true)
+    private String tutorType;
 
     /**
-     * 订单类型
+     * 订单类型: STANDARD(标准),EXPERIENCE(体验),EXCHANGE(兑换)
      */
     @Column(name = "order_channel", nullable = true)
     private String orderChannel;
 
     /**
-     * 课程类型
+     * 产品分类: 1001为上课,  1002为外教点评
      */
-    @Column(name = "teaching_type", nullable = true)
-    private Integer teachingType;
+    @Column(name = "product_type", nullable = true)
+    private Integer productType;
+
+//    /**
+//     * 课程类型
+//     */
+//    @Column(name = "teaching_type", nullable = true)
+//    private Integer teachingType;
+
 }

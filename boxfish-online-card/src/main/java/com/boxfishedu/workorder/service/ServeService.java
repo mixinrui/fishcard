@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
-import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
@@ -210,6 +210,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
     }
 
+    public List<Service> findByOrderIdAndProductType(Long orderId, Integer productType) {
+        return jpa.findByOrderIdAndProductType(orderId, productType);
+    }
+
     public Service findByIdForUpdate(Long id) {
         return jpa.findByIdForUpdate(id);
     }
@@ -313,18 +317,19 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         String orderRemark = orderView.getOrderRemark();
         ProductCombo productCombo = objectMapper.readValue(orderRemark, ProductCombo.class);
         //服务信息容器
-        Map<Long, Service> serviceHashMap = new HashMap<>();
+        Map<TutorType, Service> serviceHashMap = new HashMap<>();
         List<Service> services = new ArrayList<>();
+
         productCombo.getComboDetails().forEach( productComboDetail -> {
-                    // map.compute(key, (key,val) -> {}) 当存在时与不存在时如何处理
-                    Service service = serviceHashMap.get(productCombo.getId());
+                    // 根据
+                    Service service = serviceHashMap.get(productComboDetail.getTutorType());
                     if(service != null) {
                         //增加有效期,数量
                         setServiceExistedSpecs(service, productComboDetail);
                     } else {
                         service = getServiceByOrderView(orderView, productComboDetail, productCombo);
                         services.add(service);
-                        serviceHashMap.put(productCombo.getId(), service);
+                        serviceHashMap.put(productComboDetail.getTutorType(), service);
                     }});
 
         // service的开始日期,结束日期设置
@@ -438,13 +443,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         // 由于志浩那不再传递这个值,商量之后这个地方取默认值1
         service.setComboCycle(ProductComboDetail.DEFAULT_COMBO_CYCLE);
         service.setSkuId(productComboDetail.getComboId());
-        // 新增的套餐类型字段
-        service.setComboType(productCombo.getComboType().name());
         // 课程类型
-        service.setTeachingType(productCombo.getComboType().getValue());
+        service.setTutorType(productComboDetail.getTutorType().name());
         // 几周消费完
         service.setComboCycle(productCombo.getComboCycle());
-        service.setRoleId(productComboDetail.getComboId().intValue());
+        // 产品类型
+        service.setProductType(productComboDetail.getProductCode());
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);

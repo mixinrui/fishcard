@@ -22,6 +22,8 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
 
+    List<Service> findByOrderIdAndProductType(Long orderId, Integer productType);
+
     //鱼卡中心查询学生的接口
     @Query("select sv from Service sv where sv.studentId=?1 and sv.skuId!=?2 and sv.skuId!=?3")
     public List<Service> findAllServicesByUser(Long studentId, Long skuIdPlanner, Long skuIdAnswer);

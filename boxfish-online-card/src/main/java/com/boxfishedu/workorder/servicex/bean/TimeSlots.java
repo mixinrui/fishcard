@@ -14,6 +14,7 @@ import java.io.Serializable;
  * 时间片
  */
 @Data
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TimeSlots implements Cloneable, Serializable {
 
     private final static long serialVersionUID = 1L;
