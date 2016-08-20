@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -91,6 +93,10 @@ public class AvaliableTimeServiceX {
         // 如果没有未消费的订单,则取得当前时间;否则换成订单的最后结束时间
         WorkOrder workOrder = null;
         try {
+            // 如果是overall,设置为MIXED
+            if(Objects.equals(avaliableTimeParam.getComboType(), ComboTypeToRoleId.OVERALL.name())) {
+                avaliableTimeParam.setTutorType(TutorType.MIXED.name());
+            }
             workOrder = workOrderService.getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(
                     avaliableTimeParam.getStudentId(), avaliableTimeParam.getProductType(), avaliableTimeParam.getTutorType());
         } catch (Exception ex) {

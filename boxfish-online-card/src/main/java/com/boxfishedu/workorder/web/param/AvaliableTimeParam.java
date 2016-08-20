@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.web.param;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,7 +12,6 @@ public class AvaliableTimeParam implements Serializable {
     private Long studentId;
     private String comboType;
     private String tutorType;
-    @JsonProperty(value = "productCode")
     private Integer productType;
     //是否免费
     private Boolean isFree;
@@ -22,4 +20,5 @@ public class AvaliableTimeParam implements Serializable {
 
     //给换课时候判断换课的可用时间使用
     private Long workOrderId;
+
 }
