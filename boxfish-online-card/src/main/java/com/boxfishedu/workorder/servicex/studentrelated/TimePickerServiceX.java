@@ -198,6 +198,7 @@ public class TimePickerServiceX {
             }
 
             if(!Objects.isNull(recommandCourseView)) {
+                workOrder.initCourseInfo(recommandCourseView);
                 workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
                         recommandCourseView.getCourseType()));
                 courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
