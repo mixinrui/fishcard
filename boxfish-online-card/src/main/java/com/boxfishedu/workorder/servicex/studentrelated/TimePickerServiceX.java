@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
@@ -23,7 +24,6 @@ import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
-import com.boxfishedu.workorder.web.view.course.ServiceWorkOrderCombination;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
@@ -102,37 +102,35 @@ public class TimePickerServiceX {
 
         //根据订单id,type获取对应的服务
         List<Service> serviceList = ensureConvertOver(timeSlotParam);
-        List<ServiceWorkOrderCombination> serviceWorkOrderCombinationList = serviceList.stream()
-                // 创建serviceOrderCombination组合
-                .map(ServiceWorkOrderCombination::new)
-                .peek(s ->
-                            // 验证service
-                           s.validateService(timeSlotParam, this::validateTimeSlotParam)
-                            // 不同类型课程互斥验证
-                            .validateUniqueCourse(timeSlotParam, (t, s1) -> {
-                                Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(s1.getStudentId());
-                                checkUniqueCourseSchedules(classDateTimeslotsSet, timeSlotParam.getSelectedTimes());})
-                            // 生成工单
-                            .generateWorkOrders(timeSlotParam, this::batchInitWorkorders)
-                            // 课程推荐
-                            .recommendCourses(this::getRecommandCourses))
-                // 打印日志
-                .peek( s -> logger.info("选课开始,service的id为:[{}]", s.getService().getId()))
-                .collect(Collectors.toList());
+        // 获取选课策略,每周选几次,持续几周
+        WeekStrategy weekStrategy = getWeekStrategy(timeSlotParam, serviceList);
+        // 验证service
+        validateTimeSlotParam(timeSlotParam, weekStrategy, serviceList);
+        // unique验证
+        for(Service service : serviceList) {
+            Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(service.getStudentId());
+            checkUniqueCourseSchedules(classDateTimeslotsSet, timeSlotParam.getSelectedTimes());
+        }
+
+        // 批量生成工单
+        List<WorkOrder> workOrderList = batchInitWorkorders(timeSlotParam, weekStrategy, serviceList);
+
+        // 获取课程推荐
+        Map<Integer, RecommandCourseView> recommandCourses = getRecommandCourses(workOrderList);
 
         // 批量保存鱼卡与课表
-        serviceWorkOrderCombinationList = workOrderService.persistCardInfos(serviceWorkOrderCombinationList);
-        workOrderLogService.batchSaveWorkOrderLogs(
-                ServiceWorkOrderCombination.flatMapToWorkOrder(serviceWorkOrderCombinationList));
+        List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
 
-        // 分配教师,key为workorder的starttime的time值
-        serviceWorkOrderCombinationList.parallelStream()
-                // 教师分配
-                .peek( c -> c.assignTeacher(timePickerService::getRecommandTeachers))
-                // 通知其他模块
-                .peek( c -> c.notifyOthers(this::notifyOtherModules))
-                // 日志
-                .forEach( c -> logger.info("学生[{}]选课结束", c.getService().getStudentId()));
+        // 保存日志
+        workOrderLogService.batchSaveWorkOrderLogs(workOrderList);
+
+        // 分配老师
+        timePickerService.getRecommandTeachers(serviceList.get(0), courseSchedules);
+
+        // 通知其他模块
+        notifyOtherModules(workOrderList, serviceList.get(0));
+
+        logger.info("学生[{}]选课结束", serviceList.get(0).getStudentId());
         return JsonResultModel.newJsonResultModel();
     }
 
@@ -160,18 +158,20 @@ public class TimePickerServiceX {
     }
 
 
-    private void validateTimeSlotParam(TimeSlotParam timeSlotParam,Service service) {
+    private void validateTimeSlotParam(TimeSlotParam timeSlotParam, WeekStrategy weekStrategy, List<Service> services) {
         List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
 //        if (service.getComboCycle() != -1) {
 //            if (selectedTimes.size() != (service.getAmount() >> 2)) {
 //                throw new BusinessException("选择的上课次数不符合规范");
 //            }
 //        }
-        if(serveService.getNumPerWeek(service) != selectedTimes.size()) {
+        if(weekStrategy.numPerWeek != selectedTimes.size()) {
             throw new BusinessException("选择的上课次数不符合规范");
         }
-        if(service.getCoursesSelected()==1){
-            throw new BusinessException("该订单已经完成选课,请勿重复选课");
+        for(Service service : services) {
+            if (service.getCoursesSelected() == 1) {
+                throw new BusinessException("该订单已经完成选课,请勿重复选课");
+            }
         }
     }
 
@@ -209,6 +209,7 @@ public class TimePickerServiceX {
         //通知上课中心
 //        notifyCourseOnline(workOrders);
         //通知订单中心修改状态为已选课30
+
         serveService.notifyOrderUpdateStatus(service.getOrderId(), ConstantUtil.WORKORDER_SELECTED);
     }
 
@@ -272,17 +273,20 @@ public class TimePickerServiceX {
         }
     }
 
-    private List<WorkOrder> batchInitWorkorders(TimeSlotParam timeSlotParam, Service service) throws BoxfishException {
+    private List<WorkOrder> batchInitWorkorders(TimeSlotParam timeSlotParam, WeekStrategy weekStrategy, List<Service> services) throws BoxfishException {
         List<WorkOrder> workOrders = new ArrayList<>();
-        int numPerWeek = serveService.getNumPerWeek(service);
-        int loopOfWeek = serveService.getLoopOfWeek(service);
-
+        int numPerWeek = weekStrategy.numPerWeek;
+        int loopOfWeek = weekStrategy.loopOfWeek;
+        // 中教优先于外教
+        services.sort((c1, c2) -> Objects.equals(c1.getTutorType(), TutorType.CN.name()) ? 1 : 0);
+        Queue<ServiceChoice> serviceQueue = createServiceChoice(services);
         for (int i = 0; i < loopOfWeek; i++) {
             for (int j = 0; j < numPerWeek; j++) {
                 int index = (j + 1) + i * numPerWeek;
-                if(index > service.getAmount()) {
+                if(index > weekStrategy.count) {
                     break;
                 }
+                Service service = services.get(choice(serviceQueue));
                 List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
                 WorkOrder workOrder = new WorkOrder();
                 workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
@@ -322,6 +326,49 @@ public class TimePickerServiceX {
         }
         return workOrders;
     }
+
+    private int choice(Queue<ServiceChoice> queue) {
+        ServiceChoice serviceChoice;
+        while(true) {
+            serviceChoice = queue.poll();
+            if(Objects.isNull(serviceChoice)) {
+                return -1;
+            }
+            if(serviceChoice.hasNext()) {
+                serviceChoice.decrement();
+                queue.add(serviceChoice);
+                break;
+            }
+        }
+        return serviceChoice.index;
+    }
+
+    private Queue<ServiceChoice> createServiceChoice(List<Service> services) {
+        Queue<ServiceChoice> serviceQueue = new LinkedList<>();
+        for(int i = 0; i < services.size(); i++) {
+            serviceQueue.add(new ServiceChoice(i, services.get(i).getAmount()));
+        }
+        return serviceQueue;
+    }
+
+    class ServiceChoice {
+        int index;
+        int amount;
+
+        public ServiceChoice(int index, int amount) {
+            this.index = index;
+            this.amount = amount;
+        }
+
+        public boolean hasNext() {
+            return amount > 0;
+        }
+
+        public void decrement() {
+            this.amount --;
+        }
+    }
+
 
 //    private Service ensureConvertOver(TimeSlotParam timeSlotParam, int pivot) {
 //        pivot++;
@@ -470,5 +517,30 @@ public class TimePickerServiceX {
             result.add(beanMap);
         });
         return result;
+    }
+
+    private WeekStrategy getWeekStrategy(TimeSlotParam timeSlotParam, List<Service> services) {
+        int count = services.stream().collect(Collectors.summingInt(Service::getAmount));
+        // 兑换默认为1周两次
+        if(Objects.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.EXCHANGE.name())) {
+            int loopOfWeek = (count + WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK - 1) / WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK;
+            return new WeekStrategy(loopOfWeek, WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK, count);
+        }
+        int loopOfWeek = services.stream().collect(Collectors.summingInt(Service::getComboCycle));
+        int per = count / loopOfWeek == 0 ? 1 : count / loopOfWeek;
+        return new WeekStrategy((count + per -1) / per, per, count);
+    }
+
+    class WeekStrategy{
+        public final static int DEFAULT_EXCHANGE_NUMPERWEEK = 2;
+        int loopOfWeek;
+        int numPerWeek;
+        int count;
+
+        public WeekStrategy(int loopOfWeek, int numPerWeek, int count) {
+            this.loopOfWeek = loopOfWeek;
+            this.numPerWeek = numPerWeek;
+            this.count = count;
+        }
     }
 }

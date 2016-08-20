@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -67,7 +68,8 @@ public class AvaliableTimeServiceX {
         // TODO
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(avaliableTimeParam.getStudentId());
         // 获取时间片模板,并且复制
-        DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate((long) avaliableTimeParam.getComboType().getValue());
+        DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(
+                (long) TutorType.resolve(avaliableTimeParam.getTutorType()).ordinal());
         List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(dayTimeSlots, (localDateTime, d) -> {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
@@ -89,8 +91,8 @@ public class AvaliableTimeServiceX {
         // 如果没有未消费的订单,则取得当前时间;否则换成订单的最后结束时间
         WorkOrder workOrder = null;
         try {
-            workOrder = workOrderService.getLatestWorkOrderByStudentIdAndComboType(
-                    avaliableTimeParam.getStudentId(), avaliableTimeParam.getComboType().name());
+            workOrder = workOrderService.getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(
+                    avaliableTimeParam.getStudentId(), avaliableTimeParam.getProductType(), avaliableTimeParam.getTutorType());
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");

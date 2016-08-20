@@ -11,5 +11,7 @@ import java.util.List;
 public class TimeSlotParam {
     private Long orderId;
     private Integer productType;
+    private String tutorType;
+    private String comboType;
     private List<SelectedTime> selectedTimes;
 }

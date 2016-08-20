@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
+import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
@@ -206,9 +207,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return jpa.findTop1ByOrderIdAndSkuId(orderId, skuId);
     }
 
-    public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
-        return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
-    }
+//    public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
+//        return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
+//    }
 
     public List<Service> findByOrderIdAndProductType(Long orderId, Integer productType) {
         return jpa.findByOrderIdAndProductType(orderId, productType);
@@ -440,8 +441,6 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOrderId(orderView.getId());
         service.setOriginalAmount(productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
-        // 由于志浩那不再传递这个值,商量之后这个地方取默认值1
-        service.setComboCycle(ProductComboDetail.DEFAULT_COMBO_CYCLE);
         service.setSkuId(productComboDetail.getComboId());
         // 课程类型
         service.setTutorType(productComboDetail.getTutorType().name());
@@ -492,7 +491,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
         List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
-                studentId, ComboTypeToRoleId.CRITIQUE.name());
+                studentId, ProductType.COMMENT.value());
         Integer originalAmount = services.stream().reduce(
                 0,
                 (total, service) -> total + service.getOriginalAmount(),
@@ -511,12 +510,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     public boolean haveAvailableForeignCommentService(long studentId) {
         return serviceJpaRepository.getAvailableForeignCommentServiceCount(
-                studentId, ComboTypeToRoleId.CRITIQUE.name()) > 0;
+                studentId, ProductType.COMMENT.value()) > 0;
     }
 
     public Optional<Service> findFirstAvailableForeignCommentService(long studentId) {
         Page<Service> servicePage = serviceJpaRepository.getFirstAvailableForeignCommentService(
-                studentId, ComboTypeToRoleId.CRITIQUE.name(), new PageRequest(0, 1));
+                studentId, ProductType.COMMENT.value(), new PageRequest(0, 1));
         return CollectionUtils.isEmpty(servicePage.getContent()) ?
                 Optional.empty() : Optional.of(servicePage.getContent().get(0));
     }

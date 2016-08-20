@@ -73,7 +73,7 @@ public class RabbitMqReciver {
             serveService.order2ServiceAndWorkOrder(orderView);
         } catch (Exception ex) {
             logger.error("订单[{}]转换失败", orderView.getId());
-            throw new Exception("转换失败放回队列");
+//            throw new Exception("转换失败放回队列");
         }
 //        logger.info("收到来自订单中心的转换请求,订单id:[{}]",orderView.getId());
 //        orderRelatedServiceX.preHandleOrder(orderView);
