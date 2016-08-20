@@ -134,9 +134,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
                                            Map<WorkOrder, CourseView> workOrderCourseViewMapParam) {
         // 重算hash值,不然会出错
         HashMap<WorkOrder, CourseView> workOrderCourseViewMap = Maps.newHashMap();
-        workOrderCourseViewMapParam.forEach((workOrder, courseView) ->
-                workOrderCourseViewMap.put(workOrder, courseView)
-        );
+        workOrderCourseViewMapParam.forEach(workOrderCourseViewMap::put);
 
         List<CourseSchedule> courseSchedules = new ArrayList<>();
         for (WorkOrder workOrder : workOrders) {

@@ -198,6 +198,8 @@ public class TimePickerServiceX {
             }
 
             if(!Objects.isNull(recommandCourseView)) {
+                workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
+                        recommandCourseView.getCourseType()));
                 courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
             }
 //            courseViewMap.put(workOrder.getSeqNum(), courseView);
@@ -526,7 +528,7 @@ public class TimePickerServiceX {
             int loopOfWeek = (count + WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK - 1) / WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK;
             return new WeekStrategy(loopOfWeek, WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK, count);
         }
-        int loopOfWeek = services.get(0).getComboCycle();
+        int loopOfWeek = services.stream().collect(Collectors.summingInt(Service::getComboCycle));
         int per = count / loopOfWeek == 0 ? 1 : count / loopOfWeek;
         return new WeekStrategy((count + per -1) / per, per, count);
     }
