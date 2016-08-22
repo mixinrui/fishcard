@@ -5,6 +5,8 @@ import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.ProductType;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
@@ -144,42 +146,6 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return responseCourseView.getData();
     }
 
-
-    /**
-     * 每周选几次课
-     * @param service
-     * @return
-     */
-    public int getNumPerWeek(Service service) {
-        // 兼容之前的逻辑
-        if (service.getComboCycle() == -1) {
-//            return service.getAmount();
-            return 2;
-        } else {
-            // 每周选课次数
-            int numPerWeek = service.getAmount() / service.getComboCycle();
-            return numPerWeek == 0 ? 1 : numPerWeek;
-        }
-    }
-
-    /**
-     * 几周上完
-     * @param service
-     * @return
-     */
-    public int getLoopOfWeek(Service service) {
-        // 兼容之前的业务逻辑
-        if (service.getComboCycle() == -1) {
-//            return 1;
-            return 4;
-        } else {
-            int comboCycle = service.getComboCycle();
-            return (getNumPerWeek(service) -1 + service.getAmount()) / getNumPerWeek(service);
-//            return service.getAmount() % comboCycle == 0
-//                    ? comboCycle : service.getAmount() / getNumPerWeek(service);
-        }
-    }
-
     //url:http://192.168.66.176:8083/course/recommend/{user_id}/{需要获取的课程数量}
     public CourseView getCourseByService(Service service) throws BoxfishException {
         CourseView courseView = null;
@@ -206,8 +172,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return jpa.findTop1ByOrderIdAndSkuId(orderId, skuId);
     }
 
-    public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
-        return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
+//    public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
+//        return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
+//    }
+
+    public List<Service> findByOrderIdAndProductType(Long orderId, Integer productType) {
+        return jpa.findByOrderIdAndProductType(orderId, productType);
     }
 
     public Service findByIdForUpdate(Long id) {
@@ -313,18 +283,28 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         String orderRemark = orderView.getOrderRemark();
         ProductCombo productCombo = objectMapper.readValue(orderRemark, ProductCombo.class);
         //服务信息容器
-        Map<Long, Service> serviceHashMap = new HashMap<>();
+        Map<Object, Service> serviceHashMap = new HashMap<>();
         List<Service> services = new ArrayList<>();
+
+        // 混合型套餐特殊处理,合并为一个service
+        boolean isOverAll = Objects.equals(productCombo.getComboType(), ComboTypeToRoleId.OVERALL);
+
         productCombo.getComboDetails().forEach( productComboDetail -> {
-                    // map.compute(key, (key,val) -> {}) 当存在时与不存在时如何处理
-                    Service service = serviceHashMap.get(productCombo.getId());
+                    // 课程
+                    Object key;
+                    if(isOverAll) {
+                        key = productCombo.getComboType();
+                    } else {
+                        key = productComboDetail.getTutorType();
+                    }
+                    Service service = serviceHashMap.get(key);
                     if(service != null) {
                         //增加有效期,数量
                         setServiceExistedSpecs(service, productComboDetail);
                     } else {
-                        service = getServiceByOrderView(orderView, productComboDetail, productCombo);
+                        service = getServiceByOrderView(orderView, productComboDetail, productCombo, isOverAll);
                         services.add(service);
-                        serviceHashMap.put(productCombo.getId(), service);
+                        serviceHashMap.put(key, service);
                     }});
 
         // service的开始日期,结束日期设置
@@ -429,22 +409,25 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 //    }
 
 
-    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail, ProductCombo productCombo) throws BoxfishException {
+    private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail,
+                                          ProductCombo productCombo, boolean isOverAll) throws BoxfishException {
         Service service = new Service();
         service.setStudentId(orderView.getUserId());
         service.setOrderId(orderView.getId());
         service.setOriginalAmount(productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
-        // 由于志浩那不再传递这个值,商量之后这个地方取默认值1
-        service.setComboCycle(ProductComboDetail.DEFAULT_COMBO_CYCLE);
         service.setSkuId(productComboDetail.getComboId());
-        // 新增的套餐类型字段
-        service.setComboType(productCombo.getComboType().name());
         // 课程类型
-        service.setTeachingType(productCombo.getComboType().getValue());
+        if(isOverAll) {
+            service.setTutorType(TutorType.MIXED.name());
+        } else {
+            service.setTutorType(productComboDetail.getTutorType().name());
+        }
         // 几周消费完
         service.setComboCycle(productCombo.getComboCycle());
-        service.setRoleId(productComboDetail.getComboId().intValue());
+        // 产品类型
+        service.setProductType(productComboDetail.getProductCode());
+        service.setComboType(productCombo.getComboType().name());
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);
@@ -488,7 +471,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
         List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
-                studentId, ComboTypeToRoleId.CRITIQUE.name());
+                studentId, ProductType.COMMENT.value());
         Integer originalAmount = services.stream().reduce(
                 0,
                 (total, service) -> total + service.getOriginalAmount(),
@@ -507,12 +490,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     public boolean haveAvailableForeignCommentService(long studentId) {
         return serviceJpaRepository.getAvailableForeignCommentServiceCount(
-                studentId, ComboTypeToRoleId.CRITIQUE.name()) > 0;
+                studentId, ProductType.COMMENT.value()) > 0;
     }
 
     public Optional<Service> findFirstAvailableForeignCommentService(long studentId) {
         Page<Service> servicePage = serviceJpaRepository.getFirstAvailableForeignCommentService(
-                studentId, ComboTypeToRoleId.CRITIQUE.name(), new PageRequest(0, 1));
+                studentId, ProductType.COMMENT.value(), new PageRequest(0, 1));
         return CollectionUtils.isEmpty(servicePage.getContent()) ?
                 Optional.empty() : Optional.of(servicePage.getContent().get(0));
     }
@@ -538,5 +521,48 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     public void deleteWorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){
         workOrderService.delete(workOrder);
         courseScheduleService.delete(courseSchedule);
+    }
+
+
+    /**************** 兼容历史版本代码******************/
+    /**
+     * 每周选几次课
+     * @param service
+     * @return
+     */
+    public int getNumPerWeek(Service service) {
+        // 兼容之前的逻辑
+        if (service.getComboCycle() == -1) {
+//            return service.getAmount();
+            return 2;
+        } else {
+            // 每周选课次数
+            int numPerWeek = service.getAmount() / service.getComboCycle();
+            return numPerWeek == 0 ? 1 : numPerWeek;
+        }
+    }
+
+    /**
+     * 几周上完
+     * @param service
+     * @return
+     */
+    public int getLoopOfWeek(Service service) {
+        // 兼容之前的业务逻辑
+        if (service.getComboCycle() == -1) {
+//            return 1;
+            return 4;
+        } else {
+            int comboCycle = service.getComboCycle();
+            return (getNumPerWeek(service) -1 + service.getAmount()) / getNumPerWeek(service);
+//            return service.getAmount() % comboCycle == 0
+//                    ? comboCycle : service.getAmount() / getNumPerWeek(service);
+        }
+    }
+
+
+    /*********兼容老版本*************/
+    public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
+        return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
     }
 }

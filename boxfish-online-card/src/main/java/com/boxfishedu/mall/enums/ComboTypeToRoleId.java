@@ -14,6 +14,7 @@ public enum ComboTypeToRoleId {
     CHINESE(1),
     CRITIQUE_CN(1),
     CRITIQUE(2),
+    EXCHANGE(3),
     UNKNOW(-1);
 
     private int value;

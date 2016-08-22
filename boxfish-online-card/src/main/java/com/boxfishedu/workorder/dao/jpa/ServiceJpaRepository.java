@@ -20,7 +20,7 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     //使用top1,是由于按照逻辑,根据查询条件只应该有一条结果返回
     public Service findTop1ByOrderIdAndSkuId(Long orderId, Long skuId);
 
-    Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
+    List<Service> findByOrderIdAndProductType(Long orderId, Integer productType);
 
     //鱼卡中心查询学生的接口
     @Query("select sv from Service sv where sv.studentId=?1 and sv.skuId!=?2 and sv.skuId!=?3")
@@ -36,16 +36,19 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     public Service findTop1ByOrderId(Long orderId);
 
-    @Query("select s from Service s where s.studentId=?1 and s.comboType=?2")
-    List<Service> getForeignCommentServiceCount(long studentId, String comboType);
+    @Query("select s from Service s where s.studentId=?1 and s.productType=?2")
+    List<Service> getForeignCommentServiceCount(long studentId, int productType);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select s from Service s where s.studentId=?1 and s.comboType=?2 and s.amount>0")
-    Page<Service> getFirstAvailableForeignCommentService(long studentId, String comboType, Pageable pageable);
+    @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0")
+    Page<Service> getFirstAvailableForeignCommentService(long studentId, int productType, Pageable pageable);
 
-    @Query("select count(s) from Service s where s.studentId=?1 and s.comboType=?2 and s.amount>0")
-    Integer getAvailableForeignCommentServiceCount(long studentId, String comboType);
+    @Query("select count(s) from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0")
+    Integer getAvailableForeignCommentServiceCount(long studentId, int productType);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Service findById(Long id);
+
+    /*********兼容老版本*************/
+    Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
 }
