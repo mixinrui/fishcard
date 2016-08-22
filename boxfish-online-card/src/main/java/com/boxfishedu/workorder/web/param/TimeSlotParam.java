@@ -11,9 +11,12 @@ import java.util.List;
 @Data
 public class TimeSlotParam {
     private Long orderId;
+    private Integer productType;
+    private String tutorType;
     private String comboType;
     private List<SelectedTime> selectedTimes;
-    public ComboTypeToRoleId getComboType() {
+
+    public ComboTypeToRoleId getComboTypeEnum() {
         return ComboTypeToRoleId.resolve(comboType);
     }
 }

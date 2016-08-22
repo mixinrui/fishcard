@@ -78,7 +78,10 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     @Query("update CourseSchedule o set o.teacherId = ?1,o.status=?3 where o.workorderId = ?2 ")
     int setTeacherIdByWorkOrderId(Long teacherId , Long workorderId, Integer status);
 
-    Page<CourseSchedule> findByStudentId(Long studentId, Pageable pageable);
+    // Page<CourseSchedule> findByStudentId(Long studentId, Pageable pageable);
+
+    @Query("select c from CourseSchedule c where c.classDate>=?2 and c.status<40 and c.studentId=?1 order by c.classDate,c.timeSlotId")
+    Page<CourseSchedule> findByStudentIdAfterClassDate(Long studentId, Date classDate, Pageable pageable);
 
     @Query("select concat(c.classDate,' ',c.timeSlotId) from CourseSchedule c where c.studentId=?1 and c.classDate>=?2 and c.status<40")
     Set<String> findUnfinishByStudentIdAndAfterDate(Long studentId, Date afterDate);

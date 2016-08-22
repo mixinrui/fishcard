@@ -1,13 +1,11 @@
 package workorder.controller;
 
-import com.boxfishedu.mall.enums.ComboTypeToRoleId;
-import com.boxfishedu.workorder.common.util.JSONParser;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.workorder.web.view.base.ReturnCode;
-//import com.boxfishedu.order.entity.Order;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.base.ReturnCode;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +26,8 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+//import com.boxfishedu.order.entity.Order;
 
 /**
  * Created by zijun.jiao on 16/6/10.
@@ -64,7 +64,7 @@ public class StudentAppRelateControllerTest {
 
         TimeSlotParam timeSlotParam = new TimeSlotParam();
         timeSlotParam.setOrderId(232l);
-        timeSlotParam.setComboType(ComboTypeToRoleId.OVERALL.name());
+//        timeSlotParam.setComboType(ComboTypeToRoleId.OVERALL.name());
 
 
         List<SelectedTime> selectedTimes = Lists.newArrayList();

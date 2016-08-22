@@ -14,6 +14,7 @@ import java.util.List;
  * Created by LuoLiBing on 16/4/25.
  */
 @Data
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CourseView implements Serializable {
 
     private final static Logger logger = LoggerFactory.getLogger(CourseView.class);

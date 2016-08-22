@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -21,15 +23,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/5/17.
- * 以前的老版本
+ * 新版本
  */
 @Component
-public class AvaliableTimeServiceX {
+public class AvaliableTimeServiceXV1 {
 
     @Autowired
     private TimeLimitPolicy timeLimitPolicy;
@@ -68,7 +71,8 @@ public class AvaliableTimeServiceX {
         // TODO
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(avaliableTimeParam.getStudentId());
         // 获取时间片模板,并且复制
-        DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate((long) avaliableTimeParam.getComboTypeEnum().getValue());
+        DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(
+                (long) TutorType.resolve(avaliableTimeParam.getTutorType()).ordinal());
         List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(dayTimeSlots, (localDateTime, d) -> {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
@@ -90,8 +94,12 @@ public class AvaliableTimeServiceX {
         // 如果没有未消费的订单,则取得当前时间;否则换成订单的最后结束时间
         WorkOrder workOrder = null;
         try {
-            workOrder = workOrderService.getLatestWorkOrderByStudentIdAndComboType(
-                    avaliableTimeParam.getStudentId(), avaliableTimeParam.getComboTypeEnum().name());
+            // 如果是overall,设置为MIXED
+            if(Objects.equals(avaliableTimeParam.getComboType(), ComboTypeToRoleId.OVERALL.name())) {
+                avaliableTimeParam.setTutorType(TutorType.MIXED.name());
+            }
+            workOrder = workOrderService.getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(
+                    avaliableTimeParam.getStudentId(), avaliableTimeParam.getProductType(), avaliableTimeParam.getTutorType());
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");

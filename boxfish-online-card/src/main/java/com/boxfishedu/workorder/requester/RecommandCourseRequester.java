@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.requester;
 
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -18,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/6/17.
@@ -56,10 +58,16 @@ public class RecommandCourseRequester {
         return recommandCourseView;
     }
 
-    public RecommandCourseView getForeignRecomandCourse(WorkOrder workOrder) {
+    public RecommandCourseView getRecomendCourse(WorkOrder workOrder, TutorType tutorType) {
         try {
+            String type;
+            if(Objects.equals(tutorType, TutorType.CN)) {
+                type = "chinese";
+            } else {
+                type = "foreigner";
+            }
             RecommandCourseView recommandCourseView = restTemplate.postForObject(
-                    createForeignRecommendUri(workOrder.getStudentId()),
+                    createRecommendUri(workOrder.getStudentId(), type),
                     HttpEntity.EMPTY,
                     RecommandCourseView.class);
             logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
@@ -181,6 +189,31 @@ public class RecommandCourseRequester {
 
         }));
     }
+
+    private URI createRecommendUri(Long studentId, String tutorType) {
+        return UriComponentsBuilder
+                .fromUriString(urlConf.getCourse_recommended_service())
+                .path("/online/" + tutorType + "/" + studentId)
+                .build()
+                .toUri();
+    }
+
+
+    /*************** 兼容老版本 ***************/
+    public RecommandCourseView getForeignRecomandCourse(WorkOrder workOrder) {
+        try {
+            RecommandCourseView recommandCourseView = restTemplate.postForObject(
+                    createForeignRecommendUri(workOrder.getStudentId()),
+                    HttpEntity.EMPTY,
+                    RecommandCourseView.class);
+            logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
+            return recommandCourseView;
+        } catch (Exception ex) {
+            logger.error("!!!!!!!!!!!!!!向推荐课发起请求失败[{}]", ex.getMessage(), ex);
+            throw new BusinessException("获取推荐课程失败");
+        }
+    }
+
 
     private URI createForeignRecommendUri(Long studentId) {
         return UriComponentsBuilder

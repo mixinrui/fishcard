@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -27,6 +28,7 @@ import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
@@ -43,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.boxfishedu.workorder.common.util.DateUtil.*;
 
@@ -50,7 +53,7 @@ import static com.boxfishedu.workorder.common.util.DateUtil.*;
  * Created by hucl on 16/3/31.
  */
 @Component
-public class TimePickerServiceX {
+public class TimePickerServiceXV1 {
     @Autowired
     private ServeService serveService;
     @Autowired
@@ -67,7 +70,6 @@ public class TimePickerServiceX {
     private TimePickerService timePickerService;
     @Autowired
     RestTemplate restTemplate;
-
     @Autowired
     private RecommandedCourseService recommandedCourseService;
 
@@ -89,43 +91,47 @@ public class TimePickerServiceX {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     * 学生选择时间
+     * @param timeSlotParam
+     * @return
+     * @throws BoxfishException
+     */
     public JsonResultModel ensureCourseTimes(TimeSlotParam timeSlotParam) throws BoxfishException {
         logger.info("客户端发起选课请求;参数:[{}]", JacksonUtil.toJSon(timeSlotParam));
 
         //根据订单id,type获取对应的服务
-        Service service = ensureConvertOver(timeSlotParam);
+        List<Service> serviceList = ensureConvertOver(timeSlotParam);
+        // 获取选课策略,每周选几次,持续几周
+        WeekStrategy weekStrategy = getWeekStrategy(timeSlotParam, serviceList);
+        // 验证service
+        validateTimeSlotParam(timeSlotParam, weekStrategy, serviceList);
+        // unique验证
+        for(Service service : serviceList) {
+            Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(service.getStudentId());
+            checkUniqueCourseSchedules(classDateTimeslotsSet, timeSlotParam.getSelectedTimes());
+        }
 
-        validateTimeSlotParam(timeSlotParam,service);
+        // 批量生成工单
+        List<WorkOrder> workOrderList = batchInitWorkorders(timeSlotParam, weekStrategy, serviceList);
 
-        // 返回学生当前选择的课程日期和时间片
-        Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(service.getStudentId());
-        // unique课程验证
-        checkUniqueCourseSchedules(classDateTimeslotsSet, timeSlotParam.getSelectedTimes());
+        // 获取课程推荐
+        Map<Integer, RecommandCourseView> recommandCourses = getRecommandCourses(workOrderList);
 
-        logger.info("选课开始,service的id为:[{}]", service.getId());
+        // 批量保存鱼卡与课表
+        List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
 
-        List<WorkOrder> workOrders = batchInitWorkorders(timeSlotParam, service);
+        // 保存日志
+        workOrderLogService.batchSaveWorkOrderLogs(workOrderList);
 
-        //TODO:推荐课的接口目前为单词请求
-        Map<Integer, RecommandCourseView> recommandCoursesMap = getRecommandCourses(workOrders);
+        // 分配老师
+        timePickerService.getRecommandTeachers(serviceList.get(0), courseSchedules);
 
-        workOrderService.batchSaveCoursesIntoCard(workOrders,recommandCoursesMap);
+        // 通知其他模块
+        notifyOtherModules(workOrderList, serviceList.get(0));
 
-
-        //入库,workorder和coursechedule的插入放入一个事务中,保证数据的一致性
-        List<CourseSchedule> courseSchedules=workOrderService.persistCardInfos(
-                service,workOrders,recommandCoursesMap);
-
-        //TODO:等测
-        workOrderLogService.batchSaveWorkOrderLogs(workOrders);
-
-        //获取订单内所有的教师,key为workorder的starttime的time值
-        timePickerService.getRecommandTeachers(service,courseSchedules);
-
-        notifyOtherModules(workOrders, service);
-
-        logger.info("学生[{}]选课结束", service.getStudentId());
-        return JsonResultModel.newJsonResultModel(null);
+        logger.info("学生[{}]选课结束", serviceList.get(0).getStudentId());
+        return JsonResultModel.newJsonResultModel();
     }
 
 
@@ -152,24 +158,25 @@ public class TimePickerServiceX {
     }
 
 
-    private void validateTimeSlotParam(TimeSlotParam timeSlotParam,Service service) {
+    private void validateTimeSlotParam(TimeSlotParam timeSlotParam, WeekStrategy weekStrategy, List<Service> services) {
         List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
 //        if (service.getComboCycle() != -1) {
 //            if (selectedTimes.size() != (service.getAmount() >> 2)) {
 //                throw new BusinessException("选择的上课次数不符合规范");
 //            }
 //        }
-        if(serveService.getNumPerWeek(service) != selectedTimes.size()) {
+        if(weekStrategy.numPerWeek != selectedTimes.size()) {
             throw new BusinessException("选择的上课次数不符合规范");
         }
-        if(service.getCoursesSelected()==1){
-            throw new BusinessException("该订单已经完成选课,请勿重复选课");
+        for(Service service : services) {
+            if (service.getCoursesSelected() == 1) {
+                throw new BusinessException("该订单已经完成选课,请勿重复选课");
+            }
         }
     }
 
-    private Service ensureConvertOver(TimeSlotParam timeSlotParam) {
-        int pivot = 0;
-        return ensureConvertOver(timeSlotParam, pivot);
+    private List<Service> ensureConvertOver(TimeSlotParam timeSlotParam) {
+        return ensureConvertOver(timeSlotParam, 0);
     }
 
     //TODO:从师生运营组获取推荐课程
@@ -178,18 +185,22 @@ public class TimePickerServiceX {
         for (WorkOrder workOrder : workOrders) {
             logger.debug("鱼卡序号{}",workOrder.getSeqNum());
             Integer index=recommandedCourseService.getCourseIndex(workOrder);
-            String comboType = workOrder.getService().getComboType();
+            // 判断tutorType 是中教外教还是中外教,对应的推课
+            TutorType tutorType = TutorType.resolve(workOrder.getService().getTutorType());
             RecommandCourseView recommandCourseView = null;
             // 不同类型的套餐对应不同类型的课程推荐
-            if(Objects.equals(comboType, ComboTypeToRoleId.OVERALL.name())) {
+            if(Objects.equals(tutorType, TutorType.MIXED)) {
                 recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
-            } else if(Objects.equals(comboType, ComboTypeToRoleId.FOREIGN.name())) {
-                recommandCourseView = recommandCourseRequester.getForeignRecomandCourse(workOrder);
+            } else if(Objects.equals(tutorType, TutorType.FRN) || Objects.equals(tutorType, TutorType.CN)) {
+                recommandCourseView = recommandCourseRequester.getRecomendCourse(workOrder, tutorType);
             } else {
 
             }
 
             if(!Objects.isNull(recommandCourseView)) {
+                workOrder.initCourseInfo(recommandCourseView);
+                workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
+                        recommandCourseView.getCourseType()));
                 courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
             }
 //            courseViewMap.put(workOrder.getSeqNum(), courseView);
@@ -201,6 +212,7 @@ public class TimePickerServiceX {
         //通知上课中心
 //        notifyCourseOnline(workOrders);
         //通知订单中心修改状态为已选课30
+
         serveService.notifyOrderUpdateStatus(service.getOrderId(), ConstantUtil.WORKORDER_SELECTED);
     }
 
@@ -264,17 +276,20 @@ public class TimePickerServiceX {
         }
     }
 
-    private List<WorkOrder> batchInitWorkorders(TimeSlotParam timeSlotParam, Service service) throws BoxfishException {
+    private List<WorkOrder> batchInitWorkorders(TimeSlotParam timeSlotParam, WeekStrategy weekStrategy, List<Service> services) throws BoxfishException {
         List<WorkOrder> workOrders = new ArrayList<>();
-        int numPerWeek = serveService.getNumPerWeek(service);
-        int loopOfWeek = serveService.getLoopOfWeek(service);
-
+        int numPerWeek = weekStrategy.numPerWeek;
+        int loopOfWeek = weekStrategy.loopOfWeek;
+        // 中教优先于外教
+        services.sort((c1, c2) -> Objects.equals(c1.getTutorType(), TutorType.CN.name()) ? 1 : 0);
+        Queue<ServiceChoice> serviceQueue = createServiceChoice(services);
         for (int i = 0; i < loopOfWeek; i++) {
             for (int j = 0; j < numPerWeek; j++) {
                 int index = (j + 1) + i * numPerWeek;
-                if(index > service.getAmount()) {
+                if(index > weekStrategy.count) {
                     break;
                 }
+                Service service = services.get(choice(serviceQueue));
                 List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
                 WorkOrder workOrder = new WorkOrder();
                 workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
@@ -291,7 +306,6 @@ public class TimePickerServiceX {
                 // skuIdExtra 字段
                 workOrder.setSkuIdExtra(service.getSkuId().intValue());
                 workOrder.setOrderChannel(service.getOrderChannel());
-                workOrder.setSendflagcc("1");// 师生互评 发送状态 默认1 为 未发送
                 TimeSlots timeSlots = getTimeSlotById(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
                 String startTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getStartTime();
                 String endTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getEndTime();
@@ -316,11 +330,81 @@ public class TimePickerServiceX {
         return workOrders;
     }
 
-    private Service ensureConvertOver(TimeSlotParam timeSlotParam, int pivot) {
+    private int choice(Queue<ServiceChoice> queue) {
+        ServiceChoice serviceChoice;
+        while(true) {
+            serviceChoice = queue.poll();
+            if(Objects.isNull(serviceChoice)) {
+                return -1;
+            }
+            if(serviceChoice.hasNext()) {
+                serviceChoice.decrement();
+                queue.add(serviceChoice);
+                break;
+            }
+        }
+        return serviceChoice.index;
+    }
+
+    private Queue<ServiceChoice> createServiceChoice(List<Service> services) {
+        Queue<ServiceChoice> serviceQueue = new LinkedList<>();
+        for(int i = 0; i < services.size(); i++) {
+            serviceQueue.add(new ServiceChoice(i, services.get(i).getAmount()));
+        }
+        return serviceQueue;
+    }
+
+    class ServiceChoice {
+        int index;
+        int amount;
+
+        public ServiceChoice(int index, int amount) {
+            this.index = index;
+            this.amount = amount;
+        }
+
+        public boolean hasNext() {
+            return amount > 0;
+        }
+
+        public void decrement() {
+            this.amount --;
+        }
+    }
+
+
+//    private Service ensureConvertOver(TimeSlotParam timeSlotParam, int pivot) {
+//        pivot++;
+//        // TODO 需要更改获取服务的方式
+//        Service service = serveService.findTop1ByOrderIdAndComboType(
+//                timeSlotParam.getOrderId(), timeSlotParam.getComboType().name());
+//        if (null == service) {
+//            if (pivot > 2) {
+//                logger.error("重试两次后发现仍然不存在对应的服务,直接返回给前端,当前pivot[{}]",pivot);
+//                throw new BusinessException("无对应服务,请重试");
+//            } else {
+//                //简单粗暴的方式先解决
+//                try {
+//                    logger.debug("不存在对应的服务,当前为第[{}]次等待获取service",pivot);
+//                    Thread.sleep(3000);
+//                } catch (Exception ex) {
+//                    logger.error("线程休眠失败");
+//                    throw new BusinessException("选课失败,请重试");
+//                }
+//                service=ensureConvertOver(timeSlotParam, pivot);
+//                return service;
+//            }
+//        }
+//        return service;
+//    }
+
+
+    private List<Service> ensureConvertOver(TimeSlotParam timeSlotParam, int pivot) {
         pivot++;
-        Service service = serveService.findTop1ByOrderIdAndComboType(
-                timeSlotParam.getOrderId(), timeSlotParam.getComboTypeEnum().name());
-        if (null == service) {
+        // TODO 需要更改获取服务的方式
+        List<Service> services = serveService.findByOrderIdAndProductType(
+                timeSlotParam.getOrderId(), timeSlotParam.getProductType());
+        if (CollectionUtils.isEmpty(services)) {
             if (pivot > 2) {
                 logger.error("重试两次后发现仍然不存在对应的服务,直接返回给前端,当前pivot[{}]",pivot);
                 throw new BusinessException("无对应服务,请重试");
@@ -333,12 +417,12 @@ public class TimePickerServiceX {
                     logger.error("线程休眠失败");
                     throw new BusinessException("选课失败,请重试");
                 }
-                service=ensureConvertOver(timeSlotParam, pivot);
-                return service;
+                return ensureConvertOver(timeSlotParam,  pivot);
             }
         }
-        return service;
+        return services;
     }
+
 
     public TimeSlots getTimeSlotById(Integer id) throws BusinessException {
         return teacherStudentRequester.getTimeSlot(id);
@@ -436,5 +520,30 @@ public class TimePickerServiceX {
             result.add(beanMap);
         });
         return result;
+    }
+
+    private WeekStrategy getWeekStrategy(TimeSlotParam timeSlotParam, List<Service> services) {
+        int count = services.stream().collect(Collectors.summingInt(Service::getAmount));
+        // 兑换默认为1周两次
+        if(Objects.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.EXCHANGE.name())) {
+            int loopOfWeek = (count + WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK - 1) / WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK;
+            return new WeekStrategy(loopOfWeek, WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK, count);
+        }
+        int loopOfWeek = services.stream().collect(Collectors.summingInt(Service::getComboCycle));
+        int per = count / loopOfWeek == 0 ? 1 : count / loopOfWeek;
+        return new WeekStrategy((count + per -1) / per, per, count);
+    }
+
+    class WeekStrategy{
+        public final static int DEFAULT_EXCHANGE_NUMPERWEEK = 2;
+        int loopOfWeek;
+        int numPerWeek;
+        int count;
+
+        public WeekStrategy(int loopOfWeek, int numPerWeek, int count) {
+            this.loopOfWeek = loopOfWeek;
+            this.numPerWeek = numPerWeek;
+            this.count = count;
+        }
     }
 }

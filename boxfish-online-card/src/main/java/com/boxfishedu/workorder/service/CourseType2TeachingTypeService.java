@@ -15,4 +15,16 @@ public class CourseType2TeachingTypeService {
         }
         return TeachingType.ZHONGJIAO.getCode();
     }
+
+    /**
+     * 提供一个静态调用
+     * @param courseType
+     * @return
+     */
+    public static int courseType2TeachingType2(String courseType){
+        if(courseType.equals(CourseTypeEnum.TALK.toString())){
+            return TeachingType.WAIJIAO.getCode();
+        }
+        return TeachingType.ZHONGJIAO.getCode();
+    }
 }
