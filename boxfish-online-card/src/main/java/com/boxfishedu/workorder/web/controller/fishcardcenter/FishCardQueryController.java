@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
 import com.boxfishedu.card.bean.CourseTypeEnum;
+import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -73,5 +74,14 @@ public class FishCardQueryController {
     public JsonResultModel listCourseType() throws Exception {
         return JsonResultModel.newJsonResultModel( CourseTypeEnum.values());
     }
+
+
+
+    @RequestMapping(value = "/rechargeType/list", method = RequestMethod.GET)
+    public JsonResultModel rechargeType() throws Exception {
+        return JsonResultModel.newJsonResultModel(FishCardChargebackStatusEnum.varMapout);
+    }
+
+
 
 }

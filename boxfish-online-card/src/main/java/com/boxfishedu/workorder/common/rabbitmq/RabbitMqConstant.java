@@ -83,4 +83,9 @@ public class RabbitMqConstant {
     //通知抢单
     public static final String GRAB_WORKER_ORDER_TIME_QUEUE= "boxfish.fishcard.graborder.timer.queue";
 
+    //订单退款通知队列template
+    public static final String RECHARGE_WORKORDER_QUEUE_TEMPLATE_NAME= "boxfish.fishcard.recharge.template";
+    //退款队列名称
+    public static final String RECHARGE_WORKORDER_QUEUE= "boxfish.fishcard.recharge.queue";
+
 }

@@ -86,6 +86,13 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareExchange(foreignCommentExchange());
 
         /**
+         * 通知订单退款申请
+         */
+        Queue notifyRechargeWorkOrderQueue = new Queue(RabbitMqConstant.RECHARGE_WORKORDER_QUEUE, true);
+        rabbitAdmin.declareQueue(notifyRechargeWorkOrderQueue);
+        Binding notifyRechargeWorkOrderQueueBinding = BindingBuilder.bind(notifyRechargeWorkOrderQueue).to(directExchange()).with(RabbitMqConstant.RECHARGE_WORKORDER_QUEUE).noargs();
+
+        /**
          * 通知定时器
          */
         Queue unassignedTeacherTimerReplyQueue = new Queue(RabbitMqConstant.UNASSIGNED_TEACHER_REPLY_TIMER_QUEUE, true);
@@ -195,6 +202,9 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareQueue(delayNotifyTeacherPrepareQueue);
         Binding delayNotifyTeacherPrepareQueueBinding=BindingBuilder.bind(delayNotifyTeacherPrepareQueue).to(delayExchange()).with(RabbitMqConstant.DELAY__NOTIFY_TEACHER_PREPARE_QUEUE).and(notifyTeacherPrepareArguments);
 
+
+
+
         /**
          * 通知教师上课延时处理队列
          */
@@ -226,7 +236,7 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareQueueBinding);
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareDealerQueueBinding);
         rabbitAdmin.declareBinding(updatePictureQueueBinding);
-
+        rabbitAdmin.declareBinding(notifyRechargeWorkOrderQueueBinding);
         return rabbitAdmin;
     }
 
@@ -277,6 +287,16 @@ public class RabbitMqConfiguration {
     @Bean(name = RabbitMqConstant.FINISH_FISHCARD_TEMPLATE_NAME)
     public RabbitTemplate teachingOnlineRabbitTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
         RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.FISHCARD_CREATED_QUEUE);
+        template.setExchange(NOTIFICATION_TASK_EXCHANGE);
+        return template;
+    }
+
+    /**
+     * 通知订单退款 template
+     */
+    @Bean(name = RabbitMqConstant.RECHARGE_WORKORDER_QUEUE_TEMPLATE_NAME)
+    public RabbitTemplate notifyOrderRechargeTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.RECHARGE_WORKORDER_QUEUE);
         template.setExchange(NOTIFICATION_TASK_EXCHANGE);
         return template;
     }
@@ -395,6 +415,17 @@ public class RabbitMqConfiguration {
     @Bean(name = RabbitMqConstant.DELAY_QUEUE_NOTIFY_TEACHER_PREPARE_TEMPLATE_NAME)
     public RabbitTemplate delayTeacherPrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
         RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.DELAY__NOTIFY_TEACHER_PREPARE_QUEUE);
+        template.setExchange(DELAY_QUEUE_EXCHANGE);
+        return template;
+    }
+
+
+    /**
+     *通知订单退款
+     */
+    @Bean(name = RabbitMqConstant.RECHARGE_WORKORDER_QUEUE_TEMPLATE_NAME)
+    public RabbitTemplate notifyOrderPrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.RECHARGE_WORKORDER_QUEUE);
         template.setExchange(DELAY_QUEUE_EXCHANGE);
         return template;
     }
