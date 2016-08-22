@@ -20,8 +20,6 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     //使用top1,是由于按照逻辑,根据查询条件只应该有一条结果返回
     public Service findTop1ByOrderIdAndSkuId(Long orderId, Long skuId);
 
-//    Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
-
     List<Service> findByOrderIdAndProductType(Long orderId, Integer productType);
 
     //鱼卡中心查询学生的接口
@@ -50,4 +48,7 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Service findById(Long id);
+
+    /*********兼容老版本*************/
+    Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
 }

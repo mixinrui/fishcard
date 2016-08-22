@@ -198,4 +198,29 @@ public class RecommandCourseRequester {
                 .toUri();
     }
 
+
+    /*************** 兼容老版本 ***************/
+    public RecommandCourseView getForeignRecomandCourse(WorkOrder workOrder) {
+        try {
+            RecommandCourseView recommandCourseView = restTemplate.postForObject(
+                    createForeignRecommendUri(workOrder.getStudentId()),
+                    HttpEntity.EMPTY,
+                    RecommandCourseView.class);
+            logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
+            return recommandCourseView;
+        } catch (Exception ex) {
+            logger.error("!!!!!!!!!!!!!!向推荐课发起请求失败[{}]", ex.getMessage(), ex);
+            throw new BusinessException("获取推荐课程失败");
+        }
+    }
+
+
+    private URI createForeignRecommendUri(Long studentId) {
+        return UriComponentsBuilder
+                .fromUriString(urlConf.getCourse_recommended_service())
+                .path("/online/foreigner/" + studentId)
+                .build()
+                .toUri();
+    }
+
 }

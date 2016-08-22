@@ -183,14 +183,6 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return courseScheduleService.save(courseSchedules);
     }
 
-//    @Transactional
-//    public List<ServiceWorkOrderCombination> persistCardInfos(List<ServiceWorkOrderCombination> workOrderCombinations) {
-//        for(ServiceWorkOrderCombination serviceWorkOrderCombination : workOrderCombinations) {
-//            serviceWorkOrderCombination.generateCourseSchedules(this::persistCardInfos);
-//        }
-//        return workOrderCombinations;
-//    }
-
     @Transactional
     public List<CourseSchedule> persistCardInfos(List<Service> services,List<WorkOrder> workOrders,Map<Integer,
             RecommandCourseView> recommandCoursesMap){
@@ -313,19 +305,6 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentIdAndStartTimeBetween(studentId, beginDate, endDate);
     }
 
-
-//    public WorkOrder getLatestWorkOrderByStudentIdAndComboType(Long studentId, String comboType) {
-//        int teachingType = ComboTypeToRoleId.resolve(comboType).getValue();
-//        String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.service.teachingType=? order by wo.endTime desc";
-//        Query query = entityManager.createQuery(sql)
-//                .setParameter(1, studentId)
-//                .setParameter(2, teachingType);
-//        query.setMaxResults(1);
-//        List resultList = query.getResultList();
-//        return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
-//    }
-
-
     public WorkOrder getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(Long studentId, Integer productType, String tutorType) {
         String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.service.productType=? and wo.service.tutorType=? order by wo.endTime desc";
         Query query = entityManager.createQuery(sql)
@@ -337,15 +316,67 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
     }
 
-    public void batchSetCourseInfo(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommendCoursesMap){
+
+    /****************************兼容老版本************************/
+    public void batchSaveCoursesIntoCard(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommandCoursesMap){
         for (WorkOrder workOrder : workOrders) {
-            RecommandCourseView courseView = recommendCoursesMap.get(workOrder.getSeqNum());
+            RecommandCourseView courseView=recommandCoursesMap.get(workOrder.getSeqNum());
             workOrder.setCourseId(courseView.getCourseId());
             workOrder.setCourseName(courseView.getCourseName());
             workOrder.setCourseType(courseView.getCourseType());
             workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
             workOrder.setSkuId(new Long(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType())));
         }
+    }
+
+    public WorkOrder getLatestWorkOrderByStudentIdAndComboType(Long studentId, String comboType) {
+        int teachingType = ComboTypeToRoleId.resolve(comboType).getValue();
+        String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.service.teachingType=? order by wo.endTime desc";
+        Query query = entityManager.createQuery(sql)
+                .setParameter(1, studentId)
+                .setParameter(2, teachingType);
+        query.setMaxResults(1);
+        List resultList = query.getResultList();
+        return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
+    }
+
+
+    /**************** 兼容历史版本 **********************/
+    @Transactional
+    public List<CourseSchedule> persistCardInfos(Service service,List<WorkOrder> workOrders,Map<Integer,
+            RecommandCourseView> recommandCoursesMap){
+        service=serveService.findByIdForUpdate(service.getId());
+        if(service.getCoursesSelected()==1){
+            throw new BusinessException("您已选过课程,请勿重复选课");
+        }
+        service.setCoursesSelected(1);
+        serveService.save(service);
+        this.save(workOrders);
+        List<CourseSchedule> courseSchedules=batchUpdateCourseSchedule(service, workOrders);
+        scheduleCourseInfoService.batchSaveCourseInfos(workOrders,courseSchedules, recommandCoursesMap);
+        return courseSchedules;
+    }
+
+
+    private List<CourseSchedule> batchUpdateCourseSchedule(Service service, List<WorkOrder> workOrders) {
+        List<CourseSchedule> courseSchedules = new ArrayList<>();
+        for (WorkOrder workOrder : workOrders) {
+            CourseSchedule courseSchedule = new CourseSchedule();
+            courseSchedule.setStatus(workOrder.getStatus());
+            courseSchedule.setStudentId(service.getStudentId());
+            courseSchedule.setTeacherId(workOrder.getTeacherId());
+            courseSchedule.setCourseId(workOrder.getCourseId());
+            courseSchedule.setCourseName(workOrder.getCourseName());
+            courseSchedule.setCourseType(workOrder.getCourseType());
+            courseSchedule.setClassDate(DateUtil.date2SimpleDate(workOrder.getStartTime()));
+            //TODO:此处如果是外教,需要修改roleId为外教的Id
+            courseSchedule.setRoleId(workOrder.getSkuId().intValue());
+            courseSchedule.setTimeSlotId(workOrder.getSlotId());
+            courseSchedule.setWorkorderId(workOrder.getId());
+            courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
+            courseSchedules.add(courseSchedule);
+        }
+        return courseScheduleService.save(courseSchedules);
     }
 
 }

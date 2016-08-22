@@ -522,4 +522,47 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         workOrderService.delete(workOrder);
         courseScheduleService.delete(courseSchedule);
     }
+
+
+    /**************** 兼容历史版本代码******************/
+    /**
+     * 每周选几次课
+     * @param service
+     * @return
+     */
+    public int getNumPerWeek(Service service) {
+        // 兼容之前的逻辑
+        if (service.getComboCycle() == -1) {
+//            return service.getAmount();
+            return 2;
+        } else {
+            // 每周选课次数
+            int numPerWeek = service.getAmount() / service.getComboCycle();
+            return numPerWeek == 0 ? 1 : numPerWeek;
+        }
+    }
+
+    /**
+     * 几周上完
+     * @param service
+     * @return
+     */
+    public int getLoopOfWeek(Service service) {
+        // 兼容之前的业务逻辑
+        if (service.getComboCycle() == -1) {
+//            return 1;
+            return 4;
+        } else {
+            int comboCycle = service.getComboCycle();
+            return (getNumPerWeek(service) -1 + service.getAmount()) / getNumPerWeek(service);
+//            return service.getAmount() % comboCycle == 0
+//                    ? comboCycle : service.getAmount() / getNumPerWeek(service);
+        }
+    }
+
+
+    /*********兼容老版本*************/
+    public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
+        return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
+    }
 }

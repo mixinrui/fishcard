@@ -149,6 +149,9 @@ public class WorkOrder{
     //0 True 1 False  是否手动修改过
     @Column(name="update_manul_flag", length = 1)
     private String updateManulFlag;
+    /** 关于更改课程 是否发送过消息   1 未发送  0 表示已经发送 **/
+    @Column(name = "sendflagcc", nullable = true)
+    private String sendflagcc;
 
     @Override
     public String toString() {
