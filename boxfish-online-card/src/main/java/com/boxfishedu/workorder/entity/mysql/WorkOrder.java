@@ -159,12 +159,6 @@ public class WorkOrder{
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatetimeChangecourse;
 
-    /** 关于更改课程 是否发送过消息   1 未发送  0 表示已经发送 **/
-    @Column(name = "sendflagcc", nullable = true)
-    private String sendflagcc;
-
-
-
     /** 关于更改课程 是否发送过消息   1 未确认  0 已经确认 **/
     @Column(name = "confirm_flag", nullable = true)
     private String confirmFlag;

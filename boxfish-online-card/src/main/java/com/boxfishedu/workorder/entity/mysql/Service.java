@@ -85,7 +85,7 @@ public class Service {
     @Column(name = "combo_cycle", nullable = true)
     private Integer comboCycle;
 
-    //每月的的上课次数
+//    //每月的的上课次数
 //    @Column(name = "count_in_month", nullable = true)
 //    private Integer countInMonth;
 
@@ -119,10 +119,10 @@ public class Service {
     @Column(name = "product_type", nullable = true)
     private Integer productType;
 
-//    /**
-//     * 课程类型
-//     */
-//    @Column(name = "teaching_type", nullable = true)
-//    private Integer teachingType;
+    /**
+     * 课程类型
+     */
+    @Column(name = "teaching_type", nullable = true)
+    private Integer teachingType;
 
 }
