@@ -243,12 +243,14 @@ public class MakeUpLessionServiceX {
     public JsonResultModel fishcardConfirmStatusRecharge(MakeUpCourseParam makeUpCourseParam){
         Map<String,String> resultMap = Maps.newHashMap();
         if(null == makeUpCourseParam || null ==makeUpCourseParam.getWorkOrderIds()|| makeUpCourseParam.getWorkOrderIds().length<1){
+            logger.info("::fishcardConfirmStatusRecharge1::");
             resultMap.put("1","参数有错误");
         }
 
         List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
 
         if(null==workOrders || workOrders.size()<1){
+            logger.info("::fishcardConfirmStatusRecharge1::");
             resultMap.put("1","参数有错误");
         }
 
@@ -260,9 +262,23 @@ public class MakeUpLessionServiceX {
 //            }
             // 1 正常  0  未开始 或者正在进行
             if("0".equals(wo.getIsCourseOver())){
+                logger.info("::fishcardConfirmStatusRecharge2::");
                 resultMap.put("2","请核实鱼卡信息,该课程未开始或者已经正在进行中!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
+
+            if(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode() != wo.getStatusRecharge()){
+                logger.info("::fishcardConfirmStatusRecharge3::");
+                resultMap.put("3","请核实鱼卡信息,鱼卡退款状态有不符合标准退款流程,请合适数据!");
+                return JsonResultModel.newJsonResultModel(resultMap);
+            }
+
+            if(!wo.getStatus().equals(FishCardStatusEnum. TEACHER_ABSENT.getCode()  ) ||  !wo.getStatus().equals(FishCardStatusEnum. TEACHER_LEAVE_EARLY.getCode())  || !wo.getStatus().equals( FishCardStatusEnum. EXCEPTION.getCode()) ){
+                logger.info("::fishcardConfirmStatusRecharge4::");
+                resultMap.put("4","请核实鱼卡信息,鱼卡状态不符合退款要求!");
+                return JsonResultModel.newJsonResultModel(resultMap);
+            }
+
             wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGBACKING.getCode());
             wo.setUpdatetimeRecharge(new Date());
         }
