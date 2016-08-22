@@ -61,4 +61,13 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
      */
     @Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=?3 and c.teacherId is null")
     List<CommentCard> findUndistributedTeacher(Date from, Date to, Integer status);
+
+    /**
+     * 统计外教点评教师端Done列表未读个数
+     */
+    @Query("select count(c) from CommentCard c where c.teacherId = ?1 and c.teacherReadFlag = 0 and (c.status = 400 or c.status = 500 or c.status = 600)")
+    public long countTeacherDoneListUnread(Long teacherId);
+
+    @Query("select count(c) from CommentCard c where c.teacherId = ?1 and c.teacherReadFlag = 0 and c.status = 300")
+    public long countTeacherTodoListUnread(Long teacherId);
 }
