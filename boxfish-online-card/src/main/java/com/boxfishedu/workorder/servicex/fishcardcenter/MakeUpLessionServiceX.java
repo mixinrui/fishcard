@@ -273,8 +273,10 @@ public class MakeUpLessionServiceX {
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
 
-            if(!wo.getStatus().equals(FishCardStatusEnum. TEACHER_ABSENT.getCode()  ) ||  !wo.getStatus().equals(FishCardStatusEnum. TEACHER_LEAVE_EARLY.getCode())  || !wo.getStatus().equals( FishCardStatusEnum. EXCEPTION.getCode()) ){
-                logger.info("::fishcardConfirmStatusRecharge4::");
+            if(wo.getStatus().equals(FishCardStatusEnum. TEACHER_ABSENT.getCode()  ) || wo.getStatus().equals(FishCardStatusEnum. TEACHER_LEAVE_EARLY.getCode())  || wo.getStatus().equals( FishCardStatusEnum. EXCEPTION.getCode()) ){
+
+            }else {
+                logger.info("::fishcardConfirmStatusRecharge4:[{}]:",wo.getStatus());
                 resultMap.put("4","请核实鱼卡信息,鱼卡状态不符合退款要求!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
