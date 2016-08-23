@@ -527,7 +527,8 @@ public class TimePickerServiceXV1 {
         // 兑换默认为1周两次
         if(Objects.equals(timeSlotParam.getComboTypeEnum(), ComboTypeToRoleId.EXCHANGE)) {
             int loopOfWeek = (count + WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK - 1) / WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK;
-            return new WeekStrategy(loopOfWeek, WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK, count);
+            int numPerWeek = count == 1 ? 1: WeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK;
+            return new WeekStrategy(loopOfWeek, numPerWeek, count);
         }
         int loopOfWeek = services.stream().collect(Collectors.summingInt(Service::getComboCycle));
         int per = count / loopOfWeek == 0 ? 1 : count / loopOfWeek;
