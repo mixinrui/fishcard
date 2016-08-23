@@ -37,6 +37,7 @@ public enum ComboTypeToRoleId {
             case "CHINESE": return CHINESE;
             case "CRITIQUE_CN": return CRITIQUE_CN;
             case "CRITIQUE": return CRITIQUE;
+            case "EXCHANGE" : return EXCHANGE;
             default: return UNKNOW;
         }
     }
