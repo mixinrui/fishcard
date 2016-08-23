@@ -425,6 +425,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         }
         // 几周消费完
         service.setComboCycle(productCombo.getComboCycle());
+        // 课程类型 兼容老版本
+        service.setTeachingType(productCombo.getComboType().getValue());
         // 产品类型
         service.setProductType(productComboDetail.getProductCode());
         service.setComboType(productCombo.getComboType().name());
