@@ -44,19 +44,6 @@ public class FishCardMakeUpRechargeController {
      */
     @RequestMapping(value = "/fishcard/laststate/change", method = RequestMethod.POST)
     public JsonResultModel fixedStateFromOrder(@RequestBody MakeUpCourseParam makeUpCourseParam)throws Exception{
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = request.getParameter("access_token");
-
-        if(StringUtils.isEmpty(token)){
-            logger.info("fishcardConfirmStatusRecharge1 用户无权操作该功能");
-            return JsonResultModel.newJsonResultModel("fishcardConfirmStatusRecharge1 用户名无权操作该功能");
-        }
-
-        String  userName = tokenUtils.getUserName(token);
-        if(StringUtils.isEmpty(userName) || !userName.toLowerCase().endsWith("refund")){
-            logger.info("fishcardConfirmStatusRecharge2 用户无权操作该功能");
-            return JsonResultModel.newJsonResultModel("fishcardConfirmStatusRecharge2 用户名无权操作该功能");
-        }
         return makeUpLessionServiceX.fishcardConfirmStatusRecharge(makeUpCourseParam);
     }
 
