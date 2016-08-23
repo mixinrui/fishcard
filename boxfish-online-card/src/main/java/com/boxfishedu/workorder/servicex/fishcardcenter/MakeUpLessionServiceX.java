@@ -318,6 +318,7 @@ public class MakeUpLessionServiceX {
     public JsonResultModel fixedStateFromOrder(MakeUpCourseParam makeUpCourseParam){
         Map<String,String> resultMap = Maps.newHashMap();
         if(null == makeUpCourseParam || null ==makeUpCourseParam.getWorkOrderIds()|| makeUpCourseParam.getWorkOrderIds().length<1 ){
+            logger.info("fixedStateFromOrder1 参数有误");
             resultMap.put("1","参数有错误");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
@@ -325,6 +326,7 @@ public class MakeUpLessionServiceX {
         List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
 
         if(null==workOrders || workOrders.size()<1){
+            logger.info("fixedStateFromOrder2 参数有误");
             resultMap.put("2","参数有错误");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
