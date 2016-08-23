@@ -158,8 +158,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus(
 //                DateUtil.localDate2Date(now.minusDays(2)),
 //                DateUtil.localDate2Date(now.minusDays(1)),
+                DateUtil.localDate2Date(now.minusMinutes(20)),
                 DateUtil.localDate2Date(now.minusMinutes(10)),
-                DateUtil.localDate2Date(now.minusMinutes(5)),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         for (CommentCard commentCard: list) {
             if (StringUtils.isEmpty(commentCard.getTeacherId())){
@@ -208,8 +208,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus2(
 //                DateUtil.localDate2Date(now.minusDays(3)),
 //                DateUtil.localDate2Date(now.minusDays(2)),
-                DateUtil.localDate2Date(now.minusMinutes(15)),
-                DateUtil.localDate2Date(now.minusMinutes(10)),
+                DateUtil.localDate2Date(now.minusMinutes(40)),
+                DateUtil.localDate2Date(now.minusMinutes(20)),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         Date updateDate = DateUtil.localDate2Date(now);
         for (CommentCard commentCard: list) {
