@@ -47,6 +47,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     CommentCardSDK commentCardSDK;
 
     @Autowired
+    CommentCardTeacherAppService commentCardTeacherAppService;
+
+    @Autowired
     ServeService serveService;
 
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
@@ -301,7 +304,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public JsonResultModel countTeacherUnreadCommentCards(Long userId){
         logger.info("教师端调用查询未读点评个数,用户id为:"+userId);
         JsonResultModel jsonResultModel = new JsonResultModel();
-        jsonResultModel.setData(String.valueOf(commentCardJpaRepository.countTeacherUnreadCommentCards(userId)));
+        Map<String,Long> countMap = new LinkedHashMap<>();
+        countMap.put("todoUnreadElements",commentCardTeacherAppService.countTeacherTodoUnread(userId));
+        countMap.put("doneUnreadElements",commentCardTeacherAppService.countTeacherDoneUnread(userId));
+        jsonResultModel.setData(countMap);
         jsonResultModel.setReturnCode(HttpStatus.SC_OK);
         jsonResultModel.setReturnMsg("success");
         return jsonResultModel;
