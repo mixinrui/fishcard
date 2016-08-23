@@ -21,6 +21,7 @@ import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -190,7 +191,7 @@ public class RabbitMqReciver {
     @RabbitListener(queues = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE)
     public void assignForeignTeacher(String param) {
         if(param == null){
-            throw new ValidationException();
+            throw new AmqpRejectAndDontRequeueException("param 为 null!");
         }
         FromTeacherStudentForm fromTeacherStudentForm = JSONParser.fromJson(param,FromTeacherStudentForm.class);
         foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
@@ -204,11 +205,11 @@ public class RabbitMqReciver {
     public void updateCommentCardsPictures(String param){
         if(param == null){
             logger.info("接收头像更新通知,接收参数为:"+param);
-            throw new ValidationException();
+            throw new AmqpRejectAndDontRequeueException("param 为 null!");
         }
         UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
         if(updatePicturesForm.getFigure_url().isEmpty()){
-            throw new ValidationException();
+            throw new AmqpRejectAndDontRequeueException("param 为 null!");
         }else {
             foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
             logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);

@@ -273,8 +273,10 @@ public class MakeUpLessionServiceX {
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
 
-            if(!wo.getStatus().equals(FishCardStatusEnum. TEACHER_ABSENT.getCode()  ) ||  !wo.getStatus().equals(FishCardStatusEnum. TEACHER_LEAVE_EARLY.getCode())  || !wo.getStatus().equals( FishCardStatusEnum. EXCEPTION.getCode()) ){
-                logger.info("::fishcardConfirmStatusRecharge4::");
+            if(wo.getStatus().equals(FishCardStatusEnum. TEACHER_ABSENT.getCode()  ) || wo.getStatus().equals(FishCardStatusEnum. TEACHER_LEAVE_EARLY.getCode())  || wo.getStatus().equals( FishCardStatusEnum. EXCEPTION.getCode()) ){
+
+            }else {
+                logger.info("::fishcardConfirmStatusRecharge4:[{}]:",wo.getStatus());
                 resultMap.put("4","请核实鱼卡信息,鱼卡状态不符合退款要求!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
@@ -316,6 +318,7 @@ public class MakeUpLessionServiceX {
     public JsonResultModel fixedStateFromOrder(MakeUpCourseParam makeUpCourseParam){
         Map<String,String> resultMap = Maps.newHashMap();
         if(null == makeUpCourseParam || null ==makeUpCourseParam.getWorkOrderIds()|| makeUpCourseParam.getWorkOrderIds().length<1 ){
+            logger.info("fixedStateFromOrder1 参数有误");
             resultMap.put("1","参数有错误");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
@@ -323,6 +326,7 @@ public class MakeUpLessionServiceX {
         List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
 
         if(null==workOrders || workOrders.size()<1){
+            logger.info("fixedStateFromOrder2 参数有误");
             resultMap.put("2","参数有错误");
             return JsonResultModel.newJsonResultModel(resultMap);
         }

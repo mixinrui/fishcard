@@ -46,15 +46,15 @@ public class FishCardMakeUpController {
         return makeUpLessionServiceX.fishcardStatusChange(makeUpCourseParam);
     }
 
-    /**
-     * 批量确认鱼卡  确认状态
-     * @param makeUpCourseParam
-     * @return
-     */
-    @RequestMapping(value = "/fishcard/confirmstatus/change", method = RequestMethod.POST)
-    public JsonResultModel fishcardConfirmStatusChange(@RequestBody MakeUpCourseParam makeUpCourseParam){
-        return makeUpLessionServiceX.fishcardStatusRechargeChange(makeUpCourseParam);
-    }
+//    /**
+//     * 批量确认鱼卡  确认状态
+//     * @param makeUpCourseParam
+//     * @return    ============>详见  FishCardMakeUpRechargeController
+//     */
+//    @RequestMapping(value = "/fishcard/confirmstatus/change", method = RequestMethod.POST)
+//    public JsonResultModel fishcardConfirmStatusChange(@RequestBody MakeUpCourseParam makeUpCourseParam){
+//        return makeUpLessionServiceX.fishcardStatusRechargeChange(makeUpCourseParam);
+//    }
 
 
     /**
