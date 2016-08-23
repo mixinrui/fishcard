@@ -46,15 +46,15 @@ public class FishCardMakeUpController {
         return makeUpLessionServiceX.fishcardStatusChange(makeUpCourseParam);
     }
 
-//    /**
-//     * 批量确认鱼卡  确认状态
-//     * @param makeUpCourseParam
-//     * @return    ============>详见  FishCardMakeUpRechargeController
-//     */
-//    @RequestMapping(value = "/fishcard/confirmstatus/change", method = RequestMethod.POST)
-//    public JsonResultModel fishcardConfirmStatusChange(@RequestBody MakeUpCourseParam makeUpCourseParam){
-//        return makeUpLessionServiceX.fishcardStatusRechargeChange(makeUpCourseParam);
-//    }
+    /**
+     * 批量确认鱼卡  确认状态
+     * @param makeUpCourseParam
+     * @return
+     */
+    @RequestMapping(value = "/fishcard/confirmstatus/change", method = RequestMethod.POST)
+    public JsonResultModel fishcardConfirmStatusChange(@RequestBody MakeUpCourseParam makeUpCourseParam){
+        return makeUpLessionServiceX.fishcardStatusRechargeChange(makeUpCourseParam);
+    }
 
 
     /**
@@ -68,15 +68,15 @@ public class FishCardMakeUpController {
     }
 
 
-    /**
-     * 订单系统调用http方式进行退款状态回馈
-     * @param makeUpCourseParam
-     * @return
-     */
-    @RequestMapping(value = "/fishcard/laststate/change", method = RequestMethod.POST)
-    public JsonResultModel fixedStateFromOrder(@RequestBody MakeUpCourseParam makeUpCourseParam){
-        return makeUpLessionServiceX.fixedStateFromOrder(makeUpCourseParam);
-    }
+//    /**
+//     * 订单系统调用http方式进行退款状态回馈
+//     * @param makeUpCourseParam  ============>详见  FishCardMakeUpRechargeController
+//     * @return
+//     */
+//    @RequestMapping(value = "/fishcard/laststate/change", method = RequestMethod.POST)
+//    public JsonResultModel fixedStateFromOrder(@RequestBody MakeUpCourseParam makeUpCourseParam){
+//        return makeUpLessionServiceX.fixedStateFromOrder(makeUpCourseParam);
+//    }
 
 
 }
