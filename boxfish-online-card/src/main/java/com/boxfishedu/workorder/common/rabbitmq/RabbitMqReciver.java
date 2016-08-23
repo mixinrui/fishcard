@@ -190,12 +190,13 @@ public class RabbitMqReciver {
      */
     @RabbitListener(queues = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE)
     public void assignForeignTeacher(String param) {
-        if(param == null){
-            throw new AmqpRejectAndDontRequeueException("param 为 null!");
+        try{
+            FromTeacherStudentForm fromTeacherStudentForm = JSONParser.fromJson(param,FromTeacherStudentForm.class);
+            foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
+            logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
+        }catch (Exception e){
+            logger.info("@assignForeignTeacher接收外教点评分配老师失败!");
         }
-        FromTeacherStudentForm fromTeacherStudentForm = JSONParser.fromJson(param,FromTeacherStudentForm.class);
-        foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
-        logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
     }
 
     /**
@@ -203,16 +204,16 @@ public class RabbitMqReciver {
      */
     @RabbitListener(queues = RabbitMqConstant.UPDATE_PICTURE_QUEUE)
     public void updateCommentCardsPictures(String param){
-        if(param == null){
-            logger.info("接收头像更新通知,接收参数为:"+param);
-            throw new AmqpRejectAndDontRequeueException("param 为 null!");
-        }
-        UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
-        if(updatePicturesForm.getFigure_url().isEmpty()){
-            throw new AmqpRejectAndDontRequeueException("param 为 null!");
-        }else {
-            foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
-            logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
+        try{
+            UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
+            if(updatePicturesForm.getFigure_url().isEmpty()){
+                throw new AmqpRejectAndDontRequeueException("param 为 null!");
+            }else {
+                foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
+                logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
+            }
+        }catch (Exception e){
+            logger.info("接收头像更新通知,但跟新失败!");
         }
     }
 
