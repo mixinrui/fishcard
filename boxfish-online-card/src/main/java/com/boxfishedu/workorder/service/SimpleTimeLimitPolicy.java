@@ -79,7 +79,7 @@ public class SimpleTimeLimitPolicy implements TimeLimitPolicy {
     }
 
     @Data
-    class TimeRange {
+    public static class TimeRange {
         Date from;
 
         Date to;
