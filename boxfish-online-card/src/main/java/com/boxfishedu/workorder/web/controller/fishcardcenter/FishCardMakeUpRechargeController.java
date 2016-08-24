@@ -44,7 +44,7 @@ public class FishCardMakeUpRechargeController {
      */
     @RequestMapping(value = "/fishcard/laststate/change", method = RequestMethod.POST)
     public JsonResultModel fixedStateFromOrder(@RequestBody MakeUpCourseParam makeUpCourseParam)throws Exception{
-        return makeUpLessionServiceX.fishcardConfirmStatusRecharge(makeUpCourseParam);
+        return makeUpLessionServiceX.fixedStateFromOrder(makeUpCourseParam);
     }
 
 

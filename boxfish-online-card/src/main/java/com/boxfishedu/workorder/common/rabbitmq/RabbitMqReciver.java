@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
@@ -64,6 +65,9 @@ public class RabbitMqReciver {
 
     @Autowired
     private CourseChangeServiceX courseChangeServiceX;
+
+    @Autowired
+    private CourseNotifyOneDayServiceX courseNotifyOneDayServiceX;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -155,7 +159,11 @@ public class RabbitMqReciver {
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
                 foreignTeacherCommentCardService.foreignUndistributedTeacherCommentCards();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.CLASSS_TOMO_STU_NOTIFY.value()){
+                logger.info("=========>receiveMessageTomoStuhasClass");
+                courseNotifyOneDayServiceX.notiFyStudentClass();
             }
+
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);

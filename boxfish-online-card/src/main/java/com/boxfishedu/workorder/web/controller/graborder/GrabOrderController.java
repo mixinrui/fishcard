@@ -4,6 +4,7 @@ import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
+import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
@@ -38,7 +39,14 @@ public class GrabOrderController {
     @Autowired
     private CourseChangeServiceX courseChangeServiceX;
 
+    @Autowired
+    private CourseNotifyOneDayServiceX courseNotifyOneDayServiceX;
 
+    @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
+    public JsonResultModel tomonotify() {
+        courseNotifyOneDayServiceX.notiFyStudentClass();
+        return new JsonResultModel();
+    }
     /**
      * 根据老师获取抢单列表
      * @param teacherId
