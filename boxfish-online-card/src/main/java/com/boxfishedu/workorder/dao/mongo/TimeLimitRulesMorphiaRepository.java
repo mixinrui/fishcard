@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.dao.mongo;
 
+import com.boxfishedu.workorder.common.bean.SlotRuleEnum;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
@@ -41,8 +42,8 @@ public class TimeLimitRulesMorphiaRepository extends BaseMorphiaRepository<TimeL
         return query.asList();
     }
 
-    public Optional<List<TimeLimitRules>> queryByComboTypeAndDay(String comboType, Integer day) {
-        String limitRules = cacheManager.getCache(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY).get(TimeLimitRules.getCacheKey(comboType, day), String.class);
+    public Optional<List<TimeLimitRules>> queryByComboTypeAndRuleAndDay(String comboType, SlotRuleEnum slotRuleEnum, Integer day) {
+        String limitRules = cacheManager.getCache(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY).get(TimeLimitRules.getCacheKey(comboType,slotRuleEnum.toString(), day), String.class);
         if (limitRules != null) {
             logger.debug("@queryByComboTypeAndDay#redis#limitules[{}]",limitRules);
             if(limitRules.equals(NONE)){
@@ -61,15 +62,16 @@ public class TimeLimitRulesMorphiaRepository extends BaseMorphiaRepository<TimeL
         Query<TimeLimitRules> query = datastore.createQuery(TimeLimitRules.class);
         query.and(
                 query.criteria("comboType").equal(comboType),
+                query.criteria("rule").equal(slotRuleEnum.toString()),
                 query.criteria("day").equal(day)
         );
         List<TimeLimitRules> timeLimitRules=query.asList();
         if(CollectionUtils.isEmpty(timeLimitRules)){
-            cacheManager.getCache(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY).put(TimeLimitRules.getCacheKey(comboType, day),NONE);
+            cacheManager.getCache(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY).put(TimeLimitRules.getCacheKey(comboType,slotRuleEnum.toString(), day),NONE);
             return Optional.empty();
         }
         else{
-            cacheManager.getCache(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY).put(TimeLimitRules.getCacheKey(comboType, day),JacksonUtil.toJSon(timeLimitRules));
+            cacheManager.getCache(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY).put(TimeLimitRules.getCacheKey(comboType,slotRuleEnum.toString(), day),JacksonUtil.toJSon(timeLimitRules));
             return Optional.ofNullable(timeLimitRules);
         }
     }

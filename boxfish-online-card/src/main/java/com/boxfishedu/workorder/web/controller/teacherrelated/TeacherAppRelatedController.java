@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.web.controller.teacherrelated;
 
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
+import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.teacherrelated.TeacherAppRelatedServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -31,6 +32,8 @@ public class TeacherAppRelatedController {
     private TimeLimitPolicy timeLimitPolicy;
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+    @Autowired
+    private RandomSlotFilterService randomSlotFilterService;
     private final static DateTimeFormatter yearMonthFormatter = DateTimeFormatter.ofPattern("yyyyMM");
 
     /**
@@ -85,7 +88,8 @@ public class TeacherAppRelatedController {
                                                    @RequestParam(required = false)
                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         commonServeServiceX.checkToken(teacherId, userId);
-        return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(teacherStudentRequester.dayTimeSlotsTemplate(teacherId, date)));
+//        return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(teacherStudentRequester.dayTimeSlotsTemplate(teacherId, date)));
+        return JsonResultModel.newJsonResultModel(randomSlotFilterService.removeSlotsNotInRange(teacherStudentRequester.dayTimeSlotsTemplate(teacherId, date),teacherId));
     }
 
     @RequestMapping(value = "international/{teacherId}/timeSlots/template", method = RequestMethod.GET)
