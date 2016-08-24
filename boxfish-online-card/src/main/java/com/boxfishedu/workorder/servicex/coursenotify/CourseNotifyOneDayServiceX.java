@@ -108,6 +108,7 @@ public class CourseNotifyOneDayServiceX {
             JSONObject jo = new JSONObject();
             jo.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_TOMO_TYPE.toString());
             jo.put("count", count);
+            jo.put("push_title", pushTitle);
 
 //            try{
 //                logger.info(":::::::sendToStudentContent::::pushTitle:[{}]:size[{}]",pushTitle,map.get(key));
