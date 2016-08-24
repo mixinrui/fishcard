@@ -24,10 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by ansel on 16/7/18.
@@ -185,7 +182,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCard.setUpdateTime(updateDate);
                 logger.info("调用师生运营接口,设置参与该点评卡的外教为旷课......",commentCard);
                 JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
-                logger.info("此外教标注旷课状态情况{}",jsonResultModel);
+                logger.info("调用师生运营接口结果",jsonResultModel);
+                logger.info("向老师端推送消息,告知其点评超时......");
+                String info = "您"+commentCard.getAssignTeacherTime().toString()+"的点评订单,超时未点评,超过2次未点评将取消点评资格。[知道了]";
+                JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(commentCard.getTeacherId().toString()),info,"FOREIGNCOMMENT");
+                logger.info("向老师端推送消息结果"+pushResult);
                 CommentCard oldCommentCard = commentCardJpaRepository.save(commentCard);
                 // 克隆点评卡
                 CommentCard temp = oldCommentCard.cloneCommentCard();
@@ -233,8 +234,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         List<CommentCard> list = commentCardJpaRepository.findUndistributedTeacher(
 //                DateUtil.localDate2Date(now.minusDays(1)),
 //                DateUtil.localDate2Date(now.minusDays(0)),
-                DateUtil.localDate2Date(now.minusMinutes(5)),
-                DateUtil.localDate2Date(now.minusMinutes(0)),
+                DateUtil.localDate2Date(now.minusMinutes(20)),
+                DateUtil.localDate2Date(now.minusMinutes(10)),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         for (CommentCard commentCard: list) {
             ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
