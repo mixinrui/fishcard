@@ -68,7 +68,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
         //开始发送通知
-
+        pushTeacherList(studentHasClassMap);
 
 
         logger.info("notiFyStudentClass:::::通知完成");
