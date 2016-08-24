@@ -241,6 +241,7 @@ public class MakeUpLessionServiceX {
      * @return
      */
     public JsonResultModel fishcardConfirmStatusRecharge(MakeUpCourseParam makeUpCourseParam){
+        logger.info("begin:fishcardConfirmStatusRecharge");
         Map<String,String> resultMap = Maps.newHashMap();
         if(null == makeUpCourseParam || null ==makeUpCourseParam.getWorkOrderIds()|| makeUpCourseParam.getWorkOrderIds().length<1){
             logger.info("::fishcardConfirmStatusRecharge1::");
@@ -267,8 +268,8 @@ public class MakeUpLessionServiceX {
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
 
-            if(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode() != wo.getStatusRecharge()){
-                logger.info("::fishcardConfirmStatusRecharge3::");
+            if(FishCardChargebackStatusEnum.RECHARGBACKING.getCode() != wo.getStatusRecharge()){
+                logger.info("::fishcardConfirmStatusRecharge3::1[{}]::2[{}]",FishCardChargebackStatusEnum.RECHARGBACKING.getCode(),wo.getStatusRecharge());
                 resultMap.put("3","请核实鱼卡信息,鱼卡退款状态有不符合标准退款流程,请合适数据!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }

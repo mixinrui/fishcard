@@ -73,7 +73,11 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
 
 
         if(null !=fishCardFilterParam.getConfirmFlag()){
-            sql.append(" and wo.confirmFlag=:confirmFlag ");
+            if("1".equals(fishCardFilterParam.getConfirmFlag())){
+                sql.append(" and (wo.confirmFlag=:confirmFlag or wo.confirmFlag !='0' )  ");
+            }else {
+                sql.append(" and wo.confirmFlag=:confirmFlag ");
+            }
         }
 
         if("before".equals(fishCardFilterParam.getRechargeType())){
