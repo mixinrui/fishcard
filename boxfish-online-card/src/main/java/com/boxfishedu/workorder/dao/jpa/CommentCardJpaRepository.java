@@ -53,8 +53,7 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
      * @param status
      * @return
      */
-    //@Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=?3 and c.assignTeacherCount = 2")
-    @Query("select c from CommentCard c where c.studentAskTime >?1 and c.status<=?3 and c.assignTeacherCount = 2")
+    @Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=?3 and c.assignTeacherCount = 2")
     List<CommentCard> findByDateRangeAndStatus2(Date from, Date to, Integer status);
 
     /**
