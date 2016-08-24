@@ -55,7 +55,7 @@ public class CourseNotifyOneDayServiceX {
         try {
 
             logger.info("notiFyStudentClass:::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", studentHasClassMap == null ? 0 : studentHasClassMap.size());
-            logger.info("notiFyStudentClass:::::::::sendToTeahcerInfo [{}]::::::::::::::::::::::::::::::::", studentHasClassMap);
+            logger.info("notiFyStudentClass:::::::::sendToStudentInfo [{}]::::::::::::::::::::::::::::::::", studentHasClassMap);
 
         }catch (Exception e){
             logger.error("lazyLoadError");
