@@ -268,7 +268,7 @@ public class MakeUpLessionServiceX {
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
 
-            if(FishCardChargebackStatusEnum.RECHARGBACKING.getCode() != wo.getStatusRecharge()){
+            if(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode() != wo.getStatusRecharge()){
                 logger.info("::fishcardConfirmStatusRecharge3::1[{}]::2[{}]",FishCardChargebackStatusEnum.RECHARGBACKING.getCode(),wo.getStatusRecharge());
                 resultMap.put("3","请核实鱼卡信息,鱼卡退款状态有不符合标准退款流程,请合适数据!");
                 return JsonResultModel.newJsonResultModel(resultMap);
