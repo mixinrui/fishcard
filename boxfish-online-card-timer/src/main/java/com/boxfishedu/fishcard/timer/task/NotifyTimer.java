@@ -192,4 +192,18 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
+
+
+    /**
+     * 通知学生明天 有几节课
+     */
+    @Scheduled(cron = "0 30 18 * * ?")
+    public void notifyTomoStudentHasClass() {
+        logger.info("<<<<<<notifyTomoStudentHasClass<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<开始通知<<<学生明天有课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.CLASSS_TOMO_STU_NOTIFY.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
 }
