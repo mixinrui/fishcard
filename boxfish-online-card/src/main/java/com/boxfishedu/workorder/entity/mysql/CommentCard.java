@@ -128,6 +128,8 @@ public class CommentCard {
         commentCard.setCourseId(commentCardForm.getCourseId());
         commentCard.setCourseName(commentCardForm.getCourseName());
         commentCard.setCover(commentCardForm.getCover());
+        commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
+        commentCard.setVoiceTime(commentCardForm.getVoiceTime());
         return commentCard;
     }
 

@@ -13,10 +13,6 @@ public interface CommentCardJpaRepositoryCustom {
 
     public Page<CommentCard> queryCommentCardList(Pageable pageable,Long studentId);
 
-    public List<CommentCard> queryCommentNoAnswerList();
-
-    public List<CommentCard> queryCommentNoAnswerList2();
-
     public Page<CommentCard> queryTeacherAnsweredList(Pageable pageable,Long teacherId);
 
     public Page<CommentCard> queryTeacherUnAnsweredList(Pageable pageable,Long teacherId);

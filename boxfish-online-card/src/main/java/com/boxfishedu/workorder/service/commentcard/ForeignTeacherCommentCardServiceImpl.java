@@ -61,19 +61,16 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
         if(service.getAmount() <= 0){
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
-        }
-        else {
+        }else {
             service.setAmount(service.getAmount() - 1);
             updateCommentAmount(service);
             commentCard.setStudentId(userId);
             commentCard.setService(service);
             commentCard.setOrderId(service.getOrderId());
             commentCard.setOrderCode(service.getOrderCode());
-            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
-            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
             commentCard.setStudentPicturePath(getUserPicture(access_token));
         }
-        logger.info("调用外教点评接口新增学生问题,其中"+commentCard);
+        logger.info("调用外教点评接口新增学生点评卡,其中"+commentCard);
         Date dateNow = new Date();
         commentCard.setStudentAskTime(dateNow);
         commentCard.setCreateTime(dateNow);
