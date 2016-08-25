@@ -18,6 +18,8 @@ public class DateUtil {
 
     public final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    public final static DateTimeFormatter dateFormatterChinese = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
+
     public final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public final static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -122,6 +124,12 @@ public class DateUtil {
     public static String Date2String(Date date) throws RuntimeException {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
+
+
+    public static String Date2StringChinese(Date date) throws RuntimeException {
+        return new SimpleDateFormat("yyyy年MM月dd日").format(date);
+    }
+
 
 
     public static String Date2String24(Date date) throws RuntimeException {

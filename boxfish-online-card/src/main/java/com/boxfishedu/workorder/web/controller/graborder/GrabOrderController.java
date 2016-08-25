@@ -3,8 +3,10 @@ package com.boxfishedu.workorder.web.controller.graborder;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
+import com.boxfishedu.workorder.servicex.fishcardcenter.MakeUpLessionServiceX;
 import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
@@ -42,9 +44,33 @@ public class GrabOrderController {
     @Autowired
     private CourseNotifyOneDayServiceX courseNotifyOneDayServiceX;
 
+
+    @Autowired
+    private  WorkOrderService  workOrderService;
+
+    @Autowired
+    private MakeUpLessionServiceX makeUpLessionServiceX;
+
+    @RequestMapping(value = "/meilin", method = RequestMethod.GET)
+    public JsonResultModel meilin() {
+        GrabOrderView grabOrderView = new GrabOrderView();
+        grabOrderView.setTeacherId(1978718L);
+        grabOrderView.setWorkOrderId(13836L);
+        grabOrderServiceX.checkIfCanGrabOrderByOnlineTeacherGetTeacherName(grabOrderView);
+        return new JsonResultModel();
+    }
+
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
     public JsonResultModel tomonotify() {
         courseNotifyOneDayServiceX.notiFyStudentClass();
+
+
+        // 退款发送消息测试
+        Long[]  woid = {14050L,14269L};
+        List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(woid);
+        for(WorkOrder wo:workOrders){
+            makeUpLessionServiceX.sendMessageRefund(wo);
+        }
         return new JsonResultModel();
     }
     /**
