@@ -61,19 +61,16 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
         if(service.getAmount() <= 0){
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
-        }
-        else {
+        }else {
             service.setAmount(service.getAmount() - 1);
             updateCommentAmount(service);
             commentCard.setStudentId(userId);
             commentCard.setService(service);
             commentCard.setOrderId(service.getOrderId());
             commentCard.setOrderCode(service.getOrderCode());
-            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
-            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
             commentCard.setStudentPicturePath(getUserPicture(access_token));
         }
-        logger.info("调用外教点评接口新增学生问题,其中"+commentCard);
+        logger.info("调用外教点评接口新增学生点评卡,其中"+commentCard);
         Date dateNow = new Date();
         commentCard.setStudentAskTime(dateNow);
         commentCard.setCreateTime(dateNow);
@@ -184,7 +181,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
                 logger.info("调用师生运营接口结果",jsonResultModel);
                 logger.info("向老师端推送消息,告知其点评超时......");
-                String info = "您"+commentCard.getAssignTeacherTime().toString()+"的点评订单,超时未点评,超过2次未点评将取消点评资格。[知道了]";
+                String info = "You have not assessed the answer at "+commentCard.getAssignTeacherTime().toString()+", in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
+                        "GET IT";
                 JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(commentCard.getTeacherId().toString()),info,"FOREIGNCOMMENT");
                 logger.info("向老师端推送消息结果"+pushResult);
                 CommentCard oldCommentCard = commentCardJpaRepository.save(commentCard);
