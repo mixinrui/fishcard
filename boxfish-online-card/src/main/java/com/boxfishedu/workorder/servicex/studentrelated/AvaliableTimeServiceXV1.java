@@ -80,7 +80,8 @@ public class AvaliableTimeServiceXV1 {
         List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(dayTimeSlots, (localDateTime, d) -> {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
-            DayTimeSlots result = timeLimitPolicy.limit(clone);
+            //获取时间片范围内的数据
+            DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
             //随机显示热点时间片
             result=randomSlotFilterService.removeExculdeSlot(result,avaliableTimeParam);
             result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
