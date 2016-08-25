@@ -88,8 +88,7 @@ public class TeacherAppRelatedController {
                                                    @RequestParam(required = false)
                                                    @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         commonServeServiceX.checkToken(teacherId, userId);
-//        return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(teacherStudentRequester.dayTimeSlotsTemplate(teacherId, date)));
-        return JsonResultModel.newJsonResultModel(randomSlotFilterService.removeSlotsNotInRange(teacherStudentRequester.dayTimeSlotsTemplate(teacherId, date),teacherId));
+        return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(teacherStudentRequester.dayTimeSlotsTemplate(teacherId, date)));
     }
 
     @RequestMapping(value = "international/{teacherId}/timeSlots/template", method = RequestMethod.GET)

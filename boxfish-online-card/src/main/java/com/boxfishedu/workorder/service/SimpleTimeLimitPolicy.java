@@ -30,7 +30,7 @@ public class SimpleTimeLimitPolicy implements TimeLimitPolicy {
         dayTimeRange = new TimeRange[7];
         for(int i = 0; i< 7; i++) {
             if(i == 0 || i == 6) {
-                dayTimeRange[i] = new TimeRange(7, 24);
+                dayTimeRange[i] = new TimeRange(9, 24);
             } else {
                 dayTimeRange[i] = new TimeRange(19, 24);
             }
