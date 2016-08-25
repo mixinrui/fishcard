@@ -181,7 +181,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
                 logger.info("调用师生运营接口结果",jsonResultModel);
                 logger.info("向老师端推送消息,告知其点评超时......");
-                String info = "您"+commentCard.getAssignTeacherTime().toString()+"的点评订单,超时未点评,超过2次未点评将取消点评资格。[知道了]";
+                String info = "You have not assessed the answer at "+commentCard.getAssignTeacherTime().toString()+", in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
+                        "GET IT";
                 JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(commentCard.getTeacherId().toString()),info,"FOREIGNCOMMENT");
                 logger.info("向老师端推送消息结果"+pushResult);
                 CommentCard oldCommentCard = commentCardJpaRepository.save(commentCard);
