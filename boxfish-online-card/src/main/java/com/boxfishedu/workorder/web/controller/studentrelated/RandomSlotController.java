@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.dao.mongo.TimeLimitRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,12 @@ public class RandomSlotController {
             timeLimitRules1.setFrom("19:00:00");
             timeLimitRules1.setTo("19:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.MUTEX.toString());
+
+            TimeLimitRules timeLimitRules2=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules2);
+            timeLimitRules2.setComboType("EXCHANGE");
+
+            timeLimitRulesMorphiaRepository.save(timeLimitRules2);
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
         }
 
@@ -42,6 +49,12 @@ public class RandomSlotController {
             timeLimitRules1.setFrom("20:00:00");
             timeLimitRules1.setTo("20:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.MUTEX.toString());
+
+            TimeLimitRules timeLimitRules2=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules2);
+            timeLimitRules2.setComboType("EXCHANGE");
+
+            timeLimitRulesMorphiaRepository.save(timeLimitRules2);
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
         }
 
@@ -52,6 +65,12 @@ public class RandomSlotController {
             timeLimitRules1.setFrom("21:00:00");
             timeLimitRules1.setTo("21:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.MUTEX.toString());
+
+            TimeLimitRules timeLimitRules2=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules2);
+            timeLimitRules2.setComboType("EXCHANGE");
+
+            timeLimitRulesMorphiaRepository.save(timeLimitRules2);
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
         }
 
@@ -68,6 +87,12 @@ public class RandomSlotController {
             timeLimitRules1.setFrom("09:00:00");
             timeLimitRules1.setTo("09:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.MUTEX.toString());
+
+            TimeLimitRules timeLimitRules2=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules2);
+            timeLimitRules2.setComboType("EXCHANGE");
+
+            timeLimitRulesMorphiaRepository.save(timeLimitRules2);
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
         }
 
@@ -82,6 +107,12 @@ public class RandomSlotController {
             timeLimitRules1.setFrom("10:00:00");
             timeLimitRules1.setTo("10:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.MUTEX.toString());
+
+            TimeLimitRules timeLimitRules2=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules2);
+            timeLimitRules2.setComboType("EXCHANGE");
+
+            timeLimitRulesMorphiaRepository.save(timeLimitRules2);
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
         }
         return JsonResultModel.newJsonResultModel("ok");
@@ -106,6 +137,12 @@ public class RandomSlotController {
             timeLimitRules1.setLimitMini("19:00:00");
             timeLimitRules1.setLimitMax("23:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.RANGE.toString());
+
+            TimeLimitRules timeLimitRules2=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules2);
+            timeLimitRules2.setComboType("EXCHANGE");
+            timeLimitRulesMorphiaRepository.save(timeLimitRules2);
+
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
         }
 
@@ -117,8 +154,15 @@ public class RandomSlotController {
             timeLimitRules1.setLimitMini("09:00:00");
             timeLimitRules1.setLimitMax("23:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.RANGE.toString());
-            timeLimitRulesMorphiaRepository.save(timeLimitRules1);
 
+            TimeLimitRules timeLimitRules2 = new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1, timeLimitRules2);
+            timeLimitRules2.setComboType("EXCHANGE");
+            timeLimitRulesMorphiaRepository.save(timeLimitRules2);
+
+            timeLimitRulesMorphiaRepository.save(timeLimitRules1);
+        }
+        {
             //周日
             TimeLimitRules timeLimitRules2 = new TimeLimitRules();
             timeLimitRules2.setComboType("OVERALL");
@@ -126,6 +170,12 @@ public class RandomSlotController {
             timeLimitRules2.setLimitMini("09:00:00");
             timeLimitRules2.setLimitMax("23:55:00");
             timeLimitRules2.setRule(SlotRuleEnum.RANGE.toString());
+
+            TimeLimitRules timeLimitRules3 = new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules2, timeLimitRules3);
+            timeLimitRules3.setComboType("EXCHANGE");
+            timeLimitRulesMorphiaRepository.save(timeLimitRules3);
+
             timeLimitRulesMorphiaRepository.save(timeLimitRules2);
         }
 
