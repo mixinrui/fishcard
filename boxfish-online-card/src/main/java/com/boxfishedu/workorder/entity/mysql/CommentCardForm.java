@@ -15,7 +15,7 @@ public class CommentCardForm {
     private String cover;
     private String askVoicePath;
     private Long voiceTime;
-    private String teacherName;
+
     private String answerVideoPath;
 
     //测试用数据
