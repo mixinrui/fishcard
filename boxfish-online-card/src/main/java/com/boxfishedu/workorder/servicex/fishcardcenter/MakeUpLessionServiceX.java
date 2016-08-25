@@ -419,10 +419,10 @@ public class MakeUpLessionServiceX {
                                   +DateUtil.Date2StringChinese(wo.getStartTime())+  // 开始时间
                               WorkOrderConstant.SEND_STU_CLASS_REFUND_TWO
                                   + wo.getCourseName() +                            // 课程名
-                              WorkOrderConstant.SEND_STU_CLASS_REFUND_TWO
+                              WorkOrderConstant.SEND_STU_CLASS_REFUND_THREE
                                   + reason +                                        // 原因
-                              WorkOrderConstant.SEND_STU_CLASS_REFUND_THREE;
-
+                              WorkOrderConstant.SEND_STU_CLASS_REFUND_FOUR;
+        logger.info("sendMessageRefund title [{}] ,reason [{}]",pushTitle,reason);
             Map map1 = Maps.newHashMap();
             map1.put("user_id", wo.getStudentId());
             map1.put("push_title", pushTitle);

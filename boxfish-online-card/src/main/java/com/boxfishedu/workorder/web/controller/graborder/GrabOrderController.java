@@ -51,14 +51,7 @@ public class GrabOrderController {
     @Autowired
     private MakeUpLessionServiceX makeUpLessionServiceX;
 
-    @RequestMapping(value = "/meilin", method = RequestMethod.GET)
-    public JsonResultModel meilin() {
-        GrabOrderView grabOrderView = new GrabOrderView();
-        grabOrderView.setTeacherId(1978718L);
-        grabOrderView.setWorkOrderId(13836L);
-        grabOrderServiceX.checkIfCanGrabOrderByOnlineTeacherGetTeacherName(grabOrderView);
-        return new JsonResultModel();
-    }
+
 
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
     public JsonResultModel tomonotify() {
