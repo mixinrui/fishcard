@@ -110,6 +110,24 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         return result;
     }
 
+
+    /**
+     * 通知未来一天通知 学生有课
+     * @return
+     */
+    public List<WorkOrder> getCardsStudentNotifyClass(){
+        Date date=new Date();
+
+        Date startDate= DateUtil.parseTime(   DateUtil.getBeforeDays(date,-1),0);
+        Date endDate=DateUtil.parseTime( DateUtil.getBeforeDays(date,-1) ,1);
+        logger.debug("@query db开始从数据库查询[[[需要课前通知上课的学生]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
+                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
+        return result;
+    }
+
+
+
     public MessageProperties getMsgProperties(Date date, FishCardDelayMsgType fishCardDelayMsgType){
         MessageProperties messageProperties = new MessageProperties();
         Calendar calendar = Calendar.getInstance();

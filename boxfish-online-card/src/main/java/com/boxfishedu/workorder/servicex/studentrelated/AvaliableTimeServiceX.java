@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
@@ -43,6 +44,9 @@ public class AvaliableTimeServiceX {
     @Autowired
     private WorkOrderService workOrderService;
 
+    @Autowired
+    private RandomSlotFilterService randomSlotFilterService;
+
     /**
      * 免费体验的天数
      */
@@ -72,7 +76,11 @@ public class AvaliableTimeServiceX {
         List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(dayTimeSlots, (localDateTime, d) -> {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
-            DayTimeSlots result = timeLimitPolicy.limit(clone);
+//            DayTimeSlots result = timeLimitPolicy.limit(clone);
+            //获取时间片范围内的数据
+            DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
+            //随机显示热点时间片
+            result=randomSlotFilterService.removeExculdeSlot(result,avaliableTimeParam);
             result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
                     .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
                     .collect(Collectors.toList()));

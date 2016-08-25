@@ -260,6 +260,12 @@ public class DateUtil {
         return new DateRangeForm(from, to);
     }
 
+    public static int getDayOfWeek(Date dt){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dt);
+        return cal.get(Calendar.DAY_OF_WEEK) - 1;
+    }
+
 
     /**
      * 当前时间 加 几分钟

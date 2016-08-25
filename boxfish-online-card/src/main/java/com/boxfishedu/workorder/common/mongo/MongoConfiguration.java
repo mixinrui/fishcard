@@ -1,9 +1,6 @@
 package com.boxfishedu.workorder.common.mongo;
 
-import com.boxfishedu.workorder.entity.mongo.CommentCardLog;
-import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
-import com.boxfishedu.workorder.entity.mongo.TrialCourse;
-import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.entity.mongo.*;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.mongodb.*;
 import org.mongodb.morphia.Datastore;
@@ -78,6 +75,7 @@ public class MongoConfiguration {
         morphia.map(WorkOrderLog.class);
         morphia.map(ScheduleCourseInfo.class);
         morphia.map(TrialCourse.class);
+        morphia.map(TimeLimitRules.class);
         Datastore datastore = morphia.createDatastore(mongoClient(),mongoProperties.getDbName());
         datastore.ensureIndexes();
         return  datastore;
