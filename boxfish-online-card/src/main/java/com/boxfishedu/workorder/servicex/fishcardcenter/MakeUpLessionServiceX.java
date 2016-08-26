@@ -31,6 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -381,8 +382,8 @@ public class MakeUpLessionServiceX {
         for(WorkOrder wo:workOrders){
             JSONObject jsinner =new JSONObject();
             jsinner.put("workOrderId",wo.getId());
-            jsinner.put("skuId","??????????skuid待定???????");
-            jsinner.put("orderType","???????订单类型待定?????????");
+            jsinner.put("skuId",wo.getSkuId());
+            jsinner.put("orderType",wo.getOrderChannel());
             jsinner.put("courseType",wo.getCourseType());
             jsinner.put("reason",FishCardStatusEnum.get(wo.getStatus()).getDesc());
             jsonArray.add(jsinner);
@@ -418,7 +419,7 @@ public class MakeUpLessionServiceX {
         String pushTitle = WorkOrderConstant.SEND_STU_CLASS_REFUND_ONE
                                   +DateUtil.Date2StringChinese(wo.getStartTime())+  // 开始时间
                               WorkOrderConstant.SEND_STU_CLASS_REFUND_TWO
-                                  + wo.getCourseName() +                            // 课程名
+                                  + trimTitle(wo.getCourseName()) +                            // 课程名
                               WorkOrderConstant.SEND_STU_CLASS_REFUND_THREE
                                   + reason +                                        // 原因
                               WorkOrderConstant.SEND_STU_CLASS_REFUND_FOUR;
@@ -439,6 +440,23 @@ public class MakeUpLessionServiceX {
         logger.info("sendMessageRefund::end");
 
 
+    }
+
+
+    /**
+     * 对课程名进行截取
+     * @param title
+     * @return
+     */
+    private String trimTitle(String title){
+        if(StringUtils.isEmpty(title)){
+            return "";
+        }
+        int len = title.length();
+        if(len>60  ||  (len>50 && len<60)){
+            return (title.substring(0,50)+"...");
+        }
+        return title;
     }
 
 
