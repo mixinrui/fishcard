@@ -54,9 +54,10 @@ public class GrabOrderController {
 
 
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
-    public JsonResultModel tomonotify() {
+    public JsonResultModel tomonotify()throws Exception {
         courseNotifyOneDayServiceX.notiFyStudentClass();
 
+        Thread.sleep(2000);
 
         // 退款发送消息测试
         Long[]  woid = {14050L,14269L};
