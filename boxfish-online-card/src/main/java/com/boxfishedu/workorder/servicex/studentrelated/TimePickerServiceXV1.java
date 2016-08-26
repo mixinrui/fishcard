@@ -102,6 +102,10 @@ public class TimePickerServiceXV1 {
 
         //根据订单id,type获取对应的服务
         List<Service> serviceList = ensureConvertOver(timeSlotParam);
+
+        // 验证service权限
+        serviceList.forEach(s -> s.authentication(timeSlotParam.getStudentId()));
+
         // 获取选课策略,每周选几次,持续几周
         WeekStrategy weekStrategy = getWeekStrategy(timeSlotParam, serviceList);
         // 验证service
@@ -134,7 +138,6 @@ public class TimePickerServiceXV1 {
         return JsonResultModel.newJsonResultModel();
     }
 
-
     private void checkUniqueCourseSchedules(Set<String> classDateTimeSlotsList, List<SelectedTime> selectedTimes) {
         for(SelectedTime selectedTime : selectedTimes) {
             checkUniqueCourseSchedule(
@@ -156,7 +159,6 @@ public class TimePickerServiceXV1 {
             throw new BusinessException(exceptionProducer.get());
         }
     }
-
 
     private void validateTimeSlotParam(TimeSlotParam timeSlotParam, WeekStrategy weekStrategy, List<Service> services) {
         List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();

@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.param;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.List;
@@ -14,6 +15,8 @@ public class TimeSlotParam {
     private Integer productType;
     private String tutorType;
     private String comboType;
+    @JsonIgnore
+    private Long studentId;
     private List<SelectedTime> selectedTimes;
 
     public ComboTypeToRoleId getComboTypeEnum() {

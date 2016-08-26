@@ -95,6 +95,9 @@ public class TimePickerServiceX {
         //根据订单id,type获取对应的服务
         Service service = ensureConvertOver(timeSlotParam);
 
+        // 操作权限认证,防止非法的访问
+        service.authentication(timeSlotParam.getStudentId());
+
         validateTimeSlotParam(timeSlotParam,service);
 
         // 返回学生当前选择的课程日期和时间片

@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,6 +9,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -124,5 +126,11 @@ public class Service {
      */
     @Column(name = "teaching_type", nullable = true)
     private Integer teachingType;
+
+    public void authentication(Long userId) {
+        if(!Objects.equals(studentId, userId)) {
+            throw new BusinessException("非法用户,拒绝访问!");
+        }
+    }
 
 }

@@ -40,7 +40,8 @@ StudentAppRelatedController {
      * TODO:1.获取课程的接口为假数据 2.获取教师的时候需要根据coursetype把外教区分出来,并且体现到workorder和course_schedule的冗余表里
      */
     @RequestMapping(value = "/v1/workorders", method = RequestMethod.POST)
-    public JsonResultModel ensureCourseTimesV1(@RequestBody TimeSlotParam timeSlotParam) {
+    public JsonResultModel ensureCourseTimesV1(@RequestBody TimeSlotParam timeSlotParam, Long userId) {
+        timeSlotParam.setStudentId(userId);
         JsonResultModel jsonResultModel= timePickerServiceXV1.ensureCourseTimes(timeSlotParam);
         return jsonResultModel;
     }
@@ -90,7 +91,8 @@ StudentAppRelatedController {
 
     /***********************兼容历史版本***************************/
     @RequestMapping(value = "/workorders", method = RequestMethod.POST)
-    public JsonResultModel ensureCourseTimes(@RequestBody TimeSlotParam timeSlotParam) {
+    public JsonResultModel ensureCourseTimes(@RequestBody TimeSlotParam timeSlotParam, Long userId) {
+        timeSlotParam.setStudentId(userId);
         JsonResultModel jsonResultModel= timePickerServiceX.ensureCourseTimes(timeSlotParam);
         return jsonResultModel;
     }
