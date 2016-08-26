@@ -80,10 +80,5 @@ public class ForeignTeacherCommentController {
     public JsonResultModel testQueryAll(Pageable pageable){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
-
-    //测试获取内部账号
-    @RequestMapping(value = "/test_get_inner_teacher_id", method = RequestMethod.GET)
-    public JsonResultModel getInnerTeacherId(){
-        return commentCardSDK.getInnerTeacherId();
-    }
+    
 }
