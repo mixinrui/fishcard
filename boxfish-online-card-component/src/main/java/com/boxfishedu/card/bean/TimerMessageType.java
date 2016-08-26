@@ -27,8 +27,10 @@ public enum TimerMessageType {
     GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH(101),
 
     //每天6点向老师发送课程变化的消息
-    COURSE_CHANGER_WORKORDER(102);
+    COURSE_CHANGER_WORKORDER(102),
 
+    //每天6:30点向学生发送明天有几节课
+    CLASSS_TOMO_STU_NOTIFY(105);
 
     private int code;
 

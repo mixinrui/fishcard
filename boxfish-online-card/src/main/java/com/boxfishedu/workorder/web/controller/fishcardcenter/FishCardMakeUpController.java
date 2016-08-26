@@ -1,11 +1,19 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
+import com.boxfishedu.workorder.common.login.TokenUtils;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.servicex.fishcardcenter.MakeUpLessionPickerServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.MakeUpLessionServiceX;
 import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by hucl on 16/6/17.
@@ -14,11 +22,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/backend/makeup")
 public class FishCardMakeUpController {
+    //本地异常日志记录对象
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     private MakeUpLessionPickerServiceX makeUpLessionPickerServiceX;
 
     @Autowired
     private MakeUpLessionServiceX makeUpLessionServiceX;
+
+    @Autowired
+    private TokenUtils tokenUtils;
 
 
     /**
@@ -46,15 +60,15 @@ public class FishCardMakeUpController {
         return makeUpLessionServiceX.fishcardStatusChange(makeUpCourseParam);
     }
 
-//    /**
-//     * 批量确认鱼卡  确认状态
-//     * @param makeUpCourseParam
-//     * @return    ============>详见  FishCardMakeUpRechargeController
-//     */
-//    @RequestMapping(value = "/fishcard/confirmstatus/change", method = RequestMethod.POST)
-//    public JsonResultModel fishcardConfirmStatusChange(@RequestBody MakeUpCourseParam makeUpCourseParam){
-//        return makeUpLessionServiceX.fishcardStatusRechargeChange(makeUpCourseParam);
-//    }
+    /**
+     * 批量确认鱼卡  确认状态
+     * @param makeUpCourseParam
+     * @return
+     */
+    @RequestMapping(value = "/fishcard/confirmstatus/change", method = RequestMethod.POST)
+    public JsonResultModel fishcardConfirmStatusChange(@RequestBody MakeUpCourseParam makeUpCourseParam){
+        return makeUpLessionServiceX.fishcardStatusRechargeChange(makeUpCourseParam);
+    }
 
 
     /**
@@ -63,20 +77,33 @@ public class FishCardMakeUpController {
      * @return
      */
     @RequestMapping(value = "/fishcard/confirm/recharge", method = RequestMethod.POST)
-    public JsonResultModel fishcardConfirmStatusRecharge(@RequestBody MakeUpCourseParam makeUpCourseParam){
+    public JsonResultModel fishcardConfirmStatusRecharge(@RequestBody MakeUpCourseParam makeUpCourseParam)throws Exception{
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String token = request.getParameter("token");
+
+        if(StringUtils.isEmpty(token)){
+            logger.info("fishcardConfirmStatusRecharge1 用户无权操作该功能");
+            return JsonResultModel.newJsonResultModel("fishcardConfirmStatusRecharge1 用户名无权操作该功能");
+        }
+
+        String  userName = tokenUtils.getUserName(token);
+        if(StringUtils.isEmpty(userName) || !userName.toLowerCase().endsWith("refund")){
+            logger.info("fishcardConfirmStatusRecharge2 用户无权操作该功能");
+            return JsonResultModel.newJsonResultModel("fishcardConfirmStatusRecharge2 用户名无权操作该功能");
+        }
         return makeUpLessionServiceX.fishcardConfirmStatusRecharge(makeUpCourseParam);
     }
 
 
-    /**
-     * 订单系统调用http方式进行退款状态回馈
-     * @param makeUpCourseParam
-     * @return
-     */
-    @RequestMapping(value = "/fishcard/laststate/change", method = RequestMethod.POST)
-    public JsonResultModel fixedStateFromOrder(@RequestBody MakeUpCourseParam makeUpCourseParam){
-        return makeUpLessionServiceX.fixedStateFromOrder(makeUpCourseParam);
-    }
+//    /**
+//     * 订单系统调用http方式进行退款状态回馈
+//     * @param makeUpCourseParam  ============>详见  FishCardMakeUpRechargeController
+//     * @return
+//     */
+//    @RequestMapping(value = "/fishcard/laststate/change", method = RequestMethod.POST)
+//    public JsonResultModel fixedStateFromOrder(@RequestBody MakeUpCourseParam makeUpCourseParam){
+//        return makeUpLessionServiceX.fixedStateFromOrder(makeUpCourseParam);
+//    }
 
 
 }

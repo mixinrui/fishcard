@@ -10,6 +10,8 @@ public class GrabOrderView {
 
     private Long teacherId;
 
+    private String teacherName;
+
     private Long workOrderId;
 
     private Integer state;

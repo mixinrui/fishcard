@@ -102,8 +102,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     // 抢单之后,给课程匹配相应的老师
     @Modifying
-    @Query("update WorkOrder o set o.teacherId = ?1 ,o.status = ?2 ,updateTime=current_timestamp ,assignTeacherTime=current_timestamp   where o.id = ?3 and o.teacherId = ?4")
-    int setFixedTeacherIdAndStatusFor(Long teacherId ,Integer status, Long workorderId , Long teacherIdZero );
+    @Query("update WorkOrder o set o.teacherName= ?1 ,o.teacherId = ?2 ,o.status = ?3 ,updateTime=current_timestamp ,assignTeacherTime=current_timestamp   where o.id = ?4 and o.teacherId = ?5")
+    int setFixedTeacherIdAndStatusFor(String teacherName,Long teacherId ,Integer status, Long workorderId , Long teacherIdZero );
 
 
     @Query("select wo from WorkOrder wo where wo.id in (?1) ")

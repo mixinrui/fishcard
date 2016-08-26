@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
@@ -64,6 +65,9 @@ public class RabbitMqReciver {
 
     @Autowired
     private CourseChangeServiceX courseChangeServiceX;
+
+    @Autowired
+    private CourseNotifyOneDayServiceX courseNotifyOneDayServiceX;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -155,7 +159,11 @@ public class RabbitMqReciver {
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
                 foreignTeacherCommentCardService.foreignUndistributedTeacherCommentCards();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.CLASSS_TOMO_STU_NOTIFY.value()){
+                logger.info("=========>receiveMessageTomoStuhasClass");
+                courseNotifyOneDayServiceX.notiFyStudentClass();
             }
+
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);
@@ -190,12 +198,13 @@ public class RabbitMqReciver {
      */
     @RabbitListener(queues = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE)
     public void assignForeignTeacher(String param) {
-        if(param == null){
-            throw new AmqpRejectAndDontRequeueException("param 为 null!");
+        try{
+            FromTeacherStudentForm fromTeacherStudentForm = JSONParser.fromJson(param,FromTeacherStudentForm.class);
+            foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
+            logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
+        }catch (Exception e){
+            logger.info("@assignForeignTeacher接收外教点评分配老师失败!");
         }
-        FromTeacherStudentForm fromTeacherStudentForm = JSONParser.fromJson(param,FromTeacherStudentForm.class);
-        foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
-        logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
     }
 
     /**
@@ -203,16 +212,16 @@ public class RabbitMqReciver {
      */
     @RabbitListener(queues = RabbitMqConstant.UPDATE_PICTURE_QUEUE)
     public void updateCommentCardsPictures(String param){
-        if(param == null){
-            logger.info("接收头像更新通知,接收参数为:"+param);
-            throw new AmqpRejectAndDontRequeueException("param 为 null!");
-        }
-        UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
-        if(updatePicturesForm.getFigure_url().isEmpty()){
-            throw new AmqpRejectAndDontRequeueException("param 为 null!");
-        }else {
-            foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
-            logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
+        try{
+            UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
+            if(updatePicturesForm.getFigure_url().isEmpty()){
+                throw new AmqpRejectAndDontRequeueException("param 为 null!");
+            }else {
+                foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
+                logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
+            }
+        }catch (Exception e){
+            logger.info("接收头像更新通知,但跟新失败!");
         }
     }
 

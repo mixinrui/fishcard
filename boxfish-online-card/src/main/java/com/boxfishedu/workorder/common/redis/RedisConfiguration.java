@@ -82,6 +82,7 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         expires.put("timeSlots", 3600 * 2L);
         expires.put(DayTimeSlots.CACHE_KEY, 3600 * 2L);
         expires.put(CacheKeyConstant.NOTIFY_TEACHEZr_PREPARE_CLASS_KEY,60*10l);
+        expires.put(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY,3600*24L);
         //  鱼卡后台 用户信息永久有效
         expires.put(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO,3600 * 24 * 30 *12 * 15L);
         expires.put(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY,60*10l);

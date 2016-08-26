@@ -13,7 +13,14 @@ public enum MessagePushTypeEnum {
 
 
     //当天新匹配课程消息推送
-    NEW_COURSES_ASSIGNED_DAILY("NEW_COURSES_ASSIGNED_DAILY");
+    NEW_COURSES_ASSIGNED_DAILY("NEW_COURSES_ASSIGNED_DAILY"),
+
+    // 向学生发送 明天有几节课准备上课
+    SEND_STUDENT_CLASS_TOMO_TYPE("SEND_STUDENT_CLASS_TOMO_TYPE"),
+
+
+    // 退款成功 消息推送
+    SEND_STUDENT_CLASS_REFUND_TYPE("SEND_STUDENT_CLASS_REFUND_TYPE");
 
     private String value;
 

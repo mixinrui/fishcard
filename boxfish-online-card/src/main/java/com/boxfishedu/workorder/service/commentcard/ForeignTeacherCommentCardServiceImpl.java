@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
+import com.boxfishedu.workorder.common.util.SimpleDateUtil;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
@@ -24,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by ansel on 16/7/18.
@@ -64,19 +62,16 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
         if(service.getAmount() <= 0){
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
-        }
-        else {
+        }else {
             service.setAmount(service.getAmount() - 1);
             updateCommentAmount(service);
             commentCard.setStudentId(userId);
             commentCard.setService(service);
             commentCard.setOrderId(service.getOrderId());
             commentCard.setOrderCode(service.getOrderCode());
-            commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
-            commentCard.setVoiceTime(commentCardForm.getVoiceTime());
             commentCard.setStudentPicturePath(getUserPicture(access_token));
         }
-        logger.info("调用外教点评接口新增学生问题,其中"+commentCard);
+        logger.info("调用外教点评接口新增学生点评卡,其中"+commentCard);
         Date dateNow = new Date();
         commentCard.setStudentAskTime(dateNow);
         commentCard.setCreateTime(dateNow);
@@ -164,7 +159,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         for (CommentCard commentCard: list) {
             if (StringUtils.isEmpty(commentCard.getTeacherId())){
                 logger.info("超过24小时没有分配到老师,为其分配内部账号,该点评卡id为:"+commentCard.getStudentId());
-                Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId().getData();
+                Map paramMap = new HashMap<>();
+                paramMap.put("fishCardId",commentCard.getId());
+                paramMap.put("studentId",commentCard.getStudentId());
+                paramMap.put("courseId",commentCard.getCourseId());
+                Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
                 commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
                 commentCard.setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode());
                 commentCard.setAssignTeacherTime(updateDate);
@@ -185,7 +184,13 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCard.setUpdateTime(updateDate);
                 logger.info("调用师生运营接口,设置参与该点评卡的外教为旷课......",commentCard);
                 JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
-                logger.info("此外教标注旷课状态情况{}",jsonResultModel);
+                logger.info("调用师生运营接口结果",jsonResultModel);
+                logger.info("向老师端推送消息,告知其点评超时......");
+                String info = "You have not assessed the answer at "+ SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime())+
+                        " on "+ SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime())+",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
+                        "GET IT";
+                JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(commentCard.getTeacherId().toString()),info,"FOREIGNCOMMENT");
+                logger.info("向老师端推送消息结果"+pushResult);
                 CommentCard oldCommentCard = commentCardJpaRepository.save(commentCard);
                 // 克隆点评卡
                 CommentCard temp = oldCommentCard.cloneCommentCard();
@@ -233,8 +238,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         List<CommentCard> list = commentCardJpaRepository.findUndistributedTeacher(
 //                DateUtil.localDate2Date(now.minusDays(1)),
 //                DateUtil.localDate2Date(now.minusDays(0)),
-                DateUtil.localDate2Date(now.minusMinutes(5)),
-                DateUtil.localDate2Date(now.minusMinutes(0)),
+                DateUtil.localDate2Date(now.minusMinutes(20)),
+                DateUtil.localDate2Date(now.minusMinutes(10)),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         for (CommentCard commentCard: list) {
             ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);

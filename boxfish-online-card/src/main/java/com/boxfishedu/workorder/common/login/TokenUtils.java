@@ -263,11 +263,11 @@ public class TokenUtils {
 
 //            TokenUtils des = new TokenUtils();//自定义密钥
 //            System.out.println(des.getPassword("boxfishedu"));
-            String test = "boxfish001_20100911111111";
+            String test = "kz%cHUvri@d*ZGMjm$sOWHG&$pjox";
 
             System.out.println("加密前的字符：" + test);
-            System.out.println("加密后的字符：" + des.encrypt(test));
-            System.out.println("解密后的字符：" + des.decrypt(des.encrypt(test)));
+            System.out.println("加密后的字符：" + des.getPassword(test));
+           // System.out.println("解密后的字符：" + des.decrypt(des.encrypt(test)));
 
             //System.out.println("解密后的字符：" + des.decrypt("202cb962ac59075b964b07152d234b70"));
         } catch (Exception e) {

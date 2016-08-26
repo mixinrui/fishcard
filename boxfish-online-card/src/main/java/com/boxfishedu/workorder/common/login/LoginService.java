@@ -106,6 +106,8 @@ public class LoginService {
              json = JSON.parseObject(userInfo);
              String  redisps = json.get("password").toString();
              if(!ps .equals(redisps)){
+                 logger.info("login1111:[{}]",ps);
+                 logger.info("login1122:[{}]",redisps);
                  flag = false;
                  resultMap.put("code","3");
                  resultMap.put("msg","密码不正确,请重新输入");
