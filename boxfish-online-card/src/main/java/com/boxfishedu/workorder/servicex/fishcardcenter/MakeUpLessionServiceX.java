@@ -4,13 +4,16 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.*;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardMakeUpService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
@@ -28,6 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -64,6 +68,10 @@ public class MakeUpLessionServiceX {
 
     @Autowired
     private RabbitMqSender rabbitMqSender;
+
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
 
 
@@ -324,6 +332,8 @@ public class MakeUpLessionServiceX {
             return JsonResultModel.newJsonResultModel(resultMap);
         }
 
+        logger.info("fixedStateFromOrder::makeUpCourseParam.getWorkOrderIds():::[{}]",makeUpCourseParam.getWorkOrderIds());
+
         List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
 
         if(null==workOrders || workOrders.size()<1){
@@ -342,6 +352,8 @@ public class MakeUpLessionServiceX {
         for(WorkOrder wo:workOrders){
 
            if(successFlag){
+               // 推送成功消息
+               sendMessageRefund(wo);
                wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGEBACK_SUCCESS.getCode());
            }else{
                wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGEBACK_FAILED.getCode());
@@ -370,8 +382,8 @@ public class MakeUpLessionServiceX {
         for(WorkOrder wo:workOrders){
             JSONObject jsinner =new JSONObject();
             jsinner.put("workOrderId",wo.getId());
-            jsinner.put("skuId","??????????skuid待定???????");
-            jsinner.put("orderType","???????订单类型待定?????????");
+            jsinner.put("skuId",wo.getSkuId());
+            jsinner.put("orderType",wo.getOrderChannel());
             jsinner.put("courseType",wo.getCourseType());
             jsinner.put("reason",FishCardStatusEnum.get(wo.getStatus()).getDesc());
             jsonArray.add(jsinner);
@@ -393,6 +405,59 @@ public class MakeUpLessionServiceX {
 
     }
 
+
+    /**
+     * 向学生推送退款消息
+     * @param wo
+     */
+    public void sendMessageRefund(WorkOrder wo){
+        logger.info("sendMessageRefund 退款消息 id [{}]" ,wo.getId());
+
+        logger.info("sendMessageRefund::begin");
+        List list = Lists.newArrayList();
+        String reason = wo.getStatus()==FishCardStatusEnum.EXCEPTION.getCode()?"不可抗力因素":FishCardStatusEnum.get(wo.getStatus()).getDesc();// 描述原因
+        String pushTitle = WorkOrderConstant.SEND_STU_CLASS_REFUND_ONE
+                                  +DateUtil.Date2StringChinese(wo.getStartTime())+  // 开始时间
+                              WorkOrderConstant.SEND_STU_CLASS_REFUND_TWO
+                                  + trimTitle(wo.getCourseName()) +                            // 课程名
+                              WorkOrderConstant.SEND_STU_CLASS_REFUND_THREE
+                                  + reason +                                        // 原因
+                              WorkOrderConstant.SEND_STU_CLASS_REFUND_FOUR;
+        logger.info("sendMessageRefund title [{}] ,reason [{}]",pushTitle,reason);
+            Map map1 = Maps.newHashMap();
+            map1.put("user_id", wo.getStudentId());
+            map1.put("push_title", pushTitle);
+                JSONObject jo = new JSONObject();
+                jo.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_REFUND_TYPE.toString());
+                jo.put("push_title", pushTitle);
+
+            map1.put("data", jo);
+            list.add(map1);
+
+        teacherStudentRequester.pushTeacherListOnlineMsg(list);
+
+
+        logger.info("sendMessageRefund::end");
+
+
+    }
+
+
+    /**
+     * 对课程名进行截取
+     * @param title
+     * @return
+     */
+    private String trimTitle(String title){
+        if(StringUtils.isEmpty(title)){
+            return "";
+        }
+        int len = title.length();
+        if(len>60  ||  (len>50 && len<60)){
+            return (title.substring(0,50)+"...");
+        }
+        return title;
+    }
 
 
 

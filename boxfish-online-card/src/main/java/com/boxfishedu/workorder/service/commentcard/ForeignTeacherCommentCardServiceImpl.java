@@ -159,7 +159,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         for (CommentCard commentCard: list) {
             if (StringUtils.isEmpty(commentCard.getTeacherId())){
                 logger.info("超过24小时没有分配到老师,为其分配内部账号,该点评卡id为:"+commentCard.getStudentId());
-                Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId().getData();
+                Map paramMap = new HashMap<>();
+                paramMap.put("fishCardId",commentCard.getId());
+                paramMap.put("studentId",commentCard.getStudentId());
+                paramMap.put("courseId",commentCard.getCourseId());
+                Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
                 commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
                 commentCard.setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode());
                 commentCard.setAssignTeacherTime(updateDate);
