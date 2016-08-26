@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
+import com.boxfishedu.workorder.common.util.SimpleDateUtil;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
@@ -181,7 +182,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
                 logger.info("调用师生运营接口结果",jsonResultModel);
                 logger.info("向老师端推送消息,告知其点评超时......");
-                String info = "You have not assessed the answer at "+commentCard.getAssignTeacherTime().toString()+", in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
+                String info = "You have not assessed the answer at "+ SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime())+
+                        " on "+ SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime())+",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
                         "GET IT";
                 JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(commentCard.getTeacherId().toString()),info,"FOREIGNCOMMENT");
                 logger.info("向老师端推送消息结果"+pushResult);
