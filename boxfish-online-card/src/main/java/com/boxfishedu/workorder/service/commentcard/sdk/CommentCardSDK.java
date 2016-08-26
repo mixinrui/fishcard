@@ -59,7 +59,7 @@ public class CommentCardSDK {
     }
 
     public JsonResultModel getInnerTeacherId(Map paramMap){
-        return restTemplate.postForObject(createTeacherAbsenceURI(), paramMap,JsonResultModel.class);
+        return restTemplate.postForObject(getInnerTeacherURI(), paramMap,JsonResultModel.class);
     }
 
     private URI createTeacherAbsenceURI(){

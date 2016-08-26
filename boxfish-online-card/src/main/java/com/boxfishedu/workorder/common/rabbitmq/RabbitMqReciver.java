@@ -221,7 +221,7 @@ public class RabbitMqReciver {
                 logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
             }
         }catch (Exception e){
-            logger.info("接收头像更新通知,但跟新失败!");
+            logger.info("接收头像更新通知,但更新失败!");
         }
     }
 
