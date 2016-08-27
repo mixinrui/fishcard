@@ -222,6 +222,17 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setUpdateTime(updateDate);
             com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
             commentCard.setService(serviceTemp);
+
+            logger.info("调用师生运营接口,设置参与该点评卡的外教为旷课......",commentCard);
+            JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
+            logger.info("调用师生运营接口结果",jsonResultModel);
+            logger.info("向老师端推送消息,告知其点评超时......");
+            String info = "You have not assessed the answer at "+ SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime())+
+                    " on "+ SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime())+",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
+                    "GET IT";
+            JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(commentCard.getTeacherId().toString()),info,"FOREIGNCOMMENT");
+            logger.info("向老师端推送消息结果"+pushResult);
+
             commentCardJpaRepository.save(commentCard);
             serviceTemp.setAmount(serviceTemp.getAmount() + 1);
             serviceTemp.setUpdateTime(updateDate);
