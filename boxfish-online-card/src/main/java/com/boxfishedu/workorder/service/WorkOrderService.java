@@ -338,6 +338,15 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
 
+    /**
+     * 用于发起退款请求并发问题
+     * @param
+     * @return
+     */
+    public int updateWorkFishRechargeOne(int rechargeStatus,Long workOrderId){
+        return  jpa.setFixedStatusRechargeFor(rechargeStatus,workOrderId,FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
+    }
+
 
     public List<WorkOrder> getAllWorkOrdersByIds(Long[] ids){
         return jpa.findWorkOrderAll(ids);

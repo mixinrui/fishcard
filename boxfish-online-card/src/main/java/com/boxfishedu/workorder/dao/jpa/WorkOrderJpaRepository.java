@@ -103,7 +103,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     // 抢单之后,给课程匹配相应的老师
     @Modifying
     @Query("update WorkOrder o set o.teacherName= ?1 ,o.teacherId = ?2 ,o.status = ?3 ,updateTime=current_timestamp ,assignTeacherTime=current_timestamp   where o.id = ?4 and o.teacherId = ?5")
-    int setFixedTeacherIdAndStatusFor(String teacherName,Long teacherId ,Integer status, Long workorderId , Long teacherIdZero );
+    int setFixedTeacherNameAndTeacherIdAndStatusFor(String teacherName,Long teacherId ,Integer status, Long workorderId , Long teacherIdZero );
 
 
     @Query("select wo from WorkOrder wo where wo.id in (?1) ")
@@ -114,5 +114,10 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByCourseType(String courseType);
 
     public List<WorkOrder> findByStudentIdAndStatusLessThanAndStartTimeAfter(Long studentId,Integer status,Date beginDate);
+
+
+    @Modifying
+    @Query("update WorkOrder o set o.updatetimeRecharge= current_timestamp ,o.statusRecharge= ?1 where o.id = ?2 and o.statusRecharge=?3")
+    int setFixedStatusRechargeFor(Integer rechargeCodeAfter,Long id,Integer rechargeCodeBefore);
 
 }
