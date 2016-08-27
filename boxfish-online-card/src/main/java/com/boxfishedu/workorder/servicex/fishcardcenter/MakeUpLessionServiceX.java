@@ -257,11 +257,12 @@ public class MakeUpLessionServiceX {
     @Transactional
     public JsonResultModel fishcardConfirmStatusRecharge(MakeUpCourseParam makeUpCourseParam) {
         String msg = "";
-        logger.info("begin:fishcardConfirmStatusRecharge");
+        logger.info("begin:fishcardConfirmStatusRecharge:::WorkOrderIds()=>[{}]",makeUpCourseParam.getWorkOrderIds());
         Map<String, String> resultMap = Maps.newHashMap();
         if (null == makeUpCourseParam || null == makeUpCourseParam.getWorkOrderIds() || makeUpCourseParam.getWorkOrderIds().length < 1) {
             logger.info("::fishcardConfirmStatusRecharge1::");
             resultMap.put("1", "参数有错误");
+            return JsonResultModel.newJsonResultModel(resultMap);
         }
 
         List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
@@ -274,10 +275,6 @@ public class MakeUpLessionServiceX {
 
         Long orderId = workOrders.get(0).getOrderId();
         for (WorkOrder wo : workOrders) {
-//            if(!orderId.equals(   wo.getOrderId())){
-//                resultMap.put("3","退款的鱼卡应该在同一个订单里!");
-//                return JsonResultModel.newJsonResultModel(resultMap);
-//            }
             // 1 正常  0  未开始 或者正在进行
             if ("0".equals(wo.getIsCourseOver())) {
                 logger.info("::fishcardConfirmStatusRecharge2::");

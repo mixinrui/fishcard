@@ -168,7 +168,7 @@ public class GrabOrderServiceX {
                         return JsonResultModel.newJsonResultModel(jsonObject);
                     }
 
-                    // 更新鱼卡
+                    // 更新抢单表
                     grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
 
                     workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
