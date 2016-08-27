@@ -81,7 +81,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
         CommentCard newCommentCard = commentCardJpaRepository.save(commentCard);
         ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(newCommentCard);
-        logger.info("向师生运营发生消息,通知分配外教进行点评...");
+        logger.debug("@foreignTeacherCommentCardAdd向师生运营发生消息,通知分配外教进行点评...");
         rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
         return newCommentCard;
     }
@@ -94,6 +94,28 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             throw new UnauthorizedException("不存在的点评卡!");
         }else {
             if(fromTeacherStudentForm.getTeacherId() == null){
+                if (commentCard.getAssignTeacherCount() == CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode()){
+                    Date updateTime = new Date();
+                    Map paramMap = new HashMap<>();
+                    paramMap.put("fishCardId",commentCard.getId());
+                    paramMap.put("studentId",commentCard.getStudentId());
+                    paramMap.put("courseId",commentCard.getCourseId());
+                    Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
+                    commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
+                    commentCard.setAssignTeacherTime(updateTime);
+                    commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
+                    commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
+                    commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
+                    commentCard.setUpdateTime(updateTime);
+                    commentCardJpaRepository.save(commentCard);
+                    JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(Long.parseLong(innerTeacherMap.get("teacherId").toString()),"学生发来一次求点评，点击查看。\n" +
+                            "You’ve got a new answer to access; Do it now~","FOREIGNCOMMENT");
+                    if (jsonResultModel.getReturnCode().equals(HttpStatus.SC_OK)){
+                        logger.info("已经向教师端推送消息,推送的教师teacherId=" + innerTeacherMap.get("teacherId").toString());
+                    }else {
+                        logger.info("向教师端推送消息失败,推送失败的教师teacherId=" + innerTeacherMap.get("teacherId").toString());
+                    }
+                }
                 logger.info("现在老师资源空缺,没有分配到老师的点评卡id为:"+fromTeacherStudentForm.getFishCardId());
             }else {
                 logger.info("学生点评卡分配到老师,点评卡id为:"+fromTeacherStudentForm.getFishCardId());
@@ -198,7 +220,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 temp.changeToOverTime();
                 CommentCard newCommentCard = commentCardJpaRepository.save(temp);
                 ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(newCommentCard);
-                logger.info("再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+newCommentCard);
+                logger.debug("@foreignTeacherCommentUnAnswer再次向师生运营发生消息,通知重新分配外教进行点评,重新分配的commentCard:"+newCommentCard);
                 rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
             }
         }
@@ -243,18 +265,19 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
+    @Transactional
     public void foreignUndistributedTeacherCommentCards() {
         logger.info("调用-查询24小时内暂时还未分配到老师的点评卡--接口,为其重新请求分配老师...");
         LocalDateTime now = LocalDateTime.now();
         List<CommentCard> list = commentCardJpaRepository.findUndistributedTeacher(
 //                DateUtil.localDate2Date(now.minusDays(1)),
 //                DateUtil.localDate2Date(now.minusDays(0)),
-                DateUtil.localDate2Date(now.minusMinutes(20)),
                 DateUtil.localDate2Date(now.minusMinutes(10)),
+                DateUtil.localDate2Date(now.minusMinutes(0)),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         for (CommentCard commentCard: list) {
             ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
-            logger.info("向师生运营发生消息,通知分配外教进行点评...");
+            logger.debug("@foreignUndistributedTeacherCommentCards向师生运营发生消息,通知分配外教进行点评...");
             rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
         }
     }
