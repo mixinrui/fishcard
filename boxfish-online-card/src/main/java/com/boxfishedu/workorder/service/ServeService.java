@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
@@ -219,8 +220,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         try {
             StopWatch stopWatch=new StopWatch();
             stopWatch.start();
-            logger.info("@order2ServiceAndWorkOrder*****订单:[{}]转换服务,答疑单,鱼卡开始*****", orderView.getId());
-
+            logger.info("@order2ServiceAndWorkOrder*****订单:[{}]转换服务,答疑单,鱼卡开始***** 订单信息[{}]", orderView.getId(), JacksonUtil.toJSon(orderView));
 //            订单转服务
             order2Service(orderView);
 //            规划服务已不再有
