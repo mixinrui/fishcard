@@ -5,7 +5,6 @@ import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
-import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -203,6 +202,7 @@ public class RabbitMqReciver {
             foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
             logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
         }catch (Exception e){
+            e.printStackTrace();
             logger.info("@assignForeignTeacher接收外教点评分配老师失败!");
         }
     }

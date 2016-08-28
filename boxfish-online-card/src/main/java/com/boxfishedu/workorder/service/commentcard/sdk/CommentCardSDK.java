@@ -3,24 +3,18 @@ package com.boxfishedu.workorder.service.commentcard.sdk;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.config.CommentCardUrlConf;
 import com.boxfishedu.workorder.entity.mysql.PushToStudentAndTeacher;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.RequestEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by ansel on 16/7/26.
@@ -38,9 +32,9 @@ public class CommentCardSDK {
 
     public JsonResultModel setTeacherAbsence(Long teacherId,Long studentId, Long id){
         Map<String,String> paramMap = new HashMap<>();
-        paramMap.put("teacherId",teacherId.toString());
-        paramMap.put("studentId",studentId.toString());
-        paramMap.put("fishCardId",id.toString());
+        paramMap.put("teacherId", Objects.toString(teacherId));
+        paramMap.put("studentId", Objects.toString(studentId));
+        paramMap.put("fishCardId",Objects.toString(id));
         return restTemplate.postForObject(createTeacherAbsenceURI(), paramMap,JsonResultModel.class);
     }
 

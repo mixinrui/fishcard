@@ -101,19 +101,23 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     paramMap.put("studentId",commentCard.getStudentId());
                     paramMap.put("courseId",commentCard.getCourseId());
                     Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
-                    commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
+                    if(innerTeacherMap.get("teacherId") != null) {
+                        commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
+                    }
                     commentCard.setAssignTeacherTime(updateTime);
                     commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
                     commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
                     commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
                     commentCard.setUpdateTime(updateTime);
                     commentCardJpaRepository.save(commentCard);
-                    JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(Long.parseLong(innerTeacherMap.get("teacherId").toString()),"学生发来一次求点评，点击查看。\n" +
-                            "You’ve got a new answer to access; Do it now~","FOREIGNCOMMENT");
-                    if (jsonResultModel.getReturnCode().equals(HttpStatus.SC_OK)){
-                        logger.info("已经向教师端推送消息,推送的教师teacherId=" + innerTeacherMap.get("teacherId").toString());
-                    }else {
-                        logger.info("向教师端推送消息失败,推送失败的教师teacherId=" + innerTeacherMap.get("teacherId").toString());
+                    if(innerTeacherMap.get("teacherId") != null) {
+                        JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(Long.parseLong(innerTeacherMap.get("teacherId").toString()), "学生发来一次求点评，点击查看。\n" +
+                                "You’ve got a new answer to access; Do it now~", "FOREIGNCOMMENT");
+                        if (jsonResultModel.getReturnCode().equals(HttpStatus.SC_OK)) {
+                            logger.info("已经向教师端推送消息,推送的教师teacherId=" + innerTeacherMap.get("teacherId").toString());
+                        } else {
+                            logger.info("向教师端推送消息失败,推送失败的教师teacherId=" + innerTeacherMap.get("teacherId").toString());
+                        }
                     }
                 }
                 logger.info("现在老师资源空缺,没有分配到老师的点评卡id为:"+fromTeacherStudentForm.getFishCardId());
@@ -208,10 +212,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
                 logger.info("调用师生运营接口结果",jsonResultModel);
                 logger.info("向老师端推送消息,告知其点评超时......");
-                String info = "You have not assessed the answer at "+ SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime())+
-                        " on "+ SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime())+",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
-                        "GET IT";
-                JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(commentCard.getTeacherId().toString()),info,"FOREIGNCOMMENT");
+                JsonResultModel pushResult = pushInfoToStudentAndTeacher(
+                        Long.parseLong(commentCard.getTeacherId().toString()),
+                        createPushUnAnswerInfoToStudentAndTeacherMessage(commentCard),
+                        "FOREIGNCOMMENT");
                 logger.info("向老师端推送消息结果"+pushResult);
                 CommentCard oldCommentCard = commentCardJpaRepository.save(commentCard);
                 // 克隆点评卡
@@ -225,6 +229,16 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             }
         }
         logger.info("所有在24小时内为被点评的学生已重新请求分配外教完毕,一共重新分配外教点评的个数为:"+list.size());
+    }
+
+    private String createPushUnAnswerInfoToStudentAndTeacherMessage(CommentCard commentCard) {
+        String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+                "UNKNOW" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
+        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+                "UNKNOW" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
+        return  "You have not assessed the answer at "+ assignTeacherTime+
+                " on "+ englishAssignTeacherTime +",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
+                "GET IT";
     }
 
     @Override
@@ -249,10 +263,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(),commentCard.getStudentId(),commentCard.getId());
             logger.info("调用师生运营接口结果",jsonResultModel);
             logger.info("向老师端推送消息,告知其点评超时......");
-            String info = "You have not assessed the answer at "+ SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime())+
-                    " on "+ SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime())+",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
-                    "GET IT";
-            JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(commentCard.getTeacherId().toString()),info,"FOREIGNCOMMENT");
+            JsonResultModel pushResult = pushInfoToStudentAndTeacher(Long.parseLong(
+                    commentCard.getTeacherId().toString()),
+                    createPushUnAnswer2InfoToStudentAndTeacherMessage(commentCard),
+                    "FOREIGNCOMMENT");
             logger.info("向老师端推送消息结果"+pushResult);
 
             commentCardJpaRepository.save(commentCard);
@@ -263,6 +277,17 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }
         logger.info("所有学生外教点评次数返还完毕,一共返回次数为:"+list.size());
     }
+
+    private String createPushUnAnswer2InfoToStudentAndTeacherMessage(CommentCard commentCard) {
+        String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+                "UNKNOW" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
+        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+                "UNKNOW" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
+        return  "You have not assessed the answer at "+ assignTeacherTime +
+                " on "+ englishAssignTeacherTime + ",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
+                "GET IT";
+    }
+
 
     @Override
     @Transactional
