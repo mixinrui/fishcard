@@ -48,11 +48,4 @@ public class CourseModifyController {
         });
         return JsonResultModel.newJsonResultModel("ok");
     }
-
-    @RequestMapping(value = "/courses/phonics", method = RequestMethod.PUT)
-    public JsonResultModel changePhonicsCourses(){
-        fishCardModifyServiceX.changePhonicsCourses();
-        return JsonResultModel.newJsonResultModel("ok");
-    }
-
 }

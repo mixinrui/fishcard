@@ -259,14 +259,37 @@ public class TokenUtils {
     public static void main(String[] args) {
         try {
             TokenUtils des = new TokenUtils();//自定义密钥
-            System.out.println(des.getPassword("boxfishedu"));
+            //System.out.println(des.getPassword("boxfishedu"));
 
 //            TokenUtils des = new TokenUtils();//自定义密钥
 //            System.out.println(des.getPassword("boxfishedu"));
-            String test = "kz%cHUvri@d*ZGMjm$sOWHG&$pjox";
+            String test1 = "I#zUcPAP@3XkXazyDljZZLgTxSyNjCx";
+            String test2 = "wH4JIvlXnk8O5iSOPlnS28&XyfiUbOI";
+            String test3 = "If%lj^KghmDt6G&W$rk%uFlV$BZEAhv";
+            String test4 = "I5b0RCQzgQ!90tziLyhceJLpQNSFP6m";
+            String test5 = "hagM0qErK3XFg5NA2GqqB#tg#R20UOF";
+            String test6 = "9tl5$e*U1lRY7Z!9w6FqF^4Ki2dNKIi";
+            String test7 ="%BfY1$r5w#uJh*BLI!r6%y3LBAc3!uP";
+            String test8 = "X#oPmOvb6s%%sU7Tr^HcyQEcHtusrqw";
+            String test9 = "F*MX%^vyMFYXW^t&QK9hL2mVyKKwWDQ";
+            String test10 = "C6TleQu5s&CaQT3AAO!cB5LEIwX^ZVz";
+            String test11 = "42JB1#gRzJKEPw9s0c35$fvT2IqUHf9";
 
-            System.out.println("加密前的字符：" + test);
-            System.out.println("加密后的字符：" + des.getPassword(test));
+
+
+            System.out.println("'"+des.getPassword(test1)+"'");
+            System.out.println("'"+des.getPassword(test2)+"'");
+            System.out.println("'"+des.getPassword(test3)+"'");
+            System.out.println("'"+des.getPassword(test4)+"'");
+            System.out.println("'"+des.getPassword(test5)+"'");
+            System.out.println("'"+des.getPassword(test6)+"'");
+            System.out.println("'"+des.getPassword(test7)+"'");
+            System.out.println("'"+des.getPassword(test8)+"'");
+            System.out.println("'"+des.getPassword(test9)+"'");
+            System.out.println("'"+des.getPassword(test10)+"'");
+            System.out.println("'"+des.getPassword(test11)+"'");
+
+
            // System.out.println("解密后的字符：" + des.decrypt(des.encrypt(test)));
 
             //System.out.println("解密后的字符：" + des.decrypt("202cb962ac59075b964b07152d234b70"));
