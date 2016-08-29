@@ -83,10 +83,10 @@ public class RecommandCourseRequester {
     public RecommandCourseView changeCourse(WorkOrder workOrder) {
         String tutorType=workOrder.getService().getTutorType();
         logger.debug("@RecommandCourseRequester#changeCourse,参数tutorType[{}]",tutorType);
-        if(Objects.equals(tutorType, TutorType.CN)) {
+        if(Objects.equals(tutorType, TutorType.CN.name())) {
             return changeChineseCourse(workOrder);
         }
-        else if(Objects.equals(tutorType,TutorType.FRN)){
+        else if(Objects.equals(tutorType,TutorType.FRN.name())){
             return changeForeignCourse(workOrder);
         }
         else {
