@@ -48,7 +48,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
     public void changeCourse(WorkOrder workOrder) {
         String oldCourseName = workOrder.getCourseName();
 
-        RecommandCourseView recommandCourseView = recommandCourseRequester.getRecommandCourse(workOrder);
+        RecommandCourseView recommandCourseView = recommandCourseRequester.changeCourse(workOrder);
         workOrder.setCourseName(recommandCourseView.getCourseName());
         workOrder.setCourseId(recommandCourseView.getCourseId());
         workOrder.setCourseType(recommandCourseView.getCourseType());
@@ -86,42 +86,6 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
 
     public List<WorkOrder> findByStudentIdAndStatusLessThan(Long studentId, Integer status) {
         return jpa.findByStudentIdAndStatusLessThan(studentId, status);
-    }
-
-    public void changeCourse(WorkOrder workOrder, Integer index) {
-        String oldCourseName = workOrder.getCourseName();
-
-        RecommandCourseView recommandCourseView = recommandCourseRequester.getRecommandCourse(workOrder, index);
-        workOrder.setCourseName(recommandCourseView.getCourseName());
-        workOrder.setCourseId(recommandCourseView.getCourseId());
-        workOrder.setCourseType(recommandCourseView.getCourseType());
-
-        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
-        courseSchedule.setCourseId(workOrder.getCourseId());
-        courseSchedule.setCourseName(workOrder.getCourseType());
-        courseSchedule.setCourseType(workOrder.getCourseType());
-
-        //修改课程信息
-        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(workOrder.getId());
-        scheduleCourseInfo.setCourseType(workOrder.getCourseType());
-        scheduleCourseInfo.setCourseId(workOrder.getCourseId());
-        scheduleCourseInfo.setName(workOrder.getCourseName());
-        scheduleCourseInfo.setDifficulty(recommandCourseView.getDifficulty());
-        scheduleCourseInfo.setPublicDate(recommandCourseView.getPublicDate());
-        scheduleCourseInfo.setThumbnail(recommandCourseRequester.getThumbNailPath(recommandCourseView));
-
-        //外教不参与师生互评 jiaozijun
-        if(!workOrder.getCourseType().equals("TALK")) {
-            /** 换课更新  换课时间  jiaozijun **/
-            workOrder.setUpdatetimeChangecourse(new Date());
-            /** 换课 1 换课消息未发送 jiaozijun **/
-            workOrder.setSendflagcc("1");
-        }
-
-
-        scheduleCourseInfoService.updateCourseIntoScheduleInfo(scheduleCourseInfo);
-        workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
-        workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,老课程[" + oldCourseName + "]");
     }
 
     public List<WorkOrder> findByStudentIdAndStatusLessThanAndStartTimeAfter(Long studentId, Integer status, Date beginDate) {

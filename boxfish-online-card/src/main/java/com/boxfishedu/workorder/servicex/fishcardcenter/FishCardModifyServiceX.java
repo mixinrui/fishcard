@@ -136,13 +136,6 @@ public class FishCardModifyServiceX {
         fishCardModifyService.changeCourse(workOrder);
     }
 
-    public void changePhonicsCourses() {
-        List<WorkOrder> workOrders = workOrderService.findByCourseType("PHONICS");
-        for (WorkOrder workOrder : workOrders) {
-            fishCardModifyService.changeCourse(workOrder, 7);
-        }
-    }
-
     public void deleteFishCardsByStudentIds(FishCardDeleteParam fishCardDeleteParam) {
         List<Long> studentIds = fishCardDeleteParam.getStudentIds();
         Date beginDate = new Date();
