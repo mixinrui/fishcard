@@ -164,13 +164,6 @@ spring:
     virtualHost: local
   profiles: development
 
-service:
-  sdk:
-    teacherAbsenceUrl: http://101.201.237.252:8099
-    getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://101.201.239.116:9090
-    innerTeacherUrl: http://101.201.237.252:8099
-
 ##################接口调用地址
 interface:
   address:
@@ -184,6 +177,13 @@ interface:
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
+
+service:
+  sdk:
+    teacherAbsenceUrl: http://101.201.237.252:8099
+    getPictureUrl: http://114.55.58.184:8099
+    pushInfoIrl: http://101.201.239.116:9090
+    innerTeacherUrl: http://101.201.237.252:8099
 server.port: 8080
 
 #===============================================================test环境:123.56.13.168 机器密码:Boxfish2016===============================================================
@@ -212,13 +212,6 @@ spring:
     virtualHost: local
   profiles: test
 
-service:
-  sdk:
-    teacherAbsenceUrl: http://127.0.0.1:8099
-    getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://127.0.0.1:9090
-    innerTeacherUrl: http://127.0.0.1:8099
-
 ##################接口调用地址
 interface:
   address:
@@ -231,6 +224,13 @@ interface:
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.test.boxfish.cn
+
+service:
+  sdk:
+    teacherAbsenceUrl: http://127.0.0.1:8099
+    getPictureUrl: http://114.55.58.184:8099
+    pushInfoIrl: http://127.0.0.1:9090
+    innerTeacherUrl: http://127.0.0.1:8099
 
 server.port: 8080
 
@@ -260,13 +260,6 @@ spring:
     virtualHost: local
   profiles: pretest
 
-service:
-  sdk:
-    teacherAbsenceUrl: http://127.0.0.1:8099
-    getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://127.0.0.1:9090
-    innerTeacherUrl: http://127.0.0.1:8099
-
 ##################接口调用地址
 interface:
   address:
@@ -279,6 +272,13 @@ interface:
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.test.boxfish.cn
+
+service:
+  sdk:
+    teacherAbsenceUrl: http://127.0.0.1:8099
+    getPictureUrl: http://114.55.58.184:8099
+    pushInfoIrl: http://127.0.0.1:9090
+    innerTeacherUrl: http://127.0.0.1:8099
 
 server.port: 8080
 #===============================================================demo环境=====101.201.66.32===============================================================
@@ -412,3 +412,10 @@ interface:
     fishcard_page: http://101.201.66.109:94/
     data_analysis_service: http://online-api.log.boxfish.cn/log/mongo
     student_teacher_relation: http://api.boxfish.cn
+#外教点评接口调用
+service:
+  sdk:
+    teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
+    getPictureUrl: http://base.boxfish.cn/passbook
+    pushInfoIrl: http://online-api.boxfish.cn/teaching-service
+    innerTeacherUrl: http://online-api.boxfish.cn/teacher
