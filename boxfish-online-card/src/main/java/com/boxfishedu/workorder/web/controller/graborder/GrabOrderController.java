@@ -55,8 +55,8 @@ public class GrabOrderController {
 
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
     public JsonResultModel tomonotify()throws Exception {
-//        测试明天有课推送
-//        courseNotifyOneDayServiceX.notiFyStudentClass();
+        //测试明天有课推送
+        courseNotifyOneDayServiceX.notiFyStudentClass();
 //
 //        Thread.sleep(2000);
 //
