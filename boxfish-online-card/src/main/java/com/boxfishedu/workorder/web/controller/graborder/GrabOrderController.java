@@ -55,16 +55,17 @@ public class GrabOrderController {
 
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
     public JsonResultModel tomonotify()throws Exception {
-        courseNotifyOneDayServiceX.notiFyStudentClass();
-
-        Thread.sleep(2000);
-
-        // 退款发送消息测试
-        Long[]  woid = {14050L,14269L};
-        List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(woid);
-        for(WorkOrder wo:workOrders){
-            makeUpLessionServiceX.sendMessageRefund(wo);
-        }
+//        测试明天有课推送
+//        courseNotifyOneDayServiceX.notiFyStudentClass();
+//
+//        Thread.sleep(2000);
+//
+//        // 退款发送消息测试 推送
+//        Long[]  woid = {14050L,14269L};
+//        List<WorkOrder>  workOrders = workOrderService.getAllWorkOrdersByIds(woid);
+//        for(WorkOrder wo:workOrders){
+//            makeUpLessionServiceX.sendMessageRefund(wo);
+//        }
         return new JsonResultModel();
     }
     /**
