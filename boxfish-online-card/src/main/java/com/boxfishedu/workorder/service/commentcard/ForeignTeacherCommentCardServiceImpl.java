@@ -93,7 +93,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             logger.info("根据点评卡id查到的点评卡为空,点评卡id来自师生运营回传参数:"+fromTeacherStudentForm);
             throw new UnauthorizedException("不存在的点评卡!");
         }else {
-            if(StringUtils.isEmpty(fromTeacherStudentForm.getTeacherId())){
+            if(Objects.isNull(fromTeacherStudentForm.getTeacherId())){
                 logger.info("现在老师资源空缺,没有分配到老师的点评卡id为:"+fromTeacherStudentForm.getFishCardId());
                 if (commentCard.getAssignTeacherCount().equals(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode())){
                     Date updateTime = new Date();
@@ -104,6 +104,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
                     if(!StringUtils.isEmpty(innerTeacherMap.get("teacherId"))) {
                         commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
+                    }else {
+                        return;
                     }
                     commentCard.setAssignTeacherTime(updateTime);
                     commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
