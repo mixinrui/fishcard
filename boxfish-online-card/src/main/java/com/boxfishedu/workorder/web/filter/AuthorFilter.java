@@ -30,9 +30,19 @@ import java.util.Set;
  * 新增鱼卡抢单过滤("/fishcard/graborder/*","/graborder/*")
  */
 @WebFilter(urlPatterns ={
-        "/fishcard/service/student/*", "/fishcard/service/teacher/*",
-        "/fishcard/comment_card/*", "/comment_card/*",
-        "/service/teacher/*", "/service/student/*", "/comment_card/*", "/comment/foreign/*", "/fishcard/graborder/*","/graborder/*"})
+        // 带contextPath的拦截
+        "/fishcard/service/student/*",
+        "/fishcard/service/teacher/*",
+        "/fishcard/comment_card/*",
+        "/fishcard/comment/foreign/*",
+        "/fishcard/graborder/*",
+
+        //
+        "/service/teacher/*",
+        "/service/student/*",
+        "/comment_card/*",
+        "/comment/foreign/*",
+        "/graborder/*"})
 public class AuthorFilter extends OncePerRequestFilter {
 
     private Logger logger = LoggerFactory.getLogger(AuthorFilter.class);
