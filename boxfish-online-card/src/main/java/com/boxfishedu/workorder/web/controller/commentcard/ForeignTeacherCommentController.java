@@ -70,13 +70,13 @@ public class ForeignTeacherCommentController {
     }
 
     //测试用接口
-    @RequestMapping(value = "/test_teacher_comment", method = RequestMethod.POST)
+    //@RequestMapping(value = "/test_teacher_comment", method = RequestMethod.POST)
     public JsonResultModel testTeacherComment(@RequestBody CommentCardForm commentCardForm, Long userId,String access_token){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testTeacherComment(commentCardForm,userId,access_token));
     }
 
     //测试用接口
-    @RequestMapping(value = "/test_query_all", method = RequestMethod.GET)
+    //@RequestMapping(value = "/test_query_all", method = RequestMethod.GET)
     public JsonResultModel testQueryAll(Pageable pageable){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
