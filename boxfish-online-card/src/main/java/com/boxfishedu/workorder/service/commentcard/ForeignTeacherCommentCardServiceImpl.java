@@ -89,19 +89,19 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Override
     public void foreignTeacherCommentUpdateAnswer(FromTeacherStudentForm fromTeacherStudentForm) {
         CommentCard commentCard = commentCardJpaRepository.findById(fromTeacherStudentForm.getFishCardId());
-        if (commentCard == null){
+        if (commentCard.equals(null)){
             logger.info("根据点评卡id查到的点评卡为空,点评卡id来自师生运营回传参数:"+fromTeacherStudentForm);
             throw new UnauthorizedException("不存在的点评卡!");
         }else {
-            if(fromTeacherStudentForm.getTeacherId() == null){
-                if (commentCard.getAssignTeacherCount() == CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode()){
+            if(fromTeacherStudentForm.getTeacherId().equals(null)){
+                if (commentCard.getAssignTeacherCount().equals(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode())){
                     Date updateTime = new Date();
                     Map paramMap = new HashMap<>();
                     paramMap.put("fishCardId",commentCard.getId());
                     paramMap.put("studentId",commentCard.getStudentId());
                     paramMap.put("courseId",commentCard.getCourseId());
                     Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
-                    if(innerTeacherMap.get("teacherId") != null) {
+                    if(!innerTeacherMap.get("teacherId").equals(null)) {
                         commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
                     }
                     commentCard.setAssignTeacherTime(updateTime);
@@ -110,7 +110,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
                     commentCard.setUpdateTime(updateTime);
                     commentCardJpaRepository.save(commentCard);
-                    if(innerTeacherMap.get("teacherId") != null) {
+                    if(!innerTeacherMap.get("teacherId").equals(null)) {
                         JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(Long.parseLong(innerTeacherMap.get("teacherId").toString()), "You’ve got a new answer to access; Do it now~", "FOREIGNCOMMENT");
                         if (jsonResultModel.getReturnCode().equals(HttpStatus.SC_OK)) {
                             logger.info("已经向教师端推送消息,推送的教师teacherId=" + innerTeacherMap.get("teacherId").toString());
@@ -230,9 +230,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     private String createPushUnAnswerInfoToStudentAndTeacherMessage(CommentCard commentCard) {
         String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
-                "UNKNOW" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
+                "UNKNOWN" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
         String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
-                "UNKNOW" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
+                "UNKNOWN" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
         return  "You have not assessed the answer at "+ assignTeacherTime+
                 " on "+ englishAssignTeacherTime +",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
                 "GET IT";
