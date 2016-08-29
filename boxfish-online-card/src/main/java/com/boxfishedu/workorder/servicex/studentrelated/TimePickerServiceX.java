@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -188,8 +189,10 @@ public class TimePickerServiceX {
                 recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
             } else if(Objects.equals(comboType, ComboTypeToRoleId.FOREIGN.name())) {
                 recommandCourseView = recommandCourseRequester.getForeignRecomandCourse(workOrder);
-            } else {
-
+            } else if(Objects.equals(comboType, ComboTypeToRoleId.EXCHANGE.name())) {
+                // 兑换类型,需要判断对应service的tutorType类型
+                recommandCourseView = recommandCourseRequester.getRecomendCourse(
+                        workOrder, TutorType.resolve(workOrder.getService().getTutorType()));
             }
 
             if(!Objects.isNull(recommandCourseView)) {

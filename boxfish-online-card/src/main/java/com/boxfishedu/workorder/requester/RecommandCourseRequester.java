@@ -19,7 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by hucl on 16/6/17.
@@ -61,10 +60,10 @@ public class RecommandCourseRequester {
     public RecommandCourseView getRecomendCourse(WorkOrder workOrder, TutorType tutorType) {
         try {
             String type;
-            if(Objects.equals(tutorType, TutorType.CN)) {
-                type = "chinese";
-            } else {
-                type = "foreigner";
+            switch (tutorType) {
+                case CN: type = "chinese"; break;
+                case FRN: type = "foreigner"; break;
+                default: throw new BusinessException("未知类型的课程");
             }
             RecommandCourseView recommandCourseView = restTemplate.postForObject(
                     createRecommendUri(workOrder.getStudentId(), type),
