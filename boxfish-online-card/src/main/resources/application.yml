@@ -412,7 +412,7 @@ interface:
     fishcard_page: http://101.201.66.109:94/
     data_analysis_service: http://online-api.log.boxfish.cn/log/mongo
     student_teacher_relation: http://api.boxfish.cn
-#外教点评接口调用
+#外教点评接口调用地址
 service:
   sdk:
     teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
