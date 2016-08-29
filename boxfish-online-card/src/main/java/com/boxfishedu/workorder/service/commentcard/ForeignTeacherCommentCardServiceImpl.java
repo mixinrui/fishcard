@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.SimpleDateUtil;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.CommentCardStatisticsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.service.ServeService;
@@ -34,6 +35,9 @@ import java.util.*;
 public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherCommentCardService{
     @Autowired
     CommentCardJpaRepository commentCardJpaRepository;
+
+    @Autowired
+    CommentCardStatisticsJpaRepository commentCardStatisticsJpaRepository;
 
     @Autowired
     RabbitMqSender rabbitMqSender;
@@ -70,20 +74,26 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setOrderId(service.getOrderId());
             commentCard.setOrderCode(service.getOrderCode());
             commentCard.setStudentPicturePath(getUserPicture(access_token));
+            logger.info("调用外教点评接口新增学生点评卡,其中"+commentCard);
+            Date dateNow = new Date();
+            commentCard.setStudentAskTime(dateNow);
+            commentCard.setCreateTime(dateNow);
+            commentCard.setUpdateTime(dateNow);
+            commentCard.setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_ONCE.getCode());
+            commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
+            commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+            CommentCard newCommentCard = commentCardJpaRepository.save(commentCard);
+            ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(newCommentCard);
+            logger.debug("@foreignTeacherCommentCardAdd向师生运营发生消息,通知分配外教进行点评...");
+            rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+            logger.info("@foreignTeacherCommentCardAdd点评次数消耗一次...");
+            CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
+            commentCardStatistics.setCommentCardId(newCommentCard.getId());
+            commentCardStatistics.setServicedId(service.getId());
+            commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_ADD.getCode());
+            commentCardStatisticsJpaRepository.save(commentCardStatistics);
+            return newCommentCard;
         }
-        logger.info("调用外教点评接口新增学生点评卡,其中"+commentCard);
-        Date dateNow = new Date();
-        commentCard.setStudentAskTime(dateNow);
-        commentCard.setCreateTime(dateNow);
-        commentCard.setUpdateTime(dateNow);
-        commentCard.setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_ONCE.getCode());
-        commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
-        commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
-        CommentCard newCommentCard = commentCardJpaRepository.save(commentCard);
-        ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(newCommentCard);
-        logger.debug("@foreignTeacherCommentCardAdd向师生运营发生消息,通知分配外教进行点评...");
-        rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
-        return newCommentCard;
     }
 
     @Override
@@ -275,6 +285,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             serviceTemp.setUpdateTime(updateDate);
             serviceJpaRepository.save(serviceTemp);
             logger.info("外教在48小时内未点评,为学生返还点评次数...");
+            CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
+            commentCardStatistics.setCommentCardId(commentCard.getId());
+            commentCardStatistics.setServicedId(serviceTemp.getId());
+            commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_MINUS.getCode());
+            commentCardStatisticsJpaRepository.save(commentCardStatistics);
         }
         logger.info("所有学生外教点评次数返还完毕,一共返回次数为:"+list.size());
     }

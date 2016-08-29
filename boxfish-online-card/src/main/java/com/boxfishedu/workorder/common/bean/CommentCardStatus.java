@@ -17,7 +17,10 @@ public enum CommentCardStatus {
     TEACHER_UNREAD(0,"外教未读"),
 
     ASSIGN_TEACHER_ONCE(1,"第一次分配外教"),
-    ASSIGN_TEACHER_TWICE(2,"第二次分配外教");
+    ASSIGN_TEACHER_TWICE(2,"第二次分配外教"),
+
+    AMOUNT_ADD(1,"点评次数加1"),
+    AMOUNT_MINUS(-1,"点评次数减1");
     private int code;
     private String status;
 
