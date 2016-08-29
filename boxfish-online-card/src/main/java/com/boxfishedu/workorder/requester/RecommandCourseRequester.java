@@ -81,11 +81,14 @@ public class RecommandCourseRequester {
     }
 
     public RecommandCourseView changeCourse(WorkOrder workOrder) {
-        if (workOrder.getService().getComboType().equals(ComboTypeEnum.OVERALL.toString())) {
-            return changeOverAllCourse(workOrder);
-        } else if (workOrder.getService().getComboType().equals(ComboTypeEnum.FOREIGN.toString())) {
+        String tutorType=workOrder.getService().getTutorType();
+        if(Objects.equals(tutorType, TutorType.CN)) {
+            return changeChineseCourse(workOrder);
+        }
+        else if(Objects.equals(tutorType,TutorType.FRN)){
             return changeForeignCourse(workOrder);
-        } else {
+        }
+        else {
             return changeOverAllCourse(workOrder);
         }
     }
