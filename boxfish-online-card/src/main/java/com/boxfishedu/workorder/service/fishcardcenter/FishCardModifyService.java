@@ -24,6 +24,7 @@ import java.util.List;
  * Created by hucl on 16/7/8.
  */
 @Component
+@SuppressWarnings("ALL")
 public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRepository, Long> {
 
     @Autowired
@@ -46,9 +47,6 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
 
     public void changeCourse(WorkOrder workOrder) {
         String oldCourseName = workOrder.getCourseName();
-
-        //取消老课程
-        recommandCourseRequester.cancelOldRecommandCourse(workOrder);
 
         RecommandCourseView recommandCourseView = recommandCourseRequester.getRecommandCourse(workOrder);
         workOrder.setCourseName(recommandCourseView.getCourseName());
