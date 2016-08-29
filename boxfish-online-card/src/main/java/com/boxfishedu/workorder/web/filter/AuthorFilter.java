@@ -31,6 +31,7 @@ import java.util.Set;
  */
 @WebFilter(urlPatterns ={
         "/fishcard/service/student/*", "/fishcard/service/teacher/*",
+        "/fishcard/comment_card/*", "/comment_card/*",
         "/service/teacher/*", "/service/student/*", "/comment_card/*", "/comment/foreign/*", "/fishcard/graborder/*","/graborder/*"})
 public class AuthorFilter extends OncePerRequestFilter {
 
