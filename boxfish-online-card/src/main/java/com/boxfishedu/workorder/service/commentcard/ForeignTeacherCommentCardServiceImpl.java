@@ -89,11 +89,12 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Override
     public void foreignTeacherCommentUpdateAnswer(FromTeacherStudentForm fromTeacherStudentForm) {
         CommentCard commentCard = commentCardJpaRepository.findById(fromTeacherStudentForm.getFishCardId());
-        if (commentCard.equals(null)){
+        if (StringUtils.isEmpty(commentCard)){
             logger.info("根据点评卡id查到的点评卡为空,点评卡id来自师生运营回传参数:"+fromTeacherStudentForm);
             throw new UnauthorizedException("不存在的点评卡!");
         }else {
-            if(fromTeacherStudentForm.getTeacherId().equals(null)){
+            if(StringUtils.isEmpty(fromTeacherStudentForm.getTeacherId())){
+                logger.info("现在老师资源空缺,没有分配到老师的点评卡id为:"+fromTeacherStudentForm.getFishCardId());
                 if (commentCard.getAssignTeacherCount().equals(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode())){
                     Date updateTime = new Date();
                     Map paramMap = new HashMap<>();
@@ -101,7 +102,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     paramMap.put("studentId",commentCard.getStudentId());
                     paramMap.put("courseId",commentCard.getCourseId());
                     Map innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
-                    if(!innerTeacherMap.get("teacherId").equals(null)) {
+                    if(!StringUtils.isEmpty(innerTeacherMap.get("teacherId"))) {
                         commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
                     }
                     commentCard.setAssignTeacherTime(updateTime);
@@ -110,7 +111,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
                     commentCard.setUpdateTime(updateTime);
                     commentCardJpaRepository.save(commentCard);
-                    if(!innerTeacherMap.get("teacherId").equals(null)) {
+                    if(!StringUtils.isEmpty(innerTeacherMap.get("teacherId"))) {
                         JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(Long.parseLong(innerTeacherMap.get("teacherId").toString()), "You’ve got a new answer to access; Do it now~", "FOREIGNCOMMENT");
                         if (jsonResultModel.getReturnCode().equals(HttpStatus.SC_OK)) {
                             logger.info("已经向教师端推送消息,推送的教师teacherId=" + innerTeacherMap.get("teacherId").toString());
@@ -119,7 +120,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                         }
                     }
                 }
-                logger.info("现在老师资源空缺,没有分配到老师的点评卡id为:"+fromTeacherStudentForm.getFishCardId());
             }else {
                 logger.info("学生点评卡分配到老师,点评卡id为:"+fromTeacherStudentForm.getFishCardId());
                 Date dateNow = new Date();
@@ -156,7 +156,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public CommentCard foreignTeacherCommentDetailQuery(Long id,Long userId) {
         logger.info("调用学生查询某条外教点评具体信息接口,并将此条设置为已读,其中id="+id);
         CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
-        if(commentCard == null){
+        if(StringUtils.isEmpty(commentCard)){
             logger.info("用户所查点评卡不存在,用户userId="+userId,", 点评卡id="+id);
             throw new UnauthorizedException();
         }
