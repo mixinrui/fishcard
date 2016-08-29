@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.mall.enums.TutorType;
-import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -18,8 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/6/17.
