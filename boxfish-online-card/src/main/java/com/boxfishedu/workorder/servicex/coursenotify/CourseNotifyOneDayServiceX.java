@@ -38,17 +38,17 @@ public class CourseNotifyOneDayServiceX {
     private TeacherStudentRequester teacherStudentRequester;
 
 
-    public void notiFyStudentClass(){
+    public void notiFyStudentClass() {
 
         logger.info("notiFyStudentClass--->开始检索明天有课的学生准备上课");
-        List<WorkOrder> listWorkOrders =   fishCardStatusService.getCardsStudentNotifyClass();
-        if(null ==listWorkOrders || listWorkOrders.isEmpty()){
+        List<WorkOrder> listWorkOrders = fishCardStatusService.getCardsStudentNotifyClass();
+        if (null == listWorkOrders || listWorkOrders.isEmpty()) {
             logger.info("notiFyStudentClass--->没有明天要上课的学生");
             return;
         }
 
 
-        Map<Long ,Integer>  studentHasClassMap = Maps.newHashMap();
+        Map<Long, Integer> studentHasClassMap = Maps.newHashMap();
 
 
         studentHasClassMap = getStudentClassess(studentHasClassMap, listWorkOrders);
@@ -57,12 +57,12 @@ public class CourseNotifyOneDayServiceX {
             logger.info("notiFyStudentClass:::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", studentHasClassMap == null ? 0 : studentHasClassMap.size());
             logger.info("notiFyStudentClass:::::::::sendToStudentInfo [{}]::::::::::::::::::::::::::::::::", studentHasClassMap);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("lazyLoadError");
             e.printStackTrace();
         }
 
-        if(null ==studentHasClassMap || studentHasClassMap.isEmpty()){
+        if (null == studentHasClassMap || studentHasClassMap.isEmpty()) {
             logger.info("notiFyStudentClass:::::::::::MapIsNull");
             return;
         }
@@ -75,15 +75,15 @@ public class CourseNotifyOneDayServiceX {
 
     }
 
-    private Map<Long,Integer> getStudentClassess(Map<Long, Integer> studentHasClassMap, List<WorkOrder> listWorkOrders) {
+    private Map<Long, Integer> getStudentClassess(Map<Long, Integer> studentHasClassMap, List<WorkOrder> listWorkOrders) {
 
         listWorkOrders.forEach(workOrder -> {
             Integer account = studentHasClassMap.get(workOrder.getStudentId());
-            if(null!=account){
-                account+=1;
-                studentHasClassMap.put( workOrder.getStudentId(),account );
-            }else {
-                studentHasClassMap.put( workOrder.getStudentId(),new Integer(1) );
+            if (null != account) {
+                account += 1;
+                studentHasClassMap.put(workOrder.getStudentId(), account);
+            } else {
+                studentHasClassMap.put(workOrder.getStudentId(), new Integer(1));
             }
         });
         return studentHasClassMap;
@@ -99,10 +99,10 @@ public class CourseNotifyOneDayServiceX {
             Map map1 = Maps.newHashMap();
             map1.put("user_id", key);
 
-            if(null == map.get(key)){
+            if (null == map.get(key)) {
                 continue;
             }
-            pushTitle = ( pushTitle + count + WorkOrderConstant.SEND_STU_CLASS_TOMO_MESSAGE_END );
+            pushTitle = (pushTitle + count + WorkOrderConstant.SEND_STU_CLASS_TOMO_MESSAGE_END);
             map1.put("push_title", pushTitle);
 
             JSONObject jo = new JSONObject();
@@ -120,11 +120,11 @@ public class CourseNotifyOneDayServiceX {
 
             list.add(map1);
         }
-        if(!list.isEmpty() ){
+        if (!list.isEmpty()) {
             // 2000 分组
-            if(list.size()>2000){
+            if (list.size() > 2000) {
                 teacherStudentRequester.pushTeacherListOnlineMsg(list);
-            }else {
+            } else {
                 teacherStudentRequester.pushTeacherListOnlineMsg(list);
             }
         }
@@ -132,31 +132,33 @@ public class CourseNotifyOneDayServiceX {
         logger.info("notiFyStudentClass::end");
     }
 
-    private void splitByTwoThousandsMessage(List list){
-        int count = list.size()/base_count;
-        int yushu = list.size()%base_count;
+    private void splitByTwoThousandsMessage(List list) {
+        int count = list.size() / base_count;
+        int yushu = list.size() % base_count;
 
-        logger.info("splitByTwoThousandsMessage::count=[{}] ::yushu[{}]",count,yushu);
+        logger.info("splitByTwoThousandsMessage::count=[{}] ::yushu[{}]", count, yushu);
 
-        for(int i=0;i<count;i++){
-            List list1 = list.subList(i*base_count,i*base_count+base_count);
+        for (int i = 0; i < count; i++) {
+            List list1 = list.subList(i * base_count, i * base_count + base_count);
             //System.out.println(list1.get(0)+"-----"+list1.get(list1.size()-1));
-           teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(i*base_count,i*base_count+base_count-1));
+            teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(i * base_count, i * base_count + base_count - 1));
+            logger.info("splitByTwoThousandsMessage:[{}] :begin:[{}]:end:[{}]",i,i * base_count,i * base_count + base_count - 1);
         }
-        List list2 = list.subList(count*base_count,count*base_count+yushu);
+        List list2 = list.subList(count * base_count, count * base_count + yushu);
 
         //System.out.println(list2.get(0)+"-----"+list2.get(list2.size()-1));
-        teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(count*base_count,count*base_count+yushu-1));
+        teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(count * base_count, count * base_count + yushu - 1));
+        logger.info("splitByTwoThousandsMessage: last :begin:[{}]:end:[{}]",count * base_count,count * base_count + yushu - 1);
 
     }
 
 
     public static void main(String[] args) {
-        CourseNotifyOneDayServiceX  t = new CourseNotifyOneDayServiceX();
+        CourseNotifyOneDayServiceX t = new CourseNotifyOneDayServiceX();
 
         List list = Lists.newArrayList();
 
-        for(int i=0;i<5;i++){
+        for (int i = 0; i < 5; i++) {
             list.add(i);
         }
 
