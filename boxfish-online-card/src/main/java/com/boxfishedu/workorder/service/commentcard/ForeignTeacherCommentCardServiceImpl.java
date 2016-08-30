@@ -60,7 +60,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Transactional
     public CommentCard foreignTeacherCommentCardAdd(CommentCardForm commentCardForm, Long userId, String access_token) {
         CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
-        if(! serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
+        if(!serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
         }
         com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
@@ -98,9 +98,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Override
     public void foreignTeacherCommentUpdateAnswer(FromTeacherStudentForm fromTeacherStudentForm) {
-        CommentCard commentCard = commentCardJpaRepository.findById(fromTeacherStudentForm.getFishCardId());
-        if (StringUtils.isEmpty(commentCard)){
-            logger.info("根据点评卡id查到的点评卡为空,点评卡id来自师生运营回传参数:"+fromTeacherStudentForm);
+        CommentCard commentCard = commentCardJpaRepository.findOne(fromTeacherStudentForm.getFishCardId());
+        logger.info("@foreignTeacherCommentUpdateAnswer接收师生运营分配老师:"+fromTeacherStudentForm+",并准备修改点评卡:"+commentCard);
+        if (Objects.isNull(commentCard)){
+            logger.info("@foreignTeacherCommentUpdateAnswer根据点评卡id查到的点评卡为空,点评卡id来自师生运营回传参数:"+fromTeacherStudentForm);
             throw new UnauthorizedException("不存在的点评卡!");
         }else {
             if(Objects.isNull(fromTeacherStudentForm.getTeacherId())){
@@ -168,7 +169,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public CommentCard foreignTeacherCommentDetailQuery(Long id,Long userId) {
         logger.info("调用学生查询某条外教点评具体信息接口,并将此条设置为已读,其中id="+id);
         CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
-        if(StringUtils.isEmpty(commentCard)){
+        if(Objects.isNull(commentCard)){
             logger.info("用户所查点评卡不存在,用户userId="+userId,", 点评卡id="+id);
             throw new UnauthorizedException();
         }
@@ -180,7 +181,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
-    @Transactional
     public void foreignTeacherCommentUnAnswer() {
         logger.info("调用--查询24小时未点评的外教--接口");
         // 超过24小时,未超过48小时
@@ -251,7 +251,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
-    @Transactional
     public void foreignTeacherCommentUnAnswer2() {
         logger.info("调用--查询48小时未点评的外教--接口");
         LocalDateTime now = LocalDateTime.now();
@@ -306,7 +305,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
 
     @Override
-    @Transactional
     public void foreignUndistributedTeacherCommentCards() {
         logger.info("调用-查询24小时内暂时还未分配到老师的点评卡--接口,为其重新请求分配老师...");
         LocalDateTime now = LocalDateTime.now();
