@@ -18,6 +18,9 @@ public class CommentCardForm {
 
     private String answerVideoPath;
 
+    private Long fromTeacherId;
+    private Long toTeacherId;
+
     //测试用数据
     private Integer status;
     private Long answerVideoTime;

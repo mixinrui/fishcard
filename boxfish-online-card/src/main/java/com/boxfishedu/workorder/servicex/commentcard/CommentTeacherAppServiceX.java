@@ -63,7 +63,7 @@ public class CommentTeacherAppServiceX {
         commentCard.setStudentReadFlag(0);
         commentCard.setStatus(CommentCardStatus.ANSWERED.getCode());
         commentCard.setUpdateTime(new Date());
-        commentCard.setTeacherId(commentCardSubmitParam.getTeacherId());//测试时使用,正式去掉
+        //commentCard.setTeacherId(commentCardSubmitParam.getTeacherId());//测试时使用,正式去掉
         commentCard.setAnswerVideoPath(commentCardSubmitParam.getVideoPath());
         commentCard.setAnswerVideoTime(commentCardSubmitParam.getAnswerVideoTime());
         commentCard.setAnswerVideoSize(commentCardSubmitParam.getAnswerVideoSize());

@@ -18,6 +18,7 @@ public enum CommentCardStatus {
 
     ASSIGN_TEACHER_ONCE(1,"第一次分配外教"),
     ASSIGN_TEACHER_TWICE(2,"第二次分配外教"),
+    ASSIGN_TEACHER_TRIPLE(3,"强制换掉外教"),
 
     AMOUNT_ADD(1,"点评次数加1"),
     AMOUNT_MINUS(-1,"点评次数减1");
