@@ -42,4 +42,6 @@ public interface ForeignTeacherCommentCardService {
     public JsonResultModel countTeacherUnreadCommentCards(Long userId);
 
     public void updateCommentCardsPictures(UpdatePicturesForm updatePicturesForm);
+
+    public void forceToChangeTeacher(Long fromTeacherId,Long toTeacherId);
 }
