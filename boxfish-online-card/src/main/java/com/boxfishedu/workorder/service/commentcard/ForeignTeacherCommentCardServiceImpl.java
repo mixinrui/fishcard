@@ -89,6 +89,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             logger.info("@foreignTeacherCommentCardAdd点评次数消耗一次...");
             CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
             commentCardStatistics.setCommentCardId(newCommentCard.getId());
+            commentCardStatistics.setStudentId(newCommentCard.getStudentId());
+            commentCardStatistics.setAmount(service.getAmount());
             commentCardStatistics.setServicedId(service.getId());
             commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_MINUS.getCode());
             commentCardStatisticsJpaRepository.save(commentCardStatistics);
@@ -305,6 +307,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             logger.info("@foreignTeacherCommentUnAnswer2外教在48小时内未点评,为学生返还点评次数...");
             CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
             commentCardStatistics.setCommentCardId(commentCard.getId());
+            commentCardStatistics.setStudentId(commentCard.getStudentId());
+            commentCardStatistics.setAmount(serviceTemp.getAmount());
             commentCardStatistics.setServicedId(serviceTemp.getId());
             commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_ADD.getCode());
             commentCardStatisticsJpaRepository.save(commentCardStatistics);
