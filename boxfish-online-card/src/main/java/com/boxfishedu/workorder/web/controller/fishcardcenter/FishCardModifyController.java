@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardModifyServiceX;
 import com.boxfishedu.workorder.web.param.CourseChangeParam;
+import com.boxfishedu.workorder.web.param.StartTimeParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.FishCardDeleteParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by hucl on 16/5/10.
  * 供内部接口更换课程
+ * 换时间
  */
 @CrossOrigin
 @RestController
@@ -39,4 +41,15 @@ public class FishCardModifyController {
         }
         return JsonResultModel.newJsonResultModel("success");
     }
+
+    /**
+     * 更换上课时间
+     * @param startTimeParam  包含鱼卡id  开始时间
+     * @return
+     */
+    @RequestMapping(value = "/changeStartTime", method = RequestMethod.PUT)
+    public JsonResultModel changeStartTime(@RequestBody StartTimeParam startTimeParam) {
+        return fishCardModifyServiceX.changeStartTime(startTimeParam);
+    }
+
 }

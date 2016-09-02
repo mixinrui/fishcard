@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.web.param.StartTimeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.FishCardDeleteParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.config.UrlConf;
@@ -65,6 +66,9 @@ public class FishCardModifyServiceX {
 
     @Autowired
     private FishCardModifyService fishCardModifyService;
+
+    @Autowired
+    private CourseOnlineRequester  courseOnlineRequester;
 
     @Autowired
     private UrlConf urlConf;
@@ -186,6 +190,89 @@ public class FishCardModifyServiceX {
             WorkOrder workOrder = workOrderService.findOne(id);
             teacherStudentRequester.notifyCancelTeacher(workOrder);
         }
+    }
+
+
+    /**
+     * 更改上课时间点
+     * @param startTimeParam
+     * @return
+     */
+    @Transactional
+    public JsonResultModel  changeStartTime(StartTimeParam startTimeParam){
+        Map<String,String> resultMap = Maps.newHashMap();
+        // 检查日期合法化
+        boolean  dataFlag = checkDate(startTimeParam);
+        if(!dataFlag){
+            resultMap.put("code","1");
+            resultMap.put("msg","日期不合法");
+            return  JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        //获取鱼卡信息
+        WorkOrder workOrder =workOrderService.findByIdForUpdate(startTimeParam.getWorkOrderId())   ;
+        // 验证鱼卡状态 创建、分配课程、分配老师
+
+        //获取结束时间
+        Date endDate = DateUtil.addSecond(startTimeParam.getBeginDateFormat(),25);
+
+        //分配教师以后其实就已经是就绪,目前这两个状态有重叠
+        if(workOrder.getStatus()!=FishCardStatusEnum.CREATED.getCode() || workOrder.getStatus()!=FishCardStatusEnum.COURSE_ASSIGNED.getCode() || workOrder.getStatus()!=FishCardStatusEnum.TEACHER_ASSIGNED.getCode()){
+            resultMap.put("code","2");
+            resultMap.put("msg","鱼卡状态不正确");
+        }else {
+            if(workOrder.getStatus()!=FishCardStatusEnum.CREATED.getCode()){
+                workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+            }
+
+            workOrder.setStartTime(startTimeParam.getBeginDateFormat() );
+            workOrder.setEndTime(endDate );
+        }
+
+
+
+
+
+
+
+        // 如果 含有 教室id  进行教室资源释放
+
+        //通知师生运营释放教师资源
+        teacherStudentRequester.releaseTeacher(workOrder);
+        //通知小马解散师生关系
+        courseOnlineRequester.releaseGroup(workOrder);
+
+        // 记录日志
+        workOrderLogService.saveWorkOrderLog(workOrder,"换时间");
+        return new JsonResultModel().newJsonResultModel("OK");
+    }
+
+    /**
+     * 判断日期合法性
+     * @param startTimeParam
+     * @return
+     */
+    private boolean checkDate(StartTimeParam startTimeParam){
+        // 日期为空判断
+        if(startTimeParam == null || null ==startTimeParam.getBeginDate())
+            return false;
+        //日期长度判断
+        if(startTimeParam.getBeginDate().length()<16)
+            return false;
+
+        String minutes = startTimeParam.getBeginDate().substring(14,16);
+        if(!minutes.equals("00") || !minutes.equals("30")){
+            return false;
+        }
+
+        startTimeParam.setBeginDateFormat(DateUtil.String2Date(startTimeParam.getBeginDate()));
+
+        // 大于现在的时间
+        if(startTimeParam.getBeginDateFormat().after(new Date())){
+            return false;
+        }
+        return true;
+
     }
 
 }
