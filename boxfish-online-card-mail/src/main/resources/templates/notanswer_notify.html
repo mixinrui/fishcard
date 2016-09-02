@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>12小时内未回复的老师</title>
+</head>
+<body>
+
+<table class="table table-striped">
+    <caption>12小时未回复老师列表</caption>
+    <thead>
+    <tr>
+        <th style="width: 100px;">序号</th>
+        <th style="width: 100px;">点评ID</th>
+        <th style="width: 100px;">学生ID</th>
+        <th style="width: 100px;">老师ID</th>
+        <th style="width: 100px;">老师姓名</th>
+        <th style="width: 200px;">发起点评时间</th>
+        <th style="width: 100px;">时长(小时)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="card,iterCard: ${cards}">
+        <td th:text="${iterCard.index + 1}"></td>
+        <td th:text="${card.id}"></td>
+        <td th:text="${card.studentId}"></td>
+        <td th:text="${card.teacherInfo.teacherId}"></td>
+        <td th:text="${card.teacherInfo.name}"></td>
+        <td th:text="${card.studentAskTime}"></td>
+        <td th:text="${card.hours}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

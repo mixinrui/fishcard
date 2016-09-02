@@ -1,0 +1,41 @@
+spring.jpa:
+  show-sql: true
+#  generate-ddl: true
+#  hibernate.ddl-auto: update
+  database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
+  hibernate.naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+
+spring.datasource:
+  driver-class-name: com.mysql.jdbc.Driver
+  test-while-idle: true
+  validation-query: SELECT 1
+  initial-size: 2
+  max-active: 50
+  max-idle: 20
+  connection-timeout: 5000
+  autoReconnect: true
+  jdbc-interceptors: SlowQueryReport(threshold=1000)
+
+spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
+spring.jackson.time-zone: GMT+8
+
+#spring.profiles.active: product
+spring.profiles.active: local
+#spring.profiles.active: development
+#spring.profiles.active: test
+#spring.profiles.active: demo
+#spring.profiles.active: pretest
+
+
+#===============================================================local======================================================================
+---
+spring:
+  datasource:
+#    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: Box123456
+  profiles: test
+
+server.port: 8085
+

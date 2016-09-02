@@ -1,0 +1,66 @@
+spring.jpa:
+  show-sql: true
+#  generate-ddl: true
+#  hibernate.ddl-auto: update
+  database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
+  hibernate.naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+
+spring.datasource:
+  driver-class-name: com.mysql.jdbc.Driver
+  test-while-idle: true
+  validation-query: SELECT 1
+  initial-size: 2
+  max-active: 50
+  max-idle: 20
+  connection-timeout: 5000
+  autoReconnect: true
+  jdbc-interceptors: SlowQueryReport(threshold=1000)
+
+spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
+spring.jackson.time-zone: GMT+8
+
+#spring.profiles.active: product
+#spring.profiles.active: local
+#spring.profiles.active: development
+spring.profiles.active: test
+#spring.profiles.active: demo
+#spring.profiles.active: pretest
+
+
+
+mail:
+  notAnswerOver12HoursRecipients:
+    recipients: luolibing@boxfish.cn, 3324941283@qq.com
+    sender: luolibing@boxfish.cn
+    subject: 12小时未回复点评列表
+
+
+#===============================================================test环境======================================================================
+---
+spring:
+  datasource:
+#    url: jdbc:mysql://boxfish2016inside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://boxfish-online-2016-outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: nEaJiP7hwoXEUkPDnDjaBK3hEJanHTec
+  profiles: test
+
+  mail:
+    host: smtp.exmail.qq.com
+    port: 25
+    username: luolibing@boxfish.cn
+    password: Luo198788
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: false
+
+service:
+  sdk:
+    teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
+
+server.port: 8085
+
