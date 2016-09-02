@@ -12,6 +12,7 @@
         <module>boxfish-online-card</module>
         <module>boxfish-online-card-timer</module>
         <module>boxfish-online-card-component</module>
+        <module>boxfish-online-card-mail</module>
     </modules>
 
 
