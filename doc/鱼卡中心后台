@@ -192,3 +192,8 @@ method:post
     "userName":"boxfishcard007",
     "passWord":"fishcard0000007a"
 }
+
+##########获取订单类型列表
+http://127.0.0.1:8080/backend/fishcard/orderType/list
+method:get
+参数:无

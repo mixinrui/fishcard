@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
 import com.boxfishedu.card.bean.CourseTypeEnum;
+import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
@@ -66,7 +67,7 @@ public class FishCardQueryController {
 
 
     /**
-     * 获取课程类型(给张一前段提供)
+     * 获取课程类型(前段提供)
      * @return
      * @throws Exception
      */
@@ -74,6 +75,18 @@ public class FishCardQueryController {
     public JsonResultModel listCourseType() throws Exception {
         return JsonResultModel.newJsonResultModel( CourseTypeEnum.values());
     }
+
+    /**
+     * 获取订单类型(前段提供)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/orderType/list", method = RequestMethod.GET)
+    public JsonResultModel listOrderType() throws Exception {
+        return JsonResultModel.newJsonResultModel( OrderChannelDesc.values());
+    }
+
+
 
 
 

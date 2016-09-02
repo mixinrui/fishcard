@@ -40,5 +40,7 @@ public class FishCardFilterParam {
 
     private Integer rechargeValue;
 
+    private String orderType;// 订单类型
+
 
 }
