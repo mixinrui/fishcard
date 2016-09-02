@@ -1,7 +1,7 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.card.comment.manage.entity.mysql.ToTeacherStudentForm;
+import com.boxfishedu.card.comment.manage.entity.form.ToTeacherStudentForm;
 import org.springframework.stereotype.Service;
 
 /**
