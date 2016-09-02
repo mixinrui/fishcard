@@ -37,5 +37,9 @@ spring:
     password: Box123456
   profiles: local
 
+service:
+  sdk:
+    teacherStudentBusinessUrl: http://101.201.237.252:8099
+
 server.port: 8085
 
