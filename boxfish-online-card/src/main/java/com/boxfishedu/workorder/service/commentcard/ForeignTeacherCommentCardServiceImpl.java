@@ -339,7 +339,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         for (CommentCard commentCard: list) {
             ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
-            logger.debug("@foreignUndistributedTeacherCommentCards向师生运营发生消息,通知分配外教进行点评...");
+            logger.debug("@foreignUndistributedTeacherCommentCards向师生运营发生消息,通知分配外教进行点评..."+commentCard);
             rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
         }
     }
