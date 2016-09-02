@@ -8,6 +8,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.card.comment.manage.entity.form.ToTeacherStudentForm;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by ansel on 16/9/2.
@@ -34,4 +37,15 @@ public class CommentCardManageSDK {
                 .toUri();
     }
 
+    public JsonResultModel freezeTeacherId(Long teacherId){
+        return null;
+    }
+
+    public JsonResultModel unfreezeTeacherId(Long teacherId){
+        return null;
+    }
+
+    public JsonResultModel getTeacherIdList(ToTeacherStudentForm toTeacherStudentForm){
+        return null;
+    }
 }

@@ -1,4 +1,4 @@
-package com.boxfishedu.card.comment.manage.entity.mysql;
+package com.boxfishedu.card.comment.manage.entity.form;
 
 import lombok.Data;
 
