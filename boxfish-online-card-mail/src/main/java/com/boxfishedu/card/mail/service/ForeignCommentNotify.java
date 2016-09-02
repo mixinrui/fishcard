@@ -46,8 +46,8 @@ public class ForeignCommentNotify {
 
 
     //9-23/2
-//    @Scheduled(cron = "0 0 9-23/2 * * *")
-    @Scheduled(cron = "5-50/20 * * * * *")
+    @Scheduled(cron = "0 0 9-23/2 * * *")
+//    @Scheduled(cron = "5-50/20 * * * * *")
     public void notifyNotAnswerOver12Hours() throws MessagingException {
         List<CommentCard> commentCards = getNotAnswerOver12HoursList();
         new CardMimeMailSender()
