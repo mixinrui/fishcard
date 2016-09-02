@@ -53,12 +53,6 @@ public class ForeignTeacherCommentController {
         }
     }
 
-    //@RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
-    public JsonResultModel haveAvailableForeignCommentService(long userId) {
-        return JsonResultModel.newJsonResultModel(
-                Collections.singletonMap("available", serveService.haveAvailableForeignCommentService(userId)));
-    }
-
     @RequestMapping(value = "/count", method = RequestMethod.GET)
     public JsonResultModel getAvailableForeignCommentServiceCount(long userId) {
         return JsonResultModel.newJsonResultModel(serveService.getForeignCommentServiceCount(userId));
@@ -69,14 +63,27 @@ public class ForeignTeacherCommentController {
         return foreignTeacherCommentCardService.countStudentUnreadCommentCards(userId);
     }
 
+    //强制换老师
+    @RequestMapping(value = "/force_to_change_teacher",method = RequestMethod.PUT)
+    public JsonResultModel forceToChangeTeacher(@RequestBody CommentCardForm commentCardForm){
+        foreignTeacherCommentCardService.forceToChangeTeacher(commentCardForm.getFromTeacherId(),commentCardForm.getToTeacherId());
+        return JsonResultModel.newJsonResultModel();
+    }
+
+    //@RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
+    public JsonResultModel haveAvailableForeignCommentService(long userId) {
+        return JsonResultModel.newJsonResultModel(
+                Collections.singletonMap("available", serveService.haveAvailableForeignCommentService(userId)));
+    }
+
     //测试用接口
-    //@RequestMapping(value = "/test_teacher_comment", method = RequestMethod.POST)
+    @RequestMapping(value = "/test_teacher_comment", method = RequestMethod.POST)
     public JsonResultModel testTeacherComment(@RequestBody CommentCardForm commentCardForm, Long userId,String access_token){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testTeacherComment(commentCardForm,userId,access_token));
     }
 
     //测试用接口
-    //@RequestMapping(value = "/test_query_all", method = RequestMethod.GET)
+    @RequestMapping(value = "/test_query_all", method = RequestMethod.GET)
     public JsonResultModel testQueryAll(Pageable pageable){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
