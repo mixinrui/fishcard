@@ -11,4 +11,8 @@ import org.springframework.data.domain.Pageable;
 public interface CommentCardService {
 
     Page<CommentCardDto> findCommentCardByOptions(CommentCardForm commentCardForm, Pageable pageable);
+
+    CommentCardDto findCommentCardById(Long id);
+
+    void changeTeacher(Long id, Long teacherId);
 }

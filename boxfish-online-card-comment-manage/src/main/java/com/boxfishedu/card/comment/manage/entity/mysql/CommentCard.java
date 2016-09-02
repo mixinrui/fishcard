@@ -1,12 +1,17 @@
 package com.boxfishedu.card.comment.manage.entity.mysql;
 
+import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +24,7 @@ import java.util.List;
 @Table(name = "comment_card")
 @ToString(exclude = {"unAnswerTeacherCards","service"})
 @EqualsAndHashCode(exclude = {"unAnswerTeacherCards"})
-public class CommentCard {
+public class CommentCard implements Serializable {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -134,4 +139,33 @@ public class CommentCard {
         this.studentCommentBadTagCode = String.join(",", studentCommentBadTagCode);
     }
 
+    // 换老师逻辑
+    public CommentCard changeTeacher(Long targetTeacher) {
+        Duration duration = Duration.between(studentAskTime.toInstant(), Instant.now());
+        // 没有超过24小时的不能换老师
+        if(duration.toHours() < 24) {
+            throw new IllegalArgumentException("没有超过24小时不能更换老师");
+        }
+
+        Date now = new Date();
+        // 复制一份点评作为新的外教点评
+        CommentCard newCommentCard = (CommentCard) SerializationUtils.clone(this);
+        newCommentCard.setId(null);
+        newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        newCommentCard.setTeacherId(targetTeacher);
+        newCommentCard.setUpdateTime(now);
+
+        // 之前的老师标记为过期,并且标记为后台强制更换老师
+        status = CommentCardStatus.OVERTIME.getCode();
+        assignTeacherCount = CommentCardStatus.ASSIGN_TEACHER_TRIPLE.getCode();
+        teacherReadFlag = CommentCardStatus.TEACHER_UNREAD.getCode();
+        updateTime = now;
+        assignTeacherTime = now;
+        return newCommentCard;
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }
