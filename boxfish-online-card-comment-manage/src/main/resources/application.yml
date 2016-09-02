@@ -35,7 +35,7 @@ spring:
     url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
     username: service
     password: Box123456
-  profiles: test
+  profiles: local
 
 server.port: 8085
 
