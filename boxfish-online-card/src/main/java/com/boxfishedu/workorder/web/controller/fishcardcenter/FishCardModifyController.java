@@ -47,7 +47,7 @@ public class FishCardModifyController {
      * @param startTimeParam  包含鱼卡id  开始时间
      * @return
      */
-    @RequestMapping(value = "/changeStartTime", method = RequestMethod.PUT)
+    @RequestMapping(value = "/changeStartTime", method = RequestMethod.POST)
     public JsonResultModel changeStartTime(@RequestBody StartTimeParam startTimeParam) {
         return fishCardModifyServiceX.changeStartTime(startTimeParam);
     }

@@ -98,13 +98,13 @@ public class AvaliableTimeServiceX {
         avaliableTimeParam.setStudentId(workOrder.getStudentId());
         avaliableTimeParam.setComboType(workOrder.getService().getComboType());
         avaliableTimeParam.setTutorType(workOrder.getService().getTutorType());
-
+        avaliableTimeParam.setDate(date);
 
 
         Integer days = new Integer(1);
         // 获取时间区间
-        DateRange dateRange = getEnableDateRange(avaliableTimeParam, days);
-
+        DateRange dateRange = getEnableDateRangeCurrentDay(avaliableTimeParam, days);
+       logger.info("getTimeAvailableChangeTimes [{}]",DateUtil.date2SimpleDate(DateUtil.String2Date(date)));
         // TODO  获取当天的时间
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndCurrentDate(avaliableTimeParam.getStudentId(),DateUtil.date2SimpleDate(DateUtil.String2Date(date))  );
         // 获取时间片模板,并且复制
@@ -115,11 +115,6 @@ public class AvaliableTimeServiceX {
 //            DayTimeSlots result = timeLimitPolicy.limit(clone);
             //获取时间片范围内的数据
             DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
-            //随机显示热点时间片
-            result=randomSlotFilterService.removeExculdeSlot(result,avaliableTimeParam);
-//            result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
-//                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
-//                    .collect(Collectors.toList()));
             return result;
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
@@ -167,6 +162,12 @@ public class AvaliableTimeServiceX {
         if(afterDays > 0) {
             startDate = startDate.plusDays(afterDays);
         }
+        return new DateRange(startDate, days);
+    }
+
+    private DateRange getEnableDateRangeCurrentDay(AvaliableTimeParam avaliableTimeParam, Integer days) {
+        Date date = DateUtil.date2SimpleDate(DateUtil.String2Date(avaliableTimeParam.getDate()))  ;
+        LocalDateTime startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
         return new DateRange(startDate, days);
     }
 

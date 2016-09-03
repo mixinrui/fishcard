@@ -13,6 +13,12 @@ public class StartTimeParam {
 
     private String beginDate;
 
+    private String endDate;
+
     private Date beginDateFormat;
+
+    private Date endDateFormat;
+
+    private int timeslotId;
 
 }
