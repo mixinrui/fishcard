@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -88,6 +89,57 @@ public class AvaliableTimeServiceX {
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
     }
+
+
+    public JsonResultModel getTimeAvailableChangeTime(Long workOrderId,String date) throws CloneNotSupportedException {
+        WorkOrder workOrder = validateAndGetWorkOrder(workOrderId);
+
+        AvaliableTimeParam avaliableTimeParam  = new AvaliableTimeParam();
+        avaliableTimeParam.setStudentId(workOrder.getStudentId());
+        avaliableTimeParam.setComboType(workOrder.getService().getComboType());
+        avaliableTimeParam.setTutorType(workOrder.getService().getTutorType());
+
+
+
+        Integer days = new Integer(1);
+        // 获取时间区间
+        DateRange dateRange = getEnableDateRange(avaliableTimeParam, days);
+
+        // TODO  获取当天的时间
+        Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndCurrentDate(avaliableTimeParam.getStudentId(),DateUtil.date2SimpleDate(DateUtil.String2Date(date))  );
+        // 获取时间片模板,并且复制
+        DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate((long) avaliableTimeParam.getComboTypeEnum().getValue());
+        List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(dayTimeSlots, (localDateTime, d) -> {
+            DayTimeSlots clone = (DayTimeSlots) d.clone();
+            clone.setDay(DateUtil.formatLocalDate(localDateTime));
+//            DayTimeSlots result = timeLimitPolicy.limit(clone);
+            //获取时间片范围内的数据
+            DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
+            //随机显示热点时间片
+            result=randomSlotFilterService.removeExculdeSlot(result,avaliableTimeParam);
+//            result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+//                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+//                    .collect(Collectors.toList()));
+            return result;
+        });
+        return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
+    }
+
+
+
+    private WorkOrder validateAndGetWorkOrder(Long workOrderId) {
+        WorkOrder workOrder;
+        try {
+            workOrder = workOrderService.findOne(workOrderId);
+            if (null == workOrder) {
+                throw new BusinessException("鱼卡在服务端无对应的服务");
+            }
+        } catch (Exception ex) {
+            throw new BusinessException("传入鱼卡的id在服务端无对应服务");
+        }
+        return workOrder;
+    }
+
 
     /**
      * 获取可选的时间区间

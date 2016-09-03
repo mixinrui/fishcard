@@ -85,4 +85,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     @Query("select concat(c.classDate,' ',c.timeSlotId) from CourseSchedule c where c.studentId=?1 and c.classDate>=?2 and c.status<40")
     Set<String> findUnfinishByStudentIdAndAfterDate(Long studentId, Date afterDate);
+
+    @Query("select concat(c.classDate,' ',c.timeSlotId) from CourseSchedule c where c.studentId=?1 and c.classDate=?2 and c.status<40")
+    Set<String> findUnfinishByStudentIdAndCurrentDate(Long studentId, Date Date);
 }

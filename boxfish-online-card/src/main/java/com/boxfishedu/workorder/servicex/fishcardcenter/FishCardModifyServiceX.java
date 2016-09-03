@@ -211,6 +211,7 @@ public class FishCardModifyServiceX {
 
         //获取鱼卡信息
         WorkOrder workOrder =workOrderService.findByIdForUpdate(startTimeParam.getWorkOrderId())   ;
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
         // 验证鱼卡状态 创建、分配课程、分配老师
 
         //获取结束时间
@@ -227,13 +228,12 @@ public class FishCardModifyServiceX {
 
             workOrder.setStartTime(startTimeParam.getBeginDateFormat() );
             workOrder.setEndTime(endDate );
+
+            workOrderService.save(workOrder);
+
         }
 
-
-
-
-
-
+        // 调用分配老师接口
 
         // 如果 含有 教室id  进行教室资源释放
 
