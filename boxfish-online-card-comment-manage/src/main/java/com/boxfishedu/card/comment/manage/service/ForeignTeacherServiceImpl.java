@@ -1,9 +1,11 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import com.boxfishedu.card.comment.manage.entity.form.FromTeacherStudentForm;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
+import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +58,11 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
                 if (Objects.nonNull(teacherForm.getTeacherId())){
                     predicateList.add(criteriaBuilder.equal(root.get("teacherId"),teacherForm.getTeacherId()));
                 }
-                if (StringUtils.isNotEmpty(teacherForm.getTeacherName()))
-                return new Predicate[0];
+                if (StringUtils.isNotEmpty(teacherForm.getTeacherName())){
+                    predicateList.add(criteriaBuilder.equal(root.get("teacherName"),teacherForm.getTeacherName()));
+                }
+                predicateList.add(criteriaBuilder.equal(root.get("teacherStatus"), CommentCardStatus.TEACHER_NORMAL.getCode()));
+                return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };
         return null;
