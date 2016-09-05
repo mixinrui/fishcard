@@ -144,7 +144,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 Map<String,String> innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
                 if(!StringUtils.isEmpty(innerTeacherMap.get("teacherId"))) {
                     commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
-                    commentCard.setTeacherName(innerTeacherMap.get("teacherName"));
+                    commentCard.setTeacherName(innerTeacherMap.get("teacherFirstName")+innerTeacherMap.get("teacherLastName"));
                     commentCard.setTeacherFirstName(innerTeacherMap.get("teacherFirstName"));
                     commentCard.setTeacherLastName(innerTeacherMap.get("teacherLastName"));
                     commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
@@ -173,7 +173,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCard.setTeacherId(fromTeacherStudentForm.getTeacherId());
                 commentCard.setTeacherFirstName(fromTeacherStudentForm.getTeacherFirstName());
                 commentCard.setTeacherLastName(fromTeacherStudentForm.getTeacherLastName());
-                commentCard.setTeacherName(fromTeacherStudentForm.getTeacherName());
+                commentCard.setTeacherName(fromTeacherStudentForm.getTeacherFirstName()+fromTeacherStudentForm.getTeacherLastName());
                 commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
                 commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
                 commentCard.setUpdateTime(dateNow);
@@ -237,7 +237,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 paramMap.put("courseId",commentCard.getCourseId());
                 Map<String,String> innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
                 commentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
-                commentCard.setTeacherName(innerTeacherMap.get("teacherName"));
+                commentCard.setTeacherName(innerTeacherMap.get("teacherFirstName")+innerTeacherMap.get("teacherLastName"));
                 commentCard.setTeacherFirstName(innerTeacherMap.get("teacherFirstName"));
                 commentCard.setTeacherLastName(innerTeacherMap.get("teacherLastName"));
                 commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
@@ -281,7 +281,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 paramMap.put("courseId",newCommentCard.getCourseId());
                 Map<String,String> innerTeacherMap = (Map)commentCardSDK.getInnerTeacherId(paramMap).getData();
                 newCommentCard.setTeacherId(Long.parseLong(innerTeacherMap.get("teacherId").toString()));
-                commentCard.setTeacherName(innerTeacherMap.get("teacherName"));
+                commentCard.setTeacherName(innerTeacherMap.get("teacherFirstName")+innerTeacherMap.get("teacherLastName"));
                 commentCard.setTeacherFirstName(innerTeacherMap.get("teacherFirstName"));
                 commentCard.setTeacherLastName(innerTeacherMap.get("teacherLastName"));
                 commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
