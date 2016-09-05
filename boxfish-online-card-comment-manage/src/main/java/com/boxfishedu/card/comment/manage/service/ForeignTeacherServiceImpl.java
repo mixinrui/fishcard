@@ -2,6 +2,7 @@ package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.entity.form.ToTeacherStudentForm;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +21,7 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
     }
 
     @Override
-    public JsonResultModel getTeacherList(ToTeacherStudentForm toTeacherStudentForm) {
+    public JsonResultModel getTeacherList(ToTeacherStudentForm toTeacherStudentForm, Pageable pageable) {
         return null;
     }
 }

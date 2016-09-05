@@ -30,6 +30,9 @@ public class CommentCard {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "previous_id", nullable = true)
+    private Long previous_id;
+
     @Column(name = "student_id", nullable = true)
     private Long studentId;
 
@@ -63,6 +66,9 @@ public class CommentCard {
 
     @Column(name = "teacher_picture_path")
     private String teacherPicturePath;
+
+    @Column(name = "teacher_status")
+    private Integer teacherStatus;
 
     @Column(name="assign_teacher_count", nullable = true)
     private Integer assignTeacherCount = 0;
