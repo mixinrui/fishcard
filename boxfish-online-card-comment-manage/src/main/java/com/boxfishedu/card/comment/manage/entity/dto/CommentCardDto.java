@@ -1,6 +1,8 @@
 package com.boxfishedu.card.comment.manage.entity.dto;
 
+import com.boxfishedu.card.comment.manage.entity.dto.merger.CommentCardStatusMerger;
 import lombok.Data;
+import org.jdto.annotation.Source;
 
 import java.util.Date;
 
@@ -61,6 +63,9 @@ public class CommentCardDto {
     private Date studentCommentTeacherTime;
 
     private Integer status;
+
+    @Source(value = "status", merger = CommentCardStatusMerger.class)
+    private String statusDesc;
 
     private Date createTime;
 

@@ -1,12 +1,16 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
+import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
+import com.boxfishedu.card.comment.manage.entity.enums.NotAnswerTime;
 import com.boxfishedu.card.comment.manage.entity.form.CommentCardForm;
+import com.boxfishedu.card.comment.manage.entity.form.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import com.boxfishedu.card.comment.manage.util.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jdto.DTOBinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,15 +56,46 @@ public class CommentCardServiceImpl implements CommentCardService {
             @Override
             public Predicate[] predicates() {
                 List<Predicate> predicateList = new ArrayList<>();
-                // commentCardForm
-                if(Objects.nonNull(commentCardForm.getStudentAskTimeRange())) {
-                    CommentCardForm.DateRange dateRange = commentCardForm.getStudentAskTimeRange();
-                    predicateList.add(criteriaBuilder.between(
-                            root.get("studentAskTime"),
-                            DateUtils.parseFromDate(dateRange.getFrom()),
-                            DateUtils.parseFromDate(dateRange.getTo())
-                    ));
+
+                // 老师Id
+                if(Objects.nonNull(commentCardForm.getTeacherId())) {
+                    predicateList.add(criteriaBuilder.equal(root.get("teacherId"), commentCardForm.getTeacherId()));
                 }
+
+                // 学生Id
+                if(Objects.nonNull(commentCardForm.getStudentId())) {
+                    predicateList.add(criteriaBuilder.equal(root.get("studentId"), commentCardForm.getStudentId()));
+                }
+
+                // 状态
+                if(Objects.nonNull(commentCardForm.getStatus())) {
+                    // 未点评
+                    if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.NOTANSWER.value())) {
+                        predicateList.add(criteriaBuilder.lt(
+                                root.get("status"), CommentCardStatus.ANSWERED.getCode()));
+                        // 未点评的时候,时间段才起作用
+                        if(Objects.nonNull(commentCardForm.getNotAnswerTime())) {
+                            NotAnswerTime.DateRange dateRange = commentCardForm.getNotAnswerTime().getRange();
+                            predicateList.add(criteriaBuilder.between(
+                                    root.get("studentAskTime"), dateRange.getFrom(), dateRange.getTo()));
+                        }
+                    }
+                    // 已点评
+                    else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.ANSWERED.value())) {
+                        predicateList.add(criteriaBuilder.equal(
+                                root.get("status"), CommentCardStatus.ANSWERED.getCode()));
+                    }
+                    // 超时未点评
+                    else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.TIMEOUT.value())) {
+
+                    }
+                }
+
+                // 订单类型
+                if(StringUtils.isNotBlank(commentCardForm.getOrderChannel())) {
+
+                }
+
                 //.... 多条件
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
@@ -92,6 +127,29 @@ public class CommentCardServiceImpl implements CommentCardService {
 
         // 调用中外教运营老师减可分配次数
         // commentCardManageSDK.teacherDecrementCount(teacherId);
+    }
+
+    @Override
+    @Transactional
+    public void changeTeacherBatch(Long[] ids, Long teacherId) {
+        for(Long id : ids) {
+            changeTeacher(id, teacherId);
+        }
+    }
+
+    @Override
+    public Integer[] findNoAnswerCountsByAskTime() {
+        Integer[] result = new Integer[3];
+        result[0] = findNoAnswerCountByAskTime(NotAnswerTime._24HOURS.getRange());
+        result[1] = findNoAnswerCountByAskTime(NotAnswerTime._24_36HOURS.getRange());
+        result[2] = findNoAnswerCountByAskTime(NotAnswerTime._36HOURS.getRange());
+        return result;
+    }
+
+    private Integer findNoAnswerCountByAskTime(NotAnswerTime.DateRange dateRange) {
+        return commentCardJpaRepository.findNoAnswerCountByAskTime(
+                DateUtils.parseFromLocalDateTime(dateRange.getFrom()),
+                DateUtils.parseFromLocalDateTime(dateRange.getTo()));
     }
 
 }

@@ -15,4 +15,8 @@ public interface CommentCardService {
     CommentCardDto findCommentCardById(Long id);
 
     void changeTeacher(Long id, Long teacherId);
+
+    void changeTeacherBatch(Long[] ids, Long teacherId);
+
+    Integer[] findNoAnswerCountsByAskTime();
 }

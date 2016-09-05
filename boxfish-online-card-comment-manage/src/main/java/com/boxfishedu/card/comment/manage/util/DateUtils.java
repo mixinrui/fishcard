@@ -19,4 +19,8 @@ public class DateUtils {
     public static String format(LocalDateTime localDateTime) {
         return localDateTime.format(dateTimeFormatter);
     }
+
+    public static Date parseFromLocalDateTime(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
 }
