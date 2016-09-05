@@ -83,14 +83,13 @@ public class FishCardUpdatorServiceX {
         if (null == workOrder) {
             throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
         }
-        if (!workOrder.getStatus().equals(fishCardDelayMessage.getStatus())) {
-            logger.info("absentUpdator鱼卡:[{}]的已经处理过,没有旷课现象;当前状态:[{}]",
-                    workOrder.getId(), FishCardStatusEnum.getDesc(FishCardStatusEnum.TEACHER_ABSENT.getCode()));
+        if (!isTeacherAbsent(workOrder)) {
+            logger.info("@absentUpdator鱼卡:[{}]的已经处理过,没有旷课现象;当前状态:[{}]",
+                    workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             return;
         } else {
             CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
             courseOnlineService.notAllowUpdateStatus(workOrder);
-            workOrder.setUpdateTime(new Date());
 
             logger.warn("@[absentUpdator.teacher]鱼卡:[{}]的状态为教师旷课,开始处理", workOrder.getId());
             courseOnlineRequester.notifyTeachingOnlinePushMessage(fishCardDelayMessage.getId(), TeachingNotificationEnum.TEACHER_ABSENT);
@@ -258,5 +257,20 @@ public class FishCardUpdatorServiceX {
     private void handleStudentAbsent(FishCardDelayMessage fishCardDelayMessage, WorkOrder workOrder, CourseSchedule courseSchedule) {
         logger.info("@handleStudentAbsent->鱼卡[{}]处理TEACHER_CANCEL_PUSH", fishCardDelayMessage.getId());
 
+    }
+
+    //如果确定教师旷课返回true,否则返回false
+    private boolean isTeacherAbsent(WorkOrder workOrder){
+        List<WorkOrderLog> workOrderLogs=workOrderLogService.queryByWorkId(workOrder.getId());
+        if(CollectionUtils.isEmpty(workOrderLogs)){
+            logger.error("@excluedeTeacherAbsent获取到的鱼卡日志为空,可确定其为旷课,鱼卡id[{}]",workOrder.getId());
+            return true;
+        }
+        for(WorkOrderLog workOrderLog:workOrderLogs){
+            if(workOrderLog.getStatus()==FishCardStatusEnum.WAITFORSTUDENT.getCode()){
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -35,7 +35,7 @@ public class FishCardStatusFinderServiceX {
     public void teacherAbsentFinder() {
         logger.info("=================teacherAbsentFinder开始轮询课程开始情况,判断教师是否旷课");
         List<WorkOrder> workOrderList = fishCardStatusService.getCardsToStart();
-        logger.info("超过上课时间没有开始上课的数量:{}", workOrderList.size());
+        logger.info("@teacherAbsentFinder#超过上课时间没有开始上课的数量:{}", workOrderList.size());
         TreeSet<FishCardDelayMessage> treeSet = getFishCardDelayMessages(workOrderList, FishCardDelayMsgType.TEACHER_ABSENT);
         Iterator<FishCardDelayMessage> iterator=treeSet.iterator();
         while (iterator.hasNext()){
