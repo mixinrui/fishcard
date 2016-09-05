@@ -57,7 +57,7 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     List<CommentCard> findByDateRangeAndStatus2(Date from, Date to, Integer status);
 
     /**
-     * 为分配到老师
+     * 未分配到老师
      */
     @Query("select c from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=?3 and c.teacherId is null")
     List<CommentCard> findUndistributedTeacher(Date from, Date to, Integer status);

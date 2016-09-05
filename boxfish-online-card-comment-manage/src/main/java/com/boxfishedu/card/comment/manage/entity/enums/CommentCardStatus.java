@@ -23,7 +23,10 @@ public enum CommentCardStatus implements BaseEnum {
     ASSIGN_TEACHER_TRIPLE(3,"强制换掉外教"),
 
     AMOUNT_ADD(1,"点评次数加1"),
-    AMOUNT_MINUS(-1,"点评次数减1");
+    AMOUNT_MINUS(-1,"点评次数减1"),
+
+    TEACHER_NORMAL(200,"老师账号正常"),
+    TEACHER_FREEZE(500,"老师账号已冻结");
     private int code;
     private String status;
 

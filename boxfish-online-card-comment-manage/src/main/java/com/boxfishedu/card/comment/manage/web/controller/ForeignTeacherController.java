@@ -1,7 +1,11 @@
 package com.boxfishedu.card.comment.manage.web.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
+import com.boxfishedu.card.comment.manage.service.ForeignTeacherService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by ansel on 16/9/2.
@@ -9,4 +13,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/comment_teacher/manage")
 public class ForeignTeacherController {
+    @Autowired
+    ForeignTeacherService foreignTeacherService;
+
+    @RequestMapping(value = "/freeze_teacher_id/{teacherId}", method = RequestMethod.PUT)
+    public Object freezeTeacherId(@PathVariable Long teacherId){
+        foreignTeacherService.freezeTeacherId(teacherId);
+        return JsonResultModel.newJsonResultModel();
+    }
+
+    @RequestMapping(value = "/unfreeze_teacher_id/{teacherId}", method = RequestMethod.PUT)
+    public Object unfreezeTeacherId(@PathVariable  Long teacherId){
+        foreignTeacherService.unfreezeTeacherId(teacherId);
+        return JsonResultModel.newJsonResultModel();
+    }
+
+    @RequestMapping(value = "/get_teacher_operation/{teacherId}", method = RequestMethod.GET)
+    public Object getTeacherOperations(@PathVariable  Long teacherId){
+        return foreignTeacherService.getTeacherOperations(teacherId);
+    }
+
+    @RequestMapping(value = "/get_teacher_times/{teacherId}", method = RequestMethod.GET)
+    public Object getTeacherTimes(@PathVariable  Long teacherId){
+        return foreignTeacherService.getTeacherTimes(teacherId);
+    }
+
+    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    public Object getTeacherList(Pageable pageable, TeacherForm teacherForm){
+        return foreignTeacherService.getTeacherList(pageable,teacherForm);
+    }
 }
