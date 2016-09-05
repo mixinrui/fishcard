@@ -30,6 +30,9 @@ public class CommentCard implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "previous_id", nullable = true)
+    private Long previous_id;
+
     @Column(name = "student_id", nullable = true)
     private Long studentId;
 
