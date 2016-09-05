@@ -158,7 +158,6 @@ public class FishCardUpdatorServiceX {
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
 
         boolean containConnectedFlag = false;
-        boolean isOldVersion = true;
         LocalDateTime startLocalDate = LocalDateTime.ofInstant(workOrder.getStartTime().toInstant(), ZoneId.systemDefault()).minusMinutes(3);
         LocalDateTime endLocalDate = startLocalDate.plusMinutes(studentAbsentTimeLimit);
         Date startDate = DateUtil.localDate2Date(startLocalDate);
