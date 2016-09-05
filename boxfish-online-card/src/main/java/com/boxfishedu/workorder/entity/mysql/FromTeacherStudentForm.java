@@ -9,5 +9,7 @@ import lombok.Data;
 public class FromTeacherStudentForm {
     Long fishCardId;
     Long teacherId;
+    String teacherFirstName;
+    String teacherLastName;
     String teacherName;
 }

@@ -33,6 +33,9 @@ public class CommentCard {
     @Column(name = "student_id", nullable = true)
     private Long studentId;
 
+    @Column(name = "student_name", nullable = true)
+    private String studentName;
+
     @Column(name = "student_picture_path")
     private String studentPicturePath;
 
@@ -48,6 +51,15 @@ public class CommentCard {
 
     @Column(name = "teacher_id", nullable = true)
     private Long teacherId;
+
+    @Column(name = "teacher_first_name", nullable = true)
+    private String teacherFirstName;
+
+    @Column(name = "teacher_last_name",nullable = true)
+    private String teacherLastName;
+
+    @Column(name = "teacher_name", nullable = true)
+    private String teacherName;
 
     @Column(name = "teacher_picture_path")
     private String teacherPicturePath;
