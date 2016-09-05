@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
  * Created by LuoLiBing on 16/9/5.
  */
 public enum NotAnswerTime {
-    _24HOURS(0),_24_36HOURS(1), _36HOURS(2), ;
+    _24HOURS(0),_24_36HOURS(1), _36HOURS(2), _24_48HOURS(3);
 
     private int code;
 
@@ -20,6 +20,7 @@ public enum NotAnswerTime {
             case 0: return new DateRange(now.minusHours(24), now);
             case 1: return new DateRange(now.minusHours(36), now.minusHours(24));
             case 2: return new DateRange(now.minusHours(48), now.minusHours(36));
+            case 3: return new DateRange(now.minusHours(48), now.minusHours(24));
             default: throw new IllegalArgumentException("参数应该在(0,1,2)当中");
         }
     }

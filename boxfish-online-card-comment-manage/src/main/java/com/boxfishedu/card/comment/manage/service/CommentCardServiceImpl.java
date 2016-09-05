@@ -62,9 +62,19 @@ public class CommentCardServiceImpl implements CommentCardService {
                     predicateList.add(criteriaBuilder.equal(root.get("teacherId"), commentCardForm.getTeacherId()));
                 }
 
+                // 老师姓名
+                if(StringUtils.isNotBlank(commentCardForm.getTeacherName())) {
+                    predicateList.add(criteriaBuilder.equal(root.get("teacherName"), commentCardForm.getTeacherName()));
+                }
+
                 // 学生Id
                 if(Objects.nonNull(commentCardForm.getStudentId())) {
                     predicateList.add(criteriaBuilder.equal(root.get("studentId"), commentCardForm.getStudentId()));
+                }
+
+                // 学生姓名
+                if(StringUtils.isNotBlank(commentCardForm.getStudentName())) {
+                    predicateList.add(criteriaBuilder.equal(root.get("studentName"), commentCardForm.getStudentName()));
                 }
 
                 // 状态
@@ -87,7 +97,13 @@ public class CommentCardServiceImpl implements CommentCardService {
                     }
                     // 超时未点评
                     else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.TIMEOUT.value())) {
-
+                        predicateList.add(criteriaBuilder.lt(
+                                root.get("status"), CommentCardStatus.ANSWERED.getCode()
+                        ));
+                        NotAnswerTime.DateRange dateRange = NotAnswerTime._24_48HOURS.getRange();
+                        predicateList.add(criteriaBuilder.between(
+                                root.get("studentAskTime"), dateRange.getFrom(),dateRange.getTo()
+                        ));
                     }
                 }
 
@@ -100,6 +116,8 @@ public class CommentCardServiceImpl implements CommentCardService {
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };
+        // 排序方式 entityQuery.getQuery().orderBy(pageable.getSort().iterator());
+        entityQuery.orderBy(pageable.getSort().iterator());
         Page page = entityQuery.page();
         List<CommentCardDto> resultList = dtoBinder.bindFromBusinessObjectList(CommentCardDto.class, page.getContent());
         return new PageImpl<>(resultList, pageable, page.getTotalElements());
@@ -124,7 +142,6 @@ public class CommentCardServiceImpl implements CommentCardService {
         CommentCard newCommentCard = commentCard.changeTeacher(teacherId);
         commentCardJpaRepository.save(newCommentCard);
         commentCardJpaRepository.save(commentCard);
-
         // 调用中外教运营老师减可分配次数
         // commentCardManageSDK.teacherDecrementCount(teacherId);
     }

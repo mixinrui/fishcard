@@ -1,5 +1,6 @@
 package com.boxfishedu.card.comment.manage.entity.jpa;
 
+import com.google.common.collect.Lists;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -71,6 +73,10 @@ public abstract class EntityQuery<T> {
     public Long count() {
         TypedQuery<Long> q = this.entityManager.createQuery(this.getQueryForCount());
         return q.getSingleResult();
+    }
+
+    public void orderBy(Iterator<Sort.Order> orderIterator) {
+        query.orderBy(Lists.newArrayList(orderIterator));
     }
 
     private void sort() {

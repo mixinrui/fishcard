@@ -26,7 +26,7 @@ import java.util.List;
 @EqualsAndHashCode(exclude = {"unAnswerTeacherCards"})
 public class CommentCard implements Serializable {
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
@@ -134,6 +134,9 @@ public class CommentCard implements Serializable {
     @Column(name = "update_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
+
+    @Column(name = "service_id")
+    private Long serviceId;
 
     public String[] getStudentCommentGoodTagCode() {
         if(StringUtils.isNotEmpty(studentCommentGoodTagCode)) {
