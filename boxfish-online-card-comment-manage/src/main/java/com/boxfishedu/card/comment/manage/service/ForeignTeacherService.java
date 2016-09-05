@@ -1,7 +1,8 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.card.comment.manage.entity.form.ToTeacherStudentForm;
+import com.boxfishedu.card.comment.manage.entity.form.FromTeacherStudentForm;
+import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -9,9 +10,13 @@ import org.springframework.data.domain.Pageable;
  */
 
 public interface ForeignTeacherService{
-    public JsonResultModel freezeTeacherId(Long teacherId);
+    public void freezeTeacherId(Long teacherId);
 
-    public JsonResultModel unfreezeTeacherId(Long teacherId);
+    public void unfreezeTeacherId(Long teacherId);
 
-    public JsonResultModel getTeacherList(ToTeacherStudentForm toTeacherStudentForm, Pageable pageable);
+    public JsonResultModel getTeacherOperations(Long teacherId);
+
+    public JsonResultModel getTeacherTimes(Long teacherId);
+
+    public JsonResultModel getTeacherList(Pageable pageable,TeacherForm teacherForm);
 }
