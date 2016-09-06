@@ -247,8 +247,7 @@ public class GrabOrderServiceX {
     public String checkIfCanGrabOrderByOnlineTeacherGetTeacherName(GrabOrderView grabOrderView) throws BoxfishException {
 
         Map<String, Object> mapParams = this.makeParams(grabOrderView);
-        String url = "http://192.168.77.88:8099/order/course/schedule/add/order/time";   //TODO
-        //  String url=String.format("%s/order/course/schedule/add/order/time", urlConf.getTeacher_service());
+        String url=String.format("%s/order/course/schedule/add/order/time", urlConf.getTeacher_service());
         JsonResultModel jsonResultModel = restTemplate.postForObject(url, mapParams, JsonResultModel.class);
         if (jsonResultModel.getReturnCode() == HttpStatus.OK.value()) {
             /** 从师生运营获取教师姓名 **/
