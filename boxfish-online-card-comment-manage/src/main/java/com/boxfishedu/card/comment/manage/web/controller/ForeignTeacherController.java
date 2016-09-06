@@ -28,18 +28,23 @@ public class ForeignTeacherController {
         return JsonResultModel.newJsonResultModel();
     }
 
-    @RequestMapping(value = "/get_teacher_operation/{teacherId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/get/teacher_operations/{teacherId}", method = RequestMethod.GET)
     public Object getTeacherOperations(@PathVariable  Long teacherId){
         return foreignTeacherService.getTeacherOperations(teacherId);
     }
 
-    @RequestMapping(value = "/get_teacher_times/{teacherId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/get/teacher_times/{teacherId}", method = RequestMethod.GET)
     public Object getTeacherTimes(@PathVariable  Long teacherId){
         return foreignTeacherService.getTeacherTimes(teacherId);
     }
 
-    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    @RequestMapping(value = "/page/comment", method = RequestMethod.GET)
     public Object getTeacherList(Pageable pageable, TeacherForm teacherForm){
         return foreignTeacherService.getTeacherList(pageable,teacherForm);
+    }
+
+    @RequestMapping(value = "/page/uncomment", method = RequestMethod.GET)
+    public Object getUncommentTeacherList(Pageable pageable, TeacherForm teacherForm){
+        return foreignTeacherService.getUncommentTeacherList(pageable,teacherForm);
     }
 }
