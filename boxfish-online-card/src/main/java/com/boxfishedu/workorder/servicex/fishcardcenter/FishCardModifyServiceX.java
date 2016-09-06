@@ -219,6 +219,16 @@ public class FishCardModifyServiceX {
         //获取鱼卡信息
         WorkOrder workOrder =workOrderService.findByIdForUpdate(startTimeParam.getWorkOrderId())   ;
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
+
+        if(null == workOrder || courseSchedule ==null){
+            resultMap.put("code","2");
+            resultMap.put("msg","鱼卡或者课程信息不存在");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        Long teacherId = workOrder.getTeacherId();
+        String startTime = DateUtil.Date2String(  workOrder.getStartTime());
+
         // 验证鱼卡状态 创建、分配课程、分配老师
 
         //获取结束时间
@@ -241,6 +251,9 @@ public class FishCardModifyServiceX {
             courseSchedule.setTeacherId(0L);
 
             courseScheduleService.save(courseSchedule);
+
+            // 推送教师更换时间推送
+            this.pushTeacherList(teacherId,startTime);
 
         }else {
             resultMap.put("code","2");
@@ -301,35 +314,35 @@ public class FishCardModifyServiceX {
     }
 
 
-
-    public void pushTeacherList(Map<Long, Integer> map) {
-        logger.info("notiFyTeahcer::begin");
+    /**
+     * 推送通知老师 更换时间
+     * @param teahcerId  老师id
+     * @param startTime  原来课程 开始时间
+     */
+    private  void pushTeacherList(Long teahcerId,String startTime) {
+        logger.info("notiFyTeahcerchangeStartTime::begin");
         List list = Lists.newArrayList();
-        for (Long key : map.keySet()) {
-            String pushTitle = WorkOrderConstant.SEND_STU_CLASS_TOMO_MESSAGE_BEGIN;
-            Integer count = (null == map.get(key) ? 0 : map.get(key));
-            Map map1 = Maps.newHashMap();
-            map1.put("user_id", key);
 
-            if (null == map.get(key)) {
-                continue;
-            }
-            pushTitle = (pushTitle + count + WorkOrderConstant.SEND_STU_CLASS_TOMO_MESSAGE_END);
+
+            String pushTitle = WorkOrderConstant.SEND_TEACHER_CHANGETIME_BEGIN+startTime+WorkOrderConstant.SEND_TEACHER_CHANGETIME_END;
+            Integer count = 1;
+            Map map1 = Maps.newHashMap();
+            map1.put("user_id", teahcerId);
             map1.put("push_title", pushTitle);
 
             JSONObject jo = new JSONObject();
-            jo.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_TOMO_TYPE.toString());
+            jo.put("type", MessagePushTypeEnum.SEND_TEACHER_CHANGE_CLASSTIME_TYPE.toString());
             jo.put("count", count);
             jo.put("push_title", pushTitle);
 
             map1.put("data", jo);
 
             list.add(map1);
-        }
+
 
         teacherStudentRequester.pushTeacherListOnlineMsg(list);
 
-        logger.info("notiFyTeahcer::end");
+        logger.info("notiFyTeahcerchangeStartTime::end");
     }
 
 

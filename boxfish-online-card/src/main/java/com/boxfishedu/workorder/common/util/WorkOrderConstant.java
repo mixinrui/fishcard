@@ -47,4 +47,10 @@ public  class WorkOrderConstant {
 
     /** end  退款成功消息  **/
 
+
+    /** begin 鱼卡换时间  **/
+    public final  static String SEND_TEACHER_CHANGETIME_BEGIN="抱歉，由于学生更换上课时间，您";
+    public final  static String SEND_TEACHER_CHANGETIME_END="的课被取消。";
+    /** end 鱼卡换时间  **/
+
 }
