@@ -1,5 +1,6 @@
 package com.boxfishedu.card.comment.manage.entity.mysql;
 
+import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,6 +25,16 @@ import java.util.List;
 @Table(name = "comment_card")
 @ToString(exclude = {"unAnswerTeacherCards","service"})
 @EqualsAndHashCode(exclude = {"unAnswerTeacherCards"})
+@SqlResultSetMapping(name = "commentTeacherInfo", classes = {
+        @ConstructorResult(targetClass = CommentTeacherInfo.class, columns = {
+                @ColumnResult(name = "teacherId"),
+                @ColumnResult(name = "teacherName"),
+                @ColumnResult(name = "commentCount"),
+                @ColumnResult(name = "finishCount"),
+                @ColumnResult(name = "unfinishCount"),
+                @ColumnResult(name = "timeoutCount")
+        })
+})
 public class CommentCard implements Serializable {
     @Id
     @Column(name = "id")

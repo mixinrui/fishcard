@@ -48,9 +48,15 @@ public class ForeignTeacherController {
         return foreignTeacherService.getTeacherTimes(teacherId);
     }
 
+    /**
+     * 已收到点评老师列表
+     * @param pageable
+     * @param teacherForm
+     * @return
+     */
     @RequestMapping(value = "/teacher/page/comment", method = RequestMethod.GET)
     public Object getTeacherList(Pageable pageable, TeacherForm teacherForm){
-        return foreignTeacherService.getTeacherList(pageable,teacherForm);
+        return foreignTeacherService.commentTeacherPage(pageable,teacherForm);
     }
 
     @RequestMapping(value = "/teacher/page/uncomment", method = RequestMethod.GET)

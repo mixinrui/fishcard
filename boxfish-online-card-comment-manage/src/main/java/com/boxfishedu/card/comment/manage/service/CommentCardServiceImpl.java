@@ -138,12 +138,7 @@ public class CommentCardServiceImpl implements CommentCardService {
     @Transactional
     public void changeTeacher(Long id, Long teacherId) {
         CommentCard commentCard = commentCardJpaRepository.findOne(id);
-        Assert.notNull(commentCard, "点评不存在");
-        CommentCard newCommentCard = commentCard.changeTeacher(teacherId);
-        commentCardJpaRepository.save(newCommentCard);
-        commentCardJpaRepository.save(commentCard);
-        // 调用中外教运营老师减可分配次数
-        // commentCardManageSDK.teacherDecrementCount(teacherId);
+        changeTeacher(commentCard, teacherId);
     }
 
     @Override
@@ -152,6 +147,16 @@ public class CommentCardServiceImpl implements CommentCardService {
         for(Long id : ids) {
             changeTeacher(id, teacherId);
         }
+    }
+
+    @Override
+    public void changeTeacher(CommentCard commentCard, Long teacherId) {
+        Assert.notNull(commentCard, "点评不存在");
+        CommentCard newCommentCard = commentCard.changeTeacher(teacherId);
+        commentCardJpaRepository.save(newCommentCard);
+        commentCardJpaRepository.save(commentCard);
+        // 调用中外教运营老师减可分配次数
+        // commentCardManageSDK.teacherDecrementCount(teacherId);
     }
 
     @Override

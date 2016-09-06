@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by LuoLiBing on 16/9/2.
@@ -19,7 +20,6 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Query(value = "update CommentCard c set c.teacherStatus = 500 where c.teacherId =?1")
     void freezeTeacherId(Long teacherId);
 
-    @Modifying
-    @Query(value = "update CommentCard c set c.teacherStatus = 200 where c.teacherId =?1")
-    void unfreezeTeacherId(Long teacherId);
+    @Query(value = "select c from CommentCard c where c.status=300 and c.teacherId=?1")
+    List<CommentCard> findNoAnswerCommentCardByTeacherId(Long teacherId);
 }

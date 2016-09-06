@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Map;
 
 /**
  * Created by ansel on 16/9/2.
@@ -47,6 +48,10 @@ public class CommentCardManageSDK {
                 .toUri();
     }
 
+    /**
+     * 冻结老师
+     * @param teacherId
+     */
     public void freezeTeacherId(Long teacherId){
         logger.info("Accessing freezeTeacherId in CommentCardManageSDK......");
         restTemplate.exchange(
@@ -54,6 +59,15 @@ public class CommentCardManageSDK {
                 HttpMethod.PUT,
                 HttpEntity.EMPTY,
                 Object.class);
+    }
+
+    /**
+     * 获取内部老师
+     * @param paramMap
+     * @return
+     */
+    public JsonResultModel getInnerTeacherId(Map paramMap){
+        return restTemplate.postForObject(getInnerTeacherURI(), paramMap,JsonResultModel.class);
     }
 
     private URI createFreezeTeacherURI(Long teacherId){
@@ -126,6 +140,15 @@ public class CommentCardManageSDK {
                 .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/")
                 .queryParams(paramMap)
+                .build()
+                .toUri();
+    }
+
+    private URI getInnerTeacherURI(){
+        logger.info("Accessing getInnerTeacher in CommentCardSDK......");
+        return UriComponentsBuilder.fromUriString(commentCardManageUrl.getInnerTeacherUrl())
+                .path("/f_teacher_review/get_inner_f_review_teacher")
+                .queryParam("")
                 .build()
                 .toUri();
     }
