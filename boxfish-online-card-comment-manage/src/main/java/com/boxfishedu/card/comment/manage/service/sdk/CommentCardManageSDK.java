@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Map;
 
 /**
  * Created by ansel on 16/9/2.
@@ -27,8 +26,7 @@ public class CommentCardManageSDK {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
-    Logger logger = LoggerFactory.getLogger(CommentCardManageSDK.class);
+    private final static Logger logger = LoggerFactory.getLogger(CommentCardManageSDK.class);
 
     @Autowired
     private CommentCardManageUrl commentCardManageUrl;

@@ -45,6 +45,12 @@ public class CommentCardController {
         return JsonResultModel.newJsonResultModel();
     }
 
+    /**
+     * 批量换老师逻辑
+     * @param teacherId
+     * @param ids
+     * @return
+     */
     @RequestMapping(value = "/batch/change/teacher/{teacherId}", method = RequestMethod.PUT)
     public Object changeTeacherBatch(@PathVariable Long teacherId, Long[] ids) {
         commentCardService.changeTeacherBatch(ids, teacherId);

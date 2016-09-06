@@ -1,12 +1,11 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
-import com.boxfishedu.card.comment.manage.entity.form.FromTeacherStudentForm;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
-import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +35,7 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
     @Autowired
     CommentCardJpaRepository commentCardJpaRepository;
 
-    @Autowired
-    Logger logger = LoggerFactory.getLogger(ForeignTeacherServiceImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(ForeignTeacherServiceImpl.class);
 
     @Override
     public void freezeTeacherId(Long teacherId) {
@@ -81,6 +80,45 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };
+
+        return null;
+    }
+
+
+    /**
+     * select c.teacher_id,c.teacher_name,count(teacher_id) 收到点评总数,
+     * sum(case when c.status=400 or c.status=600 then 1 else 0 end)已完成 c1,
+     * sum(case when c.status=300 then 1 else 0 end)未回答 c2,
+     * sum(case when c.status=500 then 1 else 0 end)超时未回答 c3
+     * from comment_card c where c.teacher_id is not null
+     * group by c.teacher_id
+     * @param pageable
+     * @param teacherForm
+     * @return
+     */
+    @Override
+    public JsonResultModel commentTeacherPage(Pageable pageable, TeacherForm teacherForm) {
+        StringBuilder builder = new StringBuilder(200);
+        builder.append("select c.teacher_id teacherId,c.teacher_name teacherName,count(teacher_id) commentCount,")/*收到点评总数*/
+                .append("sum(case when c.status=400 or c.status=600 then 1 else 0 end) finishCount,")/*已完成*/
+                .append("sum(case when c.status=300 then 1 else 0 end) unfinishCount,")/*未回答*/
+                .append("sum(case when c.status=500 then 1 else 0 end) timeoutCount")/*超时未回答*/
+                .append("from comment_card c ")
+                .append("where c.teacher_id is not null ");
+        // 老师Id不为空
+        if(Objects.nonNull(teacherForm.getTeacherId())) {
+            builder.append("and c.teacher_id=? ");
+        } else if(Objects.nonNull(teacherForm.getTeacherName())) {
+            builder.append("and c.teacher_name like '?' ");
+        }
+        // 状态不为空
+        if(Objects.nonNull(teacherForm.getTeacherStatus())) {
+
+        }
+        builder.append(" limit ");
+        Query nativeQuery = entityManager.createNativeQuery(builder.toString(), CommentTeacherInfo.class);
+        int size = nativeQuery.getMaxResults();
+        nativeQuery.getResultList();
         return null;
     }
 

@@ -11,17 +11,27 @@ import org.springframework.web.bind.annotation.*;
  * Created by ansel on 16/9/2.
  */
 @RestController
-@RequestMapping("/comment_teacher/manage")
+@RequestMapping("/comment/manage")
 public class ForeignTeacherController {
     @Autowired
     ForeignTeacherService foreignTeacherService;
 
+    /**
+     * 冻结老师
+     * @param teacherId
+     * @return
+     */
     @RequestMapping(value = "/freeze_teacher_id/{teacherId}", method = RequestMethod.PUT)
     public Object freezeTeacherId(@PathVariable Long teacherId){
         foreignTeacherService.freezeTeacherId(teacherId);
         return JsonResultModel.newJsonResultModel();
     }
 
+    /**
+     * 解冻老师
+     * @param teacherId
+     * @return
+     */
     @RequestMapping(value = "/unfreeze_teacher_id/{teacherId}", method = RequestMethod.PUT)
     public Object unfreezeTeacherId(@PathVariable  Long teacherId){
         foreignTeacherService.unfreezeTeacherId(teacherId);
@@ -38,12 +48,12 @@ public class ForeignTeacherController {
         return foreignTeacherService.getTeacherTimes(teacherId);
     }
 
-    @RequestMapping(value = "/page/comment", method = RequestMethod.GET)
+    @RequestMapping(value = "/teacher/page/comment", method = RequestMethod.GET)
     public Object getTeacherList(Pageable pageable, TeacherForm teacherForm){
         return foreignTeacherService.getTeacherList(pageable,teacherForm);
     }
 
-    @RequestMapping(value = "/page/uncomment", method = RequestMethod.GET)
+    @RequestMapping(value = "/teacher/page/uncomment", method = RequestMethod.GET)
     public Object getUncommentTeacherList(Pageable pageable, TeacherForm teacherForm){
         return foreignTeacherService.getUncommentTeacherList(pageable,teacherForm);
     }
