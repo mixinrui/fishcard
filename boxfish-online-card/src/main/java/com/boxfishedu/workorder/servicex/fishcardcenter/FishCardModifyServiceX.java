@@ -1,8 +1,11 @@
 package com.boxfishedu.workorder.servicex.fishcardcenter;
 
+import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
@@ -296,5 +299,38 @@ public class FishCardModifyServiceX {
         return true;
 
     }
+
+
+
+    public void pushTeacherList(Map<Long, Integer> map) {
+        logger.info("notiFyTeahcer::begin");
+        List list = Lists.newArrayList();
+        for (Long key : map.keySet()) {
+            String pushTitle = WorkOrderConstant.SEND_STU_CLASS_TOMO_MESSAGE_BEGIN;
+            Integer count = (null == map.get(key) ? 0 : map.get(key));
+            Map map1 = Maps.newHashMap();
+            map1.put("user_id", key);
+
+            if (null == map.get(key)) {
+                continue;
+            }
+            pushTitle = (pushTitle + count + WorkOrderConstant.SEND_STU_CLASS_TOMO_MESSAGE_END);
+            map1.put("push_title", pushTitle);
+
+            JSONObject jo = new JSONObject();
+            jo.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_TOMO_TYPE.toString());
+            jo.put("count", count);
+            jo.put("push_title", pushTitle);
+
+            map1.put("data", jo);
+
+            list.add(map1);
+        }
+
+        teacherStudentRequester.pushTeacherListOnlineMsg(list);
+
+        logger.info("notiFyTeahcer::end");
+    }
+
 
 }

@@ -201,7 +201,7 @@ method:get
 
 
 ##########更改获取时间片
-http://127.0.0.1:8080/service/student/time/available/13836/2016-09-05 00:00:00
+http://127.0.0.1:8080/backend/fishcard/time/available/13836/2016-09-05 00:00:00
 method:get
 /workOrderId/日期(那一天)
 
@@ -215,3 +215,8 @@ method:post
   "endDate":'2016-09-01 08:55:00',
   "timeslotId",12
 }
+
+
+####### 增加订单查询条件
+http:127.0.0.1:8080/backend/fishcard/list
+之前接口 增加查询条件  orderType=

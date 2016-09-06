@@ -104,10 +104,7 @@ StudentAppRelatedController {
         return avaliableTimeServiceX.getTimeAvailable(avaliableTimeParam);
     }
 
-    @RequestMapping(value = "/time/available/{workorder_id}/{date}", method = RequestMethod.GET)
-    public JsonResultModel timeAvailable(@PathVariable("workorder_id") Long workorder_id ,@PathVariable("date") String date) throws CloneNotSupportedException {
-        return avaliableTimeServiceX.getTimeAvailableChangeTime(workorder_id,date);
-    }
+
 
 
 }

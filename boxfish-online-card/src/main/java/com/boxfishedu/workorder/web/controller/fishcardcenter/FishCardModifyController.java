@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardModifyServiceX;
+import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.web.param.CourseChangeParam;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class FishCardModifyController {
     @Autowired
     private FishCardModifyServiceX fishCardModifyServiceX;
+
+    @Autowired
+    private AvaliableTimeServiceX avaliableTimeServiceX;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -50,6 +54,11 @@ public class FishCardModifyController {
     @RequestMapping(value = "/changeStartTime", method = RequestMethod.POST)
     public JsonResultModel changeStartTime(@RequestBody StartTimeParam startTimeParam) {
         return fishCardModifyServiceX.changeStartTime(startTimeParam);
+    }
+
+    @RequestMapping(value = "/time/available/{workorder_id}/{date}", method = RequestMethod.GET)
+    public JsonResultModel timeAvailable(@PathVariable("workorder_id") Long workorder_id ,@PathVariable("date") String date) throws CloneNotSupportedException {
+        return avaliableTimeServiceX.getTimeAvailableChangeTime(workorder_id,date);
     }
 
 }
