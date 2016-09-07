@@ -258,13 +258,14 @@ public class DateUtil {
     }
 
     /**
-     * 返回当前起半年时间区间
+     * 返回当前起2个月的区间
      * @return
      */
     public static DateRangeForm createHalfYearDateRangeForm() {
         YearMonth now = YearMonth.now();
         Date from = convertToDate(now.atDay(1));
-        Date to = convertToDate(now.plusMonths(6).atEndOfMonth());
+        // FIXME 将半年数据改为2个月数据
+        Date to = convertToDate(now.plusMonths(1).atEndOfMonth());
         return new DateRangeForm(from, to);
     }
 
