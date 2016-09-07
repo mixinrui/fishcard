@@ -220,3 +220,21 @@ method:post
 ####### 增加订单查询条件
 http:127.0.0.1:8080/backend/fishcard/list
 之前接口 增加查询条件  orderType=
+
+
+
+####### 鱼卡后台验证token接口
+http://123.56.13.168:8080/backend/login/checktoken/23sdfsdfsfd/out
+method:get
+return :
+{
+  "data": "error",
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+{
+  "data": "ok",
+  "returnCode": 200,
+  "returnMsg": "success"
+}

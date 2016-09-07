@@ -75,10 +75,10 @@ public class LoginContrller {
     @RequestMapping(value = "/checktoken/{token}/out", method = RequestMethod.GET)
     public JsonResultModel checktoken(@PathVariable("token") String token) throws Exception{
         if(!loginService.checkToken(token)){
-            return JsonResultModel.newJsonResultModel("ok");
+            return JsonResultModel.newJsonResultModel("error");
         }
         logger.info("checktoken:tokenis[{}]",token);
-        return JsonResultModel.newJsonResultModel("error");
+        return JsonResultModel.newJsonResultModel("ok");
     }
 
 
