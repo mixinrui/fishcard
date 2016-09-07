@@ -68,6 +68,21 @@ public class CourseOnlineService {
 
     }
 
+    public void teacherAbsentNotAllowUpdateStatus(WorkOrder workOrder,String desc){
+        Integer savedStatus=workOrder.getStatus();
+        boolean flag=(savedStatus== FishCardStatusEnum.COMPLETED.getCode())
+                ||(savedStatus==FishCardStatusEnum.COMPLETED_FORCE.getCode())
+                ||(savedStatus==FishCardStatusEnum.COMPLETED_FORCE_SERVER.getCode())
+                ||(savedStatus==FishCardStatusEnum.TEACHER_ABSENT.getCode()
+                ||(1==workOrder.getIsCourseOver()));
+        if(flag){
+            workOrderLogService.saveWorkOrderLog(workOrder,desc);
+            logger.error("@teacherAbsentNotAllowUpdateStatus#当前鱼卡["+workOrder.getId()+",不允许再做修改!");
+            throw new BusinessException("鱼卡状态已冻结,不允许修改");
+        }
+
+    }
+
     public void notAllowUpdateStatus(WorkOrder workOrder){
         notAllowUpdateStatus(workOrder,workOrder.getStatus());
     }
