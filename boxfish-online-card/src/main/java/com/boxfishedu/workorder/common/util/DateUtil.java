@@ -35,6 +35,11 @@ public class DateUtil {
         return date;
     }
 
+    public  static String Date2ForForeignDate(Date date){
+        return new SimpleDateFormat("HH:mm,MM-dd").format(date);
+    }
+
+
     public static Date String2DateBack(String str) throws RuntimeException {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
         Date date = null;

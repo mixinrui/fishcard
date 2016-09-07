@@ -87,9 +87,11 @@ public class FishCardQueryController {
     }
 
 
-
-
-
+    /**
+     * 退款状态类型
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/rechargeType/list", method = RequestMethod.GET)
     public JsonResultModel rechargeType() throws Exception {
         return JsonResultModel.newJsonResultModel(FishCardChargebackStatusEnum.varMapout);

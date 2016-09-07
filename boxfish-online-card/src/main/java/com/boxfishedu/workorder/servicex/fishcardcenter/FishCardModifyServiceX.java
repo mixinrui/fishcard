@@ -290,6 +290,7 @@ public class FishCardModifyServiceX {
      * @return
      */
     private boolean checkDate(StartTimeParam startTimeParam){
+        logger.info("checkDate :[{}]",startTimeParam.getBeginDate());
         // 日期为空判断
         if(startTimeParam == null || null ==startTimeParam.getBeginDate())
             return false;
@@ -307,11 +308,13 @@ public class FishCardModifyServiceX {
 
         // 大于现在的时间
         if(startTimeParam.getBeginDateFormat().before(new Date())){
+            logger.info("checkDate :1");
             return false;
         }
         return true;
 
     }
+
 
 
     /**
@@ -322,7 +325,7 @@ public class FishCardModifyServiceX {
     private  void pushTeacherList(Long teahcerId,String startTime) {
         logger.info("notiFyTeahcerchangeStartTime::begin");
         List list = Lists.newArrayList();
-
+            startTime = DateUtil.Date2ForForeignDate( DateUtil.String2Date( startTime) );
 
             String pushTitle = WorkOrderConstant.SEND_TEACHER_CHANGETIME_BEGIN+startTime+WorkOrderConstant.SEND_TEACHER_CHANGETIME_END;
             Integer count = 1;
@@ -331,7 +334,7 @@ public class FishCardModifyServiceX {
             map1.put("push_title", pushTitle);
 
             JSONObject jo = new JSONObject();
-            jo.put("type", MessagePushTypeEnum.SEND_TEACHER_CHANGE_CLASSTIME_TYPE.toString());
+            //jo.put("type", MessagePushTypeEnum.SEND_TEACHER_CHANGE_CLASSTIME_TYPE.toString());
             jo.put("count", count);
             jo.put("push_title", pushTitle);
 

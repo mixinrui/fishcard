@@ -1,6 +1,8 @@
 package com.boxfishedu.workorder.common.login;
 
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/backend/login")
 public class LoginContrller {
+
+    //本地异常日志记录对象
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private LoginService loginService;
@@ -59,6 +64,23 @@ public class LoginContrller {
         loginService.initData();
         return JsonResultModel.newJsonResultModel(null);
     }
+
+
+    /**
+     * 外教点评验证token有效性
+     * @param token
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/checktoken/{token}/out", method = RequestMethod.GET)
+    public JsonResultModel checktoken(@PathVariable("token") String token) throws Exception{
+        if(!loginService.checkToken(token)){
+            return JsonResultModel.newJsonResultModel("ok");
+        }
+        logger.info("checktoken:tokenis[{}]",token);
+        return JsonResultModel.newJsonResultModel("error");
+    }
+
 
 
 }
