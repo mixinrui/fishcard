@@ -71,7 +71,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
     private String getFilterSql(FishCardFilterParam fishCardFilterParam){
         StringBuilder sql=new StringBuilder("from WorkOrder wo where wo.startTime between :begin and :end ");
 
-
+        if(null!=fishCardFilterParam.getOrderType()){
+            sql.append(" and wo.orderChannel=:orderChannel ");
+        }
         if(null !=fishCardFilterParam.getConfirmFlag()){
             if("1".equals(fishCardFilterParam.getConfirmFlag())){
                 sql.append(" and (wo.confirmFlag=:confirmFlag or wo.confirmFlag !='0' )  ");
@@ -167,6 +169,11 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         Query query = entityManager.createQuery(sql);
         query.setParameter("begin",fishCardFilterParam.getBeginDateFormat());
         query.setParameter("end",fishCardFilterParam.getEndDateFormat());
+
+        // 订单类型
+        if(null != fishCardFilterParam.getOrderType()){
+            query.setParameter("orderChannel",fishCardFilterParam.getOrderType());
+        }
 
         if(null!=fishCardFilterParam.getCreateBeginDateFormat()){
             query.setParameter("createbegin",fishCardFilterParam.getCreateBeginDateFormat());

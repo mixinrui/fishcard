@@ -103,4 +103,8 @@ StudentAppRelatedController {
         avaliableTimeParam.setStudentId(userId);
         return avaliableTimeServiceX.getTimeAvailable(avaliableTimeParam);
     }
+
+
+
+
 }
