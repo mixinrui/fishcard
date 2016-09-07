@@ -76,7 +76,7 @@ public enum FishCardStatusEnum {
         if (varMap.containsKey(code)) {
             return varMap.get(code).getDesc();
         }
-        return "未知";
+        return "未知:["+code+"]";
     }
 
     public static String getRemark(int code) {
