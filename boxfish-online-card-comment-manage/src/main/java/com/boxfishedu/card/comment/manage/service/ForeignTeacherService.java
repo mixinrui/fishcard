@@ -17,8 +17,6 @@ public interface ForeignTeacherService{
 
     public JsonResultModel getTeacherTimes(Long teacherId);
 
-    public JsonResultModel getTeacherList(Pageable pageable,TeacherForm teacherForm);
-
     JsonResultModel commentTeacherPage(Pageable pageable, TeacherForm teacherForm);
 
     public JsonResultModel getUncommentTeacherList(Pageable pageable,TeacherForm teacherForm);

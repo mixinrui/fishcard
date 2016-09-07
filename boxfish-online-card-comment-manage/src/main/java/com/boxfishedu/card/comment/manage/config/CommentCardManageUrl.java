@@ -13,4 +13,5 @@ import org.springframework.context.annotation.Configuration;
 public class CommentCardManageUrl {
     private String teacherStudentBusinessUrl;
     private String innerTeacherUrl;
+    private String authenticationUrl;
 }

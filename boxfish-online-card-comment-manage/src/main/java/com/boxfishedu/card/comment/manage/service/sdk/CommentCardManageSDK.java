@@ -3,6 +3,7 @@ package com.boxfishedu.card.comment.manage.service.sdk;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.config.CommentCardManageUrl;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,12 @@ public class CommentCardManageSDK {
      */
     public JsonResultModel getInnerTeacherId(Map paramMap){
         return restTemplate.postForObject(getInnerTeacherURI(), paramMap,JsonResultModel.class);
+    }
+
+    public boolean checkToken(String accessToken) {
+        JsonResultModel jsonResultModel = restTemplate.getForObject(
+                createTokenCheckURI(accessToken), JsonResultModel.class);
+        return (StringUtils.equals("ok", jsonResultModel.getData().toString()));
     }
 
     private URI createFreezeTeacherURI(Long teacherId){
@@ -149,6 +156,13 @@ public class CommentCardManageSDK {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getInnerTeacherUrl())
                 .path("/f_teacher_review/get_inner_f_review_teacher")
                 .queryParam("")
+                .build()
+                .toUri();
+    }
+
+    private URI createTokenCheckURI(String accessToken) {
+        return UriComponentsBuilder.fromUriString(commentCardManageUrl.getAuthenticationUrl())
+                .path("/backend/login/checktoken/" + accessToken + "/out")
                 .build()
                 .toUri();
     }
