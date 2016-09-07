@@ -67,7 +67,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     public CourseSchedule findTop1ByStudentIdAndTimeSlotIdAndClassDate(Long studentId, Integer timeSlotId, Date classDate);
 
-    @Query(value = "select max(c.classDate) from CourseSchedule c where teacherId=?1")
+    @Query(value = "select min(c.classDate) from CourseSchedule c where teacherId=?1")
     Optional<Date> findTop1ClassDateByTeacherId(Long teacherId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
