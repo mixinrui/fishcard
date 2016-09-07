@@ -40,7 +40,22 @@ spring:
 service:
   sdk:
     teacherStudentBusinessUrl: http://101.201.237.252:8099
-    innerTeacherUrl: http://123.56.13.168:8099
+    innerTeacherUrl: http://101.201.237.252:8099
 
 server.port: 8085
 
+---
+spring:
+  datasource:
+#    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: Box123456
+  profiles: development
+
+service:
+  sdk:
+    teacherStudentBusinessUrl: http://101.201.237.252:8099
+    innerTeacherUrl: http://101.201.237.252:8099
+
+server.port: 8085

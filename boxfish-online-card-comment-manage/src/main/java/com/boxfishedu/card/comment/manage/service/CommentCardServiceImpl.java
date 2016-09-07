@@ -8,7 +8,6 @@ import com.boxfishedu.card.comment.manage.entity.form.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
-import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import com.boxfishedu.card.comment.manage.util.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdto.DTOBinder;
@@ -40,9 +39,6 @@ public class CommentCardServiceImpl implements CommentCardService {
 
     @Autowired
     private DTOBinder dtoBinder;
-
-    @Autowired
-    private CommentCardManageSDK commentCardManageSDK;
 
     /**
      * 多条件查询
@@ -84,10 +80,13 @@ public class CommentCardServiceImpl implements CommentCardService {
                         predicateList.add(criteriaBuilder.lt(
                                 root.get("status"), CommentCardStatus.ANSWERED.getCode()));
                         // 未点评的时候,时间段才起作用
-                        if(Objects.nonNull(commentCardForm.getNotAnswerTime())) {
-                            NotAnswerTime.DateRange dateRange = commentCardForm.getNotAnswerTime().getRange();
+                        if(Objects.nonNull(commentCardForm.getNotAnswerTime()) &&
+                                Objects.nonNull(NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()))) {
+                            NotAnswerTime.DateRange dateRange = NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()).getRange();
                             predicateList.add(criteriaBuilder.between(
-                                    root.get("studentAskTime"), dateRange.getFrom(), dateRange.getTo()));
+                                    root.get("studentAskTime"),
+                                    DateUtils.parseFromLocalDateTime(dateRange.getFrom()),
+                                    DateUtils.parseFromLocalDateTime(dateRange.getTo())));
                         }
                     }
                     // 已点评
@@ -102,7 +101,9 @@ public class CommentCardServiceImpl implements CommentCardService {
                         ));
                         NotAnswerTime.DateRange dateRange = NotAnswerTime._24_48HOURS.getRange();
                         predicateList.add(criteriaBuilder.between(
-                                root.get("studentAskTime"), dateRange.getFrom(),dateRange.getTo()
+                                root.get("studentAskTime"),
+                                DateUtils.parseFromLocalDateTime(dateRange.getFrom()),
+                                DateUtils.parseFromLocalDateTime(dateRange.getTo())
                         ));
                     }
                 }
@@ -116,8 +117,10 @@ public class CommentCardServiceImpl implements CommentCardService {
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
         };
-        // 排序方式 entityQuery.getQuery().orderBy(pageable.getSort().iterator());
-        entityQuery.orderBy(pageable.getSort().iterator());
+        // 排序方式
+        if(Objects.nonNull(pageable.getSort())) {
+            entityQuery.orderBy(pageable.getSort().iterator());
+        }
         Page page = entityQuery.page();
         List<CommentCardDto> resultList = dtoBinder.bindFromBusinessObjectList(CommentCardDto.class, page.getContent());
         return new PageImpl<>(resultList, pageable, page.getTotalElements());

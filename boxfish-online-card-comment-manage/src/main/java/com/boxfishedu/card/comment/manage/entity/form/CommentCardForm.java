@@ -1,6 +1,5 @@
 package com.boxfishedu.card.comment.manage.entity.form;
 
-import com.boxfishedu.card.comment.manage.entity.enums.NotAnswerTime;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,9 +11,9 @@ import java.util.Date;
 public class CommentCardForm {
 
     /**
-     * 点评创建时间范围
+     * 未回答时长范围
      */
-    private NotAnswerTime notAnswerTime;
+    private Integer notAnswerTime;
 
     private Long teacherId;
 

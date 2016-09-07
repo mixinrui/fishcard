@@ -1,5 +1,9 @@
 package com.boxfishedu.card.comment.manage.entity.form;
 
+import com.google.common.collect.Maps;
+
+import java.util.Map;
+
 /**
  * Created by LuoLiBing on 16/9/5.
  */
@@ -17,5 +21,14 @@ public enum CommentCardFormStatus {
 
     public int value() {
         return code;
+    }
+
+
+    public static Map<String, Integer> getMappings() {
+        Map<String, Integer> result = Maps.newLinkedHashMap();
+        for(CommentCardFormStatus commentCardFormStatus : values())  {
+            result.put(commentCardFormStatus.desc, commentCardFormStatus.code);
+        }
+        return result;
     }
 }
