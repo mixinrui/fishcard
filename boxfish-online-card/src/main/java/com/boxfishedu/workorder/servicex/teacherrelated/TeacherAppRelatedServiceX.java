@@ -388,7 +388,7 @@ public class TeacherAppRelatedServiceX {
 
     private boolean hasMoreHistory(Long teacherId, DateRangeForm dateRangeForm) {
         Long firstDayTimeStamp = null;
-        Optional<Date> firstDay = courseScheduleService.findMaxClassDateByTeacherId(teacherId);
+        Optional<Date> firstDay = courseScheduleService.findMinClassDateByTeacherId(teacherId);
         if (firstDay.isPresent()) {
             firstDayTimeStamp = firstDay.get().getTime();
         }
