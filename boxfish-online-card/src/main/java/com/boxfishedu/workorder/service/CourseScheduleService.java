@@ -197,4 +197,11 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     public Set<String> findByStudentIdAndAfterDate(Long studentId) {
         return jpa.findUnfinishByStudentIdAndAfterDate(studentId, new Date());
     }
+
+
+    public Set<String> findByStudentIdAndCurrentDate(Long studentId,Date date) {
+        return jpa.findUnfinishByStudentIdAndCurrentDate(studentId, date);
+    }
+
+
 }
