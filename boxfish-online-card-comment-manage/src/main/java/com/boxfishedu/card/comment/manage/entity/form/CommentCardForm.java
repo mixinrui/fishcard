@@ -31,12 +31,18 @@ public class CommentCardForm {
     /**
      * 学生提问时间区间
      */
-    private DateRange studentAskTimeRange;
+//    private DateRange studentAskTimeRange;
+
+    private Date from;
+
+    private Date to;
 
     /**
      * 订单类型
      */
     private String orderChannel;
+
+    private String orderCode;
 
     @Data
     public class DateRange {

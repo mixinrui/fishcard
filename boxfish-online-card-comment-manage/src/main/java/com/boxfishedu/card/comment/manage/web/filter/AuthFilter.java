@@ -10,7 +10,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,8 +18,8 @@ import java.io.PrintWriter;
 /**
  * Created by LuoLiBing on 16/6/15.
  */
-@WebFilter(urlPatterns ={
-        "/comment/manage/**"})
+//@WebFilter(urlPatterns ={
+//        "/comment/manage/**"})
 public class AuthFilter extends OncePerRequestFilter {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();

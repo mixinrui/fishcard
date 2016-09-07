@@ -113,6 +113,27 @@ public class CommentCardServiceImpl implements CommentCardService {
 
                 }
 
+                // 订单编号
+                if(StringUtils.isNotBlank(commentCardForm.getOrderCode())) {
+                    predicateList.add(criteriaBuilder.equal(
+                            root.get("orderCode"), commentCardForm.getOrderCode()
+                    ));
+                }
+
+                // 点评创建开始时间
+                if(Objects.nonNull(commentCardForm.getFrom())) {
+                    predicateList.add(criteriaBuilder.greaterThanOrEqualTo(
+                            root.get("createTime"), commentCardForm.getFrom()
+                    ));
+                }
+
+                // 点评创建结束时间
+                if(Objects.nonNull(commentCardForm.getTo())) {
+                    predicateList.add(criteriaBuilder.lessThanOrEqualTo(
+                            root.get("createTime"), commentCardForm.getTo()
+                    ));
+                }
+
                 //.... 多条件
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
