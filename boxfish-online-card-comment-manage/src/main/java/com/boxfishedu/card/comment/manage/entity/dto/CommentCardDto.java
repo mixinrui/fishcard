@@ -1,8 +1,12 @@
 package com.boxfishedu.card.comment.manage.entity.dto;
 
-import com.boxfishedu.card.comment.manage.entity.dto.merger.CommentCardStatusMerger;
+import com.boxfishedu.card.comment.manage.entity.dto.merger.CommentCardDtoStatusMerger;
+import com.boxfishedu.card.comment.manage.entity.enums.CommentCardDtoStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.jdto.annotation.DTOTransient;
 import org.jdto.annotation.Source;
+import org.jdto.annotation.Sources;
 
 import java.util.Date;
 
@@ -62,12 +66,21 @@ public class CommentCardDto {
 
     private Date studentCommentTeacherTime;
 
-    private Integer status;
-
-    @Source(value = "status", merger = CommentCardStatusMerger.class)
-    private String statusDesc;
+    @Sources(value = {@Source(value = "status"), @Source(value = "studentAskTime")}, merger = CommentCardDtoStatusMerger.class)
+    @JsonIgnore
+    private CommentCardDtoStatus commentStatus;
 
     private Date createTime;
 
     private Date updateTime;
+
+    @DTOTransient
+    public int getStatus() {
+        return commentStatus.value();
+    }
+
+    @DTOTransient
+    public String getStatusDesc() {
+        return commentStatus.desc();
+    }
 }

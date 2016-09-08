@@ -40,7 +40,6 @@ spring:
 service:
   sdk:
     teacherStudentBusinessUrl: http://101.201.237.252:8099
-    innerTeacherUrl: http://101.201.237.252:8099
 
 server.port: 8085
 

@@ -12,6 +12,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "service.sdk")
 public class CommentCardManageUrl {
     private String teacherStudentBusinessUrl;
-    private String innerTeacherUrl;
     private String authenticationUrl;
 }

@@ -16,6 +16,9 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Query(value = "select count(c) from CommentCard c where c.studentAskTime between ?1 and ?2 and c.status<=300")
     Integer findNoAnswerCountByAskTime(Date from, Date to);
 
+    @Query(value = "select count(c) from CommentCard c where c.studentAskTime<=?1 and c.status<=300")
+    Integer findNoAnswerCountByAskTime(Date from);
+
     @Query(value = "select c from CommentCard c where c.status=300 and c.teacherId=?1")
     List<CommentCard> findNoAnswerCommentCardByTeacherId(Long teacherId);
 }

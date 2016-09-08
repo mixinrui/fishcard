@@ -191,7 +191,8 @@ public class CommentCardServiceImpl implements CommentCardService {
         Integer[] result = new Integer[3];
         result[0] = findNoAnswerCountByAskTime(NotAnswerTime._24HOURS.getRange());
         result[1] = findNoAnswerCountByAskTime(NotAnswerTime._24_36HOURS.getRange());
-        result[2] = findNoAnswerCountByAskTime(NotAnswerTime._36HOURS.getRange());
+        result[2] = commentCardJpaRepository.findNoAnswerCountByAskTime(
+                DateUtils.parseFromLocalDateTime(NotAnswerTime._36HOURS.getRange().getTo()));
         return result;
     }
 

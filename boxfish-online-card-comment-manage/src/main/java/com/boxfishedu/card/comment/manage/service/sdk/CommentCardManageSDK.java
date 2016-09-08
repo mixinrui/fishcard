@@ -3,10 +3,12 @@ package com.boxfishedu.card.comment.manage.service.sdk;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.config.CommentCardManageUrl;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
+import com.boxfishedu.card.comment.manage.util.JsonResultModuleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -41,14 +43,6 @@ public class CommentCardManageSDK {
                 Object.class);
     }
 
-    private URI createTeacherDecrementCountURI(Long teacherId) {
-        return UriComponentsBuilder
-                .fromUriString("")
-                .path("/" + teacherId)
-                .build()
-                .toUri();
-    }
-
     /**
      * 冻结老师
      * @param teacherId
@@ -71,20 +65,21 @@ public class CommentCardManageSDK {
         return restTemplate.postForObject(getInnerTeacherURI(), paramMap,JsonResultModel.class);
     }
 
+    /**
+     * token验证
+     * @param accessToken
+     * @return
+     */
     public boolean checkToken(String accessToken) {
         JsonResultModel jsonResultModel = restTemplate.getForObject(
                 createTokenCheckURI(accessToken), JsonResultModel.class);
         return (StringUtils.equals("ok", jsonResultModel.getData().toString()));
     }
 
-    private URI createFreezeTeacherURI(Long teacherId){
-        return UriComponentsBuilder
-                .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("/" + teacherId)
-                .build()
-                .toUri();
-    }
-
+    /**
+     * 老师解冻
+     * @param teacherId
+     */
     public void unfreezeTeacherId(Long teacherId){
         logger.info("Accessing unfreezeTeacherId in CommentCardManageSDK......");
         restTemplate.exchange(
@@ -95,12 +90,12 @@ public class CommentCardManageSDK {
         );
     }
 
-    private URI createUnfreezeTeacherURI(Long teacherId){
-        return UriComponentsBuilder
-                .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("/" + teacherId)
-                .build()
-                .toUri();
+    public JsonResultModel getNoCommentPage(Pageable pageable, TeacherForm teacherForm) {
+        JsonResultModel jsonResultModel = restTemplate.getForObject(createNoCommentPageURI(
+                pageable, teacherForm), JsonResultModel.class);
+        return new PageImpl<>(JsonResultModuleUtils.getListFromPageResult(jsonResultModel, PayTradeView.class,
+                ((clazz, beanMap) -> PayTradeView.transferFromMap(beanMap))),
+                pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
     }
 
     public JsonResultModel getTeacherOperations(Long teacherId){
@@ -141,6 +136,35 @@ public class CommentCardManageSDK {
                 Object.class));
     }
 
+
+    /************************************* 构建URI ********************************/
+
+    private URI createFreezeTeacherURI(Long teacherId){
+        return UriComponentsBuilder
+                .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
+                .path("/" + teacherId)
+                .build()
+                .toUri();
+    }
+
+
+    private URI createUnfreezeTeacherURI(Long teacherId){
+        return UriComponentsBuilder
+                .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
+                .path("/" + teacherId)
+                .build()
+                .toUri();
+    }
+
+
+    private URI createTeacherDecrementCountURI(Long teacherId) {
+        return UriComponentsBuilder
+                .fromUriString("")
+                .path("/" + teacherId)
+                .build()
+                .toUri();
+    }
+
     private URI createGetUncommentTeacherListURI(Pageable pageable, TeacherForm teacherForm){
         MultiValueMap paramMap = new LinkedMultiValueMap();
         return UriComponentsBuilder
@@ -153,7 +177,7 @@ public class CommentCardManageSDK {
 
     private URI getInnerTeacherURI(){
         logger.info("Accessing getInnerTeacher in CommentCardSDK......");
-        return UriComponentsBuilder.fromUriString(commentCardManageUrl.getInnerTeacherUrl())
+        return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/get_inner_f_review_teacher")
                 .queryParam("")
                 .build()
@@ -163,6 +187,17 @@ public class CommentCardManageSDK {
     private URI createTokenCheckURI(String accessToken) {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getAuthenticationUrl())
                 .path("/backend/login/checktoken/" + accessToken + "/out")
+                .build()
+                .toUri();
+    }
+
+    private URI createNoCommentPageURI(Pageable pageable, TeacherForm teacherForm) {
+        MultiValueMap<String, String> paramMap = teacherForm.createValueMap();
+        paramMap.add("page", pageable.getPageNumber() + "");
+        paramMap.add("size", pageable.getPageSize() + "");
+        return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
+                .path("f_teacher_review/get_review_todaycount")
+                .queryParams(paramMap)
                 .build()
                 .toUri();
     }
