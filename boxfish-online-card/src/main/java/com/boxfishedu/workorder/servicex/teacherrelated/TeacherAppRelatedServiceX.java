@@ -149,8 +149,8 @@ public class TeacherAppRelatedServiceX {
         // 如果没有指定查询的年月,则默认查询半年的数据
         if (yearMonth == null) {
             // 默认为当月+6个月,传参数默认为单月+1月
-            int months = count == null ? 6 : 1;
-            dateRangeForm = DateUtil.createHalfYearDateRangeForm(count);
+            int months = count == null ? 5 : 1;
+            dateRangeForm = DateUtil.createHalfYearDateRangeForm(months);
         } else {
             dateRangeForm = new DateRangeForm(
                     DateUtil.convertToDate(yearMonth.atDay(1)),
