@@ -36,7 +36,7 @@ public class DateUtil {
     }
 
     public  static String Date2ForForeignDate(Date date){
-        return new SimpleDateFormat("HH:mm,MM-dd").format(date);
+        return new SimpleDateFormat(" HH:mm,MM/dd ").format(date);
     }
 
 
@@ -266,11 +266,10 @@ public class DateUtil {
      * 返回当前起2个月的区间
      * @return
      */
-    public static DateRangeForm createHalfYearDateRangeForm() {
+    public static DateRangeForm createHalfYearDateRangeForm(int months) {
         YearMonth now = YearMonth.now();
         Date from = convertToDate(now.atDay(1));
-        // FIXME 将半年数据改为2个月数据
-        Date to = convertToDate(now.plusMonths(1).atEndOfMonth());
+        Date to = convertToDate(now.plusMonths(months).atEndOfMonth());
         return new DateRangeForm(from, to);
     }
 
