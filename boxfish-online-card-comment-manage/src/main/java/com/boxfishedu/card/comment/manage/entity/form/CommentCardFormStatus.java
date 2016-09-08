@@ -8,7 +8,7 @@ import java.util.Map;
  * Created by LuoLiBing on 16/9/5.
  */
 public enum CommentCardFormStatus {
-    NOTANSWER(0, "未点评"), ANSWERED(1, "已回答"), TIMEOUT(2, "超时未完成"), ALL(3, "全部");
+    NOTANSWER(0, "未点评"), ANSWERED(1, "已回答"), TIMEOUT(2, "超时未完成");
 
     private int code;
 

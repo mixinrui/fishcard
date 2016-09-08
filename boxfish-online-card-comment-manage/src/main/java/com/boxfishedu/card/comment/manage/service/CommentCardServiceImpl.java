@@ -134,6 +134,9 @@ public class CommentCardServiceImpl implements CommentCardService {
                     ));
                 }
 
+                // 超时过期作废的点评卡排除
+                predicateList.add(criteriaBuilder.notEqual(root.get("status"), CommentCardStatus.OVERTIME.getCode()));
+
                 //.... 多条件
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
