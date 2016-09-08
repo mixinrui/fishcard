@@ -3,12 +3,10 @@ package com.boxfishedu.card.comment.manage.service.sdk;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.config.CommentCardManageUrl;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
-import com.boxfishedu.card.comment.manage.util.JsonResultModuleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -93,9 +91,10 @@ public class CommentCardManageSDK {
     public JsonResultModel getNoCommentPage(Pageable pageable, TeacherForm teacherForm) {
         JsonResultModel jsonResultModel = restTemplate.getForObject(createNoCommentPageURI(
                 pageable, teacherForm), JsonResultModel.class);
-        return new PageImpl<>(JsonResultModuleUtils.getListFromPageResult(jsonResultModel, PayTradeView.class,
-                ((clazz, beanMap) -> PayTradeView.transferFromMap(beanMap))),
-                pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
+        return null;
+//        return new PageImpl<>(JsonResultModuleUtils.getListFromPageResult(jsonResultModel, CommentTeacherInfo.class,
+//                ((clazz, beanMap) -> ObjectUtils.convertObject(beanMap, CommentTeacherInfo.class)),
+//                pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
     }
 
     public JsonResultModel getTeacherOperations(Long teacherId){

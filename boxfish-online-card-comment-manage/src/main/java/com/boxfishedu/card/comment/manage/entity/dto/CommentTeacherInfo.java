@@ -38,6 +38,8 @@ public class CommentTeacherInfo {
         this.timeoutCount = timeoutCount.intValue();
     }
 
+
+
 //    public static List<CommentTeacherInfo>
 
 }
