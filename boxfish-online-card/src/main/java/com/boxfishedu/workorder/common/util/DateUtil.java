@@ -36,7 +36,7 @@ public class DateUtil {
     }
 
     public  static String Date2ForForeignDate(Date date){
-        return new SimpleDateFormat("HH:mm,MM-dd").format(date);
+        return new SimpleDateFormat(" HH:mm,MM/dd ").format(date);
     }
 
 
