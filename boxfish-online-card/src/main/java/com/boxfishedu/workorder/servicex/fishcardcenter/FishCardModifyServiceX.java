@@ -249,6 +249,7 @@ public class FishCardModifyServiceX {
 
             courseSchedule.setClassDate(startTimeParam.getBeginDateFormat());
             courseSchedule.setTeacherId(0L);
+            courseSchedule.setTimeSlotId(startTimeParam.getTimeslotId() );
 
             courseScheduleService.save(courseSchedule);
 

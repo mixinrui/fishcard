@@ -128,6 +128,7 @@ public class GrabOrderServiceX {
     public JsonResultModel grabOrderByOneTeacher(GrabOrderView grabOrderView) {
         JSONObject jsonObject = new JSONObject();
         String teacherName = checkIfCanGrabOrderByOnlineTeacherGetTeacherName(grabOrderView);
+        logger.info("grabOrderByOneTeacher:[{}]",teacherName);
         if (!checkIfCanGrabOrderByOnlineFishcard(grabOrderView) || (null == teacherName)) {
             //     if (!checkIfCanGrabOrderByOnlineTeacher(grabOrderView) || !checkIfCanGrabOrderByOnlineFishcard(grabOrderView)) {
 //     if(!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
@@ -156,6 +157,7 @@ public class GrabOrderServiceX {
 
                     grabOrderView.setState(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
                     grabOrderView.setTeacherName(teacherName);
+                    logger.info("grabOrderByOneTeacher:[{}]",grabOrderView.getTeacherName());
                     //更新鱼卡(状态  教师id)
                     int updateCount = grabOrderService.updateTestGrab(grabOrderView);
 
