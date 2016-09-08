@@ -255,7 +255,7 @@ public class GrabOrderServiceX {
             /** 从师生运营获取教师姓名 **/
             String teancherName = (String) jsonResultModel.getData();
             logger.info("::::::::::::::::::OnlineTeacher验证----能抢(returnCode==200)::::::::::::::teacherName[{}]::::", teancherName);
-            return teancherName == null ? "" : teancherName;
+            return (teancherName == null) ? "" : teancherName;
         } else {
             logger.info("::::::::::::::::::OnlineTeacher验证----不能抢::::::::::::::::::");
             return null;
