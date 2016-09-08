@@ -1,6 +1,9 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCountSetLog;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.NoCommentTeacherInfoDto;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
@@ -8,6 +11,7 @@ import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -52,7 +56,7 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
             commentCardService.changeTeacher(commentCard, getInnerTeacherId(commentCard));
         }
         // 调用中外教管理管理冻结老师账号
-        // commentCardManageSDK.freezeTeacherId(teacherId);
+        commentCardManageSDK.freezeTeacherId(teacherId);
     }
 
     /**
@@ -71,12 +75,6 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         return commentCardManageSDK.getTeacherOperations(teacherId);
     }
 
-    @Override
-    public JsonResultModel getTeacherTimes(Long teacherId) {
-        logger.info("@ForeignTeacherServiceImpl: getting teacher's times in 'getTeacherTimes'......");
-        return commentCardManageSDK.getTeacherTimes(teacherId);
-    }
-
 
     /**
      * 查询老师对应点评统计
@@ -92,7 +90,7 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
      * @return
      */
     @Override
-    public JsonResultModel commentTeacherPage(Pageable pageable, TeacherForm teacherForm) {
+    public Page<CommentTeacherInfo> commentTeacherPage(Pageable pageable, TeacherForm teacherForm) {
         // 获取查询sql
         StringBuilder querySb = commentTeacherSql();
         StringBuilder countSb = commentTeacherCountSql();
@@ -114,15 +112,31 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         Query countQuery = entityManager.createNativeQuery(countSb.toString());
         setParameter(countQuery, parameters);
         BigInteger size = (BigInteger) countQuery.getSingleResult();
-        return JsonResultModel.newJsonResultModel(
-                new PageImpl<>(nativeQuery.getResultList(), pageable, size.intValue()));
+        return new PageImpl<>(nativeQuery.getResultList(), pageable, size.intValue());
     }
 
+    /**
+     * 未收到点评老师
+     * @param pageable
+     * @param teacherForm
+     * @return
+     */
     @Override
-    public JsonResultModel getUncommentTeacherList(Pageable pageable, TeacherForm teacherForm) {
-        logger.info("@ForeignTeacherServiceImpl: getting uncomment-teacher's list in 'getTeacherList'......");
-        return getUncommentTeacherList(pageable,teacherForm);
+    public Page<NoCommentTeacherInfoDto> uncommentTeacherPage(Pageable pageable, TeacherForm teacherForm) {
+        return commentCardManageSDK.getNoCommentPage(pageable, teacherForm);
     }
+
+    /**
+     * 老师点评次数设置日志
+     * @param pageable
+     * @param teacherId
+     * @return
+     */
+    @Override
+    public Page<CommentCountSetLog> commentCountSetLogPage(Pageable pageable, Long teacherId) {
+        return commentCardManageSDK.getCommentCountSetLogPage(pageable, teacherId);
+    }
+
 
     private StringBuilder commentTeacherCountSql() {
         StringBuilder builder = new StringBuilder(200);
@@ -134,8 +148,8 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         StringBuilder builder = new StringBuilder(200);
         builder.append("select c.teacher_id teacherId,ifnull(c.teacher_name,'') teacherName,count(teacher_id) commentCount,")/*收到点评总数*/
                 .append("sum(case when c.status=400 or c.status=600 then 1 else 0 end) finishCount,")/*已完成*/
-                .append("floor(sum(case when c.status=300 then 1 else 0 end)) unfinishCount,")/*未回答*/
-                .append("floor(sum(case when c.status=500 then 1 else 0 end)) timeoutCount ")/*超时未回答*/
+                .append("sum(case when c.status=300 then 1 else 0 end) unfinishCount,")/*未回答*/
+                .append("sum(case when c.status=500 then 1 else 0 end) timeoutCount ")/*超时未回答*/
                 .append("from comment_card c ")
                 .append("where c.teacher_id is not null ");
         return builder;

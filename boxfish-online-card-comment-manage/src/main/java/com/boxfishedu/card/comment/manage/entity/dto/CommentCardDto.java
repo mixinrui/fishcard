@@ -12,6 +12,7 @@ import java.util.Date;
 
 /**
  * Created by LuoLiBing on 16/9/2.
+ * 点评dto
  */
 @Data
 public class CommentCardDto {

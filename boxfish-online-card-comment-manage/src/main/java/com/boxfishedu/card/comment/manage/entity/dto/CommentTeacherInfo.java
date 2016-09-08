@@ -9,6 +9,7 @@ import java.math.BigInteger;
 
 /**
  * Created by LuoLiBing on 16/9/6.
+ * 已点评老师列表
  */
 @Data
 public class CommentTeacherInfo {
@@ -37,9 +38,4 @@ public class CommentTeacherInfo {
         this.unfinishCount = unfinishCount.intValue();
         this.timeoutCount = timeoutCount.intValue();
     }
-
-
-
-//    public static List<CommentTeacherInfo>
-
 }

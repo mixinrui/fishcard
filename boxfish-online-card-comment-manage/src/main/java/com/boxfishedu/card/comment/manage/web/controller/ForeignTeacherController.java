@@ -43,11 +43,6 @@ public class ForeignTeacherController {
         return foreignTeacherService.getTeacherOperations(teacherId);
     }
 
-    @RequestMapping(value = "/get/teacher_times/{teacherId}", method = RequestMethod.GET)
-    public Object getTeacherTimes(@PathVariable  Long teacherId){
-        return foreignTeacherService.getTeacherTimes(teacherId);
-    }
-
     /**
      * 已收到点评老师列表
      * @param pageable
@@ -56,11 +51,19 @@ public class ForeignTeacherController {
      */
     @RequestMapping(value = "/teacher/page/comment", method = RequestMethod.GET)
     public Object getTeacherList(Pageable pageable, TeacherForm teacherForm){
-        return foreignTeacherService.commentTeacherPage(pageable,teacherForm);
+        return JsonResultModel.newJsonResultModel(
+                foreignTeacherService.commentTeacherPage(pageable,teacherForm));
     }
 
     @RequestMapping(value = "/teacher/page/uncomment", method = RequestMethod.GET)
     public Object getUncommentTeacherList(Pageable pageable, TeacherForm teacherForm){
-        return foreignTeacherService.getUncommentTeacherList(pageable,teacherForm);
+        return JsonResultModel.newJsonResultModel(
+                foreignTeacherService.uncommentTeacherPage(pageable,teacherForm));
+    }
+
+    @RequestMapping(value = "/teacher/{teacherId}/teacher_times/logs", method = RequestMethod.GET)
+    public Object teacherTimesLogs(Pageable pageable, @PathVariable Long teacherId) {
+        return JsonResultModel.newJsonResultModel(
+                foreignTeacherService.commentCountSetLogPage(pageable, teacherId));
     }
 }

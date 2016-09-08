@@ -1,7 +1,11 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCountSetLog;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.NoCommentTeacherInfoDto;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -9,15 +13,15 @@ import org.springframework.data.domain.Pageable;
  */
 
 public interface ForeignTeacherService{
-    public void freezeTeacherId(Long teacherId);
+    void freezeTeacherId(Long teacherId);
 
-    public void unfreezeTeacherId(Long teacherId);
+    void unfreezeTeacherId(Long teacherId);
 
-    public JsonResultModel getTeacherOperations(Long teacherId);
+    JsonResultModel getTeacherOperations(Long teacherId);
 
-    public JsonResultModel getTeacherTimes(Long teacherId);
+    Page<CommentTeacherInfo> commentTeacherPage(Pageable pageable, TeacherForm teacherForm);
 
-    JsonResultModel commentTeacherPage(Pageable pageable, TeacherForm teacherForm);
+    Page<NoCommentTeacherInfoDto> uncommentTeacherPage(Pageable pageable, TeacherForm teacherForm);
 
-    public JsonResultModel getUncommentTeacherList(Pageable pageable,TeacherForm teacherForm);
+    Page<CommentCountSetLog> commentCountSetLogPage(Pageable pageable, Long teacherId);
 }

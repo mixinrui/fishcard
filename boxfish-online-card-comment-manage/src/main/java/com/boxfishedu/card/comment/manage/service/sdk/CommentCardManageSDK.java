@@ -2,11 +2,19 @@ package com.boxfishedu.card.comment.manage.service.sdk;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.config.CommentCardManageUrl;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCountSetLog;
+import com.boxfishedu.card.comment.manage.entity.dto.NoCommentTeacherInfoDto;
+import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
+import com.boxfishedu.card.comment.manage.util.JsonResultModuleUtils;
+import com.boxfishedu.card.comment.manage.util.ObjectUtils;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -17,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -33,25 +42,16 @@ public class CommentCardManageSDK {
     @Autowired
     private CommentCardManageUrl commentCardManageUrl;
 
-    public void teacherDecrementCount(Long teacherId) {
-        restTemplate.exchange(
-                createTeacherDecrementCountURI(teacherId),
-                HttpMethod.POST,
-                HttpEntity.EMPTY,
-                Object.class);
-    }
-
     /**
      * 冻结老师
      * @param teacherId
      */
     public void freezeTeacherId(Long teacherId){
         logger.info("Accessing freezeTeacherId in CommentCardManageSDK......");
-        restTemplate.exchange(
-                createFreezeTeacherURI(teacherId),
-                HttpMethod.PUT,
-                HttpEntity.EMPTY,
-                Object.class);
+        Map<String, Object> requestBody = Maps.newHashMap();
+        requestBody.put("teacherId", teacherId);
+        requestBody.put("freezeFlag", TeacherInfo.FREEZE);
+        restTemplate.postForObject(createUpdateFreezeTeacherURI(), requestBody, Object.class);
     }
 
     /**
@@ -60,7 +60,7 @@ public class CommentCardManageSDK {
      * @return
      */
     public JsonResultModel getInnerTeacherId(Map paramMap){
-        return restTemplate.postForObject(getInnerTeacherURI(), paramMap,JsonResultModel.class);
+        return restTemplate.postForObject(getInnerTeacherURI(), paramMap, JsonResultModel.class);
     }
 
     /**
@@ -75,26 +75,42 @@ public class CommentCardManageSDK {
     }
 
     /**
-     * 老师解冻
-     * @param teacherId
+     * 老师解冻 0冻结 1解冻
+     * @param  teacherId
      */
     public void unfreezeTeacherId(Long teacherId){
         logger.info("Accessing unfreezeTeacherId in CommentCardManageSDK......");
-        restTemplate.exchange(
-                createUnfreezeTeacherURI(teacherId),
-                HttpMethod.PUT,
-                HttpEntity.EMPTY,
-                Object.class
-        );
+        Map<String, Object> requestBody = Maps.newHashMap();
+        requestBody.put("teacherId", teacherId);
+        requestBody.put("freezeFlag", TeacherInfo.UNFREEZE);
+        restTemplate.postForObject(createUpdateFreezeTeacherURI(), requestBody, Object.class);
     }
 
-    public JsonResultModel getNoCommentPage(Pageable pageable, TeacherForm teacherForm) {
+    /**
+     * 未点评老师
+     * @param pageable
+     * @param teacherForm
+     * @return
+     */
+    public Page<NoCommentTeacherInfoDto> getNoCommentPage(Pageable pageable, TeacherForm teacherForm) {
         JsonResultModel jsonResultModel = restTemplate.getForObject(createNoCommentPageURI(
                 pageable, teacherForm), JsonResultModel.class);
-        return null;
-//        return new PageImpl<>(JsonResultModuleUtils.getListFromPageResult(jsonResultModel, CommentTeacherInfo.class,
-//                ((clazz, beanMap) -> ObjectUtils.convertObject(beanMap, CommentTeacherInfo.class)),
-//                pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
+        return new PageImpl<>(
+                JsonResultModuleUtils.getListFromPageResult(jsonResultModel, NoCommentTeacherInfoDto.class,
+                        ((clazz, beanMap) -> ObjectUtils.convertObject(beanMap, clazz))),
+                pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
+    }
+
+
+    public Page<CommentCountSetLog> getCommentCountSetLogPage(Pageable pageable, Long teacherId) {
+        JsonResultModel jsonResultModel = restTemplate.postForObject(
+                createCommentCountSetLogPageURI(pageable),
+                Collections.singletonMap("teacherId", teacherId),
+                JsonResultModel.class);
+        return new PageImpl<>(
+                JsonResultModuleUtils.getListFromPageResult(jsonResultModel, CommentCountSetLog.class,
+                        ((clazz, beanMap) -> ObjectUtils.convertObject(beanMap, clazz))),
+                pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
     }
 
     public JsonResultModel getTeacherOperations(Long teacherId){
@@ -112,28 +128,7 @@ public class CommentCardManageSDK {
                 .toUri();
     }
 
-    public JsonResultModel getTeacherTimes(Long teacherId){
-        logger.info("Accessing getTeacherTimes in CommentCardManageSDK......");
-        return JsonResultModel.newJsonResultModel(restTemplate.exchange(createGetTeacherTimesURI(teacherId),HttpMethod.GET,
-                HttpEntity.EMPTY,
-                Object.class));
-    }
 
-    private URI createGetTeacherTimesURI(Long teacherId){
-        return UriComponentsBuilder
-                .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("/" + teacherId)
-                .build()
-                .toUri();
-    }
-
-    public JsonResultModel getUncommentTeacherList(Pageable pageable, TeacherForm teacherForm){
-        logger.info("Accessing getUncommentTeacherList in CommentCardManageSDK......");
-        return JsonResultModel.newJsonResultModel(restTemplate.exchange(createGetUncommentTeacherListURI(pageable,teacherForm),
-                HttpMethod.GET,
-                HttpEntity.EMPTY,
-                Object.class));
-    }
 
 
     /************************************* 构建URI ********************************/
@@ -147,10 +142,10 @@ public class CommentCardManageSDK {
     }
 
 
-    private URI createUnfreezeTeacherURI(Long teacherId){
+    private URI createUpdateFreezeTeacherURI(){
         return UriComponentsBuilder
                 .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("/" + teacherId)
+                .path("f_teacher_review/update_freeze_status")
                 .build()
                 .toUri();
     }
@@ -178,7 +173,6 @@ public class CommentCardManageSDK {
         logger.info("Accessing getInnerTeacher in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/get_inner_f_review_teacher")
-                .queryParam("")
                 .build()
                 .toUri();
     }
@@ -197,6 +191,16 @@ public class CommentCardManageSDK {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("f_teacher_review/get_review_todaycount")
                 .queryParams(paramMap)
+                .build()
+                .toUri();
+    }
+
+    private URI createCommentCountSetLogPageURI(Pageable pageable){
+        return UriComponentsBuilder
+                .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
+                .path("/f_teacher_review/get_review_count")
+                .queryParam("page", pageable.getPageNumber())
+                .queryParam("size", pageable.getPageSize())
                 .build()
                 .toUri();
     }
