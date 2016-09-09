@@ -40,7 +40,7 @@ spring:
 service:
   sdk:
     teacherStudentBusinessUrl: http://101.201.237.252:8099
-
+    avatarsUrl: http://avatars.boxfish.cn
 server.port: 8085
 
 ---
@@ -55,6 +55,6 @@ spring:
 service:
   sdk:
     teacherStudentBusinessUrl: http://101.201.237.252:8099
-    innerTeacherUrl: http://101.201.237.252:8099
+    avatarsUrl: http://avatars.boxfish.cn
 
 server.port: 8085

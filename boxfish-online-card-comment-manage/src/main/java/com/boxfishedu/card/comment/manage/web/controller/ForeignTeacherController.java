@@ -66,4 +66,20 @@ public class ForeignTeacherController {
         return JsonResultModel.newJsonResultModel(
                 foreignTeacherService.commentCountSetLogPage(pageable, teacherId));
     }
+
+    /**
+     * 单个老师
+     * @param teacherId
+     * @return
+     */
+    @RequestMapping(value = "/teacher/{teacherId}", method = RequestMethod.GET)
+    public Object getTeacherInfo(@PathVariable Long teacherId) {
+        return JsonResultModel.newJsonResultModel(foreignTeacherService.getTeacherInfoById(teacherId));
+    }
+
+    @RequestMapping(value = "teacher/page", method = RequestMethod.GET)
+    public Object getTeacherInfoPage(Pageable pageable, TeacherForm teacherForm) {
+        return JsonResultModel.newJsonResultModel(
+                foreignTeacherService.getCanCommentTeacherPage(pageable, teacherForm));
+    }
 }

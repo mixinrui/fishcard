@@ -1,6 +1,10 @@
 package com.boxfishedu.card.comment.manage.entity.dto.merger;
 
 import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
+import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
+import com.boxfishedu.card.comment.manage.util.ApplicationContextProvider;
+
+import java.util.Objects;
 
 /**
  * Created by LuoLiBing on 16/5/18.
@@ -8,16 +12,16 @@ import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
  */
 public class TeacherInfoRpcMerger extends BaseRpcMerger<TeacherInfo, Long> {
 
+    private static CommentCardManageSDK commentCardManageSDK =
+            ApplicationContextProvider.getBean(CommentCardManageSDK.class);
+
     @Override
     public TeacherInfo rpcCall(Long identify) {
-//        return financeSDK.getUserInfo(identify);
-        return mock();
-    }
-
-    private TeacherInfo mock() {
-        TeacherInfo userInfo = new TeacherInfo();
-        userInfo.setStatus(100);
-        userInfo.setStatusDesc("冻结");
-        return userInfo;
+        try {
+            TeacherInfo teacherInfo = commentCardManageSDK.getTeacherInfoById(identify);
+            return Objects.isNull(teacherInfo) ? TeacherInfo.UNKNOW : teacherInfo;
+        } catch (Exception e) {
+            return TeacherInfo.UNKNOW;
+        }
     }
 }

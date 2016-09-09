@@ -1,5 +1,6 @@
 package com.boxfishedu.card.comment.manage.entity.dto;
 
+import com.boxfishedu.card.comment.manage.entity.dto.merger.AliCloudPathMerger;
 import com.boxfishedu.card.comment.manage.entity.dto.merger.CommentCardDtoStatusMerger;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardDtoStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,6 +24,7 @@ public class CommentCardDto {
 
     private String studentPicturePath;
 
+    @Source(value = "askVoicePath", merger = AliCloudPathMerger.class)
     private String askVoicePath;
 
     private Long voiceTime;
@@ -39,6 +41,7 @@ public class CommentCardDto {
 
     private Date teacherAnswerTime;
 
+    @Source(value = "answerVideoPath", merger = AliCloudPathMerger.class)
     private String answerVideoPath;
 
     private Long answerVideoTime;

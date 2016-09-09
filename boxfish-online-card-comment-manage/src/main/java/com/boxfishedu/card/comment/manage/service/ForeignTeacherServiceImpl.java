@@ -2,12 +2,14 @@ package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCountSetLog;
-import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfoDto;
 import com.boxfishedu.card.comment.manage.entity.dto.NoCommentTeacherInfoDto;
+import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
+import org.jdto.DTOBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import java.util.Objects;
  */
 @Service
 public class ForeignTeacherServiceImpl implements ForeignTeacherService{
+
     @Autowired
     CommentCardManageSDK commentCardManageSDK;
 
@@ -40,6 +43,9 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
 
     @Autowired
     private CommentCardService commentCardService;
+
+    @Autowired
+    private DTOBinder dtoBinder;
 
     private final static Logger logger = LoggerFactory.getLogger(ForeignTeacherServiceImpl.class);
 
@@ -90,7 +96,7 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
      * @return
      */
     @Override
-    public Page<CommentTeacherInfo> commentTeacherPage(Pageable pageable, TeacherForm teacherForm) {
+    public Page<CommentTeacherInfoDto> commentTeacherPage(Pageable pageable, TeacherForm teacherForm) {
         // 获取查询sql
         StringBuilder querySb = commentTeacherSql();
         StringBuilder countSb = commentTeacherCountSql();
@@ -112,7 +118,8 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         Query countQuery = entityManager.createNativeQuery(countSb.toString());
         setParameter(countQuery, parameters);
         BigInteger size = (BigInteger) countQuery.getSingleResult();
-        return new PageImpl<>(nativeQuery.getResultList(), pageable, size.intValue());
+        List<CommentTeacherInfoDto> resultList = dtoBinder.bindFromBusinessObjectList(CommentTeacherInfoDto.class, nativeQuery.getResultList());
+        return new PageImpl<>(resultList, pageable, size.intValue());
     }
 
     /**
@@ -137,6 +144,21 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         return commentCardManageSDK.getCommentCountSetLogPage(pageable, teacherId);
     }
 
+    @Override
+    public TeacherInfo getTeacherInfoById(Long teacherId) {
+        try {
+            TeacherInfo teacherInfo = commentCardManageSDK.getTeacherInfoById(teacherId);
+            return Objects.isNull(teacherInfo) ? TeacherInfo.UNKNOW : teacherInfo;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return TeacherInfo.UNKNOW;
+        }
+    }
+
+    @Override
+    public Page<TeacherInfo> getCanCommentTeacherPage(Pageable pageable, TeacherForm teacherForm) {
+        return commentCardManageSDK.getTeacherInfoPage(pageable, teacherForm);
+    }
 
     private StringBuilder commentTeacherCountSql() {
         StringBuilder builder = new StringBuilder(200);
@@ -146,7 +168,7 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
 
     private StringBuilder commentTeacherSql() {
         StringBuilder builder = new StringBuilder(200);
-        builder.append("select c.teacher_id teacherId,ifnull(c.teacher_name,'') teacherName,count(teacher_id) commentCount,")/*收到点评总数*/
+        builder.append("select c.teacher_id teacherId,count(teacher_id) commentCount,")/*收到点评总数*/
                 .append("sum(case when c.status=400 or c.status=600 then 1 else 0 end) finishCount,")/*已完成*/
                 .append("sum(case when c.status=300 then 1 else 0 end) unfinishCount,")/*未回答*/
                 .append("sum(case when c.status=500 then 1 else 0 end) timeoutCount ")/*超时未回答*/

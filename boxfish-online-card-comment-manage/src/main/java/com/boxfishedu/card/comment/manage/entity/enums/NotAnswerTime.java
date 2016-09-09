@@ -33,6 +33,10 @@ public enum NotAnswerTime {
         return null;
     }
 
+    public int code() {
+        return code;
+    }
+
     public class DateRange {
         private LocalDateTime from;
         private LocalDateTime to;

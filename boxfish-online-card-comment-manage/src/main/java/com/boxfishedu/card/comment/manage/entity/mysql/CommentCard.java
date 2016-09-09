@@ -1,20 +1,17 @@
 package com.boxfishedu.card.comment.manage.entity.mysql;
 
 import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -28,7 +25,6 @@ import java.util.List;
 @SqlResultSetMapping(name = "commentTeacherInfo", classes = {
         @ConstructorResult(targetClass = CommentTeacherInfo.class, columns = {
                 @ColumnResult(name = "teacherId"),
-                @ColumnResult(name = "teacherName"),
                 @ColumnResult(name = "commentCount"),
                 @ColumnResult(name = "finishCount"),
                 @ColumnResult(name = "unfinishCount"),
@@ -149,42 +145,21 @@ public class CommentCard implements Serializable {
     @Column(name = "service_id")
     private Long serviceId;
 
-    public String[] getStudentCommentGoodTagCode() {
-        if(StringUtils.isNotEmpty(studentCommentGoodTagCode)) {
-            return studentCommentGoodTagCode.split(",");
-        }
-        return null;
-    }
-
-    public void setStudentCommentGoodTagCode(List studentCommentGoodTagCode) {
-        this.studentCommentGoodTagCode = String.join(",", studentCommentGoodTagCode);
-    }
-
-    public String[] getStudentCommentBadTagCode() {
-        if(StringUtils.isNotEmpty(studentCommentBadTagCode)) {
-            return studentCommentBadTagCode.split(",");
-        }
-        return null;
-    }
-
-    public void setStudentCommentBadTagCode(List studentCommentBadTagCode) {
-        this.studentCommentBadTagCode = String.join(",", studentCommentBadTagCode);
-    }
-
     // 换老师逻辑
-    public CommentCard changeTeacher(Long targetTeacher) {
-        Duration duration = Duration.between(studentAskTime.toInstant(), Instant.now());
-        // 没有超过24小时的不能换老师
-        if(duration.toHours() < 24) {
-            throw new IllegalArgumentException("没有超过24小时不能更换老师");
-        }
+    public CommentCard changeTeacher(TeacherInfo teacherInfo) {
+//        Duration duration = Duration.between(studentAskTime.toInstant(), Instant.now());
+//        // 没有超过24小时的不能换老师
+//        if(duration.toHours() < 24) {
+//            throw new IllegalArgumentException("没有超过24小时不能更换老师");
+//        }
 
         Date now = new Date();
         // 复制一份点评作为新的外教点评
         CommentCard newCommentCard = (CommentCard) SerializationUtils.clone(this);
         newCommentCard.setId(null);
         newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
-        newCommentCard.setTeacherId(targetTeacher);
+        newCommentCard.setTeacherId(teacherInfo.getTeacherId());
+        newCommentCard.setTeacherName(teacherInfo.getTeacherName());
         newCommentCard.setUpdateTime(now);
 
         // 之前的老师标记为过期,并且标记为后台强制更换老师

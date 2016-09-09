@@ -1,8 +1,7 @@
 package com.boxfishedu.card.comment.manage.entity.dto;
 
-import com.boxfishedu.card.comment.manage.entity.dto.merger.TeacherInfoRpcMerger;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import org.jdto.annotation.Source;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -12,11 +11,10 @@ import java.math.BigInteger;
  * 已点评老师列表
  */
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CommentTeacherInfo {
 
     private Long teacherId;
-
-    private String teacherName;
 
     private Integer commentCount;
 
@@ -26,16 +24,14 @@ public class CommentTeacherInfo {
 
     private Integer timeoutCount;
 
-    @Source(value = "teacherId", merger = TeacherInfoRpcMerger.class)
-    private TeacherInfo teacherInfo;
-
-    public CommentTeacherInfo(BigInteger teacherId, String teacherName, BigInteger commentCount,
+    public CommentTeacherInfo(BigInteger teacherId, BigInteger commentCount,
                               BigDecimal finishCount, BigDecimal unfinishCount, BigDecimal timeoutCount) {
         this.teacherId = teacherId.longValue();
-        this.teacherName = teacherName;
         this.commentCount = commentCount.intValue();
         this.finishCount = finishCount.intValue();
         this.unfinishCount = unfinishCount.intValue();
         this.timeoutCount = timeoutCount.intValue();
     }
+
+    public CommentTeacherInfo() {}
 }
