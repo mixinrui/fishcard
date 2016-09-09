@@ -254,12 +254,14 @@ public class FishCardModifyServiceX {
             courseScheduleService.save(courseSchedule);
 
             // 推送教师更换时间推送
-            this.pushTeacherList(teacherId,startTime);
+            if(null!=teacherId && teacherId>0L){
+                this.pushTeacherList(teacherId,startTime);
+            }
 
         }else {
             resultMap.put("code","2");
             resultMap.put("msg","鱼卡状态不正确");
-
+            return JsonResultModel.newJsonResultModel(resultMap);
         }
 
         List<CourseSchedule> courseSchedules = Lists.newArrayList();
@@ -348,6 +350,5 @@ public class FishCardModifyServiceX {
 
         logger.info("notiFyTeahcerchangeStartTime::end");
     }
-
 
 }
