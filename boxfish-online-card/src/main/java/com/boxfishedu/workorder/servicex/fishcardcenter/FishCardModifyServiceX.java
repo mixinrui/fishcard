@@ -130,6 +130,9 @@ public class FishCardModifyServiceX {
 
     public void changeSpecialOrderCourses(Long studentId, Long orderId) {
         List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndOrderIdAndStatusLessThan(studentId, orderId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
+        if(CollectionUtils.isEmpty(workOrders)){
+            return;
+        }
         workOrders.forEach(workOrder -> {
             fishCardModifyService.changeCourse(workOrder);
         });
@@ -137,6 +140,9 @@ public class FishCardModifyServiceX {
 
     public void changerderCourses(Long studentId) {
         List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndStatusLessThan(studentId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
+        if(CollectionUtils.isEmpty(workOrders)){
+            return;
+        }
         workOrders.forEach(workOrder -> {
             fishCardModifyService.changeCourse(workOrder);
         });
@@ -144,6 +150,9 @@ public class FishCardModifyServiceX {
 
     public void changCourse(Long workOrderId) {
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
+        if(null==workOrder){
+            return;
+        }
         fishCardModifyService.changeCourse(workOrder);
     }
 
