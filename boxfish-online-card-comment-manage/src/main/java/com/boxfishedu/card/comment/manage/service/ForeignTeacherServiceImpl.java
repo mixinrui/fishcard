@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -108,6 +109,11 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
                 .append(pageable.getPageSize() * pageable.getPageNumber())
                 .append(",")
                 .append(pageable.getPageSize());
+        if(Objects.nonNull(pageable.getSort())) {
+            for (Sort.Order order : pageable.getSort()) {
+                querySb.append(String.format(" order by %s %s", order.getProperty(), order.getDirection().name()));
+            }
+        }
         // 查询参数设置
         Query nativeQuery = entityManager.createNativeQuery(querySb.toString(), "commentTeacherInfo");
         setParameter(nativeQuery, parameters);

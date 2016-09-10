@@ -2,11 +2,11 @@ package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
 import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.enums.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.NotAnswerTime;
 import com.boxfishedu.card.comment.manage.entity.form.ChangeTeacherForm;
 import com.boxfishedu.card.comment.manage.entity.form.CommentCardForm;
-import com.boxfishedu.card.comment.manage.entity.form.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
@@ -189,23 +189,6 @@ public class CommentCardServiceImpl implements CommentCardService {
             if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.NOTANSWER.value())) {
                 predicateList.add(criteriaBuilder.lt(
                         root.get("status"), CommentCardStatus.ANSWERED.getCode()));
-                // 未点评的时候,时间段才起作用
-                if(Objects.nonNull(commentCardForm.getNotAnswerTime()) &&
-                        Objects.nonNull(NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()))) {
-                    NotAnswerTime.DateRange dateRange = NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()).getRange();
-                    if(Objects.equals(commentCardForm.getNotAnswerTime(), NotAnswerTime._36HOURS.code())) {
-                        predicateList.add(criteriaBuilder.lessThanOrEqualTo(
-                                root.get("studentAskTime"),
-                                DateUtils.parseFromLocalDateTime(dateRange.getFrom())
-                        ));
-                    } else {
-                        predicateList.add(criteriaBuilder.between(
-                                root.get("studentAskTime"),
-                                DateUtils.parseFromLocalDateTime(dateRange.getFrom()),
-                                DateUtils.parseFromLocalDateTime(dateRange.getTo())
-                        ));
-                    }
-                }
             }
             // 已点评
             else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.ANSWERED.value())) {
@@ -218,6 +201,24 @@ public class CommentCardServiceImpl implements CommentCardService {
                         root.get("status"), CommentCardStatus.ANSWERED.getCode()
                 ));
                 NotAnswerTime.DateRange dateRange = NotAnswerTime._24_48HOURS.getRange();
+                predicateList.add(criteriaBuilder.between(
+                        root.get("studentAskTime"),
+                        DateUtils.parseFromLocalDateTime(dateRange.getFrom()),
+                        DateUtils.parseFromLocalDateTime(dateRange.getTo())
+                ));
+            }
+        }
+
+
+        // 时间区间
+        if(notAnswerDateTimeRangeOption(commentCardForm)) {
+            NotAnswerTime.DateRange dateRange = NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()).getRange();
+            if(Objects.equals(commentCardForm.getNotAnswerTime(), NotAnswerTime._36HOURS.code())) {
+                predicateList.add(criteriaBuilder.lessThanOrEqualTo(
+                        root.get("studentAskTime"),
+                        DateUtils.parseFromLocalDateTime(dateRange.getFrom())
+                ));
+            } else {
                 predicateList.add(criteriaBuilder.between(
                         root.get("studentAskTime"),
                         DateUtils.parseFromLocalDateTime(dateRange.getFrom()),
@@ -257,6 +258,15 @@ public class CommentCardServiceImpl implements CommentCardService {
 
         //.... 多条件
         return predicateList.toArray(new Predicate[predicateList.size()]);
+    }
+
+
+    private boolean notAnswerDateTimeRangeOption(CommentCardForm commentCardForm) {
+        // 点评状态条件为全部或者是未点评时,选择未点评时间区间才起作用
+        return (Objects.isNull(commentCardForm.getStatus())
+                || Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.NOTANSWER.value()))
+                && Objects.nonNull(commentCardForm.getNotAnswerTime())
+                && Objects.nonNull(NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()));
     }
 
 }
