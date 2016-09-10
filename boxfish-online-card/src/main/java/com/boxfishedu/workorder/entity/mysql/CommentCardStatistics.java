@@ -24,11 +24,17 @@ public class CommentCardStatistics {
     @Column(name = "comment_card_id", nullable = true)
     private Long commentCardId;
 
+    @Column(name = "student_id", nullable = true)
+    private Long studentId;
+
     @Column(name = "service_id", nullable = true)
     private Long ServicedId;
 
     @Column(name = "operation_type", nullable = true)
     private int operationType;
+
+    @Column(name = "amount", nullable = true)
+    private Integer amount;
 
     @Column(name = "create_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)

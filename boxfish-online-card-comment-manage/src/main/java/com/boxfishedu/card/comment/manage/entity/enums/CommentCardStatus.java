@@ -1,9 +1,11 @@
-package com.boxfishedu.workorder.common.bean;
+package com.boxfishedu.card.comment.manage.entity.enums;
+
+import com.boxfishedu.card.comment.manage.entity.dto.merger.BaseEnum;
 
 /**
  * Created by ansel on 16/7/18.
  */
-public enum CommentCardStatus {
+public enum CommentCardStatus implements BaseEnum {
     ASKED(100,"已提问"),
     REQUEST_ASSIGN_TEACHER(200,"请求分配教师"),
     ASSIGNED_TEACHER(300,"已分配教师"),
@@ -39,6 +41,14 @@ public enum CommentCardStatus {
         for (CommentCardStatus commentCardStatus: CommentCardStatus.values()){
             if (commentCardStatus.code == code)
                 return commentCardStatus.status;
+        }
+        return null;
+    }
+
+    public static CommentCardStatus resolve(int code) {
+        for (CommentCardStatus commentCardStatus: CommentCardStatus.values()){
+            if (commentCardStatus.code == code)
+                return commentCardStatus;
         }
         return null;
     }

@@ -1,19 +1,17 @@
-package com.boxfishedu.workorder.entity.mysql;
+package com.boxfishedu.card.comment.manage.entity.mysql;
 
-import com.boxfishedu.workorder.common.bean.CommentCardStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -24,9 +22,18 @@ import java.util.Set;
 @Table(name = "comment_card")
 @ToString(exclude = {"unAnswerTeacherCards","service"})
 @EqualsAndHashCode(exclude = {"unAnswerTeacherCards"})
-public class CommentCard {
+@SqlResultSetMapping(name = "commentTeacherInfo", classes = {
+        @ConstructorResult(targetClass = CommentTeacherInfo.class, columns = {
+                @ColumnResult(name = "teacherId"),
+                @ColumnResult(name = "commentCount"),
+                @ColumnResult(name = "finishCount"),
+                @ColumnResult(name = "unfinishCount"),
+                @ColumnResult(name = "timeoutCount")
+        })
+})
+public class CommentCard implements Serializable {
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
@@ -102,11 +109,6 @@ public class CommentCard {
     @Column(name = "cover", nullable = true, length = 50)
     private String cover;
 
-    @JoinColumn(name = "service_id", referencedColumnName = "id")//设置对应数据表的列名和引用的数据表的列名
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
-    private Service service;
-
     @Column(name = "order_id", nullable = true)
     private Long orderId;
 
@@ -140,74 +142,37 @@ public class CommentCard {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
-    public static CommentCard getCommentCard(CommentCardForm commentCardForm){
-        CommentCard commentCard = new CommentCard();
-        commentCard.setQuestionName(commentCardForm.getQuestionName());
-        commentCard.setCourseId(commentCardForm.getCourseId());
-        commentCard.setCourseName(commentCardForm.getCourseName());
-        commentCard.setCover(commentCardForm.getCover());
-        commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
-        commentCard.setVoiceTime(commentCardForm.getVoiceTime());
-        return commentCard;
+    @Column(name = "service_id")
+    private Long serviceId;
+
+    // 换老师逻辑
+    public CommentCard changeTeacher(TeacherInfo teacherInfo) {
+//        Duration duration = Duration.between(studentAskTime.toInstant(), Instant.now());
+//        // 没有超过24小时的不能换老师
+//        if(duration.toHours() < 24) {
+//            throw new IllegalArgumentException("没有超过24小时不能更换老师");
+//        }
+
+        Date now = new Date();
+        // 复制一份点评作为新的外教点评
+        CommentCard newCommentCard = (CommentCard) SerializationUtils.clone(this);
+        newCommentCard.setId(null);
+        newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        newCommentCard.setTeacherId(teacherInfo.getTeacherId());
+        newCommentCard.setTeacherName(teacherInfo.getTeacherName());
+        newCommentCard.setUpdateTime(now);
+
+        // 之前的老师标记为过期,并且标记为后台强制更换老师
+        status = CommentCardStatus.OVERTIME.getCode();
+        assignTeacherCount = CommentCardStatus.ASSIGN_TEACHER_TRIPLE.getCode();
+        teacherReadFlag = CommentCardStatus.TEACHER_UNREAD.getCode();
+        updateTime = now;
+        assignTeacherTime = now;
+        return newCommentCard;
     }
 
-    public String[] getStudentCommentGoodTagCode() {
-        if(StringUtils.isNotEmpty(studentCommentGoodTagCode)) {
-            return studentCommentGoodTagCode.split(",");
-        }
-        return null;
-    }
-
-    public void setStudentCommentGoodTagCode(List studentCommentGoodTagCode) {
-        this.studentCommentGoodTagCode = String.join(",", studentCommentGoodTagCode);
-    }
-
-    public String[] getStudentCommentBadTagCode() {
-        if(StringUtils.isNotEmpty(studentCommentBadTagCode)) {
-            return studentCommentBadTagCode.split(",");
-        }
-        return null;
-    }
-
-    public void setStudentCommentBadTagCode(List studentCommentBadTagCode) {
-        this.studentCommentBadTagCode = String.join(",", studentCommentBadTagCode);
-    }
-
-    public CommentCard cloneCommentCard() {
-        CommentCard temp = new CommentCard();
-        temp.setStudentId(this.studentId);
-        temp.setStudentPicturePath(studentPicturePath);
-        temp.setAskVoicePath(askVoicePath);
-        temp.setVoiceTime(voiceTime);
-        temp.setStudentAskTime(studentAskTime);
-        temp.setCourseId(courseId);
-        temp.setCourseName(courseName);
-        temp.setQuestionName(questionName);
-        temp.setCover(cover);
-        temp.setService(service);
-        temp.setOrderId(orderId);
-        temp.setOrderCode(orderCode);
-        temp.setCreateTime(createTime);
-        temp.setUpdateTime(new Date());
-        return temp;
-    }
-
-    /**
-     * 超过24小时换老师
-     */
-    public void changeToOverTime() {
-        setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode());
-        setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
-        setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
-        setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
-    }
-
-    /**
-     * 超过48小时退换次数
-     */
-    public void changeToReturn() {
-        setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
-        setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
-        setStatus(CommentCardStatus.OVERTIME.getCode());
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
