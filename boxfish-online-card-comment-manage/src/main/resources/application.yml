@@ -58,3 +58,18 @@ service:
     avatarsUrl: http://avatars.boxfish.cn
 
 server.port: 8085
+
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
+    username: service
+    password: Box123456
+  profiles: test
+
+service:
+  sdk:
+    teacherStudentBusinessUrl: http://123.56.13.168:8099
+    avatarsUrl: http://avatars.boxfish.cn
+
+server.port: 8085

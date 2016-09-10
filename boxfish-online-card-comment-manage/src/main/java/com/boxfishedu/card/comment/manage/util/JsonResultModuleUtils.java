@@ -31,7 +31,8 @@ public class JsonResultModuleUtils {
     public static <T> List<T> getListFromPageResult(JsonResultModel jsonResultModel, Class<T> clazz, Handle<T> handle) {
         HashMap hashMap = jsonResultModel.getData(HashMap.class);
         if(hashMap == null) {
-            throw new RuntimeException("返回的结果为空");
+            return null;
+            //throw new RuntimeException("返回的结果为空");
         }
         Object content = hashMap.get("content");
         if(content == null) {
@@ -50,7 +51,8 @@ public class JsonResultModuleUtils {
     public static Integer getTotalElements(JsonResultModel jsonResultModel) {
         HashMap hashMap = jsonResultModel.getData(HashMap.class);
         if(hashMap == null) {
-            throw new RuntimeException("返回的结果为空");
+            return 0;
+            //throw new RuntimeException("返回的结果为空");
         }
         return hashMap.get("totalElements") == null ? 0 : (Integer) hashMap.get("totalElements");
     }
