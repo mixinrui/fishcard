@@ -256,7 +256,8 @@ public class FishCardModifyServiceX {
             workOrder.setSlotId(startTimeParam.getTimeslotId());
             workOrderService.save(workOrder);
 
-            courseSchedule.setClassDate(startTimeParam.getBeginDateFormat());
+            courseSchedule.setClassDate(DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
+            logger.info("changeStartTime : [{}]",DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
             courseSchedule.setTeacherId(0L);
             courseSchedule.setTimeSlotId(startTimeParam.getTimeslotId() );
 
@@ -282,7 +283,8 @@ public class FishCardModifyServiceX {
         // 如果 含有 教室id  进行教室资源释放
 
         //通知师生运营释放教师资源
-        teacherStudentRequester.releaseTeacher(workOrder);
+       // teacherStudentRequester.releaseTeacher(workOrder);
+        teacherStudentRequester.notifyCancelTeacher(workOrder);
         //通知小马解散师生关系
         courseOnlineRequester.releaseGroup(workOrder);
 
