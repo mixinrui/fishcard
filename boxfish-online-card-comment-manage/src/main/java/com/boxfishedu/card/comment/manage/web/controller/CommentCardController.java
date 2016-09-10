@@ -2,7 +2,7 @@ package com.boxfishedu.card.comment.manage.web.controller;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.entity.form.CommentCardForm;
-import com.boxfishedu.card.comment.manage.entity.form.CommentCardFormStatus;
+import com.boxfishedu.card.comment.manage.entity.enums.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.service.CommentCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

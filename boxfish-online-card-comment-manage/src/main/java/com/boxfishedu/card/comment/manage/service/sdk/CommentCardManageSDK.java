@@ -250,7 +250,7 @@ public class CommentCardManageSDK {
 
     private URI createGetTeacherFreezeLogPage(Pageable pageable, Long teacherId) {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("/f_teacher_review/get_freeze_log")
+                .path("/f_teacher_review/get_freeze_log/" + teacherId)
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
                 .build()

@@ -1,4 +1,4 @@
-package com.boxfishedu.card.comment.manage.entity.form;
+package com.boxfishedu.card.comment.manage.entity.enums;
 
 import com.google.common.collect.Maps;
 
