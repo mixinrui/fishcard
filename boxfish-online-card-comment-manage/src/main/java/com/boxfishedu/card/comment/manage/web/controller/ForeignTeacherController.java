@@ -77,9 +77,27 @@ public class ForeignTeacherController {
         return JsonResultModel.newJsonResultModel(foreignTeacherService.getTeacherInfoById(teacherId));
     }
 
+    /**
+     * 获取所有老师列表
+     * @param pageable
+     * @param teacherForm
+     * @return
+     */
     @RequestMapping(value = "teacher/page", method = RequestMethod.GET)
     public Object getTeacherInfoPage(Pageable pageable, TeacherForm teacherForm) {
         return JsonResultModel.newJsonResultModel(
                 foreignTeacherService.getCanCommentTeacherPage(pageable, teacherForm));
+    }
+
+    /**
+     * 查看老师冻结日志
+     * @param pageable
+     * @param teacherId
+     * @return
+     */
+    @RequestMapping(value = "/teacher/freezelog/page", method = RequestMethod.GET)
+    public Object getTeacherFreezeLogPage(Pageable pageable, Long teacherId) {
+        return JsonResultModel.newJsonResultModel(
+                foreignTeacherService.getTeacherFreezeLogPage(pageable, teacherId));
     }
 }

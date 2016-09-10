@@ -1,10 +1,7 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.card.comment.manage.entity.dto.CommentCountSetLog;
-import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfoDto;
-import com.boxfishedu.card.comment.manage.entity.dto.NoCommentTeacherInfoDto;
-import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.*;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
@@ -158,6 +155,11 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
     @Override
     public Page<TeacherInfo> getCanCommentTeacherPage(Pageable pageable, TeacherForm teacherForm) {
         return commentCardManageSDK.getTeacherInfoPage(pageable, teacherForm);
+    }
+
+    @Override
+    public Page<FreezeLogDto> getTeacherFreezeLogPage(Pageable pageable, Long teacherId) {
+        return commentCardManageSDK.getTeacherFreezeLongPage(pageable, teacherId);
     }
 
     private StringBuilder commentTeacherCountSql() {

@@ -3,6 +3,7 @@ package com.boxfishedu.card.comment.manage.service.sdk;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.config.CommentCardManageUrl;
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCountSetLog;
+import com.boxfishedu.card.comment.manage.entity.dto.FreezeLogDto;
 import com.boxfishedu.card.comment.manage.entity.dto.NoCommentTeacherInfoDto;
 import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.form.ChangeTeacherForm;
@@ -145,11 +146,26 @@ public class CommentCardManageSDK {
         return jsonResultModel.getData(TeacherInfo.class);
     }
 
+    /**
+     * 获取老师列表
+     * @param pageable
+     * @param teacherForm
+     * @return
+     */
     public Page<TeacherInfo> getTeacherInfoPage(Pageable pageable, TeacherForm teacherForm) {
         JsonResultModel jsonResultModel = restTemplate.postForObject(
                 createCanCommentTeacherPageURI(pageable), teacherForm, JsonResultModel.class);
         return new PageImpl<>(
                 JsonResultModuleUtils.getListFromPageResult(jsonResultModel, TeacherInfo.class,
+                        ((clazz, beanMap) -> ObjectUtils.convertObject(beanMap, clazz))),
+                pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
+    }
+
+    public Page<FreezeLogDto> getTeacherFreezeLongPage(Pageable pageable, Long teacherId) {
+        JsonResultModel jsonResultModel = restTemplate.getForObject(
+                createGetTeacherFreezeLogPage(pageable, teacherId), JsonResultModel.class);
+        return new PageImpl<>(
+                JsonResultModuleUtils.getListFromPageResult(jsonResultModel, FreezeLogDto.class,
                         ((clazz, beanMap) -> ObjectUtils.convertObject(beanMap, clazz))),
                 pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
     }
@@ -228,6 +244,15 @@ public class CommentCardManageSDK {
     private URI createGetTeacherInfoURI(Long teacherId) {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/get_review_teacher_info/" + teacherId)
+                .build()
+                .toUri();
+    }
+
+    private URI createGetTeacherFreezeLogPage(Pageable pageable, Long teacherId) {
+        return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
+                .path("/f_teacher_review/get_freeze_log")
+                .queryParam("page", pageable.getPageNumber())
+                .queryParam("size", pageable.getPageSize())
                 .build()
                 .toUri();
     }
