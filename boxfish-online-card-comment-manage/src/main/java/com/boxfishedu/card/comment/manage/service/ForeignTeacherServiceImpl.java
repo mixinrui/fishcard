@@ -5,9 +5,11 @@ import com.boxfishedu.card.comment.manage.entity.dto.*;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
+import com.boxfishedu.card.comment.manage.exception.BusinessException;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.util.Asserts;
 import org.jdto.DTOBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +58,8 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
     @Transient
     public void freezeTeacherId(Long teacherId) {
         logger.info("@ForeignTeacherServiceImpl: freezing teacher's id in 'freezeTeacherId'......");
+        // 验证老师能否被冻结与解冻
+        validateFreezeOrUnFreeze(teacherId);
         // 将该老师未完成的点评,转移给内部账号
         List<CommentCard> commentCardList = commentCardJpaRepository.findNoAnswerCommentCardByTeacherId(teacherId);
         for(CommentCard commentCard : commentCardList) {
@@ -73,6 +77,8 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
     @Transient
     public void unfreezeTeacherId(Long teacherId) {
         logger.info("@ForeignTeacherServiceImpl: unfreezing teacher's id in 'unfreezeTeacherId'......");
+        // 验证老师能否被冻结与解冻
+        validateFreezeOrUnFreeze(teacherId);
         commentCardManageSDK.unfreezeTeacherId(teacherId);
     }
 
@@ -232,6 +238,14 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         paramMap.put("studentId",commentCard.getStudentId());
         paramMap.put("courseId",commentCard.getCourseId());
         return paramMap;
+    }
+
+    private void validateFreezeOrUnFreeze(Long id) {
+        TeacherInfo teacherInfo = commentCardManageSDK.getTeacherInfoById(id);
+        Asserts.notNull(teacherInfo, "对应老师不存在");
+        if(Objects.equals(teacherInfo.getTeacherType(), 1)) {
+            throw new BusinessException("内部账号不能执行冻结或者解冻!!");
+        }
     }
 
 }
