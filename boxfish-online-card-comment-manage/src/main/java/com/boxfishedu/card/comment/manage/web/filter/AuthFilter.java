@@ -23,7 +23,7 @@ public class AuthFilter extends OncePerRequestFilter {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
-    public final static int order = Ordered.HIGHEST_PRECEDENCE;
+    public final static int order = Ordered.HIGHEST_PRECEDENCE + 1;
 
     @Autowired
     private CommentCardManageSDK commentCardManageSDK;
