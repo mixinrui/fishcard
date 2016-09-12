@@ -245,7 +245,10 @@ public class FishCardModifyServiceX {
 
         //记录老教师,时间
         Long oldTeacherId= workOrder.getTeacherId();
-        Date oldStartTime=workOrder.getStartTime();
+        String oldStartTime=StringUtils.EMPTY;
+        if(null!=workOrder.getStartTime()){
+            oldStartTime=DateUtil.date2SimpleString(workOrder.getStartTime());
+        }
         String oldTeacherName= StringUtils.EMPTY;
         if(!StringUtils.isEmpty(workOrder.getTeacherName())){
             workOrder.getTeacherName();
@@ -297,7 +300,7 @@ public class FishCardModifyServiceX {
         courseOnlineRequester.releaseGroup(workOrder);
 
         // 记录日志
-        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+DateUtil.Date2String(oldStartTime)+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");
+        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");
 
 
         return new JsonResultModel().newJsonResultModel("OK");
