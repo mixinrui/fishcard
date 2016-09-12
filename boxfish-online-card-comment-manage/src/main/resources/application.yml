@@ -41,6 +41,10 @@ service:
   sdk:
     teacherStudentBusinessUrl: http://101.201.237.252:8099
     avatarsUrl: http://avatars.boxfish.cn
+    authenticationUrl: http://123.56.13.168:8080
+    # 访问师生运营的key
+    boxfishKey: XJlL3N2bi_nlJ_mtLvlj6Por63lpKfniIbngrgxLzAyMy7miJHlj6_ku6Xl
+
 server.port: 8085
 
 ---
@@ -56,6 +60,9 @@ service:
   sdk:
     teacherStudentBusinessUrl: http://101.201.237.252:8099
     avatarsUrl: http://avatars.boxfish.cn
+    authenticationUrl: http://123.56.13.168:8080
+    # 访问师生运营的key
+    boxfishKey: XJlL3N2bi_nlJ_mtLvlj6Por63lpKfniIbngrgxLzAyMy7miJHlj6_ku6Xl
 
 server.port: 8085
 
@@ -71,5 +78,8 @@ service:
   sdk:
     teacherStudentBusinessUrl: http://123.56.13.168:8099
     avatarsUrl: http://avatars.boxfish.cn
+    authenticationUrl: http://123.56.13.168:8080
+    # 访问师生运营的key
+    boxfishKey: XJlL3N2bi_nlJ_mtLvlj6Por63lpKfniIbngrgxLzAyMy7miJHlj6_ku6Xl
 
 server.port: 8085

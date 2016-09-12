@@ -184,6 +184,7 @@ public class CommentCardManageSDK {
         return UriComponentsBuilder
                 .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("f_teacher_review/update_freeze_status")
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -192,6 +193,7 @@ public class CommentCardManageSDK {
         logger.info("Accessing getInnerTeacher in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/get_inner_f_review_teacher")
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -210,6 +212,7 @@ public class CommentCardManageSDK {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("f_teacher_review/get_review_todaycount")
                 .queryParams(paramMap)
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -220,6 +223,7 @@ public class CommentCardManageSDK {
                 .path("/f_teacher_review/get_review_count")
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -227,6 +231,7 @@ public class CommentCardManageSDK {
     private URI createGetTeacherOperationURI(Long teacherId){
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/" + teacherId)
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -236,6 +241,7 @@ public class CommentCardManageSDK {
                 .path("/f_teacher_review/query_review_teacher_infos")
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -243,6 +249,7 @@ public class CommentCardManageSDK {
     private URI createChangeTeacherURI() {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("f_teacher_review/change_review_teacher_batch")
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -251,6 +258,7 @@ public class CommentCardManageSDK {
     private URI createGetTeacherInfoURI(Long teacherId) {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/get_review_teacher_info/" + teacherId)
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -260,6 +268,7 @@ public class CommentCardManageSDK {
                 .path("/f_teacher_review/get_freeze_log/" + teacherId)
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -267,6 +276,7 @@ public class CommentCardManageSDK {
     private URI createGetTeacherListByName() {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/query_teachers_byname")
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }

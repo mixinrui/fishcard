@@ -14,4 +14,5 @@ public class CommentCardManageUrl {
     private String teacherStudentBusinessUrl;
     private String authenticationUrl;
     private String avatarsUrl;
+    private String boxfishKey;
 }
