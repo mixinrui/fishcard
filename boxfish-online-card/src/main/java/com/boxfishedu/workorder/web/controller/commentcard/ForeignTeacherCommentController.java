@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
+import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
@@ -94,4 +95,16 @@ public class ForeignTeacherCommentController {
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
 
+    //测试换头像
+    @RequestMapping(value = "/update/pic",method = RequestMethod.GET)
+    public void updatePic(){
+        String path = "www.baidu.com";
+        Long studentId = 1299462l;
+        UpdatePicturesForm updatePicturesForm = new UpdatePicturesForm();
+        updatePicturesForm.setId(studentId);
+        updatePicturesForm.setFigure_url(path);
+        updatePicturesForm.setType("STUDENT");
+        updatePicturesForm.setNickname("ansel");
+        foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
+    }
 }
