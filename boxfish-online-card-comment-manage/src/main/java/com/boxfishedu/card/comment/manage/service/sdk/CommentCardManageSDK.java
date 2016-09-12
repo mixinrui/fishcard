@@ -27,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -170,6 +171,12 @@ public class CommentCardManageSDK {
                 pageable, JsonResultModuleUtils.getTotalElements(jsonResultModel));
     }
 
+    public List<TeacherInfo> getTeacherListByName(String name) {
+        JsonResultModel jsonResultModel = restTemplate.postForObject(
+                createGetTeacherListByName(), Collections.singletonMap("teacherName", name), JsonResultModel.class);
+        return jsonResultModel.getListData(TeacherInfo.class);
+    }
+
     /************************************* 构建URI ********************************/
 
 
@@ -257,4 +264,10 @@ public class CommentCardManageSDK {
                 .toUri();
     }
 
+    private URI createGetTeacherListByName() {
+        return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
+                .path("/f_teacher_review/query_teachers_byname")
+                .build()
+                .toUri();
+    }
 }

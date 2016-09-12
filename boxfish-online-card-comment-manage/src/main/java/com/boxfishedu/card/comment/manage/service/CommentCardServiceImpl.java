@@ -1,6 +1,7 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCardLogDto;
 import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
@@ -12,6 +13,7 @@ import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import com.boxfishedu.card.comment.manage.util.DateUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdto.DTOBinder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +111,7 @@ public class CommentCardServiceImpl implements CommentCardService {
             commentCardJpaRepository.save(commentCard);
 
             // 添加换的老师
-            changeTeacherForm.addChangeTeacher(commentCard, teacherId);
+            changeTeacherForm.addChangeTeacher(commentCard, newCommentCard);
         }
         // 调用中外教管理接口
         commentCardManageSDK.changeTeacherBatch(changeTeacherForm);
@@ -127,7 +129,7 @@ public class CommentCardServiceImpl implements CommentCardService {
         commentCardJpaRepository.save(commentCard);
         // 调用中外教运营老师减可分配次数
         ChangeTeacherForm changeTeacherForm = new ChangeTeacherForm();
-        changeTeacherForm.addChangeTeacher(commentCard, teacherId);
+        changeTeacherForm.addChangeTeacher(commentCard, newCommentCard);
         commentCardManageSDK.changeTeacherBatch(changeTeacherForm);
     }
 
@@ -141,8 +143,27 @@ public class CommentCardServiceImpl implements CommentCardService {
         return result;
     }
 
+    /**
+     * 外教点评日志
+     * @param id
+     * @return
+     */
+    @Override
+    public CommentCardLogDto findCommentCardLog(Long id) {
+        CommentCard firstCommentCard = commentCardJpaRepository.findOne(id);
+        List<CommentCard> commentCardList = commentCardJpaRepository.findByPrevious_id(id);
+        if(CollectionUtils.isNotEmpty(commentCardList)) {
+            return new CommentCardLogDto(firstCommentCard, commentCardList);
+        }
+        return new CommentCardLogDto(firstCommentCard);
+    }
+
     private TeacherInfo validateTeacher(Long teacherId, int count) {
         TeacherInfo teacherInfo = commentCardManageSDK.getTeacherInfoById(teacherId);
+        // 内部账号,不需要验证
+        if(Objects.equals(teacherInfo.getTeacherType(), 1)) {
+            return teacherInfo;
+        }
         teacherInfo.validate(count);
         return teacherInfo;
     }
@@ -212,6 +233,10 @@ public class CommentCardServiceImpl implements CommentCardService {
 
         // 时间区间
         if(notAnswerDateTimeRangeOption(commentCardForm)) {
+            if(Objects.isNull(commentCardForm.getStatus())) {
+                predicateList.add(criteriaBuilder.lt(
+                        root.get("status"), CommentCardStatus.ANSWERED.getCode()));
+            }
             NotAnswerTime.DateRange dateRange = NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()).getRange();
             if(Objects.equals(commentCardForm.getNotAnswerTime(), NotAnswerTime._36HOURS.code())) {
                 predicateList.add(criteriaBuilder.lessThanOrEqualTo(

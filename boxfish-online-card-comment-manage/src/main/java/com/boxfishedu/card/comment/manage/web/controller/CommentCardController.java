@@ -68,10 +68,17 @@ public class CommentCardController {
                 Collections.singletonMap("count", commentCardService.findNoAnswerCountsByAskTime()));
     }
 
-
+    /**
+     * 点评状态列表
+     * @return
+     */
     @RequestMapping(value = "/statuses", method = RequestMethod.GET)
     public Object statuses() {
         return JsonResultModel.newJsonResultModel(CommentCardFormStatus.getMappings());
     }
 
+    @RequestMapping(value = "/logs/{id}", method = RequestMethod.GET)
+    public Object getCommentCardById(@PathVariable Long id) {
+        return JsonResultModel.newJsonResultModel(commentCardService.findCommentCardLog(id).getLogs());
+    }
 }

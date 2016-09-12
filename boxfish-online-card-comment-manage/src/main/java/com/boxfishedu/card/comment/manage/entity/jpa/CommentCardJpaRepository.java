@@ -21,4 +21,16 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
 
     @Query(value = "select c from CommentCard c where c.status=300 and c.teacherId=?1")
     List<CommentCard> findNoAnswerCommentCardByTeacherId(Long teacherId);
+
+    /**
+     * 更新老师的冻结与解冻状态
+     * @param CommentCardStatus
+     * @param teacherId
+     */
+    @Modifying
+    @Query(value = "update CommentCard c set c.teacherStatus=?1 where c.teacherId=?2")
+    void updateTeacherStatus(Integer CommentCardStatus, Long teacherId);
+
+    @Query(value = "select c from CommentCard c where c.previous_id=?1 order by c.createTime asc")
+    List<CommentCard> findByPrevious_id(Long previousId);
 }

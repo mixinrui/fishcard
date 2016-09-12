@@ -30,7 +30,7 @@ spring.profiles.active: test
 
 mail:
   notAnswerOver12HoursRecipients:
-    recipients: luolibing@boxfish.cn, 3324941283@qq.com
+    recipients: luolibing@boxfish.cn, liruixue@boxfish.cn,3324941283@qq.com
     sender: luolibing@boxfish.cn
     subject: 12小时未回复点评列表
 
@@ -62,5 +62,5 @@ service:
   sdk:
     teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
 
-server.port: 8085
+server.port: 9098
 

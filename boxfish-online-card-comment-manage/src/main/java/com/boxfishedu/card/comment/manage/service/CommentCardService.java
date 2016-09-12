@@ -1,6 +1,7 @@
 package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCardLogDto;
 import com.boxfishedu.card.comment.manage.entity.form.CommentCardForm;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import org.springframework.data.domain.Page;
@@ -22,4 +23,6 @@ public interface CommentCardService {
     void changeTeacher(CommentCard commentCard, Long teacherId);
 
     Integer[] findNoAnswerCountsByAskTime();
+
+    CommentCardLogDto findCommentCardLog(Long id);
 }
