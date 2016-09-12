@@ -511,11 +511,12 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
+    @Transactional
     public void updateCommentCardsPictures(UpdatePicturesForm updatePicturesForm) {
-        if(updatePicturesForm.getType().equals("STUDENT")){
+        if(Objects.nonNull(updatePicturesForm) && Objects.equals(updatePicturesForm.getType(), "STUDENT")){
             logger.info("@updateCommentCardsPictures调用点评卡修改头像接口---->修改的角色为:学生,userId="+updatePicturesForm.getId());
             commentCardJpaRepository.updateStudentPicture(updatePicturesForm.getFigure_url(),updatePicturesForm.getId());
-        }else if (updatePicturesForm.getType().equals("TEACHER")){
+        }else if (Objects.nonNull(updatePicturesForm) && Objects.equals(updatePicturesForm.getType(), "TEACHER")){
             logger.info("@updateCommentCardsPictures调用点评卡修改头像接口---->修改的角色为:外教,userId="+updatePicturesForm.getId());
             commentCardJpaRepository.updateTeacherPicture(updatePicturesForm.getFigure_url(),updatePicturesForm.getId());
         }
