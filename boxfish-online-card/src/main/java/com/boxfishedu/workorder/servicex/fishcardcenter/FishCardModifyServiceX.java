@@ -243,6 +243,14 @@ public class FishCardModifyServiceX {
         //获取结束时间
         startTimeParam.setEndDateFormat(     DateUtil.String2Date(startTimeParam.getEndDate()) );
 
+        //记录老教师,时间
+        Long oldTeacherId= workOrder.getTeacherId();
+        Date oldStartTime=workOrder.getStartTime();
+        String oldTeacherName= StringUtils.EMPTY;
+        if(!StringUtils.isEmpty(workOrder.getTeacherName())){
+            workOrder.getTeacherName();
+        }
+
         //分配教师以后其实就已经是就绪,目前这两个状态有重叠
         if(workOrder.getStatus()==FishCardStatusEnum.CREATED.getCode() || workOrder.getStatus()==FishCardStatusEnum.COURSE_ASSIGNED.getCode() || workOrder.getStatus()==FishCardStatusEnum.TEACHER_ASSIGNED.getCode()){
             if(workOrder.getStatus()!=FishCardStatusEnum.CREATED.getCode()){
@@ -289,7 +297,7 @@ public class FishCardModifyServiceX {
         courseOnlineRequester.releaseGroup(workOrder);
 
         // 记录日志
-        workOrderLogService.saveWorkOrderLog(workOrder,"换时间");
+        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+DateUtil.Date2String(oldStartTime)+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");
 
 
         return new JsonResultModel().newJsonResultModel("OK");
