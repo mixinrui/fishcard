@@ -12,9 +12,9 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TeacherInfo {
 
-    public final static int FREEZE = 0;
+    public final static boolean FREEZE = true;
 
-    public final static int UNFREEZE = 1;
+    public final static boolean UNFREEZE = false;
 
     public final static TeacherInfo UNKNOW = new UnknowTeacherInfo();
 

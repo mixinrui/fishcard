@@ -10,6 +10,7 @@ import org.jdto.annotation.Source;
 import org.jdto.annotation.Sources;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by LuoLiBing on 16/9/2.
@@ -19,6 +20,9 @@ import java.util.Date;
 public class CommentCardDto {
 
     private Long id;
+
+    // 编号
+    private Long previous_id;
 
     private Long studentId;
 
@@ -86,5 +90,9 @@ public class CommentCardDto {
     @DTOTransient
     public String getStatusDesc() {
         return commentStatus.desc();
+    }
+
+    public Long getId() {
+        return Objects.isNull(previous_id) ? id: previous_id;
     }
 }

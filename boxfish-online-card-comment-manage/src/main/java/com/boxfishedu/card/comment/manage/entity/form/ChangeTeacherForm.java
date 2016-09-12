@@ -29,18 +29,18 @@ public class ChangeTeacherForm {
         private Long fishCardId;
     }
 
-    public void addChangeTeacher(CommentCard commentCard, Long teacherId) {
+    public void addChangeTeacher(CommentCard oldCommentCard, CommentCard newCommentCard) {
         // 释放老师资源
         ReviewTagParam escape = new ReviewTagParam();
-        escape.setTeacherId(commentCard.getTeacherId());
-        escape.setFishCardId(commentCard.getId());
+        escape.setTeacherId(oldCommentCard.getTeacherId());
+        escape.setFishCardId(oldCommentCard.getId());
 
         // 换老师
         ReviewTagParam review = new ReviewTagParam();
-        review.setFishCardId(commentCard.getId());
-        review.setStudentId(commentCard.getStudentId());
-        review.setCourseId(commentCard.getCourseId());
-        review.setTeacherId(teacherId);
+        review.setFishCardId(newCommentCard.getId());
+        review.setStudentId(newCommentCard.getStudentId());
+        review.setCourseId(newCommentCard.getCourseId());
+        review.setTeacherId(newCommentCard.getTeacherId());
 
         escapeReviewTagParamList.add(escape);
         reviewTagParamList.add(review);

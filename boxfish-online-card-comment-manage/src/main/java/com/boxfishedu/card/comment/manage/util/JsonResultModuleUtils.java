@@ -15,10 +15,12 @@ public class JsonResultModuleUtils {
 
     // private final static ObjectMapper objectMapper = new ObjectMapper();
 
+    private final static List EMPTY = Lists.newArrayList();
+
     public static <T> List<T> getListFormResult(JsonResultModel jsonResultModel, Class<T> clazz, Handle<T> handle) {
         List resultList = jsonResultModel.getData(List.class);
         if(resultList == null) {
-            return null;
+            return EMPTY;
         }
         List<T> result = Lists.newArrayList();
         resultList.forEach(beanMap -> {
@@ -31,12 +33,12 @@ public class JsonResultModuleUtils {
     public static <T> List<T> getListFromPageResult(JsonResultModel jsonResultModel, Class<T> clazz, Handle<T> handle) {
         HashMap hashMap = jsonResultModel.getData(HashMap.class);
         if(hashMap == null) {
-            return null;
+            return EMPTY;
             //throw new RuntimeException("返回的结果为空");
         }
         Object content = hashMap.get("content");
         if(content == null) {
-            return null;
+            return EMPTY;
         }
 
         if(!(content instanceof List)) {

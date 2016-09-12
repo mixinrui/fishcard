@@ -3,6 +3,7 @@ package com.boxfishedu.card.comment.manage.entity.mysql;
 import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
+import com.boxfishedu.card.comment.manage.exception.BusinessException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -152,15 +154,24 @@ public class CommentCard implements Serializable {
 //        if(duration.toHours() < 24) {
 //            throw new IllegalArgumentException("没有超过24小时不能更换老师");
 //        }
-
+        if(this.status > 300) {
+            throw new BusinessException("此点评不是未点评状态,不能更换老师!!!");
+        }
         Date now = new Date();
         // 复制一份点评作为新的外教点评
         CommentCard newCommentCard = (CommentCard) SerializationUtils.clone(this);
         newCommentCard.setId(null);
         newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        newCommentCard.setAssignTeacherTime(now);
         newCommentCard.setTeacherId(teacherInfo.getTeacherId());
         newCommentCard.setTeacherName(teacherInfo.getTeacherName());
         newCommentCard.setUpdateTime(now);
+        if(Objects.nonNull(this.previous_id)) {
+            newCommentCard.setPrevious_id(this.previous_id);
+        } else {
+            newCommentCard.setPrevious_id(this.id);
+        }
+        newCommentCard.setCreateTime(new Date());
 
         // 之前的老师标记为过期,并且标记为后台强制更换老师
         status = CommentCardStatus.OVERTIME.getCode();

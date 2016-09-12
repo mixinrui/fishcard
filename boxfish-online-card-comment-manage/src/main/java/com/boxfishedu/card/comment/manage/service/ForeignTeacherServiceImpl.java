@@ -6,6 +6,8 @@ import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jdto.DTOBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +20,9 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.Transient;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by ansel on 16/9/2.
@@ -47,11 +47,13 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
 
     private final static Logger logger = LoggerFactory.getLogger(ForeignTeacherServiceImpl.class);
 
+
     /**
      * 冻结老师
      * @param teacherId
      */
     @Override
+    @Transient
     public void freezeTeacherId(Long teacherId) {
         logger.info("@ForeignTeacherServiceImpl: freezing teacher's id in 'freezeTeacherId'......");
         // 将该老师未完成的点评,转移给内部账号
@@ -68,6 +70,7 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
      * @param teacherId
      */
     @Override
+    @Transient
     public void unfreezeTeacherId(Long teacherId) {
         logger.info("@ForeignTeacherServiceImpl: unfreezing teacher's id in 'unfreezeTeacherId'......");
         commentCardManageSDK.unfreezeTeacherId(teacherId);
@@ -104,16 +107,18 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         // 分组条件
         querySb.append(" group by c.teacher_id");
         countSb.append(" group by c.teacher_id) t");
-        // 分页
-        querySb.append(" limit ")
-                .append(pageable.getPageSize() * pageable.getPageNumber())
-                .append(",")
-                .append(pageable.getPageSize());
         if(Objects.nonNull(pageable.getSort())) {
             for (Sort.Order order : pageable.getSort()) {
                 querySb.append(String.format(" order by %s %s", order.getProperty(), order.getDirection().name()));
             }
         }
+
+        // 分页
+        querySb.append(" limit ")
+                .append(pageable.getPageSize() * pageable.getPageNumber())
+                .append(",")
+                .append(pageable.getPageSize());
+
         // 查询参数设置
         Query nativeQuery = entityManager.createNativeQuery(querySb.toString(), "commentTeacherInfo");
         setParameter(nativeQuery, parameters);
@@ -192,10 +197,18 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
             queryBuilder.append("and c.teacher_id=:teacherId ");
             countQueryBuilder.append("and c.teacher_id=:teacherId ");
             parameters.put("teacherId", teacherForm.getTeacherId());
-        } else if(Objects.nonNull(teacherForm.getTeacherName())) {
-            queryBuilder.append("and c.teacher_name like '?' ");
-            countQueryBuilder.append("and c.teacher_name like '?' ");
-            parameters.put("teacherName", teacherForm.getTeacherName());
+        } else if(StringUtils.isNotBlank(teacherForm.getTeacherName())) {
+            List<TeacherInfo> teacherInfos = commentCardManageSDK.getTeacherListByName(teacherForm.getTeacherName());
+            if(CollectionUtils.isNotEmpty(teacherInfos)) {
+                String[] ids = teacherInfos.stream().map(
+                        teacher -> teacher.getId().toString()).toArray((size) -> new String[size]);
+                String idsStr = String.join(",", ids);
+                countQueryBuilder.append("and c.teacher_id in(" + idsStr + ") ");
+                queryBuilder.append("and c.teacher_id in(" + idsStr + ") ");
+            } else {
+                countQueryBuilder.append("and c.teacher_id=-1 ");
+                queryBuilder.append("and c.teacher_id=-1 ");
+            }
         }
         // 状态不为空
         if(Objects.nonNull(teacherForm.getTeacherStatus())) {
@@ -209,8 +222,8 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
 
     private Long getInnerTeacherId(CommentCard commentCard) {
         JsonResultModel jsonResultModel = commentCardManageSDK.getInnerTeacherId(getInnerTeacherParameterMap(commentCard));
-        Map<String, String> data = (Map<String, String>) jsonResultModel.getData();
-        return Long.valueOf(data.get("teacherId"));
+        InnerTeacher innerTeacher = jsonResultModel.getData(InnerTeacher.class);
+        return innerTeacher.getTeacherId();
     }
 
     private Map<String, Object> getInnerTeacherParameterMap(CommentCard commentCard) {
@@ -220,4 +233,5 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         paramMap.put("courseId",commentCard.getCourseId());
         return paramMap;
     }
+
 }
