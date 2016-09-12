@@ -53,8 +53,14 @@ public class ForeignTeacherCommentController {
         }
     }
 
+    //@RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
+    public JsonResultModel haveAvailableForeignCommentService(Long userId) {
+        return JsonResultModel.newJsonResultModel(
+                Collections.singletonMap("available", serveService.haveAvailableForeignCommentService(userId)));
+    }
+
     @RequestMapping(value = "/count", method = RequestMethod.GET)
-    public JsonResultModel getAvailableForeignCommentServiceCount(long userId) {
+    public JsonResultModel getAvailableForeignCommentServiceCount(Long userId) {
         return JsonResultModel.newJsonResultModel(serveService.getForeignCommentServiceCount(userId));
     }
 
@@ -87,5 +93,5 @@ public class ForeignTeacherCommentController {
     public JsonResultModel testQueryAll(Pageable pageable){
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.testQueryAll(pageable));
     }
-    
+
 }

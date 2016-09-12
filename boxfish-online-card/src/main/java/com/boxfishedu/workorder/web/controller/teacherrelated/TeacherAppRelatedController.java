@@ -57,13 +57,14 @@ public class TeacherAppRelatedController {
     public Object courseScheduleMonth(
             @PathVariable("teacher_id") Long teacherId,
             Long userId,
+            Integer count,
             String yearMonth) {
         commonServeServiceX.checkToken(teacherId, userId);
         YearMonth yearMonthParam = null;
         if(StringUtils.isNotBlank(yearMonth)) {
             yearMonthParam = YearMonth.from(yearMonthFormatter.parse(yearMonth));
         }
-        return teacherAppRelatedServiceX.getScheduleByIdAndDateRange(teacherId, yearMonthParam);
+        return teacherAppRelatedServiceX.getScheduleByIdAndDateRange(teacherId, yearMonthParam, count);
     }
 
     @RequestMapping(value = "{teacher_id}/schedule/day", method = RequestMethod.GET)

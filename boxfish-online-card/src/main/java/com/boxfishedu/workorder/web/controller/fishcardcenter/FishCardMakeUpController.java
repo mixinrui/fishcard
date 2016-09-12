@@ -91,6 +91,7 @@ public class FishCardMakeUpController {
             logger.info("fishcardConfirmStatusRecharge2 用户无权操作该功能");
             return JsonResultModel.newJsonResultModel("fishcardConfirmStatusRecharge2 用户名无权操作该功能");
         }
+        makeUpCourseParam.setUserName(userName);
         return makeUpLessionServiceX.fishcardConfirmStatusRecharge(makeUpCourseParam);
     }
 

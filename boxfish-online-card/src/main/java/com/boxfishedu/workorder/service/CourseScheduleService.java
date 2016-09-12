@@ -174,7 +174,7 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
         return courseSchedule;
     }
 
-    public Optional<Date> findMaxClassDateByTeacherId(Long teacherId) {
+    public Optional<Date> findMinClassDateByTeacherId(Long teacherId) {
         return jpa.findTop1ClassDateByTeacherId(teacherId);
     }
 
@@ -197,4 +197,11 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     public Set<String> findByStudentIdAndAfterDate(Long studentId) {
         return jpa.findUnfinishByStudentIdAndAfterDate(studentId, new Date());
     }
+
+
+    public Set<String> findByStudentIdAndCurrentDate(Long studentId,Date date) {
+        return jpa.findUnfinishByStudentIdAndCurrentDate(studentId, date);
+    }
+
+
 }

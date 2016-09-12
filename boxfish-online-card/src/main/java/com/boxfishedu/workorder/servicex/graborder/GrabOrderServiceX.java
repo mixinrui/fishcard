@@ -128,6 +128,7 @@ public class GrabOrderServiceX {
     public JsonResultModel grabOrderByOneTeacher(GrabOrderView grabOrderView) {
         JSONObject jsonObject = new JSONObject();
         String teacherName = checkIfCanGrabOrderByOnlineTeacherGetTeacherName(grabOrderView);
+        logger.info("grabOrderByOneTeacher:[{}]",teacherName);
         if (!checkIfCanGrabOrderByOnlineFishcard(grabOrderView) || (null == teacherName)) {
             //     if (!checkIfCanGrabOrderByOnlineTeacher(grabOrderView) || !checkIfCanGrabOrderByOnlineFishcard(grabOrderView)) {
 //     if(!checkIfCanGrabOrderByOnlineFishcard(grabOrderView)){
@@ -156,6 +157,7 @@ public class GrabOrderServiceX {
 
                     grabOrderView.setState(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
                     grabOrderView.setTeacherName(teacherName);
+                    logger.info("grabOrderByOneTeacher:[{}]",grabOrderView.getTeacherName());
                     //更新鱼卡(状态  教师id)
                     int updateCount = grabOrderService.updateTestGrab(grabOrderView);
 
@@ -247,14 +249,13 @@ public class GrabOrderServiceX {
     public String checkIfCanGrabOrderByOnlineTeacherGetTeacherName(GrabOrderView grabOrderView) throws BoxfishException {
 
         Map<String, Object> mapParams = this.makeParams(grabOrderView);
-        String url = "http://192.168.77.88:8099/order/course/schedule/add/order/time";   //TODO
-        //  String url=String.format("%s/order/course/schedule/add/order/time", urlConf.getTeacher_service());
+        String url=String.format("%s/order/course/schedule/add/order/time", urlConf.getTeacher_service());
         JsonResultModel jsonResultModel = restTemplate.postForObject(url, mapParams, JsonResultModel.class);
         if (jsonResultModel.getReturnCode() == HttpStatus.OK.value()) {
             /** 从师生运营获取教师姓名 **/
             String teancherName = (String) jsonResultModel.getData();
             logger.info("::::::::::::::::::OnlineTeacher验证----能抢(returnCode==200)::::::::::::::teacherName[{}]::::", teancherName);
-            return teancherName == null ? "" : teancherName;
+            return (teancherName == null) ? "" : teancherName;
         } else {
             logger.info("::::::::::::::::::OnlineTeacher验证----不能抢::::::::::::::::::");
             return null;

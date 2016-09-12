@@ -299,7 +299,7 @@ public class MakeUpLessionServiceX {
             int count = workOrderService.updateWorkFishRechargeOne(FishCardChargebackStatusEnum.RECHARGBACKING.getCode(), wo.getId());
             logger.info("fishcardConfirmStatusRecharge7:count[{}]", count);
             if (count > 0) {
-                logger.info("fishcardConfirmStatusRecharge6 id[{}]发送退款请求成功 ", wo.getId());
+                logger.info("fishcardConfirmStatusRecharge6 鱼卡id[{}]  用户账号 [{}]发送退款请求成功 ", wo.getId(),makeUpCourseParam.getUserName());
                 msg += (wo.getId() + "success");
                 JSONObject message = generator(wo);
                 logger.info("::::::fishcardConfirmStatusRecharge:::::[{}]", message);

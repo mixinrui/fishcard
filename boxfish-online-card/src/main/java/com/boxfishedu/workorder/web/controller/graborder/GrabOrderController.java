@@ -4,6 +4,7 @@ import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.graborder.GrabOrderService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.MakeUpLessionServiceX;
@@ -51,12 +52,15 @@ public class GrabOrderController {
     @Autowired
     private MakeUpLessionServiceX makeUpLessionServiceX;
 
+    @Autowired
+    private GrabOrderService  grabOrderService;
+
 
 
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
     public JsonResultModel tomonotify()throws Exception {
-//        测试明天有课推送
-//        courseNotifyOneDayServiceX.notiFyStudentClass();
+        //测试明天有课推送
+        courseNotifyOneDayServiceX.notiFyStudentClass();
 //
 //        Thread.sleep(2000);
 //
@@ -86,10 +90,16 @@ public class GrabOrderController {
 
     @RequestMapping(value = "/graboneordertest", method = RequestMethod.GET)
     public JsonResultModel grabOrderTest() {
-        GrabOrderView grabOrderView = new GrabOrderView();
-        grabOrderView.setTeacherId(1299167L);
-        grabOrderView.setWorkOrderId(8239L);
-        return grabOrderServiceX.grabOrderByOneTeacher(grabOrderView);
+//        GrabOrderView grabOrderView = new GrabOrderView();
+//        grabOrderView.setTeacherId(1299220L);
+//        grabOrderView.setWorkOrderId(13836L);
+//
+//        grabOrderView.setTeacherName("冯磊");
+//        grabOrderView.setState(30);
+//        // grabOrderServiceX.grabOrderByOneTeacher(grabOrderView);
+//
+//        grabOrderService.updateTestGrab(grabOrderView);
+        return JsonResultModel.newJsonResultModel();
     }
 
 
@@ -124,21 +134,6 @@ public class GrabOrderController {
         makeWorkOrderServiceX.clearGrabData();
         return new JsonResultModel();
     }
-
-    @RequestMapping(value = "/zhaojian", method = RequestMethod.POST)
-    public JsonResultModel zhaojian(@RequestBody TeacherForm teacherForm) {
-        makeWorkOrderServiceX.makeTest(teacherForm.getTeacherId());
-        return new JsonResultModel();
-    }
-
-
-
-    @RequestMapping(value = "/testnew", method = RequestMethod.GET)
-    public JsonResultModel testnew() {
-        List<WorkOrder> list =  makeWorkOrderService.findByTeacherIdGreaterThanAndStatusAndUpdateTimeChangeCourseBetween();
-        return new JsonResultModel();
-    }
-
 
     /**
      * 方便测试测试  每天18:00 向教师发送 从现在开始  未来48+6小时内 变更课程的数量  的消息
