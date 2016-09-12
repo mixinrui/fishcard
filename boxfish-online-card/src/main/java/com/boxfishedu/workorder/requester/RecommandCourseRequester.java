@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.mall.enums.TutorType;
-import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -18,8 +17,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -63,10 +60,10 @@ public class RecommandCourseRequester {
     public RecommandCourseView getRecomendCourse(WorkOrder workOrder, TutorType tutorType) {
         try {
             String type;
-            if(Objects.equals(tutorType, TutorType.CN)) {
-                type = "chinese";
-            } else {
-                type = "foreigner";
+            switch (tutorType) {
+                case CN: type = "chinese"; break;
+                case FRN: type = "foreigner"; break;
+                default: throw new BusinessException("未知类型的课程");
             }
             RecommandCourseView recommandCourseView = restTemplate.postForObject(
                     createRecommendUri(workOrder.getStudentId(), type),
@@ -82,10 +79,11 @@ public class RecommandCourseRequester {
 
     public RecommandCourseView changeCourse(WorkOrder workOrder) {
         String tutorType=workOrder.getService().getTutorType();
-        if(Objects.equals(tutorType, TutorType.CN)) {
+        logger.debug("@RecommandCourseRequester#changeCourse,参数tutorType[{}]",tutorType);
+        if(Objects.equals(tutorType, TutorType.CN.name())) {
             return changeChineseCourse(workOrder);
         }
-        else if(Objects.equals(tutorType,TutorType.FRN)){
+        else if(Objects.equals(tutorType,TutorType.FRN.name())){
             return changeForeignCourse(workOrder);
         }
         else {

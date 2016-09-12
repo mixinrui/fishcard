@@ -192,3 +192,49 @@ method:post
     "userName":"boxfishcard007",
     "passWord":"fishcard0000007a"
 }
+
+##########获取订单类型列表
+http://127.0.0.1:8080/backend/fishcard/orderType/list
+method:get
+参数:无
+
+
+
+##########更改获取时间片
+http://127.0.0.1:8080/backend/fishcard/time/available/13836/2016-09-05 00:00:00
+method:get
+/workOrderId/日期(那一天)
+
+##########更改时间
+http://127.0.0.1:8080/backend/fishcard/changeStartTime
+method:post
+参数:
+{
+  "workOrderId":323232,
+  "beginDate":'2016-09-01 08:30:00',
+  "endDate":'2016-09-01 08:55:00',
+  "timeslotId",12
+}
+
+
+####### 增加订单查询条件
+http:127.0.0.1:8080/backend/fishcard/list
+之前接口 增加查询条件  orderType=
+
+
+
+####### 鱼卡后台验证token接口
+http://123.56.13.168:8080/backend/login/checktoken/23sdfsdfsfd/out
+method:get
+return :
+{
+  "data": "error",
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+{
+  "data": "ok",
+  "returnCode": 200,
+  "returnMsg": "success"
+}

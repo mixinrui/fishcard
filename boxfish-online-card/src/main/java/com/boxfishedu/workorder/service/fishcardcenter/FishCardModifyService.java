@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service.fishcardcenter;
 
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -13,6 +14,8 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +48,10 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
     @Autowired
     private WorkOrderLogService workOrderLogService;
 
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
+
     public void changeCourse(WorkOrder workOrder) {
+        logger.debug("FishCardModifyService#changeCourse:开始换课,旧的鱼卡信息[{}]", JacksonUtil.toJSon(workOrder));
         String oldCourseName = workOrder.getCourseName();
 
         RecommandCourseView recommandCourseView = recommandCourseRequester.changeCourse(workOrder);

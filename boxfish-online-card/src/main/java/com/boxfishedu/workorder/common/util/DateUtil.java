@@ -35,6 +35,11 @@ public class DateUtil {
         return date;
     }
 
+    public  static String Date2ForForeignDate(Date date){
+        return new SimpleDateFormat(" HH:mm,MM/dd ").format(date);
+    }
+
+
     public static Date String2DateBack(String str) throws RuntimeException {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
         Date date = null;
@@ -258,13 +263,13 @@ public class DateUtil {
     }
 
     /**
-     * 返回当前起半年时间区间
+     * 返回当前起2个月的区间
      * @return
      */
-    public static DateRangeForm createHalfYearDateRangeForm() {
+    public static DateRangeForm createHalfYearDateRangeForm(int months) {
         YearMonth now = YearMonth.now();
         Date from = convertToDate(now.atDay(1));
-        Date to = convertToDate(now.plusMonths(6).atEndOfMonth());
+        Date to = convertToDate(now.plusMonths(months).atEndOfMonth());
         return new DateRangeForm(from, to);
     }
 
