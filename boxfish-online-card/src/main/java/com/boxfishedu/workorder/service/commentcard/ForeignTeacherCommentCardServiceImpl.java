@@ -66,34 +66,44 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         if(service.getAmount() <= 0){
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
         }else {
-            service.setAmount(service.getAmount() - 1);
-            updateCommentAmount(service);
-            commentCard.setStudentId(userId);
-            commentCard.setService(service);
-            commentCard.setOrderId(service.getOrderId());
-            commentCard.setOrderCode(service.getOrderCode());
-            commentCard.setStudentPicturePath(getUserPicture(access_token));
-            logger.info("@foreignTeacherCommentCardAdd调用外教点评接口新增学生点评卡,其中"+commentCard);
-            Date dateNow = new Date();
-            commentCard.setStudentAskTime(dateNow);
-            commentCard.setCreateTime(dateNow);
-            commentCard.setUpdateTime(dateNow);
-            commentCard.setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_ONCE.getCode());
-            commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
-            commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
-            CommentCard newCommentCard = commentCardJpaRepository.save(commentCard);
-            ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(newCommentCard);
-            logger.debug("@foreignTeacherCommentCardAdd向师生运营发生消息,通知分配外教进行点评...");
-            rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
-            logger.info("@foreignTeacherCommentCardAdd点评次数消耗一次...");
-            CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
-            commentCardStatistics.setCommentCardId(newCommentCard.getId());
-            commentCardStatistics.setStudentId(newCommentCard.getStudentId());
-            commentCardStatistics.setAmount(service.getAmount());
-            commentCardStatistics.setServicedId(service.getId());
-            commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_MINUS.getCode());
-            commentCardStatisticsJpaRepository.save(commentCardStatistics);
-            return newCommentCard;
+            CommentCard newCommentCard = null;
+            boolean flag = true;
+            try{
+                service.setAmount(service.getAmount() - 1);
+                updateCommentAmount(service);
+                commentCard.setStudentId(userId);
+                commentCard.setService(service);
+                commentCard.setOrderId(service.getOrderId());
+                commentCard.setOrderCode(service.getOrderCode());
+                commentCard.setStudentPicturePath(getUserPicture(access_token));
+                logger.info("@foreignTeacherCommentCardAdd调用外教点评接口新增学生点评卡,其中"+commentCard);
+                Date dateNow = new Date();
+                commentCard.setStudentAskTime(dateNow);
+                commentCard.setCreateTime(dateNow);
+                commentCard.setUpdateTime(dateNow);
+                commentCard.setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_ONCE.getCode());
+                commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
+                commentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+                newCommentCard = commentCardJpaRepository.save(commentCard);
+                logger.info("@foreignTeacherCommentCardAdd点评次数消耗一次...");
+                CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
+                commentCardStatistics.setCommentCardId(newCommentCard.getId());
+                commentCardStatistics.setStudentId(newCommentCard.getStudentId());
+                commentCardStatistics.setAmount(service.getAmount());
+                commentCardStatistics.setServicedId(service.getId());
+                commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_MINUS.getCode());
+                commentCardStatisticsJpaRepository.save(commentCardStatistics);
+                return newCommentCard;
+            }catch (Exception e){
+                flag = false;
+                throw new RuntimeException(e);
+            }finally {
+                if(flag){
+                    ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(newCommentCard);
+                    logger.debug("@foreignTeacherCommentCardAdd向师生运营发生消息,通知分配外教进行点评...");
+                    rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+                }
+            }
         }
     }
 
