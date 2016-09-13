@@ -1,6 +1,7 @@
 package com.boxfishedu.card.comment.manage.entity.mysql;
 
 import com.boxfishedu.card.comment.manage.entity.dto.CommentTeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.InnerTeacher;
 import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import com.boxfishedu.card.comment.manage.exception.BusinessException;
@@ -161,6 +162,7 @@ public class CommentCard implements Serializable {
         // 复制一份点评作为新的外教点评
         CommentCard newCommentCard = (CommentCard) SerializationUtils.clone(this);
         newCommentCard.setId(null);
+        // 分配老师
         newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
         newCommentCard.setAssignTeacherTime(now);
         newCommentCard.setTeacherId(teacherInfo.getTeacherId());
@@ -171,15 +173,21 @@ public class CommentCard implements Serializable {
         } else {
             newCommentCard.setPrevious_id(this.id);
         }
-        newCommentCard.setCreateTime(new Date());
+        newCommentCard.setCreateTime(now);
 
         // 之前的老师标记为过期,并且标记为后台强制更换老师
         status = CommentCardStatus.OVERTIME.getCode();
         assignTeacherCount = CommentCardStatus.ASSIGN_TEACHER_TRIPLE.getCode();
         teacherReadFlag = CommentCardStatus.TEACHER_UNREAD.getCode();
         updateTime = now;
-        assignTeacherTime = now;
         return newCommentCard;
+    }
+
+    public void setInnerTeacher(InnerTeacher innerTeacher) {
+        this.teacherId = innerTeacher.getTeacherId();
+        this.teacherName = innerTeacher.getTeacherName();
+        this.teacherFirstName = innerTeacher.getTeacherFirstName();
+        this.teacherLastName = innerTeacher.getTeacherLastName();
     }
 
     @Override

@@ -40,7 +40,7 @@ public class ServiceOnlineBoxfishExceptionHandler {
      * @param e
      * @return
      */
-    @ExceptionHandler(value = ValidationException.class)
+    @ExceptionHandler(value = {ValidationException.class})
     public Object validationException(ValidationException e) {
         return boxfishExceptionReturn(e);
     }

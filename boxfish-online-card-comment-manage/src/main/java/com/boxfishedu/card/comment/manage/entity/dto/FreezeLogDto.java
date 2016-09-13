@@ -12,6 +12,7 @@ import lombok.Data;
 public class FreezeLogDto {
     private Long id;
     private Long teacherId;
-    private Boolean freezeStauts;
+    private Boolean freezeStatus;
     private Long createTime;
+
 }

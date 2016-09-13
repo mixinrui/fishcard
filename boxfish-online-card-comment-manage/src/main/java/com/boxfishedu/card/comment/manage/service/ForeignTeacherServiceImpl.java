@@ -5,6 +5,8 @@ import com.boxfishedu.card.comment.manage.entity.dto.*;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
+import com.boxfishedu.card.comment.manage.exception.BoxfishAsserts;
+import com.boxfishedu.card.comment.manage.exception.BusinessException;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,9 +22,12 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.Transient;
+import javax.transaction.Transactional;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by ansel on 16/9/2.
@@ -53,13 +58,22 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
      * @param teacherId
      */
     @Override
-    @Transient
+//    @Transactional
     public void freezeTeacherId(Long teacherId) {
         logger.info("@ForeignTeacherServiceImpl: freezing teacher's id in 'freezeTeacherId'......");
+        // 验证老师能否被冻结与解冻
+        validateFreezeOrUnFreeze(teacherId);
         // 将该老师未完成的点评,转移给内部账号
         List<CommentCard> commentCardList = commentCardJpaRepository.findNoAnswerCommentCardByTeacherId(teacherId);
         for(CommentCard commentCard : commentCardList) {
-            commentCardService.changeTeacher(commentCard, getInnerTeacherId(commentCard));
+            // 先设置一个空的老师,生成一个新的点评
+            CommentCard newCommentCard = commentCard.changeTeacher(TeacherInfo.UNKNOW);
+            commentCardJpaRepository.save(newCommentCard);
+            commentCardJpaRepository.save(commentCard);
+            // 为新的点评请求内部账号
+            InnerTeacher innerTeacher = commentCardManageSDK.getInnerTeacherId(newCommentCard);
+            newCommentCard.setInnerTeacher(innerTeacher);
+            commentCardJpaRepository.save(newCommentCard);
         }
         // 调用中外教管理管理冻结老师账号
         commentCardManageSDK.freezeTeacherId(teacherId);
@@ -70,9 +84,11 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
      * @param teacherId
      */
     @Override
-    @Transient
+    @Transactional
     public void unfreezeTeacherId(Long teacherId) {
         logger.info("@ForeignTeacherServiceImpl: unfreezing teacher's id in 'unfreezeTeacherId'......");
+        // 验证老师能否被冻结与解冻
+        validateFreezeOrUnFreeze(teacherId);
         commentCardManageSDK.unfreezeTeacherId(teacherId);
     }
 
@@ -220,18 +236,12 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
         parameters.forEach(query::setParameter);
     }
 
-    private Long getInnerTeacherId(CommentCard commentCard) {
-        JsonResultModel jsonResultModel = commentCardManageSDK.getInnerTeacherId(getInnerTeacherParameterMap(commentCard));
-        InnerTeacher innerTeacher = jsonResultModel.getData(InnerTeacher.class);
-        return innerTeacher.getTeacherId();
-    }
-
-    private Map<String, Object> getInnerTeacherParameterMap(CommentCard commentCard) {
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("fishCardId",commentCard.getId());
-        paramMap.put("studentId",commentCard.getStudentId());
-        paramMap.put("courseId",commentCard.getCourseId());
-        return paramMap;
+    private void validateFreezeOrUnFreeze(Long id) {
+        TeacherInfo teacherInfo = commentCardManageSDK.getTeacherInfoById(id);
+        BoxfishAsserts.notNull(teacherInfo, "对应老师不存在");
+        if(Objects.equals(teacherInfo.getTeacherType(), 1)) {
+            throw new BusinessException("内部账号不能执行冻结或者解冻!!");
+        }
     }
 
 }

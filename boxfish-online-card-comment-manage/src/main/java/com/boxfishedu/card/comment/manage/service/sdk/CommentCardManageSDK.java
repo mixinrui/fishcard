@@ -2,12 +2,10 @@ package com.boxfishedu.card.comment.manage.service.sdk;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.config.CommentCardManageUrl;
-import com.boxfishedu.card.comment.manage.entity.dto.CommentCountSetLog;
-import com.boxfishedu.card.comment.manage.entity.dto.FreezeLogDto;
-import com.boxfishedu.card.comment.manage.entity.dto.NoCommentTeacherInfoDto;
-import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.*;
 import com.boxfishedu.card.comment.manage.entity.form.ChangeTeacherForm;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
+import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.util.JsonResultModuleUtils;
 import com.boxfishedu.card.comment.manage.util.ObjectUtils;
 import com.google.common.collect.Maps;
@@ -27,6 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,11 +57,13 @@ public class CommentCardManageSDK {
 
     /**
      * 获取内部老师
-     * @param paramMap
+     * @param commentCard
      * @return
      */
-    public JsonResultModel getInnerTeacherId(Map paramMap){
-        return restTemplate.postForObject(getInnerTeacherURI(), paramMap, JsonResultModel.class);
+    public InnerTeacher getInnerTeacherId(CommentCard commentCard){
+        JsonResultModel jsonResultModel = restTemplate.postForObject(
+                getInnerTeacherURI(), getInnerTeacherParameterMap(commentCard), JsonResultModel.class);
+        return jsonResultModel.getData(InnerTeacher.class);
     }
 
     /**
@@ -184,6 +185,7 @@ public class CommentCardManageSDK {
         return UriComponentsBuilder
                 .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("f_teacher_review/update_freeze_status")
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -192,6 +194,7 @@ public class CommentCardManageSDK {
         logger.info("Accessing getInnerTeacher in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/get_inner_f_review_teacher")
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -210,6 +213,7 @@ public class CommentCardManageSDK {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("f_teacher_review/get_review_todaycount")
                 .queryParams(paramMap)
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -220,6 +224,7 @@ public class CommentCardManageSDK {
                 .path("/f_teacher_review/get_review_count")
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -227,6 +232,7 @@ public class CommentCardManageSDK {
     private URI createGetTeacherOperationURI(Long teacherId){
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/" + teacherId)
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -236,6 +242,7 @@ public class CommentCardManageSDK {
                 .path("/f_teacher_review/query_review_teacher_infos")
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -243,6 +250,7 @@ public class CommentCardManageSDK {
     private URI createChangeTeacherURI() {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("f_teacher_review/change_review_teacher_batch")
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -251,6 +259,7 @@ public class CommentCardManageSDK {
     private URI createGetTeacherInfoURI(Long teacherId) {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/get_review_teacher_info/" + teacherId)
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -260,6 +269,7 @@ public class CommentCardManageSDK {
                 .path("/f_teacher_review/get_freeze_log/" + teacherId)
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
     }
@@ -267,7 +277,16 @@ public class CommentCardManageSDK {
     private URI createGetTeacherListByName() {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
                 .path("/f_teacher_review/query_teachers_byname")
+                .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
+    }
+
+    private Map<String, Object> getInnerTeacherParameterMap(CommentCard commentCard) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("fishCardId",commentCard.getId());
+        paramMap.put("studentId",commentCard.getStudentId());
+        paramMap.put("courseId",commentCard.getCourseId());
+        return paramMap;
     }
 }

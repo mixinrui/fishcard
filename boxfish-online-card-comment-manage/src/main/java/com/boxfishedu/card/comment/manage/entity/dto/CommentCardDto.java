@@ -37,6 +37,8 @@ public class CommentCardDto {
 
     private Long teacherId;
 
+    private String teacherName;
+
     private String teacherPicturePath;
 
     private Integer assignTeacherCount = 0;
@@ -92,7 +94,8 @@ public class CommentCardDto {
         return commentStatus.desc();
     }
 
-    public Long getId() {
+    @DTOTransient
+    public Long getCode() {
         return Objects.isNull(previous_id) ? id: previous_id;
     }
 }

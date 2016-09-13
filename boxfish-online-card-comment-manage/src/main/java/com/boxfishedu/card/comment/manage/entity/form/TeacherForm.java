@@ -16,6 +16,7 @@ public class TeacherForm {
     private Long teacherId;
     private String teacherName;
     private Integer teacherStatus;
+    private Integer teacherType;
 
     public MultiValueMap<String,String> createValueMap() {
         MultiValueMap<String,String> result = new LinkedMultiValueMap<>();
@@ -29,6 +30,10 @@ public class TeacherForm {
 
         if(Objects.nonNull(teacherStatus)) {
             result.add("teacherStatus", teacherStatus.toString());
+        }
+
+        if(Objects.nonNull(teacherType)) {
+            result.add("teacherType", teacherType.toString());
         }
         return result;
     }

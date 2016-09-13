@@ -35,11 +35,11 @@ public class CommentCardLogDto {
         CommentCard latestCommentCard = commentCardList.get(commentCardList.size() - 1);
 
         // 最后一个
-        if(Objects.equals(latestCommentCard.getStatus(), CommentCardStatus.ANSWERED.getCode())) {
+        if(Objects.nonNull(latestCommentCard.getTeacherAnswerTime())) {
             logs.put("已点评", latestCommentCard.getTeacherAnswerTime());
         }
 
-        if(Objects.equals(latestCommentCard.getStatus(), CommentCardStatus.ANSWERED.getCode())) {
+        if(Objects.equals(latestCommentCard.getStatus(), CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())) {
             logs.put("学生已评价", latestCommentCard.getStudentCommentTeacherTime());
         }
     }
@@ -55,11 +55,11 @@ public class CommentCardLogDto {
         if(Objects.nonNull(firstCommentCard.getTeacherId())) {
             logs.put("分配老师" + firstCommentCard.getId() + ":" + firstCommentCard.getTeacherName(), new Date());
         }
-        if(Objects.equals(firstCommentCard.getStatus(), CommentCardStatus.ANSWERED.getCode())) {
+        if(Objects.nonNull(firstCommentCard.getTeacherAnswerTime())) {
             logs.put("已点评", firstCommentCard.getTeacherAnswerTime());
         }
 
-        if(Objects.equals(firstCommentCard.getStatus(), CommentCardStatus.ANSWERED.getCode())) {
+        if(Objects.equals(firstCommentCard.getStatus(), CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())) {
             logs.put("学生已评价", firstCommentCard.getStudentCommentTeacherTime());
         }
     }
