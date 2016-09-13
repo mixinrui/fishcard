@@ -97,6 +97,10 @@ public class FishCardExcelServiceX {
         hssfCell = hssfRow.createCell(13);
         hssfCell.setCellValue("所属订单");
 
+        hssfCell = hssfRow.createCell(14);
+        hssfCell.setCellValue("订单类型");
+
+
 
 
 
@@ -148,6 +152,9 @@ public class FishCardExcelServiceX {
             hssfCell = hssfRow.createCell(13);
             hssfCell.setCellValue( list.get(i).getOrderCode());
 
+            hssfCell = hssfRow.createCell(14);
+            hssfCell.setCellValue( list.get(i).getOrderType());
+
         }
 
         response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".xls");
@@ -189,6 +196,7 @@ public class FishCardExcelServiceX {
                wexcel.setRealStartTime(workOrder.getActualStartTime());
                wexcel.setRealEndTime(workOrder.getActualEndTime());
                wexcel.setOrderCode(workOrder.getOrderCode());
+               wexcel.setOrderType(workOrder.getOrderChannel());
             listexcel.add(wexcel);
         });
 

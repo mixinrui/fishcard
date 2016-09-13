@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.servicex.bean;
 
+import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.mysql.jdbc.StringUtils;
 
 import java.util.Date;
 
@@ -23,6 +25,8 @@ public class WorkOrderViewExcel {
     private String realStartTime;
     private String realEndTime;
     private String orderCode;
+
+    private String orderType;
 
     private String hasAddCourse;//是否补过课
 
@@ -171,4 +175,17 @@ public class WorkOrderViewExcel {
             this.hasAddCourse="是";
         }
     }
+
+
+
+    public String setOrderType(String orderType) {
+        if(StringUtils.isNullOrEmpty(OrderChannelDesc.get(orderType).getDesc() ))
+            return orderType;
+        return this.orderType = OrderChannelDesc.get(orderType).getDesc();
+    }
+    public String getOrderType() {
+        return orderType;
+    }
+
+
 }
