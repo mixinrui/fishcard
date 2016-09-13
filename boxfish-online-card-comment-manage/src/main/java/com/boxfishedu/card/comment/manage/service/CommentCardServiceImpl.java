@@ -2,6 +2,7 @@ package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardLogDto;
+import com.boxfishedu.card.comment.manage.entity.dto.InnerTeacher;
 import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
@@ -11,6 +12,7 @@ import com.boxfishedu.card.comment.manage.entity.form.CommentCardForm;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
+import com.boxfishedu.card.comment.manage.exception.BoxfishAsserts;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import com.boxfishedu.card.comment.manage.util.DateUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,7 +24,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -120,7 +121,7 @@ public class CommentCardServiceImpl implements CommentCardService {
     @Override
     @Transactional
     public void changeTeacher(CommentCard commentCard, Long teacherId) {
-        Assert.notNull(commentCard, "点评不存在");
+        BoxfishAsserts.notNull(commentCard, "点评不存在");
         // 对老师进行验证
         TeacherInfo teacherInfo = validateTeacher(teacherId, 1);
 
@@ -151,11 +152,19 @@ public class CommentCardServiceImpl implements CommentCardService {
     @Override
     public CommentCardLogDto findCommentCardLog(Long id) {
         CommentCard firstCommentCard = commentCardJpaRepository.findOne(id);
+        BoxfishAsserts.notNull(firstCommentCard,  id + "该点评卡不存在");
         List<CommentCard> commentCardList = commentCardJpaRepository.findByPrevious_id(id);
         if(CollectionUtils.isNotEmpty(commentCardList)) {
             return new CommentCardLogDto(firstCommentCard, commentCardList);
         }
         return new CommentCardLogDto(firstCommentCard);
+    }
+
+    @Override
+    public ChangeTeacherForm changeCommentCardToInnerTeacher(Long teacherId) {
+        ChangeTeacherForm changeTeacherForm = new ChangeTeacherForm();
+
+        return changeTeacherForm;
     }
 
     private TeacherInfo validateTeacher(Long teacherId, int count) {

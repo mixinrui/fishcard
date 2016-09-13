@@ -20,9 +20,9 @@ spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
 
 #spring.profiles.active: product
-spring.profiles.active: local
+#spring.profiles.active: local
 #spring.profiles.active: development
-#spring.profiles.active: test
+spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
 
@@ -79,6 +79,24 @@ service:
     teacherStudentBusinessUrl: http://123.56.13.168:8099
     avatarsUrl: http://avatars.boxfish.cn
     authenticationUrl: http://123.56.13.168:8080
+    # 访问师生运营的key
+    boxfishKey: XJlL3N2bi_nlJ_mtLvlj6Por63lpKfniIbngrgxLzAyMy7miJHlj6_ku6Xl
+
+server.port: 8085
+
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish-online-2016-inside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: nEaJiP7hwoXEUkPDnDjaBK3hEJanHTec
+  profiles: product
+
+service:
+  sdk:
+    teacherStudentBusinessUrl: http://online-api.boxfish.cn/teacher
+    avatarsUrl: http://avatars.boxfish.cn
+    authenticationUrl: http://online-api.boxfish.cn/fishcard
     # 访问师生运营的key
     boxfishKey: XJlL3N2bi_nlJ_mtLvlj6Por63lpKfniIbngrgxLzAyMy7miJHlj6_ku6Xl
 
