@@ -28,4 +28,5 @@ public interface ForeignTeacherService{
     Page<TeacherInfo> getCanCommentTeacherPage(Pageable pageable, TeacherForm teacherForm);
 
     Page<FreezeLogDto> getTeacherFreezeLogPage(Pageable pageable, Long teacherId);
+
 }

@@ -2,12 +2,10 @@ package com.boxfishedu.card.comment.manage.service.sdk;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.card.comment.manage.config.CommentCardManageUrl;
-import com.boxfishedu.card.comment.manage.entity.dto.CommentCountSetLog;
-import com.boxfishedu.card.comment.manage.entity.dto.FreezeLogDto;
-import com.boxfishedu.card.comment.manage.entity.dto.NoCommentTeacherInfoDto;
-import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.*;
 import com.boxfishedu.card.comment.manage.entity.form.ChangeTeacherForm;
 import com.boxfishedu.card.comment.manage.entity.form.TeacherForm;
+import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.util.JsonResultModuleUtils;
 import com.boxfishedu.card.comment.manage.util.ObjectUtils;
 import com.google.common.collect.Maps;
@@ -27,6 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,11 +57,13 @@ public class CommentCardManageSDK {
 
     /**
      * 获取内部老师
-     * @param paramMap
+     * @param commentCard
      * @return
      */
-    public JsonResultModel getInnerTeacherId(Map paramMap){
-        return restTemplate.postForObject(getInnerTeacherURI(), paramMap, JsonResultModel.class);
+    public InnerTeacher getInnerTeacherId(CommentCard commentCard){
+        JsonResultModel jsonResultModel = restTemplate.postForObject(
+                getInnerTeacherURI(), getInnerTeacherParameterMap(commentCard), JsonResultModel.class);
+        return jsonResultModel.getData(InnerTeacher.class);
     }
 
     /**
@@ -279,5 +280,13 @@ public class CommentCardManageSDK {
                 .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
+    }
+
+    private Map<String, Object> getInnerTeacherParameterMap(CommentCard commentCard) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("fishCardId",commentCard.getId());
+        paramMap.put("studentId",commentCard.getStudentId());
+        paramMap.put("courseId",commentCard.getCourseId());
+        return paramMap;
     }
 }
