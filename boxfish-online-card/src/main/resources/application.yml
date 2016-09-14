@@ -78,6 +78,7 @@ spring.datasource:
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
 
+#spring.profiles.active: local_hucl
 #spring.profiles.active: product
 #spring.profiles.active: local
 #spring.profiles.active: development
@@ -123,21 +124,57 @@ spring:
 server.servlet-path: /
 server.port: 8080
 
+#===============================================================local_hucl======================================================================
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service_test?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false
+    username: service
+    password: Box123456
+
+  mongo:
+    serverAddress: 123.56.13.168:27017
+    dbName: fishcard
+    username: root
+    password: Boxfish2016
+
+  redis:
+    hostName: 127.0.0.1
+    password: Box123456
+    port: 6379
+    timeout: 10000
+  rabbitmq:
+#    address: 101.201.239.116:5672
+    address: 101.201.237.252:5672
+    username: boxfish
+    password: boxfish
+    virtualHost: local
+  profiles: local_hucl
+
+server.servlet-path: /
+server.port: 8080
+
 ##################接口调用地址
 interface:
   address:
-    teacher_service: http://101.201.237.252:8099
-    teacher_service_admin: http://192.168.88.210:8099
+    teacher_service: http://123.56.13.168:8099
+    teacher_service_admin: http://123.56.13.168:8099
 
     course_recommended_service: http://base.boxfish.cn/recommend/core
 #    course_recommended_service: http://114.55.40.98:8001
-    fishcard_service: http://127.0.0.1:8080
-    order_service: http://101.201.237.252:8082
-    course_online_service: http://101.201.66.32:9090
+    fishcard_service: http://123.56.13.168:8080
+    order_service: http://123.56.13.168:8082
+    course_online_service: http://123.56.13.168:9090
 #    course_online_service: http://online-api.boxfish.cn/teaching-service
-    auth_user: http://114.55.58.184:8099
-    data_analysis_service: http://114.55.65.28:9301
+    auth_user: http://123.56.13.168:8099
+    data_analysis_service: http://123.56.13.168:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
+service:
+  sdk:
+    teacherAbsenceUrl: http://123.56.13.168:8099
+    getPictureUrl: http://123.56.13.168:8099
+    pushInfoIrl: http://123.56.13.168:9090
+    innerTeacherUrl: http://123.56.13.168:8099
 
 #===============================================================development环境:101.201.239.116 密码:Box12345678 ===============================================================
 ---
@@ -196,7 +233,7 @@ spring:
     password: Box123456
 
   mongo:
-    serverAddress: 60.205.178.235:27017
+    serverAddress: 101.201.237.252:27017
     dbName: fishcard
     username: root
     password: Boxfish2016
@@ -216,7 +253,7 @@ spring:
 ##################接口调用地址
 interface:
   address:
-    teacher_service: http://60.205.178.235:8099
+    teacher_service: http://101.201.237.252:8099
     teacher_service_admin: http://60.205.178.235:8099
     course_recommended_service: http://60.205.178.235:8001/recommend/core
     fishcard_service: http://60.205.178.235:8080
