@@ -80,8 +80,8 @@ spring.jackson.time-zone: GMT+8
 
 #spring.profiles.active: product
 #spring.profiles.active: local
-spring.profiles.active: development
-#spring.profiles.active: test
+#spring.profiles.active: development
+spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
 
@@ -177,6 +177,8 @@ interface:
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
+#  学生旷课扣积分
+    absenteeism_deduct_score:
 
 service:
   sdk:
@@ -224,6 +226,8 @@ interface:
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.test.boxfish.cn
+#  学生旷课扣积分
+    absenteeism_deduct_score:
 
 service:
   sdk:
