@@ -2,7 +2,6 @@ package com.boxfishedu.card.comment.manage.service;
 
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardLogDto;
-import com.boxfishedu.card.comment.manage.entity.dto.InnerTeacher;
 import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
@@ -250,7 +249,7 @@ public class CommentCardServiceImpl implements CommentCardService {
             if(Objects.equals(commentCardForm.getNotAnswerTime(), NotAnswerTime._36HOURS.code())) {
                 predicateList.add(criteriaBuilder.lessThanOrEqualTo(
                         root.get("studentAskTime"),
-                        DateUtils.parseFromLocalDateTime(dateRange.getFrom())
+                        DateUtils.parseFromLocalDateTime(dateRange.getTo())
                 ));
             } else {
                 predicateList.add(criteriaBuilder.between(
