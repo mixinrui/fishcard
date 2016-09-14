@@ -16,8 +16,7 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
 
     private static final long DEDUCT_SCORE = 30000l;
 
-    @Autowired
-    Logger logger = LoggerFactory.getLogger(AbsenteeismServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger(AbsenteeismServiceImpl.class);
 
     @Autowired
     AbsenteeismSDK absenteeismSDK;
