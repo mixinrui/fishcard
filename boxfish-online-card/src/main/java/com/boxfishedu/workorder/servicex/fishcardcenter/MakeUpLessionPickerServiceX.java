@@ -1,6 +1,8 @@
 package com.boxfishedu.workorder.servicex.fishcardcenter;
 
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -23,10 +25,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/6/17.
@@ -52,6 +52,12 @@ public class MakeUpLessionPickerServiceX {
     @Autowired
     private FishCardMakeUpService fishCardMakeUpService;
 
+    @Autowired
+    private RandomSlotFilterService randomSlotFilterService;
+
+    @Autowired
+    private CourseScheduleService courseScheduleService;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //获取学生可以选择补课的时间,超过补课时间;不再允许补课;但是如果是多次补课呢??????必须要求落下的课程在两周内补完
@@ -62,6 +68,8 @@ public class MakeUpLessionPickerServiceX {
         fishCardMakeUpService.processMakeUpParam(workOrder);
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(workOrder, days);
+
+        Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(workOrder.getStudentId());
         // 获取时间片模板,并且复制
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(workOrder.getTeacherId());
         List<DayTimeSlots> monthTimeSlots = Lists.newArrayList();
@@ -69,18 +77,24 @@ public class MakeUpLessionPickerServiceX {
             try {
                 DayTimeSlots clone = (DayTimeSlots) dayTimeSlots.clone();
                 clone.setDay(DateUtil.localDate2SimpleString(from));
-                clone = timeLimitPolicy.limit(clone);
-                monthTimeSlots.add(clone);
+
+                AvaliableTimeParam avaliableTimeParam=new AvaliableTimeParam();
+                avaliableTimeParam.setComboType(workOrder.getService().getComboType());
+                //获取时间片范围内的数据
+                DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
+
+                result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+                        .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+                        .collect(Collectors.toList()));
+                monthTimeSlots.add(result);
             } catch (Exception ex) {
                 logger.error("鱼卡[{}]获取可用时间片失败", workOrderId, ex);
                 throw new BusinessException("鱼卡[" + workOrderId + "]获取可用时间片失败");
             }
         }
-
-        AvaliableTimeParam avaliableTimeParam = new AvaliableTimeParam();
-        avaliableTimeParam.setStudentId(workOrder.getStudentId());
-        addTagForSlotTemplate(avaliableTimeParam, monthTimeSlots, dateRange);
-
+//        AvaliableTimeParam avaliableTimeParam = new AvaliableTimeParam();
+//        avaliableTimeParam.setStudentId(workOrder.getStudentId());
+//        addTagForSlotTemplate(avaliableTimeParam, monthTimeSlots, dateRange);
         return JsonResultModel.newJsonResultModel(monthTimeSlots);
     }
 

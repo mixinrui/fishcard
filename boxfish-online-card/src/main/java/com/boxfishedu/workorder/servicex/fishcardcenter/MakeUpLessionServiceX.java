@@ -86,26 +86,20 @@ public class MakeUpLessionServiceX {
         if (null == oldWorkOrder) {
             throw new BusinessException("所传参数不合法");
         }
-        fishCardMakeUpService.processMakeUpParam(oldWorkOrder);
         CourseSchedule oldCourseSchedule = courseScheduleService.findByWorkOrderId(oldWorkOrder.getId());
         if (null == oldCourseSchedule) {
             throw new BusinessException("无对应的排课表");
         }
+        fishCardMakeUpService.processMakeUpParam(oldWorkOrder);
+
         WorkOrder newWorkOrder = getMakeUpWorkOrder(oldWorkOrder, makeUpCourseParam);
         CourseSchedule newCourseSchedule = getMakeUpSchedule(oldCourseSchedule, makeUpCourseParam);
 
         oldWorkOrder.setMakeUpFlag((short) 1);
-        //将已经安排补课的鱼卡的
-        //将的鱼卡和courseschedule状态修改为补课
-//        oldWorkOrder.setStatus(FishCardStatusEnum.FISHCARD_ADDITION.getCode());
-//        oldCourseSchedule.setStatus(FishCardStatusEnum.FISHCARD_ADDITION.getCode());
 
         //保存入库
         fishCardMakeUpService.saveBothOldAndNew(oldWorkOrder, newWorkOrder, oldCourseSchedule, newCourseSchedule);
-        //保存数据日志到mongodb
 
-        //通知小马释放师生关系
-        courseOnlineRequester.releaseGroup(oldWorkOrder);
         //调用教师资源分配
         List<CourseSchedule> newCourseScheduleList = Lists.newArrayList();
         newCourseScheduleList.add(newCourseSchedule);

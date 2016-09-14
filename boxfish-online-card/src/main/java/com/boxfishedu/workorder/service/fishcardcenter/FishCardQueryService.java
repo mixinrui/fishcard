@@ -23,6 +23,7 @@ import java.util.List;
  * Created by hucl on 16/6/16.
  */
 @Component
+@SuppressWarnings("ALL")
 public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRepository, Long> {
     @Autowired
     private EntityManager entityManager;
