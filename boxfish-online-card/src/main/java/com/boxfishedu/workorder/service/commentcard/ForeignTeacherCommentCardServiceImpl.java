@@ -303,7 +303,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     newCommentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
                     newCommentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
                     newCommentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
-                    newCommentCard.setPrevious_id(commentCard.getId());
+                    if(Objects.nonNull(commentCard.getPrevious_id())) {
+                        newCommentCard.setPrevious_id(commentCard.getPrevious_id());
+                    } else {
+                        newCommentCard.setPrevious_id(commentCard.getId());
+                    }
                     commentCardJpaRepository.save(newCommentCard);
 
 
