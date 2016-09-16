@@ -72,6 +72,9 @@ public class CourseScheduleUpdatorServiceX {
     private static Map<Long, List<CourseSchedule>> groupByUserId(List<CourseSchedule> courseScheduleList) {
         Map<Long, List<CourseSchedule>> resultMap = Maps.newLinkedHashMap();
         for (CourseSchedule courseSchedule : courseScheduleList) {
+            if(courseSchedule.getIsFreeze()==1){
+                continue;
+            }
             List<CourseSchedule> studentCourseScheduleList = resultMap.get(courseSchedule.getStudentId());
             if (studentCourseScheduleList == null) {
                 studentCourseScheduleList = Lists.newArrayList();

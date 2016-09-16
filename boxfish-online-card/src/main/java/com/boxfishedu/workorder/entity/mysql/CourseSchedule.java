@@ -65,6 +65,9 @@ public class CourseSchedule {
     @Column(name = "sku_id_extra", nullable = true)
     private Integer skuIdExtra;
 
+    @Column(name = "is_freeze", nullable = true)
+    private Integer isFreeze;
+
 //    @Column(name="schedule_type")
 //    private Integer scheduleType;
 }

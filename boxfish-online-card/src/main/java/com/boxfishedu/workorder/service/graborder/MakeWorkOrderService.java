@@ -49,7 +49,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
         Date end = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-2),1);
         Date createTime =DateUtil.addSecond(new Date(),-10);
         logger.info(":::::findByTeacherIdAndStartTimeBetweenOrderByStartTime:::conditionDateFrom{[]}:::::To{[]}",DateUtil.Date2String(begin),DateUtil.Date2String(end));
-       return workOrderJpaRepository.findByTeacherIdAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(0L,begin,end,createTime);
+       return workOrderJpaRepository.findByTeacherIdAndIsFreezeAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(0L,0,begin,end,createTime);
     }
 
 

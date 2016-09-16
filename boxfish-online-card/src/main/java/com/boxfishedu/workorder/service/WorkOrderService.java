@@ -180,6 +180,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedule.setTimeSlotId(workOrder.getSlotId());
             courseSchedule.setWorkorderId(workOrder.getId());
             courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
+            courseSchedule.setIsFreeze(0);
             courseSchedules.add(courseSchedule);
         }
         return courseScheduleService.save(courseSchedules);
@@ -405,6 +406,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedule.setTimeSlotId(workOrder.getSlotId());
             courseSchedule.setWorkorderId(workOrder.getId());
             courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
+            courseSchedule.setIsFreeze(0);
             courseSchedules.add(courseSchedule);
         }
         return courseScheduleService.save(courseSchedules);

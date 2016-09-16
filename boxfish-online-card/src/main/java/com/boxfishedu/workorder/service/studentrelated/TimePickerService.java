@@ -5,6 +5,8 @@ import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.param.ScheduleModel;
 import org.slf4j.Logger;
@@ -23,11 +25,19 @@ public class TimePickerService {
     private Logger logger= LoggerFactory.getLogger(this.getClass());
     @Autowired
     private RabbitMqSender rabbitMqSender;
+
+    @Autowired
+    private WorkOrderService workOrderService;
+
     //根据course_schedule获取教师
     public void getRecommandTeachers(Service service, List<CourseSchedule> courseSchedules) {
         FetchTeacherParam fetchTeacherParam = new FetchTeacherParam();
         List<ScheduleModel> scheduleModelList = new ArrayList<>();
         for (CourseSchedule courseSchedule : courseSchedules) {
+            WorkOrder workOrder=workOrderService.findOne(courseSchedule.getWorkorderId());
+            if(workOrder.getIsFreeze()==1){
+                continue;
+            }
             ScheduleModel scheduleModel = new ScheduleModel();
             scheduleModel.setId(courseSchedule.getId());
             scheduleModel.setRoleId(courseSchedule.getRoleId());

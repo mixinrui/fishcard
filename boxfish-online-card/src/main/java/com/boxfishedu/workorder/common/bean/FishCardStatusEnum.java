@@ -31,7 +31,6 @@ public enum FishCardStatusEnum {
     //客户端双方都上报信息
     EXCEPTION(60, "系统异常",""),
     EXCEPTION_RESOURCE_DOWNLOAD_FAIL(61,"资源下载异常","");
-
     FishCardStatusEnum() {
     }
 

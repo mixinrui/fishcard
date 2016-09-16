@@ -120,4 +120,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("update WorkOrder o set o.updatetimeRecharge= current_timestamp ,o.statusRecharge= ?1 where o.id = ?2 and o.statusRecharge=?3")
     int setFixedStatusRechargeFor(Integer rechargeCodeAfter,Long id,Integer rechargeCodeBefore);
 
+    //  获取未来两天内 未安排教师的鱼卡信息  teacherid =0
+    public List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(Long teacherId,Integer isFreeze, Date startDate, Date endDate,Date createTime);
+
 }

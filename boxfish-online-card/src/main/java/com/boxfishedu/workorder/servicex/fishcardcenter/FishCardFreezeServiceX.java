@@ -65,11 +65,12 @@ public class FishCardFreezeServiceX {
         workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         courseSchedule.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         workOrder.setIsFreeze(1);
+        courseSchedule.setIsFreeze(1);
         workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
 
         workOrderLogService.saveWorkOrderLog(workOrder,"冻结课程,冻结前教师id["+teacherId+"],教师姓名["+teacherName+"]");
 
-        return JsonResultModel.newJsonResultModel("success");
+        return JsonResultModel.newJsonResultModel("ok");
     }
 
     public JsonResultModel unfreeze(Long fishcardId){
@@ -86,15 +87,16 @@ public class FishCardFreezeServiceX {
 
 
         workOrder.setIsFreeze(0);
-        workOrderService.save(workOrder);
+        courseSchedule.setIsFreeze(0);
+        workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
 
         List<CourseSchedule> list= Lists.newArrayList();
         list.add(courseSchedule);
 
         timePickerService.getRecommandTeachers(workOrder.getService(),list);
-        workOrderLogService.saveWorkOrderLog(workOrder,"解冻结课程");
+        workOrderLogService.saveWorkOrderLog(workOrder,"解冻鱼卡");
 
-        return JsonResultModel.newJsonResultModel("success");
+        return JsonResultModel.newJsonResultModel("ok");
     }
 
     private void validateOperationCond(WorkOrder workOrder){

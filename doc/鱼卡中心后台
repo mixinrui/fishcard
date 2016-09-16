@@ -238,3 +238,44 @@ return :
   "returnCode": 200,
   "returnMsg": "success"
 }
+
+
+#######冻结与卡
+http://123.56.13.168:8080/backend/fishcard/{workorder_id}/freeze?token={token}
+method:PUT
+参数说明:
+workorder_id:鱼卡id
+
+返回:
+{
+  "data": "ok",
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+
+
+######解冻鱼卡
+http://123.56.13.168:8080/backend/fishcard/{workorder_id}/unfreeze?token={token}
+method:PUT
+参数说明:
+workorder_id:鱼卡id
+
+返回:
+{
+  "data": "ok",
+  "returnCode": 200,
+  "returnMsg": "success"
+}
+
+
+######筛选金币换课最近连续两次旷课的学生所有的鱼卡
+url[原来的接口上加筛选条件]:/fishcard/list?continueabsencenum=2
+如：http://123.56.13.168:8080/backend/fishcard/list?page=0&size=10&continueabsencenum=2
+method:GET
+参数说明:
+{
+   //最近连续旷课的次数
+   "continueabsencenum":2
+}
+

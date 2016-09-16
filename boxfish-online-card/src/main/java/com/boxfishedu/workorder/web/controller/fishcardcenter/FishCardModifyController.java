@@ -32,7 +32,7 @@ public class FishCardModifyController {
     @Autowired
     private FishCardFreezeServiceX fishCardFreezeServiceX;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "/teacher", method = RequestMethod.PUT)
     public JsonResultModel changeTeacher(@RequestBody TeacherChangeParam teacherChangeParam) {
@@ -40,35 +40,36 @@ public class FishCardModifyController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public JsonResultModel deleteFishCard(@RequestBody FishCardDeleteParam fishCardDeleteParam){
-        if(!CollectionUtils.isEmpty(fishCardDeleteParam.getFishCardIds())) {
+    public JsonResultModel deleteFishCard(@RequestBody FishCardDeleteParam fishCardDeleteParam) {
+        if (!CollectionUtils.isEmpty(fishCardDeleteParam.getFishCardIds())) {
             fishCardModifyServiceX.deleteFishCardsByIds(fishCardDeleteParam);
         }
-        if(!CollectionUtils.isEmpty(fishCardDeleteParam.getStudentIds())){
+        if (!CollectionUtils.isEmpty(fishCardDeleteParam.getStudentIds())) {
             fishCardModifyServiceX.deleteFishCardsByStudentIds(fishCardDeleteParam);
         }
         return JsonResultModel.newJsonResultModel("success");
     }
 
     /**
-     *冻结金币换课的鱼卡
+     * 冻结金币换课的鱼卡
      */
-    @RequestMapping(value = "/{workorder_id}/freeze", method = RequestMethod.PUT)
-    public JsonResultModel freezeFishCard(@PathVariable("workorder_id") Long fishcardId) {
-        return fishCardFreezeServiceX.freeze(fishcardId);
+    @RequestMapping(value = "/freeze", method = RequestMethod.PUT)
+    public JsonResultModel freezeFishCard(@RequestBody java.util.Map<String, Long> map) {
+        return fishCardFreezeServiceX.freeze(map.get("workOrderId"));
     }
 
     /**
-     *解冻对应的鱼卡
+     * 解冻对应的鱼卡
      */
-    @RequestMapping(value = "/{workorder_id}/unfreeze", method = RequestMethod.PUT)
-    public JsonResultModel unfreezeFishCard(@PathVariable("workorder_id") Long fishcardId) {
-        return fishCardFreezeServiceX.unfreeze(fishcardId);
+    @RequestMapping(value = "/unfreeze", method = RequestMethod.PUT)
+    public JsonResultModel unfreezeFishCard(@RequestBody java.util.Map<String, Long> map) {
+        return fishCardFreezeServiceX.unfreeze(map.get("workOrderId"));
     }
 
     /**
      * 更换上课时间
-     * @param startTimeParam  包含鱼卡id  开始时间
+     *
+     * @param startTimeParam 包含鱼卡id  开始时间
      * @return
      */
     @RequestMapping(value = "/changeStartTime", method = RequestMethod.POST)
@@ -77,8 +78,8 @@ public class FishCardModifyController {
     }
 
     @RequestMapping(value = "/time/available/{workorder_id}/{date}", method = RequestMethod.GET)
-    public JsonResultModel timeAvailable(@PathVariable("workorder_id") Long workorder_id ,@PathVariable("date") String date) throws CloneNotSupportedException {
-        return avaliableTimeServiceX.getTimeAvailableChangeTime(workorder_id,date);
+    public JsonResultModel timeAvailable(@PathVariable("workorder_id") Long workorder_id, @PathVariable("date") String date) throws CloneNotSupportedException {
+        return avaliableTimeServiceX.getTimeAvailableChangeTime(workorder_id, date);
     }
 
 }
