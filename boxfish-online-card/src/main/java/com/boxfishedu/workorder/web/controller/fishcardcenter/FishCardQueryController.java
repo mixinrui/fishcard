@@ -96,7 +96,4 @@ public class FishCardQueryController {
     public JsonResultModel rechargeType() throws Exception {
         return JsonResultModel.newJsonResultModel(FishCardChargebackStatusEnum.varMapout);
     }
-
-
-
 }

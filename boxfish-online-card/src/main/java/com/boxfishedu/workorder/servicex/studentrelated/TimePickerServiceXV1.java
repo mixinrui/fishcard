@@ -305,6 +305,7 @@ public class TimePickerServiceXV1 {
                 workOrder.setSeqNum(index);
                 workOrder.setCreateTime(new Date());
                 workOrder.setOrderCode(service.getOrderCode());
+                workOrder.setIsFreeze(0);
                 // skuIdExtra 字段
                 workOrder.setSkuIdExtra(service.getSkuId().intValue());
                 workOrder.setOrderChannel(service.getOrderChannel());

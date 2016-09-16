@@ -1,9 +1,11 @@
 package com.boxfishedu.workorder.service.fishcardcenter;
 
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
@@ -17,6 +19,11 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,6 +56,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             workOrder.setSkuId(workOrder.getService().getSkuId());
             workOrder.setMakeUpOrNot("否");
             workOrder.setIdDesc(workOrder.getId().toString());
+
             if(null!=workOrder.getMakeUpFlag()&&0!=workOrder.getMakeUpFlag()){
                 workOrder.setMakeUpOrNot("是");
             }
@@ -64,6 +72,16 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                     idDesc+="B";
                 }
                 workOrder.setIdDesc(idDesc);
+            }
+            if(workOrder.getService().getComboType().equals(ComboTypeEnum.EXCHANGE.toString())){
+                if(workOrder.getIsFreeze()<1){
+                    if(workOrder.getStatus()<FishCardStatusEnum.WAITFORSTUDENT.getCode()){
+                        LocalDateTime beginLocalDate = LocalDateTime.ofInstant(DateUtil.date2SimpleDate(new Date()).toInstant(), ZoneId.systemDefault()).minusHours(24);
+                        if(workOrder.getStartTime().after(DateUtil.localDate2Date(beginLocalDate))){
+                            workOrder.setFreezeBtnShowFlag(Boolean.TRUE);
+                        }
+                    }
+                }
             }
         }
         return workOrders;

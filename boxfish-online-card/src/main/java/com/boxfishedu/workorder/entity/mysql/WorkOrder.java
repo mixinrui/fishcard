@@ -5,10 +5,14 @@ import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.mongodb.morphia.annotations.*;
 import org.springframework.stereotype.Component;
 
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 import java.util.Date;
 
 /**
@@ -153,7 +157,6 @@ public class WorkOrder{
     @Column(name = "sendflagcc", nullable = true)
     private String sendflagcc;
 
-
     /** 更改课程时间  **/
     @Column(name = "updatetime_changecourse", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
@@ -176,6 +179,12 @@ public class WorkOrder{
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatetimeRecharge;
 
+    //是否被冻结,0.未冻结 1.冻结
+    @Column(name = "is_freeze", nullable = true)
+    private Integer isFreeze;
+
+    @Transient
+    private Boolean freezeBtnShowFlag=false;
 
     @Override
     public String toString() {

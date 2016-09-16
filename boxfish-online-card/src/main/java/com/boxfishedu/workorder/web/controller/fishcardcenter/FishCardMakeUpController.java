@@ -44,6 +44,14 @@ public class FishCardMakeUpController {
     }
 
     /**
+     *冻结金币换课的鱼卡
+     */
+    @RequestMapping(value = "/{workorder_id}/freeze", method = RequestMethod.PUT)
+    public JsonResultModel freezeFishCard(@PathVariable("workorder_id") Long fishcardId) {
+        return JsonResultModel.newJsonResultModel("success");
+    }
+
+    /**
      *点击补课触发操作
      */
     @RequestMapping(value = "/modification", method = RequestMethod.POST)
