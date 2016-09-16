@@ -1056,3 +1056,28 @@ method:post
   "returnCode": 400,
   "returnMsg": "无对应服务,请重试"
 }
+
+
+
+
+
+
+#########鱼卡后台获取时间片接口：
+URL:http://ip:port/service/student/changeTime/v2/time/available?workOrderId=[{鱼卡id}]
+method:get
+demo:http://123.56.13.168:8080/service/student/changeTime/v2/time/available?workOrderId=16773
+
+
+-----------------------------
+##########更改时间
+URL:http://ip:port/service/student/changeTime/changeTime
+method:post
+http://http://123.56.13.168:8080/service/student/changeTime/changeTime
+
+参数:
+{
+  "workOrderId":323232,
+  "beginDate":'2016-09-01 08:30:00',
+  "endDate":'2016-09-01 08:55:00',
+  "timeslotId",12
+}
