@@ -8,5 +8,5 @@ import com.boxfishedu.beans.view.JsonResultModel;
 public interface AbsenteeismService {
     public JsonResultModel absenteeismDeductScore(Long studentId);
 
-    public JsonResultModel queryAbsentStudent();
+    public void queryAbsentStudent();
 }

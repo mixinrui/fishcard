@@ -18,7 +18,7 @@ public class AbsenteeismController{
     @Autowired
     AbsenteeismService absenteeismService;
 
-    @RequestMapping(value = "/deduct_score/{studentId}" , method = RequestMethod.PUT)
+    //@RequestMapping(value = "/deduct_score/{studentId}" , method = RequestMethod.PUT)
     public JsonResultModel deductScore(@PathVariable Long studentId){
         return  absenteeismService.absenteeismDeductScore(studentId);
     }
