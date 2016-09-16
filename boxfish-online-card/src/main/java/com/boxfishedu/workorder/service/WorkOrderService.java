@@ -410,4 +410,9 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return courseScheduleService.save(courseSchedules);
     }
 
+    // 根据订单id获取所有鱼卡信息
+    public List<WorkOrder> getAllWorkOrdersByOrderId(Long orderId){
+       return jpa.findByOrderId(orderId);
+    }
+
 }
