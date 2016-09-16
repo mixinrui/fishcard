@@ -249,7 +249,7 @@ public class CommentCardManageSDK {
 
     private URI createChangeTeacherURI() {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("f_teacher_review/change_review_teacher_batch")
+                .path("/f_teacher_review/change_review_teacher_batch")
                 .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
