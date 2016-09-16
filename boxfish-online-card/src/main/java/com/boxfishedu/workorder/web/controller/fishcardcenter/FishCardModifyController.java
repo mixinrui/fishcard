@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
+import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardFreezeServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardModifyServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.web.param.CourseChangeParam;
@@ -28,6 +29,9 @@ public class FishCardModifyController {
     @Autowired
     private AvaliableTimeServiceX avaliableTimeServiceX;
 
+    @Autowired
+    private FishCardFreezeServiceX fishCardFreezeServiceX;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "/teacher", method = RequestMethod.PUT)
@@ -44,6 +48,22 @@ public class FishCardModifyController {
             fishCardModifyServiceX.deleteFishCardsByStudentIds(fishCardDeleteParam);
         }
         return JsonResultModel.newJsonResultModel("success");
+    }
+
+    /**
+     *冻结金币换课的鱼卡
+     */
+    @RequestMapping(value = "/{workorder_id}/freeze", method = RequestMethod.PUT)
+    public JsonResultModel freezeFishCard(@PathVariable("workorder_id") Long fishcardId) {
+        return fishCardFreezeServiceX.freeze(fishcardId);
+    }
+
+    /**
+     *解冻对应的鱼卡
+     */
+    @RequestMapping(value = "/{workorder_id}/unfreeze", method = RequestMethod.PUT)
+    public JsonResultModel unfreezeFishCard(@PathVariable("workorder_id") Long fishcardId) {
+        return fishCardFreezeServiceX.unfreeze(fishcardId);
     }
 
     /**
