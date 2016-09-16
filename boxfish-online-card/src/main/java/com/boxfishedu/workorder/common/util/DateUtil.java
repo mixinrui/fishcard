@@ -35,7 +35,7 @@ public class DateUtil {
         return date;
     }
 
-    public  static String Date2ForForeignDate(Date date){
+    public static String Date2ForForeignDate(Date date) {
         return new SimpleDateFormat(" HH:mm,MM/dd ").format(date);
     }
 
@@ -53,6 +53,7 @@ public class DateUtil {
 
     /**
      * yyyy-MM-dd
+     *
      * @param str
      * @return
      * @throws RuntimeException
@@ -67,8 +68,8 @@ public class DateUtil {
         return date;
     }
 
-    public static Date date2SimpleDate(Date dateWithTime){
-        String dateWithTimeStr=Date2String(dateWithTime);
+    public static Date date2SimpleDate(Date dateWithTime) {
+        String dateWithTimeStr = Date2String(dateWithTime);
         return String2SimpleDate(dateWithTimeStr);
     }
 
@@ -118,6 +119,7 @@ public class DateUtil {
 
     /**
      * yyyy-MM-dd
+     *
      * @param date
      * @return
      */
@@ -136,7 +138,6 @@ public class DateUtil {
     }
 
 
-
     public static String Date2String24(Date date) throws RuntimeException {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
     }
@@ -152,18 +153,18 @@ public class DateUtil {
     }
 
     /**
-     *  获取制定时间的前 num  天
+     * 获取制定时间的前 num  天
      */
-    public static Date getBeforeDays(Date date ,int num){
+    public static Date getBeforeDays(Date date, int num) {
 
-        Calendar   calendar   =   new GregorianCalendar();
+        Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
-        calendar.add(calendar.DATE,-num);//把日期往后增加一天.整数往后推,负数往前移动
-        return  calendar.getTime();   //这个时间就是日期往后推一天的结果
+        calendar.add(calendar.DATE, -num);//把日期往后增加一天.整数往后推,负数往前移动
+        return calendar.getTime();   //这个时间就是日期往后推一天的结果
 
     }
 
-    public static Date localDate2Date(LocalDateTime ldt){
+    public static Date localDate2Date(LocalDateTime ldt) {
         return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
     }
 
@@ -176,28 +177,27 @@ public class DateUtil {
     }
 
     /**
-     *
      * @param date
      * @param flag * @flag 0 返回yyyy-MM-dd 00:00:00日期<br>
-     *                     1 返回yyyy-MM-dd 23:59:59日期
+     *             1 返回yyyy-MM-dd 23:59:59日期
      * @return
      */
-    public static Date parseTime(Date date , int flag){
+    public static Date parseTime(Date date, int flag) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int hour = cal.get(Calendar.HOUR_OF_DAY);
         int minute = cal.get(Calendar.MINUTE);
         int second = cal.get(Calendar.SECOND);
         //时分秒（毫秒数）
-        long millisecond = hour*60*60*1000 + minute*60*1000 + second*1000;
+        long millisecond = hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000;
         //凌晨00:00:00
-        cal.setTimeInMillis(cal.getTimeInMillis()-millisecond);
+        cal.setTimeInMillis(cal.getTimeInMillis() - millisecond);
 
         if (flag == 0) {
             return cal.getTime();
         } else if (flag == 1) {
             //凌晨23:59:59
-            cal.setTimeInMillis(cal.getTimeInMillis()+23*60*60*1000 + 59*60*1000 + 59*1000);
+            cal.setTimeInMillis(cal.getTimeInMillis() + 23 * 60 * 60 * 1000 + 59 * 60 * 1000 + 59 * 1000);
         }
         return cal.getTime();
 
@@ -205,19 +205,20 @@ public class DateUtil {
 
     /**
      * 获取第二天凌晨时间
+     *
      * @return
      */
-    public static Date getTheTomrrowLC(Date date){
-        date  = getBeforeDays(new Date(),-1)   ;
-        return  parseTime(date,0);
+    public static Date getTheTomrrowLC(Date date) {
+        date = getBeforeDays(new Date(), -1);
+        return parseTime(date, 0);
     }
 
-    public static String localDate2SimpleString(LocalDateTime localDateTime){
-        Date date=localDate2Date(localDateTime);
+    public static String localDate2SimpleString(LocalDateTime localDateTime) {
+        Date date = localDate2Date(localDateTime);
         return simpleDate2String(date2SimpleDate(date));
     }
 
-    public static String date2SimpleString(Date date){
+    public static String date2SimpleString(Date date) {
         return simpleDate2String(date2SimpleDate(date));
     }
 
@@ -244,7 +245,7 @@ public class DateUtil {
         return calendar.getTime();
     }
 
-    public static Date addMinutes(Date date,int minutes){
+    public static Date addMinutes(Date date, int minutes) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.add(Calendar.MINUTE, minutes);
@@ -264,6 +265,7 @@ public class DateUtil {
 
     /**
      * 返回当前起2个月的区间
+     *
      * @return
      */
     public static DateRangeForm createHalfYearDateRangeForm(int months) {
@@ -273,7 +275,7 @@ public class DateUtil {
         return new DateRangeForm(from, to);
     }
 
-    public static int getDayOfWeek(Date dt){
+    public static int getDayOfWeek(Date dt) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(dt);
         return cal.get(Calendar.DAY_OF_WEEK) - 1;
@@ -282,12 +284,29 @@ public class DateUtil {
 
     /**
      * 当前时间 加 几分钟
+     *
      * @param now
      * @param second
      * @return
      */
-    public static Date addSecond(Date now ,int second) {
-        return new Date(now .getTime() + second*1000*60);
+    public static Date addSecond(Date now, int second) {
+        return new Date(now.getTime() + second * 1000 * 60);
+    }
+
+
+    /*
+    * Java代码计算时间差
+    * 现在是：2004-03-26 13：31：40
+    * 过去是：2004-01-02 11：30：24
+    */
+    public static int getBetweenDays(Date begin, Date end) {
+        long l = end.getTime() - begin.getTime();
+        return  (int)( l / (24 * 60 * 60 * 1000));
+    }
+
+
+    public static void main(String[] args) {
+       System.out.print(  DateUtil.getBetweenDays(new Date(),DateUtil.addSecond(new Date(),60*24*5)));
     }
 
 }

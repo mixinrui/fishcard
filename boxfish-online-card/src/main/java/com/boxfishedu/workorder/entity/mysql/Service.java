@@ -110,6 +110,7 @@ public class Service {
     private String orderChannel;
 
     /**
+     * 订单类型
      * comboType
      */
     @Column(name = "combo_type", nullable = true)
