@@ -62,6 +62,7 @@ public class GrabOrderService extends BaseService<WorkOrderGrab, WorkOrderGrabJp
     }
 
     public int updateTestGrab(GrabOrderView grabOrderView){
+        logger.info("updateTestGrab:[{}]",grabOrderView.getTeacherName());
         return   workOrderJpaRepository.setFixedTeacherNameAndTeacherIdAndStatusFor(grabOrderView.getTeacherName(),grabOrderView.getTeacherId(),grabOrderView.getState(),grabOrderView.getWorkOrderId(),0L);
     }
     /**
