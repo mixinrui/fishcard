@@ -176,6 +176,9 @@ public class WorkOrder{
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatetimeRecharge;
 
+    /** 学生旷课扣积分标记**/
+    @Column(name = "deduct_score" , nullable = true)
+    private Integer deduct_score;
 
     @Override
     public String toString() {

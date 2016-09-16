@@ -30,8 +30,10 @@ public enum TimerMessageType {
     COURSE_CHANGER_WORKORDER(102),
 
     //每天6:30点向学生发送明天有几节课
-    CLASSS_TOMO_STU_NOTIFY(105);
+    CLASSS_TOMO_STU_NOTIFY(105),
 
+    //查询学生旷课扣积分队列
+    STUDENT_ABSENT_DEDUCT_SCORE(106);
     private int code;
 
     private TimerMessageType(int code) {

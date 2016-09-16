@@ -30,7 +30,9 @@ public enum FishCardStatusEnum {
     FISHCARD_CANCELED(55,"退课",""),
     //客户端双方都上报信息
     EXCEPTION(60, "系统异常",""),
-    EXCEPTION_RESOURCE_DOWNLOAD_FAIL(61,"资源下载异常","");
+    EXCEPTION_RESOURCE_DOWNLOAD_FAIL(61,"资源下载异常",""),
+    //学生旷课扣积分
+    DEDUCT_SCORE(70,"旷课已扣积分","");
 
     FishCardStatusEnum() {
     }
