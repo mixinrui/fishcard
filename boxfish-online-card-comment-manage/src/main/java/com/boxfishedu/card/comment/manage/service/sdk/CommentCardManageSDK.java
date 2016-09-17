@@ -184,7 +184,7 @@ public class CommentCardManageSDK {
     private URI createUpdateFreezeTeacherURI(){
         return UriComponentsBuilder
                 .fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("f_teacher_review/update_freeze_status")
+                .path("/f_teacher_review/update_freeze_status")
                 .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
@@ -211,7 +211,7 @@ public class CommentCardManageSDK {
         paramMap.add("page", pageable.getPageNumber() + "");
         paramMap.add("size", pageable.getPageSize() + "");
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("f_teacher_review/get_review_todaycount")
+                .path("/f_teacher_review/get_review_todaycount")
                 .queryParams(paramMap)
                 .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
@@ -249,7 +249,7 @@ public class CommentCardManageSDK {
 
     private URI createChangeTeacherURI() {
         return UriComponentsBuilder.fromUriString(commentCardManageUrl.getTeacherStudentBusinessUrl())
-                .path("f_teacher_review/change_review_teacher_batch")
+                .path("/f_teacher_review/change_review_teacher_batch")
                 .queryParam("boxfish_key", commentCardManageUrl.getBoxfishKey())
                 .build()
                 .toUri();
