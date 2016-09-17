@@ -251,7 +251,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service=findByIdForUpdate(service.getId());
         //此处是否是减去1?
         if(service.getAmount()>0) {
-            service.setAmount(service.getAmount() - 1);
+            if (null == workOrder.getMakeUpSeq() || 0 == workOrder.getMakeUpSeq()) {
+                service.setAmount(service.getAmount() - 1);
+            }
         }
         else{
             logger.error("@decreaseService,服务出现不够减情况,需要排查问题service[{}],鱼卡[{}]",service.getId(),workOrder.getId());

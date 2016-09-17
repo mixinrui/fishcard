@@ -76,6 +76,7 @@ public class MongoConfiguration {
         morphia.map(ScheduleCourseInfo.class);
         morphia.map(TrialCourse.class);
         morphia.map(TimeLimitRules.class);
+        morphia.map(ContinousAbsenceRecord.class);
         Datastore datastore = morphia.createDatastore(mongoClient(),mongoProperties.getDbName());
         datastore.ensureIndexes();
         return  datastore;
