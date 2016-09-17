@@ -17,7 +17,6 @@ import java.net.URI;
 @Service
 public class AbsenteeismSDK {
 
-    @Autowired
     Logger logger = LoggerFactory.getLogger(AbsenteeismSDK.class);
 
     @Autowired
