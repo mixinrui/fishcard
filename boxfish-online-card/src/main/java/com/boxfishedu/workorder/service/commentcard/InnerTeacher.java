@@ -13,7 +13,7 @@ public class InnerTeacher {
     private String teacherName;
 
     public void setTeacherName(String teacherName) {
-        this.teacherName = (teacherFirstName == null ? "" : teacherFirstName)
-                + (teacherLastName == null ? "" :teacherLastName);
+        this.teacherName = (teacherFirstName == null ? "" : teacherFirstName.trim())
+                + " "+ (teacherLastName == null ? "" :teacherLastName.trim());
     }
 }
