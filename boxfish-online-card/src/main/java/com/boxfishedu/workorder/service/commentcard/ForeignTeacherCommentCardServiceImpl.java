@@ -151,6 +151,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 paramMap.put("studentId",commentCard.getStudentId());
                 paramMap.put("courseId",commentCard.getCourseId());
                 InnerTeacher innerTeacher = commentCardSDK.getInnerTeacherId(paramMap).getData(InnerTeacher.class);
+                logger.info("InnerTeacher0 is "+ innerTeacher);
                 if(Objects.isNull(innerTeacher) || Objects.isNull(innerTeacher.getTeacherId())) {
                     return;
                 }
@@ -174,7 +175,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     logger.info("向教师端推送消息失败,推送失败的教师teacherId=" + innerTeacher.getTeacherId());
                 }
             }else {
-                logger.info("学生点评卡分配到老师,点评卡id为:"+fromTeacherStudentForm.getFishCardId());
+                logger.info("Teacher is "+fromTeacherStudentForm);
                 Date dateNow = new Date();
                 commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
                 commentCard.setAssignTeacherTime(dateNow);
@@ -234,10 +235,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         LocalDateTime now = LocalDateTime.now();
         Date updateDate = DateUtil.localDate2Date(now);
         List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus(
-                DateUtil.localDate2Date(now.minusDays(2)),
-                DateUtil.localDate2Date(now.minusDays(1)),
-//                DateUtil.localDate2Date(now.minusMinutes(20)),
-//                DateUtil.localDate2Date(now.minusMinutes(10)),
+//                DateUtil.localDate2Date(now.minusDays(2)),
+//                DateUtil.localDate2Date(now.minusDays(1)),
+                DateUtil.localDate2Date(now.minusMinutes(20)),
+                DateUtil.localDate2Date(now.minusMinutes(10)),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         for (CommentCard commentCard : list) {
             try {
@@ -248,6 +249,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     paramMap.put("studentId", commentCard.getStudentId());
                     paramMap.put("courseId", commentCard.getCourseId());
                     InnerTeacher innerTeacher = commentCardSDK.getInnerTeacherId(paramMap).getData(InnerTeacher.class);
+                    logger.info("InnerTeacher1 is "+ innerTeacher);
                     commentCard.setTeacherId(innerTeacher.getTeacherId());
                     commentCard.setTeacherName(innerTeacher.getTeacherName());
                     commentCard.setTeacherFirstName(innerTeacher.getTeacherFirstName());
@@ -343,10 +345,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("@foreignTeacherCommentUnAnswer2调用--查询48小时未点评的外教--接口");
         LocalDateTime now = LocalDateTime.now();
         List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus2(
-                DateUtil.localDate2Date(now.minusDays(30)),
-                DateUtil.localDate2Date(now.minusDays(2)),
-//                DateUtil.localDate2Date(now.minusMinutes(6000)),
-//                DateUtil.localDate2Date(now.minusMinutes(20)),
+//                DateUtil.localDate2Date(now.minusDays(30)),
+//                DateUtil.localDate2Date(now.minusDays(2)),
+                DateUtil.localDate2Date(now.minusMinutes(6000)),
+                DateUtil.localDate2Date(now.minusMinutes(20)),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         Date updateDate = DateUtil.localDate2Date(now);
         for (CommentCard commentCard: list) {
@@ -406,10 +408,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("@foreignUndistributedTeacherCommentCards调用-查询24小时内暂时还未分配到老师的点评卡--接口,为其重新请求分配老师...");
         LocalDateTime now = LocalDateTime.now();
         List<CommentCard> list = commentCardJpaRepository.findUndistributedTeacher(
-                DateUtil.localDate2Date(now.minusDays(30)),
-                DateUtil.localDate2Date(now.minusDays(0)),
-//                DateUtil.localDate2Date(now.minusMinutes(6000)),
-//                DateUtil.localDate2Date(now.minusMinutes(0)),
+//                DateUtil.localDate2Date(now.minusDays(30)),
+//                DateUtil.localDate2Date(now.minusDays(0)),
+                DateUtil.localDate2Date(now.minusMinutes(6000)),
+                DateUtil.localDate2Date(now.minusMinutes(0)),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         for (CommentCard commentCard: list) {
             try {
@@ -421,6 +423,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 paramMap.put("studentId", commentCard.getStudentId());
                 paramMap.put("courseId", commentCard.getCourseId());
                 InnerTeacher innerTeacher = commentCardSDK.getInnerTeacherId(paramMap).getData(InnerTeacher.class);
+                logger.info("InnerTeacher2 is "+ innerTeacher);
                 commentCard.setTeacherId(innerTeacher.getTeacherId());
                 commentCard.setTeacherName(innerTeacher.getTeacherName());
                 commentCard.setTeacherFirstName(innerTeacher.getTeacherFirstName());
