@@ -206,4 +206,17 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
+    /**
+     * 查询旷课的学生,对其扣积分
+     */
+
+//    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0/5 * * * ?")    //测试时5分钟检查一次
+    public void deductScore(){
+        logger.info("<<<<<<deductScore<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<查询旷课的学生<<<<<<扣积分,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.STUDENT_ABSENT_DEDUCT_SCORE.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 }

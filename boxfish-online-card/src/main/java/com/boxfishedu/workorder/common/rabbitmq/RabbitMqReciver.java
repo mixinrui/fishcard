@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
+import com.boxfishedu.workorder.service.absenteeism.AbsenteeismService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
@@ -69,6 +70,9 @@ public class RabbitMqReciver {
     private CourseNotifyOneDayServiceX courseNotifyOneDayServiceX;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private AbsenteeismService absenteeismService;
 
     /**
      * 订单中心转换请求
@@ -161,6 +165,9 @@ public class RabbitMqReciver {
             }else if(serviceTimerMessage.getType() == TimerMessageType.CLASSS_TOMO_STU_NOTIFY.value()){
                 logger.info("=========>receiveMessageTomoStuhasClass");
                 courseNotifyOneDayServiceX.notiFyStudentClass();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.STUDENT_ABSENT_DEDUCT_SCORE.value()){
+                logger.info("@CommentCardTimer>>>>>STUDENT_ABSENT_DEDUCT_SCORE>>>>查询旷课的学生,扣积分");
+                absenteeismService.queryAbsentStudent();
             }
 
         } catch (Exception ex) {

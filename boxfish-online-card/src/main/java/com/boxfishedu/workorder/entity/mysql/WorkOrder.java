@@ -189,6 +189,9 @@ public class WorkOrder{
     //解冻按钮是否显示标记
     @Transient
     private Boolean unfreezeBtnShowFlag=false;
+    /** 学生旷课扣积分标记**/
+    @Column(name = "deduct_score_status" , nullable = true)
+    private Integer deduct_score_status;
 
     @Override
     public String toString() {
