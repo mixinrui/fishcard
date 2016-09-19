@@ -181,7 +181,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCard.setTeacherId(fromTeacherStudentForm.getTeacherId());
                 commentCard.setTeacherFirstName(fromTeacherStudentForm.getTeacherFirstName());
                 commentCard.setTeacherLastName(fromTeacherStudentForm.getTeacherLastName());
-                commentCard.setTeacherName(fromTeacherStudentForm.getTeacherFirstName()+fromTeacherStudentForm.getTeacherLastName());
+                commentCard.setTeacherName(fromTeacherStudentForm.getTeacherName());
                 commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
                 commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
                 commentCard.setUpdateTime(dateNow);
@@ -299,7 +299,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 //                    commentCard.setTeacherLastName(innerTeacher.getTeacherLastName());
 //                    commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
                     newCommentCard.setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode());
-                    newCommentCard.setAssignTeacherTime(updateDate);
+                    newCommentCard.setUpdateTime(updateDate);
                     newCommentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
                     newCommentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
                     newCommentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
