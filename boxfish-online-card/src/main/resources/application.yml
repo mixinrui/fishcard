@@ -481,7 +481,7 @@ interface:
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
 #  学生旷课扣积分
-    absenteeism_deduct_score: http://api.online.test.boxfish.cn
+    absenteeism_deduct_score: http://api.test.boxfish.cn
 
 service:
   sdk:
