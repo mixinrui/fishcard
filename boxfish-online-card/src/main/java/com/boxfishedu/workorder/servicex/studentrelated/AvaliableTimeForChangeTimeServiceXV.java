@@ -86,8 +86,8 @@ public class AvaliableTimeForChangeTimeServiceXV {
         // 判断是免费还是正常购买
         Integer days =  comboCycle* daysOfWeek;
 
-        //获取截至日期
-        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(workOrder.getCreateTime()),60*24*days  );
+        //获取截至日期 (T+2原则  下单之后选时间最早后台)
+        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(workOrder.getCreateTime()),60*24*(days+2)  );
 
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(workOrder, endDate);

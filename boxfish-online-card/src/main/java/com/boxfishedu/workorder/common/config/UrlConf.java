@@ -35,4 +35,12 @@ public class UrlConf {
     /** zhong老师接口 **/
     @Value("${interface.address.student_teacher_relation}")
     private String student_teacher_relation;
+
+    /** 学生旷课扣积分**/
+    @Value("${interface.address.absenteeism_deduct_score}")
+    private String absenteeism_deduct_score;
+
+    /** 支付系统 **/
+    @Value("${interface.address.pay_service}")
+    private String pay_service;
 }
