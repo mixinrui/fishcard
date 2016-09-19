@@ -114,6 +114,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Override
     public void foreignTeacherCommentUpdateAnswer(FromTeacherStudentForm fromTeacherStudentForm) {
         CommentCard commentCard = commentCardJpaRepository.findOne(fromTeacherStudentForm.getFishCardId());
+        String name;
         logger.info("@foreignTeacherCommentUpdateAnswer接收师生运营分配老师:"+fromTeacherStudentForm+",并准备修改点评卡:"+commentCard);
         if (Objects.isNull(commentCard)){
             logger.info("@foreignTeacherCommentUpdateAnswer根据点评卡id查到的点评卡为空,点评卡id来自师生运营回传参数:"+fromTeacherStudentForm);
@@ -161,7 +162,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 }
 
                 commentCard.setTeacherId(innerTeacher.getTeacherId());
-                commentCard.setTeacherName(getTeacherName(innerTeacher.getTeacherFirstName(),innerTeacher.getTeacherLastName()));
+                name = getTeacherName(innerTeacher.getTeacherFirstName(),innerTeacher.getTeacherLastName());
+                logger.info("==========================>@166name:"+name+" lastName"+innerTeacher.getTeacherLastName());
+                commentCard.setTeacherName(name);
                 commentCard.setTeacherFirstName(innerTeacher.getTeacherFirstName());
                 commentCard.setTeacherLastName(innerTeacher.getTeacherLastName());
                 commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
@@ -186,7 +189,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCard.setTeacherId(fromTeacherStudentForm.getTeacherId());
                 commentCard.setTeacherFirstName(fromTeacherStudentForm.getTeacherFirstName());
                 commentCard.setTeacherLastName(fromTeacherStudentForm.getTeacherLastName());
-                commentCard.setTeacherName(getTeacherName(fromTeacherStudentForm.getTeacherFirstName(),fromTeacherStudentForm.getTeacherLastName()));
+                name = getTeacherName(fromTeacherStudentForm.getTeacherFirstName(),fromTeacherStudentForm.getTeacherLastName());
+                logger.info("==========================>@193name:"+name+" lastName:"+fromTeacherStudentForm.getTeacherLastName());
+                commentCard.setTeacherName(name);
                 commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
                 commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
                 commentCard.setUpdateTime(dateNow);
@@ -234,6 +239,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
      */
     @Override
     public void foreignTeacherCommentUnAnswer() {
+        String name;
         logger.info("@foreignTeacherCommentUnAnswer调用--查询24小时未点评的外教--接口");
         // 超过24小时,未超过48小时
         LocalDateTime now = LocalDateTime.now();
@@ -261,7 +267,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     InnerTeacher innerTeacher = commentCardSDK.getInnerTeacherId(paramMap).getData(InnerTeacher.class);
                     logger.info("InnerTeacher1 is "+ innerTeacher);
                     commentCard.setTeacherId(innerTeacher.getTeacherId());
-                    commentCard.setTeacherName(getTeacherName(innerTeacher.getTeacherFirstName(),innerTeacher.getTeacherLastName()));
+                    name = getTeacherName(innerTeacher.getTeacherFirstName(),innerTeacher.getTeacherLastName());
+                    logger.info("==========================>@271name:"+name+" lastName:"+innerTeacher.getTeacherLastName());
+                    commentCard.setTeacherName(name);
                     commentCard.setTeacherFirstName(innerTeacher.getTeacherFirstName());
                     commentCard.setTeacherLastName(innerTeacher.getTeacherLastName());
                     commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
@@ -421,6 +429,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
      */
     @Override
     public void foreignUndistributedTeacherCommentCards() {
+        String name;
         logger.info("@foreignUndistributedTeacherCommentCards调用-查询24小时内暂时还未分配到老师的点评卡--接口,为其重新请求分配老师...");
         LocalDateTime now = LocalDateTime.now();
         List<CommentCard> list = null;
@@ -448,7 +457,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 InnerTeacher innerTeacher = commentCardSDK.getInnerTeacherId(paramMap).getData(InnerTeacher.class);
                 logger.info("InnerTeacher2 is "+ innerTeacher);
                 commentCard.setTeacherId(innerTeacher.getTeacherId());
-                commentCard.setTeacherName(getTeacherName(innerTeacher.getTeacherFirstName(),innerTeacher.getTeacherLastName()));
+                name = getTeacherName(innerTeacher.getTeacherFirstName(),innerTeacher.getTeacherLastName());
+                logger.info("==========================>@461name:"+name+" lastName:"+innerTeacher.getTeacherLastName());
+                commentCard.setTeacherName(name);
                 commentCard.setTeacherFirstName(innerTeacher.getTeacherFirstName());
                 commentCard.setTeacherLastName(innerTeacher.getTeacherLastName());
                 commentCard.setTeacherStatus(CommentCardStatus.TEACHER_NORMAL.getCode());
@@ -577,6 +588,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     private String getTeacherName(String teacherFirstName,String teacherLastName){
+        logger.info("@getTeacherName --->teacherFirstName:" + teacherFirstName + " teacherLastName:"+teacherLastName);
             return (teacherFirstName == null ? "" : teacherFirstName.trim())
                     + " "+ (teacherLastName == null ? "" :teacherLastName.trim());
     }
