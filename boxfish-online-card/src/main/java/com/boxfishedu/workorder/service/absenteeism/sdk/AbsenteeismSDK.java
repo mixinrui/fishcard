@@ -33,18 +33,17 @@ public class AbsenteeismSDK {
     public JsonResultModel absenteeismDeductScore(WorkOrder workOrder){
         Map<String,String> paramsMap = new HashMap<>();
         paramsMap.put("lesson_id",workOrder.getCourseId());
-        paramsMap.put("channel","online");
         paramsMap.put("message","{\"user_id\":"+workOrder.getStudentId()+",\"score\":30000}");
-        paramsMap.put("type","ESCAPE");
         paramsMap.put("user_id",workOrder.getStudentId().toString());
-        return restTemplate.postForObject(createDeductScoreURI(),paramsMap,JsonResultModel.class);
+        return restTemplate.postForObject(createDeductScoreURI(paramsMap),null,JsonResultModel.class);
     }
 
-    private URI createDeductScoreURI() {
+    private URI createDeductScoreURI(Map map) {
         logger.info("Accessing createTeacherAbsenceURI in AbsenteeismSDK......");
         return UriComponentsBuilder.fromUriString(urlConf.getAbsenteeism_deduct_score())
-                .path("/online/user/score/escape")
-                .queryParam("")
+                .path("/online/user/score/escape?")
+                .queryParam("lesson_id="+map.get("lesson_id")+"&channel=online"+
+                "&message="+map.get("message")+"&type=ESCAPE"+"&user_id="+map.get("user_id"))
                 .build()
                 .toUri();
     }
