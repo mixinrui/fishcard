@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.service.commentcard;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.config.ServiceGateWayType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
@@ -52,6 +53,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Autowired
     ServeService serveService;
+
+    @Autowired
+    ServiceGateWayType serviceGateWayType;
 
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
@@ -234,12 +238,18 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         // 超过24小时,未超过48小时
         LocalDateTime now = LocalDateTime.now();
         Date updateDate = DateUtil.localDate2Date(now);
-        List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus(
-//                DateUtil.localDate2Date(now.minusDays(2)),
-//                DateUtil.localDate2Date(now.minusDays(1)),
-                DateUtil.localDate2Date(now.minusMinutes(20)),
-                DateUtil.localDate2Date(now.minusMinutes(10)),
-                CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        List<CommentCard> list =null;
+        if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
+            list = commentCardJpaRepository.findByDateRangeAndStatus(
+                    DateUtil.localDate2Date(now.minusMinutes(20)),
+                    DateUtil.localDate2Date(now.minusMinutes(10)),
+                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        }else{
+            list = commentCardJpaRepository.findByDateRangeAndStatus(
+                DateUtil.localDate2Date(now.minusDays(2)),
+                DateUtil.localDate2Date(now.minusDays(1)),
+                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        }
         for (CommentCard commentCard : list) {
             try {
                 if (Objects.isNull(commentCard.getTeacherId())) {
@@ -344,12 +354,18 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public void foreignTeacherCommentUnAnswer2() {
         logger.info("@foreignTeacherCommentUnAnswer2调用--查询48小时未点评的外教--接口");
         LocalDateTime now = LocalDateTime.now();
-        List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus2(
-//                DateUtil.localDate2Date(now.minusDays(30)),
-//                DateUtil.localDate2Date(now.minusDays(2)),
-                DateUtil.localDate2Date(now.minusMinutes(6000)),
-                DateUtil.localDate2Date(now.minusMinutes(20)),
-                CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        List<CommentCard> list = null;
+        if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
+             list = commentCardJpaRepository.findByDateRangeAndStatus2(
+                    DateUtil.localDate2Date(now.minusMinutes(6000)),
+                    DateUtil.localDate2Date(now.minusMinutes(20)),
+                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        }else{
+             list = commentCardJpaRepository.findByDateRangeAndStatus2(
+                DateUtil.localDate2Date(now.minusDays(30)),
+                DateUtil.localDate2Date(now.minusDays(2)),
+                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        }
         Date updateDate = DateUtil.localDate2Date(now);
         for (CommentCard commentCard: list) {
             try {
@@ -407,12 +423,19 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public void foreignUndistributedTeacherCommentCards() {
         logger.info("@foreignUndistributedTeacherCommentCards调用-查询24小时内暂时还未分配到老师的点评卡--接口,为其重新请求分配老师...");
         LocalDateTime now = LocalDateTime.now();
-        List<CommentCard> list = commentCardJpaRepository.findUndistributedTeacher(
-//                DateUtil.localDate2Date(now.minusDays(30)),
-//                DateUtil.localDate2Date(now.minusDays(0)),
-                DateUtil.localDate2Date(now.minusMinutes(6000)),
-                DateUtil.localDate2Date(now.minusMinutes(0)),
-                CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        List<CommentCard> list = null;
+        if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
+            list = commentCardJpaRepository.findUndistributedTeacher(
+                    DateUtil.localDate2Date(now.minusMinutes(6000)),
+                    DateUtil.localDate2Date(now.minusMinutes(0)),
+                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        }else{
+            list = commentCardJpaRepository.findUndistributedTeacher(
+                DateUtil.localDate2Date(now.minusDays(30)),
+                DateUtil.localDate2Date(now.minusDays(0)),
+                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
+        }
+
         for (CommentCard commentCard: list) {
             try {
 //                ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(commentCard);
