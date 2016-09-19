@@ -30,20 +30,22 @@ public class AbsenteeismSDK {
     @Autowired
     RestTemplate restTemplate;
 
-    public JsonResultModel absenteeismDeductScore(WorkOrder workOrder){
+    public Map absenteeismDeductScore(WorkOrder workOrder){
         Map<String,String> paramsMap = new HashMap<>();
         paramsMap.put("lesson_id",workOrder.getCourseId());
         paramsMap.put("message","{\"user_id\":"+workOrder.getStudentId()+",\"score\":30000}");
         paramsMap.put("user_id",workOrder.getStudentId().toString());
-        return restTemplate.postForObject(createDeductScoreURI(paramsMap),null,JsonResultModel.class);
+        return restTemplate.postForObject(createDeductScoreURI(paramsMap),null,Map.class);
     }
 
     private URI createDeductScoreURI(Map map) {
         logger.info("Accessing createTeacherAbsenceURI in AbsenteeismSDK......");
         return UriComponentsBuilder.fromUriString(urlConf.getAbsenteeism_deduct_score())
-                .path("/online/user/score/escape?")
-                .queryParam("lesson_id="+map.get("lesson_id")+"&channel=online"+
-                "&message="+map.get("message")+"&type=ESCAPE"+"&user_id="+map.get("user_id"))
+                .path("/online/user/score/escape")
+                .queryParam("lesson_id",map.get("lesson_id"))
+                .queryParam("channel","ONLINE")
+                .queryParam("message",map.get("message"))
+                .queryParam("user_id",map.get("user_id"))
                 .build()
                 .toUri();
     }
