@@ -115,6 +115,9 @@ public class AvaliableTimeServiceX {
 //            DayTimeSlots result = timeLimitPolicy.limit(clone);
             //获取时间片范围内的数据
             DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
+            result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+                    .collect(Collectors.toList()));
             return result;
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
