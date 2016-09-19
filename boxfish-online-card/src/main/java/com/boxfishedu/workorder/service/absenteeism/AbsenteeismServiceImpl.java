@@ -64,4 +64,21 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
             }
         }
     }
+
+    @Override
+    public void testQueryAbsentStudent() {
+        LocalDateTime now = LocalDateTime.now();
+        List<WorkOrder> workOrderList =  workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(30)),DateUtil.localDate2Date(now.minusMinutes(0)), ComboTypeEnum.EXCHANGE.toString());
+        for (WorkOrder workOrder: workOrderList) {
+            logger.info("@testQueryAbsentStudent Deducting score " + workOrder.getId());
+            Map map = absenteeismDeductScore(workOrder);
+            logger.info("@testQueryAbsentStudent Deducted result:" + map);
+            if(!ObjectUtils.isEmpty(map)){
+                if ( map.get("success").equals("true")) {
+                    workOrder.setDeductScoreStatus(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
+                    workOrderJpaRepository.save(workOrder);
+                }
+            }
+        }
+    }
 }

@@ -12,4 +12,6 @@ public interface AbsenteeismService {
     public Map absenteeismDeductScore(WorkOrder workOrder);
 
     public void queryAbsentStudent();
+
+    public void testQueryAbsentStudent();
 }
