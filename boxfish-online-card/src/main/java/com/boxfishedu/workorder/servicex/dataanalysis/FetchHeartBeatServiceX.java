@@ -28,12 +28,19 @@ public class FetchHeartBeatServiceX {
     }
 
     public boolean isOnline(DataAnalysisLogParam dataAnalysisLogParam){
-        String startDateStr=DateUtil.Date2String(new Date(dataAnalysisLogParam.getStartTime()));
-        String endDateStr=DateUtil.Date2String(new Date(dataAnalysisLogParam.getEndTime()));
-        List<EventResultBean.EventResult> eventResults= fetchHeartBeatLog(dataAnalysisLogParam).getContent();
-        boolean result= CollectionUtils.isNotEmpty(eventResults);
-        logger.info("@FetchHeartBeatServiceX###isOnline###判断当前用户[{}]在指定时间startDate[{}],endDate[{}]是否在线[{}];",
-                dataAnalysisLogParam.getUserId(),startDateStr,endDateStr,result);
-        return result;
+        try {
+            String startDateStr=DateUtil.Date2String(new Date(dataAnalysisLogParam.getStartTime()));
+            String endDateStr=DateUtil.Date2String(new Date(dataAnalysisLogParam.getEndTime()));
+            List<EventResultBean.EventResult> eventResults= fetchHeartBeatLog(dataAnalysisLogParam).getContent();
+            boolean result= CollectionUtils.isNotEmpty(eventResults);
+            logger.info("@FetchHeartBeatServiceX###isOnline###判断当前用户[{}]在指定时间startDate[{}],endDate[{}]是否在线[{}];",
+                    dataAnalysisLogParam.getUserId(),startDateStr,endDateStr,result);
+            return result;
+        }
+        catch (Exception ex){
+            logger.error("@isOnline分析数据有问题,影响结果");
+            return false;
+        }
+
     }
 }
