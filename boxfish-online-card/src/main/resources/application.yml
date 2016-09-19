@@ -267,7 +267,8 @@ interface:
     student_teacher_relation: http://api.online.demo.boxfish.cn
 #  学生旷课扣积分
     absenteeism_deduct_score:
-
+#支付系统
+    pay_service: http://101.201.237.252:8888/pay-inside
 service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099
@@ -316,7 +317,8 @@ interface:
     student_teacher_relation: http://api.test.boxfish.cn
 #  学生旷课扣积分
     absenteeism_deduct_score:
-
+#支付系统
+    pay_service: http://123.56.6.91:8888/pay-inside
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
@@ -413,6 +415,8 @@ interface:
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
+#支付系统
+    pay_service: http://101.201.66.32:8888/pay-inside
 #===============================================================预生产环境===============================================================
 ---
 spring:
@@ -504,6 +508,8 @@ interface:
     fishcard_page: http://101.201.66.109:94/
     data_analysis_service: http://online-api.log.boxfish.cn/log/mongo
     student_teacher_relation: http://api.boxfish.cn
+#支付系统
+    pay_service: http://online-api.inside.boxfish.cn/pay-inside
 #外教点评接口调用地址
 service:
   sdk:

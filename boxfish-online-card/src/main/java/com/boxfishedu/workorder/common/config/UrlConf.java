@@ -39,4 +39,8 @@ public class UrlConf {
     /** 学生旷课扣积分**/
     @Value("${interface.address.absenteeism_deduct_score}")
     private String absenteeism_deduct_score;
+
+    /** 支付系统 **/
+    @Value("${interface.address.pay_service}")
+    private String pay_service;
 }
