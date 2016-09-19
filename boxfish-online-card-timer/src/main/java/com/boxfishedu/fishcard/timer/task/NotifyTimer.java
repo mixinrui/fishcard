@@ -210,8 +210,8 @@ public class NotifyTimer {
      * 查询旷课的学生,对其扣积分
      */
 
-//    @Scheduled(cron = "0 0 0 * * ?")
-    @Scheduled(cron = "0 0/5 * * * ?")    //测试时5分钟检查一次
+    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(cron = "0 0/5 * * * ?")    //测试时5分钟检查一次
     public void deductScore(){
         logger.info("<<<<<<deductScore<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<查询旷课的学生<<<<<<扣积分,时间[{}]", DateUtil.Date2String(new Date()));
