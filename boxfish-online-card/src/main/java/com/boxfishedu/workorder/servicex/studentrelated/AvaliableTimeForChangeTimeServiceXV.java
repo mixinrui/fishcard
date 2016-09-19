@@ -90,7 +90,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
         Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(workOrder.getCreateTime()),60*24*(days+2)  );
 
         // 获取时间区间
-        DateRange dateRange = getEnableDateRange(workOrder, endDate);
+        DateRange dateRange = getEnableDateRange(endDate);
 
         // TODO
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(workOrder.getStudentId());
@@ -123,7 +123,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
      *
      * @return
      */
-    private DateRange getEnableDateRange(WorkOrder workOrder, Date endDate) {
+    private DateRange getEnableDateRange(Date endDate) {
         Date date  = DateUtil.date2SimpleDate(new Date());
         int days = DateUtil.getBetweenDays(date,endDate);
         if(days<2){

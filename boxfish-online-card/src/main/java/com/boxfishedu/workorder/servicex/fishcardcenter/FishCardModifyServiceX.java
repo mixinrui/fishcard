@@ -324,11 +324,11 @@ public class FishCardModifyServiceX {
         if(startTimeParam.getBeginDate().length()<16)
             return false;
 
-        String minutes = startTimeParam.getBeginDate().substring(14,16);
-        if(minutes.equals("00") || minutes.equals("30")){
-        }else {
-            return false;
-        }
+//        String minutes = startTimeParam.getBeginDate().substring(14,16);
+//        if(minutes.equals("00") || minutes.equals("30")){
+//        }else {
+//            return false;
+//        }
 
         startTimeParam.setBeginDateFormat(DateUtil.String2Date(startTimeParam.getBeginDate()));
 
