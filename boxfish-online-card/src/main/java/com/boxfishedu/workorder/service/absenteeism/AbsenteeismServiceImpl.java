@@ -16,6 +16,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ansel on 16/9/14.
@@ -36,7 +37,7 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     ServiceGateWayType serviceGateWayType;
 
     @Override
-    public JsonResultModel absenteeismDeductScore(WorkOrder workOrder){
+    public Map absenteeismDeductScore(WorkOrder workOrder){
         logger.info("@AbsenteeismServiceImpl Student played truant. Deducting score ...");
         return absenteeismSDK.absenteeismDeductScore(workOrder);
     }
@@ -52,12 +53,14 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
             workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(1)),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
         }
         for (WorkOrder workOrder: workOrderList) {
-            logger.info("@queryAbsentStudent Deducting {} score " + workOrder.getId());
-            JsonResultModel jsonResultModel = absenteeismDeductScore(workOrder);
-            logger.info("@queryAbsentStudent Deducted result:" + jsonResultModel.getData());
-            if(!ObjectUtils.isEmpty(jsonResultModel.getData())){
-                workOrder.setDeductScoreStatus(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
-                workOrderJpaRepository.save(workOrder);
+            logger.info("@queryAbsentStudent Deducting score " + workOrder.getId());
+            Map map = absenteeismDeductScore(workOrder);
+            logger.info("@queryAbsentStudent Deducted result:" + map);
+            if(!ObjectUtils.isEmpty(map)){
+                if ( map.get("success").equals("true")) {
+                    workOrder.setDeductScoreStatus(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
+                    workOrderJpaRepository.save(workOrder);
+                }
             }
         }
     }
