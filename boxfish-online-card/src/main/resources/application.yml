@@ -265,8 +265,6 @@ interface:
     auth_user: http://101.201.237.252:8099
     data_analysis_service: http://101.201.237.252:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
-#  学生旷课扣积分
-    absenteeism_deduct_score:
 #支付系统
     pay_service: http://101.201.237.252:8888/pay-inside
     absenteeism_deduct_score: http://api.online.test.boxfish.cn
