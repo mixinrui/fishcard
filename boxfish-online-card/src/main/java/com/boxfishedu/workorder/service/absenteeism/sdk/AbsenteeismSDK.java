@@ -13,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by ansel on 16/9/14.
@@ -29,20 +31,20 @@ public class AbsenteeismSDK {
     RestTemplate restTemplate;
 
     public JsonResultModel absenteeismDeductScore(WorkOrder workOrder){
-        return restTemplate.getForObject(createDeductScoreURI(workOrder),JsonResultModel.class);
+        Map<String,String> paramsMap = new HashMap<>();
+        paramsMap.put("lesson_id",workOrder.getCourseId());
+        paramsMap.put("channel","online");
+        paramsMap.put("message","{\"user_id\":"+workOrder.getStudentId()+",\"score\":30000}");
+        paramsMap.put("type","ESCAPE");
+        paramsMap.put("user_id",workOrder.getStudentId().toString());
+        return restTemplate.postForObject(createDeductScoreURI(),paramsMap,JsonResultModel.class);
     }
 
-    private URI createDeductScoreURI(WorkOrder workOrder) {
+    private URI createDeductScoreURI() {
         logger.info("Accessing createTeacherAbsenceURI in AbsenteeismSDK......");
-        MultiValueMap paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("lesson_id",workOrder.getCourseId());
-        paramsMap.add("channel","online");
-        paramsMap.add("message","{\"user_id\":"+workOrder.getStudentId()+",\"score\":30000}");
-        paramsMap.add("type","ESCAPE");
-        paramsMap.add("user_id",workOrder.getStudentId());
         return UriComponentsBuilder.fromUriString(urlConf.getAbsenteeism_deduct_score())
                 .path("/online/user/score/escape")
-                .queryParams(paramsMap)
+                .queryParam("")
                 .build()
                 .toUri();
     }

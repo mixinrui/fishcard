@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.service.absenteeism;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.config.ServiceGateWayType;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -31,6 +32,9 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     @Autowired
     WorkOrderJpaRepository workOrderJpaRepository;
 
+    @Autowired
+    ServiceGateWayType serviceGateWayType;
+
     @Override
     public JsonResultModel absenteeismDeductScore(WorkOrder workOrder){
         logger.info("@AbsenteeismServiceImpl Student played truant. Deducting score ...");
@@ -40,7 +44,13 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     @Override
     public void queryAbsentStudent() {
         LocalDateTime now = LocalDateTime.now();
-        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(19)),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
+        List<WorkOrder> workOrderList = null;
+        if (serviceGateWayType.getType().equals("test") || serviceGateWayType.getType().equals("development_new")){
+            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(5)),DateUtil.localDate2Date(now.minusMinutes(0)), ComboTypeEnum.EXCHANGE.toString());
+
+        }else{
+            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(1)),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
+        }
         for (WorkOrder workOrder: workOrderList) {
             logger.info("@queryAbsentStudent Deducting {} score " + workOrder.getId());
             JsonResultModel jsonResultModel = absenteeismDeductScore(workOrder);

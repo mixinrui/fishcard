@@ -77,9 +77,9 @@ public class AvaliableTimeForChangeTimeServiceXV {
         /**
          * 获取该鱼卡所在订单有效周期
          */
-        int comboCycle = workOrder.getService().getComboCycle();
+        Integer comboCycle = workOrder.getService().getComboCycle();
 
-        if(comboCycle<1){
+        if(null==comboCycle  || comboCycle<1 ){
             throw new BusinessException("该鱼卡不允许更改时间");
         }
 

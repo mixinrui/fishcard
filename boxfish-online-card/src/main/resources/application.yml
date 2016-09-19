@@ -216,7 +216,7 @@ interface:
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
 #  学生旷课扣积分
-    absenteeism_deduct_score:
+    absenteeism_deduct_score: http://api.online.test.boxfish.cn
 
 service:
   sdk:
@@ -265,9 +265,10 @@ interface:
     auth_user: http://101.201.237.252:8099
     data_analysis_service: http://101.201.237.252:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
+#  学生旷课扣积分
+    absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #支付系统
     pay_service: http://101.201.237.252:8888/pay-inside
-    absenteeism_deduct_score: http://api.online.test.boxfish.cn
 
 service:
   sdk:
@@ -275,6 +276,8 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://101.201.237.252:9090
     innerTeacherUrl: http://101.201.237.252:8099
+  gateway:
+      type: development_new
 server.port: 8080
 
 #===============================================================test环境:123.56.13.168 机器密码:Boxfish2016===============================================================
@@ -316,7 +319,7 @@ interface:
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.test.boxfish.cn
 #  学生旷课扣积分
-    absenteeism_deduct_score:
+    absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
 service:
@@ -325,6 +328,9 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+  gateway:
+    type: test
+
 
 server.port: 8080
 
@@ -373,6 +379,8 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+  gateway:
+      type: pretest
 
 server.port: 8080
 #===============================================================demo环境=====101.201.66.32===============================================================
