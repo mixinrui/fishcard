@@ -12,8 +12,8 @@ public class InnerTeacher {
     private String teacherLastName;
     private String teacherName;
 
-    public void setTeacherName(String teacherName) {
-        this.teacherName = (teacherFirstName == null ? "" : teacherFirstName.trim())
-                + " "+ (teacherLastName == null ? "" :teacherLastName.trim());
-    }
+//    public void setTeacherName(String teacherName) {
+//        this.teacherName = (teacherFirstName == null ? "" : teacherFirstName.trim())
+//                + " "+ (teacherLastName == null ? "" :teacherLastName.trim());
+//    }
 }
