@@ -32,9 +32,9 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     WorkOrderJpaRepository workOrderJpaRepository;
 
     @Override
-    public JsonResultModel absenteeismDeductScore(Long studentId){
+    public JsonResultModel absenteeismDeductScore(WorkOrder workOrder){
         logger.info("@AbsenteeismServiceImpl Student played truant. Deducting score ...");
-        return absenteeismSDK.absenteeismDeductScore(studentId,DEDUCT_SCORE);
+        return absenteeismSDK.absenteeismDeductScore(workOrder);
     }
 
     @Override
@@ -44,8 +44,9 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
                 DateUtil.localDate2Date(now.minusDays(0)));
         for (WorkOrder workOrder: workOrderList
              ) {
-            absenteeismDeductScore(workOrder.getStudentId());
             logger.info("@queryAbsentStudent Deducting {} score " + workOrder.getId());
+            JsonResultModel jsonResultModel = absenteeismDeductScore(workOrder);
+            logger.info("@queryAbsentStudent Deducted result:" + jsonResultModel.getData());
         }
     }
 }
