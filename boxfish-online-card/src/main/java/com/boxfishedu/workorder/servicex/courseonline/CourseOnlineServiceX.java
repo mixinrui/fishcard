@@ -4,9 +4,11 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.ValidationException;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mongo.ContinousAbsenceRecord;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -14,6 +16,7 @@ import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.*;
+import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +60,12 @@ public class CourseOnlineServiceX {
 
     @Autowired
     private RecommandCourseRequester recommandCourseRequester;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
+
+    @Autowired
+    private AbsenceDealService absenceDealService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -168,11 +177,13 @@ public class CourseOnlineServiceX {
         }
         workOrderLog.setCreateTime(new Date());
         workOrderLogService.save(workOrderLog);
-        logger.info("鱼卡id为:[{}]开始状态更新成功,新生成的鱼卡日志id为:[{}]",workOrderView.getId(),workOrderLog.getId());
+        logger.info("鱼卡id为:[{}]开始状态更新成功,新生成的鱼卡日志id为:[{}]", workOrderView.getId(), workOrderLog.getId());
     }
 
     public void completeCourse(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status) throws BoxfishException {
         logger.info("@completeCourse,开始做课程完成处理;鱼卡状态将被设置为:[{}]", FishCardStatusEnum.getDesc(status));
+        //连续旷课操作
+        this.handleContinusAbsence(workOrder, status);
         // 服务消费扣除
         serveService.decreaseService(workOrder, courseSchedule, status);
         //通知师生运营释放教师资源
@@ -183,6 +194,38 @@ public class CourseOnlineServiceX {
         serveService.notifyOrderUpdateStatus(workOrder, ConstantUtil.WORKORDER_COMPLETED);
         //通知推荐课服务,目前由App调用
 //        recommandCourseRequester.notifyCompleteCourse(workOrder);
+    }
+
+    public void handleContinusAbsence(WorkOrder workOrder, Integer status) {
+        threadPoolManager.execute(new Thread(() -> {
+            try {
+                ContinousAbsenceRecord continousAbsenceRecord = absenceDealService.queryByStudentIdAndComboType(workOrder.getStudentId(), workOrder.getService().getComboType());
+                if (null != continousAbsenceRecord) {
+                    if (status == FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
+                        continousAbsenceRecord.setContinusAbsenceNum(continousAbsenceRecord.getContinusAbsenceNum() + 1);
+                        continousAbsenceRecord.setUpdateTime(new Date());
+                    } else {
+                        continousAbsenceRecord.setContinusAbsenceNum(0);
+                    }
+                    continousAbsenceRecord.setUpdateTime(new Date());
+                    absenceDealService.updateCourseAbsenceNum(continousAbsenceRecord);
+                } else {
+                    continousAbsenceRecord = new ContinousAbsenceRecord();
+                    continousAbsenceRecord.setComboType(workOrder.getService().getComboType());
+                    continousAbsenceRecord.setStudentId(workOrder.getStudentId());
+                    continousAbsenceRecord.setCreateTime(new Date());
+                    if (status == FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
+                        continousAbsenceRecord.setContinusAbsenceNum(1);
+                    } else {
+                        continousAbsenceRecord.setContinusAbsenceNum(0);
+                    }
+                    absenceDealService.save(continousAbsenceRecord);
+                }
+            } catch (Exception ex) {
+                logger.error("@handleContinusAbsence#exception#鱼卡[{}],参数[{}]", workOrder.getId(), JacksonUtil.toJSon(workOrder));
+            }
+
+        }));
     }
 
     /**
