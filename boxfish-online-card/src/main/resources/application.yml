@@ -372,7 +372,8 @@ interface:
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.test.boxfish.cn
-
+#  学生旷课扣积分
+    absenteeism_deduct_score: http://api.online.test.boxfish.cn
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
@@ -423,8 +424,19 @@ interface:
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
+#  学生旷课扣积分
+    absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #支付系统
     pay_service: http://101.201.66.32:8888/pay-inside
+
+service:
+  sdk:
+    teacherAbsenceUrl: http://127.0.0.1:8099
+    getPictureUrl: http://114.55.58.184:8099
+    pushInfoIrl: http://127.0.0.1:9090
+    innerTeacherUrl: http://127.0.0.1:8099
+  gateway:
+      type: demo
 #===============================================================预生产环境===============================================================
 ---
 spring:
@@ -468,6 +480,17 @@ interface:
     auth_user: http://base.boxfish.cn/passbook
     data_analysis_service: http://114.55.65.28:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
+#  学生旷课扣积分
+    absenteeism_deduct_score: http://api.online.test.boxfish.cn
+
+service:
+  sdk:
+    teacherAbsenceUrl: http://127.0.0.1:8099
+    getPictureUrl: http://114.55.58.184:8099
+    pushInfoIrl: http://127.0.0.1:9090
+    innerTeacherUrl: http://127.0.0.1:8099
+  gateway:
+      type: preproduct
 
 #===============================================================生产环境===============================================================
 #=============192.168.1.30===============192.168.1.29======================192.168.1.25===============================================#
@@ -518,6 +541,8 @@ interface:
     student_teacher_relation: http://api.boxfish.cn
 #支付系统
     pay_service: http://online-api.inside.boxfish.cn/pay-inside
+#  学生旷课扣积分
+    absenteeism_deduct_score: http://api.boxfish.cn
 #外教点评接口调用地址
 service:
   sdk:
@@ -525,3 +550,5 @@ service:
     getPictureUrl: http://base.boxfish.cn/passbook
     pushInfoIrl: http://online-api.boxfish.cn/teaching-service
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
+  gateway:
+    type: product
