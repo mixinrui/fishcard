@@ -39,7 +39,7 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     @Override
     public void queryAbsentStudent() {
         LocalDateTime now = LocalDateTime.now();
-        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(30)),DateUtil.localDate2Date(now.minusDays(0)));
+        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(19)),DateUtil.localDate2Date(now.minusDays(0)));
         for (WorkOrder workOrder: workOrderList) {
             logger.info("@queryAbsentStudent Deducting {} score " + workOrder.getId());
             JsonResultModel jsonResultModel = absenteeismDeductScore(workOrder);
