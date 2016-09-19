@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
+import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
@@ -76,6 +77,9 @@ public class MakeUpLessionServiceX {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
+    @Autowired
+    private ScheduleCourseInfoService scheduleCourseInfoService;
+
 
     /**
      * 补课逻辑
@@ -99,6 +103,16 @@ public class MakeUpLessionServiceX {
 
         //保存入库
         fishCardMakeUpService.saveBothOldAndNew(oldWorkOrder, newWorkOrder, oldCourseSchedule, newCourseSchedule);
+
+        ScheduleCourseInfo scheduleCourseInfo=scheduleCourseInfoService.queryByWorkId(oldWorkOrder.getId());
+        ScheduleCourseInfo clone=new ScheduleCourseInfo();
+        BeanUtils.copyProperties(scheduleCourseInfo,clone);
+        clone.setId(null);
+        clone.setWorkOrderId(newWorkOrder.getId());
+        clone.setScheduleId(newCourseSchedule.getId());
+        scheduleCourseInfoService.save(clone);
+
+        workOrderLogService.saveWorkOrderLog(newWorkOrder,"补课生成鱼卡");
 
         //调用教师资源分配
         List<CourseSchedule> newCourseScheduleList = Lists.newArrayList();
