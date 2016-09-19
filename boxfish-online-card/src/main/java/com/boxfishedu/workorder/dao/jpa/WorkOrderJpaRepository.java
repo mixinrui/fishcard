@@ -123,4 +123,10 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     //  获取未来两天内 未安排教师的鱼卡信息  teacherid =0
     public List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(Long teacherId,Integer isFreeze, Date startDate, Date endDate,Date createTime);
 
+    //查找出学生所有状态的工单
+    @Query("select distinct wo.studentId from WorkOrder wo where wo.orderId<11111111")
+    public List<Long> findDistinctUsersFromWorkOrder();
+
+    public List<WorkOrder> findByStudentIdAndEndTimeLessThanOrderByStartTimeDesc(Long studentId,Date date);
+
 }

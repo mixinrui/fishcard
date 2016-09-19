@@ -163,7 +163,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                 int i=0;
                 for (ContinousAbsenceRecord continousAbsenceRecord : continousAbsenceRecords) {
                     if(i==continousAbsenceRecords.size()-1){
-                        builder.append(continousAbsenceRecord.getStudentId()+",");
+                        builder.append(continousAbsenceRecord.getStudentId());
                     }
                     else{
                         builder.append(continousAbsenceRecord.getStudentId()+",");
@@ -172,6 +172,10 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                 }
                 sql.append("and student_id in (").append(builder).append(") ");
             }
+            else{
+                sql.append("and student_id in (").append(-1).append(") ");
+            }
+            sql.append("and orderChannel=:comboType ");
         }
 
         sql.append("and orderId !=:orderId ");
@@ -218,6 +222,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         // 订单类型
         if (null != fishCardFilterParam.getOrderType()) {
             query.setParameter("orderChannel", fishCardFilterParam.getOrderType());
+        }
+        if(null !=fishCardFilterParam.getContineAbsenceNum()){
+            query.setParameter("comboType",ComboTypeEnum.EXCHANGE.toString());
         }
 
         if (null != fishCardFilterParam.getCreateBeginDateFormat()) {
