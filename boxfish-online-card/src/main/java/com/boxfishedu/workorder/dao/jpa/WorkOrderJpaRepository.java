@@ -121,6 +121,6 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     int setFixedStatusRechargeFor(Integer rechargeCodeAfter,Long id,Integer rechargeCodeBefore);
 
     /** 查询旷课的、还未扣积分的学生**/
-    @Query("select  wo from WorkOrder wo where wo.status = 51 and wo.deductScore and wo.startTime between ?1 and ? 2")
+    @Query("select  wo from WorkOrder wo where wo.status = 51 and wo.deductScore is null and wo.startTime between ?1 and ? 2")
     List<WorkOrder> queryAbsentStudent(Date startTime,Date endTime);
 }

@@ -177,8 +177,8 @@ public class WorkOrder{
     private Date updatetimeRecharge;
 
     /** 学生旷课扣积分标记**/
-    @Column(name = "deduct_score" , nullable = true)
-    private Integer deduct_score;
+    @Column(name = "deduct_score_status" , nullable = true)
+    private Integer deduct_score_status;
 
     @Override
     public String toString() {

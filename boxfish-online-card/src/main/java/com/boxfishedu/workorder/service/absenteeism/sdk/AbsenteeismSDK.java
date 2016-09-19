@@ -37,11 +37,11 @@ public class AbsenteeismSDK {
         MultiValueMap paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("lesson_id",workOrder.getCourseId());
         paramsMap.add("channel","online");
-        paramsMap.add("message","user_id:"+workOrder.getStudentId()+",score:30000");
+        paramsMap.add("message","{\"user_id\":"+workOrder.getStudentId()+",\"score\":30000}");
         paramsMap.add("type","ESCAPE");
         paramsMap.add("user_id",workOrder.getStudentId());
         return UriComponentsBuilder.fromUriString(urlConf.getAbsenteeism_deduct_score())
-                .path("/statistic/user/score")
+                .path("/online/user/score/escape")
                 .queryParams(paramsMap)
                 .build()
                 .toUri();

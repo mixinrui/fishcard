@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service.absenteeism;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -9,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,8 +21,6 @@ import java.util.List;
 
 @Service
 public class AbsenteeismServiceImpl implements AbsenteeismService{
-
-    private static final long DEDUCT_SCORE = 30000l;
 
     private Logger logger = LoggerFactory.getLogger(AbsenteeismServiceImpl.class);
 
@@ -40,13 +39,15 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     @Override
     public void queryAbsentStudent() {
         LocalDateTime now = LocalDateTime.now();
-        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(1)),
-                DateUtil.localDate2Date(now.minusDays(0)));
-        for (WorkOrder workOrder: workOrderList
-             ) {
+        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(30)),DateUtil.localDate2Date(now.minusDays(0)));
+        for (WorkOrder workOrder: workOrderList) {
             logger.info("@queryAbsentStudent Deducting {} score " + workOrder.getId());
             JsonResultModel jsonResultModel = absenteeismDeductScore(workOrder);
             logger.info("@queryAbsentStudent Deducted result:" + jsonResultModel.getData());
+            if(!ObjectUtils.isEmpty(jsonResultModel.getData())){
+                workOrder.setDeduct_score_status(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
+                workOrderJpaRepository.save(workOrder);
+            }
         }
     }
 }
