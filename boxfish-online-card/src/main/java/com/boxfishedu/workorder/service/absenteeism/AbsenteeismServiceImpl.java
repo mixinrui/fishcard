@@ -45,7 +45,7 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     public void queryAbsentStudent() {
         LocalDateTime now = LocalDateTime.now();
         List<WorkOrder> workOrderList = null;
-        if (serviceGateWayType.getType().equals("test")){
+        if (serviceGateWayType.getType().equals("test") || serviceGateWayType.getType().equals("development_new")){
             workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(5)),DateUtil.localDate2Date(now.minusMinutes(0)), ComboTypeEnum.EXCHANGE.toString());
 
         }else{
