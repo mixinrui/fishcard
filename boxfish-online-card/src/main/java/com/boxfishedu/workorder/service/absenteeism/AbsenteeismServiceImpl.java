@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service.absenteeism;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -39,13 +40,13 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     @Override
     public void queryAbsentStudent() {
         LocalDateTime now = LocalDateTime.now();
-        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(19)),DateUtil.localDate2Date(now.minusDays(0)));
+        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(19)),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
         for (WorkOrder workOrder: workOrderList) {
             logger.info("@queryAbsentStudent Deducting {} score " + workOrder.getId());
             JsonResultModel jsonResultModel = absenteeismDeductScore(workOrder);
             logger.info("@queryAbsentStudent Deducted result:" + jsonResultModel.getData());
             if(!ObjectUtils.isEmpty(jsonResultModel.getData())){
-                workOrder.setDeduct_score_status(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
+                workOrder.setDeductScoreStatus(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
                 workOrderJpaRepository.save(workOrder);
             }
         }

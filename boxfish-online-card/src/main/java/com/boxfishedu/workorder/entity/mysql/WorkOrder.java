@@ -191,7 +191,7 @@ public class WorkOrder{
     private Boolean unfreezeBtnShowFlag=false;
     /** 学生旷课扣积分标记**/
     @Column(name = "deduct_score_status" , nullable = true)
-    private Integer deduct_score_status;
+    private Integer deductScoreStatus;
 
     @Override
     public String toString() {
