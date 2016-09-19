@@ -128,4 +128,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStudentIdAndEndTimeLessThanOrderByStartTimeDesc(Long studentId,Date date);
 
+    public List<WorkOrder> findByStudentIdAndOrderChannelAndStartTimeAfter(Long studentId,String orderChannel,Date date);
+
+
 }

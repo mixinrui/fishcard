@@ -36,7 +36,4 @@ public class FishCardQueryOutController {
     public JsonResultModel listFishCardsByCond(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
     }
-
-
-
 }

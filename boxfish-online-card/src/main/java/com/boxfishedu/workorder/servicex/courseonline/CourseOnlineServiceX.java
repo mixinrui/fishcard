@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.courseonline;
 
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -18,6 +19,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.*;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardFreezeServiceX;
 import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -66,6 +69,9 @@ public class CourseOnlineServiceX {
 
     @Autowired
     private AbsenceDealService absenceDealService;
+
+    @Autowired
+    private FishCardFreezeServiceX fishCardFreezeServiceX;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -220,6 +226,16 @@ public class CourseOnlineServiceX {
                         continousAbsenceRecord.setContinusAbsenceNum(0);
                     }
                     absenceDealService.save(continousAbsenceRecord);
+                }
+                //连续旷课超过两次,
+                if(continousAbsenceRecord.getContinusAbsenceNum()>1){
+                    //如果超过两次,直接全部冻结
+                    if(workOrder.getCourseType().equals(ComboTypeEnum.EXCHANGE.toString())){
+                        List<WorkOrder> workOrders=workOrderService.findByStudentIdAndOrderChannelAndStartTimeAfter(workOrder.getStudentId(),ComboTypeEnum.EXCHANGE.toString(),new Date());
+                        workOrders.forEach(workOrder1 -> {
+                            fishCardFreezeServiceX.freeze(workOrder1.getId());
+                        });
+                    }
                 }
             } catch (Exception ex) {
                 logger.error("@handleContinusAbsence#exception#鱼卡[{}],参数[{}]", workOrder.getId(), JacksonUtil.toJSon(workOrder));

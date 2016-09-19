@@ -417,4 +417,8 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
        return jpa.findByOrderId(orderId);
     }
 
+    public List<WorkOrder> findByStudentIdAndOrderChannelAndStartTimeAfter(Long studentId,String orderChannel,Date date){
+        return jpa.findByStudentIdAndOrderChannelAndStartTimeAfter(studentId,orderChannel,date);
+    }
+
 }
