@@ -205,6 +205,7 @@ public class CourseOnlineServiceX {
     public void handleContinusAbsence(WorkOrder workOrder, Integer status) {
         threadPoolManager.execute(new Thread(() -> {
             try {
+                logger.debug("@handleContinusAbsence#user[{}],workorder[{}]连续旷课处理逻辑",workOrder.getStudentId(),workOrder.getId());
                 ContinousAbsenceRecord continousAbsenceRecord = absenceDealService.queryByStudentIdAndComboType(workOrder.getStudentId(), workOrder.getService().getComboType());
                 if (null != continousAbsenceRecord) {
                     if (status == FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
@@ -231,8 +232,10 @@ public class CourseOnlineServiceX {
                 if(continousAbsenceRecord.getContinusAbsenceNum()>1){
                     //如果超过两次,直接全部冻结
                     if(workOrder.getCourseType().equals(ComboTypeEnum.EXCHANGE.toString())){
+                        logger.debug("@handleContinusAbsence#user[{}],workorder[{}],次数[{}]连续旷课次数超过一次处理逻辑",workOrder.getStudentId(),workOrder.getId(),continousAbsenceRecord.getContinusAbsenceNum());
                         List<WorkOrder> workOrders=workOrderService.findByStudentIdAndOrderChannelAndStartTimeAfter(workOrder.getStudentId(),ComboTypeEnum.EXCHANGE.toString(),new Date());
                         workOrders.forEach(workOrder1 -> {
+                            logger.info("handleContinusAbsence#冻结鱼卡[{}]",workOrder1.getId());
                             fishCardFreezeServiceX.freeze(workOrder1.getId());
                         });
                     }
