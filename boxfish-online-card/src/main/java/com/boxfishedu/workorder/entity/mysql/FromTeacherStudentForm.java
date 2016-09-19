@@ -13,8 +13,8 @@ public class FromTeacherStudentForm {
     String teacherLastName;
     String teacherName;
 
-    private void setTeahcerName(String teacherName){
-        this.teacherName = (teacherFirstName !=null ? teacherFirstName.trim() : "")+ " "+
-                (teacherLastName !=null ? teacherLastName.trim() : "");
-    }
+//    private void setTeahcerName(String teacherName){
+//        this.teacherName = (teacherFirstName !=null ? teacherFirstName.trim() : "")+ " "+
+//                (teacherLastName !=null ? teacherLastName.trim() : "");
+//    }
 }
