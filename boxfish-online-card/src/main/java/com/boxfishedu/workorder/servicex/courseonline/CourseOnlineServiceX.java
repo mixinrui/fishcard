@@ -231,11 +231,11 @@ public class CourseOnlineServiceX {
                 //连续旷课超过两次,
                 if(continousAbsenceRecord.getContinusAbsenceNum()>1){
                     //如果超过两次,直接全部冻结
-                    if(workOrder.getCourseType().equals(ComboTypeEnum.EXCHANGE.toString())){
+                    if(workOrder.getOrderChannel().equals(ComboTypeEnum.EXCHANGE.toString())){
                         logger.debug("@handleContinusAbsence#user[{}],workorder[{}],次数[{}]连续旷课次数超过一次处理逻辑",workOrder.getStudentId(),workOrder.getId(),continousAbsenceRecord.getContinusAbsenceNum());
                         List<WorkOrder> workOrders=workOrderService.findByStudentIdAndOrderChannelAndStartTimeAfter(workOrder.getStudentId(),ComboTypeEnum.EXCHANGE.toString(),new Date());
                         workOrders.forEach(workOrder1 -> {
-                            logger.info("handleContinusAbsence#冻结鱼卡[{}]",workOrder1.getId());
+                            logger.info("@handleContinusAbsence#freeze#冻结鱼卡[{}]",workOrder1.getId());
                             fishCardFreezeServiceX.freeze(workOrder1.getId());
                         });
                     }
