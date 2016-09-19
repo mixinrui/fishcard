@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.NotFoundException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
@@ -141,7 +142,7 @@ public class FishCardModifyServiceX {
     public void changerderCourses(Long studentId) {
         List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndStatusLessThan(studentId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
         if(CollectionUtils.isEmpty(workOrders)){
-            return;
+            throw new NotFoundException();
         }
         workOrders.forEach(workOrder -> {
             fishCardModifyService.changeCourse(workOrder);
