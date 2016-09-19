@@ -7,10 +7,13 @@ import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.workorder.entity.mongo.ContinousAbsenceRecord;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jboss.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,9 @@ import java.util.List;
 public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRepository, Long> {
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private AbsenceDealService absenceDealService;
 
     public Long filterFishCardsCount(FishCardFilterParam fishCardFilterParam) {
         String prefix = "select count(wo) ";
@@ -150,6 +156,28 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             sql.append("and status in (").append(splitCourseTypeString(fishCardFilterParam.getStatuses())).append(") ");
         }
 
+        if(null!=fishCardFilterParam.getContineAbsenceNum()){
+            List<ContinousAbsenceRecord> continousAbsenceRecords=absenceDealService.queryByComboTypeAndContinusAbsenceNum(ComboTypeEnum.EXCHANGE.toString(),fishCardFilterParam.getContineAbsenceNum());
+            if(!CollectionUtils.isEmpty(continousAbsenceRecords)){
+                StringBuilder builder=new StringBuilder();
+                int i=0;
+                for (ContinousAbsenceRecord continousAbsenceRecord : continousAbsenceRecords) {
+                    if(i==continousAbsenceRecords.size()-1){
+                        builder.append(continousAbsenceRecord.getStudentId());
+                    }
+                    else{
+                        builder.append(continousAbsenceRecord.getStudentId()+",");
+                    }
+                    i++;
+                }
+                sql.append("and student_id in (").append(builder).append(") ");
+            }
+            else{
+                sql.append("and student_id in (").append(-1).append(") ");
+            }
+            sql.append("and orderChannel=:comboType ");
+        }
+
         sql.append("and orderId !=:orderId ");
 
 
@@ -194,6 +222,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         // 订单类型
         if (null != fishCardFilterParam.getOrderType()) {
             query.setParameter("orderChannel", fishCardFilterParam.getOrderType());
+        }
+        if(null !=fishCardFilterParam.getContineAbsenceNum()){
+            query.setParameter("comboType",ComboTypeEnum.EXCHANGE.toString());
         }
 
         if (null != fishCardFilterParam.getCreateBeginDateFormat()) {
