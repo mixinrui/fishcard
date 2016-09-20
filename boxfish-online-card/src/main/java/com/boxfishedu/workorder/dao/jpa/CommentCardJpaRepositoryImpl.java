@@ -1,7 +1,7 @@
 package com.boxfishedu.workorder.dao.jpa;
 
-import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
+import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.Predicate;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,12 +25,16 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
             @Override
             public Predicate[] predicates() {
                 List<Predicate> predicateList = Lists.newArrayList();
+                // student=? and (((status between 100 and 400) or status=600) or (status=500 and assignTeacherCount=2)) 状态非500或者状态500分配2次的课表(退还次数)
                 predicateList.add(criteriaBuilder.equal(root.get("studentId"),studentId));
                 predicateList.add(criteriaBuilder.or(
-                        criteriaBuilder.or(criteriaBuilder.between(root.get("status"),CommentCardStatus.ASKED.getCode(),CommentCardStatus.ANSWERED.getCode()),
-                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())),
-                        criteriaBuilder.and(criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME.getCode()),criteriaBuilder.equal(
-                        root.get("assignTeacherCount"),CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode()
+                        criteriaBuilder.or(
+                                criteriaBuilder.between(root.get("status"),CommentCardStatus.ASKED.getCode(), CommentCardStatus.ANSWERED.getCode()),
+                                criteriaBuilder.equal(root.get("status"),CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())
+                        ),
+                        criteriaBuilder.and(
+                                criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME.getCode()),
+                                criteriaBuilder.equal(root.get("assignTeacherCount"),CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode()
                 ))));
                 return predicateList.toArray(new Predicate[predicateList.size()]);
             }
@@ -45,8 +48,10 @@ public class CommentCardJpaRepositoryImpl implements CommentCardJpaRepositoryCus
             @Override
             public Predicate[] predicates() {
                 List<Predicate> predicateList = Lists.newArrayList();
+                // teacherId=? and ((status=400) or (status=600) or(status=500))
                 predicateList.add(criteriaBuilder.equal(root.get("teacherId"),teacherId));
-                predicateList.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("status"),CommentCardStatus.ANSWERED.getCode()),
+                predicateList.add(criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("status"),CommentCardStatus.ANSWERED.getCode()),
                         criteriaBuilder.equal(root.get("status"),CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode()),
                         criteriaBuilder.equal(root.get("status"),CommentCardStatus.OVERTIME.getCode())));
                 return predicateList.toArray(new Predicate[predicateList.size()]);

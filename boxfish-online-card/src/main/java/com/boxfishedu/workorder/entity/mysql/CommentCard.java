@@ -2,7 +2,6 @@ package com.boxfishedu.workorder.entity.mysql;
 
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -11,9 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -206,6 +203,7 @@ public class CommentCard {
      * 超过48小时退换次数
      */
     public void changeToReturn() {
+        setAssignTeacherCount(CommentCardStatus.ASSIGN_TEACHER_TWICE.getCode());
         setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
         setStudentReadFlag(CommentCardStatus.STUDENT_UNREAD.getCode());
         setStatus(CommentCardStatus.OVERTIME.getCode());
