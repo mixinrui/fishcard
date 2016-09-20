@@ -19,6 +19,12 @@ public class AvaliableTimeParam implements Serializable {
     private Long orderId;
     private String date;
 
+    /**
+     * 默认为0 模板方式
+     * 选时间方式, 0 模板 1 自定义方式
+     */
+    private Integer selectMode;
+
     //给换课时候判断换课的可用时间使用
     private Long workOrderId;
 

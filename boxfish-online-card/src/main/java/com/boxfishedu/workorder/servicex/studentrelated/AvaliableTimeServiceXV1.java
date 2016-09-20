@@ -6,7 +6,6 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
@@ -19,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,9 +34,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class AvaliableTimeServiceXV1 {
-
-    @Autowired
-    private TimeLimitPolicy timeLimitPolicy;
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
@@ -60,19 +57,18 @@ public class AvaliableTimeServiceXV1 {
      */
     @Value("${choiceTime.consumerStartDay:2}")
     private Integer consumerStartDay;
-    private final static Integer daysOfWeek = 7;
+    private final static int daysOfWeek = 7;
+    private final static int daysOfMonth = 30;
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      *获取可以修改鱼卡的时间片列表
      */
     public JsonResultModel getTimeAvailable(AvaliableTimeParam avaliableTimeParam) throws CloneNotSupportedException {
-        // 判断是免费还是正常购买
-        Integer days = avaliableTimeParam.getIsFree() ? freeExperienceDay : daysOfWeek;
-        // 获取时间区间
-        DateRange dateRange = getEnableDateRange(avaliableTimeParam, days);
 
-        // TODO
+        // 获取时间区间
+        DateRange dateRange = getEnableDateRange(avaliableTimeParam, getOptionalDays(avaliableTimeParam));
+
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(avaliableTimeParam.getStudentId());
         // 获取时间片模板,并且复制
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(
@@ -81,13 +77,16 @@ public class AvaliableTimeServiceXV1 {
             DayTimeSlots clone = (DayTimeSlots) d.clone();
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
             //获取时间片范围内的数据
-            DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
+            DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone, avaliableTimeParam);
+            if(Objects.isNull(result)) {
+                return null;
+            }
             //随机显示热点时间片
             result=randomSlotFilterService.removeExculdeSlot(result,avaliableTimeParam);
             result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
                     .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
                     .collect(Collectors.toList()));
-            return result;
+            return CollectionUtils.isEmpty(result.getDailyScheduleTime()) ? null : result;
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
     }
@@ -123,6 +122,21 @@ public class AvaliableTimeServiceXV1 {
             startDate = startDate.plusDays(afterDays);
         }
         return new DateRange(startDate, days);
+    }
+
+    /**
+     * 获取返回的一次选时间的日期总数,默认为一周,如果自由选择,则为一个月
+     * @param avaliableTimeParam
+     * @return
+     */
+    private int getOptionalDays(AvaliableTimeParam avaliableTimeParam) {
+        // 判断选择模式,如果是模板模式,则为一周. 默认为模板方式
+        if(Objects.isNull(avaliableTimeParam.getSelectMode())
+                || Objects.equals(avaliableTimeParam.getSelectMode(), TimePickerServiceXV1.WeekStrategy.TEMPLATE)) {
+            return avaliableTimeParam.getIsFree() ? freeExperienceDay : daysOfWeek;
+        } else {
+            return avaliableTimeParam.getIsFree() ? freeExperienceDay : daysOfMonth;
+        }
     }
 
 }

@@ -283,7 +283,10 @@ public class CommentCardManageSDK {
     }
 
     private Map<String, Object> getInnerTeacherParameterMap(CommentCard commentCard) {
-        Map<String, Object> paramMap = new HashMap<>();
+        Map<String, Object> paramMap
+
+
+                = new HashMap<>();
         paramMap.put("fishCardId",commentCard.getId());
         paramMap.put("studentId",commentCard.getStudentId());
         paramMap.put("courseId",commentCard.getCourseId());

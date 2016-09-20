@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.studentrelated;
 
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
@@ -34,6 +35,8 @@ StudentAppRelatedController {
     private TimePickerServiceXV1 timePickerServiceXV1;
     @Autowired
     private AvaliableTimeServiceXV1 avaliableTimeServiceXV1;
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
 
     /**
      * 学生端批量选择课程的接口
@@ -67,7 +70,7 @@ StudentAppRelatedController {
 
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
     public JsonResultModel timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
-        commonServeServiceX.checkToken(userId,userId);
+        commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(),userId);
         avaliableTimeParam.setStudentId(userId);
         return avaliableTimeServiceXV1.getTimeAvailable(avaliableTimeParam);
     }
@@ -99,7 +102,7 @@ StudentAppRelatedController {
 
     @RequestMapping(value = "/time/available", method = RequestMethod.GET)
     public JsonResultModel timeAvailable(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
-        commonServeServiceX.checkToken(userId,userId);
+        commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(),userId);
         avaliableTimeParam.setStudentId(userId);
         return avaliableTimeServiceX.getTimeAvailable(avaliableTimeParam);
     }

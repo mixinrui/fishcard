@@ -17,6 +17,11 @@ public class TimeSlotParam {
     private String comboType;
     @JsonIgnore
     private Long studentId;
+    /**
+     * 默认为0 模板方式
+     * 选时间方式, 0 模板 1 自定义方式
+     */
+    private Integer selectMode;
     private List<SelectedTime> selectedTimes;
 
     public ComboTypeToRoleId getComboTypeEnum() {
