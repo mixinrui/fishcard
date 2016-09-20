@@ -406,8 +406,8 @@ public class TimePickerServiceXV1 {
         for (int i = 0; i < workOrders.size(); i++) {
             WorkOrder workOrder = workOrders.get(i);
             logger.debug("鱼卡序号{}",workOrder.getSeqNum());
-            Integer index=recommandedCourseService.getCourseIndex(workOrder);
-            RecommandCourseView recommandCourseView = resultMap.get(index -1);
+//            Integer index=recommandedCourseService.getCourseIndex(workOrder);
+            RecommandCourseView recommandCourseView = resultMap.get(workOrder.getSeqNum());
                 workOrder.initCourseInfo(recommandCourseView);
                 workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
                         recommandCourseView.getCourseType()));
