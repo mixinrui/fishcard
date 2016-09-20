@@ -178,7 +178,7 @@ public class MakeUpLessionServiceX {
         }
 
         // 该课程已经更改过一次
-        if (workOrder.getUpdateManulFlag().equals("0")) {
+        if ("0" .equals( workOrder.getUpdateManulFlag() )) {
             resultMap.put("2", "该课程已经更改过");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
