@@ -40,7 +40,7 @@ public class RecommandCourseRequester {
     private RecommandedCourseService recommandedCourseService;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-    
+
     public RecommandCourseView getRecommandCourse(WorkOrder workOrder, Integer index) {
         String url = String.format("%s/online/%s/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), index);
         logger.debug("@<-<-<-<-<-<-向推荐课发起获取推荐课的请求,url:[{}]", url);

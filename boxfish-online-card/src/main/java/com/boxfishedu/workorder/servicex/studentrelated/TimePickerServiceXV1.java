@@ -102,7 +102,7 @@ public class TimePickerServiceXV1 {
         List<WorkOrder> workOrderList = batchInitWorkorders(timeSlotParam, weekStrategy, serviceList);
 
         // 获取课程推荐
-        Map<Integer, RecommandCourseView> recommandCourses = getRecommandCourses(workOrderList);
+        Map<Integer, RecommandCourseView> recommandCourses = getRecommandCourses(workOrderList, timeSlotParam);
 
         // 批量保存鱼卡与课表
         List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
@@ -176,7 +176,12 @@ public class TimePickerServiceXV1 {
     }
 
     //TODO:从师生运营组获取推荐课程
-    private Map<Integer, RecommandCourseView> getRecommandCourses(List<WorkOrder> workOrders) {
+    private Map<Integer, RecommandCourseView> getRecommandCourses(List<WorkOrder> workOrders, TimeSlotParam timeSlotParam) {
+        // 如果是overall的8次或者16次课程,直接调用批量推荐
+        if(Objects.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.OVERALL.name()) && (workOrders.size() % 8 == 0)) {
+            return getOverAllBatchRecommand(workOrders, timeSlotParam.getStudentId());
+        }
+
         Map<Integer, RecommandCourseView> courseViewMap = Maps.newHashMap();
         for (WorkOrder workOrder : workOrders) {
             logger.debug("鱼卡序号{}",workOrder.getSeqNum());
@@ -186,9 +191,6 @@ public class TimePickerServiceXV1 {
             RecommandCourseView recommandCourseView = null;
             // 不同类型的套餐对应不同类型的课程推荐
             if(Objects.equals(tutorType, TutorType.MIXED)) {
-//                if(workOrders.size() % 8 == 0) {
-//
-//                }
                 recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
             } else if(Objects.equals(tutorType, TutorType.FRN) || Objects.equals(tutorType, TutorType.CN)) {
                 recommandCourseView = recommandCourseRequester.getRecomendCourse(workOrder, tutorType);
@@ -388,13 +390,12 @@ public class TimePickerServiceXV1 {
      * 7+1 套餐批量推荐课程,16次7+1也可以批量进行2次推荐
      * @param workOrders
      * @param studentId
-     * @param count
      * @return
      */
-    private Map<Integer, RecommandCourseView> overAllBatchRecommand(List<WorkOrder> workOrders, Long studentId, int count) {
+    private Map<Integer, RecommandCourseView> getOverAllBatchRecommand(List<WorkOrder> workOrders, Long studentId) {
         Map<Integer, RecommandCourseView> resultMap = new HashMap<>();
         int recommendIndex = 0;
-        for(int i = 0; i < count / 8; i++) {
+        for(int i = 0; i < workOrders.size() / 8; i++) {
             List<RecommandCourseView> recommendCourseViews = recommandCourseRequester.getBatchRecommandCourse(studentId);
             for(RecommandCourseView recommandCourseView : recommendCourseViews) {
                 resultMap.put(recommendIndex++, recommandCourseView);
