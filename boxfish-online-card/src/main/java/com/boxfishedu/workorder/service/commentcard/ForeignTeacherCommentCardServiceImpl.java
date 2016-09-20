@@ -241,6 +241,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
         for (CommentCard commentCard : list) {
             try {
+                // 1 24小时未分配外教的,直接分配内部账号
                 if (Objects.isNull(commentCard.getTeacherId())) {
                     logger.info("@foreignTeacherCommentUnAnswer超过24小时没有分配到老师,为其分配内部账号,该点评卡id为:" + commentCard.getStudentId());
                     Map paramMap = new HashMap<>();
@@ -265,7 +266,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     } else {
                         logger.info("@foreignTeacherCommentUnAnswer向教师端推送消息失败,推送失败的教师teacherId=" + innerTeacher.getTeacherId());
                     }
-                } else {
+                }
+                // 2 将之前的点评标记为过期,并且复制一个新的点评,重新分配内部账号
+                else {
                     commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
                     commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
                     commentCard.setStatus(CommentCardStatus.OVERTIME.getCode());
@@ -351,6 +354,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         Date updateDate = DateUtil.localDate2Date(now);
         for (CommentCard commentCard: list) {
             try {
+                // 退还次数
                 commentCard.changeToReturn();
                 commentCard.setUpdateTime(updateDate);
                 com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
