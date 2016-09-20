@@ -430,7 +430,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_UNREAD.getCode());
                 commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
                 commentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
-                commentCard.setPrevious_id(commentCard.getId());
                 commentCardJpaRepository.save(commentCard);
                 JsonResultModel jsonResultModel = pushInfoToStudentAndTeacher(innerTeacher.getTeacherId(), "You’ve got a new answer to access; Do it now~", "FOREIGNCOMMENT");
                 if (jsonResultModel.getReturnCode().equals(HttpStatus.SC_OK)) {
