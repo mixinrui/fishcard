@@ -3,6 +3,11 @@ package com.boxfishedu.workorder.servicex.coursenotify;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
+import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.ShortMessageCodeConstant;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -15,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +43,11 @@ public class CourseNotifyOneDayServiceX {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
+
+    @Autowired
+    private RabbitMqSender rabbitMqSender;
 
     public void notiFyStudentClass() {
 
@@ -48,7 +59,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
 
-        Map<Long, Integer> studentHasClassMap = Maps.newHashMap();
+        Map<Long, List<WorkOrder>> studentHasClassMap = Maps.newHashMap();
 
 
         studentHasClassMap = getStudentClassess(studentHasClassMap, listWorkOrders);
@@ -67,6 +78,10 @@ public class CourseNotifyOneDayServiceX {
             return;
         }
 
+        /**  begin  发送短信 **/
+        sendShortMessage(studentHasClassMap);
+        /**  end    发送短信 **/
+
         //开始发送通知
         pushTeacherList(studentHasClassMap);
 
@@ -75,27 +90,29 @@ public class CourseNotifyOneDayServiceX {
 
     }
 
-    private Map<Long, Integer> getStudentClassess(Map<Long, Integer> studentHasClassMap, List<WorkOrder> listWorkOrders) {
+    private Map<Long, List<WorkOrder>> getStudentClassess(Map<Long, List<WorkOrder>> studentHasClassMap, List<WorkOrder> listWorkOrders) {
 
         listWorkOrders.forEach(workOrder -> {
-            Integer account = studentHasClassMap.get(workOrder.getStudentId());
-            if (null != account) {
-                account += 1;
-                studentHasClassMap.put(workOrder.getStudentId(), account);
+
+            List<WorkOrder>  listWorkOrder= studentHasClassMap.get(workOrder.getStudentId());
+            if (null != listWorkOrder) {
+                studentHasClassMap.get(workOrder.getStudentId()).add(workOrder);
             } else {
-                studentHasClassMap.put(workOrder.getStudentId(), new Integer(1));
+                listWorkOrder = Lists.newArrayList();
+                listWorkOrder.add(workOrder);
+                studentHasClassMap.put(workOrder.getStudentId(),listWorkOrder );
             }
         });
         return studentHasClassMap;
     }
 
 
-    public void pushTeacherList(Map<Long, Integer> map) {
+    public void pushTeacherList(Map<Long, List<WorkOrder>> map) {
         logger.info("notiFyStudentClass::begin");
         List list = Lists.newArrayList();
         for (Long key : map.keySet()) {
             String pushTitle = WorkOrderConstant.SEND_STU_CLASS_TOMO_MESSAGE_BEGIN;
-            Integer count = (null == map.get(key) ? 0 : map.get(key));
+            Integer count = (null == map.get(key) ? 0 : map.get(key).size());
             Map map1 = Maps.newHashMap();
             map1.put("user_id", key);
 
@@ -121,6 +138,7 @@ public class CourseNotifyOneDayServiceX {
             list.add(map1);
         }
         if (!list.isEmpty()) {
+
             // 2000 分组
             if (list.size() > 2000) {
                 teacherStudentRequester.pushTeacherListOnlineMsg(list);
@@ -131,6 +149,46 @@ public class CourseNotifyOneDayServiceX {
 
         logger.info("notiFyStudentClass::end");
     }
+
+
+    /**
+     * 发送短信
+     * @param studentHasClassMap
+     */
+    private void sendShortMessage(Map<Long,List<WorkOrder>> studentHasClassMap){
+        for(Long key :studentHasClassMap.keySet()){
+            threadPoolManager.execute(new Thread(() -> {
+                // 发送短信 向短信队列发送q消息
+                List<WorkOrder> list = studentHasClassMap.get(key);
+                if(null!=list){
+                    Object o = getMessage(key,list);
+                    rabbitMqSender.send(o, QueueTypeEnum.SHORT_MESSAGE);
+                }
+            }));
+        }
+
+    }
+
+   private Object getMessage(Long userId,List<WorkOrder> list){
+       Map map = Maps.newHashMap();
+       map.put("user_id",userId);
+       map.put("template_code", ShortMessageCodeConstant.SMS_STU_NOTITY_TOMO_CODE);
+
+       JSONObject jo = new JSONObject();
+       jo.put("quantity", list.size());
+
+       StringBuffer startTime = new StringBuffer("");
+       list.forEach(workOrder -> {
+           startTime.append(DateUtil.date2ShortString(workOrder.getStartTime())).append(",");
+       });
+
+       jo.put("startTime", startTime.substring(0,startTime.length()-1));
+
+       map.put("data",jo);
+       return map;
+
+   }
+
 
     private void splitByTwoThousandsMessage(List list) {
         int count = list.size() / base_count;

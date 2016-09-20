@@ -6,6 +6,8 @@ package com.boxfishedu.workorder.common.util;
  */
 public class ShortMessageCodeConstant {
 
+    public final static String CANCELREASON="学生调整或者其他原因";
+
     /** 学生明天有课提醒 编码 **/
     public final  static String SMS_STU_NOTITY_TOMO_CODE="SMS_15120322";
 

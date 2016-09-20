@@ -89,8 +89,8 @@ public class RabbitMqConstant {
     public static final String RECHARGE_WORKORDER_QUEUE= "boxfish.fishcard.recharge.queue";
 
     /** 短信que end **/
-    public static final String SHORT_MESSAGE_TEMPLATE_NAME = "boxfish.short.message.template";
-    public static final String SHORT_MESSAGE_REPLY_TEMPLATE_NAME = "boxfish.short.message.reply.template";
+    public static final String SHORT_MESSAGE_TEMPLATE_NAME = "com.boxfishedu.teaching.send_sms_queue";
+    public static final String SHORT_MESSAGE_REPLY_TEMPLATE_NAME = "com.boxfishedu.teaching.send_sms_queue.reply";
     /** 短信que end **/
 
 }

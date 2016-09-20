@@ -3,9 +3,12 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
+import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NotFoundException;
+import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.ShortMessageCodeConstant;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
@@ -80,6 +83,9 @@ public class FishCardModifyServiceX {
 
     @Autowired
     private UrlConf urlConf;
+
+    @Autowired
+    private RabbitMqSender rabbitMqSender;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -372,6 +378,25 @@ public class FishCardModifyServiceX {
         teacherStudentRequester.pushTeacherListOnlineMsg(list);
 
         logger.info("notiFyTeahcerchangeStartTime::end");
+    }
+
+    /**
+     * 短信通知老师 课程取消
+     * @param teahcerId
+     * @param startTime
+     * @param workOrder
+     */
+    private void  sendShortMessage(Long teahcerId,String startTime,WorkOrder workOrder){
+        Map map =  Maps.newHashMap();
+        map.put("user_id",teahcerId);
+        map.put("template_code", ShortMessageCodeConstant.SMS_TEA_NOTITY_CLASS_CANCEL_CODE);
+        JSONObject jo =new JSONObject();
+        jo.put("startTime",workOrder.getStartTime());
+        jo.put("courseName",workOrder.getCourseName());
+        jo.put("cancelReason",ShortMessageCodeConstant.CANCELREASON);
+        map.put("data",jo);
+
+        rabbitMqSender.send(map, QueueTypeEnum.SHORT_MESSAGE);
     }
 
 }
