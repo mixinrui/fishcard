@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.RecommandedCourseService;
+import com.boxfishedu.workorder.web.view.course.OverAllRecommandViews;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,7 +40,6 @@ public class RecommandCourseRequester {
     private RecommandedCourseService recommandedCourseService;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-
 
     public RecommandCourseView getRecommandCourse(WorkOrder workOrder, Integer index) {
         String url = String.format("%s/online/%s/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), index);
@@ -122,6 +123,8 @@ public class RecommandCourseRequester {
         }
     }
 
+
+
     //目前为中教的换课
     public RecommandCourseView changeForeignCourse(WorkOrder workOrder) {
         String url = String.format("%s/exchange/foreigner/%s/%s", urlConf.getCourse_recommended_service(),
@@ -144,6 +147,12 @@ public class RecommandCourseRequester {
 
     public RecommandCourseView getRecommandCourse(WorkOrder workOrder) {
         return getRecommandCourse(workOrder, recommandedCourseService.getCourseIndex(workOrder));
+    }
+
+    public List<RecommandCourseView> getBatchRecommandCourse(Long studentId) {
+        OverAllRecommandViews overAllRecommandViews = restTemplate.getForObject(
+                createOverAllRecommend(studentId), OverAllRecommandViews.class);
+        return overAllRecommandViews.getSingle();
     }
 
 
@@ -195,4 +204,12 @@ public class RecommandCourseRequester {
                 .toUri();
     }
 
+
+    private URI createOverAllRecommend(Long studentId) {
+        return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
+                .path("/online/" + studentId)
+                .build()
+                .toUri();
+
+    }
 }
