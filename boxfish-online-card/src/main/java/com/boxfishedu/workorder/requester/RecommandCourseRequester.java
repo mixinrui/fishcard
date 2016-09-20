@@ -150,9 +150,13 @@ public class RecommandCourseRequester {
     }
 
     public List<RecommandCourseView> getBatchRecommandCourse(Long studentId) {
-        OverAllRecommandViews overAllRecommandViews = restTemplate.getForObject(
-                createOverAllRecommend(studentId), OverAllRecommandViews.class);
-        return overAllRecommandViews.getSingle();
+        try {
+            OverAllRecommandViews overAllRecommandViews = restTemplate.getForObject(
+                    createOverAllRecommend(studentId), OverAllRecommandViews.class);
+            return overAllRecommandViews.getSingle();
+        } catch (Exception e) {
+            throw new BusinessException("调用课程推荐失败");
+        }
     }
 
 
