@@ -202,6 +202,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         if(workOrder.getService().getAmount()>0){
             return;
         }
+        logger.info("@notifyOrderUpdateStatus#向订单中心发起订单完成消息,鱼卡[{}],订单[{}]",workOrder.getId(),workOrder.getOrderId());
         Map param = Maps.newHashMap();
         param.put("id", workOrder.getOrderId());
         param.put("status", status);
