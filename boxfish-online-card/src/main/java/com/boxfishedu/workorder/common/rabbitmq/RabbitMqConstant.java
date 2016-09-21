@@ -88,4 +88,9 @@ public class RabbitMqConstant {
     //退款队列名称
     public static final String RECHARGE_WORKORDER_QUEUE= "boxfish.fishcard.recharge.queue";
 
+    /** 短信que end **/
+    public static final String SHORT_MESSAGE_TEMPLATE_NAME = "com.boxfishedu.teaching.send_sms_queue";
+    public static final String SHORT_MESSAGE_REPLY_TEMPLATE_NAME = "com.boxfishedu.teaching.send_sms_queue.reply";
+    /** 短信que end **/
+
 }
