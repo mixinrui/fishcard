@@ -133,6 +133,7 @@ public class MakeUpLessionServiceX {
         newWorkOrder.setUpdateTime(null);
         newWorkOrder.setActualStartTime(null);
         newWorkOrder.setActualEndTime(null);
+        newWorkOrder.setIsCourseOver((short) 0);
         //已经安排补课
         newWorkOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         if (null == oldWorkOrder.getMakeUpSeq() || 0 == oldWorkOrder.getMakeUpSeq()) {
