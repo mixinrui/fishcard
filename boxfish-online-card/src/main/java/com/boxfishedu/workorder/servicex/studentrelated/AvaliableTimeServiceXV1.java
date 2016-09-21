@@ -78,7 +78,7 @@ public class AvaliableTimeServiceXV1 {
             clone.setDay(DateUtil.formatLocalDate(localDateTime));
             //获取时间片范围内的数据
             DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone, avaliableTimeParam);
-            if(Objects.isNull(result)) {
+            if(Objects.isNull(result) || CollectionUtils.isEmpty(result.getDailyScheduleTime())) {
                 return null;
             }
             //随机显示热点时间片

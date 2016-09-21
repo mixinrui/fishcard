@@ -18,11 +18,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -80,6 +82,9 @@ public class AvaliableTimeServiceX {
 //            DayTimeSlots result = timeLimitPolicy.limit(clone);
             //获取时间片范围内的数据
             DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
+            if(Objects.isNull(result) || CollectionUtils.isEmpty(result.getDailyScheduleTime())) {
+                return null;
+            }
             //随机显示热点时间片
             result=randomSlotFilterService.removeExculdeSlot(result,avaliableTimeParam);
             result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
