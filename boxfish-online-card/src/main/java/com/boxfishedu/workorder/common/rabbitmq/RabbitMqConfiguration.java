@@ -85,6 +85,14 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareExchange(delayExchange());
         rabbitAdmin.declareExchange(foreignCommentExchange());
 
+
+        /**
+         *  发送短信队列
+         */
+        Queue notifyMessageQueue = new Queue(RabbitMqConstant.SHORT_MESSAGE_TEMPLATE_NAME, true);
+        rabbitAdmin.declareQueue(notifyMessageQueue);
+        Binding notifyMessageQueueBinding = BindingBuilder.bind(notifyMessageQueue).to(directExchange()).with(RabbitMqConstant.SHORT_MESSAGE_TEMPLATE_NAME).noargs();
+
         /**
          * 通知订单退款申请
          */
@@ -237,6 +245,7 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareDealerQueueBinding);
         rabbitAdmin.declareBinding(updatePictureQueueBinding);
         rabbitAdmin.declareBinding(notifyRechargeWorkOrderQueueBinding);
+        rabbitAdmin.declareBinding(notifyMessageQueueBinding); /** 短信 **/
         return rabbitAdmin;
     }
 
@@ -300,6 +309,18 @@ public class RabbitMqConfiguration {
         template.setExchange(NOTIFICATION_TASK_EXCHANGE);
         return template;
     }
+
+    /**
+     * 发送短信 template
+     */
+    @Bean(name = RabbitMqConstant.SHORT_MESSAGE_REPLY_TEMPLATE_NAME)
+    public RabbitTemplate notifyMessageTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SHORT_MESSAGE_TEMPLATE_NAME);
+        template.setExchange(NOTIFICATION_TASK_EXCHANGE);
+        return template;
+    }
+
+
 
     /**
      *定时器回复template
@@ -426,6 +447,16 @@ public class RabbitMqConfiguration {
     @Bean(name = RabbitMqConstant.RECHARGE_WORKORDER_QUEUE_TEMPLATE_NAME)
     public RabbitTemplate notifyOrderPrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
         RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.RECHARGE_WORKORDER_QUEUE);
+        template.setExchange(DELAY_QUEUE_EXCHANGE);
+        return template;
+    }
+
+    /**
+     *通知订单退款
+     */
+    @Bean(name = RabbitMqConstant.SHORT_MESSAGE_REPLY_TEMPLATE_NAME)
+    public RabbitTemplate notifyMessagePrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SHORT_MESSAGE_TEMPLATE_NAME);
         template.setExchange(DELAY_QUEUE_EXCHANGE);
         return template;
     }

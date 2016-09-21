@@ -34,6 +34,8 @@ public class RabbitMqSender {
     private @Qualifier(RabbitMqConstant.ASSIGN_FOREIGN_TEACHER_COMMENT_TEMPLATE_NAME) RabbitTemplate assignForeignTeacherCommentRabbitTemplate;
     @Autowired
     private @Qualifier(RabbitMqConstant.RECHARGE_WORKORDER_QUEUE_TEMPLATE_NAME)RabbitTemplate rechargeWorkOrderTemplate;// 订单退款
+    @Autowired
+    private @Qualifier(RabbitMqConstant.SHORT_MESSAGE_REPLY_TEMPLATE_NAME)RabbitTemplate shortMessageTemplate;// 发送短信
 
 
     public void send(Object object, QueueTypeEnum queueTypeEnum) {
@@ -80,6 +82,10 @@ public class RabbitMqSender {
             case RECHARGE_ORDER:{
                 logger.info("@<-<-<-<-<-<-<orderRecharge-订单退款的请求,参数:{}", JacksonUtil.toJSon(object));
                 rechargeWorkOrderTemplate.convertAndSend(object);
+            }
+            case SHORT_MESSAGE:{
+                logger.info("@<-<-<-<-<-<-<sendShortMessage-发送短信,参数:{}", JacksonUtil.toJSon(object));
+                shortMessageTemplate.convertAndSend(object);
             }
             default:
                 break;

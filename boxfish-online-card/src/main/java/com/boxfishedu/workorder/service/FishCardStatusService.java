@@ -131,6 +131,20 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         return result;
     }
 
+    /**
+     * 通知今天老师有课
+     * @return
+     */
+    public List<WorkOrder> getCardsTeacherNotifyClass(){
+        Date date=new Date();
+        Date startDate= DateUtil.parseTime(date,0);
+        Date endDate=DateUtil.parseTime( date ,1);
+        logger.debug("@query db开始从数据库查询[[[今天有课的记录]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
+                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
+        return result;
+    }
+
 
 
     public MessageProperties getMsgProperties(Date date, FishCardDelayMsgType fishCardDelayMsgType){
