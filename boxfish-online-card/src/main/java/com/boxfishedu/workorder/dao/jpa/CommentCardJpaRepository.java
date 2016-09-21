@@ -78,5 +78,6 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Modifying
     @Query("update CommentCard c set c.teacherId =?2 where c.teacherId =?1 and c.status = 300")
     public void forceToChangeTeacher(Long fromTeacherId , Long toTeacherId);
+
     public List<CommentCard> findByTeacherIdAndStatus(Long teacherId, Integer status);
 }
