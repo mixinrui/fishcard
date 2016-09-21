@@ -225,7 +225,7 @@ public class TimePickerServiceXV1 {
      */
     private List<WorkOrder> batchInitUserDefinedWorkOrders(TimeSlotParam timeSlotParams, List<Service> services) {
         Queue<ServiceChoice> serviceQueue = createServiceChoice(services);
-        final int[] index = {0};
+        final int[] index = {1};
         return timeSlotParams.getSelectedTimes().stream().map( timeSlotParam -> {
             Service service = services.get(choice(serviceQueue));
             WorkOrder workOrder = initWorkOrder(service, index[0]++, timeSlotParam.getTimeSlotId());
@@ -399,7 +399,7 @@ public class TimePickerServiceXV1 {
         for(int i = 0; i < workOrders.size() / 8; i++) {
             List<RecommandCourseView> recommendCourseViews = recommandCourseRequester.getBatchRecommandCourse(studentId);
             for(RecommandCourseView recommandCourseView : recommendCourseViews) {
-                resultMap.put(recommendIndex++, recommandCourseView);
+                resultMap.put(++recommendIndex, recommandCourseView);
             }
         }
 

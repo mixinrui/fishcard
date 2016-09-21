@@ -219,7 +219,7 @@ public class TimePickerServiceX {
         for(int i = 0; i < workOrders.size() / 8; i++) {
             List<RecommandCourseView> recommendCourseViews = recommandCourseRequester.getBatchRecommandCourse(studentId);
             for(RecommandCourseView recommandCourseView : recommendCourseViews) {
-                resultMap.put(recommendIndex++, recommandCourseView);
+                resultMap.put(++recommendIndex, recommandCourseView);
             }
         }
 
