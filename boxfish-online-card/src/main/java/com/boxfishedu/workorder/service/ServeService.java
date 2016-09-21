@@ -200,6 +200,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     //通知订单中心修改订单状态
     public void notifyOrderUpdateStatus(WorkOrder workOrder, Integer status) {
         if(workOrder.getService().getAmount()>0){
+            logger.debug("服务次数大于0,不处理,鱼卡[{}]",workOrder.getId());
             return;
         }
         logger.info("@notifyOrderUpdateStatus#向订单中心发起订单完成消息,鱼卡[{}],订单[{}]",workOrder.getId(),workOrder.getOrderId());
@@ -246,6 +247,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         logger.info("@decreaseService:开始对服务次数进行减操作,操作的鱼卡号[{}],服务号[{}],服务初始数量[{}],还剩数量[{}],触发操作的状态为[{}],状态描述是[{}]",
                 workOrder.getId(),service.getId(),service.getOriginalAmount(),service.getAmount(),status,FishCardStatusEnum.getDesc(status));
         if (null == service) {
+            logger.error("@decreaseService:鱼卡[{}]无对应的服务",workOrder.getId());
             throw new BusinessException("订单无对应的服务");
         }
         //使用select for update为记录加锁

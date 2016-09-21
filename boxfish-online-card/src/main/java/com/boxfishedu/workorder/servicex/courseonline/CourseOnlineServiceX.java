@@ -107,6 +107,7 @@ public class CourseOnlineServiceX {
 
         //处理完成的情况
         if (status == FishCardStatusEnum.COMPLETED.getCode() || status == FishCardStatusEnum.COMPLETED_FORCE.getCode()) {
+            logger.debug("@updateTeachingStatus#complete#fishcard{}完成上课,开始做完成处理",workOrder.getId());
             completeCourse(workOrder, courseSchedule, status);
         }
         //处理早退的情况(定时器不到不应该减去服务)
