@@ -178,7 +178,8 @@ public class TimePickerServiceXV1 {
     //TODO:从师生运营组获取推荐课程
     private Map<Integer, RecommandCourseView> getRecommandCourses(List<WorkOrder> workOrders, TimeSlotParam timeSlotParam) {
         // 如果是overall的8次或者16次课程,直接调用批量推荐
-        if(Objects.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.OVERALL.name()) && (workOrders.size() % 8 == 0)) {
+        if(Objects.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.OVERALL.name())
+                && (workOrders.size() % 8 == 0)) {
             return getOverAllBatchRecommand(workOrders, timeSlotParam.getStudentId());
         }
 
