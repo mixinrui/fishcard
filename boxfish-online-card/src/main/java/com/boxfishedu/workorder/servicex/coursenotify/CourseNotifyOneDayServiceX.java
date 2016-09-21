@@ -49,6 +49,8 @@ public class CourseNotifyOneDayServiceX {
     @Autowired
     private RabbitMqSender rabbitMqSender;
 
+
+
     /**
      * 通知明天学生有课
      */
@@ -201,7 +203,7 @@ public class CourseNotifyOneDayServiceX {
 
        jo.put("startTime", startTime.substring(0,startTime.length()-1));
 
-       map.put("data",jo);
+       map.put("data",jo.toJSONString());
        return map;
 
    }
@@ -226,7 +228,7 @@ public class CourseNotifyOneDayServiceX {
         }catch (Exception e){
             e.printStackTrace();
         }
-        map.put("data",jo);
+        map.put("data",jo.toJSONString());
         return map;
 
     }
