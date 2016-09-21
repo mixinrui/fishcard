@@ -5,7 +5,7 @@ package com.boxfishedu.workorder.common.util;
  * Created by jiaozijun on 16/9/20.
  */
 public class ShortMessageCodeConstant {
-    
+
     public final static String CANCELREASON="学生调整或者其他原因";
 
 
@@ -14,4 +14,7 @@ public class ShortMessageCodeConstant {
 
     /** 老师课程取消短信通知编码 **/
     public final  static String SMS_TEA_NOTITY_CLASS_CANCEL_CODE="SMS_15115267";
+
+    /** 老师课程取消短信通知编码 **/
+    public final  static String SMS_TEA_NOTITY_CLASS_TODY_CODE="SMS_15160346";
 }

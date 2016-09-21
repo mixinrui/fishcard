@@ -12,17 +12,17 @@ import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.FishCardStatusService;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 提前一天 通知明天学生上课消息
@@ -49,6 +49,9 @@ public class CourseNotifyOneDayServiceX {
     @Autowired
     private RabbitMqSender rabbitMqSender;
 
+    /**
+     * 通知明天学生有课
+     */
     public void notiFyStudentClass() {
 
         logger.info("notiFyStudentClass--->开始检索明天有课的学生准备上课");
@@ -79,7 +82,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
         /**  begin  发送短信 **/
-        sendShortMessage(studentHasClassMap);
+        sendShortMessage(studentHasClassMap,"2");
         /**  end    发送短信 **/
 
         //开始发送通知
@@ -152,16 +155,24 @@ public class CourseNotifyOneDayServiceX {
 
 
     /**
-     * 发送短信
-     * @param studentHasClassMap
+     * 给学生发送短信
+     * @param classMap
+     * @param type  1 给学生发短信
+     *              2 给老师发送短信
      */
-    private void sendShortMessage(Map<Long,List<WorkOrder>> studentHasClassMap){
-        for(Long key :studentHasClassMap.keySet()){
+    private void sendShortMessage(Map<Long,List<WorkOrder>> classMap,String type){
+        for(Long key :classMap.keySet()){
             threadPoolManager.execute(new Thread(() -> {
                 // 发送短信 向短信队列发送q消息
-                List<WorkOrder> list = studentHasClassMap.get(key);
+                List<WorkOrder> list = classMap.get(key);
                 if(null!=list){
-                    Object o = getMessage(key,list);
+                    Object o = null;
+                    if("1".equals(type)){
+                        o= getMessageStu(key,list);
+                    }else if("2".equals(type)){
+                        o= getMessageteacher(key,list);
+                    }
+
                     rabbitMqSender.send(o, QueueTypeEnum.SHORT_MESSAGE);
                 }
             }));
@@ -169,7 +180,13 @@ public class CourseNotifyOneDayServiceX {
 
     }
 
-   private Object getMessage(Long userId,List<WorkOrder> list){
+    /**
+     * 学生消息体
+     * @param userId
+     * @param list
+     * @return
+     */
+   private Object getMessageStu(Long userId,List<WorkOrder> list){
        Map map = Maps.newHashMap();
        map.put("user_id",userId);
        map.put("template_code", ShortMessageCodeConstant.SMS_STU_NOTITY_TOMO_CODE);
@@ -188,6 +205,31 @@ public class CourseNotifyOneDayServiceX {
        return map;
 
    }
+
+
+    /**
+     * 老师消息体
+     * @param userId
+     * @param list
+     * @return
+     */
+    private Object getMessageteacher(Long userId,List<WorkOrder> list){
+        Map map = Maps.newHashMap();
+        map.put("user_id",userId);
+        map.put("template_code", ShortMessageCodeConstant.SMS_TEA_NOTITY_CLASS_TODY_CODE);
+
+        JSONObject jo = new JSONObject();
+            jo.put("quantity", list.size());
+            jo.put("startTime", CollectionUtils.isEmpty(list)?"":DateUtil.date2ShortString(list.get(0).getStartTime())     );
+        try {
+            logger.info(":::getMessageteacher::fishcardId [{}]::startTime [{}]",list.get(0).getId(),list.get(0).getStartTime());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        map.put("data",jo);
+        return map;
+
+    }
 
 
     private void splitByTwoThousandsMessage(List list) {
@@ -221,6 +263,86 @@ public class CourseNotifyOneDayServiceX {
         }
 
         t.splitByTwoThousandsMessage(list);
+    }
+
+
+
+
+    /**
+     * 通知今天老师有课
+     */
+    public void notiFyTeacherClass() {
+
+        logger.info("notiFyTeacherClass--->开始检索老师今天有课的记录");
+        List<WorkOrder> listWorkOrders = fishCardStatusService.getCardsTeacherNotifyClass();
+        if (null == listWorkOrders || listWorkOrders.isEmpty()) {
+            logger.info("notiFyTeacherClass--->没有今天的课");
+            return;
+        }
+
+
+        Map<Long, List<WorkOrder>> teacherHasClassMap = Maps.newHashMap();
+
+
+        teacherHasClassMap = getTeacherClassess(teacherHasClassMap, listWorkOrders);
+        try {
+
+            logger.info("notiFyStudentClass:::::::匹配_fishcard_map ,size=[{}]::::::::::::::::::::::::::::::::", teacherHasClassMap == null ? 0 : teacherHasClassMap.size());
+            logger.info("notiFyStudentClass:::::::::sendToStudentInfo [{}]::::::::::::::::::::::::::::::::", teacherHasClassMap);
+
+        } catch (Exception e) {
+            logger.error("lazyLoadError");
+            e.printStackTrace();
+        }
+
+        if (null == teacherHasClassMap || teacherHasClassMap.isEmpty()) {
+            logger.info("notiFyTeacherClass:::::::::::MapIsNull");
+            return;
+        }
+
+        /**  begin  发送短信 **/
+        sendShortMessage(teacherHasClassMap,"1");
+        /**  end    发送短信 **/
+
+        logger.info("notiFyTeacherClass:::::通知完成");
+
+    }
+
+
+
+    private Map<Long, List<WorkOrder>> getTeacherClassess(Map<Long, List<WorkOrder>> teacherHasClassMap, List<WorkOrder> listWorkOrders) {
+
+        listWorkOrders.forEach(workOrder -> {
+
+            List<WorkOrder>  listWorkOrder= teacherHasClassMap.get(workOrder.getTeacherId());
+            if (null != listWorkOrder) {
+                teacherHasClassMap.get(workOrder.getTeacherId()).add(workOrder);
+            } else {
+                listWorkOrder = Lists.newLinkedList();
+                final Function<WorkOrder, Date> byName = wo -> wo.getStartTime();
+                listWorkOrder.add(workOrder);
+                teacherHasClassMap.put(workOrder.getTeacherId(),listWorkOrder );
+            }
+        });
+
+        // 按照开始时间排序
+        if(!teacherHasClassMap.isEmpty()){
+            teacherHasClassMap.forEach((id,wolist)->{
+                if(null!=wolist && wolist.size()>0){
+                    wolist.sort(new Comparator<WorkOrder>() {
+                        @Override
+                        public int compare(WorkOrder o1, WorkOrder o2) {
+                             if(o1.getStartTime().after(o2.getStartTime())){
+                                 return 0;
+                             }
+                            return -1;
+                        }
+                    });
+                }
+            });
+        }
+
+        return teacherHasClassMap;
     }
 
 }

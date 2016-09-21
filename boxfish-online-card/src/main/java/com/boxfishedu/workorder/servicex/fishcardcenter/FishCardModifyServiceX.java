@@ -284,6 +284,7 @@ public class FishCardModifyServiceX {
             // 推送教师更换时间推送
             if(null!=teacherId && teacherId>0L){
                 this.pushTeacherList(teacherId,startTime);
+                // 发送短信   this.sendShortMessage(teacherId,startTime,workOrder);
             }
 
         }else {
@@ -376,7 +377,6 @@ public class FishCardModifyServiceX {
 
 
         teacherStudentRequester.pushTeacherListOnlineMsg(list);
-
         logger.info("notiFyTeahcerchangeStartTime::end");
     }
 
