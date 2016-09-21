@@ -207,6 +207,18 @@ public class NotifyTimer {
     }
 
     /**
+     * 7点通知老师今天有几节课 第一节什么时间上
+     */
+    @Scheduled(cron = "0 30 07 * * ?")
+    public void notifyTodyTeacherHasClass() {
+        logger.info("<<<<<<notifyTodyTeacherHasClass<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<开始通知<<<老师今天有课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.CLASSS_TODY_TEA_NOTIFY.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    /**
      * 查询旷课的学生,对其扣积分
      */
 

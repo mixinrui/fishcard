@@ -83,6 +83,16 @@ public class DateUtil {
         return dateStr;
     }
 
+    public static String date2ShortString(Date date) {
+        String dateStr = null;
+        try {
+            dateStr = new SimpleDateFormat("HH:mm").format(date);
+        } catch (Exception ex) {
+            throw new RuntimeException("日期格式不合法");
+        }
+        return dateStr;
+    }
+
     public static LocalDate convertLocalDate(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }

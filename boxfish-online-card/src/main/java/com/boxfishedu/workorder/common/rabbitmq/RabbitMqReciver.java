@@ -168,6 +168,9 @@ public class RabbitMqReciver {
             }else if(serviceTimerMessage.getType() == TimerMessageType.STUDENT_ABSENT_DEDUCT_SCORE.value()){
                 logger.info("@CommentCardTimer>>>>>STUDENT_ABSENT_DEDUCT_SCORE>>>>查询旷课的学生,扣积分");
                 absenteeismService.queryAbsentStudent();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.CLASSS_TODY_TEA_NOTIFY.value()){
+                logger.info("=========>notifyTomoStudentHasClass=====>>>>通知老师今天有课");
+                courseNotifyOneDayServiceX.notiFyTeacherClass();
             }
 
         } catch (Exception ex) {
