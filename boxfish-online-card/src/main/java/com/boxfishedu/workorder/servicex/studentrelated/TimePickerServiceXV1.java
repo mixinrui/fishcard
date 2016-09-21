@@ -90,7 +90,7 @@ public class TimePickerServiceXV1 {
 
         // 获取选课策略,每周选几次,持续几周
         WeekStrategy weekStrategy = getWeekStrategy(timeSlotParam, serviceList);
-        // 验证service
+        // 验证参数
         validateTimeSlotParam(timeSlotParam, weekStrategy, serviceList);
         // unique验证
         for(Service service : serviceList) {
@@ -161,6 +161,16 @@ public class TimePickerServiceXV1 {
             Integer count = services.stream().collect(Collectors.summingInt(Service::getAmount));
             if(!Objects.equals(count, selectedTimes.size())) {
                 throw new BusinessException("选择的上课次数不符合规范");
+            }
+        }
+
+        // 重复选择时间
+        Set<String> selectTimesSet = new HashSet<>();
+        for(SelectedTime selectedTime : selectedTimes) {
+            if(!selectTimesSet.add(selectedTime.getSelectedDate() + "-" + selectedTime.getTimeSlotId())) {
+                TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(selectedTime.getTimeSlotId());
+                throw new BusinessException("选择有重复的时间"
+                        + selectedTime.getSelectedDate() + " " + timeSlot.getStartTime());
             }
         }
 

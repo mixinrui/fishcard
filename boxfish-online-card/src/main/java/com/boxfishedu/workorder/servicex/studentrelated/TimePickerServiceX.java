@@ -169,6 +169,15 @@ public class TimePickerServiceX {
         if(service.getCoursesSelected()==1){
             throw new BusinessException("该订单已经完成选课,请勿重复选课");
         }
+
+        Set<String> selectTimesSet = new HashSet<>();
+        for(SelectedTime selectedTime : selectedTimes) {
+            if(!selectTimesSet.add(selectedTime.getSelectedDate() + "-" + selectedTime.getTimeSlotId())) {
+                TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(selectedTime.getTimeSlotId());
+                throw new BusinessException("选择有重复的时间"
+                        + selectedTime.getSelectedDate() + " " + timeSlot.getStartTime());
+            }
+        }
     }
 
     private Service ensureConvertOver(TimeSlotParam timeSlotParam) {
