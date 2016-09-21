@@ -13,5 +13,7 @@ public interface AbsenteeismService {
 
     public void queryAbsentStudent();
 
-    public void testQueryAbsentStudent();
+    public int testQueryAbsentStudent();
+
+    public int productQueryAbsentStudent();
 }
