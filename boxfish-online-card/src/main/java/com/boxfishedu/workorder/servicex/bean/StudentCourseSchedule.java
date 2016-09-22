@@ -33,6 +33,9 @@ public class StudentCourseSchedule implements Serializable {
 
     private Long workOrderId;
 
+    //是否冻结标记,冻结为1,其他为不冻结
+    private Integer isFreeze;
+
     private Integer status;
 
     public String getCourseType() {

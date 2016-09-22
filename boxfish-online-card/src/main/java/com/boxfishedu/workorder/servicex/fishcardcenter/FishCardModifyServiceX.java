@@ -227,9 +227,7 @@ public class FishCardModifyServiceX {
         // 检查日期合法化
         boolean  dataFlag = checkDate(startTimeParam);
         if(!dataFlag){
-            resultMap.put("code","1");
-            resultMap.put("msg","日期不合法");
-            return  JsonResultModel.newJsonResultModel(resultMap);
+            throw new BusinessException("日期不合法");
         }
 
         //获取鱼卡信息
@@ -237,9 +235,7 @@ public class FishCardModifyServiceX {
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
 
         if(null == workOrder || courseSchedule ==null){
-            resultMap.put("code","2");
-            resultMap.put("msg","鱼卡或者课程信息不存在");
-            return JsonResultModel.newJsonResultModel(resultMap);
+            throw new BusinessException("课程信息不存在");
         }
 
         Long teacherId = workOrder.getTeacherId();
@@ -263,6 +259,16 @@ public class FishCardModifyServiceX {
 
         //分配教师以后其实就已经是就绪,目前这两个状态有重叠
         if(workOrder.getStatus()==FishCardStatusEnum.CREATED.getCode() || workOrder.getStatus()==FishCardStatusEnum.COURSE_ASSIGNED.getCode() || workOrder.getStatus()==FishCardStatusEnum.TEACHER_ASSIGNED.getCode()){
+
+
+            //******************* 先  进行1 ,2  在进行跟换鱼卡信息
+            // 1 通知师生运营释放教师资源
+            teacherStudentRequester.notifyCancelTeacher(workOrder);
+            //2 通知小马解散师生关系
+            courseOnlineRequester.releaseGroup(workOrder);
+
+
+
             if(workOrder.getStatus()!=FishCardStatusEnum.CREATED.getCode()){
                 workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
                 courseSchedule.setStatus( FishCardStatusEnum.COURSE_ASSIGNED.getCode());
@@ -288,24 +294,13 @@ public class FishCardModifyServiceX {
             }
 
         }else {
-            resultMap.put("code","2");
-            resultMap.put("msg","鱼卡状态不正确");
-            return JsonResultModel.newJsonResultModel(resultMap);
+            throw new BusinessException("课程信息不能修改");
         }
 
         List<CourseSchedule> courseSchedules = Lists.newArrayList();
         courseSchedules.add(courseSchedule);
-        // 调用分配老师接口
+        // 3 调用分配老师接口
         timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
-
-
-        // 如果 含有 教室id  进行教室资源释放
-
-        //通知师生运营释放教师资源
-       // teacherStudentRequester.releaseTeacher(workOrder);
-        teacherStudentRequester.notifyCancelTeacher(workOrder);
-        //通知小马解散师生关系
-        courseOnlineRequester.releaseGroup(workOrder);
 
         // 记录日志
         workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");

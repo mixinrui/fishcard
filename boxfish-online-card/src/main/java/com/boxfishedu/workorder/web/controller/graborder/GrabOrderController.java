@@ -61,6 +61,9 @@ public class GrabOrderController {
     public JsonResultModel tomonotify()throws Exception {
         //测试明天有课推送
         courseNotifyOneDayServiceX.notiFyStudentClass();
+
+        //测试今天有课
+        courseNotifyOneDayServiceX.notiFyTeacherClass();
 //
 //        Thread.sleep(2000);
 //

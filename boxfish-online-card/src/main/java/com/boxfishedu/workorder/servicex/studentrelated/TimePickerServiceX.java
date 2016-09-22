@@ -440,6 +440,7 @@ public class TimePickerServiceX {
         studentCourseSchedule.setTime(timeSlots.getStartTime());
         studentCourseSchedule.setWorkOrderId(courseSchedule.getWorkorderId());
         studentCourseSchedule.setStatus(courseSchedule.getStatus());
+        studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
         if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
             studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()));
         }
