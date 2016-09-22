@@ -4,9 +4,11 @@ import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
@@ -49,6 +52,9 @@ public class AvaliableTimeForChangeTimeServiceXV {
     @Autowired
     private RandomSlotFilterService randomSlotFilterService;
 
+    @Autowired
+    private ServeService serveService;
+
     /**
      * 选时间生效天数,默认为第二天生效
      */
@@ -65,12 +71,8 @@ public class AvaliableTimeForChangeTimeServiceXV {
         //获取鱼卡信息
         WorkOrder workOrder = validateAndGetWorkOrder(workOrderId);
 
-        //获取该订单所有鱼卡信息
-        List<WorkOrder> workOrders = validateAndGetWorkOrders(workOrder.getOrderId());
-
-
-        //获取首次鱼卡开始时间
-        WorkOrder fistWorkOrder = getFirstOrder(workOrders);
+        //首次鱼卡时间
+        Date beginDate = getFirstTimeOfService(workOrder);
 
         AvaliableTimeParam avaliableTimeParam = new  AvaliableTimeParam();
         avaliableTimeParam.setComboType(workOrder.getService().getComboType());
@@ -88,7 +90,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
         Integer days =  comboCycle* daysOfWeek;
 
         //获取截至日期 (T+2原则  下单之后选时间最早后台)
-        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(fistWorkOrder.getStartTime()),60*24*(days)  );
+        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(beginDate),60*24*(days)  );
 
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(endDate);
@@ -176,6 +178,32 @@ public class AvaliableTimeForChangeTimeServiceXV {
         return list;
     }
 
+    /**
+     * 获取首次鱼卡时间
+     * @param workOrder
+     * @return
+     */
+    @Transactional
+    public Date getFirstTimeOfService(WorkOrder workOrder){
+                //获取首次鱼卡开始时间
+        WorkOrder fistWorkOrder = null;
+
+        Date beginDate = workOrder.getService().getFirstTime();
+
+        if(null==beginDate){
+            //获取该订单所有鱼卡信息
+            List<WorkOrder> workOrders = validateAndGetWorkOrders(workOrder.getOrderId());
+            fistWorkOrder = getFirstOrder(workOrders);
+            beginDate = fistWorkOrder.getStartTime();
+            logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]",fistWorkOrder.getId(),   fistWorkOrder.getStartTime());
+            //更新service的首次鱼卡开始时间
+            Service  service =serveService .findByIdForUpdate(fistWorkOrder.getService().getId());
+            service.setFirstTime(beginDate);
+            serveService.save(service);
+        }
+        logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]",workOrder.getId(),   workOrder.getStartTime());
+        return beginDate;
+    }
 
     /**
      * 返回首次时间
