@@ -20,13 +20,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -67,9 +65,12 @@ public class AvaliableTimeForChangeTimeServiceXV {
         //获取鱼卡信息
         WorkOrder workOrder = validateAndGetWorkOrder(workOrderId);
 
+        //获取该订单所有鱼卡信息
+        List<WorkOrder> workOrders = validateAndGetWorkOrders(workOrder.getOrderId());
 
-//        //获取该订单所有鱼卡信息
-//        List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(workOrder.getOrderId());
+
+        //获取首次鱼卡开始时间
+        WorkOrder fistWorkOrder = getFirstOrder(workOrders);
 
         AvaliableTimeParam avaliableTimeParam = new  AvaliableTimeParam();
         avaliableTimeParam.setComboType(workOrder.getService().getComboType());
@@ -87,7 +88,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
         Integer days =  comboCycle* daysOfWeek;
 
         //获取截至日期 (T+2原则  下单之后选时间最早后台)
-        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(workOrder.getCreateTime()),60*24*(days+2)  );
+        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(fistWorkOrder.getStartTime()),60*24*(days)  );
 
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(endDate);
@@ -154,6 +155,45 @@ public class AvaliableTimeForChangeTimeServiceXV {
             throw new BusinessException("传入鱼卡的id在服务端无对应服务");
         }
         return workOrder;
+    }
+
+
+    /**
+     * 根据鱼卡获取该订单所有鱼卡
+     * @param workOrderId
+     * @return
+     */
+    private List<WorkOrder> validateAndGetWorkOrders(Long workOrderId){
+        List<WorkOrder> list =  null;
+        try {
+            list = workOrderService.getAllWorkOrdersByOrderId(workOrderId);
+            if (CollectionUtils.isEmpty(list)) {
+                throw new BusinessException("数据不合法");
+            }
+        } catch (Exception ex) {
+            throw new BusinessException("传入鱼卡的id在服务端无对应服务");
+        }
+        return list;
+    }
+
+
+    /**
+     * 返回首次时间
+     * @param workOrders
+     * @return
+     */
+    private WorkOrder getFirstOrder(List<WorkOrder> workOrders){
+        workOrders.sort(new Comparator<WorkOrder>() {
+            @Override
+            public int compare(WorkOrder o1, WorkOrder o2) {
+                if(o1.getStartTime().after(o2.getStartTime())){
+                    return 0;
+                }
+                return -1;
+            }
+        });
+
+        return workOrders.get(0);
     }
 
 
