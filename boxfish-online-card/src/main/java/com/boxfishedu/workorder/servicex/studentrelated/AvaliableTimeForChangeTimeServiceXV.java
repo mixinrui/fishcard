@@ -4,9 +4,11 @@ import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
@@ -20,13 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +52,9 @@ public class AvaliableTimeForChangeTimeServiceXV {
     @Autowired
     private RandomSlotFilterService randomSlotFilterService;
 
+    @Autowired
+    private ServeService serveService;
+
     /**
      * 选时间生效天数,默认为第二天生效
      */
@@ -67,9 +71,8 @@ public class AvaliableTimeForChangeTimeServiceXV {
         //获取鱼卡信息
         WorkOrder workOrder = validateAndGetWorkOrder(workOrderId);
 
-
-//        //获取该订单所有鱼卡信息
-//        List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(workOrder.getOrderId());
+        //首次鱼卡时间
+        Date beginDate = serveService.getFirstTimeOfService(workOrder);
 
         AvaliableTimeParam avaliableTimeParam = new  AvaliableTimeParam();
         avaliableTimeParam.setComboType(workOrder.getService().getComboType());
@@ -87,7 +90,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
         Integer days =  comboCycle* daysOfWeek;
 
         //获取截至日期 (T+2原则  下单之后选时间最早后台)
-        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(workOrder.getCreateTime()),60*24*(days+2)  );
+        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(beginDate),60*24*(days-1)  );
 
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(endDate);
@@ -155,6 +158,11 @@ public class AvaliableTimeForChangeTimeServiceXV {
         }
         return workOrder;
     }
+
+
+
+
+
 
 
 }

@@ -84,7 +84,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
         /**  begin  发送短信 **/
-        sendShortMessage(studentHasClassMap,"2");
+        sendShortMessage(studentHasClassMap,"1");
         /**  end    发送短信 **/
 
         //开始发送通知
@@ -194,7 +194,7 @@ public class CourseNotifyOneDayServiceX {
        map.put("template_code", ShortMessageCodeConstant.SMS_STU_NOTITY_TOMO_CODE);
 
        JSONObject jo = new JSONObject();
-       jo.put("quantity", list.size());
+       jo.put("quantity", String.valueOf(list.size()));
 
        StringBuffer startTime = new StringBuffer("");
        list.forEach(workOrder -> {
@@ -221,7 +221,7 @@ public class CourseNotifyOneDayServiceX {
         map.put("template_code", ShortMessageCodeConstant.SMS_TEA_NOTITY_CLASS_TODY_CODE);
 
         JSONObject jo = new JSONObject();
-            jo.put("quantity", list.size());
+            jo.put("quantity", String.valueOf(list .size()));
             jo.put("startTime", CollectionUtils.isEmpty(list)?"":DateUtil.date2ShortString(list.get(0).getStartTime())     );
         try {
             logger.info(":::getMessageteacher::fishcardId [{}]::startTime [{}]",list.get(0).getId(),list.get(0).getStartTime());
@@ -303,7 +303,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
         /**  begin  发送短信 **/
-        sendShortMessage(teacherHasClassMap,"1");
+        sendShortMessage(teacherHasClassMap,"2");
         /**  end    发送短信 **/
 
         logger.info("notiFyTeacherClass:::::通知完成");

@@ -85,21 +85,20 @@ public class TimePickerServiceXV1 {
         //根据订单id,type获取对应的服务
         List<Service> serviceList = ensureConvertOver(timeSlotParam);
 
-        // 验证service权限
+        // 操作权限认证,防止非法的访问
         serviceList.forEach(s -> s.authentication(timeSlotParam.getStudentId()));
 
         // 获取选课策略,每周选几次,持续几周
         WeekStrategy weekStrategy = getWeekStrategy(timeSlotParam, serviceList);
         // 验证参数
         validateTimeSlotParam(timeSlotParam, weekStrategy, serviceList);
-        // unique验证
-        for(Service service : serviceList) {
-            Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(service.getStudentId());
-            checkUniqueCourseSchedules(classDateTimeslotsSet, timeSlotParam.getSelectedTimes());
-        }
 
         // 批量生成工单 TODO 生成工单
         List<WorkOrder> workOrderList = batchInitWorkorders(timeSlotParam, weekStrategy, serviceList);
+
+        // 返回学生当前选择的课程日期和时间片, unique课程验证
+        Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(timeSlotParam.getStudentId());
+        checkUniqueCourseSchedules(classDateTimeslotsSet, workOrderList);
 
         // 获取课程推荐
         Map<Integer, RecommandCourseView> recommandCourses = getRecommandCourses(workOrderList, timeSlotParam);
@@ -130,24 +129,21 @@ public class TimePickerServiceXV1 {
         }
     }
 
-    private void checkUniqueCourseSchedules(Set<String> classDateTimeSlotsList, List<SelectedTime> selectedTimes) {
-        for(SelectedTime selectedTime : selectedTimes) {
+    private void checkUniqueCourseSchedules(Set<String> classDateTimeSlotsList, List<WorkOrder> workOrderList) {
+        for(WorkOrder workOrder : workOrderList) {
             checkUniqueCourseSchedule(
                     classDateTimeSlotsList,
-                    selectedTime,
-                    () -> {
-                        TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(selectedTime.getTimeSlotId());
-                        return String.join(" ", selectedTime.getSelectedDate(), timeSlot.getStartTime())
-                                + "已经安排了课程,请重新选择!";
-                    });
+                    workOrder,
+                    () -> String.join(" ", DateUtil.Date2String(workOrder.getStartTime()))
+                            + "已经安排了课程,请重新选择!");
         }
     }
 
     private void checkUniqueCourseSchedule(
-            Set<String> classDateTimeSlotsList, SelectedTime selectedTime, Supplier<String> exceptionProducer) {
+            Set<String> classDateTimeSlotsList, WorkOrder workOrder, Supplier<String> exceptionProducer) {
         if(classDateTimeSlotsList.contains(
-                String.join(" ", selectedTime.getSelectedDate(),
-                        selectedTime.getTimeSlotId().toString()))) {
+                String.join(" ", DateUtil.simpleDate2String(workOrder.getStartTime()),
+                        workOrder.getSlotId().toString()))) {
             throw new BusinessException(exceptionProducer.get());
         }
     }
