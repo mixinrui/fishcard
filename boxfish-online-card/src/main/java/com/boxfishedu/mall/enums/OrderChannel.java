@@ -8,5 +8,6 @@ public enum OrderChannel {
     STANDARD,
     EXPERIENCE,
     ADJUST,
-    EXCHANGE
+    EXCHANGE,
+    ALLOWANCE
 }

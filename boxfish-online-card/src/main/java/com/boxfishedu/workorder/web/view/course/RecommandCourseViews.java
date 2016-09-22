@@ -8,7 +8,7 @@ import java.util.List;
  * Created by LuoLiBing on 16/9/19.
  */
 @Data
-public class OverAllRecommandViews {
+public class RecommandCourseViews {
 
     private List<RecommandCourseView> single;
 }

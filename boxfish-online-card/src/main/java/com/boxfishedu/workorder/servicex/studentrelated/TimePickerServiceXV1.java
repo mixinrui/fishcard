@@ -17,6 +17,7 @@ import com.boxfishedu.workorder.service.*;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
+import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendHandlerHelper;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -73,6 +74,9 @@ public class TimePickerServiceXV1 {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Autowired
+    private RecommendHandlerHelper recommendHandlerHelper;
+
     /**
      * 学生选择时间
      * @param timeSlotParam
@@ -101,7 +105,7 @@ public class TimePickerServiceXV1 {
         checkUniqueCourseSchedules(classDateTimeslotsSet, workOrderList);
 
         // 获取课程推荐
-        Map<Integer, RecommandCourseView> recommandCourses = getRecommandCourses(workOrderList, timeSlotParam);
+        Map<Integer, RecommandCourseView> recommandCourses = recommendHandlerHelper.recommendCourses(workOrderList, timeSlotParam);
 
         // 批量保存鱼卡与课表
         List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
@@ -184,9 +188,12 @@ public class TimePickerServiceXV1 {
     //TODO:从师生运营组获取推荐课程
     private Map<Integer, RecommandCourseView> getRecommandCourses(List<WorkOrder> workOrders, TimeSlotParam timeSlotParam) {
         // 如果是overall的8次或者16次课程,直接调用批量推荐
-        if(Objects.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.OVERALL.name()) && (workOrders.size() % 8 == 0)) {
+        if(Objects.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.OVERALL.name())
+                && (workOrders.size() % 8 == 0)) {
             return getOverAllBatchRecommand(workOrders, timeSlotParam.getStudentId());
         }
+
+
 
         Map<Integer, RecommandCourseView> courseViewMap = Maps.newHashMap();
         for (WorkOrder workOrder : workOrders) {

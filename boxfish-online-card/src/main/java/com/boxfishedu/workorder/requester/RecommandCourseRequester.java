@@ -7,8 +7,8 @@ import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.RecommandedCourseService;
-import com.boxfishedu.workorder.web.view.course.OverAllRecommandViews;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.course.RecommandCourseViews;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class RecommandCourseRequester {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public RecommandCourseView getRecommandCourse(WorkOrder workOrder, Integer index) {
-        String url = String.format("%s/online/%s/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), index);
+        String url = String.format("%s/core/online/%s/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), index);
         logger.debug("@<-<-<-<-<-<-向推荐课发起获取推荐课的请求,url:[{}]", url);
         RecommandCourseView recommandCourseView = null;
         try {
@@ -94,7 +94,7 @@ public class RecommandCourseRequester {
 
     //目前为中教的换课
     public RecommandCourseView changeOverAllCourse(WorkOrder workOrder) {
-        String url = String.format("%s/exchange/online/%s/%s/%s", urlConf.getCourse_recommended_service(),
+        String url = String.format("%s/core/exchange/online/%s/%s/%s", urlConf.getCourse_recommended_service(),
                 workOrder.getStudentId(), workOrder.getSeqNum(), workOrder.getCourseId());
         try {
             logger.info("@changeCourse#request发起换课请求,url[{}]", url);
@@ -110,7 +110,7 @@ public class RecommandCourseRequester {
 
     //目前为中教的换课
     public RecommandCourseView changeChineseCourse(WorkOrder workOrder) {
-        String url = String.format("%s/exchange/chinese/%s/%s", urlConf.getCourse_recommended_service(),
+        String url = String.format("%s/core/exchange/chinese/%s/%s", urlConf.getCourse_recommended_service(),
                 workOrder.getStudentId(), workOrder.getCourseId());
         try {
             logger.info("@changeChineseCourse#request发起换课请求,url[{}]", url);
@@ -127,7 +127,7 @@ public class RecommandCourseRequester {
 
     //目前为中教的换课
     public RecommandCourseView changeForeignCourse(WorkOrder workOrder) {
-        String url = String.format("%s/exchange/foreigner/%s/%s", urlConf.getCourse_recommended_service(),
+        String url = String.format("%s/core/exchange/foreigner/%s/%s", urlConf.getCourse_recommended_service(),
                 workOrder.getStudentId(), workOrder.getCourseId());
         try {
             logger.info("@changeForeignCourse#request发起换课请求,url[{}]", url);
@@ -151,18 +151,32 @@ public class RecommandCourseRequester {
 
     public List<RecommandCourseView> getBatchRecommandCourse(Long studentId) {
         try {
-            OverAllRecommandViews overAllRecommandViews = restTemplate.getForObject(
-                    createOverAllRecommend(studentId), OverAllRecommandViews.class);
+            RecommandCourseViews overAllRecommandViews = restTemplate.getForObject(
+                    createOverAllRecommend(studentId), RecommandCourseViews.class);
             return overAllRecommandViews.getSingle();
         } catch (Exception e) {
             throw new BusinessException("调用课程推荐失败");
         }
     }
 
+    public RecommandCourseView getDreamRecommandCourse(WorkOrder workOrder) {
+        return restTemplate.postForObject(
+                createDreamRecommend(workOrder.getStudentId(), recommandedCourseService.getCourseIndex(workOrder)),
+                HttpEntity.EMPTY,
+                RecommandCourseView.class);
+    }
+
+
+    public List<RecommandCourseView> getBatch8DreamRecommandCourse(Long studentId) {
+        RecommandCourseViews recommandCourseViews = restTemplate.getForObject(
+                create8BatchDreamRecommend(studentId), RecommandCourseViews.class);
+        return recommandCourseViews.getSingle();
+    }
+
 
     //课程完成后,通知推荐课程服务
     public void notifyCompleteCourse(WorkOrder workOrder) {
-        String url = String.format("%s/counter/user_id/%s/lesson_id/%s", urlConf.getCourse_recommended_service(),
+        String url = String.format("%s/core/counter/user_id/%s/lesson_id/%s", urlConf.getCourse_recommended_service(),
                 workOrder.getStudentId(), workOrder.getCourseId());
         logger.info("上课结束,通知推荐课url::::[{}]", url);
         threadPoolManager.execute(new Thread(() -> {
@@ -178,7 +192,7 @@ public class RecommandCourseRequester {
     private URI createRecommendUri(Long studentId, String tutorType) {
         return UriComponentsBuilder
                 .fromUriString(urlConf.getCourse_recommended_service())
-                .path("/online/" + tutorType + "/" + studentId)
+                .path("/core/online/" + tutorType + "/" + studentId)
                 .build()
                 .toUri();
     }
@@ -203,7 +217,7 @@ public class RecommandCourseRequester {
     private URI createForeignRecommendUri(Long studentId) {
         return UriComponentsBuilder
                 .fromUriString(urlConf.getCourse_recommended_service())
-                .path("/online/foreigner/" + studentId)
+                .path("/core/online/foreigner/" + studentId)
                 .build()
                 .toUri();
     }
@@ -211,9 +225,23 @@ public class RecommandCourseRequester {
 
     private URI createOverAllRecommend(Long studentId) {
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
-                .path("/online/" + studentId)
+                .path("/core/online/" + studentId)
                 .build()
                 .toUri();
 
+    }
+
+    private URI createDreamRecommend(Long studentId, int index) {
+        return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
+                .path(String.format("/online/dream/%s/%s", studentId.toString(), index))
+                .build()
+                .toUri();
+    }
+
+    private URI create8BatchDreamRecommend(Long studentId) {
+        return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
+                .path(String.format("/online/dream/%s", studentId.toString()))
+                .build()
+                .toUri();
     }
 }

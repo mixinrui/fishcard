@@ -114,7 +114,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     public ResponseCourseView getCoursesByStudentId(Long studentId) {
         ResponseCourseView responseCourseView = null;
         StringBuilder buffer = new StringBuilder(urlConf.getCourse_recommended_service()).
-                append("/course/calculator/").append(studentId).append("/1");
+                append("/core/course/calculator/").append(studentId).append("/1");
         try {
             responseCourseView = restTemplate.getForObject(buffer.toString(), ResponseCourseView.class);
             if (null == responseCourseView) {
@@ -130,7 +130,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     public List<CourseView> getCoursesForUpdate(Long studentId, int num) {
         ResponseCourseView responseCourseView = null;
         StringBuilder buffer = new StringBuilder(urlConf.getCourse_recommended_service()).
-                append("/course/calculator/").append(studentId).append("/").append(num);
+                append("/core/course/calculator/").append(studentId).append("/").append(num);
         return getRecommandedCourseViews(studentId, buffer);
     }
 
