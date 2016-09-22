@@ -10,37 +10,36 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CourseType2TeachingTypeService {
-    public int courseType2TeachingType(String courseType,TutorType tutorType){
-       return getTeachingType(courseType,tutorType);
+    public int courseType2TeachingType(String courseType, TutorType tutorType) {
+        return getTeachingType(courseType, tutorType);
     }
 
-    private static int getTeachingType(String courseType,TutorType tutorType){
-            switch (tutorType){
-                case CN:
-                    return TeachingType.ZHONGJIAO.getCode();
-                case FRN:
+    private static int getTeachingType(String courseType, TutorType tutorType) {
+        switch (tutorType) {
+            case CN:
+                return TeachingType.ZHONGJIAO.getCode();
+            case FRN:
+                return TeachingType.WAIJIAO.getCode();
+            case MIXED: {
+                if (courseType.equals(CourseTypeEnum.TALK.toString())) {
                     return TeachingType.WAIJIAO.getCode();
-                case MIXED:{
-                    if(courseType.equals(CourseTypeEnum.TALK.toString())){
-                        return TeachingType.WAIJIAO.getCode();
-                    }
-                    else{
-                        return TeachingType.ZHONGJIAO.getCode();
-                    }
-                }
-                default:
+                } else {
                     return TeachingType.ZHONGJIAO.getCode();
-
+                }
             }
+            default:
+                return TeachingType.ZHONGJIAO.getCode();
+
         }
     }
 
     /**
      * 提供一个静态调用
+     *
      * @param courseType
      * @return
      */
-    public static int courseType2TeachingType2(String courseType,TutorType tutorType){
-        return getTeachingType(courseType,tutorType);
+    public static int courseType2TeachingType2(String courseType, TutorType tutorType) {
+        return getTeachingType(courseType, tutorType);
     }
 }
