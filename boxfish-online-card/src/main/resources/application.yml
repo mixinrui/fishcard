@@ -82,8 +82,8 @@ spring.jackson.time-zone: GMT+8
 #spring.profiles.active: product
 #spring.profiles.active: local
 #spring.profiles.active: development
-spring.profiles.active: development_new
-#spring.profiles.active: test
+#spring.profiles.active: development_new
+spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
 
@@ -160,7 +160,7 @@ interface:
     teacher_service: http://123.56.13.168:8099
     teacher_service_admin: http://123.56.13.168:8099
 
-    course_recommended_service: http://base.boxfish.cn/recommend/core
+    course_recommended_service: http://base.boxfish.cn/recommend
 #    course_recommended_service: http://114.55.40.98:8001
     fishcard_service: http://123.56.13.168:8080
     order_service: http://123.56.13.168:8082
@@ -207,7 +207,7 @@ interface:
   address:
     teacher_service: http://101.201.237.252:8099
     teacher_service_admin: http://101.201.237.252:8099
-    course_recommended_service: http://123.56.13.168:8001/recommend/core
+    course_recommended_service: http://123.56.13.168:8001/recommend
     fishcard_service: http://127.0.0.1:8080
     order_service: http://101.201.237.252:8082
     course_online_service: http://101.201.239.116:9090
@@ -257,12 +257,12 @@ interface:
   address:
     teacher_service: http://101.201.237.252:8099
     teacher_service_admin: http://101.201.237.252:8099
-    course_recommended_service: http://101.201.237.252:8001/recommend/core
+    course_recommended_service: http://123.56.13.168:8001/recommend
     fishcard_service: http://101.201.237.252:8080
     order_service: http://101.201.237.252:8082
     course_online_service: http://101.201.237.252:9090
 #    course_online_service: http://online-api.boxfish.cn/teaching-service
-    auth_user: http://101.201.237.252:8099
+    auth_user: http://114.55.58.184:8099
     data_analysis_service: http://101.201.237.252:9301
     student_teacher_relation: http://api.online.demo.boxfish.cn
 #  学生旷课扣积分
@@ -365,7 +365,7 @@ interface:
   address:
     teacher_service: http://127.0.0.1:8099
     teacher_service_admin: http://127.0.0.1:8098
-    course_recommended_service: http://127.0.0.1:8001/recommend/core
+    course_recommended_service: http://127.0.0.1:8001/recommend
     fishcard_service: http://127.0.0.1:8080
     order_service: http://127.0.0.1:8082
     course_online_service: http://127.0.0.1:9090
@@ -527,10 +527,10 @@ interface:
   address:
     teacher_service: http://online-api.boxfish.cn/teacher
     teacher_service_admin: http://online-api.boxfish.cn/teacheradmin
-#    course_recommended_service: http://base.boxfish.cn/recommend/core
-#    course_recommended_service: http://114.55.40.98:8001/recommend/core
+#    course_recommended_service: http://base.boxfish.cn/recommend
+#    course_recommended_service: http://114.55.40.98:8001/recommend
 
-    course_recommended_service: http://base.boxfish.cn/recommend/core
+    course_recommended_service: http://base.boxfish.cn/recommend
     fishcard_service: http://online-api.boxfish.cn/fishcard
     order_service: http://online-api.boxfish.cn/order
     course_online_service: http://online-api.boxfish.cn/teaching-service

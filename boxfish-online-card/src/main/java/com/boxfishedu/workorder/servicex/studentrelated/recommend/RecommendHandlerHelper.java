@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.studentrelated.recommend;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseType2TeachingTypeService;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
@@ -17,7 +18,6 @@ import java.util.Map;
 
 /**
  * Created by LuoLiBing on 16/9/22.
- * 课程推荐帮助类
  */
 @Service
 public class RecommendHandlerHelper {
@@ -54,7 +54,7 @@ public class RecommendHandlerHelper {
             RecommandCourseView recommandCourseView = resultMap.get(workOrder.getSeqNum());
             workOrder.initCourseInfo(recommandCourseView);
             workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
-                    recommandCourseView.getCourseType()));
+                    recommandCourseView.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType())));
         }
         return resultMap;
 
