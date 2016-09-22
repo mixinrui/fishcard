@@ -41,5 +41,6 @@ public class CourseType2TeachingTypeService {
      */
     public static int courseType2TeachingType2(String courseType, TutorType tutorType) {
         return getTeachingType(courseType, tutorType);
+
     }
 }
