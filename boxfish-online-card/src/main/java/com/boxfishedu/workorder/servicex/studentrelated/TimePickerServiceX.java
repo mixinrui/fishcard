@@ -234,7 +234,7 @@ public class TimePickerServiceX {
             RecommandCourseView recommandCourseView = resultMap.get(workOrder.getSeqNum());
             workOrder.initCourseInfo(recommandCourseView);
             workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
-                    recommandCourseView.getCourseType()));
+                    recommandCourseView.getCourseType(),TutorType.resolve(workOrder.getService().getTutorType())));
         }
         return resultMap;
     }
@@ -417,6 +417,7 @@ public class TimePickerServiceX {
             studentCourseSchedule.setId(courseSchedule.getId());
             studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
             studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
+            studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
             TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(courseSchedule.getTimeSlotId());
             if (timeSlot != null) {
                 // 日期转换

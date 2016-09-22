@@ -214,7 +214,7 @@ public class TimePickerServiceXV1 {
             if(!Objects.isNull(recommandCourseView)) {
                 workOrder.initCourseInfo(recommandCourseView);
                 workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
-                        recommandCourseView.getCourseType()));
+                        recommandCourseView.getCourseType(),TutorType.resolve(workOrder.getService().getTutorType())));
                 courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
             }
 //            courseViewMap.put(workOrder.getSeqNum(), courseView);
@@ -423,7 +423,7 @@ public class TimePickerServiceXV1 {
             RecommandCourseView recommandCourseView = resultMap.get(workOrder.getSeqNum());
                 workOrder.initCourseInfo(recommandCourseView);
                 workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
-                        recommandCourseView.getCourseType()));
+                        recommandCourseView.getCourseType(),TutorType.resolve(workOrder.getService().getTutorType())));
         }
         return resultMap;
     }

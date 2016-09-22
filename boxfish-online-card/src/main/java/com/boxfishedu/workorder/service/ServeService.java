@@ -572,4 +572,68 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
         return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
     }
+
+    /**
+     * 获取首次鱼卡时间
+     * @param workOrder
+     * @return
+     */
+    @Transactional
+    public Date getFirstTimeOfService(WorkOrder workOrder){
+        //获取首次鱼卡开始时间
+        WorkOrder fistWorkOrder = null;
+
+        Date beginDate = workOrder.getService().getFirstTime();
+
+        if(null==beginDate){
+            //获取该订单所有鱼卡信息
+            List<WorkOrder> workOrders = validateAndGetWorkOrders(workOrder.getOrderId());
+            fistWorkOrder = getFirstOrder(workOrders);
+            beginDate = fistWorkOrder.getStartTime();
+            logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]",fistWorkOrder.getId(),   fistWorkOrder.getStartTime());
+            //更新service的首次鱼卡开始时间
+            Service  service =this.findByIdForUpdate(fistWorkOrder.getService().getId());
+            service.setFirstTime(beginDate);
+            this.save(service);
+        }
+        logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]",workOrder.getId(),   workOrder.getStartTime());
+        return beginDate;
+    }
+
+    /**
+     * 返回首次时间
+     * @param workOrders
+     * @return
+     */
+    private WorkOrder getFirstOrder(List<WorkOrder> workOrders){
+        workOrders.sort(new Comparator<WorkOrder>() {
+            @Override
+            public int compare(WorkOrder o1, WorkOrder o2) {
+                if(o1.getStartTime().after(o2.getStartTime())){
+                    return 0;
+                }
+                return -1;
+            }
+        });
+
+        return workOrders.get(0);
+    }
+
+    /**
+     * 根据鱼卡获取该订单所有鱼卡
+     * @param workOrderId
+     * @return
+     */
+    private List<WorkOrder> validateAndGetWorkOrders(Long workOrderId){
+        List<WorkOrder> list =  null;
+        try {
+            list = workOrderService.getAllWorkOrdersByOrderId(workOrderId);
+            if (org.springframework.util.CollectionUtils.isEmpty(list)) {
+                throw new BusinessException("数据不合法");
+            }
+        } catch (Exception ex) {
+            throw new BusinessException("传入鱼卡的id在服务端无对应服务");
+        }
+        return list;
+    }
 }

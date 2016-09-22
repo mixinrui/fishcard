@@ -84,7 +84,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
         /**  begin  发送短信 **/
-        sendShortMessage(studentHasClassMap,"2");
+        sendShortMessage(studentHasClassMap,"1");
         /**  end    发送短信 **/
 
         //开始发送通知
@@ -303,7 +303,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
         /**  begin  发送短信 **/
-        sendShortMessage(teacherHasClassMap,"1");
+        sendShortMessage(teacherHasClassMap,"2");
         /**  end    发送短信 **/
 
         logger.info("notiFyTeacherClass:::::通知完成");

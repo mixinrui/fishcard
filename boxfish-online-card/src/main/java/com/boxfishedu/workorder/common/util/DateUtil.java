@@ -311,7 +311,7 @@ public class DateUtil {
     */
     public static int getBetweenDays(Date begin, Date end) {
         long l = end.getTime() - begin.getTime();
-        return  (int)( l / (24 * 60 * 60 * 1000));
+        return  ((int)( l / (24 * 60 * 60 * 1000)) -1);
     }
 
 

@@ -9,6 +9,7 @@ import java.util.Date;
  */
 @Data
 public class FishCardFilterParam {
+    private Long id;
     private Long studentId;
     private Long teacherId;
     private String orderCode;

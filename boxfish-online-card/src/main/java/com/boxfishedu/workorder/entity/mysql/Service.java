@@ -58,6 +58,13 @@ public class Service {
     @Column(name = "sku_name", nullable = true, length = 45)
     private String skuName;
 
+
+    /** 第一次鱼卡开始时间  **/
+    @Column(name = "first_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date firstTime;
+
+
     @Column(name = "create_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
