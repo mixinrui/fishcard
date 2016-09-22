@@ -417,6 +417,7 @@ public class TimePickerServiceX {
             studentCourseSchedule.setId(courseSchedule.getId());
             studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
             studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
+            studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
             TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(courseSchedule.getTimeSlotId());
             if (timeSlot != null) {
                 // 日期转换
