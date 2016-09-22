@@ -90,7 +90,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
         Integer days =  comboCycle* daysOfWeek;
 
         //获取截至日期 (T+2原则  下单之后选时间最早后台)
-        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(beginDate),60*24*(days)  );
+        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(beginDate),60*24*(days-1)  );
 
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(endDate);
