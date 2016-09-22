@@ -9,6 +9,7 @@ import lombok.Data;
 public class RecommandCourseView {
     private String courseId;
     private String courseName;
+//    private String englishName;
     private String courseType;
     private String publicDate;
     private Integer bundleOrder;

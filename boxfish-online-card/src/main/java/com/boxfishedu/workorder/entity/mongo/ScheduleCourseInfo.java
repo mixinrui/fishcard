@@ -18,6 +18,7 @@ public class ScheduleCourseInfo {
     @Indexed(background = true)
     private String courseId;
     private String name;
+//    private String englishName;
     private String courseType;
     private String publicDate;
     private Integer difficulty;

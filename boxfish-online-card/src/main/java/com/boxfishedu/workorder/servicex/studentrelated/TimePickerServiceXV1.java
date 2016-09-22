@@ -105,7 +105,7 @@ public class TimePickerServiceXV1 {
         checkUniqueCourseSchedules(classDateTimeslotsSet, workOrderList);
 
         // 获取课程推荐
-        Map<Integer, RecommandCourseView> recommandCourses = recommendHandlerHelper.recommendCourses(workOrderList, timeSlotParam);
+        Map<Integer, RecommandCourseView> recommandCourses = getRecommandCourses(workOrderList, timeSlotParam);
 
         // 批量保存鱼卡与课表
         List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
@@ -192,8 +192,6 @@ public class TimePickerServiceXV1 {
                 && (workOrders.size() % 8 == 0)) {
             return getOverAllBatchRecommand(workOrders, timeSlotParam.getStudentId());
         }
-
-
 
         Map<Integer, RecommandCourseView> courseViewMap = Maps.newHashMap();
         for (WorkOrder workOrder : workOrders) {
