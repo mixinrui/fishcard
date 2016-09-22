@@ -136,6 +136,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         if (null != fishCardFilterParam.getOrderCode()) {
             sql.append("and orderCode=:orderCode ");
         }
+        if (null != fishCardFilterParam.getId()) {
+            sql.append("and id=:id ");
+        }
         if (null != fishCardFilterParam.getStudentId()) {
             sql.append("and studentId=:studentId ");
         }
@@ -219,6 +222,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         query.setParameter("begin", fishCardFilterParam.getBeginDateFormat());
         query.setParameter("end", fishCardFilterParam.getEndDateFormat());
 
+        if (null != fishCardFilterParam.getId()) {
+            query.setParameter("id",fishCardFilterParam.getId());
+        }
         // 订单类型
         if (null != fishCardFilterParam.getOrderType()) {
             query.setParameter("orderChannel", fishCardFilterParam.getOrderType());
