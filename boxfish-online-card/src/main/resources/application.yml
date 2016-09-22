@@ -28,7 +28,7 @@ choiceTime:
   # 默认为购买后第二天生效
   consumerStartDay: 2
   #服务端允许补课的时间范围,单位:天
-  durationAllowMakeUp: 14
+  durationAllowMakeUp: 60
   #补课距离当前课的可开始时间
   durationFromParentCourse: 1
 
