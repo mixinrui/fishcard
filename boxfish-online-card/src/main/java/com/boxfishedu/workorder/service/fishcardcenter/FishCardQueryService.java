@@ -177,8 +177,11 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             sql.append("and orderChannel=:comboType ");
         }
 
-        sql.append("and orderId !=:orderId ");
-
+        if (fishCardFilterParam.getDemoType().trim().equals("true")) {
+            sql.append("and orderId=:orderId ");
+        }else{
+            sql.append("and orderId !=:orderId ");
+        }
 
         if (null != fishCardFilterParam.getStartTimeSort()) {
             sql.append("order by wo.startTime   ").append(fishCardFilterParam.getStartTimeSort().toLowerCase());
