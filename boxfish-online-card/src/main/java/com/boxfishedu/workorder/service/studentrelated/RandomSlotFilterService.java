@@ -140,11 +140,11 @@ public class RandomSlotFilterService {
         return dayTimeSlots;
     }
 
-    public DayTimeSlots removeSlotsNotInRange(DayTimeSlots dayTimeSlots, Long teacherId) {
-        AvaliableTimeParam avaliableTimeParam = new AvaliableTimeParam();
-        avaliableTimeParam.setComboType(getComboTypeByTeacherId(teacherId));
-        return this.removeSlotsNotInRange(dayTimeSlots, avaliableTimeParam);
-    }
+//    public DayTimeSlots removeSlotsNotInRange(DayTimeSlots dayTimeSlots, Long teacherId) {
+//        AvaliableTimeParam avaliableTimeParam = new AvaliableTimeParam();
+//        avaliableTimeParam.setComboType(getComboTypeByTeacherId(teacherId));
+//        return this.removeSlotsNotInRange(dayTimeSlots, avaliableTimeParam);
+//    }
 
     //是否为该包含的时间片
     private boolean isInTimeRange(TimeSlots timeSlots, String comboType, Date day, List<SimpleTimeLimitPolicy.TimeRange> timeRanges) {
@@ -159,17 +159,17 @@ public class RandomSlotFilterService {
         return false;
     }
 
-    private String getComboTypeByTeacherId(Long teacherId) {
-        try {
-            int teacherType = teacherStudentRequester.getTeacherType(teacherId);
-            if (teacherType == TeachingType.WAIJIAO.getCode()) {
-                return ComboTypeEnum.FOREIGN.toString();
-            } else {
-                return ComboTypeEnum.OVERALL.toString();
-            }
-        } catch (Exception ex) {
-            logger.error("@getComboTypeByTeacherId#eror", ex);
-            return ComboTypeEnum.OVERALL.toString();
-        }
-    }
+//    private String getComboTypeByTeacherId(Long teacherId) {
+//        try {
+//            int teacherType = teacherStudentRequester.getTeacherType(teacherId);
+//            if (teacherType == TeachingType.WAIJIAO.getCode()) {
+//                return ComboTypeEnum.FOREIGN.toString();
+//            } else {
+//                return ComboTypeEnum.OVERALL.toString();
+//            }
+//        } catch (Exception ex) {
+//            logger.error("@getComboTypeByTeacherId#eror", ex);
+//            return ComboTypeEnum.OVERALL.toString();
+//        }
+//    }
 }

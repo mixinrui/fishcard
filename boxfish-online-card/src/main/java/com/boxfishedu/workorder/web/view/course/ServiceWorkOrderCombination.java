@@ -88,7 +88,7 @@ public class ServiceWorkOrderCombination {
         for(WorkOrder workOrder : workOrderList) {
             RecommandCourseView recommandCourseView = recommendCourseViewMap.get(workOrder.getSeqNum());
             workOrder.initCourseInfo(recommandCourseView);
-            workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
+            workOrder.setSkuId( CourseType2TeachingTypeService.courseType2TeachingType2(
                     recommandCourseView.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType())));
         }
         return this;
