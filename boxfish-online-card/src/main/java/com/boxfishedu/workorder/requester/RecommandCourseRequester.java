@@ -233,14 +233,14 @@ public class RecommandCourseRequester {
 
     private URI createDreamRecommend(Long studentId, int index) {
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
-                .path(String.format("/online/dream/%s/%s", studentId.toString(), index))
+                .path(String.format("/online/ultimate/%s/%s", studentId.toString(), index))
                 .build()
                 .toUri();
     }
 
     private URI create8BatchDreamRecommend(Long studentId) {
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
-                .path(String.format("/online/dream/%s", studentId.toString()))
+                .path(String.format("/online/ultimate/%s", studentId.toString()))
                 .build()
                 .toUri();
     }
