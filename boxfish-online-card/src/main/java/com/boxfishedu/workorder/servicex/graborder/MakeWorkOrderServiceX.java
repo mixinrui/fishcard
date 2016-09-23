@@ -29,6 +29,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
@@ -38,6 +39,10 @@ import java.util.Map;
 
 /**
  * 生成可以抢单的鱼卡
+ * 160922:终极梦想
+ *       课程类型:Reading,Conversation,Function,Talk,Phonics
+ *       Phonics 只能加拿大和美国人教(北美外教)
+ *
  * Created by jiaozijun on 16/7/11.
  */
 @Component
@@ -198,22 +203,22 @@ public class MakeWorkOrderServiceX {
      * }
      *
      * @param map
-     * @param workOrderNOteacher
-     * @param workOrderYESteacher
-     * @param teacherForms
+     * @param workOrderNOteacher   没有老师的鱼卡
+     * @param workOrderYESteacher  分配老师的鱼卡
+     * @param teacherForms         教师列表
      * @return
      */
     public Map getTeacherWorkOrderList(Map map, List<WorkOrder> workOrderNOteacher, List<WorkOrder> workOrderYESteacher, List<TeacherForm> teacherForms) {
 
-        boolean workOrderYESteacherFlag = true;
-        if (null == workOrderYESteacher || workOrderYESteacher.size() < 1) {
+        boolean workOrderYESteacherFlag = true;   //是否含有  有老师的鱼卡
+        if (CollectionUtils.isEmpty(workOrderYESteacher)) {
             workOrderYESteacherFlag = false;
         }
         for (TeacherForm teacher : teacherForms) {
 
             if (!workOrderYESteacherFlag) {
                 List workOrderteacherList = getTeacherListByType(workOrderNOteacher, teacher.getTeacherType());
-                if(workOrderteacherList !=null && workOrderteacherList.size()>0){
+                if(!CollectionUtils.isEmpty(workOrderteacherList)){
                     map.put(teacher.getTeacherId(), workOrderteacherList);
                 }
             } else {
@@ -322,6 +327,7 @@ public class MakeWorkOrderServiceX {
             Map m = (Map)o;
             tf.setTeacherId(Long.parseLong( String.valueOf( m.get("teacherId"))));
             tf.setTeacherType((Integer) m.get("teachingType"));
+            tf.setCourseIds((String[])m.get("courseIds"));
             teacherListFromTeach.add(tf);
         }
 
