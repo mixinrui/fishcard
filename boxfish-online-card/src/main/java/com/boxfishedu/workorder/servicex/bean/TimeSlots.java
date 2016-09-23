@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -107,8 +108,8 @@ public class TimeSlots implements Cloneable, Serializable {
             return;
         }
 
-        // 非中文环境全部显示成英文
-        if(!Objects.equals(locale, Locale.CHINA)) {
+        // 非中文环境,并且课程英文名部位空的情况下全部显示成英文
+        if(!Objects.equals(locale, Locale.CHINA) && StringUtils.isNotEmpty(courseView.getEnglishName())) {
             courseView.setName(courseView.getEnglishName());
         }
     }
