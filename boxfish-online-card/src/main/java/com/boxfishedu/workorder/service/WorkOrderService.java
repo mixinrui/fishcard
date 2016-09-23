@@ -329,7 +329,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             workOrder.setCourseName(courseView.getCourseName());
             workOrder.setCourseType(courseView.getCourseType());
             workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
-            workOrder.setSkuId(new Long(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType()))));
+            workOrder.setSkuId(new Integer(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType()))));
         }
     }
 
