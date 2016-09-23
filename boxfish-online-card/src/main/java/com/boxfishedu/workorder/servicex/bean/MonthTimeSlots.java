@@ -10,10 +10,7 @@ import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -72,13 +69,13 @@ public class MonthTimeSlots extends ResponseBaseView implements Serializable {
      * @param
      */
     public void override(Map<String, Map<String, CourseSchedule>> courseSchedules,
-                         ServiceSDK serviceSDK) {
+                         ServiceSDK serviceSDK, Locale locale) {
         Iterator<DayTimeSlots> it = data.iterator();
         while (it.hasNext()){
             DayTimeSlots dayTimeSlots = it.next();
             // 世超传过来的是一个long型,这边是用一个long型的字符串接收.....
             // dayTimeSlots.setDay(DateUtil.simpleDateLong2String(Long.valueOf(dayTimeSlots.getDay())));
-            dayTimeSlots.override(courseSchedules, serviceSDK);
+            dayTimeSlots.override(courseSchedules, serviceSDK, locale);
             if(CollectionUtils.isEmpty(dayTimeSlots.getDailyScheduleTime())) {
                 it.remove();
             }

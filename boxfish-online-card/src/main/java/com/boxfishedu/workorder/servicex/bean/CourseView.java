@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.bean;
 
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class CourseView implements Serializable {
     private String name;
 
     // TODO 添加英文课名
+    @JsonIgnore
     private String englishName;
 
     private String thumbnail;
