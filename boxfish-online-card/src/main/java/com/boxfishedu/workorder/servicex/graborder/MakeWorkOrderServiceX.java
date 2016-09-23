@@ -32,10 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 生成可以抢单的鱼卡
@@ -217,7 +214,7 @@ public class MakeWorkOrderServiceX {
         for (TeacherForm teacher : teacherForms) {
 
             if (!workOrderYESteacherFlag) {
-                List workOrderteacherList = getTeacherListByType(workOrderNOteacher, teacher.getTeacherType());
+                List workOrderteacherList = getTeacherListByType(workOrderNOteacher, teacher);
                 if(!CollectionUtils.isEmpty(workOrderteacherList)){
                     map.put(teacher.getTeacherId(), workOrderteacherList);
                 }
@@ -240,7 +237,7 @@ public class MakeWorkOrderServiceX {
                 }
 
                 if (workOrder.size() > 0) {
-                    List workOrderteacherList = getTeacherListByType(workOrder, teacher.getTeacherType());
+                    List workOrderteacherList = getTeacherListByType(workOrder, teacher);
                     if(workOrderteacherList !=null && workOrderteacherList.size()>0){
                         map.put(teacher.getTeacherId(),workOrderteacherList);
                     }
@@ -254,6 +251,8 @@ public class MakeWorkOrderServiceX {
 
 
     public static  void  main(String args[]){
+        String [] s   = {"p","s","d"};
+        System.out.print(Arrays.binarySearch(s,"s"));
 
     }
 
@@ -263,17 +262,29 @@ public class MakeWorkOrderServiceX {
      * 根据教师类型  返回相应的 鱼卡列表
      *
      * @param workOrderNOteacher
-     * @param type
+     * @param teacherForm
      * @return
      */
-    public List<WorkOrder> getTeacherListByType(List<WorkOrder> workOrderNOteacher, int type) {
+    public List<WorkOrder> getTeacherListByType(List<WorkOrder> workOrderNOteacher,TeacherForm  teacherForm) {
         List<WorkOrder> list = Lists.newArrayList();
         for (WorkOrder wo : workOrderNOteacher) {
-            if (TeachingType.WAIJIAO.getCode() == type && CourseTypeEnum.TALK.toString().equals(wo.getCourseType())) {
-                list.add(wo);
+            if (TeachingType.WAIJIAO.getCode() == teacherForm.getTeacherType() &&  TeachingType.WAIJIAO.getCode() == wo.getSkuId()) { //判断外教
+                if(  null!=teacherForm.getCourseIds()    // 老师能教的课程类型集合
+                        &&
+                      !StringUtils.isEmpty(wo.getCourseType())  // 鱼卡的课程类型
+                        &&
+                      CourseTypeEnum.PHONICS.toString().toLowerCase().equals( wo.getCourseType().toLowerCase())
+                        &&
+                      Arrays.binarySearch(teacherForm.getCourseIds(), CourseTypeEnum.PHONICS.toString())>-1
+                           ){
+                    list.add(wo);
+                }else{
+                    list.add(wo);
+                }
+
             }
 
-            if (TeachingType.ZHONGJIAO.getCode() == type && !CourseTypeEnum.TALK.toString().equals(wo.getCourseType())) {
+            if (TeachingType.ZHONGJIAO.getCode() == teacherForm.getTeacherType() && !(TeachingType.WAIJIAO.getCode() == wo.getSkuId())) {
                 list.add(wo);
             }
         }
