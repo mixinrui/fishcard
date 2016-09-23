@@ -45,7 +45,7 @@ public class FishCardFilterParam {
 
     private String orderType;// 订单类型
 
-    /** 是否查询demo课程 true 不显示 false 显示**/
+    /** 是否查询demo课程 true 显示 false 不显示**/
 
     private String demoType;
 
