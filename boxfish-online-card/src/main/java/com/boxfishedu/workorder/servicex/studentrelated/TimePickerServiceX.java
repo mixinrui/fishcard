@@ -233,7 +233,7 @@ public class TimePickerServiceX {
 //            Integer index=recommandedCourseService.getCourseIndex(workOrder);
             RecommandCourseView recommandCourseView = resultMap.get(workOrder.getSeqNum());
             workOrder.initCourseInfo(recommandCourseView);
-            workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
+            workOrder.setSkuId(CourseType2TeachingTypeService.courseType2TeachingType2(
                     recommandCourseView.getCourseType(),TutorType.resolve(workOrder.getService().getTutorType())));
         }
         return resultMap;

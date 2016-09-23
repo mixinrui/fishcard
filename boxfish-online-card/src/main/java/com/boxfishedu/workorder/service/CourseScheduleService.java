@@ -163,8 +163,8 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     public List<TeacherAlterView> getOutNumOfTeacher(Date beginDate, Date endDate){
         String sql = "select new com.boxfishedu.workorder.web.view.fishcard.TeacherAlterView" +
                 "(count(cs.id),cs.roleId)" +
-                " from  CourseSchedule cs where (cs.status=? and cs.classDate between ? and ?) ";
-        Query query = entityManager.createQuery(sql).setParameter(1,FishCardStatusEnum.COURSE_ASSIGNED.getCode()).setParameter(2, beginDate).setParameter(3, endDate);
+                " from  CourseSchedule cs where (cs.status=? and cs.classDate between ? and ?) and cs.isFreeze!=?";
+        Query query = entityManager.createQuery(sql).setParameter(1,FishCardStatusEnum.COURSE_ASSIGNED.getCode()).setParameter(2, beginDate).setParameter(3, endDate).setParameter(4,1);
         List<TeacherAlterView> teacherAlterViews=query.getResultList();
         return teacherAlterViews;
     }

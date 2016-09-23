@@ -71,7 +71,6 @@ public class FishCardQueryServiceX {
         Page<WorkOrder> page = listFishCardsByDifferentCond(fishCardFilterParam, services, pageable);
         for (WorkOrder workOrder : page.getContent()) {
             workOrder.setStatusDesc(FishCardStatusEnum.getDesc((workOrder.getStatus())));
-            workOrder.setSkuId(workOrder.getService().getSkuId());
             if(ConstantUtil.SKU_EXTRA_VALUE==workOrder.getSkuIdExtra()){
                 workOrder.setTeachingType(TeachingType.WAIJIAO.getCode());
             }

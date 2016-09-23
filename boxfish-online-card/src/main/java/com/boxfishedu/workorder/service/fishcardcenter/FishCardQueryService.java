@@ -59,18 +59,14 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         for (WorkOrder workOrder : workOrders) {
             workOrder.setOrderCode(workOrder.getService().getOrderCode());
             workOrder.setStatusDesc(FishCardStatusEnum.getDesc((workOrder.getStatus())));
-            workOrder.setSkuId(workOrder.getService().getSkuId());
             workOrder.setMakeUpOrNot("否");
             workOrder.setIdDesc(workOrder.getId().toString());
 
             if (null != workOrder.getMakeUpFlag() && 0 != workOrder.getMakeUpFlag()) {
                 workOrder.setMakeUpOrNot("是");
             }
-            if (ConstantUtil.SKU_EXTRA_VALUE == workOrder.getSkuIdExtra()) {
-                workOrder.setTeachingType(TeachingType.WAIJIAO.getCode());
-            } else {
-                workOrder.setTeachingType(TeachingType.ZHONGJIAO.getCode());
-            }
+            workOrder.setTeachingType(workOrder.getSkuId());
+
             if (workOrder.getParentId() != null && workOrder.getParentId() != 0l) {
                 String idDesc = workOrder.getParentRootId() + "";
                 for (int i = 0; i < workOrder.getMakeUpSeq(); i++) {

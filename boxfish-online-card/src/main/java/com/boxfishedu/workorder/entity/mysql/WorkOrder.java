@@ -111,8 +111,8 @@ public class WorkOrder{
     @Transient
     private String statusDesc;
 
-    @Transient
-    private Long skuId;
+    @Column(name="sku_id")
+    private Integer skuId;
 
     //是否补过课
     @Transient
