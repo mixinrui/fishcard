@@ -11,6 +11,9 @@ public class TeacherForm {
 
     private  Long teacherId;
 
+    /** 1 中教  2 外教 **/
     private int teacherType;
+    /** 课程类型   "courseIds" : [ "EXAMINATION", "FUNCTION", "READING", "CONVERSATION", "PHONICS" ]   **/
+    private String [] courseIds;
 
 }
