@@ -74,19 +74,21 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                 }
                 workOrder.setIdDesc(idDesc);
             }
-            if (workOrder.getService().getComboType().equals(ComboTypeEnum.EXCHANGE.toString())) {
-                if (workOrder.getStatus() < FishCardStatusEnum.WAITFORSTUDENT.getCode()) {
-                    LocalDateTime beginLocalDate = LocalDateTime.ofInstant(DateUtil.date2SimpleDate(new Date()).toInstant(), ZoneId.systemDefault()).minusHours(24);
-                    if (workOrder.getStartTime().after(DateUtil.localDate2Date(beginLocalDate))) {
-                        //处于冻结
-                        if (workOrder.getIsFreeze() == 1) {
-                            workOrder.setUnfreezeBtnShowFlag(Boolean.TRUE);
-                        } else {
-                            workOrder.setFreezeBtnShowFlag(Boolean.TRUE);
+            if(StringUtils.isNotEmpty(workOrder.getService().getComboType())){
+                if (workOrder.getService().getComboType().equals(ComboTypeEnum.EXCHANGE.toString())) {
+                    if (workOrder.getStatus() < FishCardStatusEnum.WAITFORSTUDENT.getCode()) {
+                        LocalDateTime beginLocalDate = LocalDateTime.ofInstant(DateUtil.date2SimpleDate(new Date()).toInstant(), ZoneId.systemDefault()).minusHours(24);
+                        if (workOrder.getStartTime().after(DateUtil.localDate2Date(beginLocalDate))) {
+                            //处于冻结
+                            if (workOrder.getIsFreeze() == 1) {
+                                workOrder.setUnfreezeBtnShowFlag(Boolean.TRUE);
+                            } else {
+                                workOrder.setFreezeBtnShowFlag(Boolean.TRUE);
+                            }
                         }
                     }
-                }
 
+                }
             }
         }
         return workOrders;
@@ -177,9 +179,13 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             sql.append("and orderChannel=:comboType ");
         }
 
-        if (fishCardFilterParam.getDemoType().trim().equals("true")) {
-            sql.append("and orderId=:orderId ");
-        }else{
+        if (StringUtils.isNotEmpty(fishCardFilterParam.getDemoType())){
+            if (fishCardFilterParam.getDemoType().trim().equals("true")) {
+                sql.append("and orderId=:orderId ");
+            }else{
+                sql.append("and orderId !=:orderId ");
+            }
+        }else {
             sql.append("and orderId !=:orderId ");
         }
 
