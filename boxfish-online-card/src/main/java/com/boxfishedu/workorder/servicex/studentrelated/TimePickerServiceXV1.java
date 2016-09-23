@@ -18,6 +18,9 @@ import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendHandlerHelper;
+import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
+import com.boxfishedu.workorder.servicex.studentrelated.selectmode.TemplateSelectMode;
+import com.boxfishedu.workorder.servicex.studentrelated.selectmode.UserDefinedSelectMode;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -93,19 +96,19 @@ public class TimePickerServiceXV1 {
         serviceList.forEach(s -> s.authentication(timeSlotParam.getStudentId()));
 
         // 获取选课策略,每周选几次,持续几周
-        WeekStrategy weekStrategy = getWeekStrategy(timeSlotParam, serviceList);
+        SelectMode selectMode = adaptingSelectMode(timeSlotParam, serviceList);
         // 验证参数
-        validateTimeSlotParam(timeSlotParam, weekStrategy, serviceList);
+        validateTimeSlotParam(timeSlotParam, selectMode, serviceList);
 
         // 批量生成工单 TODO 生成工单
-        List<WorkOrder> workOrderList = batchInitWorkorders(timeSlotParam, weekStrategy, serviceList);
+        List<WorkOrder> workOrderList = batchInitWorkorders(timeSlotParam, selectMode, serviceList);
 
         // 返回学生当前选择的课程日期和时间片, unique课程验证
         Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(timeSlotParam.getStudentId());
         checkUniqueCourseSchedules(classDateTimeslotsSet, workOrderList);
 
         // 获取课程推荐
-        Map<Integer, RecommandCourseView> recommandCourses = getRecommandCourses(workOrderList, timeSlotParam);
+        Map<Integer, RecommandCourseView> recommandCourses = recommendHandlerHelper.recommendCourses(workOrderList, timeSlotParam);
 
         // 批量保存鱼卡与课表
         List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
@@ -123,11 +126,11 @@ public class TimePickerServiceXV1 {
         return JsonResultModel.newJsonResultModel();
     }
 
-    private List<WorkOrder> batchInitWorkorders(TimeSlotParam timeSlotParam, WeekStrategy weekStrategy, List<Service> serviceList) {
+    private List<WorkOrder> batchInitWorkorders(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> serviceList) {
         // 中教优先于外教
         serviceList.sort((c1, c2) -> Objects.equals(c1.getTutorType(), TutorType.CN.name()) ? 1 : 0);
-        if(weekStrategy instanceof TemplateWeekStrategy) {
-            return batchInitTemplateWorkOrders(timeSlotParam, weekStrategy, serviceList);
+        if(selectMode instanceof TemplateSelectMode) {
+            return batchInitTemplateWorkOrders(timeSlotParam, selectMode, serviceList);
         } else {
             return batchInitUserDefinedWorkOrders(timeSlotParam, serviceList);
         }
@@ -152,12 +155,12 @@ public class TimePickerServiceXV1 {
         }
     }
 
-    private void validateTimeSlotParam(TimeSlotParam timeSlotParam, WeekStrategy weekStrategy, List<Service> services) {
+    private void validateTimeSlotParam(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> services) {
         List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
 
-        if((weekStrategy instanceof TemplateWeekStrategy) && weekStrategy.getNumPerWeek() != selectedTimes.size()) {
+        if((selectMode instanceof TemplateSelectMode) && selectMode.getNumPerWeek() != selectedTimes.size()) {
             throw new BusinessException("选择的上课次数不符合规范");
-        } else if(weekStrategy instanceof UserDefinedWeekStrategy) {
+        } else if(selectedTimes instanceof UserDefinedSelectMode) {
             Integer count = services.stream().collect(Collectors.summingInt(Service::getAmount));
             if(!Objects.equals(count, selectedTimes.size())) {
                 throw new BusinessException("选择的上课次数不符合规范");
@@ -252,20 +255,20 @@ public class TimePickerServiceXV1 {
     /**
      * 模板选时间初始化工单
      * @param timeSlotParam
-     * @param weekStrategy
+     * @param selectMode
      * @param services
      * @return
      * @throws BoxfishException
      */
-    private List<WorkOrder> batchInitTemplateWorkOrders(TimeSlotParam timeSlotParam, WeekStrategy weekStrategy, List<Service> services) throws BoxfishException {
+    private List<WorkOrder> batchInitTemplateWorkOrders(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> services) throws BoxfishException {
         List<WorkOrder> workOrders = new ArrayList<>();
-        int numPerWeek = weekStrategy.getNumPerWeek();
-        int loopOfWeek = weekStrategy.getLoopOfWeek();
+        int numPerWeek = selectMode.getNumPerWeek();
+        int loopOfWeek = selectMode.getLoopOfWeek();
         Queue<ServiceChoice> serviceQueue = createServiceChoice(services);
         for (int i = 0; i < loopOfWeek; i++) {
             for (int j = 0; j < numPerWeek; j++) {
                 int index = (j + 1) + i * numPerWeek;
-                if(index > weekStrategy.getCount()) {
+                if(index > selectMode.getCount()) {
                     break;
                 }
                 Service service = services.get(choice(serviceQueue));
@@ -386,13 +389,13 @@ public class TimePickerServiceXV1 {
         return teacherStudentRequester.getTimeSlot(id);
     }
 
-    private WeekStrategy getWeekStrategy(TimeSlotParam timeSlotParam, List<Service> services) {
+    private SelectMode adaptingSelectMode(TimeSlotParam timeSlotParam, List<Service> services) {
         // 默认是template
         if(Objects.isNull(timeSlotParam.getSelectMode()) ||
-                Objects.equals(timeSlotParam.getSelectMode(), WeekStrategy.TEMPLATE)) {
-            return createTemplateWeekStrategy(timeSlotParam, services);
+                Objects.equals(timeSlotParam.getSelectMode(), SelectMode.TEMPLATE)) {
+            return TemplateSelectMode.createTemplateSelectMode(timeSlotParam, services);
         } else {
-            return UserDefinedWeekStrategy.DEFAULT;
+            return UserDefinedSelectMode.DEFAULT;
         }
 
     }
@@ -426,70 +429,4 @@ public class TimePickerServiceXV1 {
         return resultMap;
     }
 
-
-    private TemplateWeekStrategy createTemplateWeekStrategy(TimeSlotParam timeSlotParam, List<Service> services) {
-        int count = services.stream().collect(Collectors.summingInt(Service::getAmount));
-        // 兑换默认为1周两次
-        if(Objects.equals(timeSlotParam.getComboTypeEnum(), ComboTypeToRoleId.EXCHANGE)) {
-            int loopOfWeek = (count + TemplateWeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK - 1)
-                    / TemplateWeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK;
-            int numPerWeek = count == 1 ? 1: TemplateWeekStrategy.DEFAULT_EXCHANGE_NUMPERWEEK;
-            return new TemplateWeekStrategy(loopOfWeek, numPerWeek, count);
-        }
-        int loopOfWeek = services.stream().collect(Collectors.summingInt(Service::getComboCycle));
-        int per = count / loopOfWeek == 0 ? 1 : count / loopOfWeek;
-        logger.info("weekStrategy= loopOfWeek:[{}],per:[{}]", loopOfWeek, per);
-        return new TemplateWeekStrategy((count + per -1) / per, per, count);
-    }
-
-
-    class TemplateWeekStrategy extends WeekStrategy {
-        public final static int DEFAULT_EXCHANGE_NUMPERWEEK = 2;
-        int loopOfWeek;
-        int numPerWeek;
-        int count;
-
-        public TemplateWeekStrategy(int loopOfWeek, int numPerWeek, int count) {
-            this.loopOfWeek = loopOfWeek;
-            this.numPerWeek = numPerWeek;
-            this.count = count;
-        }
-
-        @Override
-        public int getLoopOfWeek() {
-            return loopOfWeek;
-        }
-
-        @Override
-        public int getNumPerWeek() {
-            return numPerWeek;
-        }
-
-        @Override
-        public int getCount() {
-            return count;
-        }
-    }
-
-    static class UserDefinedWeekStrategy extends WeekStrategy {
-        public final static UserDefinedWeekStrategy DEFAULT = new UserDefinedWeekStrategy();
-    }
-
-    static class WeekStrategy {
-        public final static Integer TEMPLATE = 0;
-
-        public final static Integer USERDEFINED = 1;
-
-        public int getLoopOfWeek() {
-            return 0;
-        }
-
-        public int getNumPerWeek() {
-            return 0;
-        }
-
-        public int getCount() {
-            return 0;
-        }
-    }
 }

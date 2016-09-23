@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
+import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -132,7 +133,7 @@ public class AvaliableTimeServiceXV1 {
     private int getOptionalDays(AvaliableTimeParam avaliableTimeParam) {
         // 判断选择模式,如果是模板模式,则为一周. 默认为模板方式
         if(Objects.isNull(avaliableTimeParam.getSelectMode())
-                || Objects.equals(avaliableTimeParam.getSelectMode(), TimePickerServiceXV1.WeekStrategy.TEMPLATE)) {
+                || Objects.equals(avaliableTimeParam.getSelectMode(), SelectMode.TEMPLATE)) {
             return avaliableTimeParam.getIsFree() ? freeExperienceDay : daysOfWeek;
         } else {
             return avaliableTimeParam.getIsFree() ? freeExperienceDay : daysOfMonth;

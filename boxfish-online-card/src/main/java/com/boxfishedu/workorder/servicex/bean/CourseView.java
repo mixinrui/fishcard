@@ -24,6 +24,9 @@ public class CourseView implements Serializable {
 
     private String name;
 
+    // TODO 添加英文课名
+    private String englishName;
+
     private String thumbnail;
 
     private List<String> courseType;
@@ -50,6 +53,7 @@ public class CourseView implements Serializable {
         courseView.setCourseType(courseTypeList);
         courseView.setDifficulty(difficultyList);
         courseView.setLastModified(scheduleCourseInfo.getLastModified());
+        courseView.setEnglishName(scheduleCourseInfo.getEnglishName());
         logger.info("courseView []", courseView);
         return courseView;
     }

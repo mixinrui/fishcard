@@ -19,6 +19,7 @@ import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.StudentCourseSchedule;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
+import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendHandlerHelper;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -88,6 +89,9 @@ public class TimePickerServiceX {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
+    @Autowired
+    private RecommendHandlerHelper recommendHandlerHelper;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public JsonResultModel ensureCourseTimes(TimeSlotParam timeSlotParam) throws BoxfishException {
@@ -110,7 +114,7 @@ public class TimePickerServiceX {
         checkUniqueCourseSchedules(classDateTimeslotsSet, workOrders);
 
         //TODO:推荐课的接口目前为单词请求
-        Map<Integer, RecommandCourseView> recommandCoursesMap = getRecommandCourses(workOrders, timeSlotParam);
+        Map<Integer, RecommandCourseView> recommandCoursesMap = recommendHandlerHelper.recommendCourses(workOrders, timeSlotParam);
 
         workOrderService.batchSaveCoursesIntoCard(workOrders,recommandCoursesMap);
 
