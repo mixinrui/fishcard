@@ -106,7 +106,7 @@ public class MakeWorkOrderServiceX {
         // 2 向师生运营获取教师信息列表
         List<TeacherForm> teacherForms = getTeacherList(foreighAndChinesTeahcer(workOrderNOteacher,teacherType),flag);
 
-        if (null == teacherForms || teacherForms.size() < 0) {
+        if (CollectionUtils.isEmpty(teacherForms) ) {
             logger.info("222222222222222:::::::::::::thereisNOteacherList:没有查询到符合条件的教师列表::::: ::::::::::::::::::::::::::");
             return;
         }
@@ -118,7 +118,7 @@ public class MakeWorkOrderServiceX {
         List<WorkOrder> workOrderYESteacher = makeWorkOrderService.findWorkOrderContainTeachers();
 
         // 4 进行 老师鱼卡匹配
-        Map<Long, List<WorkOrder>> map = Maps.newConcurrentMap();
+        Map<Long, List<WorkOrder>> map = Maps.newHashMap();
         map = getTeacherWorkOrderList(map, workOrderNOteacher, workOrderYESteacher, teacherForms);
 
 
@@ -177,9 +177,9 @@ public class MakeWorkOrderServiceX {
         boolean chineseTeacherflag = false;
         boolean foreignTeahcerflag = false;
         for (WorkOrder wo : workOrderNOteacher) {
-            if (CourseTypeEnum.TALK.toString().equals(wo.getCourseType())  && CourseTypeEnum.TALK.toString().equals(teacherType)) {
+            if ((TeachingType.WAIJIAO.getCode() ==wo.getSkuId())  && CourseTypeEnum.TALK.toString().equals(teacherType)) {
                 foreignTeahcerflag = true;
-            } else if( !CourseTypeEnum.TALK.toString().equals(wo.getCourseType())  &&   CourseTypeEnum.FUNCTION.toString().equals(teacherType)){// FUNCTION 代表中教
+            } else if( !(TeachingType.WAIJIAO.getCode() ==wo.getSkuId())  &&   CourseTypeEnum.FUNCTION.toString().equals(teacherType)){// FUNCTION 代表中教
                 chineseTeacherflag = true;
             }
             if (foreignTeahcerflag && chineseTeacherflag)
@@ -275,7 +275,7 @@ public class MakeWorkOrderServiceX {
                         &&
                       CourseTypeEnum.PHONICS.toString().toLowerCase().equals( wo.getCourseType().toLowerCase())
                         &&
-                      Arrays.binarySearch(teacherForm.getCourseIds(), CourseTypeEnum.PHONICS.toString())>-1
+                        teacherForm.getCourseIds().contains(CourseTypeEnum.PHONICS.toString())
                            ){
                     list.add(wo);
                 }else{
@@ -301,28 +301,28 @@ public class MakeWorkOrderServiceX {
     public List getTeacherList(String parameter,String flag) {
         List<TeacherForm> teacherListFromTeach = Lists.newArrayList();
 
-        if(!StringUtils.isEmpty(flag)){
-
-            TeacherForm tf1 = new TeacherForm();//IOS
-            tf1.setTeacherId(1298937L);
-            tf1.setTeacherType(1);
-
-            TeacherForm tf2 = new TeacherForm();//安卓
-            tf2.setTeacherId(1298904L);
-            tf2.setTeacherType(1);
-
-            TeacherForm tf3 = new TeacherForm();//安卓
-            tf3.setTeacherId(1243339L);
-            tf3.setTeacherType(1);
-
-            teacherListFromTeach.add(tf1);
-
-            teacherListFromTeach.add(tf2);
-
-            teacherListFromTeach.add(tf3);
-
-            return teacherListFromTeach;
-        }
+//        if(!StringUtils.isEmpty(flag)){
+//
+//            TeacherForm tf1 = new TeacherForm();//IOS
+//            tf1.setTeacherId(1298937L);
+//            tf1.setTeacherType(1);
+//
+//            TeacherForm tf2 = new TeacherForm();//安卓
+//            tf2.setTeacherId(1298904L);
+//            tf2.setTeacherType(1);
+//
+//            TeacherForm tf3 = new TeacherForm();//安卓
+//            tf3.setTeacherId(1243339L);
+//            tf3.setTeacherType(1);
+//
+//            teacherListFromTeach.add(tf1);
+//
+//            teacherListFromTeach.add(tf2);
+//
+//            teacherListFromTeach.add(tf3);
+//
+//            return teacherListFromTeach;
+//        }
 
 
         // 获取教师列表  TeacherForm
@@ -338,7 +338,7 @@ public class MakeWorkOrderServiceX {
             Map m = (Map)o;
             tf.setTeacherId(Long.parseLong( String.valueOf( m.get("teacherId"))));
             tf.setTeacherType((Integer) m.get("teachingType"));
-            tf.setCourseIds((String[])m.get("courseIds"));
+            tf.setCourseIds((List)m.get("courseTypeIds"));
             teacherListFromTeach.add(tf);
         }
 
