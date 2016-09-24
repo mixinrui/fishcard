@@ -2,7 +2,11 @@ package com.boxfishedu.workorder.servicex.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
+import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.util.ConstantUtil;
+import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardUnanswerTeacher;
 import com.boxfishedu.workorder.requester.TeacherStudentCommentCardRequester;
@@ -13,6 +17,7 @@ import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardSer
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.boxfishedu.workorder.web.param.commentcard.TeacherReadMsgParam;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/7/20.
@@ -38,6 +44,12 @@ public class CommentTeacherAppServiceX {
 
     @Autowired
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
+
+    @Autowired
+    private ServiceJpaRepository serviceJpaRepository;
+
+    @Autowired
+    private RabbitMqSender rabbitMqSender;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -78,9 +90,23 @@ public class CommentTeacherAppServiceX {
         }else {
             logger.info("向学生端推送消息失败,推送失败的学生studentId=" + commentCard.getStudentId());
         }
+        //通知订单中心修改状态
+        com.boxfishedu.workorder.entity.mysql.Service service = serviceJpaRepository.findOne(commentCard.getService().getId());
+        if (service.getAmount() == 0){
+            logger.info("@CommentTeacherAppServiceX 调用notifyOrderUpdateStatus,通知修改状态...");
+            notifyOrderUpdateStatus(service.getOrderId(), ConstantUtil.WORKORDER_COMPLETED);
+        }
     }
 
     public CommentCard checkTeacher(Long id, Long teacherId){
         return commentCardTeacherAppService.checkTeacher(id, teacherId);
+    }
+
+    private void notifyOrderUpdateStatus(Long orderId, Integer status) {
+        logger.info("@notifyOrderUpdateStatus 通知订单中心修改状体...");
+        Map param = Maps.newHashMap();
+        param.put("id",orderId.toString());
+        param.put("status",status.toString());
+        rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
     }
 }
