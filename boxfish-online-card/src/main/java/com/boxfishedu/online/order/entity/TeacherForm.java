@@ -2,6 +2,8 @@ package com.boxfishedu.online.order.entity;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 教师信息
  * Created by jiaozijun on 16/7/11.
@@ -14,6 +16,6 @@ public class TeacherForm {
     /** 1 中教  2 外教 **/
     private int teacherType;
     /** 课程类型   "courseIds" : [ "EXAMINATION", "FUNCTION", "READING", "CONVERSATION", "PHONICS" ]   **/
-    private String [] courseIds;
+    private List courseIds;
 
 }
