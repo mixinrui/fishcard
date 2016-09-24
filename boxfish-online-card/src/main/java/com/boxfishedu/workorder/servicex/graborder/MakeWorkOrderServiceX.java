@@ -273,12 +273,12 @@ public class MakeWorkOrderServiceX {
                         &&
                       !StringUtils.isEmpty(wo.getCourseType())  // 鱼卡的课程类型
                         &&
-                      CourseTypeEnum.PHONICS.toString().toLowerCase().equals( wo.getCourseType().toLowerCase())
+                      CourseTypeEnum.PHONICS.toString().equals( wo.getCourseType())
                         &&
                         teacherForm.getCourseIds().contains(CourseTypeEnum.PHONICS.toString())
                            ){
                     list.add(wo);
-                }else{
+                }else if(!CourseTypeEnum.PHONICS.toString().equals( wo.getCourseType())){
                     list.add(wo);
                 }
 
