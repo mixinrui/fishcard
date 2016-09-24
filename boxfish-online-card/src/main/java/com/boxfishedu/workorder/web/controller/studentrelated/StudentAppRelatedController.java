@@ -18,6 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
+
 /**
  * Created by hucl on 16/3/31.
  * 主要处理学生App相关的操作
@@ -53,20 +55,23 @@ StudentAppRelatedController {
 
 
     @RequestMapping(value = "{student_Id}/schedule/month", method = RequestMethod.GET)
-    public JsonResultModel courseScheduleList(@PathVariable("student_Id") Long studentId,Long userId) {
+    public JsonResultModel courseScheduleList(
+            @PathVariable("student_Id") Long studentId,Long userId,
+            @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage) {
         commonServeServiceX.checkToken(studentId,userId);
-        return timePickerServiceX.getByStudentIdAndDateRange(studentId, DateUtil.createDateRangeForm());
+        return timePickerServiceX.getByStudentIdAndDateRange(
+                studentId, DateUtil.createDateRangeForm(), Locale.forLanguageTag(acceptLanguage));
     }
 
 
     @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
-                                              @PageableDefault(
-                                                      value = 15,
-                                                      sort = {"classDate", "timeSlotId"},
-                                                      direction = Sort.Direction.DESC) Pageable pageable) {
+                                     @PageableDefault(value = 15, sort = {"classDate", "timeSlotId"},
+                                             direction = Sort.Direction.DESC) Pageable pageable,
+                                     @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage
+    ) {
         commonServeServiceX.checkToken(studentId,userId);
-        return timePickerServiceX.getCourseSchedulePage(studentId, pageable);
+        return timePickerServiceX.getCourseSchedulePage(studentId, pageable, Locale.forLanguageTag(acceptLanguage));
     }
 
 
@@ -78,19 +83,21 @@ StudentAppRelatedController {
     }
 
     @RequestMapping(value = "schedule/finish/page")
-    public JsonResultModel getFinishCourseSchedulePage(Long userId, @PageableDefault(
-                                                        value = 10,
-                                                        sort = {"classDate", "timeSlotId"},
-                                                        direction = Sort.Direction.DESC) Pageable pageable) {
-        return timePickerServiceX.getFinishCourseSchedulePage(userId, pageable);
+    public JsonResultModel getFinishCourseSchedulePage(
+            Long userId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
+                    direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage
+    ) {
+        return timePickerServiceX.getFinishCourseSchedulePage(userId, pageable, Locale.forLanguageTag(acceptLanguage));
     }
 
     @RequestMapping(value = "schedule/unfinish/page")
-    public JsonResultModel getUnFinishCourseSchedulePage(Long userId, @PageableDefault(
-                                                        value = 10,
-                                                        sort = {"classDate", "timeSlotId"},
-                                                        direction = Sort.Direction.DESC) Pageable pageable) {
-        return timePickerServiceX.getUnFinishCourseSchedulePage(userId, pageable);
+    public JsonResultModel getUnFinishCourseSchedulePage(
+            Long userId,
+            @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
+                    direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage) {
+        return timePickerServiceX.getUnFinishCourseSchedulePage(userId, pageable, Locale.forLanguageTag(acceptLanguage));
     }
 
 

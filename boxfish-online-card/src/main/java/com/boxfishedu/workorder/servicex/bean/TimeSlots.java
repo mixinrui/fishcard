@@ -9,6 +9,8 @@ import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.io.Serializable;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Created by LuoLiBing on 16/4/19.
@@ -88,5 +90,24 @@ public class TimeSlots implements Cloneable, Serializable {
     public void setSelected(boolean selected) {
         this.selected = selected;
         this.status = selected ? TimeSlotsStatus.SELECTED : TimeSlotsStatus.FREE;
+    }
+
+    public void setCourseView(CourseView courseView) {
+        this.courseView = courseView;
+    }
+
+    /**
+     * 根据语言环境设置课程信息, Accept-Language: zh-CN
+     * @param courseView
+     * @param locale
+     */
+    public void setCourseView(CourseView courseView, Locale locale) {
+        this.courseView = courseView;
+        if(Objects.isNull(courseView)) {
+            return;
+        }
+
+        // 非中文环境,并且课程英文名部位空的情况下全部显示成英文
+        this.courseView.setLocale(locale);
     }
 }

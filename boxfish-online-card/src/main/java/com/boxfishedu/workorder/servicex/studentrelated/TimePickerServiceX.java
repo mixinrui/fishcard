@@ -397,23 +397,24 @@ public class TimePickerServiceX {
      * @param dateRangeForm
      * @return
      */
-    public JsonResultModel getByStudentIdAndDateRange(Long studentId, DateRangeForm dateRangeForm) {
+    public JsonResultModel getByStudentIdAndDateRange(Long studentId, DateRangeForm dateRangeForm, Locale locale) {
         List<CourseSchedule> courseSchedules =
                 courseScheduleService.findByStudentIdAndClassDateBetween(studentId, dateRangeForm);
-        return JsonResultModel.newJsonResultModel(adapterCourseScheduleList(courseSchedules));
+        return JsonResultModel.newJsonResultModel(adapterCourseScheduleList(courseSchedules, locale));
     }
 
-    public JsonResultModel getFinishCourseSchedulePage(Long userId, Pageable pageable) {
+    public JsonResultModel getFinishCourseSchedulePage(Long userId, Pageable pageable, Locale locale) {
         Page<CourseSchedule> courseSchedulePage = courseScheduleService.findFinishCourseSchedulePage(userId, pageable);
-        return JsonResultModel.newJsonResultModel(wrapCourseSchedulePage(pageable, courseSchedulePage));
+        return JsonResultModel.newJsonResultModel(wrapCourseSchedulePage(pageable, courseSchedulePage, locale));
     }
 
-    public JsonResultModel getUnFinishCourseSchedulePage(Long userId, Pageable pageable) {
+    public JsonResultModel getUnFinishCourseSchedulePage(Long userId, Pageable pageable,  Locale locale) {
         Page<CourseSchedule> courseSchedulePage = courseScheduleService.findUnfinishCourseSchedulePage(userId, pageable);
-        return JsonResultModel.newJsonResultModel(wrapCourseSchedulePage(pageable, courseSchedulePage));
+        return JsonResultModel.newJsonResultModel(wrapCourseSchedulePage(pageable, courseSchedulePage, locale));
     }
 
-    private Page<StudentCourseSchedule> wrapCourseSchedulePage(Pageable pageable, Page<CourseSchedule> courseSchedulePage) {
+    private Page<StudentCourseSchedule> wrapCourseSchedulePage(
+            Pageable pageable, Page<CourseSchedule> courseSchedulePage, Locale locale) {
         List<CourseSchedule> content = courseSchedulePage.getContent();
         List<StudentCourseSchedule> result = Lists.newArrayList();
         content.forEach(courseSchedule -> {
@@ -430,13 +431,13 @@ public class TimePickerServiceX {
                         parseLocalTime(timeSlot.getStartTime()));
                 studentCourseSchedule.setTime(formatLocalDateTime(time));
             }
-            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()));
+            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId(), locale));
             result.add(studentCourseSchedule);
         });
         return new PageImpl<>(result, pageable, courseSchedulePage.getTotalElements());
     }
 
-    private StudentCourseSchedule createStudentCourseSchedule(CourseSchedule courseSchedule) {
+    private StudentCourseSchedule createStudentCourseSchedule(CourseSchedule courseSchedule, Locale locale) {
         TimeSlots timeSlots = getTimeSlotById(courseSchedule.getTimeSlotId());
         StudentCourseSchedule studentCourseSchedule = new StudentCourseSchedule();
         studentCourseSchedule.setId(courseSchedule.getId());
@@ -447,14 +448,14 @@ public class TimePickerServiceX {
         studentCourseSchedule.setStatus(courseSchedule.getStatus());
         studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
         if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()));
+            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId(), locale));
         }
         return studentCourseSchedule;
     }
 
-    public Object getCourseSchedulePage(Long studentId, Pageable pageable) {
+    public Object getCourseSchedulePage(Long studentId, Pageable pageable, Locale locale) {
         Page<CourseSchedule> page = courseScheduleService.findByStudentId(studentId, pageable);
-        List<Map<String, Object>> result = adapterCourseScheduleList(page.getContent());
+        List<Map<String, Object>> result = adapterCourseScheduleList(page.getContent(), locale);
         HashMap<String, Object> resultMap = Maps.newHashMap();
         resultMap.put("data", result);
         resultMap.put("returnCode", HttpStatus.SC_OK);
@@ -465,7 +466,7 @@ public class TimePickerServiceX {
         return resultMap;
     }
 
-    private List<Map<String, Object>> adapterCourseScheduleList(List<CourseSchedule> courseScheduleList) {
+    private List<Map<String, Object>> adapterCourseScheduleList(List<CourseSchedule> courseScheduleList, Locale locale) {
         Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
         courseScheduleList.forEach(courseSchedule -> {
             String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
@@ -474,7 +475,7 @@ public class TimePickerServiceX {
                 studentCourseScheduleList = Lists.newArrayList();
                 courseScheduleMap.put(date, studentCourseScheduleList);
             }
-            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule));
+            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule, locale));
         });
 
         List<Map<String, Object>> result = Lists.newArrayList();
