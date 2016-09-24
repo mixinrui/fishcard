@@ -245,7 +245,7 @@ public class TeacherAppRelatedServiceX {
             timeSlots.setEndTime(time.getEndTime());
             timeSlots.setSelected(true);
             if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-                timeSlots.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()), locale);
+                timeSlots.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId(), locale));
             }
         });
         return JsonResultModel.newJsonResultModel(dayTimeSlots);

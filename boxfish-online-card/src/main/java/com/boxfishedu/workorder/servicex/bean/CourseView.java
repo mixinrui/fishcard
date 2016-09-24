@@ -5,11 +5,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
 import lombok.Data;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Created by LuoLiBing on 16/4/25.
@@ -36,6 +39,13 @@ public class CourseView implements Serializable {
     private List<String> difficulty;
 
     private Long lastModified;
+
+    public void setLocale(Locale locale) {
+        // 非中文环境,并且课程英文名部位空的情况下全部显示成英文
+        if(!Objects.equals(locale, Locale.CHINA) && StringUtils.isNotEmpty(englishName)) {
+            name = englishName;
+        }
+    }
 
     public static CourseView courseViewAdapter(ScheduleCourseInfo scheduleCourseInfo) {
         logger.info("scheduleCourseInfo信息 [{}]", scheduleCourseInfo);
