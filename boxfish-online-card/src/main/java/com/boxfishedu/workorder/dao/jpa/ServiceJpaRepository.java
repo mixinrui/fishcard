@@ -39,6 +39,9 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     @Query("select s from Service s where s.studentId=?1 and s.productType=?2")
     List<Service> getForeignCommentServiceCount(long studentId, int productType);
 
+    @Query("select s from Service s where s.studentId=?1 and s.productType=?2")
+    List<Service> getServiceNotSelected(long studentId, int productType);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0")
     Page<Service> getFirstAvailableForeignCommentService(long studentId, int productType, Pageable pageable);
