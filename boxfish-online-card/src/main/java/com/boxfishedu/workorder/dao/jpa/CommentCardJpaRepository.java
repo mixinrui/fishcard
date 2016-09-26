@@ -80,4 +80,31 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     public void forceToChangeTeacher(Long fromTeacherId , Long toTeacherId);
 
     public List<CommentCard> findByTeacherIdAndStatus(Long teacherId, Integer status);
+
+    /**
+     * 查询学生已点评的点评卡
+     */
+    @Query("select c from CommentCard c where c.studentId = ?1 and c.status in (400,600)")
+    public List<CommentCard> getCommentedCard(Long studentId);
+
+    /**
+     * 查询学生未点评的点评卡
+     */
+    @Query("select c from CommentCard c where c.studentId = ?1 and c.status <= 300")
+    public List<CommentCard> getUncommentedCard(Long studentId);
+
+    /**
+     * 初始化外教点评首页列表
+     */
+    @Query("select distinct(c.studentId) from CommentCard c,Service s " +
+            "where s.studentId = c.studentId and s.comboType = 'CRITIQUE' and ((c.status in (400,600) and s.amount > 0) " +
+            "or (c.status <= 300 and s.amount = 0))")
+    public List<Long> getCommentCardHomePageList();
+
+    /**
+     * 初始获取学生首页外教点评
+     */
+    @Query("select c from CommentCard c where c.studentId =?1 and c.status in (400,600) and  c.updateTime = " +
+            "(select max(cd.updateTime) from CommentCard cd where cd.studentId =?1 and cd.status in (400,600))")
+    public CommentCard getHomePageCommentCard(Long studentId);
 }

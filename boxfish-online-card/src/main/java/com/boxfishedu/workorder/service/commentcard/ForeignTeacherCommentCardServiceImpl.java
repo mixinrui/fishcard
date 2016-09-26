@@ -1,6 +1,8 @@
 package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.bean.AccountCourseBean;
+import com.boxfishedu.workorder.common.bean.AccountCourseEnum;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.config.ServiceGateWayType;
@@ -15,7 +17,9 @@ import com.boxfishedu.workorder.dao.jpa.CommentCardStatisticsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.service.ServeService;
+import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
+import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +61,12 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Autowired
     ServiceGateWayType serviceGateWayType;
 
+    @Autowired
+    CommentTeacherAppServiceX commentTeacherAppServiceX;
+
+    @Autowired
+    AccountCardInfoService accountCardInfoService;
+
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
     @Override
@@ -97,6 +107,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardStatistics.setServicedId(service.getId());
                 commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_MINUS.getCode());
                 commentCardStatisticsJpaRepository.save(commentCardStatistics);
+                if(commentCardJpaRepository.getCommentedCard(userId).size() == 0){
+                    logger.info("@foreignTeacherCommentCardAdd 首页中添加外教点评信息...");
+                    commentTeacherAppServiceX.commentHomePage(commentCard);
+                }
                 return newCommentCard;
             }catch (Exception e){
                 flag = false;
@@ -202,6 +216,13 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         if(commentCard.getStudentReadFlag() == CommentCardStatus.STUDENT_UNREAD.getCode()){
             commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
             commentCardJpaRepository.save(commentCard);
+        }
+        if (commentCardJpaRepository.getUncommentedCard(userId).size() == 0){
+            logger.info("@setHomePage1 次数用尽,重置外教点评首页...");
+            accountCardInfoService.saveOrUpdate(userId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
+        } else {
+            logger.info("@setHomePage2 设置外教点评首页...");
+            commentTeacherAppServiceX.commentHomePage(commentCard);
         }
         return commentCard;
     }
