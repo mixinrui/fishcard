@@ -104,11 +104,11 @@ public class CommentTeacherAppServiceX {
         return commentCardTeacherAppService.checkTeacher(id, teacherId);
     }
 
-    private void commentHomePage(CommentCard commentCard){
+    private void commentHomePage(CommentCard commentCard) {
         Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
         String courseType = typeAndDifficultyMap.get("courseType").toString();
         String courseDifficulty = typeAndDifficultyMap.get("courseDifficulty").toString();
-
+    }
     private void notifyOrderUpdateStatus(Long orderId, Integer status) {
         logger.info("@notifyOrderUpdateStatus 通知订单中心修改状体...");
         Map param = Maps.newHashMap();
