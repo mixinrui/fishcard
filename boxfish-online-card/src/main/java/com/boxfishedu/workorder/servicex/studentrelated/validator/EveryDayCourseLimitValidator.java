@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,7 +35,8 @@ public class EveryDayCourseLimitValidator implements StudentTimePickerValidator 
         // 只对新添加的课程进行验证,兼容历史数据
         workOrderList.forEach((workOrder -> {
             String date = DateUtil.string(workOrder.getStartTime());
-            if(Objects.equals(counter.compute(date, (k, v) -> v == null ? 1 : v + 1), everydayMaxCountCourse)) {
+            // 当一天所选的课程大于或者等于最大选课数量时,不能再选这一天的课
+            if((counter.compute(date, (k, v) -> v == null ? 1 : v + 1).intValue() >= everydayMaxCountCourse )) {
                 throw new ValidationException(date + "选课数量超过了最大" + everydayMaxCountCourse + "节课");
             }
         }));
