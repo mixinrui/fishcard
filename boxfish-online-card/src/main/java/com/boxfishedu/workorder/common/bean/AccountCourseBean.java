@@ -20,6 +20,7 @@ public class AccountCourseBean {
         private Integer difficulty;
         private String thumbnail;
         private Integer isFreeze;
+        private Integer studentReadFlag;
         private Integer status;
     }
 }
