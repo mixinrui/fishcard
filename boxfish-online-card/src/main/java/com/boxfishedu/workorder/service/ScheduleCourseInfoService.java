@@ -83,6 +83,7 @@ public class ScheduleCourseInfoService {
             ScheduleCourseInfo scheduleCourseInfo = new ScheduleCourseInfo();
             scheduleCourseInfo.setCourseId(courseView.getCourseId());
             scheduleCourseInfo.setCourseType(courseView.getCourseType());
+            scheduleCourseInfo.setEnglishName(courseView.getEnglishName());
             scheduleCourseInfo.setDifficulty(courseView.getDifficulty());
             scheduleCourseInfo.setName(courseView.getCourseName());
             String thumbnail = String.format("%s%s", urlConf.getThumbnail_server(), courseView.getCover());

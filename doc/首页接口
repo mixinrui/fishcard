@@ -1,0 +1,47 @@
+http://123.56.13.168:8080/service/student/2121/card_infos??orderType={order_type}&access_token=2212222122
+METHOD:GET
+参数说明:
+order_type:订单类型    1.默认不带此参数,返回全部类型    order_type=chinese 返回中教数据   order_type=foreign 返回外教数据  order_type=comment 返回点评数据
+返回:
+{
+  "data": {
+    "studentId": null,
+    "chinese": {
+      "leftAmount": 7,
+      "courseInfo": {
+        "courseId": "L3NoYXJlL3N2bi_lj5Hpn7Mt5YWD6Z-z5a2X5q-NLzAwNS5h55qE5Y-R6Z-z54m55L6L56-HLnhsc3g",
+        "courseName": "中文课程",
+        "courseType": "PHONICS",
+        "difficulty": 1,
+        "thumbnail": "http://api.boxfish.cn/student/publication/data/data/91ab245869cb67c653d2da123e66701c",
+        "isFreeze": 0,
+        "status": 30
+      }
+    },
+    "foreign": {
+      "leftAmount": 13,
+      "courseInfo": {
+        "courseId": "L3NoYXJlL3N2bi9GdW5jdGlvbiDotK3niakvNjExLuWmguS9leihqOi-vuWVhuWTgeWHj-S7t--8ny54bHN4",
+        "courseName": "外教课程",
+        "courseType": "PHONICS",
+        "difficulty": 1,
+        "thumbnail": "http://api.boxfish.cn/student/publication/data/data/b91a4adf3407882bf75a329f60e4dd24",
+        "isFreeze": 1,
+        "status": 30
+      }
+    },
+    "comment": {
+      "leftAmount": 29,
+      "courseInfo": {
+        "courseId": "L3NoYXJlL3N2bi9Ub3BpY1_ml4XmuLjkuI7kuqTpgJovMDAzLuaDs-imgemBqOa4uOWkquepuu-8jOS9oOimgemAmui_h-i_meWHoOWFsy54bHN4",
+        "courseName": "外教点评",
+        "courseType": "PHONICS",
+        "difficulty": 1,
+        "thumbnail": "http://api.boxfish.cn/student/publication/data/data/51ec2314d184d70fba6b938535c3350d",
+        "status": 200
+      }
+    }
+  },
+  "returnCode": 200,
+  "returnMsg": "success"
+}

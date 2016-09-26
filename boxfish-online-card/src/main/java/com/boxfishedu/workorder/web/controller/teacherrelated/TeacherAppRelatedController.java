@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 
 
 /**
@@ -52,36 +53,42 @@ public class TeacherAppRelatedController {
      * 教师端获取一个月的课程表
      * @return 返回带课程标记的课程规划表
      */
-//    @Cacheable(value = "teacher_schedule_month", key = "T(java.util.Objects).hash(#teacherId,#dateIntervalView)")
     @RequestMapping(value = "{teacher_id}/schedule/month", method = RequestMethod.GET)
     public Object courseScheduleMonth(
+            @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage,
             @PathVariable("teacher_id") Long teacherId,
             Long userId,
-            Integer count,
-            String yearMonth) {
+            Integer count, // 一次返回几个月的数据
+            String yearMonth ) {
         commonServeServiceX.checkToken(teacherId, userId);
         YearMonth yearMonthParam = null;
         if(StringUtils.isNotBlank(yearMonth)) {
             yearMonthParam = YearMonth.from(yearMonthFormatter.parse(yearMonth));
         }
-        return teacherAppRelatedServiceX.getScheduleByIdAndDateRange(teacherId, yearMonthParam, count);
+        return teacherAppRelatedServiceX.getScheduleByIdAndDateRange(
+                teacherId, yearMonthParam, count, Locale.forLanguageTag(acceptLanguage));
     }
 
     @RequestMapping(value = "{teacher_id}/schedule/day", method = RequestMethod.GET)
-    public JsonResultModel courseScheduleList(@PathVariable("teacher_id") Long teacherId, Long userId,
+    public JsonResultModel courseScheduleList(@RequestHeader(value="Accept-Language", defaultValue = "zh-CN")
+                                                  String acceptLanguage,
+                                              @PathVariable("teacher_id") Long teacherId, Long userId,
                                               @RequestParam(required = false)
                                               @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         commonServeServiceX.checkToken(teacherId, userId);
-        return teacherAppRelatedServiceX.getScheduleByIdAndDate(teacherId, date);
+        return teacherAppRelatedServiceX.getScheduleByIdAndDate(teacherId, date, Locale.forLanguageTag(acceptLanguage));
     }
 
     //    @Cacheable(value = "teacher_schedule_assigned", key = "T(java.util.Objects).hash(#teacherId,#date)")
     @RequestMapping(value = "{teacher_id}/schedule_assigned/day", method = RequestMethod.GET)
-    public JsonResultModel courseScheduleListAssign(@PathVariable("teacher_id") Long teacherId, Long userId,
+    public JsonResultModel courseScheduleListAssign(@RequestHeader(value="Accept-Language", defaultValue = "zh-CN")
+                                                        String acceptLanguage,
+                                                    @PathVariable("teacher_id") Long teacherId, Long userId,
                                                     @RequestParam(required = false)
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         commonServeServiceX.checkToken(teacherId, userId);
-        return teacherAppRelatedServiceX.getScheduleAssignedByIdAndDate(teacherId, date);
+        return teacherAppRelatedServiceX.getScheduleAssignedByIdAndDate(
+                teacherId, date, Locale.forLanguageTag(acceptLanguage));
     }
 
     @RequestMapping(value = "{teacherId}/timeSlots/template")
@@ -104,10 +111,12 @@ public class TeacherAppRelatedController {
 
     @RequestMapping(value = "international/{teacher_id}/schedule/day", method = RequestMethod.GET)
     public JsonResultModel internationalCourseScheduleList(
+            @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage,
             @PathVariable("teacher_id") Long teacherId, Long userId,
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date date) throws CloneNotSupportedException {
         commonServeServiceX.checkToken(teacherId, userId);
-        return teacherAppRelatedServiceX.getInternationalScheduleByIdAndDate(teacherId, date);
+        return teacherAppRelatedServiceX.getInternationalScheduleByIdAndDate(
+                teacherId, date, Locale.forLanguageTag(acceptLanguage));
     }
 }

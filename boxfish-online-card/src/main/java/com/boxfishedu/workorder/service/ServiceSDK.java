@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by LuoLiBing on 16/4/25.
@@ -77,9 +79,18 @@ public class ServiceSDK {
         return String.format("%s/timeslot/months", urlConf.getTeacher_service());
     }
 
-    public CourseView getCourseInfo(Long scheduleId){
+//    public CourseView getCourseInfo(Long scheduleId){
+//        return getCourseInfo(scheduleId, Locale.CHINA);
+//    }
+
+    public CourseView getCourseInfo(Long scheduleId, Locale locale){
         ScheduleCourseInfo scheduleCourseInfo=scheduleCourseInfoService.queryByScheduleId(scheduleId);
-        return CourseView.courseViewAdapter(scheduleCourseInfo);
+        CourseView courseView = CourseView.courseViewAdapter(scheduleCourseInfo);
+        if(Objects.isNull(courseView)) {
+            return null;
+        }
+        courseView.setLocale(locale);
+        return courseView;
     }
 
     //@Recover

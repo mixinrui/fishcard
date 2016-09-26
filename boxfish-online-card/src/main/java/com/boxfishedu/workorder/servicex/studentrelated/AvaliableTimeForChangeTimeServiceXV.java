@@ -71,6 +71,12 @@ public class AvaliableTimeForChangeTimeServiceXV {
         //获取鱼卡信息
         WorkOrder workOrder = validateAndGetWorkOrder(workOrderId);
 
+
+        boolean afterTomo =  afterTomoDate(workOrder);
+        if(!afterTomo){
+            throw  new BusinessException("请提前48小时修改上课时间");
+        }
+
         //首次鱼卡时间
         Date beginDate = serveService.getFirstTimeOfService(workOrder);
 
@@ -121,13 +127,27 @@ public class AvaliableTimeForChangeTimeServiceXV {
         return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
     }
 
+
+    /**
+     * 开始时间从后天开始
+     * @param workOrder
+     * @return
+     */
+    private boolean afterTomoDate(WorkOrder workOrder){
+        Date end  = DateUtil.addMinutes(new Date(),60*24*2);
+        if(workOrder.getStartTime()  .after(end)){
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 获取可选的时间区间
      *
      * @return
      */
     private DateRange getEnableDateRange(Date endDate) {
-        Date date  = DateUtil.date2SimpleDate(new Date());
+        Date date  = new Date();// DateUtil.date2SimpleDate(new Date());
         int days = DateUtil.getBetweenDays(date,endDate);
         if(days<2){
             throw new BusinessException("该鱼卡更改时间超出修改范围");

@@ -16,7 +16,10 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.*;
+import com.boxfishedu.workorder.service.CourseOnlineService;
+import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServeService;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardFreezeServiceX;
@@ -72,6 +75,7 @@ public class CourseOnlineServiceX {
 
     @Autowired
     private FishCardFreezeServiceX fishCardFreezeServiceX;
+
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -193,6 +197,8 @@ public class CourseOnlineServiceX {
         this.handleContinusAbsence(workOrder, status);
         // 服务消费扣除
         serveService.decreaseService(workOrder, courseSchedule, status);
+        //异步更新首页数据
+//        accountCardInfoService.
         //通知师生运营释放教师资源
         teacherStudentRequester.releaseTeacher(workOrder);
         //通知小马解散师生关系

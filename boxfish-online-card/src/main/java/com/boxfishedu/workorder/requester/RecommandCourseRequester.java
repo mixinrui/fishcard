@@ -1,10 +1,12 @@
 package com.boxfishedu.workorder.requester;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.RecommandedCourseService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
@@ -79,12 +81,17 @@ public class RecommandCourseRequester {
     }
 
     public RecommandCourseView changeCourse(WorkOrder workOrder) {
-        String tutorType=workOrder.getService().getTutorType();
+        Service service = workOrder.getService();
+        String tutorType = service.getTutorType();
         logger.debug("@RecommandCourseRequester#changeCourse,参数tutorType[{}]",tutorType);
         if(Objects.equals(tutorType, TutorType.CN.name())) {
             return changeChineseCourse(workOrder);
         }
         else if(Objects.equals(tutorType,TutorType.FRN.name())){
+            // 终极梦想换课
+            if(Objects.equals(service.getComboType(), ComboTypeToRoleId.CHINESE.name())) {
+                return changeDreamCourse(workOrder);
+            }
             return changeForeignCourse(workOrder);
         }
         else {
@@ -140,6 +147,14 @@ public class RecommandCourseRequester {
         }
     }
 
+    // 终极梦想换课
+    public RecommandCourseView changeDreamCourse(WorkOrder workOrder) {
+        return restTemplate.postForObject(
+                createExchangeDreamRecommend(workOrder.getStudentId(), workOrder.getSeqNum(), workOrder.getCourseId()),
+                HttpEntity.EMPTY,
+                RecommandCourseView.class);
+    }
+
     public String getThumbNailPath(RecommandCourseView courseView) {
         return String.format("%s%s", urlConf.getThumbnail_server(), courseView.getCover());
     }
@@ -160,9 +175,8 @@ public class RecommandCourseRequester {
     }
 
     public RecommandCourseView getDreamRecommandCourse(WorkOrder workOrder) {
-        return restTemplate.postForObject(
+        return restTemplate.getForObject(
                 createDreamRecommend(workOrder.getStudentId(), recommandedCourseService.getCourseIndex(workOrder)),
-                HttpEntity.EMPTY,
                 RecommandCourseView.class);
     }
 
@@ -233,14 +247,21 @@ public class RecommandCourseRequester {
 
     private URI createDreamRecommend(Long studentId, int index) {
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
-                .path(String.format("/online/dream/%s/%s", studentId.toString(), index))
+                .path(String.format("/ultimate/%s/%s", studentId.toString(), index))
                 .build()
                 .toUri();
     }
 
     private URI create8BatchDreamRecommend(Long studentId) {
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
-                .path(String.format("/online/dream/%s", studentId.toString()))
+                .path(String.format("/ultimate/%s", studentId.toString()))
+                .build()
+                .toUri();
+    }
+
+    private URI createExchangeDreamRecommend(Long studentId, int seque, String lessonId) {
+        return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
+                .path(String.format("/ultimate/exchange/%s/%s/%s", studentId.toString(), seque + "", lessonId))
                 .build()
                 .toUri();
     }

@@ -636,4 +636,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         }
         return list;
     }
+
+    private List<Service> getServiceSelectedStatus(Long studentId,Integer coursesSelected){
+        return jpa.getServiceSelectedStatus(studentId,coursesSelected);
+    }
 }

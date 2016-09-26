@@ -44,6 +44,5 @@ public class StudentCourseSchedule implements Serializable {
         } else {
             return courseView.getCourseType().get(0);
         }
-
     }
 }
