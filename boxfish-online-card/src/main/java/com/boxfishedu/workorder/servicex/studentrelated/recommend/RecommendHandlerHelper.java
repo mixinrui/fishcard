@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.studentrelated.recommend;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseType2TeachingTypeService;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
@@ -45,18 +46,22 @@ public class RecommendHandlerHelper {
         String comboTypeStr = timeSlotParam.getComboType();
         ComboTypeToRoleId comboType = ComboTypeToRoleId.resolve(comboTypeStr);
         RecommendHandler recommendHandler = adaptingRecommendHandler(comboType);
-        Map<Integer, RecommandCourseView> resultMap = recommendHandler.recommendCourseViews(workOrders, timeSlotParam);
+        try {
+            Map<Integer, RecommandCourseView> resultMap = recommendHandler.recommendCourseViews(workOrders, timeSlotParam);
 
-        for (int i = 0; i < workOrders.size(); i++) {
-            WorkOrder workOrder = workOrders.get(i);
-            logger.debug("鱼卡序号{}",workOrder.getSeqNum());
+            for (int i = 0; i < workOrders.size(); i++) {
+                WorkOrder workOrder = workOrders.get(i);
+                logger.debug("鱼卡序号{}", workOrder.getSeqNum());
 //            Integer index=recommandedCourseService.getCourseIndex(workOrder);
-            RecommandCourseView recommandCourseView = resultMap.get(workOrder.getSeqNum());
-            workOrder.initCourseInfo(recommandCourseView);
-            workOrder.setSkuId(CourseType2TeachingTypeService.courseType2TeachingType2(
-                    recommandCourseView.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType())));
+                RecommandCourseView recommandCourseView = resultMap.get(workOrder.getSeqNum());
+                workOrder.initCourseInfo(recommandCourseView);
+                workOrder.setSkuId(CourseType2TeachingTypeService.courseType2TeachingType2(
+                        recommandCourseView.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType())));
+            }
+            return resultMap;
+        } catch (Exception e) {
+            throw new BusinessException("暂时没有与你的水平匹配的课程，新课即将上线，请过些时候再选课或者调整学习设置");
         }
-        return resultMap;
 
     }
 
