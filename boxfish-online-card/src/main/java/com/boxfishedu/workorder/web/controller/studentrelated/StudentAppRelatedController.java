@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.web.controller.studentrelated;
 
 import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
@@ -37,8 +36,6 @@ StudentAppRelatedController {
     private TimePickerServiceXV1 timePickerServiceXV1;
     @Autowired
     private AvaliableTimeServiceXV1 avaliableTimeServiceXV1;
-    @Autowired
-    private RecommandCourseRequester recommandCourseRequester;
 
     /**
      * 学生端批量选择课程的接口
