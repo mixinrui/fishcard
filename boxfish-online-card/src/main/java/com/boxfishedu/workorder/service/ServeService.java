@@ -640,4 +640,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     private List<Service> getServiceSelectedStatus(Long studentId,Integer coursesSelected){
         return jpa.getServiceSelectedStatus(studentId,coursesSelected);
     }
+
+    public List<Service> getUnselectedService(Long studentId){
+        return jpa.findByStudentIdAndCoursesSelected(studentId,0);
+    }
 }

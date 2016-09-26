@@ -422,4 +422,12 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentIdAndOrderChannelAndStartTimeAfter(studentId,orderChannel,date);
     }
 
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId){
+        return jpa.findByStudentIdAndStartTimeAfter(studentId,new Date());
+    }
+
+    public WorkOrder getCardToStart(Long studentId){
+        return jpa.findTop1ByStudentIdAndStartTimeAfterOrderByStartTime(studentId,new Date());
+    }
+
 }

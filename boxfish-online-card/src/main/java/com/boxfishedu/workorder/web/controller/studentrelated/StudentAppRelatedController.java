@@ -190,6 +190,9 @@ StudentAppRelatedController {
                     accountCardInfo.setComment(accountCourseBean3);
                     break;
                 default:
+                    accountCardInfo.setChinese(accountCourseBean);
+                    accountCardInfo.setForeign(accountCourseBean2);
+                    accountCardInfo.setComment(accountCourseBean3);
                     break;
             }
         }

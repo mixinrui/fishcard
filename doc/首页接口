@@ -1,6 +1,7 @@
-http://123.56.13.168:8080/service/student/2121/card_infos??orderType={order_type}&access_token=2212222122
+http://123.56.13.168:8080/service/student/{user_id}/card_infos??orderType={order_type}&access_token=2212222122
 METHOD:GET
 参数说明:
+user_id: 学生的id
 order_type:订单类型    1.默认不带此参数,返回全部类型    order_type=chinese 返回中教数据   order_type=foreign 返回外教数据  order_type=comment 返回点评数据
 返回:
 {
@@ -38,7 +39,8 @@ order_type:订单类型    1.默认不带此参数,返回全部类型    order_t
         "courseType": "PHONICS",
         "difficulty": 1,
         "thumbnail": "http://api.boxfish.cn/student/publication/data/data/51ec2314d184d70fba6b938535c3350d",
-        "status": 200
+        "status": 200,
+        "studentReadFlag":1
       }
     }
   },

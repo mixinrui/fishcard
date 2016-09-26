@@ -54,4 +54,6 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     /*********兼容老版本*************/
     Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
+
+    public List<Service> findByStudentIdAndCoursesSelected(Long studentId,Integer coursesSelected);
 }
