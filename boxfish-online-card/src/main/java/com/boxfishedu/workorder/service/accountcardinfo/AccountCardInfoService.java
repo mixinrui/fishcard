@@ -1,6 +1,8 @@
 package com.boxfishedu.workorder.service.accountcardinfo;
 
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
+import com.boxfishedu.workorder.common.bean.AccountCourseEnum;
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.dao.mongo.AcountCardInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -21,36 +23,22 @@ public class AccountCardInfoService {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
-
     @Autowired
     private ServeService serveService;
 
     @Autowired
     private WorkOrderService workOrderService;
 
-    private AccountCardInfo queryByStudentId(Long studentId){
+    public AccountCardInfo queryByStudentId(Long studentId){
         logger.debug("@queryByStudentId#userId[{}]",studentId);
         return acountCardInfoMorphiaRepository.queryByStudentId(studentId);
     }
 
-    private void save(AccountCardInfo accountCardInfo){
+    public void save(AccountCardInfo accountCardInfo){
         acountCardInfoMorphiaRepository.save(accountCardInfo);
     }
 
-    private void updateForFisahCard(WorkOrder workOrder){
-        Long studentId=workOrder.getStudentId();
-//        AccountCardInfo accountCardInfo=accountCardInfoService.queryByStudentId(studentId);
-//
-//        if(accountCardInfo!=null){
-//
-//        }
-//        else {
-//            AccountCourseBean.CardCourseInfo chineseCardCourse=new AccountCourseBean.CardCourseInfo();
-//            chineseCardCourse.setCourseId(workOrder.getCourseId());
-//            chineseCardCourse.setCourseName("课程id");
-//            AccountCourseBean accountCourseBean=new AccountCourseBean();
-//
-//            accountCardInfo=new AccountCardInfo();
-//        }
+    public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
+        acountCardInfoMorphiaRepository.saveOrUpdate(studentId,accountCourseBean,accountCourseEnum);
     }
 }

@@ -46,6 +46,7 @@ public class TrialLectureServiceX {
         Service service = getService();
         WorkOrder workOrder = new WorkOrder();
         workOrder.setService(service);
+        workOrder.setIsFreeze(0);
         workOrder.setOrderId(service.getOrderId());
         saveParamIntoWorkOrder(workOrder,trialLectureParam);
 
