@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.commentcard.CommentCardLogService;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.boxfishedu.workorder.web.param.commentcard.TeacherReadMsgParam;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/7/20.
@@ -38,6 +40,9 @@ public class CommentTeacherAppServiceX {
 
     @Autowired
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
+
+    @Autowired
+    CommentCardSDK commentCardSDK;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -78,9 +83,17 @@ public class CommentTeacherAppServiceX {
         }else {
             logger.info("向学生端推送消息失败,推送失败的学生studentId=" + commentCard.getStudentId());
         }
+
     }
 
     public CommentCard checkTeacher(Long id, Long teacherId){
         return commentCardTeacherAppService.checkTeacher(id, teacherId);
+    }
+
+    private void commentHomePage(CommentCard commentCard){
+        Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
+        String courseType = typeAndDifficultyMap.get("courseType").toString();
+        String courseDifficulty = typeAndDifficultyMap.get("courseDifficulty").toString();
+        
     }
 }

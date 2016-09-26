@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Created by ansel on 16/7/18.
@@ -106,5 +107,13 @@ public class ForeignTeacherCommentController {
         updatePicturesForm.setType("STUDENT");
         updatePicturesForm.setNickname("ansel");
         foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
+    }
+
+    //测试获取课程难度和类型
+    @RequestMapping(value = "/test/course_type_difficulty", method = RequestMethod.GET)
+    public Object testCourseTypeAndDifficulty(){
+        Map map = commentCardSDK.commentTypeAndDifficulty("ssss");
+        System.out.println("courseType:" + map.get("courseType")+" courseDifficulty:" + map.get("courseDifficulty"));
+        return commentCardSDK.commentTypeAndDifficulty("courseId");
     }
 }

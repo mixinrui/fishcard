@@ -217,6 +217,8 @@ interface:
     student_teacher_relation: http://api.online.demo.boxfish.cn
 #  学生旷课扣积分
     absenteeism_deduct_score: http://api.online.test.boxfish.cn
+#  获取课程类型和难度
+    course_type_and_difficulty: http://123.56.13.168:8001
 
 service:
   sdk:
@@ -322,6 +324,8 @@ interface:
     absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
+#  获取课程类型和难度
+    course_type_and_difficulty: http://123.56.13.168:8001
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099

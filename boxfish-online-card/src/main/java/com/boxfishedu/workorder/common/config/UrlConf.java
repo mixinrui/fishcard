@@ -43,4 +43,8 @@ public class UrlConf {
     /** 支付系统 **/
     @Value("${interface.address.pay_service}")
     private String pay_service;
+
+    /** 查询课程类型和难度 **/
+    @Value("${interface.address.course_type_and_difficulty}")
+    private String course_type_and_difficulty;
 }
