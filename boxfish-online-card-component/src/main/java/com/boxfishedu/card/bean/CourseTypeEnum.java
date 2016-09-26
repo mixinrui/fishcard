@@ -10,7 +10,9 @@ public enum CourseTypeEnum {
     FUNCTION("FUNCTION"),
     PHONICS("PHONICS"),
 
-    TALK("TALK");
+    TALK("TALK"),
+
+    EXAMINATION("EXAMINATION");
 
     private String value;
 
