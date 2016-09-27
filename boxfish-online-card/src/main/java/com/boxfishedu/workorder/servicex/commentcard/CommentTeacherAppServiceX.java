@@ -50,6 +50,8 @@ public class CommentTeacherAppServiceX {
 
     @Autowired
     CommentCardSDK commentCardSDK;
+
+    @Autowired
     private ServiceJpaRepository serviceJpaRepository;
 
     @Autowired
