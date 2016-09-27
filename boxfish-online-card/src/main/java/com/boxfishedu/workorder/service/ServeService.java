@@ -507,6 +507,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                 studentId, ProductType.COMMENT.value()) > 0;
     }
 
+    @Transactional
     public Optional<Service> findFirstAvailableForeignCommentService(long studentId) {
         Page<Service> servicePage = serviceJpaRepository.getFirstAvailableForeignCommentService(
                 studentId, ProductType.COMMENT.value(), new PageRequest(0, 1));
