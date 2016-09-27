@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Created by LuoLiBing on 16/9/24.
- * service是否选课验证
+ * service是否选课验证,选课次数与service验证
  */
 @Order(2)
 @Component

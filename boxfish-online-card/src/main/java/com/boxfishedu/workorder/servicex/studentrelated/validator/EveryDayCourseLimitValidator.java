@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
 import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ public class EveryDayCourseLimitValidator implements StudentTimePickerValidator 
 
 
     @Override
-    public void postValidate(List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
+    public void postValidate(List<Service> serviceList, List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
         Map<String, Long> counter = unFinishWorkOrder
                 .stream()
                 .collect(Collectors.groupingBy((dateStr) -> dateStr.split(" ")[0], Collectors.counting()));
@@ -36,7 +37,7 @@ public class EveryDayCourseLimitValidator implements StudentTimePickerValidator 
         workOrderList.forEach((workOrder -> {
             String date = DateUtil.string(workOrder.getStartTime());
             // 当一天所选的课程大于或者等于最大选课数量时,不能再选这一天的课
-            if((counter.compute(date, (k, v) -> v == null ? 1 : v + 1).intValue() >= everydayMaxCountCourse )) {
+            if((counter.compute(date, (k, v) -> v == null ? 1 : v + 1).intValue() > everydayMaxCountCourse )) {
                 throw new ValidationException(date + "选课数量超过了最大" + everydayMaxCountCourse + "节课");
             }
         }));

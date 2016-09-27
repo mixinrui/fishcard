@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ import java.util.function.Supplier;
 public class UniqueCourseScheduleTimeValidator implements StudentTimePickerValidator {
 
     @Override
-    public void postValidate(List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
+    public void postValidate(List<Service> serviceList, List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
         for(WorkOrder workOrder : workOrderList) {
             checkUniqueCourseSchedule(
                     unFinishWorkOrder,
