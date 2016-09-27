@@ -37,7 +37,7 @@ public class EveryDayCourseLimitValidator implements StudentTimePickerValidator 
         workOrderList.forEach((workOrder -> {
             String date = DateUtil.string(workOrder.getStartTime());
             // 当一天所选的课程大于或者等于最大选课数量时,不能再选这一天的课
-            if((counter.compute(date, (k, v) -> v == null ? 1 : v + 1).intValue() >= everydayMaxCountCourse )) {
+            if((counter.compute(date, (k, v) -> v == null ? 1 : v + 1).intValue() > everydayMaxCountCourse )) {
                 throw new ValidationException(date + "选课数量超过了最大" + everydayMaxCountCourse + "节课");
             }
         }));
