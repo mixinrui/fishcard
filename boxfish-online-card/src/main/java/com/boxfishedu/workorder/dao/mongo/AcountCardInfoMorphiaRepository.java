@@ -23,9 +23,9 @@ public class AcountCardInfoMorphiaRepository {
     @Autowired
     protected Datastore datastore;
 
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
+    private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    public AccountCardInfo queryByStudentId(Long studentId) {
+    public AccountCardInfo queryByStudentId(Long studentId){
         Query<AccountCardInfo> query = datastore.createQuery(AccountCardInfo.class);
         query.and(query.criteria("studentId").equal(studentId));
         return query.get();
@@ -35,10 +35,10 @@ public class AcountCardInfoMorphiaRepository {
         datastore.save(accountCardInfo);
     }
 
-    public AccountCardInfo initCardInfo(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum) {
-        AccountCardInfo accountCardInfo = new AccountCardInfo();
+    public AccountCardInfo initCardInfo(Long studentId, AccountCourseBean accountCourseBean,AccountCourseEnum accountCourseEnum){
+        AccountCardInfo accountCardInfo =new AccountCardInfo();
         accountCardInfo.setStudentId(studentId);
-        switch (accountCourseEnum) {
+        switch (accountCourseEnum){
             case CHINESE:
                 accountCardInfo.setChinese(accountCourseBean);
                 break;
@@ -55,13 +55,13 @@ public class AcountCardInfoMorphiaRepository {
         return accountCardInfo;
     }
 
-    public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum) {
+    public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
         Query<AccountCardInfo> updateQuery = datastore.createQuery(AccountCardInfo.class);
         UpdateOperations<AccountCardInfo> updateOperations = datastore.createUpdateOperations(AccountCardInfo.class);
 
         updateQuery.and(updateQuery.criteria("studentId").equal(studentId));
 
-        switch (accountCourseEnum) {
+        switch (accountCourseEnum){
             case CHINESE:
                 updateOperations.set("chinese",accountCourseBean);
                 break;
@@ -74,21 +74,19 @@ public class AcountCardInfoMorphiaRepository {
             default:
                 break;
         }
-        try {
-            UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
-            if (updateResults.getUpdatedCount() < 1) {
-                throw new BusinessException("更新失败");
+        UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
+        if (updateResults.getUpdatedCount() < 1) {
+            AccountCardInfo accountCardInfo=queryByStudentId(studentId);
+            if(null==accountCardInfo){
+                logger.info("@AcountCardInfoMorphiaRepository#update#null#开始生成数据,用户[{}],类型:[{}].参数[{}]",studentId,accountCourseEnum.toString(),accountCourseBean);
+                this.initCardInfo(studentId,accountCourseBean,accountCourseEnum);
             }
-        } catch (Exception ex) {
-            AccountCardInfo accountCardInfo = queryByStudentId(studentId);
-            if (null == accountCardInfo) {
-                logger.info("@AcountCardInfoMorphiaRepository#update#null#开始生成数据,用户[{}],类型:[{}].参数[{}]", studentId, accountCourseEnum.toString(), accountCourseBean);
-                this.initCardInfo(studentId, accountCourseBean, accountCourseEnum);
-            } else {
-                logger.error("@updateCourseAbsenceNum更新课程信息失败,用户[{}],类型:[{}].参数[{}]", studentId, accountCourseEnum.toString(), accountCourseBean);
+            else{
+                logger.error("@updateCourseAbsenceNum更新课程信息失败,用户[{}],类型:[{}].参数[{}]",studentId,accountCourseEnum.toString(),accountCourseBean);
                 throw new BusinessException("更新课程信息失败");
             }
         }
     }
-}
 
+
+}
