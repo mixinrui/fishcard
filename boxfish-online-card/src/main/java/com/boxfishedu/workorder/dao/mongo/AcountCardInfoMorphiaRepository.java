@@ -58,15 +58,18 @@ public class AcountCardInfoMorphiaRepository {
     public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
         Query<AccountCardInfo> updateQuery = datastore.createQuery(AccountCardInfo.class);
         UpdateOperations<AccountCardInfo> updateOperations = datastore.createUpdateOperations(AccountCardInfo.class);
+
+        updateQuery.and(updateQuery.criteria("studentId").equal(studentId));
+
         switch (accountCourseEnum){
             case CHINESE:
-                updateQuery.and(updateQuery.criteria("chinese").equal(accountCourseBean));
+                updateOperations.set("chinese",accountCourseBean);
                 break;
             case FOREIGN:
-                updateQuery.and(updateQuery.criteria("foreign").equal(accountCourseBean));
+                updateOperations.set("foreign",accountCourseBean);
                 break;
             case CRITIQUE:
-                updateQuery.and(updateQuery.criteria("comment").equal(accountCourseBean));
+                updateOperations.set("comment",accountCourseBean);
                 break;
             default:
                 break;

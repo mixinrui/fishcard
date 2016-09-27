@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.dao.jpa;
 
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
+import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,5 +57,9 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     /*********兼容老版本*************/
     Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
 
-    public List<Service> findByStudentIdAndCoursesSelected(Long studentId,Integer coursesSelected);
+    List<Service> findByStudentIdAndCoursesSelected(Long studentId,Integer coursesSelected);
+
+    List<Service> findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelected(Long studentId, String comboType,String tutorType,Integer selectedFlag);
+
+    List<Service> findByStudentIdAndComboTypeAndCoursesSelected(Long studentId, String comboType ,Integer selectedFlag);
 }

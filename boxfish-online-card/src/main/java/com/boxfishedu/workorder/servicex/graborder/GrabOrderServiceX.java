@@ -163,7 +163,7 @@ public class GrabOrderServiceX {
 
                     if (updateCount != 1) {
                         //抢单失败
-                        logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:3");
+                        logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:3 抢单失败 鱼卡id[{}] 老师id[{}]",grabOrderView.getWorkOrderId(),grabOrderView.getTeacherId());
                         grabOrderService.setFlagFailAndTeacherId(grabOrderView);
                         jsonObject.put("msg", WorkOrderConstant.GRABORDER_FAIL);
                         jsonObject.put("code", "1");
@@ -172,7 +172,8 @@ public class GrabOrderServiceX {
 
                     // 更新抢单表
                     grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
-
+                    // 设置数据更改的字段  JPA  如果不设置 会失败
+                    workOrder.setTeacherName(grabOrderView.getTeacherName());
                     workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
                     workOrder.setTeacherId(grabOrderView.getTeacherId());
                     workOrder.setUpdateTime(new Date());
