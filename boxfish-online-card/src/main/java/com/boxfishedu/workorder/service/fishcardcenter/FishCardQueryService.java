@@ -201,6 +201,10 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             sql.append("order by wo.teacherId asc , wo.createTime desc");
         }
 
+        if(null != fishCardFilterParam.getTeacherNameSort()){
+            sql.append(" order by teacherName ").append(fishCardFilterParam.getTeacherNameSort());
+        }
+
         return sql.toString();
     }
 
