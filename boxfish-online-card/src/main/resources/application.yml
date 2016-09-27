@@ -325,7 +325,7 @@ interface:
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
 #  获取课程类型和难度
-    course_type_and_difficulty: http://123.56.13.168:8001
+    course_type_and_difficulty: http://base.boxfish.cn
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
