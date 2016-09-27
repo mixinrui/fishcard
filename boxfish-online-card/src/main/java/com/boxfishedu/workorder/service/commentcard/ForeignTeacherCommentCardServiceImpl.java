@@ -206,6 +206,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     @Override
+    @Transactional
     public CommentCard foreignTeacherCommentDetailQuery(Long id,Long userId) {
         logger.info("@foreignTeacherCommentDetailQuery调用学生查询某条外教点评具体信息接口,并将此条设置为已读,其中id="+id);
         CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
