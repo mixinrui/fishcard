@@ -2,15 +2,14 @@ package com.boxfishedu.workorder.service.accountcardinfo;
 
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
-import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,6 +99,16 @@ public class DataCollectorService {
 
     public ScheduleCourseInfo getCourseByWorkOrder(Long workOrderId) {
         return scheduleCourseInfoMorphiaRepository.queryByWorkId(workOrderId);
+    }
+
+    public void updateForeignItem(Long studentId){
+        List<WorkOrder> selectedLeftWorkOrders = getForeignSelectedLeftWorkOrders(studentId);
+
+//        Integer leftForeignNum=
+    }
+
+    public void updateChineseItem(){
+
     }
 
     public AccountCourseBean.CardCourseInfo scheduleCourseAdapter(ScheduleCourseInfo scheduleCourseInfo, WorkOrder workOrder) {
