@@ -7,7 +7,8 @@ public enum ComboTypeEnum {
     OVERALL("OVERALL"),
     FOREIGN("FOREIGN"),
     CRITIQUE("CRITIQUE"),
-    EXCHANGE("EXCHANGE");
+    EXCHANGE("EXCHANGE"),
+    CHINESE("CHINESE");
 
     private String value;
 
