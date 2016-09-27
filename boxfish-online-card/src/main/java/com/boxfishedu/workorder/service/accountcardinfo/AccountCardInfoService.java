@@ -29,8 +29,6 @@ public class AccountCardInfoService {
     @Autowired
     private WorkOrderService workOrderService;
 
-    @Autowired
-    private AccountCardInfoService accountCardInfoService;
 
     @Autowired
     private DataCollectorService dataCollectorService;
@@ -41,6 +39,7 @@ public class AccountCardInfoService {
         if(null==accountCardInfo){
             logger.debug("@queryByStudentId#init#userId[{}]",studentId);
             dataCollectorService.updateBothChnAndFnItem(studentId);
+            return acountCardInfoMorphiaRepository.queryByStudentId(studentId);
         }
         return accountCardInfo;
     }

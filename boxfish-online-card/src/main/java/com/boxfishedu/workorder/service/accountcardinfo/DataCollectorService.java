@@ -176,6 +176,7 @@ public class DataCollectorService {
         cardCourseInfo.setCourseType(scheduleCourseInfo.getCourseType());
         cardCourseInfo.setIsFreeze(workOrder.getIsFreeze());
         cardCourseInfo.setStatus(workOrder.getStatus());
+        cardCourseInfo.setDateInfo(workOrder.getStartTime());
         return cardCourseInfo;
     }
 

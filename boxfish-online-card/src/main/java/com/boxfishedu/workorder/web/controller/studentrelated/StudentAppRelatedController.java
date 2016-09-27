@@ -133,21 +133,23 @@ StudentAppRelatedController {
     @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.GET)
     public JsonResultModel userCardInfo(String order_type,@PathVariable("student_id") Long studentId) {
         AccountCardInfo accountCardInfo=accountCardInfoService.queryByStudentId(studentId);
-        switch (order_type) {
-            case "chinese":
-                accountCardInfo.setComment(null);
-                accountCardInfo.setForeign(null);
-                break;
-            case "foreign":
-                accountCardInfo.setComment(null);
-                accountCardInfo.setChinese(null);
-                break;
-            case "comment":
-                accountCardInfo.setForeign(null);
-                accountCardInfo.setChinese(null);
-                break;
-            default:
-                break;
+        if(null!=order_type) {
+            switch (order_type) {
+                case "chinese":
+                    accountCardInfo.setComment(null);
+                    accountCardInfo.setForeign(null);
+                    break;
+                case "foreign":
+                    accountCardInfo.setComment(null);
+                    accountCardInfo.setChinese(null);
+                    break;
+                case "comment":
+                    accountCardInfo.setForeign(null);
+                    accountCardInfo.setChinese(null);
+                    break;
+                default:
+                    break;
+            }
         }
         return JsonResultModel.newJsonResultModel(accountCardInfo);
     }
