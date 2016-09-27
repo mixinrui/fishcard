@@ -106,7 +106,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
                 if (checkCourseSchedule(courseSchedule)) {
                     timeSlots.initTimeSlots(courseSchedule);
                     if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-                        timeSlots.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId(), locale));
+                        timeSlots.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
                     }
                 }
             }
@@ -137,7 +137,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
                 if (checkCourseSchedule(courseSchedule)) {
                     timeSlots.initTimeSlots(courseSchedule);
                     if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-                        timeSlots.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId(), locale));
+                        timeSlots.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
                     }
                 }
             }

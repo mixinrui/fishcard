@@ -218,7 +218,7 @@ public class TimePickerServiceX {
                         parseLocalTime(timeSlot.getStartTime()));
                 studentCourseSchedule.setTime(formatLocalDateTime(time));
             }
-            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId(), locale));
+            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
             result.add(studentCourseSchedule);
         });
         return new PageImpl<>(result, pageable, courseSchedulePage.getTotalElements());
@@ -235,7 +235,7 @@ public class TimePickerServiceX {
         studentCourseSchedule.setStatus(courseSchedule.getStatus());
         studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
         if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId(), locale));
+            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
         }
         return studentCourseSchedule;
     }
