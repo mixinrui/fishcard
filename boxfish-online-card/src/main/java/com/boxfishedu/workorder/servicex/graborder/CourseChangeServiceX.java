@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.LongArraySerializer;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -131,9 +132,9 @@ public class CourseChangeServiceX {
                 continue;
             }
 
-            if (CourseTypeEnum.TALK.toString().equals(workOrder.getCourseType())) {
-                pushTitle_bein = WorkOrderConstant.SEND_CHANGE_COURSE_MESSAGE_BEGIN;
-                pushTitle_end = WorkOrderConstant.SEND_CHANGE_COURSE_MESSAGE_END;
+            if (TeachingType.WAIJIAO.getCode() == workOrder.getSkuId() ) {
+                pushTitle_bein = WorkOrderConstant.SEND_CHANGE_COURSE_MESSAGE_FOREIGN_BEGIN;
+                pushTitle_end = WorkOrderConstant.SEND_CHANGE_COURSE_MESSAGE_FOREIGN_END;
             }
             pushTitle = pushTitle_bein + map.get(key).size() + pushTitle_end;
 
