@@ -9,11 +9,13 @@ import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
+import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Created by ansel on 16/7/18.
@@ -33,6 +35,9 @@ public class ForeignTeacherCommentController {
 
     @Autowired
     CommentCardSDK commentCardSDK;
+
+    @Autowired
+    CommentTeacherAppServiceX commentTeacherAppServiceX;
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public JsonResultModel addCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId, String access_token) throws Exception {
@@ -106,5 +111,13 @@ public class ForeignTeacherCommentController {
         updatePicturesForm.setType("STUDENT");
         updatePicturesForm.setNickname("ansel");
         foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
+    }
+
+    //测试获取初始化外教点评主页列表
+    @RequestMapping(value = "/test/course_type_difficulty", method = RequestMethod.GET)
+    public Object testCourseTypeAndDifficulty(){
+        commentTeacherAppServiceX.initializeCommentHomePage();
+
+        return new JsonResultModel();
     }
 }

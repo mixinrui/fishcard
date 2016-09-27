@@ -39,8 +39,8 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     @Query("select s from Service s where s.studentId=?1 and s.productType=?2")
     List<Service> getForeignCommentServiceCount(long studentId, int productType);
 
-    @Query("select s from Service s where s.studentId=?1 and s.productType=?2")
-    List<Service> getServiceNotSelected(long studentId, int productType);
+    @Query("select s from Service s where s.studentId=?1 and s.coursesSelected=?2")
+    List<Service> getServiceSelectedStatus(long studentId,int coursesSelected);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0")
@@ -54,4 +54,6 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     /*********兼容老版本*************/
     Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
+
+    public List<Service> findByStudentIdAndCoursesSelected(Long studentId,Integer coursesSelected);
 }

@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
+import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -39,6 +41,11 @@ StudentAppRelatedController {
     private TimePickerServiceXV1 timePickerServiceXV1;
     @Autowired
     private AvaliableTimeServiceXV1 avaliableTimeServiceXV1;
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
+    @Autowired
+    private AccountCardInfoService accountCardInfoService;
+
 
     /**
      * 学生端批量选择课程的接口
@@ -47,16 +54,16 @@ StudentAppRelatedController {
     @RequestMapping(value = "/v1/workorders", method = RequestMethod.POST)
     public JsonResultModel ensureCourseTimesV1(@RequestBody TimeSlotParam timeSlotParam, Long userId) {
         timeSlotParam.setStudentId(userId);
-        JsonResultModel jsonResultModel= timePickerServiceXV1.ensureCourseTimes(timeSlotParam);
+        JsonResultModel jsonResultModel = timePickerServiceXV1.ensureCourseTimes(timeSlotParam);
         return jsonResultModel;
     }
 
 
     @RequestMapping(value = "{student_Id}/schedule/month", method = RequestMethod.GET)
     public JsonResultModel courseScheduleList(
-            @PathVariable("student_Id") Long studentId,Long userId,
-            @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage) {
-        commonServeServiceX.checkToken(studentId,userId);
+            @PathVariable("student_Id") Long studentId, Long userId,
+            @RequestHeader(value = "Accept-Language", defaultValue = "zh-CN") String acceptLanguage) {
+        commonServeServiceX.checkToken(studentId, userId);
         return timePickerServiceX.getByStudentIdAndDateRange(
                 studentId, DateUtil.createDateRangeForm(), Locale.forLanguageTag(acceptLanguage));
     }
@@ -66,16 +73,16 @@ StudentAppRelatedController {
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
                                      @PageableDefault(value = 15, sort = {"classDate", "timeSlotId"},
                                              direction = Sort.Direction.DESC) Pageable pageable,
-                                     @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage
+                                     @RequestHeader(value = "Accept-Language", defaultValue = "zh-CN") String acceptLanguage
     ) {
-        commonServeServiceX.checkToken(studentId,userId);
+        commonServeServiceX.checkToken(studentId, userId);
         return timePickerServiceX.getCourseSchedulePage(studentId, pageable, Locale.forLanguageTag(acceptLanguage));
     }
 
 
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
     public JsonResultModel timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
-        commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(),userId);
+        commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(), userId);
         avaliableTimeParam.setStudentId(userId);
         return avaliableTimeServiceXV1.getTimeAvailable(avaliableTimeParam);
     }
@@ -83,8 +90,8 @@ StudentAppRelatedController {
     @RequestMapping(value = "schedule/finish/page")
     public JsonResultModel getFinishCourseSchedulePage(
             Long userId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
-                    direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage
+            direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestHeader(value = "Accept-Language", defaultValue = "zh-CN") String acceptLanguage
     ) {
         return timePickerServiceX.getFinishCourseSchedulePage(userId, pageable, Locale.forLanguageTag(acceptLanguage));
     }
@@ -94,67 +101,105 @@ StudentAppRelatedController {
             Long userId,
             @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
                     direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestHeader(value="Accept-Language", defaultValue = "zh-CN") String acceptLanguage) {
+            @RequestHeader(value = "Accept-Language", defaultValue = "zh-CN") String acceptLanguage) {
         return timePickerServiceX.getUnFinishCourseSchedulePage(userId, pageable, Locale.forLanguageTag(acceptLanguage));
     }
 
 
-    /***********************兼容历史版本***************************/
+    /***********************
+     * 兼容历史版本
+     ***************************/
     @RequestMapping(value = "/workorders", method = RequestMethod.POST)
     public JsonResultModel ensureCourseTimes(@RequestBody TimeSlotParam timeSlotParam, Long userId) {
         timeSlotParam.setStudentId(userId);
-        JsonResultModel jsonResultModel= timePickerServiceX.ensureCourseTimes(timeSlotParam);
+        JsonResultModel jsonResultModel = timePickerServiceX.ensureCourseTimes(timeSlotParam);
         return jsonResultModel;
     }
 
     @RequestMapping(value = "/time/available", method = RequestMethod.GET)
     public JsonResultModel timeAvailable(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
-        commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(),userId);
+        commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(), userId);
         avaliableTimeParam.setStudentId(userId);
         return avaliableTimeServiceX.getTimeAvailable(avaliableTimeParam);
     }
 
-    @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.GET)
-    public JsonResultModel userCardInfo(){
-        AccountCardInfo accountCardInfo=new AccountCardInfo();
+    @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.PUT)
+    public JsonResultModel userCardInfoModify(String order_type,@PathVariable("student_id") Long studentId) {
+        AccountCardInfo accountCardInfo=accountCardInfoService.queryByStudentId(studentId);
+        AccountCourseBean.CardCourseInfo cardCourseInfo = accountCardInfo.getChinese().getCourseInfo();
+        cardCourseInfo.setCourseName("@@@@@@@中文课程名称修改2222");
+        accountCardInfoService.save(accountCardInfo);
+        return JsonResultModel.newJsonResultModel(accountCardInfo);
+    }
 
-        AccountCourseBean.CardCourseInfo cardCourseInfo=new AccountCourseBean.CardCourseInfo();
+    @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.GET)
+    public JsonResultModel userCardInfo(String order_type,@PathVariable("student_id") Long studentId) {
+        AccountCardInfo accountCardInfo = new AccountCardInfo();
+
+        AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
         cardCourseInfo.setCourseName("中文课程");
-        cardCourseInfo.setCourseId("ARRRRRRYYYYYYYAYAYYAYYAYAYAA--A4444444444444YYYYYYY" );
+        cardCourseInfo.setCourseId("L3NoYXJlL3N2bi_lj5Hpn7Mt5YWD6Z-z5a2X5q-NLzAwNS5h55qE5Y-R6Z-z54m55L6L56-HLnhsc3g");
         cardCourseInfo.setCourseType("PHONICS");
         cardCourseInfo.setDifficulty(1);
-        cardCourseInfo.setThumbnail("http://wwww.baidu.com/1.jpg");
-        AccountCourseBean accountCourseBean=new AccountCourseBean();
+        cardCourseInfo.setThumbnail("http://api.boxfish.cn/student/publication/data/data/91ab245869cb67c653d2da123e66701c");
+        cardCourseInfo.setStatus(30);
+        cardCourseInfo.setIsFreeze(0);
+        AccountCourseBean accountCourseBean = new AccountCourseBean();
         accountCourseBean.setLeftAmount(7);
+        accountCourseBean.setDateInfo(new Date());
         accountCourseBean.setCourseInfo(cardCourseInfo);
 
-        accountCardInfo.setChinese(accountCourseBean);
 
-        AccountCourseBean.CardCourseInfo cardCourseInfo2=new AccountCourseBean.CardCourseInfo();
+        AccountCourseBean.CardCourseInfo cardCourseInfo2 = new AccountCourseBean.CardCourseInfo();
         cardCourseInfo2.setCourseName("外教课程");
-        cardCourseInfo2.setCourseId("ARRRRRRYYYYYYYAYAYYAYYAYAYAA--A4444444444444YYYYYYY" );
+        cardCourseInfo2.setCourseId("L3NoYXJlL3N2bi9GdW5jdGlvbiDotK3niakvNjExLuWmguS9leihqOi-vuWVhuWTgeWHj-S7t--8ny54bHN4");
         cardCourseInfo2.setCourseType("PHONICS");
         cardCourseInfo2.setDifficulty(1);
-        cardCourseInfo2.setThumbnail("http://wwww.baidu.com/1.jpg");
-        AccountCourseBean accountCourseBean2=new AccountCourseBean();
-        accountCourseBean2.setLeftAmount(7);
+        cardCourseInfo2.setThumbnail("http://api.boxfish.cn/student/publication/data/data/b91a4adf3407882bf75a329f60e4dd24");
+        cardCourseInfo2.setStatus(30);
+        cardCourseInfo2.setIsFreeze(1);
+        AccountCourseBean accountCourseBean2 = new AccountCourseBean();
+        accountCourseBean2.setDateInfo(new Date());
+        accountCourseBean2.setLeftAmount(13);
         accountCourseBean2.setCourseInfo(cardCourseInfo2);
 
-        accountCardInfo.setForeign(accountCourseBean2);
 
-
-        AccountCourseBean.CardCourseInfo cardCourseInfo3=new AccountCourseBean.CardCourseInfo();
+        AccountCourseBean.CardCourseInfo cardCourseInfo3 = new AccountCourseBean.CardCourseInfo();
         cardCourseInfo3.setCourseName("外教点评");
-        cardCourseInfo3.setCourseId("ARRRRRRYYYYYYYAYAYYAYYAYAYAA--A4444444444444YYYYYYY" );
+        cardCourseInfo3.setCourseId("L3NoYXJlL3N2bi9Ub3BpY1_ml4XmuLjkuI7kuqTpgJovMDAzLuaDs-imgemBqOa4uOWkquepuu-8jOS9oOimgemAmui_h-i_meWHoOWFsy54bHN4");
         cardCourseInfo3.setCourseType("PHONICS");
         cardCourseInfo3.setDifficulty(1);
-        cardCourseInfo3.setThumbnail("http://wwww.baidu.com/1.jpg");
-        AccountCourseBean accountCourseBean3=new AccountCourseBean();
-        accountCourseBean3.setLeftAmount(7);
+        cardCourseInfo3.setThumbnail("http://api.boxfish.cn/student/publication/data/data/51ec2314d184d70fba6b938535c3350d");
+        cardCourseInfo3.setStatus(200);
+        cardCourseInfo3.setStudentReadFlag(0);
+        AccountCourseBean accountCourseBean3 = new AccountCourseBean();
+        accountCourseBean3.setLeftAmount(29);
         accountCourseBean3.setCourseInfo(cardCourseInfo3);
+        accountCardInfo.setStudentId(studentId);
 
-        accountCardInfo.setForeign(accountCourseBean3);
-
+        if (null == order_type) {
+            accountCardInfo.setChinese(accountCourseBean);
+            accountCardInfo.setForeign(accountCourseBean2);
+            accountCardInfo.setComment(accountCourseBean3);
+        } else {
+            switch (order_type) {
+                case "chinese":
+                    accountCardInfo.setChinese(accountCourseBean);
+                    break;
+                case "foreign":
+                    accountCardInfo.setForeign(accountCourseBean2);
+                    break;
+                case "comment":
+                    accountCardInfo.setComment(accountCourseBean3);
+                    break;
+                default:
+                    accountCardInfo.setChinese(accountCourseBean);
+                    accountCardInfo.setForeign(accountCourseBean2);
+                    accountCardInfo.setComment(accountCourseBean3);
+                    break;
+            }
+        }
+        accountCardInfoService.save(accountCardInfo);
         return JsonResultModel.newJsonResultModel(accountCardInfo);
     }
 

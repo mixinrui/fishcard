@@ -183,6 +183,9 @@ public class WorkOrder{
     @Column(name = "is_freeze", nullable = true)
     private Integer isFreeze;
 
+    @Column(name = "combo_type", nullable = true)
+    private String comboType;
+
     @Transient
     private Boolean freezeBtnShowFlag=false;
 
@@ -192,6 +195,7 @@ public class WorkOrder{
     /** 学生旷课扣积分标记**/
     @Column(name = "deduct_score_status" , nullable = true)
     private Integer deductScoreStatus;
+
 
     @Override
     public String toString() {

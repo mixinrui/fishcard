@@ -23,6 +23,7 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.ResponseCourseView;
@@ -74,6 +75,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     private CourseScheduleService courseScheduleService;
     @Autowired
     private ScheduleCourseInfoService scheduleCourseInfoService;
+
+    @Autowired
+    private CommentTeacherAppServiceX commentTeacherAppServiceX;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -317,6 +321,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         save(services);
         for (Service service:services){
             logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
+            if (Objects.equals(service.getProductType(),1002)){
+                commentTeacherAppServiceX.firstBuyForeignComment(service.getStudentId(),service.getAmount());
+            }
         }
     }
 
@@ -635,5 +642,13 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             throw new BusinessException("传入鱼卡的id在服务端无对应服务");
         }
         return list;
+    }
+
+    private List<Service> getServiceSelectedStatus(Long studentId,Integer coursesSelected){
+        return jpa.getServiceSelectedStatus(studentId,coursesSelected);
+    }
+
+    public List<Service> getUnselectedService(Long studentId){
+        return jpa.findByStudentIdAndCoursesSelected(studentId,0);
     }
 }
