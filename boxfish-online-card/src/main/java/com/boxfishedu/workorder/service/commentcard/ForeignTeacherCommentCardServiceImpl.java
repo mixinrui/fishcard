@@ -108,8 +108,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_MINUS.getCode());
                 commentCardStatisticsJpaRepository.save(commentCardStatistics);
                 if(commentCardJpaRepository.getCommentedCard(userId).size() == 0){
-                    logger.info("@foreignTeacherCommentCardAdd 首页中添加外教点评信息...");
+                    logger.info("@foreignTeacherCommentCardAdd1 首页中添加外教点评信息...");
                     commentTeacherAppServiceX.commentHomePage(commentCard);
+                }else{
+                    logger.info("@foreignTeacherCommentCardAdd2 修改首页中外教点评次数");
+                    accountCardInfoService.updateCommentLeftAmount(userId,service.getAmount() - 1);
                 }
                 return newCommentCard;
             }catch (Exception e){
@@ -386,6 +389,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardStatistics.setServicedId(serviceTemp.getId());
                 commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_ADD.getCode());
                 commentCardStatisticsJpaRepository.save(commentCardStatistics);
+                logger.info("@foreignTeacherCommentUnAnswer2 修改首页中外教点评次数");
+                accountCardInfoService.updateCommentLeftAmount(commentCard.getStudentId(),serviceTemp.getAmount() + 1);
             } catch (Exception e) {
                 e.printStackTrace();
             }
