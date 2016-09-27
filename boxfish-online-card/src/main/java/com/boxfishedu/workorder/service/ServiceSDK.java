@@ -79,12 +79,21 @@ public class ServiceSDK {
         return String.format("%s/timeslot/months", urlConf.getTeacher_service());
     }
 
-//    public CourseView getCourseInfo(Long scheduleId){
-//        return getCourseInfo(scheduleId, Locale.CHINA);
-//    }
 
-    public CourseView getCourseInfo(Long scheduleId, Locale locale){
+    public CourseView getCourseInfoByScheduleId(Long scheduleId, Locale locale){
         ScheduleCourseInfo scheduleCourseInfo=scheduleCourseInfoService.queryByScheduleId(scheduleId);
+        return getCourseInfo(scheduleCourseInfo, locale);
+    }
+
+
+
+    public CourseView getCourseInfoByWorkOrderId(Long workOrderId, Locale locale) {
+        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(workOrderId);
+        return getCourseInfo(scheduleCourseInfo, locale);
+    }
+
+
+    public CourseView getCourseInfo(ScheduleCourseInfo scheduleCourseInfo, Locale locale){
         CourseView courseView = CourseView.courseViewAdapter(scheduleCourseInfo);
         if(Objects.isNull(courseView)) {
             return null;

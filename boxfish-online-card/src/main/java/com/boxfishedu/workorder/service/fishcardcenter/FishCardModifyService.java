@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service.fishcardcenter;
 
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -74,7 +75,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         scheduleCourseInfo.setThumbnail(recommandCourseRequester.getThumbNailPath(recommandCourseView));
 
         //外教不参与师生互评 jiaozijun
-        if(!workOrder.getCourseType().equals("TALK")) {
+        if(TeachingType.WAIJIAO.getCode() != workOrder.getSkuId() ) {
             /** 换课更新  换课时间  jiaozijun **/
             workOrder.setUpdatetimeChangecourse(new Date());
             /** 换课 1 换课消息未发送 jiaozijun **/

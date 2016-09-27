@@ -124,16 +124,20 @@ public class CommentTeacherAppServiceX {
     }
 
     public void commentHomePage(CommentCard commentCard) {
-        Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
         AccountCourseBean accountCourseBean = new AccountCourseBean();
         AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
         cardCourseInfo.setCourseId(commentCard.getCourseId());
         cardCourseInfo.setCourseName(commentCard.getCourseName());
-        if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
-            cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
-        }
-        if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
-            cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()));
+        if (Objects.nonNull(commentCard.getCourseId())){
+            Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
+            if (Objects.nonNull(typeAndDifficultyMap)){
+                if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
+                    cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
+                }
+                if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
+                    cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()));
+                }
+            }
         }
         cardCourseInfo.setThumbnail(urlConf.getThumbnail_server()+commentCard.getCover());
         cardCourseInfo.setStudentReadFlag(commentCard.getStudentReadFlag());
@@ -172,9 +176,13 @@ public class CommentTeacherAppServiceX {
         List<Long> longs = commentCardJpaRepository.getCommentCardHomePageList();
         int sum = 0;
         for(Long studentId: longs){
-            CommentCard commentCard = commentCardJpaRepository.getHomePageCommentCard(studentId);
-            commentHomePage(commentCard);
-            sum +=1 ;
+            if (Objects.nonNull(studentId)){
+                CommentCard commentCard = commentCardJpaRepository.getHomePageCommentCard(studentId);
+                if (Objects.nonNull(commentCard)){
+                    commentHomePage(commentCard);
+                    sum +=1 ;
+                }
+            }
         }
         logger.info("@initializeCommentHomePage 初始化首页中外教点评相关项完毕,初始化个数为:"+sum);
     }

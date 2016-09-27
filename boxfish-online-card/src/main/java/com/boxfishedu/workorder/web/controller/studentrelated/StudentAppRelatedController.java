@@ -61,11 +61,10 @@ StudentAppRelatedController {
 
     @RequestMapping(value = "{student_Id}/schedule/month", method = RequestMethod.GET)
     public JsonResultModel courseScheduleList(
-            @PathVariable("student_Id") Long studentId, Long userId,
-            @RequestHeader(value = "Accept-Language", defaultValue = "zh-CN") String acceptLanguage) {
+            @PathVariable("student_Id") Long studentId, Long userId, Locale locale) {
         commonServeServiceX.checkToken(studentId, userId);
         return timePickerServiceX.getByStudentIdAndDateRange(
-                studentId, DateUtil.createDateRangeForm(), Locale.forLanguageTag(acceptLanguage));
+                studentId, DateUtil.createDateRangeForm(), locale);
     }
 
 
@@ -73,10 +72,9 @@ StudentAppRelatedController {
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
                                      @PageableDefault(value = 15, sort = {"classDate", "timeSlotId"},
                                              direction = Sort.Direction.DESC) Pageable pageable,
-                                     @RequestHeader(value = "Accept-Language", defaultValue = "zh-CN") String acceptLanguage
-    ) {
+                                     Locale locale) {
         commonServeServiceX.checkToken(studentId, userId);
-        return timePickerServiceX.getCourseSchedulePage(studentId, pageable, Locale.forLanguageTag(acceptLanguage));
+        return timePickerServiceX.getCourseSchedulePage(studentId, pageable, locale);
     }
 
 
@@ -91,9 +89,8 @@ StudentAppRelatedController {
     public JsonResultModel getFinishCourseSchedulePage(
             Long userId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
             direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestHeader(value = "Accept-Language", defaultValue = "zh-CN") String acceptLanguage
-    ) {
-        return timePickerServiceX.getFinishCourseSchedulePage(userId, pageable, Locale.forLanguageTag(acceptLanguage));
+            Locale locale) {
+        return timePickerServiceX.getFinishCourseSchedulePage(userId, pageable, locale);
     }
 
     @RequestMapping(value = "schedule/unfinish/page")
@@ -101,8 +98,8 @@ StudentAppRelatedController {
             Long userId,
             @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
                     direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestHeader(value = "Accept-Language", defaultValue = "zh-CN") String acceptLanguage) {
-        return timePickerServiceX.getUnFinishCourseSchedulePage(userId, pageable, Locale.forLanguageTag(acceptLanguage));
+            Locale locale) {
+        return timePickerServiceX.getUnFinishCourseSchedulePage(userId, pageable, locale);
     }
 
 
