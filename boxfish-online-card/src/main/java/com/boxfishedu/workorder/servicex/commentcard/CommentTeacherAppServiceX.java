@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/7/20.
@@ -112,7 +113,10 @@ public class CommentTeacherAppServiceX {
             notifyOrderUpdateStatus(service.getOrderId(), ConstantUtil.WORKORDER_COMPLETED);
         }
         //填充主页内容
-        commentHomePage(commentCard);
+        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId());
+        if (Objects.equals(homeCommentCard.getId(),commentCard.getId())){
+            commentHomePage(commentCard);
+        }
     }
 
     public CommentCard checkTeacher(Long id, Long teacherId){
@@ -125,8 +129,12 @@ public class CommentTeacherAppServiceX {
         AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
         cardCourseInfo.setCourseId(commentCard.getCourseId());
         cardCourseInfo.setCourseName(commentCard.getCourseName());
-        cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
-        cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()));
+        if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
+            cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
+        }
+        if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
+            cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()));
+        }
         cardCourseInfo.setThumbnail(urlConf.getThumbnail_server()+commentCard.getCover());
         cardCourseInfo.setStudentReadFlag(commentCard.getStudentReadFlag());
         cardCourseInfo.setStatus(commentCard.getStatus());

@@ -217,12 +217,16 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
             commentCardJpaRepository.save(commentCard);
         }
-        if (commentCardJpaRepository.getUncommentedCard(userId).size() == 0){
-            logger.info("@setHomePage1 次数用尽,重置外教点评首页...");
-            accountCardInfoService.saveOrUpdate(userId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
-        } else {
-            logger.info("@setHomePage2 设置外教点评首页...");
-            commentTeacherAppServiceX.commentHomePage(commentCard);
+        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(userId);
+        com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
+        if (Objects.equals(id,homeCommentCard.getId())){
+            if ((commentCardJpaRepository.getUncommentedCard(userId).size() == 0 ) && service.getAmount() == 0){
+                logger.info("@setHomePage1 次数用尽,重置外教点评首页...");
+                accountCardInfoService.saveOrUpdate(userId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
+            } else {
+                logger.info("@setHomePage2 设置外教点评首页...");
+                commentTeacherAppServiceX.commentHomePage(commentCard);
+            }
         }
         return commentCard;
     }
