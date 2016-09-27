@@ -105,6 +105,6 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
      * 初始获取学生首页外教点评
      */
     @Query("select c from CommentCard c where c.studentId =?1 and c.status in (400,600) and  c.updateTime = " +
-            "(select max(cd.updateTime) from CommentCard cd where cd.studentId =?1 and cd.status in (400,600))")
+            "(select max(cd.teacherAnswerTime) from CommentCard cd where cd.studentId =?1 and cd.status in (400,600))")
     public CommentCard getHomePageCommentCard(Long studentId);
 }
