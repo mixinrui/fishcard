@@ -220,7 +220,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }
         CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(userId);
         com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
-        if (Objects.nonNull(homeCommentCard.getId())){
+        if (Objects.nonNull(homeCommentCard)){
             if (Objects.equals(id,homeCommentCard.getId())){
                 if ((commentCardJpaRepository.getUncommentedCard(userId).size() == 0 ) && service.getAmount() == 0){
                     logger.info("@setHomePage1 次数用尽,重置外教点评首页...");
