@@ -12,8 +12,6 @@ import java.util.Date;
 public class AccountCourseBean {
     private Integer leftAmount;
     private CardCourseInfo courseInfo;
-    //2012-11-12 11:11:11
-    private Date dateInfo;
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,6 +24,9 @@ public class AccountCourseBean {
         private Integer isFreeze;
         private Integer studentReadFlag;
         private Integer status;
+        //2012-11-12 11:11:11
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private Date dateInfo;
     }
 
 }

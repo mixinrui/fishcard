@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.service;
 import com.boxfishedu.card.bean.TeachingType;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
@@ -423,8 +424,12 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentIdAndOrderChannelAndStartTimeAfter(studentId,orderChannel,date);
     }
 
-    public List<WorkOrder> getSelectedLeftAmount(Long studentId, String comboType,Integer skuId){
-        return jpa.findByStudentIdAndComboTypeAndSkuIdAndStartTimeAfter(studentId,comboType,skuId,new Date());
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId, ComboTypeEnum comboTypeEnum, TeachingType teachingType){
+        return jpa.findByStudentIdAndComboTypeAndSkuIdAndStartTimeAfter(studentId,comboTypeEnum.toString(),teachingType.getCode(),new Date());
+    }
+
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId, ComboTypeEnum comboTypeEnum){
+        return jpa.findByStudentIdAndComboTypeAndStartTimeAfter(studentId,comboTypeEnum.toString(),new Date());
     }
 
     public WorkOrder getCardToStart(Long studentId){

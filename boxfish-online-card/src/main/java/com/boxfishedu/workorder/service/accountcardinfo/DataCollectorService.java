@@ -1,6 +1,8 @@
 package com.boxfishedu.workorder.service.accountcardinfo;
 
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
@@ -37,8 +39,18 @@ public class DataCollectorService {
     }
 
     public Integer getSelectedLeftAmount(Long studentId){
-//        return workOrderService.getSelectedLeftAmount(studentId).size();
+        //中教:核心素养+金币换课中教
+        List<WorkOrder> overallCards=workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.OVERALL);
+        List<WorkOrder> exchangeChineses=workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.EXCHANGE,com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
+
+        //外教+金币换课外教+终极梦想
+        List<WorkOrder> foreignCards=workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.FOREIGN);
+        List<WorkOrder> finalDreamCards=workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.CHINESE);
+        List<WorkOrder> exchangeForeigns=workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.EXCHANGE,com.boxfishedu.card.bean.TeachingType.WAIJIAO);
+
+
         return 0;
+//        return workOrderService.getSelectedLeftAmount(studentId).size();
     }
 
     public Integer getTotalLeftAmount(Long studentId){

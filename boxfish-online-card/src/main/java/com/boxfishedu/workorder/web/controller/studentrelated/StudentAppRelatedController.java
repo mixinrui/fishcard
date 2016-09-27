@@ -144,9 +144,9 @@ StudentAppRelatedController {
         cardCourseInfo.setThumbnail("http://api.boxfish.cn/student/publication/data/data/91ab245869cb67c653d2da123e66701c");
         cardCourseInfo.setStatus(30);
         cardCourseInfo.setIsFreeze(0);
+        cardCourseInfo.setDateInfo(new Date());
         AccountCourseBean accountCourseBean = new AccountCourseBean();
         accountCourseBean.setLeftAmount(7);
-        accountCourseBean.setDateInfo(new Date());
         accountCourseBean.setCourseInfo(cardCourseInfo);
 
 
@@ -158,8 +158,8 @@ StudentAppRelatedController {
         cardCourseInfo2.setThumbnail("http://api.boxfish.cn/student/publication/data/data/b91a4adf3407882bf75a329f60e4dd24");
         cardCourseInfo2.setStatus(30);
         cardCourseInfo2.setIsFreeze(1);
+        cardCourseInfo2.setDateInfo(new Date());
         AccountCourseBean accountCourseBean2 = new AccountCourseBean();
-        accountCourseBean2.setDateInfo(new Date());
         accountCourseBean2.setLeftAmount(13);
         accountCourseBean2.setCourseInfo(cardCourseInfo2);
 
