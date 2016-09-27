@@ -86,6 +86,21 @@ public class AcountCardInfoMorphiaRepository {
         }
     }
 
+    public void updateCommentLeftAmount(Long studentId,Integer leftAmount){
+        Query<AccountCardInfo> updateQuery = datastore.createQuery(AccountCardInfo.class);
+        UpdateOperations<AccountCardInfo> updateOperations = datastore.createUpdateOperations(AccountCardInfo.class);
+
+        updateQuery.and(updateQuery.criteria("studentId").equal(studentId));
+        AccountCardInfo accountCardInfo= queryByStudentId(studentId);
+        accountCardInfo.getForeign().setLeftAmount(leftAmount);
+        updateOperations.set("comment", accountCardInfo.getForeign());
+
+        UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
+        if(updateResults.getUpdatedCount()<1){
+            logger.error("updateCommentLeftAmount#coment#更新次数失败用户[{}]",studentId);
+        }
+    }
+
     public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
         Query<AccountCardInfo> updateQuery = datastore.createQuery(AccountCardInfo.class);
         UpdateOperations<AccountCardInfo> updateOperations = datastore.createUpdateOperations(AccountCardInfo.class);

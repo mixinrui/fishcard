@@ -57,4 +57,8 @@ public class AccountCardInfoService {
     public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
         acountCardInfoMorphiaRepository.saveOrUpdate(studentId,accountCourseBean,accountCourseEnum);
     }
+
+    public void updateCommentLeftAmount(Long studentId,Integer leftAmount){
+        acountCardInfoMorphiaRepository.updateCommentLeftAmount(studentId,leftAmount);
+    }
 }
