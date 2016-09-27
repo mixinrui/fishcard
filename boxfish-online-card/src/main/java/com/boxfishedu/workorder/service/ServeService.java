@@ -7,9 +7,7 @@ import com.boxfishedu.mall.domain.product.ProductComboDetail;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
-import com.boxfishedu.workorder.common.bean.ScheduleTypeEnum;
+import com.boxfishedu.workorder.common.bean.*;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -648,7 +646,11 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return jpa.getServiceSelectedStatus(studentId,coursesSelected);
     }
 
-    public List<Service> getUnselectedService(Long studentId){
-        return jpa.findByStudentIdAndCoursesSelected(studentId,0);
+    public List<Service> getUnselectedService(Long studentId, ComboTypeEnum comboTypeEnum, TutorTypeEnum tutorTypeEnum,Integer selectedFlag){
+        return jpa.findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelected(studentId, comboTypeEnum.toString(),tutorTypeEnum.toString(),selectedFlag);
+    }
+
+    public List<Service> getUnselectedService(Long studentId,ComboTypeEnum comboTypeEnum,Integer selectedFlag){
+        return jpa.findByStudentIdAndComboTypeAndCoursesSelected(studentId, comboTypeEnum.toString() ,selectedFlag);
     }
 }
