@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.graborder.GrabOrderService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -68,6 +69,9 @@ public class GrabOrderServiceX {
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
 
 
     public JsonResultModel getWorkOrderListByTeacherId(Long teacherId) {
@@ -191,6 +195,8 @@ public class GrabOrderServiceX {
 
                     // 向在线运营发送建组(小马)
                     serviceSDK.createGroup(workOrder);
+
+                    dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
                     logger.info("::::::::::::::::::成功抢单::::::::::::::::::");
                 }
             }

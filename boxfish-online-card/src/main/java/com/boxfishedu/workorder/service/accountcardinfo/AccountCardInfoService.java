@@ -40,6 +40,10 @@ public class AccountCardInfoService {
         acountCardInfoMorphiaRepository.save(accountCardInfo);
     }
 
+    public void saveOrUpdateChAndFrn(Long studentId, AccountCourseBean chineseCourseBean, AccountCourseBean foreignAccountBean){
+        acountCardInfoMorphiaRepository.saveOrUpdateChAndFrn(studentId,chineseCourseBean,foreignAccountBean);
+    }
+
     public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
         acountCardInfoMorphiaRepository.saveOrUpdate(studentId,accountCourseBean,accountCourseEnum);
     }

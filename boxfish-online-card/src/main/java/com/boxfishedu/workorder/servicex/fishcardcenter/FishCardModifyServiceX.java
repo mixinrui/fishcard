@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.ServiceSDK;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -87,6 +88,9 @@ public class FishCardModifyServiceX {
     @Autowired
     private RabbitMqSender rabbitMqSender;
 
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //选择五门课程供给学生选择
@@ -117,6 +121,8 @@ public class FishCardModifyServiceX {
 
         //更新新的教师到workorder和courseschedule,此处做事务控制
         workOrderService.updateWorkOrderAndSchedule(workOrder, courseSchedule);
+
+        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
 
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
@@ -153,6 +159,7 @@ public class FishCardModifyServiceX {
         workOrders.forEach(workOrder -> {
             fishCardModifyService.changeCourse(workOrder);
         });
+        dataCollectorService.updateBothChnAndFnItemAsync(studentId);
     }
 
     public void changCourse(Long workOrderId) {
@@ -305,6 +312,7 @@ public class FishCardModifyServiceX {
         // 记录日志
         workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");
 
+        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
 
         return new JsonResultModel().newJsonResultModel("OK");
     }

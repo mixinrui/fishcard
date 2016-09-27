@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendHandlerHelper;
@@ -77,6 +78,9 @@ public class TimePickerServiceXV1 {
     @Autowired
     private SelectModeFactory selectModeFactory;
 
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
     /**
      * 学生选择时间
      * @param timeSlotParam
@@ -107,6 +111,8 @@ public class TimePickerServiceXV1 {
 
         // 批量保存鱼卡与课表
         List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
+
+        dataCollectorService.updateBothChnAndFnItemAsync(serviceList.get(0).getStudentId());
 
         // 保存日志
         workOrderLogService.batchSaveWorkOrderLogs(workOrderList);

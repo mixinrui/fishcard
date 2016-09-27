@@ -3,15 +3,19 @@ package com.boxfishedu.workorder.service.accountcardinfo;
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +37,17 @@ public class DataCollectorService {
     @Autowired
     private ScheduleCourseInfoMorphiaRepository scheduleCourseInfoMorphiaRepository;
 
+    @Autowired
+    private AccountCardInfoService accountCardInfoService;
+
+    @Autowired
+    private ScheduleCourseInfoService scheduleCourseInfoService;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
+
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
+
     public Integer getUnSelectedAmount(Long studentId) {
         return 0;
     }
@@ -46,7 +61,7 @@ public class DataCollectorService {
     }
 
     public Integer selectedLeftNum(List<WorkOrder> workOrders) {
-        return workOrders.size();
+        return CollectionUtils.isEmpty(workOrders)?0: workOrders.size();
     }
 
     public Integer getChineseUnselectedServices(Long studentId) {
@@ -101,13 +116,54 @@ public class DataCollectorService {
         return scheduleCourseInfoMorphiaRepository.queryByWorkId(workOrderId);
     }
 
-    public void updateForeignItem(Long studentId){
+    public AccountCourseBean updateForeignItem(Long studentId){
+        AccountCourseBean accountCourseBean=new AccountCourseBean();
         List<WorkOrder> selectedLeftWorkOrders = getForeignSelectedLeftWorkOrders(studentId);
+        int leftAmount=getForeignUnselectedServices(studentId)+selectedLeftNum(selectedLeftWorkOrders);
+        accountCourseBean.setLeftAmount(leftAmount);
+        WorkOrder latestWorkOrder=getWorkOrderToStart(selectedLeftWorkOrders);
+        if(null==latestWorkOrder){
+            accountCourseBean.setCourseInfo(null);
+            return accountCourseBean;
+        }
+        ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
-//        Integer leftForeignNum=
+        accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo,latestWorkOrder));
+
+        return accountCourseBean;
     }
 
-    public void updateChineseItem(){
+    public AccountCourseBean updateChineseItem(Long studentId){
+        AccountCourseBean accountCourseBean=new AccountCourseBean();
+        List<WorkOrder> selectedWorkOrders=getChineseSelectedLeftWorkOrders(studentId);
+        int leftAmount=getChineseUnselectedServices(studentId)+selectedLeftNum(selectedWorkOrders);
+        accountCourseBean.setLeftAmount(leftAmount);
+        WorkOrder latestWorkOrder=getWorkOrderToStart(selectedWorkOrders);
+        if(null==latestWorkOrder){
+            accountCourseBean.setCourseInfo(null);
+            return accountCourseBean;
+        }
+        ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
+
+        accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo,latestWorkOrder));
+
+        return accountCourseBean;
+    }
+
+    public void updateBothChnAndFnItemAsync(Long studentId){
+        threadPoolManager.execute(new Thread(()->this.updateBothChnAndFnItem(studentId)));
+    }
+
+    public void updateBothChnAndFnItem(Long studentId){
+        try {
+            logger.error("@updateBothChnAndFnItem#begin用户[{}]更新首页信息失败",studentId);
+            AccountCourseBean chineseCourseBean=updateChineseItem(studentId);
+            AccountCourseBean foreignCourseBean=updateForeignItem(studentId);
+            accountCardInfoService.saveOrUpdateChAndFrn(studentId,chineseCourseBean,foreignCourseBean);
+        }
+        catch (Exception ex){
+            logger.error("@updateBothChnAndFnItem#exception用户[{}]更新首页信息失败",studentId);
+        }
 
     }
 

@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -41,6 +42,9 @@ public class FishCardFreezeServiceX {
     private WorkOrderLogService workOrderLogService;
 
     @Autowired
+    private DataCollectorService dataCollectorService;
+
+    @Autowired
     private TimePickerService timePickerService;
 
     public JsonResultModel freeze(Long fishcardId){
@@ -68,6 +72,8 @@ public class FishCardFreezeServiceX {
         courseSchedule.setIsFreeze(1);
         workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
 
+        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
+
         workOrderLogService.saveWorkOrderLog(workOrder,"冻结课程,冻结前教师id["+teacherId+"],教师姓名["+teacherName+"]");
 
         return JsonResultModel.newJsonResultModel("ok");
@@ -89,6 +95,8 @@ public class FishCardFreezeServiceX {
         workOrder.setIsFreeze(0);
         courseSchedule.setIsFreeze(0);
         workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
+
+        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
 
         List<CourseSchedule> list= Lists.newArrayList();
         list.add(courseSchedule);

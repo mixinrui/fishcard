@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -48,6 +49,9 @@ public class CourseScheduleUpdatorServiceX {
 
     @Autowired
     private WorkOrderLogService workOrderLogService;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
 
     //定时任务，向师生运营组获取教师
 //    @Scheduled(cron="*/10 * * * * ?")
@@ -126,6 +130,8 @@ public class CourseScheduleUpdatorServiceX {
         }
         workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
         workOrderService.save(workOrder);
+
+        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
 
         // 创建群组
         serviceSDK.createGroup(workOrder);
