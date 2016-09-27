@@ -4,10 +4,15 @@ package com.boxfishedu.workorder.common.bean;
  * Created by hucl on 16/6/16.
  */
 public enum ComboTypeEnum {
+    // 核心素养
     OVERALL("OVERALL"),
+    //外教
     FOREIGN("FOREIGN"),
+    //外教点评
     CRITIQUE("CRITIQUE"),
+    //金币换课
     EXCHANGE("EXCHANGE"),
+    //终极梦想
     CHINESE("CHINESE");
 
     private String value;
