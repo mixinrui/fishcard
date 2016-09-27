@@ -21,6 +21,7 @@ public class AccountCardInfo {
     @Id
     private ObjectId id;
 
+    @JsonIgnore
     @Indexed(background = true)
     private Long studentId;
 

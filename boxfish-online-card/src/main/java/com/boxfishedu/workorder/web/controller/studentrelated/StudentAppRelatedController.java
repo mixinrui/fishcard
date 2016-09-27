@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -123,7 +124,7 @@ StudentAppRelatedController {
     }
 
     @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.PUT)
-    public JsonResultModel userCardInfoModify(String orderType,@PathVariable("student_id") Long studentId) {
+    public JsonResultModel userCardInfoModify(String order_type,@PathVariable("student_id") Long studentId) {
         AccountCardInfo accountCardInfo=accountCardInfoService.queryByStudentId(studentId);
         AccountCourseBean.CardCourseInfo cardCourseInfo = accountCardInfo.getChinese().getCourseInfo();
         cardCourseInfo.setCourseName("@@@@@@@中文课程名称修改2222");
@@ -132,7 +133,7 @@ StudentAppRelatedController {
     }
 
     @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.GET)
-    public JsonResultModel userCardInfo(String orderType,@PathVariable("student_id") Long studentId) {
+    public JsonResultModel userCardInfo(String order_type,@PathVariable("student_id") Long studentId) {
         AccountCardInfo accountCardInfo = new AccountCardInfo();
 
         AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
@@ -145,6 +146,7 @@ StudentAppRelatedController {
         cardCourseInfo.setIsFreeze(0);
         AccountCourseBean accountCourseBean = new AccountCourseBean();
         accountCourseBean.setLeftAmount(7);
+        accountCourseBean.setDateInfo(new Date());
         accountCourseBean.setCourseInfo(cardCourseInfo);
 
 
@@ -157,6 +159,7 @@ StudentAppRelatedController {
         cardCourseInfo2.setStatus(30);
         cardCourseInfo2.setIsFreeze(1);
         AccountCourseBean accountCourseBean2 = new AccountCourseBean();
+        accountCourseBean2.setDateInfo(new Date());
         accountCourseBean2.setLeftAmount(13);
         accountCourseBean2.setCourseInfo(cardCourseInfo2);
 
@@ -168,18 +171,18 @@ StudentAppRelatedController {
         cardCourseInfo3.setDifficulty(1);
         cardCourseInfo3.setThumbnail("http://api.boxfish.cn/student/publication/data/data/51ec2314d184d70fba6b938535c3350d");
         cardCourseInfo3.setStatus(200);
+        cardCourseInfo3.setStudentReadFlag(0);
         AccountCourseBean accountCourseBean3 = new AccountCourseBean();
         accountCourseBean3.setLeftAmount(29);
         accountCourseBean3.setCourseInfo(cardCourseInfo3);
-
         accountCardInfo.setStudentId(studentId);
 
-        if (null == orderType) {
+        if (null == order_type) {
             accountCardInfo.setChinese(accountCourseBean);
             accountCardInfo.setForeign(accountCourseBean2);
             accountCardInfo.setComment(accountCourseBean3);
         } else {
-            switch (orderType) {
+            switch (order_type) {
                 case "chinese":
                     accountCardInfo.setChinese(accountCourseBean);
                     break;

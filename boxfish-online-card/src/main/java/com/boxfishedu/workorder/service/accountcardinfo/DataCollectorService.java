@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service.accountcardinfo;
 
+import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
@@ -36,7 +37,8 @@ public class DataCollectorService {
     }
 
     public Integer getSelectedLeftAmount(Long studentId){
-        return workOrderService.getSelectedLeftAmount(studentId).size();
+//        return workOrderService.getSelectedLeftAmount(studentId).size();
+        return 0;
     }
 
     public Integer getTotalLeftAmount(Long studentId){
@@ -50,6 +52,19 @@ public class DataCollectorService {
     public ScheduleCourseInfo getCourseByWorkOrder(Long workOrderId){
             return scheduleCourseInfoMorphiaRepository.queryByWorkId(workOrderId);
     }
+
+    public AccountCourseBean.CardCourseInfo scheduleCourseAdapter(ScheduleCourseInfo scheduleCourseInfo,WorkOrder workOrder){
+        AccountCourseBean.CardCourseInfo cardCourseInfo=new AccountCourseBean.CardCourseInfo();
+        cardCourseInfo.setThumbnail(scheduleCourseInfo.getThumbnail());
+        cardCourseInfo.setCourseId(scheduleCourseInfo.getCourseId());
+        cardCourseInfo.setCourseName(scheduleCourseInfo.getName());
+        cardCourseInfo.setDifficulty(scheduleCourseInfo.getDifficulty());
+        cardCourseInfo.setCourseType(scheduleCourseInfo.getCourseType());
+        cardCourseInfo.setIsFreeze(workOrder.getIsFreeze());
+        cardCourseInfo.setStatus(workOrder.getStatus());
+        return cardCourseInfo;
+    }
+
 
 
 }

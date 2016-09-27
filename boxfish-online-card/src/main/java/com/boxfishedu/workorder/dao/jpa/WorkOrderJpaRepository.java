@@ -139,8 +139,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select  wo from WorkOrder wo where wo.status = 51 and wo.deductScoreStatus is null and (wo.startTime between?1 and?2) and wo.orderChannel=?3")
     List<WorkOrder> queryAbsentStudent(Date startTime, Date endTime, String param);
 
-    public List<WorkOrder> findByStudentIdAndStartTimeAfter(Long studentId, Date date);
+    public List<WorkOrder> findByStudentIdAndComboTypeAndSkuIdAndStartTimeAfter(Long studentId,String comboType,Integer skuId, Date date);
 
-    public WorkOrder findTop1ByStudentIdAndStartTimeAfterOrderByStartTime(Long studentId, Date date);
+    public WorkOrder findTop1ByStudentIdAndSkuIdAndStartTimeAfterOrderByStartTime(Long studentId,Integer skuId, Date date);
 
 }
