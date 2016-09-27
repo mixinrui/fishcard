@@ -29,9 +29,20 @@ public class AccountCardInfoService {
     @Autowired
     private WorkOrderService workOrderService;
 
+    @Autowired
+    private AccountCardInfoService accountCardInfoService;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
     public AccountCardInfo queryByStudentId(Long studentId){
         logger.debug("@queryByStudentId#userId[{}]",studentId);
-        return acountCardInfoMorphiaRepository.queryByStudentId(studentId);
+        AccountCardInfo accountCardInfo= acountCardInfoMorphiaRepository.queryByStudentId(studentId);
+        if(null==accountCardInfo){
+            logger.debug("@queryByStudentId#init#userId[{}]",studentId);
+            dataCollectorService.updateBothChnAndFnItem(studentId);
+        }
+        return accountCardInfo;
     }
 
 
