@@ -16,10 +16,13 @@ import java.util.Objects;
 
 /**
  * Created by LuoLiBing on 16/9/22.
- * 默认的课程推荐方式
+ * 默认的课程推荐方式,工单本身来进行判断单独推荐
  */
 @Service
 public class DefaultRecommendHandler implements RecommendHandler {
+
+
+    private final static int EXCHANGE_DREAM_SKU_ID = 11;
 
 
     @Autowired
@@ -39,10 +42,16 @@ public class DefaultRecommendHandler implements RecommendHandler {
             // 判断tutorType 是中教外教还是中外教,对应的推课
             TutorType tutorType = TutorType.resolve(workOrder.getService().getTutorType());
             RecommandCourseView recommandCourseView;
+
             // 不同类型的套餐对应不同类型的课程推荐
             if(Objects.equals(tutorType, TutorType.MIXED)) {
                 recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
-            } else {
+            }
+            // 兑换的终极梦想课程
+            else if(Objects.equals(workOrder.getSkuIdExtra(), EXCHANGE_DREAM_SKU_ID)) {
+                recommandCourseView = recommandCourseRequester.getDreamRecommandCourse(workOrder);
+            }
+            else {
                 //  if(Objects.equals(tutorType, TutorType.FRN) || Objects.equals(tutorType, TutorType.CN))
                 recommandCourseView = recommandCourseRequester.getRecomendCourse(workOrder, tutorType);
             }
