@@ -32,7 +32,9 @@ public class SelectedCountValidator implements StudentTimePickerValidator {
                 throw new BusinessException("选择的上课次数不符合规范");
             }
         } else if(selectedTimes instanceof UserDefinedSelectMode) {
-            Integer count = serviceList.stream().collect(Collectors.summingInt(Service::getAmount));
+            Integer count = serviceList.stream()
+                    .filter(service -> Objects.equals(service.getProductType(), 1001))
+                    .collect(Collectors.summingInt(Service::getAmount));
             if(!Objects.equals(count, selectedTimes.size())) {
                 throw new BusinessException("选择的上课次数不符合规范");
             }
