@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
 import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ public class EveryDayCourseLimitValidator implements StudentTimePickerValidator 
 
 
     @Override
-    public void postValidate(List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
+    public void postValidate(List<Service> serviceList, List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
         Map<String, Long> counter = unFinishWorkOrder
                 .stream()
                 .collect(Collectors.groupingBy((dateStr) -> dateStr.split(" ")[0], Collectors.counting()));

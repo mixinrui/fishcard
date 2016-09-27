@@ -100,7 +100,7 @@ public class TimePickerServiceXV1 {
 
         Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(timeSlotParam.getStudentId());
 
-        studentTimePickerValidatorSupport.postValidate(workOrderList, classDateTimeslotsSet);
+        studentTimePickerValidatorSupport.postValidate(serviceList, workOrderList, classDateTimeslotsSet);
 
         // 获取课程推荐
         Map<Integer, RecommandCourseView> recommandCourses = recommendHandlerHelper.recommendCourses(workOrderList, timeSlotParam);

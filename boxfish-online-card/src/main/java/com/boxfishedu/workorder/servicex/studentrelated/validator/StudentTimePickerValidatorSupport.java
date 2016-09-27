@@ -35,7 +35,7 @@ public class StudentTimePickerValidatorSupport {
     }
 
 
-    public void postValidate(List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
-        validatorList.forEach(validator -> validator.postValidate(workOrderList, unFinishWorkOrder));
+    public void postValidate(List<Service> serviceList, List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
+        validatorList.forEach(validator -> validator.postValidate(serviceList, workOrderList, unFinishWorkOrder));
     }
 }

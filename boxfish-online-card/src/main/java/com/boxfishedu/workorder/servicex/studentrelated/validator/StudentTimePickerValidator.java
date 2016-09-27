@@ -15,6 +15,6 @@ public interface StudentTimePickerValidator {
 
     default void prepareValidate(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> serviceList) {}
 
-    default void postValidate(List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {}
+    default void postValidate(List<Service> serviceList, List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {}
 
 }

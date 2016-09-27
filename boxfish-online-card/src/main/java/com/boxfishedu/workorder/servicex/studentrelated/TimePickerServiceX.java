@@ -108,7 +108,7 @@ public class TimePickerServiceX {
         Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(timeSlotParam.getStudentId());
 
         // 对初始化的workOrderList进行验证
-        studentTimePickerValidatorSupport.postValidate(workOrders, classDateTimeslotsSet);
+        studentTimePickerValidatorSupport.postValidate(Collections.singletonList(service),workOrders, classDateTimeslotsSet);
 
         //TODO:推荐课的接口目前为单词请求
         Map<Integer, RecommandCourseView> recommandCoursesMap = recommendHandlerHelper.recommendCourses(workOrders, timeSlotParam);
