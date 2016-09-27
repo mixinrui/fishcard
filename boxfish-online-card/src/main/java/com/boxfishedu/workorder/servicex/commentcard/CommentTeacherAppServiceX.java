@@ -117,6 +117,7 @@ public class CommentTeacherAppServiceX {
         //填充主页内容
         CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId());
         if (Objects.equals(homeCommentCard.getId(),commentCard.getId())){
+            logger.info("@submitComment 更新首页中外教点评项...");
             commentHomePage(commentCard);
         }
     }
