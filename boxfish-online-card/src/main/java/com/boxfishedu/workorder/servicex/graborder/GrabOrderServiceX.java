@@ -163,7 +163,7 @@ public class GrabOrderServiceX {
 
                     if (updateCount != 1) {
                         //抢单失败
-                        logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:3");
+                        logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:3 抢单失败 鱼卡id[{}] 老师id[{}]",grabOrderView.getWorkOrderId(),grabOrderView.getTeacherId());
                         grabOrderService.setFlagFailAndTeacherId(grabOrderView);
                         jsonObject.put("msg", WorkOrderConstant.GRABORDER_FAIL);
                         jsonObject.put("code", "1");
