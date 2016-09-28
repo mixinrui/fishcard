@@ -65,20 +65,25 @@ public class DataCollectorService {
         return CollectionUtils.isEmpty(workOrders)?0: workOrders.size();
     }
 
+    private Integer getAmountFromServices(List<Service> services){
+        return services.stream().filter(service -> service.getAmount()>0).mapToInt(Service::getAmount).sum();
+    }
+
     public Integer getChineseUnselectedServices(Long studentId) {
         List<Service> overAllServices = serveService.getUnselectedService(studentId, ComboTypeEnum.OVERALL, 0);
         List<Service> exchangeChineseServices = serveService.getUnselectedService(studentId, ComboTypeEnum.EXCHANGE, TutorTypeEnum.CN ,0);
-        return (CollectionUtils.isEmpty(overAllServices) ? 0 : overAllServices.size())
-                + (CollectionUtils.isEmpty(exchangeChineseServices) ? 0 : exchangeChineseServices.size());
+
+        return (CollectionUtils.isEmpty(overAllServices) ? 0 : this.getAmountFromServices(overAllServices))
+                + (CollectionUtils.isEmpty(exchangeChineseServices) ? 0 : this.getAmountFromServices(exchangeChineseServices));
     }
 
     public Integer getForeignUnselectedServices(Long studentId) {
         List<Service> communctionServices = serveService.getUnselectedService(studentId, ComboTypeEnum.FOREIGN, 0);
         List<Service> finalDreamServices = serveService.getUnselectedService(studentId, ComboTypeEnum.CHINESE, 0);
         List<Service> exchangeFrnServices = serveService.getUnselectedService(studentId, ComboTypeEnum.EXCHANGE, TutorTypeEnum.FRN, 0);
-        return (CollectionUtils.isEmpty(communctionServices) ? 0 : communctionServices.size())
-                + (CollectionUtils.isEmpty(finalDreamServices) ? 0 : finalDreamServices.size())
-                + (CollectionUtils.isEmpty(exchangeFrnServices) ? 0 : exchangeFrnServices.size());
+        return (CollectionUtils.isEmpty(communctionServices) ? 0 : this.getAmountFromServices(communctionServices))
+                + (CollectionUtils.isEmpty(finalDreamServices) ? 0 : this.getAmountFromServices(finalDreamServices))
+                + (CollectionUtils.isEmpty(exchangeFrnServices) ? 0 : this.getAmountFromServices(exchangeFrnServices));
     }
 
     public List<WorkOrder> getChineseSelectedLeftWorkOrders(Long studentId) {
