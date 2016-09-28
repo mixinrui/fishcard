@@ -319,10 +319,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         save(services);
         for (Service service:services){
             logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
-            if (Objects.equals(service.getProductType(),1002)){
-                commentTeacherAppServiceX.firstBuyForeignComment(service.getStudentId(),service.getAmount());
-            }
+//            if (Objects.equals(service.getProductType(),1002)){
+//                commentTeacherAppServiceX.firstBuyForeignComment(service.getStudentId(),service.getAmount());
+//            }
         }
+        logger.info("@order2Service 购买点评次数,设置首页点评次数");
+        commentTeacherAppServiceX.findHomeComment(orderView.getUserId());
     }
 
     //根据订单生成服务列表

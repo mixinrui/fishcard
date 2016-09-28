@@ -113,11 +113,16 @@ public class ForeignTeacherCommentController {
         foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
     }
 
-    //测试获取初始化外教点评主页列表
-    @RequestMapping(value = "/test/course_type_difficulty", method = RequestMethod.GET)
+    //获取初始化外教点评主页列表
+    @RequestMapping(value = "/handle/course_type_difficulty", method = RequestMethod.GET)
     public Object testCourseTypeAndDifficulty(){
         commentTeacherAppServiceX.initializeCommentHomePage();
-
         return new JsonResultModel();
+    }
+
+    //all测试接口
+    @RequestMapping(value = "/ansel/test", method = RequestMethod.GET)
+    public Object anselTest(){
+        return commentCardJpaRepository.getUncommentedCard(1299462l);
     }
 }
