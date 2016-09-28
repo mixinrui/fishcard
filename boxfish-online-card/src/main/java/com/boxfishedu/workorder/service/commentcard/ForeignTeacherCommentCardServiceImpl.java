@@ -107,13 +107,15 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardStatistics.setServicedId(service.getId());
                 commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_MINUS.getCode());
                 commentCardStatisticsJpaRepository.save(commentCardStatistics);
-                if(commentCardJpaRepository.getCommentedCard(userId).size() == 0){
-                    logger.info("@foreignTeacherCommentCardAdd1 首页中添加外教点评信息...");
-                    commentTeacherAppServiceX.commentHomePage(commentCard);
-                }else{
-                    logger.info("@foreignTeacherCommentCardAdd2 修改首页中外教点评次数");
-                    commentTeacherAppServiceX.commentHomePage(commentCardJpaRepository.getHomePageCommentCard(userId));
-                }
+//                if(commentCardJpaRepository.getCommentedCard(userId).size() == 0){
+//                    logger.info("@foreignTeacherCommentCardAdd1 首页中添加外教点评信息...");
+//                    commentTeacherAppServiceX.commentHomePage(commentCard);
+//                }else{
+//                    logger.info("@foreignTeacherCommentCardAdd2 修改首页中外教点评次数");
+//                    commentTeacherAppServiceX.commentHomePage(commentCardJpaRepository.getHomePageCommentCard(userId));
+//                }
+                logger.info("@foreignTeacherCommentCardAdd 发起外教点评,设置首页");
+                commentTeacherAppServiceX.findHomeComment(userId);
                 return newCommentCard;
             }catch (Exception e){
                 flag = false;
@@ -221,19 +223,21 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
             commentCardJpaRepository.save(commentCard);
         }
-        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(userId);
-        com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
-        if (Objects.nonNull(homeCommentCard)){
-            if (Objects.equals(id,homeCommentCard.getId())){
-                if ((commentCardJpaRepository.getUncommentedCard(userId).size() == 0 ) && service.getAmount() == 0){
-                    logger.info("@setHomePage1 次数用尽,重置外教点评首页...");
-                    accountCardInfoService.saveOrUpdate(userId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
-                } else {
-                    logger.info("@setHomePage2 设置外教点评首页...");
-                    commentTeacherAppServiceX.commentHomePage(commentCard);
-                }
-            }
-        }
+//        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(userId);
+//        com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
+//        if (Objects.nonNull(homeCommentCard)){
+//            if (Objects.equals(id,homeCommentCard.getId())){
+//                if ((commentCardJpaRepository.getUncommentedCard(userId).size() == 0 ) && service.getAmount() == 0){
+//                    logger.info("@setHomePage1 次数用尽,重置外教点评首页...");
+//                    accountCardInfoService.saveOrUpdate(userId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
+//                } else {
+//                    logger.info("@setHomePage2 设置外教点评首页...");
+//                    commentTeacherAppServiceX.commentHomePage(commentCard);
+//                }
+//            }
+//        }
+        logger.info("@setHomePage 查看详情时设置首页...");
+        commentTeacherAppServiceX.findHomeComment(userId);
         return commentCard;
     }
 
@@ -390,7 +394,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_ADD.getCode());
                 commentCardStatisticsJpaRepository.save(commentCardStatistics);
                 logger.info("@foreignTeacherCommentUnAnswer2 修改首页中外教点评次数");
-                commentTeacherAppServiceX.commentHomePage(commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId()));
+//                commentTeacherAppServiceX.commentHomePage(commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId()));
+                commentTeacherAppServiceX.findHomeComment(commentCard.getStudentId());
             } catch (Exception e) {
                 e.printStackTrace();
             }
