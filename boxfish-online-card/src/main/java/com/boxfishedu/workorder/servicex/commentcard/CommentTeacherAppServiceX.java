@@ -130,10 +130,10 @@ public class CommentTeacherAppServiceX {
 
     public void findHomeComment(Long studentId) {
         Integer amount = serveService.getForeignCommentServiceCount(studentId).get("amount");
-        if (Objects.equals(amount,0)){
+        if (amount == 0){
             List<CommentCard> commentCardList0 = commentCardJpaRepository.getUncommentedCard(studentId);
             if (commentCardList0.size() == 0){
-                logger.info("@findHomeComment 次数用尽,且点评都已查看!");
+                logger.info("@findHomeComment1 次数用尽,且点评都已查看!");
                 accountCardInfoService.saveOrUpdate(studentId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
                 return;
             }
@@ -148,7 +148,7 @@ public class CommentTeacherAppServiceX {
         }else {
             List<CommentCard> commentCardList2 = commentCardJpaRepository.getStudentNewCommentCard(studentId);
             if (commentCardList2.size() != 0){
-                logger.info("@findHomeComment 尚未有已完成的点评记录!");
+                logger.info("@findHomeComment2 尚未有已完成的点评记录!");
                 setCommentHomePage(commentCardList2.get(0));
             }else {
                 setDefaultHomeComment(studentId);
