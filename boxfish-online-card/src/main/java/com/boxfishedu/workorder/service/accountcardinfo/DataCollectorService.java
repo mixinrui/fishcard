@@ -56,7 +56,9 @@ public class DataCollectorService {
         if (CollectionUtils.isEmpty(workOrders)) {
             return null;
         }
+        logger.debug("@getWorkOrderToStart#sort#before#[{}]",workOrders);
         Collections.sort(workOrders, new SortByStartTime());
+        logger.debug("@getWorkOrderToStart#sort#end#[{}]",workOrders);
         return workOrders.get(0);
     }
 
