@@ -31,6 +31,7 @@ public interface SelectMode {
         workOrder.setCreateTime(new Date());
         workOrder.setOrderCode(service.getOrderCode());
         workOrder.setIsFreeze(0);
+        workOrder.setComboType(service.getComboType());
         // skuIdExtra 字段
         workOrder.setSkuIdExtra(service.getSkuId().intValue());
         workOrder.setOrderChannel(service.getOrderChannel());

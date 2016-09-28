@@ -56,7 +56,6 @@ public class DataCollectorService {
         if (CollectionUtils.isEmpty(workOrders)) {
             return null;
         }
-        logger.debug("@getWorkOrderToStart#sort#before#[{}]",workOrders);
         Collections.sort(workOrders, new SortByStartTime());
         logger.debug("@getWorkOrderToStart#sort#end#[{}]",workOrders);
         return workOrders.get(0);
@@ -189,7 +188,7 @@ public class DataCollectorService {
             WorkOrder s2 = (WorkOrder) o2;
             if (s1.getStartTime().after(s2.getStartTime()))
                 return 1;
-            return 0;
+            return -1;
         }
     }
 
