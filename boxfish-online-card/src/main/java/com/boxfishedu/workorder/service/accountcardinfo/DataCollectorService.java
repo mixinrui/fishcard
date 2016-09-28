@@ -162,7 +162,7 @@ public class DataCollectorService {
 
     public void updateBothChnAndFnItem(Long studentId){
         try {
-            logger.error("@updateBothChnAndFnItem#begin用户[{}]更新首页信息失败",studentId);
+            logger.error("@updateBothChnAndFnItem#begin用户[{}]更新首页信息",studentId);
             AccountCourseBean chineseCourseBean=updateChineseItem(studentId);
             AccountCourseBean foreignCourseBean=updateForeignItem(studentId);
             accountCardInfoService.saveOrUpdateChAndFrn(studentId,chineseCourseBean,foreignCourseBean);
