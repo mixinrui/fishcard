@@ -558,3 +558,64 @@ service:
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
   gateway:
     type: product
+
+#===============================================================[首页项目]生产环境===============================================================
+#=============192.168.1.59===============192.168.1.60====================================================================================#
+#=================mongo:    mongo --host dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p
+#=================外网mq:   120.27.227.72:5672(映射:120.27.227.72:5672)================================================================#
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish-online-2016-inside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: nEaJiP7hwoXEUkPDnDjaBK3hEJanHTec
+  mongo:
+    serverAddress: dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717,dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717
+    dbName: fishcard
+    username: root
+    password: sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
+  redis:
+    hostName: 96cbdee519414aba.m.cnhza.kvstore.aliyuncs.com
+    password: kVxowYcWE6NdfKAP6zDhxZsZgkPGuC
+    port: 6379
+    timeout: 10000
+  rabbitmq:
+    address: 192.168.1.19:5672,192.168.1.18:5672,192.168.1.17:5672
+    #port: 5672
+    username: admin
+    password: boxfish123
+    virtualHost: local
+  profiles: product_home
+
+server.servlet-path: /cardindex
+server.port: 9898
+##################接口调用地址
+interface:
+  address:
+    teacher_service: http://online-api.boxfish.cn/teacher
+    teacher_service_admin: http://online-api.boxfish.cn/teacheradmin
+#    course_recommended_service: http://base.boxfish.cn/recommend
+#    course_recommended_service: http://114.55.40.98:8001/recommend
+
+    course_recommended_service: http://base.boxfish.cn/recommend
+    fishcard_service: http://online-api.boxfish.cn/fishcard
+    order_service: http://online-api.boxfish.cn/order
+    course_online_service: http://online-api.boxfish.cn/teaching-service
+    auth_user: http://base.boxfish.cn/passbook
+#鱼卡管理后台的页面地址
+    fishcard_page: http://101.201.66.109:94/
+    data_analysis_service: http://online-api.log.boxfish.cn/log/mongo
+    student_teacher_relation: http://api.boxfish.cn
+#支付系统
+    pay_service: http://online-api.inside.boxfish.cn/pay-inside
+#  学生旷课扣积分
+    absenteeism_deduct_score: http://api.boxfish.cn
+#外教点评接口调用地址
+service:
+  sdk:
+    teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
+    getPictureUrl: http://base.boxfish.cn/passbook
+    pushInfoIrl: http://online-api.boxfish.cn/teaching-service
+    innerTeacherUrl: http://online-api.boxfish.cn/teacher
+  gateway:
+    type: product
