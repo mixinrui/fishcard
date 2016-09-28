@@ -2,11 +2,15 @@ package com.boxfishedu.workorder.web.controller;
 
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
+import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.ContinousAbsenceMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ContinousAbsenceRecord;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
+import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +38,16 @@ public class InitDataController {
     private ContinousAbsenceMorphiaRepository continousAbsenceMorphiaRepository;
 
     @Autowired
+    private ServiceJpaRepository serviceJpaRepository;
+
+    @Autowired
     private AbsenceDealService absenceDealService;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
+    @Autowired
+    private AccountCardInfoService accountCardInfoService;
 
     private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -68,4 +81,13 @@ public class InitDataController {
         }
         return JsonResultModel.newJsonResultModel("ok");
     }
+
+    @RequestMapping(value = "/home", method = RequestMethod.POST)
+    public JsonResultModel initHomePage(){
+        List<Long> studentIds=serviceJpaRepository.findDistinctUsersFromService();
+        studentIds.forEach(studentId->dataCollectorService.updateBothChnAndFnItemAsync(studentId));
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
+
 }
