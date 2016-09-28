@@ -111,12 +111,14 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     /**
      *查询老师最新回复的点评卡
      */
-    @Query("select c from CommentCard c where c.teacherAnswerTime =  (select max(cd.teacherAnswerTime) from CommentCard cd where cd.studentId = ?1 and cd.status in (400,600))")
+    @Query("select c from CommentCard c where c.studentId = ?1 and c.status in (400,600) and c.teacherAnswerTime =  " +
+            "(select max(cd.teacherAnswerTime) from CommentCard cd where cd.studentId = ?1 and cd.status in (400,600))")
     public List<CommentCard> getTeacherNewCommentCard(Long studentId);
 
     /**
      * 查询学生最新提问的点评卡
      */
-    @Query("select c from CommentCard c where c.studentAskTime =  (select max(cd.studentAskTime) from CommentCard cd where cd.studentId = ?1 and cd.status <= 300)")
+    @Query("select c from CommentCard c where c.studentId = ?1 and c.status <= 300 and c.studentAskTime =  " +
+            "(select max(cd.studentAskTime) from CommentCard cd where cd.studentId = ?1 and cd.status <= 300)")
     public List<CommentCard> getStudentNewCommentCard(Long studentId);
 }
