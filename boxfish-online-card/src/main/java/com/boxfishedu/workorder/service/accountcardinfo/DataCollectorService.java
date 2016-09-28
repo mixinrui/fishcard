@@ -11,7 +11,6 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -19,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -48,15 +45,11 @@ public class DataCollectorService {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    public Integer getUnSelectedAmount(Long studentId) {
-        return 0;
-    }
-
     public WorkOrder getWorkOrderToStart(List<WorkOrder> workOrders) {
         if (CollectionUtils.isEmpty(workOrders)) {
             return null;
         }
-        Collections.sort(workOrders, new SortByStartTime());
+        workOrders.sort((o1, o2) ->o1.getStartTime().after(o2.getStartTime())?1:-1);
         logger.debug("@getWorkOrderToStart#sort#end#[{}]",workOrders);
         return workOrders.get(0);
     }
@@ -170,7 +163,6 @@ public class DataCollectorService {
         catch (Exception ex){
             logger.error("@updateBothChnAndFnItem#exception用户[{}]更新首页信息失败",studentId);
         }
-
     }
 
     public AccountCourseBean.CardCourseInfo scheduleCourseAdapter(ScheduleCourseInfo scheduleCourseInfo, WorkOrder workOrder) {
@@ -185,17 +177,4 @@ public class DataCollectorService {
         cardCourseInfo.setDateInfo(workOrder.getStartTime());
         return cardCourseInfo;
     }
-
-
-    class SortByStartTime implements Comparator {
-        public int compare(Object o1, Object o2) {
-            WorkOrder s1 = (WorkOrder) o1;
-            WorkOrder s2 = (WorkOrder) o2;
-            if (s1.getStartTime().after(s2.getStartTime()))
-                return 1;
-            return -1;
-        }
-    }
-
-
 }
