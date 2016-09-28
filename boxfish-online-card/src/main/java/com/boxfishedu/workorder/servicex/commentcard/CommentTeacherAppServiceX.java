@@ -139,9 +139,12 @@ public class CommentTeacherAppServiceX {
             }
         }
         List<CommentCard> commentCardList1 = commentCardJpaRepository.getTeacherNewCommentCard(studentId);
-        System.out.println("commentCardList1:" + commentCardList1);
         if (commentCardList1.size() != 0){
-            setCommentHomePage(commentCardList1.get(0));
+            CommentCard commentCard = commentCardList1.get(0);
+            if (commentCard.getStatus().equals(CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())){
+                commentCard.setStatus(CommentCardStatus.ANSWERED.getCode());
+            }
+            setCommentHomePage(commentCard);
         }else {
             List<CommentCard> commentCardList2 = commentCardJpaRepository.getStudentNewCommentCard(studentId);
             if (commentCardList2.size() != 0){
