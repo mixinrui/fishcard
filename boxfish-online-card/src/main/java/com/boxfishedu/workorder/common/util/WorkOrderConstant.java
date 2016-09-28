@@ -22,13 +22,13 @@ public  class WorkOrderConstant {
 
 
     /** begin 课程变更消息发送 **/
-    public final  static String SEND_CHANGE_COURSE_MESSAGE_BEGIN="您的课表有 [";
+    public final  static String SEND_CHANGE_COURSE_MESSAGE_BEGIN="您的课表有";
 
-    public final  static String SEND_CHANGE_COURSE_MESSAGE_END="]节课程更新了,请提前下载.";
+    public final  static String SEND_CHANGE_COURSE_MESSAGE_END="节课程更新了,请提前下载.";
 
-    public final  static String SEND_CHANGE_COURSE_MESSAGE_FOREIGN_BEGIN="您的课表有 [";
+    public final  static String SEND_CHANGE_COURSE_MESSAGE_FOREIGN_BEGIN="";
 
-    public final  static String SEND_CHANGE_COURSE_MESSAGE_FOREIGN_END="]节课程更新了,请提前下载.";
+    public final  static String SEND_CHANGE_COURSE_MESSAGE_FOREIGN_END="classes on your schedule have been updated. Please download in advance.";
     /** end 课程变更消息发送 **/
 
 
