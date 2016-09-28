@@ -132,7 +132,7 @@ public class CommentTeacherAppServiceX {
         Integer amount = serveService.getForeignCommentServiceCount(studentId).get("amount");
         if (Objects.equals(amount,0)){
             List<CommentCard> commentCardList0 = commentCardJpaRepository.getUncommentedCard(studentId);
-            if (commentCardList0.size() != 0){
+            if (commentCardList0.size() == 0){
                 logger.info("@findHomeComment 次数用尽,且点评都已查看!");
                 accountCardInfoService.saveOrUpdate(studentId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
                 return;
