@@ -610,6 +610,8 @@ interface:
     pay_service: http://online-api.inside.boxfish.cn/pay-inside
 #  学生旷课扣积分
     absenteeism_deduct_score: http://api.boxfish.cn
+#  获取课程类型和难度
+    course_type_and_difficulty: http://base.boxfish.cn
 #外教点评接口调用地址
 service:
   sdk:
