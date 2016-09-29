@@ -72,7 +72,7 @@ public class FishCardFreezeServiceX {
         courseSchedule.setIsFreeze(1);
         workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
 
-        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
         workOrderLogService.saveWorkOrderLog(workOrder,"冻结课程,冻结前教师id["+teacherId+"],教师姓名["+teacherName+"]");
 
@@ -96,7 +96,7 @@ public class FishCardFreezeServiceX {
         courseSchedule.setIsFreeze(0);
         workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
 
-        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
         List<CourseSchedule> list= Lists.newArrayList();
         list.add(courseSchedule);

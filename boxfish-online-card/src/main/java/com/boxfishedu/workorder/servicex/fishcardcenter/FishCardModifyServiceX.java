@@ -122,7 +122,7 @@ public class FishCardModifyServiceX {
         //更新新的教师到workorder和courseschedule,此处做事务控制
         workOrderService.updateWorkOrderAndSchedule(workOrder, courseSchedule);
 
-        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
@@ -313,7 +313,7 @@ public class FishCardModifyServiceX {
         // 记录日志
         workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");
 
-        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
         return new JsonResultModel().newJsonResultModel("OK");
     }

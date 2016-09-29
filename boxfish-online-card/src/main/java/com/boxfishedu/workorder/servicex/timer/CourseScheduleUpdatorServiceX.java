@@ -131,7 +131,7 @@ public class CourseScheduleUpdatorServiceX {
         workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
         workOrderService.save(workOrder);
 
-        dataCollectorService.updateBothChnAndFnItem(workOrder.getStudentId());
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
         // 创建群组
         serviceSDK.createGroup(workOrder);
