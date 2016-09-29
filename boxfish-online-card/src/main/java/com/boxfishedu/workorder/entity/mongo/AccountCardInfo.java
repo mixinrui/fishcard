@@ -24,7 +24,7 @@ public class AccountCardInfo {
     private ObjectId id;
 
     @JsonIgnore
-    @Indexed(background = true)
+    @Indexed(background = true, unique = true)
     private Long studentId;
 
     @JsonIgnore
