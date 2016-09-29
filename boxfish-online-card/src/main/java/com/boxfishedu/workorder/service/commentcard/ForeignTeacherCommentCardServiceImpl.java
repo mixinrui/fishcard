@@ -236,7 +236,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 //                }
 //            }
 //        }
-        logger.info("@setHomePage 查看详情时设置首页...");
+        logger.info("@foreignTeacherCommentDetailQuery 查看详情时设置首页...");
         commentTeacherAppServiceX.findHomeComment(userId);
         return commentCard;
     }
