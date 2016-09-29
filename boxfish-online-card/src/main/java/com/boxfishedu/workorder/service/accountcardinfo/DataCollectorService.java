@@ -80,6 +80,7 @@ public class DataCollectorService {
     }
 
     public List<WorkOrder> getChineseSelectedLeftWorkOrders(Long studentId) {
+        logger.debug("#getChineseSelectedLeftWorkOrders#用户[{}]",studentId);
         //中教:核心素养+金币换课中教
         List<WorkOrder> overallCards = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.OVERALL);
         List<WorkOrder> exchangeChineses = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.EXCHANGE, com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
@@ -155,7 +156,7 @@ public class DataCollectorService {
 
     public void updateBothChnAndFnItem(Long studentId){
         try {
-            logger.error("@updateBothChnAndFnItem#begin用户[{}]更新首页信息",studentId);
+            logger.debug("@updateBothChnAndFnItem#begin用户[{}]更新首页信息",studentId);
             AccountCourseBean chineseCourseBean=updateChineseItem(studentId);
             AccountCourseBean foreignCourseBean=updateForeignItem(studentId);
             accountCardInfoService.saveOrUpdateChAndFrn(studentId,chineseCourseBean,foreignCourseBean);

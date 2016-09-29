@@ -38,7 +38,7 @@ public class AccountCardInfoService {
         AccountCardInfo accountCardInfo= acountCardInfoMorphiaRepository.queryByStudentId(studentId);
         if(null==accountCardInfo){
             logger.debug("@queryByStudentId#init#userId[{}]",studentId);
-            dataCollectorService.updateBothChnAndFnItemAsync(studentId);
+            dataCollectorService.updateBothChnAndFnItem(studentId);
             return acountCardInfoMorphiaRepository.queryByStudentId(studentId);
         }
         return accountCardInfo;
