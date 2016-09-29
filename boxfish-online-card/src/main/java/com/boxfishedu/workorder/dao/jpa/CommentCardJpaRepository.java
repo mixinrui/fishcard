@@ -96,9 +96,7 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     /**
      * 初始化外教点评首页列表
      */
-    @Query("select distinct(c.studentId) from CommentCard c,Service s " +
-            "where s.studentId = c.studentId and s.comboType = 'CRITIQUE' and ((c.status in (400,600) and s.amount > 0) " +
-            "or (c.status <= 300 and s.amount = 0))")
+    @Query("select distinct(studentId) from Service s where s.productType = 1002")
     public List<Long> getCommentCardHomePageList();
 
     /**

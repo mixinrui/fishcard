@@ -209,13 +209,8 @@ public class CommentTeacherAppServiceX {
         List<Long> longs = commentCardJpaRepository.getCommentCardHomePageList();
         int sum = 0;
         for(Long studentId: longs){
-            if (Objects.nonNull(studentId)){
-                CommentCard commentCard = commentCardJpaRepository.getHomePageCommentCard(studentId);
-                if (Objects.nonNull(commentCard)){
-                    setCommentHomePage(commentCard);
-                    sum +=1 ;
-                }
-            }
+            findHomeComment(studentId);
+            sum +=1 ;
         }
         logger.info("@initializeCommentHomePage 初始化首页中外教点评相关项完毕,初始化个数为:"+sum);
     }
