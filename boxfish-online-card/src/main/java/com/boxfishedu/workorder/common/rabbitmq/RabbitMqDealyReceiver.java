@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -16,6 +17,7 @@ import java.util.Date;
  * Created by hucl on 16/6/9.
  */
 @Component
+@Profile({"local_hucl","product","local","development","development_new","test","demo","pretest"})
 public class RabbitMqDealyReceiver {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
