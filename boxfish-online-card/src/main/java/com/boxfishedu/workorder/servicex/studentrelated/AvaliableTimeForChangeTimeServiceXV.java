@@ -122,11 +122,27 @@ public class AvaliableTimeForChangeTimeServiceXV {
             result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
                     .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
                     .collect(Collectors.toList()));
+            if(result.getDay().equals(DateUtil.date2SimpleString(DateUtil.localDate2Date(dateRange.getFrom())  ))){
+
+                result.setDailyScheduleTime(result.getDailyScheduleTime().stream().filter(
+                        t ->   validateFirstDate(clone.getDay(),t.getStartTime(),DateUtil.localDate2Date(dateRange.getFrom())
+                )).collect(Collectors.toList()));
+
+            }
+
+
+
             return result;
         });
         return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
     }
 
+
+
+    private  boolean validateFirstDate(String day ,String startTime,Date from){
+        Date startDate  = DateUtil.String2Date(day+" "+startTime);
+        return startDate.after(from);
+    }
 
     /**
      * 开始时间从后天开始
