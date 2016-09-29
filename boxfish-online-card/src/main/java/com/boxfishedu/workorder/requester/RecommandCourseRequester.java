@@ -95,14 +95,14 @@ public class RecommandCourseRequester {
             return changeForeignCourse(workOrder);
         }
         else {
-            return changeOverAllCourse(workOrder);
+            return changeOverAllOrFinalDreamCourse(workOrder);
         }
     }
 
     //目前为中教的换课
-    public RecommandCourseView changeOverAllCourse(WorkOrder workOrder) {
+    public RecommandCourseView changeOverAllOrFinalDreamCourse(WorkOrder workOrder) {
         String url = String.format("%s/core/exchange/online/%s/%s/%s", urlConf.getCourse_recommended_service(),
-                workOrder.getStudentId(), workOrder.getSeqNum(), workOrder.getCourseId());
+                workOrder.getStudentId(), recommandedCourseService.getCourseIndex(workOrder), workOrder.getCourseId());
         try {
             logger.info("@changeCourse#request发起换课请求,url[{}]", url);
             RecommandCourseView recommandCourseView = restTemplate.postForObject(url, null, RecommandCourseView.class);
@@ -150,7 +150,7 @@ public class RecommandCourseRequester {
     // 终极梦想换课
     public RecommandCourseView changeDreamCourse(WorkOrder workOrder) {
         return restTemplate.postForObject(
-                createExchangeDreamRecommend(workOrder.getStudentId(), workOrder.getSeqNum(), workOrder.getCourseId()),
+                createExchangeDreamRecommend(workOrder.getStudentId(), recommandedCourseService.getCourseIndex(workOrder), workOrder.getCourseId()),
                 HttpEntity.EMPTY,
                 RecommandCourseView.class);
     }
