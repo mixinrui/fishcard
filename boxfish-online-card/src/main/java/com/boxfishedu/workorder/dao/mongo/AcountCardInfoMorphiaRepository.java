@@ -109,6 +109,7 @@ public class AcountCardInfoMorphiaRepository {
     }
 
     public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
+        logger.debug("@AcountCardInfoMorphiaRepository#saveOrUpdate#用户[{}],类型[{}]",studentId,accountCourseEnum.toString());
         Query<AccountCardInfo> updateQuery = datastore.createQuery(AccountCardInfo.class);
         UpdateOperations<AccountCardInfo> updateOperations = datastore.createUpdateOperations(AccountCardInfo.class);
 
