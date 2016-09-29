@@ -12,11 +12,14 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
+import com.boxfishedu.workorder.servicex.bean.CourseView;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.fishcard.MyCourseView;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +95,8 @@ public class AvaliableTimeForChangeTimeServiceXV {
             throw new BusinessException("该鱼卡不允许更改时间");
         }
 
+        List<MyCourseView>  myCourseViews =   courseScheduleService.findMyClasses(workOrder.getStudentId());// 该学生以后的课程
+
         // 判断是免费还是正常购买
         Integer days =  comboCycle* daysOfWeek;
 
@@ -126,15 +131,42 @@ public class AvaliableTimeForChangeTimeServiceXV {
 
                 result.setDailyScheduleTime(result.getDailyScheduleTime().stream().filter(
                         t ->   validateFirstDate(clone.getDay(),t.getStartTime(),DateUtil.localDate2Date(dateRange.getFrom())
+
                 )).collect(Collectors.toList()));
 
             }
 
-
-
             return result;
         });
-        return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
+
+        List<DayTimeSlots> lastDayTimeSlots = Lists.newArrayList();
+
+        if(!CollectionUtils.isEmpty(dayTimeSlotsList)){
+            for(DayTimeSlots dts :dayTimeSlotsList){
+                if(CollectionUtils.isEmpty(myCourseViews)){
+                    if(! CollectionUtils.isEmpty( dts.getDailyScheduleTime() )){
+                        lastDayTimeSlots.add(dts);
+                    }
+
+                }else {
+                    boolean flag =true;
+                    for(MyCourseView  mcv: myCourseViews){
+                        if(dts.getDay().equals( mcv.getClassDate() )){
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if(flag){
+                        if(! CollectionUtils.isEmpty( dts.getDailyScheduleTime() )){
+                            lastDayTimeSlots.add(dts);
+                        }
+                    }
+                }
+            }
+        }
+
+        //return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
+        return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(lastDayTimeSlots).getData());
     }
 
 
