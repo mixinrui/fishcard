@@ -26,8 +26,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.lang.annotation.ElementType;
 import java.util.Date;
 import java.util.Map;
 
@@ -35,6 +38,8 @@ import java.util.Map;
  * Created by hucl on 16/4/15.
  */
 @Component
+@Configuration
+@Profile({"local_hucl","product","local","development","development_new","test","demo","pretest"})
 public class RabbitMqReciver {
     @Autowired
     private OrderRelatedServiceX orderRelatedServiceX;
