@@ -9,6 +9,8 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Indexed;
 
+import java.util.Date;
+
 /**
  * Created by hucl on 16/9/24.
  * 用户首页信息
@@ -24,6 +26,12 @@ public class AccountCardInfo {
     @JsonIgnore
     @Indexed(background = true)
     private Long studentId;
+
+    @JsonIgnore
+    private Date createTime;
+
+    @JsonIgnore
+    private Date updateTime;
 
     private AccountCourseBean chinese;
     private AccountCourseBean foreign;

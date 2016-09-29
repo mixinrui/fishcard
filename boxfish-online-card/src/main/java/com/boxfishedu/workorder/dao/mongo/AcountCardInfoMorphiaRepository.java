@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 /**
  * Created by hucl on 16/9/24.
  */
@@ -38,6 +40,8 @@ public class AcountCardInfoMorphiaRepository {
     public AccountCardInfo initCardInfo(Long studentId, AccountCourseBean accountCourseBean,AccountCourseEnum accountCourseEnum){
         AccountCardInfo accountCardInfo =new AccountCardInfo();
         accountCardInfo.setStudentId(studentId);
+        accountCardInfo.setCreateTime(new Date());
+        accountCardInfo.setUpdateTime(null);
         switch (accountCourseEnum){
             case CHINESE:
                 accountCardInfo.setChinese(accountCourseBean);
@@ -60,6 +64,8 @@ public class AcountCardInfoMorphiaRepository {
         accountCardInfo.setStudentId(studentId);
         accountCardInfo.setChinese(chineseCourseBean);
         accountCardInfo.setForeign(foreignCourseBean);
+        accountCardInfo.setCreateTime(new Date());
+        accountCardInfo.setUpdateTime(null);
         this.save(accountCardInfo);
         return accountCardInfo;
     }
@@ -72,6 +78,7 @@ public class AcountCardInfoMorphiaRepository {
 
         updateOperations.set("chinese", chineseCourseBean);
         updateOperations.set("foreign", foreignAccountBean);
+        updateOperations.set("updateTime",new Date());
 
         UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
         if (updateResults.getUpdatedCount() < 1) {
@@ -120,6 +127,7 @@ public class AcountCardInfoMorphiaRepository {
             default:
                 break;
         }
+        updateOperations.set("updateTime",new Date());
         UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
         if (updateResults.getUpdatedCount() < 1) {
             AccountCardInfo accountCardInfo=queryByStudentId(studentId);
