@@ -3,20 +3,21 @@ package com.boxfishedu.workorder.service.accountcardinfo;
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -33,39 +34,53 @@ public class DataCollectorService {
     @Autowired
     private ScheduleCourseInfoMorphiaRepository scheduleCourseInfoMorphiaRepository;
 
-    public Integer getUnSelectedAmount(Long studentId) {
-        return 0;
-    }
+    @Autowired
+    private AccountCardInfoService accountCardInfoService;
+
+    @Autowired
+    private ScheduleCourseInfoService scheduleCourseInfoService;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
+
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public WorkOrder getWorkOrderToStart(List<WorkOrder> workOrders) {
         if (CollectionUtils.isEmpty(workOrders)) {
             return null;
         }
-        Collections.sort(workOrders, new SortByStartTime());
+        workOrders.sort((o1, o2) ->o1.getStartTime().after(o2.getStartTime())?1:-1);
+        logger.debug("@getWorkOrderToStart#sort#end#[{}]",workOrders);
         return workOrders.get(0);
     }
 
     public Integer selectedLeftNum(List<WorkOrder> workOrders) {
-        return workOrders.size();
+        return CollectionUtils.isEmpty(workOrders)?0: workOrders.size();
+    }
+
+    private Integer getAmountFromServices(List<Service> services){
+        return services.stream().filter(service -> service.getAmount()>0).mapToInt(Service::getAmount).sum();
     }
 
     public Integer getChineseUnselectedServices(Long studentId) {
         List<Service> overAllServices = serveService.getUnselectedService(studentId, ComboTypeEnum.OVERALL, 0);
         List<Service> exchangeChineseServices = serveService.getUnselectedService(studentId, ComboTypeEnum.EXCHANGE, TutorTypeEnum.CN ,0);
-        return (CollectionUtils.isEmpty(overAllServices) ? 0 : overAllServices.size())
-                + (CollectionUtils.isEmpty(exchangeChineseServices) ? 0 : exchangeChineseServices.size());
+
+        return (CollectionUtils.isEmpty(overAllServices) ? 0 : this.getAmountFromServices(overAllServices))
+                + (CollectionUtils.isEmpty(exchangeChineseServices) ? 0 : this.getAmountFromServices(exchangeChineseServices));
     }
 
     public Integer getForeignUnselectedServices(Long studentId) {
         List<Service> communctionServices = serveService.getUnselectedService(studentId, ComboTypeEnum.FOREIGN, 0);
         List<Service> finalDreamServices = serveService.getUnselectedService(studentId, ComboTypeEnum.CHINESE, 0);
         List<Service> exchangeFrnServices = serveService.getUnselectedService(studentId, ComboTypeEnum.EXCHANGE, TutorTypeEnum.FRN, 0);
-        return (CollectionUtils.isEmpty(communctionServices) ? 0 : communctionServices.size())
-                + (CollectionUtils.isEmpty(finalDreamServices) ? 0 : finalDreamServices.size())
-                + (CollectionUtils.isEmpty(exchangeFrnServices) ? 0 : exchangeFrnServices.size());
+        return (CollectionUtils.isEmpty(communctionServices) ? 0 : this.getAmountFromServices(communctionServices))
+                + (CollectionUtils.isEmpty(finalDreamServices) ? 0 : this.getAmountFromServices(finalDreamServices))
+                + (CollectionUtils.isEmpty(exchangeFrnServices) ? 0 : this.getAmountFromServices(exchangeFrnServices));
     }
 
     public List<WorkOrder> getChineseSelectedLeftWorkOrders(Long studentId) {
+        logger.debug("#getChineseSelectedLeftWorkOrders#用户[{}]",studentId);
         //中教:核心素养+金币换课中教
         List<WorkOrder> overallCards = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.OVERALL);
         List<WorkOrder> exchangeChineses = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.EXCHANGE, com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
@@ -101,14 +116,54 @@ public class DataCollectorService {
         return scheduleCourseInfoMorphiaRepository.queryByWorkId(workOrderId);
     }
 
-    public void updateForeignItem(Long studentId){
+    public AccountCourseBean updateForeignItem(Long studentId){
+        AccountCourseBean accountCourseBean=new AccountCourseBean();
         List<WorkOrder> selectedLeftWorkOrders = getForeignSelectedLeftWorkOrders(studentId);
+        int leftAmount=getForeignUnselectedServices(studentId)+selectedLeftNum(selectedLeftWorkOrders);
+        accountCourseBean.setLeftAmount(leftAmount);
+        WorkOrder latestWorkOrder=getWorkOrderToStart(selectedLeftWorkOrders);
+        if(null==latestWorkOrder){
+            accountCourseBean.setCourseInfo(null);
+            return accountCourseBean;
+        }
+        ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
-//        Integer leftForeignNum=
+        accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo,latestWorkOrder));
+
+        return accountCourseBean;
     }
 
-    public void updateChineseItem(){
+    public AccountCourseBean updateChineseItem(Long studentId){
+        AccountCourseBean accountCourseBean=new AccountCourseBean();
+        List<WorkOrder> selectedWorkOrders=getChineseSelectedLeftWorkOrders(studentId);
+        int leftAmount=getChineseUnselectedServices(studentId)+selectedLeftNum(selectedWorkOrders);
+        accountCourseBean.setLeftAmount(leftAmount);
+        WorkOrder latestWorkOrder=getWorkOrderToStart(selectedWorkOrders);
+        if(null==latestWorkOrder){
+            accountCourseBean.setCourseInfo(null);
+            return accountCourseBean;
+        }
+        ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
+        accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo,latestWorkOrder));
+
+        return accountCourseBean;
+    }
+
+    public void updateBothChnAndFnItemAsync(Long studentId){
+        threadPoolManager.execute(new Thread(()->this.updateBothChnAndFnItem(studentId)));
+    }
+
+    public void updateBothChnAndFnItem(Long studentId){
+        try {
+            logger.debug("@updateBothChnAndFnItem#begin用户[{}]更新首页信息",studentId);
+            AccountCourseBean chineseCourseBean=updateChineseItem(studentId);
+            AccountCourseBean foreignCourseBean=updateForeignItem(studentId);
+            accountCardInfoService.saveOrUpdateChAndFrn(studentId,chineseCourseBean,foreignCourseBean);
+        }
+        catch (Exception ex){
+            logger.error("@updateBothChnAndFnItem#exception用户[{}]更新首页信息失败",studentId);
+        }
     }
 
     public AccountCourseBean.CardCourseInfo scheduleCourseAdapter(ScheduleCourseInfo scheduleCourseInfo, WorkOrder workOrder) {
@@ -120,19 +175,7 @@ public class DataCollectorService {
         cardCourseInfo.setCourseType(scheduleCourseInfo.getCourseType());
         cardCourseInfo.setIsFreeze(workOrder.getIsFreeze());
         cardCourseInfo.setStatus(workOrder.getStatus());
+        cardCourseInfo.setDateInfo(workOrder.getStartTime());
         return cardCourseInfo;
     }
-
-
-    class SortByStartTime implements Comparator {
-        public int compare(Object o1, Object o2) {
-            WorkOrder s1 = (WorkOrder) o1;
-            WorkOrder s2 = (WorkOrder) o2;
-            if (s1.getStartTime().after(s2.getStartTime()))
-                return 1;
-            return 0;
-        }
-    }
-
-
 }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
@@ -62,4 +63,8 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     List<Service> findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelected(Long studentId, String comboType,String tutorType,Integer selectedFlag);
 
     List<Service> findByStudentIdAndComboTypeAndCoursesSelected(Long studentId, String comboType ,Integer selectedFlag);
+
+    //查找出学生所有状态的工单
+    @Query("select distinct sv.studentId from Service sv")
+    public List<Long> findDistinctUsersFromService();
 }

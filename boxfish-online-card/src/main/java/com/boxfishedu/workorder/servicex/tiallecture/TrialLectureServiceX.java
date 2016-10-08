@@ -47,6 +47,7 @@ public class TrialLectureServiceX {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setService(service);
         workOrder.setIsFreeze(0);
+        workOrder.setComboType(service.getComboType());
         workOrder.setOrderId(service.getOrderId());
         saveParamIntoWorkOrder(workOrder,trialLectureParam);
 

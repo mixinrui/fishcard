@@ -186,7 +186,7 @@ public class RandomSlotController {
             TimeLimitRules timeLimitRules1 = new TimeLimitRules();
             timeLimitRules1.setComboType("FOREIGN");
             timeLimitRules1.setDay(i);
-            timeLimitRules1.setLimitMini("20:00:00");
+            timeLimitRules1.setLimitMini("19:00:00");
             timeLimitRules1.setLimitMax("22:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.RANGE.toString());
 
@@ -203,8 +203,8 @@ public class RandomSlotController {
             TimeLimitRules timeLimitRules1 = new TimeLimitRules();
             timeLimitRules1.setComboType("FOREIGN");
             timeLimitRules1.setDay(6);
-            timeLimitRules1.setLimitMini("08:00:00");
-            timeLimitRules1.setLimitMax("10:55:00");
+            timeLimitRules1.setLimitMini("09:00:00");
+            timeLimitRules1.setLimitMax("11:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.RANGE.toString());
 
             TimeLimitRules timeLimitRules11=new TimeLimitRules();
@@ -217,7 +217,7 @@ public class RandomSlotController {
             TimeLimitRules timeLimitRules2 = new TimeLimitRules();
             timeLimitRules2.setComboType("FOREIGN");
             timeLimitRules2.setDay(6);
-            timeLimitRules2.setLimitMini("15:00:00");
+            timeLimitRules2.setLimitMini("19:00:00");
             timeLimitRules2.setLimitMax("22:55:00");
             timeLimitRules2.setRule(SlotRuleEnum.RANGE.toString());
 
@@ -234,8 +234,8 @@ public class RandomSlotController {
             TimeLimitRules timeLimitRules1 = new TimeLimitRules();
             timeLimitRules1.setComboType("FOREIGN");
             timeLimitRules1.setDay(0);
-            timeLimitRules1.setLimitMini("08:00:00");
-            timeLimitRules1.setLimitMax("10:55:00");
+            timeLimitRules1.setLimitMini("09:00:00");
+            timeLimitRules1.setLimitMax("11:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.RANGE.toString());
 
             TimeLimitRules timeLimitRules11=new TimeLimitRules();
@@ -248,7 +248,7 @@ public class RandomSlotController {
             TimeLimitRules timeLimitRules2 = new TimeLimitRules();
             timeLimitRules2.setComboType("FOREIGN");
             timeLimitRules2.setDay(0);
-            timeLimitRules2.setLimitMini("15:00:00");
+            timeLimitRules2.setLimitMini("19:00:00");
             timeLimitRules2.setLimitMax("22:55:00");
             timeLimitRules2.setRule(SlotRuleEnum.RANGE.toString());
 

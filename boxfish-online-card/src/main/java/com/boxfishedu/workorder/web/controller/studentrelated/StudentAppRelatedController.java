@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 /**
  * Created by hucl on 16/3/31.
@@ -131,6 +132,31 @@ StudentAppRelatedController {
 
     @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.GET)
     public JsonResultModel userCardInfo(String order_type,@PathVariable("student_id") Long studentId) {
+        AccountCardInfo accountCardInfo=accountCardInfoService.queryByStudentId(studentId);
+        if(null!=order_type) {
+            switch (order_type) {
+                case "chinese":
+                    accountCardInfo.setComment(null);
+                    accountCardInfo.setForeign(null);
+                    break;
+                case "foreign":
+                    accountCardInfo.setComment(null);
+                    accountCardInfo.setChinese(null);
+                    break;
+                case "comment":
+                    accountCardInfo.setForeign(null);
+                    accountCardInfo.setChinese(null);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return JsonResultModel.newJsonResultModel(accountCardInfo);
+    }
+
+
+    @RequestMapping(value = "/{student_id}/card_infos1", method = RequestMethod.GET)
+    public JsonResultModel userCardInfo1(String order_type,@PathVariable("student_id") Long studentId) {
         AccountCardInfo accountCardInfo = new AccountCardInfo();
 
         AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();

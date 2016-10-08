@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
 /**
  * Created by hucl on 16/9/24.
  */
@@ -38,6 +40,8 @@ public class AcountCardInfoMorphiaRepository {
     public AccountCardInfo initCardInfo(Long studentId, AccountCourseBean accountCourseBean,AccountCourseEnum accountCourseEnum){
         AccountCardInfo accountCardInfo =new AccountCardInfo();
         accountCardInfo.setStudentId(studentId);
+        accountCardInfo.setCreateTime(new Date());
+        accountCardInfo.setUpdateTime(null);
         switch (accountCourseEnum){
             case CHINESE:
                 accountCardInfo.setChinese(accountCourseBean);
@@ -55,7 +59,57 @@ public class AcountCardInfoMorphiaRepository {
         return accountCardInfo;
     }
 
+    public AccountCardInfo initChnAndFrnCardInfo(Long studentId, AccountCourseBean chineseCourseBean,AccountCourseBean foreignCourseBean){
+        AccountCardInfo accountCardInfo =new AccountCardInfo();
+        accountCardInfo.setStudentId(studentId);
+        accountCardInfo.setChinese(chineseCourseBean);
+        accountCardInfo.setForeign(foreignCourseBean);
+        accountCardInfo.setCreateTime(new Date());
+        accountCardInfo.setUpdateTime(null);
+        this.save(accountCardInfo);
+        return accountCardInfo;
+    }
+
+    public void saveOrUpdateChAndFrn(Long studentId, AccountCourseBean chineseCourseBean, AccountCourseBean foreignAccountBean) {
+        Query<AccountCardInfo> updateQuery = datastore.createQuery(AccountCardInfo.class);
+        UpdateOperations<AccountCardInfo> updateOperations = datastore.createUpdateOperations(AccountCardInfo.class);
+
+        updateQuery.and(updateQuery.criteria("studentId").equal(studentId));
+
+        updateOperations.set("chinese", chineseCourseBean);
+        updateOperations.set("foreign", foreignAccountBean);
+        updateOperations.set("updateTime",new Date());
+
+        UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
+        if (updateResults.getUpdatedCount() < 1) {
+            AccountCardInfo accountCardInfo = queryByStudentId(studentId);
+            if (null == accountCardInfo) {
+                logger.info("@AcountCardInfoMorphiaRepository#update#null#开始生成数据,用户[{}]", studentId);
+                this.initChnAndFrnCardInfo(studentId, chineseCourseBean, foreignAccountBean);
+            } else {
+                logger.error("@updateCourseAbsenceNum更新课程信息失败,用户[{}]", studentId);
+                throw new BusinessException("更新课程信息失败");
+            }
+        }
+    }
+
+    public void updateCommentLeftAmount(Long studentId,Integer leftAmount){
+        Query<AccountCardInfo> updateQuery = datastore.createQuery(AccountCardInfo.class);
+        UpdateOperations<AccountCardInfo> updateOperations = datastore.createUpdateOperations(AccountCardInfo.class);
+
+        updateQuery.and(updateQuery.criteria("studentId").equal(studentId));
+        AccountCardInfo accountCardInfo= queryByStudentId(studentId);
+        accountCardInfo.getForeign().setLeftAmount(leftAmount);
+        updateOperations.set("comment", accountCardInfo.getForeign());
+
+        UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
+        if(updateResults.getUpdatedCount()<1){
+            logger.error("updateCommentLeftAmount#coment#更新次数失败用户[{}]",studentId);
+        }
+    }
+
     public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
+        logger.debug("@AcountCardInfoMorphiaRepository#saveOrUpdate#用户[{}],类型[{}]",studentId,accountCourseEnum.toString());
         Query<AccountCardInfo> updateQuery = datastore.createQuery(AccountCardInfo.class);
         UpdateOperations<AccountCardInfo> updateOperations = datastore.createUpdateOperations(AccountCardInfo.class);
 
@@ -74,6 +128,7 @@ public class AcountCardInfoMorphiaRepository {
             default:
                 break;
         }
+        updateOperations.set("updateTime",new Date());
         UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
         if (updateResults.getUpdatedCount() < 1) {
             AccountCardInfo accountCardInfo=queryByStudentId(studentId);

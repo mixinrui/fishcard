@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.StudentCourseSchedule;
@@ -87,6 +88,9 @@ public class TimePickerServiceX {
     @Autowired
     private StudentTimePickerValidatorSupport studentTimePickerValidatorSupport;
 
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public JsonResultModel ensureCourseTimes(TimeSlotParam timeSlotParam) throws BoxfishException {
@@ -118,6 +122,8 @@ public class TimePickerServiceX {
         //入库,workorder和coursechedule的插入放入一个事务中,保证数据的一致性
         List<CourseSchedule> courseSchedules=workOrderService.persistCardInfos(
                 service,workOrders,recommandCoursesMap);
+
+        dataCollectorService.updateBothChnAndFnItemAsync(service.getStudentId());
 
         //TODO:等测
         workOrderLogService.batchSaveWorkOrderLogs(workOrders);

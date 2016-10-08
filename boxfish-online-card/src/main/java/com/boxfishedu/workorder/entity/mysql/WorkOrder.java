@@ -114,6 +114,10 @@ public class WorkOrder{
     @Column(name="sku_id")
     private Integer skuId;
 
+    /** 更改次数 **/
+    @Column(name="changtime_times")
+    private Integer changTimeTimes;
+
     //是否补过课
     @Transient
     private String makeUpOrNot;

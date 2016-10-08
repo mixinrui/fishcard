@@ -29,9 +29,19 @@ public class AccountCardInfoService {
     @Autowired
     private WorkOrderService workOrderService;
 
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
     public AccountCardInfo queryByStudentId(Long studentId){
         logger.debug("@queryByStudentId#userId[{}]",studentId);
-        return acountCardInfoMorphiaRepository.queryByStudentId(studentId);
+        AccountCardInfo accountCardInfo= acountCardInfoMorphiaRepository.queryByStudentId(studentId);
+        if(null==accountCardInfo){
+            logger.debug("@queryByStudentId#init#userId[{}]",studentId);
+            dataCollectorService.updateBothChnAndFnItem(studentId);
+            return acountCardInfoMorphiaRepository.queryByStudentId(studentId);
+        }
+        return accountCardInfo;
     }
 
 
@@ -40,7 +50,15 @@ public class AccountCardInfoService {
         acountCardInfoMorphiaRepository.save(accountCardInfo);
     }
 
+    public void saveOrUpdateChAndFrn(Long studentId, AccountCourseBean chineseCourseBean, AccountCourseBean foreignAccountBean){
+        acountCardInfoMorphiaRepository.saveOrUpdateChAndFrn(studentId,chineseCourseBean,foreignAccountBean);
+    }
+
     public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
         acountCardInfoMorphiaRepository.saveOrUpdate(studentId,accountCourseBean,accountCourseEnum);
+    }
+
+    public void updateCommentLeftAmount(Long studentId,Integer leftAmount){
+        acountCardInfoMorphiaRepository.updateCommentLeftAmount(studentId,leftAmount);
     }
 }

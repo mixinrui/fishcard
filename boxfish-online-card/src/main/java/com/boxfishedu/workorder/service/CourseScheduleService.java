@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.fishcard.GrabOrderView;
+import com.boxfishedu.workorder.web.view.fishcard.MyCourseView;
 import com.boxfishedu.workorder.web.view.fishcard.TeacherAlterView;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import com.boxfishedu.workorder.web.view.teacher.MonthScheduleDataView;
@@ -26,6 +27,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -203,5 +205,16 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
         return jpa.findUnfinishByStudentIdAndCurrentDate(studentId, date);
     }
 
+
+    public List<MyCourseView> findMyClasses(Long studentId) {
+
+        String sql = "select new com.boxfishedu.workorder.web.view.fishcard.MyCourseView" +
+                "( date_format(cs.classDate,'%Y-%m-%d')  , count(cs))" +
+                " from CourseSchedule cs where cs.studentId=?1 and cs.classDate > current_timestamp  group by cs.classDate having count(cs)>3";
+        Query query = entityManager.createQuery(sql).setParameter(1,studentId);
+        List<MyCourseView> myClasses=query.getResultList();
+        return myClasses;
+
+    }
 
 }

@@ -90,21 +90,33 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     /**
      * 查询学生未点评的点评卡
      */
-    @Query("select c from CommentCard c where c.studentId = ?1 and c.status <= 300")
+    @Query("select c from CommentCard c where c.studentId = ?1 and ((c.status <= 300 or (c.studentReadFlag = 0 and c.status != 500)))")
     public List<CommentCard> getUncommentedCard(Long studentId);
 
     /**
      * 初始化外教点评首页列表
      */
-    @Query("select distinct(c.studentId) from CommentCard c,Service s " +
-            "where s.studentId = c.studentId and s.comboType = 'CRITIQUE' and ((c.status in (400,600) and s.amount > 0) " +
-            "or (c.status <= 300 and s.amount = 0))")
+    @Query("select distinct(studentId) from Service s where s.productType = 1002")
     public List<Long> getCommentCardHomePageList();
 
     /**
      * 初始获取学生首页外教点评
      */
     @Query("select c from CommentCard c where c.studentId =?1 and c.status in (400,600) and  c.updateTime = " +
-            "(select max(cd.updateTime) from CommentCard cd where cd.studentId =?1 and cd.status in (400,600))")
+            "(select max(cd.teacherAnswerTime) from CommentCard cd where cd.studentId =?1 and cd.status in (400,600))")
     public CommentCard getHomePageCommentCard(Long studentId);
+
+    /**
+     *查询老师最新回复的点评卡
+     */
+    @Query("select c from CommentCard c where c.studentId = ?1 and c.status in (400,600) and c.teacherAnswerTime =  " +
+            "(select max(cd.teacherAnswerTime) from CommentCard cd where cd.studentId = ?1 and cd.status in (400,600))")
+    public List<CommentCard> getTeacherNewCommentCard(Long studentId);
+
+    /**
+     * 查询学生最新提问的点评卡
+     */
+    @Query("select c from CommentCard c where c.studentId = ?1 and c.status <= 300 and c.studentAskTime =  " +
+            "(select max(cd.studentAskTime) from CommentCard cd where cd.studentId = ?1 and cd.status <= 300)")
+    public List<CommentCard> getStudentNewCommentCard(Long studentId);
 }
