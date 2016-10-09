@@ -86,7 +86,9 @@ public class FishCardQueryController {
     public JsonResultModel listOrderType() throws Exception {
         JSONObject json = new JSONObject();
         for (OrderChannelDesc v : OrderChannelDesc.values()) {
-            json.put(v.getCode(),v.getDesc());
+            if(!v.getCode().equals( OrderChannelDesc.STANDARD.getCode())){
+                json.put(v.getCode(),v.getDesc());
+            }
         }
         return JsonResultModel.newJsonResultModel( json);
     }
