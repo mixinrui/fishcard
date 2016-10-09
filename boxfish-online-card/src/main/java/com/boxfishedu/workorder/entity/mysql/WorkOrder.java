@@ -122,6 +122,10 @@ public class WorkOrder{
     @Transient
     private String makeUpOrNot;
 
+
+    @Transient
+    private String  orderTypeDesc;
+
     @Transient
     private Integer teachingType;
 

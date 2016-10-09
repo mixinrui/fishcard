@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service.fishcardcenter;
 
+import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
@@ -65,6 +66,14 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             if (null != workOrder.getMakeUpFlag() && 0 != workOrder.getMakeUpFlag()) {
                 workOrder.setMakeUpOrNot("是");
             }
+
+            if(null!=workOrder.getOrderChannel()){
+                if(workOrder.getOrderChannel().equals(OrderChannelDesc.STANDARD.getCode() )){
+                    workOrder.setOrderTypeDesc(OrderChannelDesc.get(workOrder.getComboType()).getDesc() );
+                }else {
+                    workOrder.setOrderTypeDesc(OrderChannelDesc.get(workOrder.getOrderChannel()).getDesc() );
+                }
+            }
             workOrder.setTeachingType(workOrder.getSkuId());
 
             if (workOrder.getParentId() != null && workOrder.getParentId() != 0l) {
@@ -98,7 +107,17 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         StringBuilder sql = new StringBuilder("from WorkOrder wo where wo.startTime between :begin and :end ");
 
         if (null != fishCardFilterParam.getOrderType()) {
-            sql.append(" and wo.orderChannel=:orderChannel ");
+            if(fishCardFilterParam.getOrderType().equals( OrderChannelDesc.OVERALL.getCode())
+              ||
+                    fishCardFilterParam.getOrderType().equals( OrderChannelDesc.CHINESE.getCode())
+              ||
+                  fishCardFilterParam.getOrderType().equals( OrderChannelDesc.FOREIGN.getCode())
+            ){
+                sql.append(" and wo.comboType=:orderChannel ");
+            }else{
+                sql.append(" and wo.orderChannel=:orderChannel ");
+            }
+
         }
         if (null != fishCardFilterParam.getConfirmFlag()) {
             if ("1".equals(fishCardFilterParam.getConfirmFlag())) {
