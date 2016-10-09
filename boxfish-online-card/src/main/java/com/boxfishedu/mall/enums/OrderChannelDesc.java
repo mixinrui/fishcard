@@ -9,11 +9,17 @@ import java.util.Map;
  */
 public enum OrderChannelDesc {
 
-    STANDARD(  "STANDARD","标准付费订单",""),
-    EXPERIENCE("EXPERIENCE","免费体验订单",""),
-    ADJUST(    "ADJUST","后台调整订单",""),
-    EXCHANGE(  "EXCHANGE","金币兑换订单",""),
-    UNKNOWN("UNKNOWN","","");
+    STANDARD("STANDARD","标准付费",""),
+    OVERALL("OVERALL","核心素养",""),
+    CHINESE("CHINESE","终极梦想",""),
+    FOREIGN("FOREIGN","跨文化交流",""),
+
+
+
+    EXPERIENCE("EXPERIENCE","免费体验",""),
+    ADJUST(    "ADJUST","后台调整",""),
+    EXCHANGE(  "EXCHANGE","金币兑换",""),
+    UNKNOWN("UNKNOWN","未知","");
 
     OrderChannelDesc(){}
 
@@ -22,6 +28,10 @@ public enum OrderChannelDesc {
         this.code = code;
         this.desc = desc;
         this.remark =remark;
+    }
+
+    public static Map<String, OrderChannelDesc>  getVarMap(){
+        return varMap;
     }
 
     private String code;

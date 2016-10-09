@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
+import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
@@ -83,7 +84,11 @@ public class FishCardQueryController {
      */
     @RequestMapping(value = "/orderType/list", method = RequestMethod.GET)
     public JsonResultModel listOrderType() throws Exception {
-        return JsonResultModel.newJsonResultModel( OrderChannelDesc.values());
+        JSONObject json = new JSONObject();
+        for (OrderChannelDesc v : OrderChannelDesc.values()) {
+            json.put(v.getCode(),v.getDesc());
+        }
+        return JsonResultModel.newJsonResultModel( json);
     }
 
 
