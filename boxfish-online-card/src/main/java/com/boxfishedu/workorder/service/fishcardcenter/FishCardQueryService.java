@@ -113,7 +113,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
               ||
                   fishCardFilterParam.getOrderType().equals( OrderChannelDesc.FOREIGN.getCode())
             ){
-                sql.append(" and wo.comboType=:orderChannel ");
+                sql.append(" and wo.comboType=:orderChannel and wo.wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
             }else{
                 sql.append(" and wo.orderChannel=:orderChannel ");
             }
