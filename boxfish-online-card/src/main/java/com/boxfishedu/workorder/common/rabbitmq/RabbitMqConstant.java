@@ -93,4 +93,8 @@ public class RabbitMqConstant {
     public static final String SHORT_MESSAGE_REPLY_TEMPLATE_NAME = "com.boxfishedu.teaching.send_sms_queue.reply";
     /** 短信que end **/
 
+    /**同步鱼卡信息到客服系统**/
+    public static final String SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME = "com.boxfishedu.sync_fishcard_template_name";
+    public static final String SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE="com.boxfishedu.sync_fishcard_queue";
+
 }
