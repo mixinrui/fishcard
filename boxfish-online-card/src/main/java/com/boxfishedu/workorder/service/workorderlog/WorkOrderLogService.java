@@ -1,6 +1,9 @@
 package com.boxfishedu.workorder.service.workorderlog;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.threadpool.AsyncNotifyPoolManager;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.WorkOrderLogMorphiaRepository;
@@ -23,6 +26,12 @@ import java.util.Optional;
 public class WorkOrderLogService {
     @Autowired
     private LogPoolManager logPoolManager;
+
+    @Autowired
+    private AsyncNotifyPoolManager asyncNotifyPoolManager;
+
+    @Autowired
+    private RabbitMqSender rabbitMqSender;
 
     @Autowired
     private WorkOrderLogMorphiaRepository workOrderLogMorphiaRepository;
@@ -61,6 +70,7 @@ public class WorkOrderLogService {
         workOrderLog.setContent(FishCardStatusEnum.getDesc(workOrder.getStatus()));
         logger.debug("保存日志到mongo,参数[{}]", JacksonUtil.toJSon(workOrderLog));
         save(workOrderLog);
+        asyncNotifyCustomer(workOrder);
     }
 
     public void saveDeleteWorkOrderLog(WorkOrder workOrder, CourseSchedule courseSchedule){
@@ -73,6 +83,7 @@ public class WorkOrderLogService {
             workOrderLog.setCourseScheduleJson(JacksonUtil.toJSon(courseSchedule));
             logger.debug("保存日志到mongo,参数[{}]", JacksonUtil.toJSon(workOrderLog));
             save(workOrderLog);
+            asyncNotifyCustomer(workOrder);
         }));
 
     }
@@ -85,6 +96,7 @@ public class WorkOrderLogService {
         workOrderLog.setContent(desc);
         logger.debug("保存日志到mongo,参数[{}]", JacksonUtil.toJSon(workOrderLog));
         save(workOrderLog);
+        asyncNotifyCustomer(workOrder);
     }
 
     private void saveWorkorderLogs(List<WorkOrder> workOrders) {
@@ -96,7 +108,14 @@ public class WorkOrderLogService {
             workOrderLog.setCreateTime(new Date());
             workOrderLog.setContent(FishCardStatusEnum.getDesc(workOrder.getStatus()));
             workOrderLogs.add(workOrderLog);
+            asyncNotifyCustomer(workOrder);
         }
         save(workOrderLogs);
+    }
+
+    public void asyncNotifyCustomer(WorkOrder workOrder){
+        asyncNotifyPoolManager.execute(new Thread(() -> {
+            rabbitMqSender.send(workOrder, QueueTypeEnum.ASYNC_NOTIFY_CUSTOMER_SERVICE);
+        }));
     }
 }

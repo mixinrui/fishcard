@@ -36,6 +36,8 @@ public class RabbitMqSender {
     private @Qualifier(RabbitMqConstant.RECHARGE_WORKORDER_QUEUE_TEMPLATE_NAME)RabbitTemplate rechargeWorkOrderTemplate;// 订单退款
     @Autowired
     private @Qualifier(RabbitMqConstant.SHORT_MESSAGE_REPLY_TEMPLATE_NAME)RabbitTemplate shortMessageTemplate;// 发送短信
+    @Autowired
+    private @Qualifier(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)RabbitTemplate syncFishCard2CustomerTemplate;// 发送短信
 
 
     public void send(Object object, QueueTypeEnum queueTypeEnum) {
@@ -86,6 +88,10 @@ public class RabbitMqSender {
             case SHORT_MESSAGE:{
                 logger.info("@<-<-<-<-<-<-<sendShortMessage-发送短信,参数:{}", JacksonUtil.toJSon(object));
                 shortMessageTemplate.convertAndSend(object);
+            }
+            case ASYNC_NOTIFY_CUSTOMER_SERVICE:{
+                logger.info("@<-<-<-<-<-<-<asyncNotifyCustomer-异步通知客服中心,参数:{}", JacksonUtil.toJSon(object));
+                syncFishCard2CustomerTemplate.convertAndSend(object);
             }
             default:
                 break;

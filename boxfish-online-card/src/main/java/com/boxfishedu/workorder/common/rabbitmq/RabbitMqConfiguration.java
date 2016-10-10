@@ -233,7 +233,7 @@ public class RabbitMqConfiguration {
          */
         Queue syncFishCard2CustomerServiceQueue = new Queue(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE, true);
         rabbitAdmin.declareQueue(syncFishCard2CustomerServiceQueue);
-        Binding syncFishCard2CustomerServiceQueueBinding = BindingBuilder.bind(syncFishCard2CustomerServiceQueue).to(foreignCommentExchange()).with(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE).noargs();
+        Binding syncFishCard2CustomerServiceQueueBinding = BindingBuilder.bind(syncFishCard2CustomerServiceQueue).to(directExchange()).with(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE).noargs();
 
         rabbitAdmin.declareBinding(unassignedTeacherFailQueueBinding);
         rabbitAdmin.declareBinding(notifyOrderQueueBinding);
@@ -474,7 +474,7 @@ public class RabbitMqConfiguration {
      */
     @Bean(name = RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)
     public RabbitTemplate notifyMessagePrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
-        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME);
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE);
         template.setExchange(NOTIFICATION_TASK_EXCHANGE);
         return template;
     }

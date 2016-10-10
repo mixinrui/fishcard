@@ -28,5 +28,5 @@ public class ConstantUtil {
 
     public static final String THREADPOOL_ORDER2SERVICE="THREADPOOL_ORDER2SERVICE";
     public static final String THREADPOOL_LOG="THREADPOOL_LOG";
-    public static final String THREADPOOL_ASYNC_NOTIFY="THREADPOOL_LOG";
+    public static final String THREADPOOL_ASYNC_NOTIFY="THREADPOOL_ASYNC_NOTIFY";
 }

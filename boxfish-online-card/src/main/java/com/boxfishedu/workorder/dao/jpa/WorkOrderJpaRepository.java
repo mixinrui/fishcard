@@ -145,4 +145,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public WorkOrder findTop1ByStudentIdAndSkuIdAndStartTimeAfterOrderByStartTime(Long studentId,Integer skuId, Date date);
 
+    @Query("select wo.id from WorkOrder wo")
+    public List<Long> findAllWorkOrderId();
+
 }
