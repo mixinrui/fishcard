@@ -97,4 +97,8 @@ public class RabbitMqConstant {
     public static final String SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME = "com.boxfishedu.sync_fishcard_template_name";
     public static final String SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE="com.boxfishedu.sync_fishcard_queue";
 
+    /**同步外教点评到客服系统**/
+    public static final String SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME = "com.boxfishedu.sync_commentcard_template_name";
+    public static final String SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE="com.boxfishedu.sync_commentcard_queue";
+
 }
