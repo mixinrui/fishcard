@@ -235,6 +235,14 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareQueue(syncFishCard2CustomerServiceQueue);
         Binding syncFishCard2CustomerServiceQueueBinding = BindingBuilder.bind(syncFishCard2CustomerServiceQueue).to(foreignCommentExchange()).with(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE).noargs();
 
+        /**
+         * 同步外教点评到客服系统
+         */
+        Queue syncCommentCard2CustomerServiceQueue = new Queue(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE, true);
+        rabbitAdmin.declareQueue(syncCommentCard2CustomerServiceQueue);
+        Binding syncCommentCard2CustomerServiceQueueBinding = BindingBuilder.bind(syncCommentCard2CustomerServiceQueue).to(foreignCommentExchange()).with(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE).noargs();
+
+
         rabbitAdmin.declareBinding(unassignedTeacherFailQueueBinding);
         rabbitAdmin.declareBinding(notifyOrderQueueBinding);
         rabbitAdmin.declareBinding(assignTeacherBinding);
@@ -254,6 +262,7 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareBinding(notifyRechargeWorkOrderQueueBinding);
         rabbitAdmin.declareBinding(notifyMessageQueueBinding); /** 短信 **/
         rabbitAdmin.declareBinding(syncFishCard2CustomerServiceQueueBinding);/**同步鱼卡信息到客服系统**/
+        rabbitAdmin.declareBinding(syncCommentCard2CustomerServiceQueueBinding);/**同步外教点评到客服系统**/
         return rabbitAdmin;
     }
 
@@ -476,6 +485,16 @@ public class RabbitMqConfiguration {
     public RabbitTemplate notifyMessagePrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
         RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME);
         template.setExchange(NOTIFICATION_TASK_EXCHANGE);
+        return template;
+    }
+
+    /**
+     *同步外教点评到客服系统
+     */
+    @Bean(name = RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)
+    public RabbitTemplate syncCommentCard2CustomerServiceTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME);
+        template.setExchange(FOREIGN_COMMENT_EXCHANGE);
         return template;
     }
 
