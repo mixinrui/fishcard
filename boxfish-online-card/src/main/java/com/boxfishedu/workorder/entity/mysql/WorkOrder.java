@@ -116,7 +116,7 @@ public class WorkOrder{
 
     /** 更改次数 **/
     @Column(name="changtime_times")
-    private Integer changTimeTimes;
+    private Integer changtimeTimes;
 
     //是否补过课
     @Transient

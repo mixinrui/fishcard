@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.filter;
 
+import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -68,15 +69,23 @@ public class AuthorFilter extends OncePerRequestFilter {
         logger.debug("用户的url:{}",request.getRequestURI());
         if (StringUtils.isEmpty(accessToken)) {
             logger.debug("用户没有带accesstoken");
-            errorTokenHandle(response, "用户没有带accesstoken");
+            errorHandle(response, "", HttpStatus.SC_UNAUTHORIZED);
             return;
         }
 
         //将access_token转换为userId,如果返回null则表示用户不存在,直接返回
-        Long userId = this.userIdComparison.getUserId(accessToken);
+        Long userId = null;
+        try {
+            userId = this.userIdComparison.getUserId(accessToken);
+        } catch (UnauthorizedException e) {
+            errorHandle(response, "", HttpStatus.SC_UNAUTHORIZED);
+        } catch (Exception e) {
+            errorHandle(response, "", HttpStatus.SC_BAD_REQUEST);
+        }
+
         if (Objects.isNull(userId)) {
             logger.info("accesstoken无效,token:[{}]",accessToken);
-            errorTokenHandle(response, String.format("accesstoken无效,token:[%s]", accessToken));
+            errorHandle(response, "", HttpStatus.SC_UNAUTHORIZED);
             return;
         }
         logger.debug("请求接口 = [{}],access_token = [{}],userId = [{}]", request.getRequestURI(), accessToken, userId);
@@ -87,16 +96,15 @@ public class AuthorFilter extends OncePerRequestFilter {
         filterChain.doFilter(authorRequestWrapper, response);
     }
 
-    public void errorTokenHandle(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+    public void errorHandle(HttpServletResponse response, String message, int status) throws IOException {
+        response.setStatus(status);
         response.setContentType("application/json;charset=UTF-8");
         JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(null);
-        jsonResultModel.setReturnCode(HttpStatus.SC_UNAUTHORIZED);
+        jsonResultModel.setReturnCode(status);
         jsonResultModel.setReturnMsg(message);
         String json = new Gson().toJson(jsonResultModel);
         try(PrintWriter out = response.getWriter()){
             out.write(json);
-            //out.flush();
         }
     }
 

@@ -285,7 +285,7 @@ public class FishCardModifyServiceX {
             workOrder.setStartTime(startTimeParam.getBeginDateFormat() );
             workOrder.setEndTime(startTimeParam.getEndDateFormat() );
             workOrder.setSlotId(startTimeParam.getTimeslotId());
-            workOrder.setChangTimeTimes(workOrder.getChangTimeTimes()==null?(new Integer(1)):(workOrder.getChangTimeTimes()+1));// 换课次数
+            workOrder.setChangtimeTimes(workOrder.getChangtimeTimes()==null?(new Integer(1)):(workOrder.getChangtimeTimes()+1));// 换课次数
             workOrderService.save(workOrder);
 
             courseSchedule.setClassDate(DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));

@@ -53,7 +53,7 @@ public class DreamRecommendHandler extends DefaultRecommendHandler {
     private Map<Integer, RecommandCourseView> batchRecommendCourses(List<WorkOrder> workOrders, TimeSlotParam timeSlotParam) {
         int recommendIndex = 0;
         Map<Integer, RecommandCourseView> resultMap = Maps.newHashMap();
-        for(int i = 0; i < workOrders.size() / 8; i++) {
+        for(int i = 0, size = workOrders.size() / 8; i < size; i++) {
             List<RecommandCourseView> recommendCourseViews = recommandCourseRequester.getBatch8DreamRecommandCourse(
                     timeSlotParam.getStudentId());
             for(RecommandCourseView recommandCourseView : recommendCourseViews) {

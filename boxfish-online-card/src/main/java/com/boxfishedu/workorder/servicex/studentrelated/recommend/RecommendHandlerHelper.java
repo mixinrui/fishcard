@@ -49,7 +49,7 @@ public class RecommendHandlerHelper {
         try {
             Map<Integer, RecommandCourseView> resultMap = recommendHandler.recommendCourseViews(workOrders, timeSlotParam);
 
-            for (int i = 0; i < workOrders.size(); i++) {
+            for (int i = 0, size = workOrders.size(); i < size; i++) {
                 WorkOrder workOrder = workOrders.get(i);
                 logger.debug("鱼卡序号{}", workOrder.getSeqNum());
 //            Integer index=recommandedCourseService.getCourseIndex(workOrder);
