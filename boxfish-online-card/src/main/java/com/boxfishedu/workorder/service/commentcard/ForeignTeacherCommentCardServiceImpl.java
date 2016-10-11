@@ -67,6 +67,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Autowired
     AccountCardInfoService accountCardInfoService;
 
+    @Autowired
+    SyncCommentCard2SystemService syncCommentCard2SystemService;
+
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
     @Override
@@ -125,6 +128,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     ToTeacherStudentForm toTeacherStudentForm = ToTeacherStudentForm.getToTeacherStudentForm(newCommentCard);
                     logger.debug("@foreignTeacherCommentCardAdd3 向师生运营发生消息,通知分配外教进行点评...");
                     rabbitMqSender.send(toTeacherStudentForm, QueueTypeEnum.ASSIGN_FOREIGN_TEACHER_COMMENT);
+                    logger.info("@foreignTeacherCommentCardAdd4 点评次数修改,通知客服系统...");
+                    syncCommentCard2SystemService.syncCommentCard2System(service.getId());
                 }
             }
         }
@@ -396,6 +401,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 logger.info("@foreignTeacherCommentUnAnswer25 修改首页中外教点评次数");
 //                commentTeacherAppServiceX.commentHomePage(commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId()));
                 commentTeacherAppServiceX.findHomeComment(commentCard.getStudentId());
+                logger.info("@foreignTeacherCommentUnAnswer26 次数修改,通知客服系统....");
+                syncCommentCard2SystemService.syncCommentCard2System(serviceTemp.getId());
             } catch (Exception e) {
                 e.printStackTrace();
             }

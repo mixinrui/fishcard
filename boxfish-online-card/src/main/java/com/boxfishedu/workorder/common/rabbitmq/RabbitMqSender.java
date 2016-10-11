@@ -38,6 +38,8 @@ public class RabbitMqSender {
     private @Qualifier(RabbitMqConstant.SHORT_MESSAGE_REPLY_TEMPLATE_NAME)RabbitTemplate shortMessageTemplate;// 发送短信
     @Autowired
     private @Qualifier(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)RabbitTemplate syncFishCard2CustomerTemplate;// 发送短信
+    @Autowired
+    private @Qualifier(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)RabbitTemplate syncCommentCard2CustomerTemplate;// 同步外教点评到客服系统
 
 
     public void send(Object object, QueueTypeEnum queueTypeEnum) {
@@ -92,6 +94,10 @@ public class RabbitMqSender {
             case ASYNC_NOTIFY_CUSTOMER_SERVICE:{
                 logger.info("@<-<-<-<-<-<-<asyncNotifyCustomer-异步通知客服中心,参数:{}", JacksonUtil.toJSon(object));
                 syncFishCard2CustomerTemplate.convertAndSend(object);
+            }
+            case ASYNC_COMMENT_CARD_CUSTOMER_SERVICE:{
+                logger.info("@<-<-<-<-<-<-<asyncCommentCardCustomer-异步通知客服中心,参数:{}", JacksonUtil.toJSon(object));
+                syncCommentCard2CustomerTemplate.convertAndSend(object);
             }
             default:
                 break;
