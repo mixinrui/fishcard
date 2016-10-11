@@ -39,7 +39,7 @@ public class RabbitMqSender {
     @Autowired
     private @Qualifier(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)RabbitTemplate syncFishCard2CustomerTemplate;// 发送短信
     @Autowired
-    private @Qualifier(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)RabbitTemplate syncCommentCard2CustomerTemplate;// 同步外教点评到客服系统
+    private @Qualifier(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)RabbitTemplate syncCommentCard2CustomerTemplate;// 同步外教点评到客服系统
 
 
     public void send(Object object, QueueTypeEnum queueTypeEnum) {

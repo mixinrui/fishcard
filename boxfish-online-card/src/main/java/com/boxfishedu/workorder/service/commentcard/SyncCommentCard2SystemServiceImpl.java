@@ -35,14 +35,17 @@ public class SyncCommentCard2SystemServiceImpl implements SyncCommentCard2System
     }
 
     @Override
-    public void initializeCommentCard2System() {
+    public long initializeCommentCard2System() {
         List<com.boxfishedu.workorder.entity.mysql.Service> serviceList = serviceJpaRepository.findByProductType();
-        int count = 0;
+        long count = 0;
         for (com.boxfishedu.workorder.entity.mysql.Service service: serviceList) {
             Map<Object,Object> paramMap = getParamMap(service);
+            logger.info("@initializeCommentCard2System1 通知客服系统,维护外教点评历史数据...");
+            rabbitMqSender.send(paramMap,QueueTypeEnum.ASYNC_COMMENT_CARD_CUSTOMER_SERVICE);
             count += 1;
         }
-        logger.info("@initializeCommentCard2System 一共初始化个数: " + count);
+        logger.info("@initializeCommentCard2System2 一共初始化个数: " + count);
+        return count;
     }
 
     private Map<Object,Object> getParamMap(com.boxfishedu.workorder.entity.mysql.Service service){
