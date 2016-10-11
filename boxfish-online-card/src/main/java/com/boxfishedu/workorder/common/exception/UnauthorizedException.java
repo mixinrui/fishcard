@@ -22,4 +22,13 @@ public class UnauthorizedException extends BoxfishException {
     public UnauthorizedException() {
         returnMsg = "认证失败,拒绝访问!!!";
     }
+
+    /**
+     * 堆栈优化
+     * @return
+     */
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
+    }
 }
