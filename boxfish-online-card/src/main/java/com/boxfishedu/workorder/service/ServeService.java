@@ -21,6 +21,7 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.service.commentcard.SyncCommentCard2SystemService;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
@@ -69,13 +70,18 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     @Autowired
     private WorkOrderService workOrderService;
+
     @Autowired
     private CourseScheduleService courseScheduleService;
+
     @Autowired
     private ScheduleCourseInfoService scheduleCourseInfoService;
 
     @Autowired
     private CommentTeacherAppServiceX commentTeacherAppServiceX;
+
+    @Autowired
+    SyncCommentCard2SystemService syncCommentCard2SystemService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -319,12 +325,14 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         save(services);
         for (Service service:services){
             logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
-//            if (Objects.equals(service.getProductType(),1002)){
-//                commentTeacherAppServiceX.firstBuyForeignComment(service.getStudentId(),service.getAmount());
-//            }
+            if (Objects.equals(service.getProductType(),1002)){
+                logger.info("@order2Service2 购买点评次数,通知跟单系统");
+                syncCommentCard2SystemService.syncCommentCard2System(service.getId());
+            }
         }
         logger.info("@order2Service 购买点评次数,设置首页点评次数");
         commentTeacherAppServiceX.findHomeComment(orderView.getUserId());
+
     }
 
     //根据订单生成服务列表

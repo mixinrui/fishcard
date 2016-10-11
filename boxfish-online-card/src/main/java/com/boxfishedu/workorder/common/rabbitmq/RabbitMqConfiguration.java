@@ -38,6 +38,7 @@ public class RabbitMqConfiguration {
     public static final String FOREIGN_COMMENT_EXCHANGE="foreign-comment-exchange";
     public static final String DEAD_LETTER_EXCHANGE_ROUTING_KEY="x-dead-letter-routing-key";
     public static final String AMQ_DIRECT_EXCHANGE="amq.direct";
+    public static final String SYNC_COMMENT_2_SYSTEM_EXCHANGE="sync-comment-2-system-exchange";
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -75,6 +76,11 @@ public class RabbitMqConfiguration {
         return new DirectExchange(FOREIGN_COMMENT_EXCHANGE, true, false);
     }
 
+    @Bean(name=SYNC_COMMENT_2_SYSTEM_EXCHANGE)
+    public Exchange syncComment2SystemExchange(){
+        return new DirectExchange(SYNC_COMMENT_2_SYSTEM_EXCHANGE, true, false);
+    }
+
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory, Exchange exchange) {
         RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
@@ -84,6 +90,7 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareExchange(scheduleExchange());
         rabbitAdmin.declareExchange(delayExchange());
         rabbitAdmin.declareExchange(foreignCommentExchange());
+        rabbitAdmin.declareExchange(syncComment2SystemExchange());
 
 
         /**
@@ -240,7 +247,7 @@ public class RabbitMqConfiguration {
          */
         Queue syncCommentCard2CustomerServiceQueue = new Queue(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE, true);
         rabbitAdmin.declareQueue(syncCommentCard2CustomerServiceQueue);
-        Binding syncCommentCard2CustomerServiceQueueBinding = BindingBuilder.bind(syncCommentCard2CustomerServiceQueue).to(foreignCommentExchange()).with(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE).noargs();
+        Binding syncCommentCard2CustomerServiceQueueBinding = BindingBuilder.bind(syncCommentCard2CustomerServiceQueue).to(syncComment2SystemExchange()).with(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE).noargs();
 
 
         rabbitAdmin.declareBinding(unassignedTeacherFailQueueBinding);
@@ -493,8 +500,8 @@ public class RabbitMqConfiguration {
      */
     @Bean(name = RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)
     public RabbitTemplate syncCommentCard2CustomerServiceTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
-        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME);
-        template.setExchange(FOREIGN_COMMENT_EXCHANGE);
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE);
+        template.setExchange(SYNC_COMMENT_2_SYSTEM_EXCHANGE);
         return template;
     }
 
