@@ -18,7 +18,7 @@ public class SyncCommentCard2SystemController {
     SyncCommentCard2SystemService syncCommentCard2SystemService;
 
     @RequestMapping(value = "/initialize/comment_card_2_system", method = RequestMethod.GET)
-    public JsonResultModel syncCommnetCards2System(){
+    public JsonResultModel syncCommentCards2System(){
         long count = syncCommentCard2SystemService.initializeCommentCard2System();
         JsonResultModel jsonResultModel = new JsonResultModel();
         jsonResultModel.setData(count);
