@@ -650,10 +650,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     }
 
     public List<Service> getUnselectedService(Long studentId, ComboTypeEnum comboTypeEnum, TutorTypeEnum tutorTypeEnum,Integer selectedFlag){
-        return jpa.findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelected(studentId, comboTypeEnum.toString(),tutorTypeEnum.toString(),selectedFlag);
+        return jpa.findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelectedAndProductType(studentId, comboTypeEnum.toString(),tutorTypeEnum.toString(),selectedFlag,ProductType.TEACHING.value());
     }
 
     public List<Service> getUnselectedService(Long studentId,ComboTypeEnum comboTypeEnum,Integer selectedFlag){
-        return jpa.findByStudentIdAndComboTypeAndCoursesSelected(studentId, comboTypeEnum.toString() ,selectedFlag);
+        return jpa.findByStudentIdAndComboTypeAndCoursesSelectedAndProductType(studentId, comboTypeEnum.toString() ,selectedFlag,ProductType.TEACHING.value());
     }
 }

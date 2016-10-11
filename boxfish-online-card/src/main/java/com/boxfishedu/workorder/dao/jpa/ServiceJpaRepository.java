@@ -60,9 +60,9 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     List<Service> findByStudentIdAndCoursesSelected(Long studentId,Integer coursesSelected);
 
-    List<Service> findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelected(Long studentId, String comboType,String tutorType,Integer selectedFlag);
+    List<Service> findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelectedAndProductType(Long studentId, String comboType,String tutorType,Integer selectedFlag,Integer productType);
 
-    List<Service> findByStudentIdAndComboTypeAndCoursesSelected(Long studentId, String comboType ,Integer selectedFlag);
+    List<Service> findByStudentIdAndComboTypeAndCoursesSelectedAndProductType(Long studentId, String comboType ,Integer selectedFlag,Integer productType);
 
     //查找出学生所有状态的工单
     @Query("select distinct sv.studentId from Service sv")

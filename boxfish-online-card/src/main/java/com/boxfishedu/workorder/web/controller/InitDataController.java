@@ -11,13 +11,11 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -31,8 +29,6 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/init")
 public class InitDataController {
-    @Autowired
-    private WorkOrderJpaRepository workOrderJpaRepository;
 
     @Autowired
     private ContinousAbsenceMorphiaRepository continousAbsenceMorphiaRepository;
@@ -41,10 +37,16 @@ public class InitDataController {
     private ServiceJpaRepository serviceJpaRepository;
 
     @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
+
+    @Autowired
     private AbsenceDealService absenceDealService;
 
     @Autowired
     private DataCollectorService dataCollectorService;
+
+    @Autowired
+    private  WorkOrderLogService workOrderLogService;
 
     @Autowired
     private AccountCardInfoService accountCardInfoService;
@@ -89,5 +91,25 @@ public class InitDataController {
         return JsonResultModel.newJsonResultModel("ok");
     }
 
+    @RequestMapping(value = "/home/student/{student_id}", method = RequestMethod.POST)
+    public JsonResultModel initSpecialHomePage(@PathVariable("student_id") Long studentId){
+        dataCollectorService.updateBothChnAndFnItemAsync(studentId);
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
+    @RequestMapping(value = "/async/all", method = RequestMethod.POST)
+    public JsonResultModel asyncNotifyCustomer(){
+        workOrderJpaRepository.findAll().forEach(workOrder -> {
+            workOrderLogService.asyncNotifyCustomer(workOrder);
+        });
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
+    @RequestMapping(value = "/async/card/{fishcard_id}", method = RequestMethod.POST)
+    public JsonResultModel asyncNotifyCustomer(@PathVariable("fishcard_id") Long fishcardId){
+        WorkOrder workOrder=workOrderJpaRepository.findOne(fishcardId);
+        workOrderLogService.asyncNotifyCustomer(workOrder);
+        return JsonResultModel.newJsonResultModel("ok");
+    }
 
 }
