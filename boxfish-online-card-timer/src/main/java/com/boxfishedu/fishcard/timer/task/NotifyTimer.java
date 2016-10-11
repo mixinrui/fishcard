@@ -231,4 +231,17 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
+
+
+    //定时任务，处理冻结的课程
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void dealFreeze() {
+        logger.info("<<<<<<开始通知<<<开始通知处理冻结的鱼卡,并更新首页>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage();
+        serviceTimerMessage.setStatus(0);
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        serviceTimerMessage.setType(TimerMessageType.FREEZE_UPDATE_HOME.value());
+        serviceTimerMessage.setBody(null);
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 }

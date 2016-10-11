@@ -36,7 +36,10 @@ public enum TimerMessageType {
     STUDENT_ABSENT_DEDUCT_SCORE(106),
 
     //每天7点提醒老师今天有课
-    CLASSS_TODY_TEA_NOTIFY(108);
+    CLASSS_TODY_TEA_NOTIFY(108),
+
+    //冻结鱼卡处理
+    FREEZE_UPDATE_HOME(110);
     private int code;
 
     private TimerMessageType(int code) {

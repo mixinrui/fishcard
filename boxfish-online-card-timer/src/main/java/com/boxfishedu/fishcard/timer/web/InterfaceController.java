@@ -46,4 +46,10 @@ public class InterfaceController {
         notifyTimer.completeForceService();
         return JsonResultModel.newJsonResultModel("ok");    
     }
+
+    @RequestMapping(value = "/freeze/update", method = RequestMethod.POST)
+    public JsonResultModel freezeUpdate(){
+        notifyTimer.dealFreeze();
+        return JsonResultModel.newJsonResultModel("ok");
+    }
 }

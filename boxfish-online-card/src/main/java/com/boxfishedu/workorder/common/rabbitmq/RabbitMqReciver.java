@@ -181,8 +181,9 @@ public class RabbitMqReciver {
             }else if(serviceTimerMessage.getType() == TimerMessageType.CLASSS_TODY_TEA_NOTIFY.value()){
                 logger.info("=========>notifyTomoStudentHasClass=====>>>>通知老师今天有课");
                 courseNotifyOneDayServiceX.notiFyTeacherClass();
+            }else if(serviceTimerMessage.getType()==TimerMessageType.FREEZE_UPDATE_HOME.value()){
+                courseScheduleUpdatorServiceX.freezeUpdateHome();
             }
-
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);

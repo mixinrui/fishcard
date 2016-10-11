@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by hucl on 16/5/6.
@@ -136,5 +138,25 @@ public class CourseScheduleUpdatorServiceX {
         // 创建群组
         serviceSDK.createGroup(workOrder);
         workOrderLogService.saveWorkOrderLog(workOrder);
+    }
+
+    public void freezeUpdateHome(){
+        logger.info("@freezeUpdateHome###########");
+        List<WorkOrder> workOrders=workOrderService.findFreezeCardsToUpdate();
+        if(CollectionUtils.isEmpty(workOrders)){
+            return;
+        }
+        Set<Long> userIdSet= Sets.newHashSet();
+        workOrders.forEach(workOrder -> {
+            if(!userIdSet.contains(workOrder.getStudentId())) {
+                userIdSet.add(workOrder.getStudentId());
+            }
+            workOrder.setIsCourseOver((short)1);
+        });
+        workOrderService.save(workOrders);
+        userIdSet.forEach(userId->{
+            logger.info("@freezeUpdateHome###########updateBothChnAndFnItemAsync");
+            dataCollectorService.updateBothChnAndFnItemAsync(userId);
+        });
     }
 }
