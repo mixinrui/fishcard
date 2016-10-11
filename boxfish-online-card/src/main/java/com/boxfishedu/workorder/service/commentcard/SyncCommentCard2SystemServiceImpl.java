@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +29,23 @@ public class SyncCommentCard2SystemServiceImpl implements SyncCommentCard2System
     @Override
     public void syncCommentCard2System(Long serviceId) {
         com.boxfishedu.workorder.entity.mysql.Service service = serviceJpaRepository.findOne(serviceId);
+        Map<Object,Object> paramMap = getParamMap(service);
+        logger.info("@syncCommentCard2System 外教点评次数修改,通知客服系统...");
+        rabbitMqSender.send(paramMap,QueueTypeEnum.ASYNC_COMMENT_CARD_CUSTOMER_SERVICE);
+    }
+
+    @Override
+    public void initializeCommentCard2System() {
+        List<com.boxfishedu.workorder.entity.mysql.Service> serviceList = serviceJpaRepository.findByProductType();
+        int count = 0;
+        for (com.boxfishedu.workorder.entity.mysql.Service service: serviceList) {
+            Map<Object,Object> paramMap = getParamMap(service);
+            count += 1;
+        }
+        logger.info("@initializeCommentCard2System 一共初始化个数: " + count);
+    }
+
+    private Map<Object,Object> getParamMap(com.boxfishedu.workorder.entity.mysql.Service service){
         Map<Object,Object> paramMap = new HashMap<>();
         paramMap.put("id",service.getId());
         paramMap.put("studentId",service.getStudentId());
@@ -43,7 +61,6 @@ public class SyncCommentCard2SystemServiceImpl implements SyncCommentCard2System
         paramMap.put("teachingType",service.getTeachingType());
         paramMap.put("createTime",service.getCreateTime());
         paramMap.put("updateTime",service.getUpdateTime());
-        logger.info("@syncCommentCard2System 外教点评次数修改,通知客服系统...");
-        rabbitMqSender.send(paramMap,QueueTypeEnum.ASYNC_COMMENT_CARD_CUSTOMER_SERVICE);
+        return paramMap;
     }
 }

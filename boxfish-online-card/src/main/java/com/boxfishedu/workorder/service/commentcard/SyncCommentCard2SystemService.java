@@ -5,4 +5,6 @@ package com.boxfishedu.workorder.service.commentcard;
  */
 public interface SyncCommentCard2SystemService {
     public void syncCommentCard2System(Long serviceId);
+
+    public void initializeCommentCard2System();
 }
