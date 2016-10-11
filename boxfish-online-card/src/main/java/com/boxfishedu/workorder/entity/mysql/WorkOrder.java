@@ -197,6 +197,9 @@ public class WorkOrder{
     @Transient
     private Boolean freezeBtnShowFlag=false;
 
+    @Transient
+    private String tutorType;
+
     //解冻按钮是否显示标记
     @Transient
     private Boolean unfreezeBtnShowFlag=false;
