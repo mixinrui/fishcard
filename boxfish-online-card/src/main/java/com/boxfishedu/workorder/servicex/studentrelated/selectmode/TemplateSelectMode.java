@@ -80,7 +80,8 @@ public class TemplateSelectMode implements SelectMode {
         // 兑换默认为1周两次
         if(Objects.equals(timeSlotParam.getComboTypeEnum(), ComboTypeToRoleId.EXCHANGE)) {
             int loopOfWeek = (count + DEFAULT_EXCHANGE_NUM_PER_WEEK - 1) / DEFAULT_EXCHANGE_NUM_PER_WEEK;
-            int numPerWeek = count == 1 ? 1: DEFAULT_EXCHANGE_NUM_PER_WEEK;
+            // 小于等于2的每周一次课
+            int numPerWeek = count <= 2 ? 1: DEFAULT_EXCHANGE_NUM_PER_WEEK;
             return new SelectTemplateParam(loopOfWeek, numPerWeek, count);
         } else {
             int loopOfWeek = services.stream().collect(Collectors.summingInt(Service::getComboCycle));

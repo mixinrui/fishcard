@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.studentrelated.recommend;
 
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.RecommandedCourseService;
@@ -10,6 +11,8 @@ import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +46,9 @@ public class DefaultRecommendHandler implements RecommendHandler {
             TutorType tutorType = TutorType.resolve(workOrder.getService().getTutorType());
             RecommandCourseView recommandCourseView;
 
+
+
+
             // 不同类型的套餐对应不同类型的课程推荐
             if(Objects.equals(tutorType, TutorType.MIXED)) {
                 recommandCourseView=recommandCourseRequester.getRecommandCourse(workOrder,index);
@@ -58,5 +64,12 @@ public class DefaultRecommendHandler implements RecommendHandler {
             courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
         }
         return courseViewMap;
+    }
+
+    private boolean within48Hourse(WorkOrder workOrder) {
+        Duration duration = Duration.between(
+                LocalDateTime.now(), DateUtil.convertLocalDateTime(workOrder.getStartTime()));
+        // 课程推荐, 否则推课程类型
+        return duration.toDays() <=2;
     }
 }
