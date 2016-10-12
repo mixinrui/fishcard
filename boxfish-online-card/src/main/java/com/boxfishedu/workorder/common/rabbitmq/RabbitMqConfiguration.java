@@ -488,9 +488,9 @@ public class RabbitMqConfiguration {
     /**
      *同步鱼卡数据到客服系统
      */
-    @Bean(name = RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)
+    @Bean(name = RabbitMqConstant.ORDER_NOTIFY_TEMPALTE_NAME)
     public RabbitTemplate notifyMessagePrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
-        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE);
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.ORDER_NOTIFY_QUEUE);
         template.setExchange(NOTIFICATION_TASK_EXCHANGE);
         return template;
     }
