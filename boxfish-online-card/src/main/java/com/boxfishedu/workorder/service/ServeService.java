@@ -327,7 +327,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
             if (Objects.equals(service.getProductType(),1002)){
                 logger.info("@order2Service2 购买点评次数,通知跟单系统");
-                syncCommentCard2SystemService.syncCommentCard2System(service.getId());
+                syncCommentCard2SystemService.syncCommentCard2System(service.getId(),CommentCardStatus.UNASKED.getCode(),null);
             }
         }
         logger.info("@order2Service 购买点评次数,设置首页点评次数");
