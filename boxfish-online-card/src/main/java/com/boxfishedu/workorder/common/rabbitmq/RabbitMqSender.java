@@ -79,25 +79,31 @@ public class RabbitMqSender {
             case ASSIGN_TEACHER_TIMER_REPLY: {
                 logger.info("@<-<-<-<-<-<-<-处理完定时任务的请求,参数:{}", JacksonUtil.toJSon(object));
                 notifyTimerTemplate.convertAndSend(object);
+                break;
             }
             case ASSIGN_FOREIGN_TEACHER_COMMENT:
                 logger.debug("@<-<-<-<-<-<-<-向师生运营发送获取外教点评教师请求,参数{}",JacksonUtil.toJSon(object));
                 assignForeignTeacherCommentRabbitTemplate.convertAndSend(JacksonUtil.toJSon(object));
+                break;
             case RECHARGE_ORDER:{
                 logger.info("@<-<-<-<-<-<-<orderRecharge-订单退款的请求,参数:{}", JacksonUtil.toJSon(object));
                 rechargeWorkOrderTemplate.convertAndSend(object);
+                break;
             }
             case SHORT_MESSAGE:{
                 logger.info("@<-<-<-<-<-<-<sendShortMessage-发送短信,参数:{}", JacksonUtil.toJSon(object));
                 shortMessageTemplate.convertAndSend(object);
+                break;
             }
             case ASYNC_NOTIFY_CUSTOMER_SERVICE:{
                 logger.info("@<-<-<-<-<-<-<asyncNotifyCustomer-异步通知客服中心,参数:{}", JacksonUtil.toJSon(object));
                 syncFishCard2CustomerTemplate.convertAndSend(object);
+                break;
             }
             case ASYNC_COMMENT_CARD_CUSTOMER_SERVICE:{
                 logger.info("@<-<-<-<-<-<-<asyncCommentCardCustomer-异步通知客服中心,参数:{}", JacksonUtil.toJSon(object));
                 syncCommentCard2CustomerTemplate.convertAndSend(object);
+                break;
             }
             default:
                 break;
