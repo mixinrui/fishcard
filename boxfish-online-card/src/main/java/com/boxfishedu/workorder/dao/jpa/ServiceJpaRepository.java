@@ -67,4 +67,8 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     //查找出学生所有状态的工单
     @Query("select distinct sv.studentId from Service sv")
     public List<Long> findDistinctUsersFromService();
+
+    //初始化客服系统中外教点评
+    @Query("SELECT s FROM Service s where s.productType = '1002'")
+    List<Service> findByProductType();
 }

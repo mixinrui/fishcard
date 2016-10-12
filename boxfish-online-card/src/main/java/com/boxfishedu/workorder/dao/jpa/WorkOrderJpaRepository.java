@@ -148,4 +148,6 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select wo.id from WorkOrder wo")
     public List<Long> findAllWorkOrderId();
 
+    List<WorkOrder> findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(Integer freezeFlag,Short isCourseOver,Integer status,Date startTime);
+
 }

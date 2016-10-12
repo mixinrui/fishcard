@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.dao.jpa;
 
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -119,4 +120,10 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Query("select c from CommentCard c where c.studentId = ?1 and c.status <= 300 and c.studentAskTime =  " +
             "(select max(cd.studentAskTime) from CommentCard cd where cd.studentId = ?1 and cd.status <= 300)")
     public List<CommentCard> getStudentNewCommentCard(Long studentId);
+
+    /**
+     *  客服系统初始化外教点评
+     */
+    @Query("SELECT c FROM CommentCard c  where c.service = ?1 order by c.teacherAnswerTime DESC")
+    public List<CommentCard> getSystemCommentCard(Service service);
 }

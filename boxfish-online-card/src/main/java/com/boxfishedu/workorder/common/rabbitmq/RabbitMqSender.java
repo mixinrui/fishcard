@@ -38,6 +38,8 @@ public class RabbitMqSender {
     private @Qualifier(RabbitMqConstant.SHORT_MESSAGE_REPLY_TEMPLATE_NAME)RabbitTemplate shortMessageTemplate;// 发送短信
     @Autowired
     private @Qualifier(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)RabbitTemplate syncFishCard2CustomerTemplate;// 发送短信
+    @Autowired
+    private @Qualifier(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)RabbitTemplate syncCommentCard2CustomerTemplate;// 同步外教点评到客服系统
 
 
     public void send(Object object, QueueTypeEnum queueTypeEnum) {
@@ -77,21 +79,31 @@ public class RabbitMqSender {
             case ASSIGN_TEACHER_TIMER_REPLY: {
                 logger.info("@<-<-<-<-<-<-<-处理完定时任务的请求,参数:{}", JacksonUtil.toJSon(object));
                 notifyTimerTemplate.convertAndSend(object);
+                break;
             }
             case ASSIGN_FOREIGN_TEACHER_COMMENT:
                 logger.debug("@<-<-<-<-<-<-<-向师生运营发送获取外教点评教师请求,参数{}",JacksonUtil.toJSon(object));
                 assignForeignTeacherCommentRabbitTemplate.convertAndSend(JacksonUtil.toJSon(object));
+                break;
             case RECHARGE_ORDER:{
                 logger.info("@<-<-<-<-<-<-<orderRecharge-订单退款的请求,参数:{}", JacksonUtil.toJSon(object));
                 rechargeWorkOrderTemplate.convertAndSend(object);
+                break;
             }
             case SHORT_MESSAGE:{
                 logger.info("@<-<-<-<-<-<-<sendShortMessage-发送短信,参数:{}", JacksonUtil.toJSon(object));
                 shortMessageTemplate.convertAndSend(object);
+                break;
             }
             case ASYNC_NOTIFY_CUSTOMER_SERVICE:{
                 logger.info("@<-<-<-<-<-<-<asyncNotifyCustomer-异步通知客服中心,参数:{}", JacksonUtil.toJSon(object));
                 syncFishCard2CustomerTemplate.convertAndSend(object);
+                break;
+            }
+            case ASYNC_COMMENT_CARD_CUSTOMER_SERVICE:{
+                logger.info("@<-<-<-<-<-<-<asyncCommentCardCustomer-异步通知客服中心,参数:{}", JacksonUtil.toJSon(object));
+                syncCommentCard2CustomerTemplate.convertAndSend(object);
+                break;
             }
             default:
                 break;

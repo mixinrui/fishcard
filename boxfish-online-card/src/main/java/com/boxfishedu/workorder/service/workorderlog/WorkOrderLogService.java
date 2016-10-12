@@ -114,6 +114,7 @@ public class WorkOrderLogService {
     }
 
     public void asyncNotifyCustomer(WorkOrder workOrder){
+        workOrder.setTutorType(workOrder.getService().getTutorType());
         asyncNotifyPoolManager.execute(new Thread(() -> {
             rabbitMqSender.send(workOrder, QueueTypeEnum.ASYNC_NOTIFY_CUSTOMER_SERVICE);
         }));
