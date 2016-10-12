@@ -438,7 +438,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     public List<WorkOrder> findFreezeCardsToUpdate() {
-        return jpa.findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(1,0,FishCardStatusEnum.ONCLASS.getCode(),new Date());
+        return jpa.findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(new Integer(1),new Short((short)0),FishCardStatusEnum.WAITFORSTUDENT.getCode(),new Date());
     }
 
 }
