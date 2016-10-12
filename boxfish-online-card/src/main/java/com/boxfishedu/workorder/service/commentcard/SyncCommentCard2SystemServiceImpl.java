@@ -34,7 +34,7 @@ public class SyncCommentCard2SystemServiceImpl implements SyncCommentCard2System
     @Override
     public void syncCommentCard2System(Long serviceId, int status, Date teacherAnswerTime) {
         com.boxfishedu.workorder.entity.mysql.Service service = serviceJpaRepository.findOne(serviceId);
-        Map<Object,String> paramMap = getParamMap(service,status,teacherAnswerTime);
+        Map<Object,Object> paramMap = getParamMap(service,status,teacherAnswerTime);
         logger.info("@syncCommentCard2System 外教点评次数修改,通知客服系统...");
         rabbitMqSender.send(paramMap,QueueTypeEnum.ASYNC_COMMENT_CARD_CUSTOMER_SERVICE);
     }
@@ -45,9 +45,8 @@ public class SyncCommentCard2SystemServiceImpl implements SyncCommentCard2System
         long count = 0;
         for (com.boxfishedu.workorder.entity.mysql.Service service: serviceList) {
             List<CommentCard> commentCardList = commentCardJpaRepository.getSystemCommentCard(service);
-            Map<Object,String> paramMap = null;
+            Map<Object,Object> paramMap = null;
             if (commentCardList.size() != 0){
-                System.out.println("status============:" + commentCardList.get(0).getStatus() + " time==================:" + commentCardList.get(0).getTeacherAnswerTime());
                 if (Objects.equals(commentCardList.get(0).getStatus(),CommentCardStatus.ANSWERED.getCode())
                         || Objects.equals(commentCardList.get(0).getStatus(),CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())) {
                     paramMap = getParamMap(service,commentCardList.get(0).getStatus(), commentCardList.get(0).getTeacherAnswerTime());
@@ -67,25 +66,24 @@ public class SyncCommentCard2SystemServiceImpl implements SyncCommentCard2System
         return count;
     }
 
-    private Map<Object,String> getParamMap(com.boxfishedu.workorder.entity.mysql.Service service,int status, Date teacherAnswerTime){
-        Map<Object,String> paramMap = new HashMap<>();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        paramMap.put("id",service.getId().toString());
-        paramMap.put("studentId",service.getStudentId().toString());
+    private Map<Object,Object> getParamMap(com.boxfishedu.workorder.entity.mysql.Service service,int status, Date teacherAnswerTime){
+        Map<Object,Object> paramMap = new HashMap<>();
+        paramMap.put("id",service.getId());
+        paramMap.put("studentId",service.getStudentId());
         paramMap.put("studentName",service.getStudentName());
-        paramMap.put("orderId",service.getOrderId().toString());
+        paramMap.put("orderId",service.getOrderId());
         paramMap.put("orderCode",service.getOrderCode());
-        paramMap.put("originalAmount",service.getOriginalAmount() == null? null: String.valueOf(service.getOriginalAmount()));
-        paramMap.put("amount",service.getAmount().toString());
+        paramMap.put("originalAmount",service.getOriginalAmount());
+        paramMap.put("amount",service.getAmount());
         paramMap.put("tutorType",service.getTutorType());
         paramMap.put("orderChannel",service.getOrderChannel());
         paramMap.put("comboType",service.getComboType());
-        paramMap.put("productType",service.getProductType() == null? null: String.valueOf(service.getProductType()));
-        paramMap.put("teachingType",service.getTeachingType() == null? null: String.valueOf(service.getTeachingType()));
-        paramMap.put("createTime",service.getCreateTime() == null? null: format.format(service.getCreateTime()));
-        paramMap.put("updateTime",service.getUpdateTime() == null? null: format.format(service.getUpdateTime()));
-        paramMap.put("status",String.valueOf(status));
-        paramMap.put("teacherAnswerTime",teacherAnswerTime == null? null: format.format(teacherAnswerTime));
+        paramMap.put("productType",service.getProductType());
+        paramMap.put("teachingType",service.getTeachingType());
+        paramMap.put("createTime",service.getCreateTime());
+        paramMap.put("updateTime",service.getUpdateTime());
+        paramMap.put("status",status);
+        paramMap.put("teacherAnswerTime",teacherAnswerTime);
         return paramMap;
     }
 }
