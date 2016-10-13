@@ -308,6 +308,23 @@ public class TeacherStudentRequester {
      * 获取课程过程中,如果课程类型发生变化,向师生运营发送更换教师请求
      */
     public void changeTeacherForTypeChanged(WorkOrder workOrder){
-
+       String url = new StringBuilder(urlConf.getTeacher_service()).append("/course/schedule/teacher/change").toString();
+        Map map = Maps.newHashMap();
+        map.put("day", DateUtil.date2SimpleDate(workOrder.getStartTime()).getTime());
+        map.put("timeSlotId", workOrder.getSlotId());
+        map.put("teacherId", workOrder.getTeacherId());
+        map.put("studentId", workOrder.getStudentId());
+        logger.debug("@changeTeacherForTypeChanged#{}向师生运营发起换教师的请求[{}],参数[{}]", workOrder.getId(), url,JacksonUtil.toJSon(map));
+        JsonResultModel jsonResultModel = null;
+        try {
+            jsonResultModel = restTemplate.postForObject(url, map, JsonResultModel.class);
+        } catch (Exception ex) {
+            logger.error("@changeTeacherForTypeChanged#{}#exception向师生运营发送更换老师失败",workOrder.getId(), ex);
+            throw new BusinessException("向师生运营请求更换教师失败");
+        }
+        if (HttpStatus.OK.value() != jsonResultModel.getReturnCode()) {
+            logger.error("@changeTeacherForTypeChanged#{}#returnException向师生运营获取教师失败,失败原因:[{}]", workOrder.getId(),jsonResultModel.getReturnMsg());
+            throw new BusinessException("教师更换失败:" + jsonResultModel.getReturnMsg());
+        }
     }
 }
