@@ -132,7 +132,8 @@ public class InitDataController {
     @RequestMapping(value = "/async/order/complete", method = RequestMethod.POST)
     public JsonResultModel asyncNotifyOrder() {
         List<Service> services = serveService.findAll();
-        services.stream().filter(service -> service.getProductType().equals("1001")).map(service1 -> service1.getOrderId()).collect(Collectors.toSet()).forEach(orderId -> {
+        services.stream().filter(service -> service.getProductType()==1001)
+                .map(service1 -> service1.getOrderId()).collect(Collectors.toSet()).forEach(orderId -> {
             threadPoolManager.execute(new Thread(() -> {
                 Map param = Maps.newHashMap();
                 param.put("id", orderId);

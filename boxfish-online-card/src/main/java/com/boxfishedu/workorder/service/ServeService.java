@@ -84,9 +84,6 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     @Autowired
     SyncCommentCard2SystemService syncCommentCard2SystemService;
 
-    @Autowired
-    private ServeService serveService;
-
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     static ObjectMapper objectMapper = new ObjectMapper()
@@ -211,7 +208,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     //通知订单中心修改订单状态
     public void notifyOrderUpdateStatus(WorkOrder workOrder, Integer status) {
-        List<Service> services=serveService.findByOrderId(workOrder.getService().getOrderId());
+        List<Service> services=this.findByOrderId(workOrder.getService().getOrderId());
         int leftAmount=services.stream().collect(Collectors.summingInt(Service::getAmount));
         if(leftAmount>0){
             logger.debug("@notifyOrderUpdateStatus#{}服务次数大于0,不处理,鱼卡[{}]",workOrder.getId(),workOrder.getId(),workOrder.getId());

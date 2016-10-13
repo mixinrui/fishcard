@@ -17,7 +17,7 @@ threadpool:
     # 线程池维护线程所允许的空闲时间
     time_keep_alive: 2000
     # 线程池所使用的缓冲队列大小
-    size_work_queue: 1024
+    size_work_queue: 20000
     # 缓冲队列任务调度周期,可以考虑放到redis等其他外围存储,防止内存泄漏
     period_task_qos: 1000
 
