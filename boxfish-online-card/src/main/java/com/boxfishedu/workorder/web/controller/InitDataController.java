@@ -132,16 +132,22 @@ public class InitDataController {
     @RequestMapping(value = "/async/order/complete", method = RequestMethod.POST)
     public JsonResultModel asyncNotifyOrder() {
         List<Service> services = serveService.findAll();
-        services.stream().filter(service -> service.getProductType()==1001)
-                .map(service1 -> service1.getOrderId()).collect(Collectors.toSet()).forEach(orderId -> {
-            threadPoolManager.execute(new Thread(() -> {
-                Map param = Maps.newHashMap();
+        Map<Long,Integer> selectedAndCompletedMap=services.stream().filter(service -> service.getProductType()==1001&&service.getCoursesSelected()==1).collect(Collectors.groupingBy(Service::getOrderId,Collectors.summingInt(Service::getAmount)));
+        Set<Long> selectedSet = selectedAndCompletedMap.entrySet().stream().filter(entry->entry.getValue()>0).map(entry->entry.getKey()).collect(Collectors.toSet());
+        Set<Long> completedSet = selectedAndCompletedMap.entrySet().stream().filter(entry->entry.getValue()==0).map(entry->entry.getKey()).collect(Collectors.toSet());
+//        selectedSet.forEach(orderId->{
+//            Map param = Maps.newHashMap();
+//                param.put("id", orderId);
+//                param.put("status", ConstantUtil.WORKORDER_SELECTED);
+//                rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
+//        });
+        completedSet.forEach(orderId->{
+            Map param = Maps.newHashMap();
                 param.put("id", orderId);
                 param.put("status", ConstantUtil.WORKORDER_COMPLETED);
                 rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
-            }));
-
         });
+        System.out.println(completedSet);
         return JsonResultModel.newJsonResultModel("ok");
     }
 
