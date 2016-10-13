@@ -45,6 +45,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/3/31.
@@ -82,6 +83,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     @Autowired
     SyncCommentCard2SystemService syncCommentCard2SystemService;
+
+    @Autowired
+    private ServeService serveService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -207,11 +211,13 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     //通知订单中心修改订单状态
     public void notifyOrderUpdateStatus(WorkOrder workOrder, Integer status) {
-        if(workOrder.getService().getAmount()>0){
-            logger.debug("服务次数大于0,不处理,鱼卡[{}]",workOrder.getId());
+        List<Service> services=serveService.findByOrderId(workOrder.getService().getOrderId());
+        int leftAmount=services.stream().collect(Collectors.summingInt(Service::getAmount));
+        if(leftAmount>0){
+            logger.debug("@notifyOrderUpdateStatus#{}服务次数大于0,不处理,鱼卡[{}]",workOrder.getId(),workOrder.getId(),workOrder.getId());
             return;
         }
-        logger.info("@notifyOrderUpdateStatus#向订单中心发起订单完成消息,鱼卡[{}],订单[{}]",workOrder.getId(),workOrder.getOrderId());
+        logger.info("@notifyOrderUpdateStatus#{}向订单中心发起订单完成消息,鱼卡[{}],订单[{}]",workOrder.getId(),workOrder.getId(),workOrder.getOrderId());
         Map param = Maps.newHashMap();
         param.put("id", workOrder.getOrderId());
         param.put("status", status);

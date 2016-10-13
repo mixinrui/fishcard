@@ -302,6 +302,12 @@ public class TeacherStudentRequester {
         logger.info("::::::::::::::::::::::::::::::::@[getTeachersBelongToStudent]向师生运营发起获取教师列表长度size[{}]  Datais[{}]::::::::::::::::::::::::::::::::",
                 teacherList == null ? 0 : teacherList.size(), JSON.toJSON(teacherList));
         return teacherList;
+    }
+
+    /**
+     * 获取课程过程中,如果课程类型发生变化,向师生运营发送更换教师请求
+     */
+    public void changeTeacherForTypeChanged(WorkOrder workOrder){
 
     }
 }
