@@ -107,4 +107,10 @@ public class TestController {
         cacheManager.getCache(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY).put("21212121212112", value);
         System.out.println(cacheManager.getCache(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY).get("21212121212112").get().toString());
     }
+
+    @RequestMapping(value = "/change_teacher/{workOrderId}", method = RequestMethod.POST)
+    public void testTeacher(@PathVariable("workOrderId") Long workOrderId){
+        WorkOrder workOrder=workOrderService.findOne(workOrderId);
+        workOrderService.changeTeacherForTypeChanged(workOrder);
+    }
 }
