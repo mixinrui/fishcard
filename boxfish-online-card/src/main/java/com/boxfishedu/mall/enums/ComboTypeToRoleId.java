@@ -15,7 +15,8 @@ public enum ComboTypeToRoleId {
     CRITIQUE_CN(1),
     CRITIQUE(2),
     EXCHANGE(3),
-    UNKNOW(-1);
+    UNKNOW(-1),
+    EXPERIENCE(3);
 
     private int value;
 
