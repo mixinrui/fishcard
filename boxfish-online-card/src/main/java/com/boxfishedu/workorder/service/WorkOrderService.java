@@ -455,11 +455,13 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             workOrderLogService.saveWorkOrderLog(workOrder,"获取教师没有发生变化");
             return;
         }
+        Long oldTeacherId=workOrder.getTeacherId();
         CourseSchedule courseSchedule=courseScheduleService.findByWorkOrderId(workOrder.getId());
         workOrder.setTeacherId(teacherView.getTeacherId());
         workOrder.setTeacherName(teacherView.getTeacherName());
         courseSchedule.setTeacherId(teacherView.getTeacherId());
         saveWorkOrderAndSchedule(workOrder,courseSchedule);
+        workOrderLogService.saveWorkOrderLog(workOrder,"课程类型变化更换教师#旧的教师["+oldTeacherId+"]");
     }
 
 }
