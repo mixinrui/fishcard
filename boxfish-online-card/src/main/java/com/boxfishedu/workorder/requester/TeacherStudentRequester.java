@@ -308,7 +308,7 @@ public class TeacherStudentRequester {
      * 获取课程过程中,如果课程类型发生变化,向师生运营发送更换教师请求
      */
     public Boolean changeTeacherForTypeChanged(WorkOrder workOrder){
-       String url = new StringBuilder(urlConf.getTeacher_service()).append("/teacher/changeYN").toString();
+       String url = new StringBuilder(urlConf.getTeacher_service()).append("/course/schedule/teacher/changeYN").toString();
         Map map = Maps.newHashMap();
         map.put("day", DateUtil.date2SimpleDate(workOrder.getStartTime()).getTime());
         map.put("timeSlotId", workOrder.getSlotId());
