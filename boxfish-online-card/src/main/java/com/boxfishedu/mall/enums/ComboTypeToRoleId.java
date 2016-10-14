@@ -32,15 +32,8 @@ public enum ComboTypeToRoleId {
         if(StringUtils.isBlank(comboType)) {
             return UNKNOW;
         }
-        switch (comboType) {
-            case "OVERALL": return OVERALL;
-            case "FOREIGN": return FOREIGN;
-            case "CHINESE": return CHINESE;
-            case "CRITIQUE_CN": return CRITIQUE_CN;
-            case "CRITIQUE": return CRITIQUE;
-            case "EXCHANGE" : return EXCHANGE;
-            default: return UNKNOW;
-        }
+        ComboTypeToRoleId result = ComboTypeToRoleId.valueOf(comboType);
+        return result == null ? UNKNOW : result;
     }
 
 }
