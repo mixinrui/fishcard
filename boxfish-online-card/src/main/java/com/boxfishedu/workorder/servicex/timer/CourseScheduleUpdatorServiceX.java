@@ -239,8 +239,10 @@ public class CourseScheduleUpdatorServiceX {
                             (w -> DateUtil.within72Hours(w.getStartTime())));
             RecommandCourseView courseView = recommendCourseMap.get(workOrder.getSeqNum());
 
-            if(!StringUtils.equals(courseView.getCourseType(), workOrder.getCourseType())) {
-                // TODO 如果已经分配老师,课程类型如果与课程推荐不匹配重新更换老师
+            // 如果已经分配老师,课程类型如果与课程推荐不匹配重新更换老师
+            if(!StringUtils.equals(courseView.getCourseType(), workOrder.getCourseType())
+                    && !Objects.isNull(workOrder.getTeacherId())) {
+                workOrderService.changeTeacherForTypeChanged(workOrder);
             }
             workOrder.initCourseInfo(courseView);
 
