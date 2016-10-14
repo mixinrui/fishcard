@@ -6,9 +6,11 @@ import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.param.ScheduleModel;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class TimePickerService {
 
     @Autowired
     private WorkOrderService workOrderService;
+
+    @Autowired
+    private CourseScheduleService courseScheduleService;
 
     //根据course_schedule获取教师
     public void getRecommandTeachers(Service service, List<CourseSchedule> courseSchedules) {
@@ -55,5 +60,12 @@ public class TimePickerService {
         fetchTeacherParam.setScheduleModelList(scheduleModelList);
         fetchTeacherParam.setUserId(service.getStudentId());
         rabbitMqSender.send(fetchTeacherParam.convertToScheduleBatchReq(), QueueTypeEnum.ASSIGN_TEACHER);
+    }
+
+    public void getRecommandTeachers(WorkOrder workOrder){
+        List<CourseSchedule> list= Lists.newArrayList();
+        CourseSchedule courseSchedule=courseScheduleService.findByWorkOrderId(workOrder.getId());
+        list.add(courseSchedule);
+        this.getRecommandTeachers(workOrder.getService(),list);
     }
 }

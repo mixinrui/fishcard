@@ -78,12 +78,12 @@ spring.datasource:
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
 
-#spring.profiles.active: local_hucl
+spring.profiles.active: local_hucl
 #spring.profiles.active: product
 #spring.profiles.active: local
 #spring.profiles.active: development
 #spring.profiles.active: development_new
-spring.profiles.active: test
+#spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
 
@@ -158,24 +158,29 @@ server.port: 8080
 interface:
   address:
     teacher_service: http://123.56.13.168:8099
-    teacher_service_admin: http://123.56.13.168:8099
-
-    course_recommended_service: http://base.boxfish.cn/recommend
+    teacher_service_admin: http://123.56.13.168:8098
+    course_recommended_service: http://123.56.13.168:8001/recommend
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
-#    course_recommended_service: http://114.55.40.98:8001
     fishcard_service: http://123.56.13.168:8080
     order_service: http://123.56.13.168:8082
     course_online_service: http://123.56.13.168:9090
-#    course_online_service: http://online-api.boxfish.cn/teaching-service
-    auth_user: http://123.56.13.168:8099
-    data_analysis_service: http://123.56.13.168:9301
-    student_teacher_relation: http://api.online.demo.boxfish.cn
+    auth_user: http://114.55.58.184:8099
+    data_analysis_service: http://114.55.65.28:9301
+    student_teacher_relation: http://api.test.boxfish.cn
+#  学生旷课扣积分
+    absenteeism_deduct_score: http://api.online.test.boxfish.cn
+#支付系统
+    pay_service: http://123.56.6.91:8888/pay-inside
+#  获取课程类型和难度
+    course_type_and_difficulty: http://base.boxfish.cn
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099
-    getPictureUrl: http://123.56.13.168:8099
+    getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9090
     innerTeacherUrl: http://123.56.13.168:8099
+  gateway:
+    type: test
 
 #===============================================================development环境:101.201.239.116 密码:Box12345678 ===============================================================
 ---

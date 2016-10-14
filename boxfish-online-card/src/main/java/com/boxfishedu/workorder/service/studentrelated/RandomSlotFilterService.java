@@ -1,8 +1,11 @@
 package com.boxfishedu.workorder.service.studentrelated;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.SlotRuleEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.mongo.TimeLimitRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
@@ -43,7 +46,7 @@ public class RandomSlotFilterService {
             return dayTimeSlots;
         }
         Date day = DateUtil.String2SimpleDate(dayTimeSlots.getDay());
-        Optional<List<SimpleTimeLimitPolicy.TimeRange>> timeRangeOptional = getExcludeDateRange(avaliableTimeParam.getComboType(), day);
+        Optional<List<SimpleTimeLimitPolicy.TimeRange>> timeRangeOptional = getExcludeDateRange(avaliableTimeParam.getComboType(),avaliableTimeParam.getTutorType(), day);
         if (!timeRangeOptional.isPresent()) {
             return dayTimeSlots;
         }
@@ -68,7 +71,19 @@ public class RandomSlotFilterService {
     }
 
     //互斥的时间片
-    private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getExcludeDateRange(String comboType, Date day) {
+    private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getExcludeDateRange(String comboType,String tutorType, Date day) {
+        switch(ComboTypeToRoleId.resolve(comboType)){
+            case EXPERIENCE:
+                if(tutorType.equals(TutorTypeEnum.CN.toString())){
+                    comboType= OrderChannelDesc.OVERALL.toString();
+                }
+                else{
+                    comboType= OrderChannelDesc.CHINESE.toString();
+                }
+                break;
+            default:
+                break;
+        }
         logger.info("@getExcludeDateRange#comboType[{}]#day[{}]", comboType, day);
         Optional<List<TimeLimitRules>> timeLimitRuleOptional = timeLimitRulesMorphiaRepository.queryByComboTypeAndRuleAndDay(comboType, SlotRuleEnum.MUTEX, DateUtil.getDayOfWeek(day));
         if (!timeLimitRuleOptional.isPresent()) {
@@ -102,7 +117,19 @@ public class RandomSlotFilterService {
     /**
      * 时间片范围
      */
-    private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getIncludeDateRange(String comboType, Date day) {
+    private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getIncludeDateRange(String comboType,String tutorType, Date day) {
+        switch(ComboTypeToRoleId.resolve(comboType)){
+            case EXPERIENCE:
+                if(tutorType.equals(TutorTypeEnum.CN.toString())){
+                    comboType= OrderChannelDesc.OVERALL.toString();
+                }
+                else{
+                    comboType= OrderChannelDesc.CHINESE.toString();
+                }
+                break;
+            default:
+                break;
+        }
         Optional<List<TimeLimitRules>> timeLimitRuleOptional = timeLimitRulesMorphiaRepository.queryByComboTypeAndRuleAndDay(comboType, SlotRuleEnum.RANGE, DateUtil.getDayOfWeek(day));
         if (!timeLimitRuleOptional.isPresent()) {
             return Optional.empty();
@@ -128,10 +155,10 @@ public class RandomSlotFilterService {
             return dayTimeSlots;
         }
         Date day = DateUtil.String2SimpleDate(dayTimeSlots.getDay());
-        Optional<List<SimpleTimeLimitPolicy.TimeRange>> timeRangeOptional = getIncludeDateRange(avaliableTimeParam.getComboType(), day);
+        Optional<List<SimpleTimeLimitPolicy.TimeRange>> timeRangeOptional = getIncludeDateRange(avaliableTimeParam.getComboType(),avaliableTimeParam.getTutorType(), day);
         if (!timeRangeOptional.isPresent()) {
             logger.debug("@removeSlotsNotInRange无可显示的slot");
-            return null;
+            return dayTimeSlots;
         }
         dayTimeSlots.setDailyScheduleTime(
                 dayTimeSlots.getDailyScheduleTime().stream().filter(
