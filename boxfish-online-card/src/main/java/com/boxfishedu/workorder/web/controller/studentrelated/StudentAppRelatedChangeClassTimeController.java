@@ -1,17 +1,12 @@
 package com.boxfishedu.workorder.web.controller.studentrelated;
 
-import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardModifyServiceX;
-import com.boxfishedu.workorder.servicex.studentrelated.*;
-import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
+import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeForChangeTimeServiceXV;
+import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
-import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 /**
