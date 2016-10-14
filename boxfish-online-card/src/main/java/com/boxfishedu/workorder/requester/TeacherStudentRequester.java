@@ -307,7 +307,7 @@ public class TeacherStudentRequester {
     /**
      * 获取课程过程中,如果课程类型发生变化,向师生运营发送更换教师请求
      */
-    public void changeTeacherForTypeChanged(WorkOrder workOrder){
+    public TeacherView changeTeacherForTypeChanged(WorkOrder workOrder){
        String url = new StringBuilder(urlConf.getTeacher_service()).append("/course/schedule/teacher/change").toString();
         Map map = Maps.newHashMap();
         map.put("day", DateUtil.date2SimpleDate(workOrder.getStartTime()).getTime());
@@ -326,5 +326,6 @@ public class TeacherStudentRequester {
             logger.error("@changeTeacherForTypeChanged#{}#returnException向师生运营获取教师失败,失败原因:[{}]", workOrder.getId(),jsonResultModel.getReturnMsg());
             throw new BusinessException("教师更换失败:" + jsonResultModel.getReturnMsg());
         }
+        return (TeacherView) jsonResultModel.getData();
     }
 }
