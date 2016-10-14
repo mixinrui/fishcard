@@ -314,9 +314,33 @@ public class DateUtil {
         return  ((int)( l / (24 * 60 * 60 * 1000)) -1);
     }
 
+    /**
+     * 48小时以内
+     * @param dateTime
+     * @return
+     */
+    public static boolean within48Hours(Date dateTime) {
+        Duration duration = Duration.between(
+                LocalDate.now().atStartOfDay(), DateUtil.convertLocalDateTime(dateTime));
+        // 课程推荐, 否则推课程类型
+        return duration.toDays() <= 2;
+    }
+
+    /**
+     * 72小时以内
+     * @param dateTime
+     * @return
+     */
+    public static boolean within72Hours(Date dateTime) {
+        Duration duration = Duration.between(
+                LocalDate.now().atStartOfDay(), DateUtil.convertLocalDateTime(dateTime));
+        // 课程推荐, 否则推课程类型
+        return duration.toDays() <= 3;
+    }
+
 
     public static void main(String[] args) {
-       System.out.print(  DateUtil.getBetweenDays(new Date(),DateUtil.addSecond(new Date(),60*24*5)));
+       within48Hours(new Date());
     }
 
 }

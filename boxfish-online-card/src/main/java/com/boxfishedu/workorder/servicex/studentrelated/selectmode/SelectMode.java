@@ -1,11 +1,13 @@
 package com.boxfishedu.workorder.servicex.studentrelated.selectmode;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by LuoLiBing on 16/9/22.
@@ -60,5 +62,38 @@ public interface SelectMode {
             }
         }
         return serviceChoice.index;
+    }
+
+    /**
+     * 创建自增序列, 兑换课【兑换课需要考虑顺序，记录下，根据不同顺序提供不同的课程】
+     * @param serviceList
+     * @param isExchange
+     * @return
+     */
+    default Map<Long, AtomicInteger> createSequences(
+            WorkOrderJpaRepository workOrderJpaRepository, List<Service> serviceList, boolean isExchange) {
+
+        Map<Long, AtomicInteger> result = new HashMap<>();
+        // 如果非兑换课程,直接使用一个从0开始的ato
+        if(!isExchange) {
+            AtomicInteger defaultAto = new AtomicInteger(0);
+            for(int i = 0, size = serviceList.size(); i < size; i++) {
+                result.put(serviceList.get(i).getId(), defaultAto);
+            }
+            return result;
+        }
+
+        // 否则需要找出这个学生同类型鱼卡最后一个序号自增
+        for(int i = 0, size = serviceList.size(); i < size; i++) {
+            Service service = serviceList.get(i);
+            Optional<Integer> maxSequence = workOrderJpaRepository.findMaxSeqNumByStudentIdComboTypeAndSkuIdExtra(
+                    service.getStudentId(), service.getComboType(), service.getSkuId().intValue());
+            Integer sequence = 0;
+            if(maxSequence.isPresent()) {
+                sequence = maxSequence.get();
+            }
+            result.put(service.getId(), new AtomicInteger(sequence));
+        }
+        return result;
     }
 }

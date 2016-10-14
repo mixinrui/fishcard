@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 /**
  * Created by hucl on 16/3/31.
@@ -163,7 +162,7 @@ StudentAppRelatedController {
         cardCourseInfo.setCourseName("中文课程");
         cardCourseInfo.setCourseId("L3NoYXJlL3N2bi_lj5Hpn7Mt5YWD6Z-z5a2X5q-NLzAwNS5h55qE5Y-R6Z-z54m55L6L56-HLnhsc3g");
         cardCourseInfo.setCourseType("PHONICS");
-        cardCourseInfo.setDifficulty(1);
+        cardCourseInfo.setDifficulty("LEVEL_1");
         cardCourseInfo.setThumbnail("http://api.boxfish.cn/student/publication/data/data/91ab245869cb67c653d2da123e66701c");
         cardCourseInfo.setStatus(30);
         cardCourseInfo.setIsFreeze(0);
@@ -177,7 +176,7 @@ StudentAppRelatedController {
         cardCourseInfo2.setCourseName("外教课程");
         cardCourseInfo2.setCourseId("L3NoYXJlL3N2bi9GdW5jdGlvbiDotK3niakvNjExLuWmguS9leihqOi-vuWVhuWTgeWHj-S7t--8ny54bHN4");
         cardCourseInfo2.setCourseType("PHONICS");
-        cardCourseInfo2.setDifficulty(1);
+        cardCourseInfo2.setDifficulty("LEVEL_1");
         cardCourseInfo2.setThumbnail("http://api.boxfish.cn/student/publication/data/data/b91a4adf3407882bf75a329f60e4dd24");
         cardCourseInfo2.setStatus(30);
         cardCourseInfo2.setIsFreeze(1);
@@ -191,7 +190,7 @@ StudentAppRelatedController {
         cardCourseInfo3.setCourseName("外教点评");
         cardCourseInfo3.setCourseId("L3NoYXJlL3N2bi9Ub3BpY1_ml4XmuLjkuI7kuqTpgJovMDAzLuaDs-imgemBqOa4uOWkquepuu-8jOS9oOimgemAmui_h-i_meWHoOWFsy54bHN4");
         cardCourseInfo3.setCourseType("PHONICS");
-        cardCourseInfo3.setDifficulty(1);
+        cardCourseInfo3.setDifficulty("LEVEL_1");
         cardCourseInfo3.setThumbnail("http://api.boxfish.cn/student/publication/data/data/51ec2314d184d70fba6b938535c3350d");
         cardCourseInfo3.setStatus(200);
         cardCourseInfo3.setStudentReadFlag(0);

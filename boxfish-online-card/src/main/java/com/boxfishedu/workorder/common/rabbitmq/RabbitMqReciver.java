@@ -183,6 +183,8 @@ public class RabbitMqReciver {
                 courseNotifyOneDayServiceX.notiFyTeacherClass();
             }else if(serviceTimerMessage.getType()==TimerMessageType.FREEZE_UPDATE_HOME.value()){
                 courseScheduleUpdatorServiceX.freezeUpdateHome();
+            } else if(serviceTimerMessage.getType() == TimerMessageType.RECOMMEND_COURSES.value()) {
+                courseScheduleUpdatorServiceX.recommendCourses();
             }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);

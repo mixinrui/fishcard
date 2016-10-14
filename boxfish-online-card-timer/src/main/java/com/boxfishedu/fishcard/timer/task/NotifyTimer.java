@@ -244,4 +244,15 @@ public class NotifyTimer {
         serviceTimerMessage.setBody(null);
         rabbitMqSender.send(serviceTimerMessage);
     }
+
+    // 课程推荐
+//    @Scheduled(cron = "0 0 3 * * ?")
+    @Scheduled(cron = "0/10 * * * * ?")
+    public void recommendCourses(){
+        logger.info("<<<<<<recommendCourses<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<课程推荐<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 }

@@ -1,19 +1,18 @@
 package com.boxfishedu.workorder.entity.mysql;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.mongodb.morphia.annotations.*;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
-
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -236,6 +235,24 @@ public class WorkOrder{
         setCourseId(courseView.getCourseId());
         setCourseName(courseView.getCourseName());
         setCourseType(courseView.getCourseType());
-        setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+
+        // 课程ID不为空,状态为分配老师,不予修改状态
+        if(StringUtils.isNotEmpty(courseView.getCourseId()) && (status == FishCardStatusEnum.CREATED.getCode())) {
+            setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+        }
+    }
+
+    @JsonIgnore
+    public int getRecommendSequence() {
+        if(Objects.isNull(seqNum)) {
+            throw new BusinessException("错误的序列号!!");
+        }
+
+        if(seqNum%8==0){
+            return 8;
+        }
+        else{
+            return seqNum%8;
+        }
     }
 }

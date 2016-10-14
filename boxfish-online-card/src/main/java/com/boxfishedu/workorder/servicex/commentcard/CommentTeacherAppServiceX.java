@@ -168,7 +168,7 @@ public class CommentTeacherAppServiceX {
                     cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
                 }
                 if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
-                    cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()));
+                    cardCourseInfo.setDifficulty(typeAndDifficultyMap.get("courseDifficulty").toString());
                 }
             }
         }

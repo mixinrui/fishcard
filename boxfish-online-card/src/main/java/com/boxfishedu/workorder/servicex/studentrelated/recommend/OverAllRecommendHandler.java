@@ -45,7 +45,8 @@ public class OverAllRecommendHandler extends DefaultRecommendHandler {
 
 
     public boolean isSupportBatchExecute(List<WorkOrder> workOrders) {
-        return (workOrders.size() % 8 == 0);
+        return false;
+//        return (workOrders.size() % 8 == 0);
     }
 
 

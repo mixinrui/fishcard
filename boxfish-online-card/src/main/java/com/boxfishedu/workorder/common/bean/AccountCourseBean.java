@@ -19,7 +19,7 @@ public class AccountCourseBean {
         private String courseId;
         private String courseName;
         private String courseType;
-        private Integer difficulty;
+        private String difficulty;
         private String thumbnail;
         private Integer isFreeze;
         private Integer studentReadFlag;

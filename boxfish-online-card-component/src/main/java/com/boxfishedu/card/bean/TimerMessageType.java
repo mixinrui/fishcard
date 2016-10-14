@@ -39,7 +39,10 @@ public enum TimerMessageType {
     CLASSS_TODY_TEA_NOTIFY(108),
 
     //冻结鱼卡处理
-    FREEZE_UPDATE_HOME(120);
+    FREEZE_UPDATE_HOME(120),
+
+    // 课程推荐
+    RECOMMEND_COURSES(130);
     private int code;
 
     private TimerMessageType(int code) {

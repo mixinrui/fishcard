@@ -60,6 +60,7 @@ public class RecommendHandlerHelper {
             }
             return resultMap;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new BusinessException("暂时没有与你的水平匹配的课程，新课即将上线，请过些时候再选课或者调整学习设置");
         }
 

@@ -4,6 +4,7 @@
 package com.boxfishedu.workorder.dao.jpa;
 
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -85,4 +86,8 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     @Query("select concat(c.classDate,' ',c.timeSlotId) from CourseSchedule c where c.studentId=?1 and c.classDate=?2 and c.status<40")
     Set<String> findUnfinishByStudentIdAndCurrentDate(Long studentId, Date Date);
+
+    // 查找48小时以内,没有课程推荐的课表
+    @Query("select c from CourseSchedule c where c.classDate<?1 and c.courseId is null")
+    List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
 }

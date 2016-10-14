@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.dao.jpa;
 
-import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,12 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.LockModeType;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -150,4 +148,11 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     List<WorkOrder> findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(Integer freezeFlag,Short isCourseOver,Integer status,Date startTime);
 
+    // 获取兑换类型一个种类下最大的一个序号
+    @Query("select max(w.seqNum) from WorkOrder w where w.studentId=?1 and w.comboType=?2 and w.skuIdExtra=?3")
+    Optional<Integer> findMaxSeqNumByStudentIdComboTypeAndSkuIdExtra(Long studentId, String comboType, Integer skuIdExtra);
+
+    // 查找48小时以内,没有推荐课程的鱼卡
+    @Query("select w from WorkOrder w where w.startTime<?1 and w.courseId is null")
+    List<WorkOrder> findWithinHoursCreatedWorkOrderList(Date endTime);
 }

@@ -16,6 +16,11 @@ public class UrlConf {
     private String teacher_service_admin;//师生运营后台服务
     @Value("${interface.address.course_recommended_service}")
     private String course_recommended_service;
+
+    // 新课程推荐
+    @Value(("${interface.address.course_wudaokou_recommend_service}"))
+    private String course_wudaokou_recommend_service;
+
     @Value("${interface.address.fishcard_service}")
     private String fishcard_service;
     @Value("${interface.address.course_online_service}")

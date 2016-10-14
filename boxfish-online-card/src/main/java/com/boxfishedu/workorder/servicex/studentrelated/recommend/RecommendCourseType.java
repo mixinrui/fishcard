@@ -10,7 +10,7 @@ import static com.boxfishedu.workorder.servicex.studentrelated.recommend.CourseT
  */
 public class RecommendCourseType {
 
-    // 脱胎换股
+    // 核心素养
     private final static CourseType[] CN_RECOMMEND = {FUNCTION, FUNCTION,CONVERSATION,PHONICS,EXAMINATION,READING,FUNCTION,FUNCTION};
 
     private final static int CN_RECOMMEND_LEN = CN_RECOMMEND.length;
@@ -24,15 +24,17 @@ public class RecommendCourseType {
 
     private final static int FRN = 1;
 
-    public RecommandCourseView recommendCN(int index) {
-        return recommend(CN, index);
+    public static RecommandCourseView recommendCN(int index) {
+        // workOrder起始号为1
+        return recommend(CN, index - 1);
     }
 
-    public RecommandCourseView recommendFRN(int index) {
-        return recommend(FRN, index);
+    public static RecommandCourseView recommendFRN(int index) {
+        // workOrder起始号为1
+        return recommend(FRN, index - 1);
     }
 
-    private RecommandCourseView recommend(int type, int index) {
+    private static RecommandCourseView recommend(int type, int index) {
         int len;
         CourseType[] courseTypes;
         if(type == CN) {
