@@ -321,7 +321,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                         service = getServiceByOrderView(orderView, productComboDetail, productCombo, isOverAll);
                         services.add(service);
                         serviceHashMap.put(key, service);
-                    }});
+                                }});
 
         // service的开始日期,结束日期设置
         addValidTimeForServices(services);

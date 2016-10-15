@@ -257,7 +257,7 @@ public class FishCardModifyServiceX {
         Long oldTeacherId= workOrder.getTeacherId();
         String oldStartTime=StringUtils.EMPTY;
         if(null!=workOrder.getStartTime()){
-            oldStartTime=DateUtil.date2SimpleString(workOrder.getStartTime());
+            oldStartTime=DateUtil.Date2String(workOrder.getStartTime());
         }
         String oldTeacherName= StringUtils.EMPTY;
         if(!StringUtils.isEmpty(workOrder.getTeacherName())){
