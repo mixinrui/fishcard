@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.common.login;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -37,6 +38,9 @@ public class LoginService {
 
     @Autowired
     private WorkOrderUserService workOrderUserService;
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
     /**
      * 从db中加载用户信息 到redis中
@@ -146,68 +150,83 @@ public class LoginService {
      * @return
      */
     public boolean  checkToken(String token){
-        boolean flag = true;
-        if(StringUtils.isEmpty(token) || StringUtils.isEmpty(token.trim())){
+        if (null == token) {
+            logger.info("@checkToken - 非法登陆");
+            throw new RuntimeException("非法登陆,传入参数不能为空");
+        }
+
+        JsonResultModel  jsonResultModel = teacherStudentRequester.checkTokenCommon(token);
+        if(jsonResultModel!=null && jsonResultModel.getReturnCode()==0){
+            return true;
+        }else{
             return false;
         }
 
-        //更新redis中的 token
-        if(flag){
-            String userName = null;//登陆用户账号
-            String realTokennew =null;//新的realtoken
-
-            try{
-                userName = tokenUtils.getUserName(token);
-                realTokennew =DateUtil.Date2String24(new Date());
-            }catch (Exception e){
-                e.printStackTrace();
-                return false;
-            }
-            String userInfo = this.getUserInfo(userName);
 
 
-            try{
-                if(!StringUtils.isEmpty(userInfo)){
-                    JSONObject json = JSON.parseObject(userInfo);
 
-                    // 比较token 传入token  和  redis中的token
-                    if(StringUtils.isEmpty(json.get("token"))){
-                        return false;
-                    }
-
-                    // token 过期
-                    if (!token.equals( json.get("token") )){
-                        return  false;
-                    }
-
-
-                    String realToken =  json.get("realtoken")==null?null:json.get("realtoken").toString();
-
-                    if(!StringUtils.isEmpty( realToken)){
-                        if(tokenUtils.isTokenCanUsed(realToken)){
-                            logger.info("用户{[]}进行上述操作",userName);// 记录访问日志
-                            // 更新最新的token
-                            json.put("realtoken",realTokennew);
-                            this.updateUserInfo(userName,json.toString());
-                            logger.info("更新最新的realTokennew(时间)={}",realTokennew);
-                        }else {
-                            return false;
-                        }
-                    }else {
-                        return false;
-                    }
-
-                }else {
-                    return  false;
-                }
-            }catch (Exception e){
-                logger.info("用户信息有错误,或遭受恶意攻击");
-                e.printStackTrace();
-                return  false;
-            }
-        }
-
-        return  flag;
+//        boolean flag = true;
+//        if(StringUtils.isEmpty(token) || StringUtils.isEmpty(token.trim())){
+//            return false;
+//        }
+//
+//        //更新redis中的 token
+//        if(flag){
+//            String userName = null;//登陆用户账号
+//            String realTokennew =null;//新的realtoken
+//
+//            try{
+//                userName = tokenUtils.getUserName(token);
+//                realTokennew =DateUtil.Date2String24(new Date());
+//            }catch (Exception e){
+//                e.printStackTrace();
+//                return false;
+//            }
+//            String userInfo = this.getUserInfo(userName);
+//
+//
+//            try{
+//                if(!StringUtils.isEmpty(userInfo)){
+//                    JSONObject json = JSON.parseObject(userInfo);
+//
+//                    // 比较token 传入token  和  redis中的token
+//                    if(StringUtils.isEmpty(json.get("token"))){
+//                        return false;
+//                    }
+//
+//                    // token 过期
+//                    if (!token.equals( json.get("token") )){
+//                        return  false;
+//                    }
+//
+//
+//                    String realToken =  json.get("realtoken")==null?null:json.get("realtoken").toString();
+//
+//                    if(!StringUtils.isEmpty( realToken)){
+//                        if(tokenUtils.isTokenCanUsed(realToken)){
+//                            logger.info("用户{[]}进行上述操作",userName);// 记录访问日志
+//                            // 更新最新的token
+//                            json.put("realtoken",realTokennew);
+//                            this.updateUserInfo(userName,json.toString());
+//                            logger.info("更新最新的realTokennew(时间)={}",realTokennew);
+//                        }else {
+//                            return false;
+//                        }
+//                    }else {
+//                        return false;
+//                    }
+//
+//                }else {
+//                    return  false;
+//                }
+//            }catch (Exception e){
+//                logger.info("用户信息有错误,或遭受恶意攻击");
+//                e.printStackTrace();
+//                return  false;
+//            }
+//        }
+//
+//        return  flag;
     }
 
 

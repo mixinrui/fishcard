@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -328,4 +330,38 @@ public class TeacherStudentRequester {
         }
         return (TeacherView) jsonResultModel.getData();
     }
+
+    /**
+     * token验证接口
+     * @param token
+     * @return
+     */
+    public JsonResultModel checkTokenCommon(String token) {
+        String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/query/self";
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("BoxFishAccessToken", token);
+        HttpEntity request = new HttpEntity(httpHeaders);
+        JsonResultModel tokenCheckObject;
+        try {
+            tokenCheckObject = restTemplate.postForObject(url, request, JsonResultModel.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            tokenCheckObject = null;
+        }
+        return tokenCheckObject;
+    }
+
+    public JsonResultModel checkTokenPrivilege(String token,String path) {
+        String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/verification?systemName=" + urlConf.getTeacher_service() +"&accessToken="+token+"&requestURI="+path;
+        JsonResultModel tokenReturnBean;
+        try {
+            tokenReturnBean = restTemplate.getForObject(url, JsonResultModel.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            tokenReturnBean = null;
+        }
+
+        return tokenReturnBean;
+    }
+
 }
