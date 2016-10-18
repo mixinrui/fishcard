@@ -338,6 +338,7 @@ public class TeacherStudentRequester {
      */
     public JsonResultModel checkTokenCommon(String token) {
         String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/query/self";
+        logger.info("checkTokenPrivilege - [{}]",url);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("BoxFishAccessToken", token);
         HttpEntity request = new HttpEntity(httpHeaders);
@@ -352,7 +353,8 @@ public class TeacherStudentRequester {
     }
 
     public JsonResultModel checkTokenPrivilege(String token,String path) {
-        String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/verification?systemName=" + urlConf.getTeacher_service() +"&accessToken="+token+"&requestURI="+path;
+        String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/verification?systemName=" + "FishCardCenter" +"&accessToken="+token+"&requestURI="+path;
+        logger.info("checkTokenPrivilege - [{}]",url);
         JsonResultModel tokenReturnBean;
         try {
             tokenReturnBean = restTemplate.getForObject(url, JsonResultModel.class);

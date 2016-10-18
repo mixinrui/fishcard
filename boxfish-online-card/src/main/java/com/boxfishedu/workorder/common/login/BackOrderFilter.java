@@ -65,6 +65,7 @@ public class BackOrderFilter extends OncePerRequestFilter {
 
         logger.info("后台登陆url={}"+url);
         String token = request.getParameter("token");
+        String URI  = request.getRequestURI();
         // 获取token
         if(StringUtils.isEmpty(token) || StringUtils.isEmpty(token.trim())){
             errorTokenHandle(response, String.format("token为空,token:[%s]", token));
@@ -72,6 +73,9 @@ public class BackOrderFilter extends OncePerRequestFilter {
         } else {
             if(!loginService.checkToken(token)){
                 errorTokenHandle(response, String.format("token无效,token:[%s]", token));
+                return;
+            }else if(!loginService.checkURI(token,URI)){
+                errorTokenHandle(response, String.format("URI无效,token:[%s]", token));
                 return;
             }
         }

@@ -144,6 +144,19 @@ public class LoginService {
      }
 
 
+    public boolean checkURI(String token,String URI){
+        if(null == URI){
+            logger.info("@checkURI - 非法登陆");
+            throw new RuntimeException("非法登陆,URL非空");
+        }
+        JsonResultModel  jsonResultModel = teacherStudentRequester.checkTokenPrivilege(token,URI);
+        if(jsonResultModel!=null && jsonResultModel.getReturnCode()==0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     /**
      * 验证token 是否有效
      * @param token

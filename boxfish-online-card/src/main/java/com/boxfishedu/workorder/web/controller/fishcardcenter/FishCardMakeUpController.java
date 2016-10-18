@@ -80,7 +80,6 @@ public class FishCardMakeUpController {
     public JsonResultModel fishcardConfirmStatusRecharge(@RequestBody MakeUpCourseParam makeUpCourseParam)throws Exception{
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String token = request.getParameter("token");
-
         if(StringUtils.isEmpty(token)){
             logger.info("fishcardConfirmStatusRecharge1 用户无权操作该功能");
             return JsonResultModel.newJsonResultModel("fishcardConfirmStatusRecharge1 用户名无权操作该功能");
