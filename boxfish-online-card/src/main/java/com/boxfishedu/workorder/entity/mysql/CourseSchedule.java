@@ -46,7 +46,7 @@ public class CourseSchedule {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
-    private Date createTime = DateTime.now().toDate();
+    private Date createTime;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
