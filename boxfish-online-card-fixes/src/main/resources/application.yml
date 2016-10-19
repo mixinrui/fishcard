@@ -10,10 +10,10 @@ logging:
 
 
 #spring.profiles.active: local_hucl
-spring.profiles.active: product
+#spring.profiles.active: product
 #spring.profiles.active: local
 #spring.profiles.active: development
-#spring.profiles.active: luo
+spring.profiles.active: luo
 #spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
@@ -35,7 +35,7 @@ spring:
   profiles: luo
 
 ##################接口调用地址
-server.port: 8080
+server.port: 7777
 
 ---
 spring:
@@ -51,5 +51,5 @@ spring:
   profiles: product
 
 server.servlet-path: /fishcard
-server.port: 9999
+server.port: 7777
 ##################接口调用地址
