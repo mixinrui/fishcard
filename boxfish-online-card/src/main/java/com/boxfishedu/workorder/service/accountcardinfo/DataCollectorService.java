@@ -8,9 +8,12 @@ import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.servicex.studentrelated.recommend.DefaultRecommendHandler;
+import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -42,6 +45,12 @@ public class DataCollectorService {
 
     @Autowired
     private ThreadPoolManager threadPoolManager;
+
+    @Autowired
+    private DefaultRecommendHandler defaultRecommendHandler;
+
+    @Autowired
+    private CourseScheduleService courseScheduleService;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -142,6 +151,10 @@ public class DataCollectorService {
         if(null==latestWorkOrder){
             accountCourseBean.setCourseInfo(null);
             return accountCourseBean;
+        }
+        if(null==latestWorkOrder.getCourseId()){
+            RecommandCourseView recommandCourseView=defaultRecommendHandler.recommandCourseView(latestWorkOrder);
+            courseScheduleService.
         }
         ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
