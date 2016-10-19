@@ -87,7 +87,7 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         expires.put(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO,3600 * 24 * 30 *12 * 15L);
         expires.put(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY,60*10l);
         // 防重复选时间缓存
-        expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 5l);
+        expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 2L);
         cacheManager.setExpires(expires);
         return cacheManager;
     }

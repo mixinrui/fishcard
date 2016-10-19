@@ -2,7 +2,6 @@ package com.boxfishedu.workorder.servicex.timer;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
-import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
@@ -10,12 +9,10 @@ import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
-import com.boxfishedu.workorder.servicex.studentrelated.recommend.DefaultRecommendHandler;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
@@ -71,15 +68,6 @@ public class CourseScheduleUpdatorServiceX {
 
     @Autowired
     private CourseScheduleRepository courseScheduleRepository;
-
-    @Autowired
-    private ScheduleCourseInfoService scheduleCourseInfoService;
-
-    @Autowired
-    private DefaultRecommendHandler defaultRecommendHandler;
-
-    @Autowired
-    private UrlConf urlConf;
 
     //定时任务，向师生运营组获取教师
 //    @Scheduled(cron="*/10 * * * * ?")

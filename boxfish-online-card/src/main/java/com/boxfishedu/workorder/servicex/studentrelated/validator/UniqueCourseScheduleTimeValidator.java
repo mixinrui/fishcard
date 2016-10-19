@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
-import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -35,7 +35,7 @@ public class UniqueCourseScheduleTimeValidator implements StudentTimePickerValid
         if(classDateTimeSlotsSet.contains(
                 String.join(" ", DateUtil.simpleDate2String(workOrder.getStartTime()),
                         workOrder.getSlotId().toString()))) {
-            throw new BusinessException(exceptionProducer.get());
+            throw new ValidationException(exceptionProducer.get());
         }
     }
 }

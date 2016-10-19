@@ -25,6 +25,11 @@ public class RepeatedSubmissionChecker {
      * @return
      */
     public boolean checkRepeatedSubmission(Long serviceId) {
+        // 不存在的时候返回false,存在的时候返回true
         return (cache.putIfAbsent(serviceId, true) != null);
+    }
+
+    public void evictRepeatedSubmission(Long serviceId) {
+        cache.evict(serviceId);
     }
 }

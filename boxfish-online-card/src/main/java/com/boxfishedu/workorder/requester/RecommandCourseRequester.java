@@ -127,7 +127,7 @@ public class RecommandCourseRequester {
 
     //课程完成后,通知推荐课程服务
     public void notifyCompleteCourse(WorkOrder workOrder) {
-        String url = String.format("%s/core/counter/user_id/%s/lesson_id/%s", urlConf.getCourse_recommended_service(),
+        String url = String.format("%s/counter/user_id/%s/lesson_id/%s", urlConf.getCourse_recommended_service(),
                 workOrder.getStudentId(), workOrder.getCourseId());
         logger.info("上课结束,通知推荐课url::::[{}]", url);
         threadPoolManager.execute(new Thread(() -> {
@@ -170,9 +170,8 @@ public class RecommandCourseRequester {
      * @return
      */
     public RecommandCourseView getPromoteRecommend(Long studentId, int index) {
-        return restTemplate.postForObject(
+        return restTemplate.getForObject(
                 createPromoteRecommend(studentId, index),
-                HttpEntity.EMPTY,
                 RecommandCourseView.class);
     }
 
@@ -214,7 +213,7 @@ public class RecommandCourseRequester {
 
     private URI createOverAllRecommend(Long studentId) {
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
-                .path("/core/online/" + studentId)
+                .path("/online/" + studentId)
                 .build()
                 .toUri();
 
@@ -231,7 +230,7 @@ public class RecommandCourseRequester {
     // 核心素养 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/promote/18826/9
     private URI createPromoteRecommend(Long studentId, int index) {
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
-                .path(String.format("/core/promote/%s/%s", studentId, index))
+                .path(String.format("/promote/%s/%s", studentId, index))
                 .build()
                 .toUri();
     }
@@ -256,7 +255,7 @@ public class RecommandCourseRequester {
     // 核心素养换课 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/exchange/promote/18826/1/L3NoYXJlL3N2bi9GdW5jdGlvbiDlhbPliIcvMzEyLuWmguS9leihqOi-vuaLheW_g-afkOS6i—8ny54bHN4
     private URI createPromoteExchangeCourse(Long studentId, int index, String lessonId) {
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
-                .path(String.format("/core/exchange/promote/%s/%s/%s", studentId.toString(), index, lessonId))
+                .path(String.format("/exchange/promote/%s/%s/%s", studentId.toString(), index, lessonId))
                 .build()
                 .toUri();
     }

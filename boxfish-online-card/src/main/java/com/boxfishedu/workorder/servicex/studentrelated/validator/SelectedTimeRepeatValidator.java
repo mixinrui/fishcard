@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
-import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
@@ -34,7 +34,7 @@ public class SelectedTimeRepeatValidator implements StudentTimePickerValidator {
         for(SelectedTime selectedTime : selectedTimes) {
             if(!selectTimesSet.add(selectedTime.getSelectedDate() + "-" + selectedTime.getTimeSlotId())) {
                 TimeSlots timeSlot = teacherStudentRequester.getTimeSlot(selectedTime.getTimeSlotId());
-                throw new BusinessException("选择有重复的时间"
+                throw new ValidationException("选择有重复的时间"
                         + selectedTime.getSelectedDate() + " " + timeSlot.getStartTime());
             }
         }

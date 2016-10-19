@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
-import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
@@ -33,12 +33,12 @@ public class SelectedCountValidator implements StudentTimePickerValidator {
                     .filter(service -> Objects.equals(service.getProductType(), 1001))
                     .collect(Collectors.summingInt(Service::getAmount));
             if(!Objects.equals(count, selectedTimes.size())) {
-                throw new BusinessException("选择的上课次数不符合规范");
+                throw new ValidationException("选择的上课次数不符合规范");
             }
         } else {
             if((TemplateSelectMode.createSelectTemplateParam(timeSlotParam, serviceList).getNumPerWeek())
                     != selectedTimes.size()) {
-                throw new BusinessException("选择的上课次数不符合规范");
+                throw new ValidationException("选择的上课次数不符合规范");
             }
         }
     }
@@ -48,7 +48,7 @@ public class SelectedCountValidator implements StudentTimePickerValidator {
         // 防止选课次数和提交鱼卡的次数不一致
         Integer count = serviceList.stream().collect(Collectors.summingInt(Service::getAmount));
         if(!Objects.equals(count, workOrderList.size())) {
-            throw new BusinessException("选择的上课次数超过了可选次数");
+            throw new ValidationException("选择的上课次数超过了可选次数");
         }
     }
 }

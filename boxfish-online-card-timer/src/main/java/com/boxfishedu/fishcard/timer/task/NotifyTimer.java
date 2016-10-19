@@ -246,8 +246,8 @@ public class NotifyTimer {
     }
 
     // 课程推荐
-    @Scheduled(cron = "0 0 3 * * ?")
-//    @Scheduled(cron = "0/10 * * * * ?")
+//    @Scheduled(cron = "0 0 3 * * ?")
+    @Scheduled(cron = "* 0/5 * * * ?")
     public void recommendCourses(){
         logger.info("<<<<<<recommendCourses<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<课程推荐<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));

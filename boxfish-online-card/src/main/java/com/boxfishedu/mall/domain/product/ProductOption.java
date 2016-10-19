@@ -2,6 +2,7 @@ package com.boxfishedu.mall.domain.product;
 
 import com.boxfishedu.mall.common.BaseEntity;
 import com.boxfishedu.mall.enums.Flag;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.EnumType;
@@ -10,6 +11,7 @@ import javax.persistence.Transient;
 import java.util.List;
 
 @Data(staticConstructor = "getInstance")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductOption extends BaseEntity {
 
     private static final long serialVersionUID = 4586015255652379024L;

@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.servicex.timer;
 
-import com.boxfishedu.workorder.common.config.ApplicationContextAccessor;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
@@ -14,6 +13,8 @@ import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.DefaultRecommendHandler;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
@@ -24,31 +25,42 @@ import java.util.Objects;
 /**
  * Created by LuoLiBing on 16/10/19.
  */
+@Component
 public class RecommendCourseTask implements Runnable {
 
-    private final static DefaultRecommendHandler defaultRecommendHandler =
-            ApplicationContextAccessor.getBean(DefaultRecommendHandler.class);
+    private static DefaultRecommendHandler defaultRecommendHandler;
 
-    private final static WorkOrderService workOrderService =
-            ApplicationContextAccessor.getBean(WorkOrderService.class);
+    private static WorkOrderService workOrderService;
 
-    private final static WorkOrderJpaRepository workOrderJpaRepository =
-            ApplicationContextAccessor.getBean(WorkOrderJpaRepository.class);
+    private static WorkOrderJpaRepository workOrderJpaRepository;
 
-    private final static WorkOrderLogService workOrderLogService =
-            ApplicationContextAccessor.getBean(WorkOrderLogService.class);
+    private static WorkOrderLogService workOrderLogService;
 
-    private final static ScheduleCourseInfoService scheduleCourseInfoService =
-            ApplicationContextAccessor.getBean(ScheduleCourseInfoService.class);
+    private static ScheduleCourseInfoService scheduleCourseInfoService;
 
-    private final static UrlConf urlConf = ApplicationContextAccessor.getBean(UrlConf.class);
+    private static UrlConf urlConf;
 
-    private final static CourseScheduleRepository courseScheduleRepository =
-            ApplicationContextAccessor.getBean(CourseScheduleRepository.class);
+    private static CourseScheduleRepository courseScheduleRepository;
+
+    @Autowired
+    public void autowired(DefaultRecommendHandler defaultRecommendHandler, WorkOrderService workOrderService,
+                          WorkOrderJpaRepository workOrderJpaRepository, WorkOrderLogService workOrderLogService,
+                          ScheduleCourseInfoService scheduleCourseInfoService, UrlConf urlConf,
+                          CourseScheduleRepository courseScheduleRepository) {
+        RecommendCourseTask.defaultRecommendHandler = defaultRecommendHandler;
+        RecommendCourseTask.workOrderService = workOrderService;
+        RecommendCourseTask.workOrderJpaRepository = workOrderJpaRepository;
+        RecommendCourseTask.workOrderLogService = workOrderLogService;
+        RecommendCourseTask.scheduleCourseInfoService = scheduleCourseInfoService;
+        RecommendCourseTask.courseScheduleRepository = courseScheduleRepository;
+        RecommendCourseTask.urlConf = urlConf;
+    }
 
     private List<WorkOrder> workOrders;
 
     private Map<Long,CourseSchedule> courseScheduleMap;
+
+    public RecommendCourseTask() {}
 
     public RecommendCourseTask(List<WorkOrder> workOrders, Map<Long,CourseSchedule> courseScheduleMap) {
         this.workOrders = workOrders;
@@ -91,14 +103,12 @@ public class RecommendCourseTask implements Runnable {
                         courseView.getCourseType(), courseView.getCourseId(), courseView.getCourseName()));
 
         // 保存mongo课程信息
-        ScheduleCourseInfo scheduleCourseInfo = ScheduleCourseInfo.create(
-                urlConf.getThumbnail_server(), courseSchedule, courseView);
-        scheduleCourseInfoService.save(scheduleCourseInfo);
-
-        if(Objects.isNull(courseSchedule)) {
-            System.err.println(String.format("[%s]鱼卡无对应的课表记录", workOrder.getId()));
-            return;
+        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(workOrder.getId());
+        if(scheduleCourseInfo == null) {
+            scheduleCourseInfo = new ScheduleCourseInfo(workOrder.getId(), courseSchedule.getId());
         }
+        scheduleCourseInfo.initRecommendCourse(urlConf.getThumbnail_server(), courseView);
+        scheduleCourseInfoService.save(scheduleCourseInfo);
 
         // 保存课表数据
         courseSchedule.setStatus(workOrder.getStatus());

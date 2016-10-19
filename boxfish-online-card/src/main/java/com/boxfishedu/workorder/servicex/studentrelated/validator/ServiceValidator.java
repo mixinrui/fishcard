@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
-import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
@@ -25,11 +25,11 @@ public class ServiceValidator implements StudentTimePickerValidator {
     public void prepareValidate(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> serviceList) {
         for(Service service : serviceList) {
             if(checker.checkRepeatedSubmission(service.getId())) {
-                throw new BusinessException("正在提交当中,请稍候...");
+                throw new RepeatedSubmissionException("正在提交当中,请稍候...");
             }
 
             if (service.getCoursesSelected() == 1) {
-                throw new BusinessException("该订单已经完成选课,请勿重复选课");
+                throw new ValidationException("该订单已经完成选课,请勿重复选课");
             }
         }
     }

@@ -5,6 +5,7 @@ import com.boxfishedu.mall.enums.Flag;
 import com.boxfishedu.mall.enums.OrderChannel;
 import com.boxfishedu.mall.enums.OrderSource;
 import com.boxfishedu.mall.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,6 +14,7 @@ import javax.persistence.Enumerated;
 
 @Data(staticConstructor = "getInstance")
 @EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderForm extends BaseEntity {
 
     private static final long serialVersionUID = 4677220636490502012L;

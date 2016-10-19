@@ -18,6 +18,7 @@ import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendHandlerHelper;
 import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
 import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectModeFactory;
+import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionChecker;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.StudentTimePickerValidatorSupport;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -81,6 +82,9 @@ public class TimePickerServiceXV1 {
     @Autowired
     private DataCollectorService dataCollectorService;
 
+    @Autowired
+    private RepeatedSubmissionChecker repeatedSubmissionChecker;
+
     /**
      * 学生选择时间
      * @param timeSlotParam
@@ -124,6 +128,9 @@ public class TimePickerServiceXV1 {
         notifyOtherModules(workOrderList, serviceList.get(0));
 
         logger.info("学生[{}]选课结束", serviceList.get(0).getStudentId());
+
+        // 清除重复提交的缓存
+        serviceList.forEach(service -> repeatedSubmissionChecker.evictRepeatedSubmission(service.getId()));
         return JsonResultModel.newJsonResultModel();
     }
 

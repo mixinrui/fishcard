@@ -89,6 +89,7 @@ public class TemplateSelectMode implements SelectMode {
 //            int per = (count / loopOfWeek == 0 ? 1 : count / loopOfWeek);
 //            logger.info("weekStrategy= loopOfWeek:[{}],per:[{}]", loopOfWeek, per);
 //            return new SelectTemplateParam((count + per -1) / per, per, count);
+
             int loopOfWeek = services.get(0).getComboCycle();
             int numPerWeek = services.get(0).getCountInMonth();
             return new SelectTemplateParam(loopOfWeek, numPerWeek, count);

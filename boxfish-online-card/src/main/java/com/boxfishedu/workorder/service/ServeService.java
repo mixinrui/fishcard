@@ -310,7 +310,6 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         productCombo.getComboDetails().forEach( productComboDetail -> {
             // 改成用comboCode作为分组字段
             String key = productComboDetail.getComboCode();
-            // todo 兼容老版本
             if(StringUtils.isEmpty(key)) {
                 if(isOverAll) {
                     key = productCombo.getComboType().name();
@@ -446,7 +445,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOrderId(orderView.getId());
         service.setOriginalAmount(productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
-        service.setSkuId(productComboDetail.getComboId());
+        service.setSkuId(productCombo.getId());
         // 课程类型
         if(isOverAll) {
             service.setTutorType(TutorType.MIXED.name());
@@ -464,13 +463,15 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setValidityDay(365);
         service.setOrderChannel(orderView.getOrderChannel().name());
 
-        ComboDurations duration = productCombo.getComboDurations();
-        if(duration != null) {
-            if(duration.getDurationWeeks() != null) {
-                service.setComboCycle(duration.getDurationWeeks());
-            }
-            if(duration.getPerWeekCourseCount() != null) {
-                service.setCountInMonth(duration.getPerWeekCourseCount());
+        List<ComboDurations> durations = productCombo.getComboDurations();
+        if(CollectionUtils.isNotEmpty(durations)) {
+            for(int i = 0, size = durations.size(); i < size;  i++) {
+                ComboDurations duration = durations.get(i);
+                if(Objects.equals(duration.getComboCode(), productComboDetail.getComboCode())) {
+                    service.setComboCycle(duration.getDurationWeeks());
+                    service.setCountInMonth(duration.getPerWeekCourseCount());
+                    break;
+                }
             }
         }
         return service;
