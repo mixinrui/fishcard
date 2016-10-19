@@ -154,7 +154,7 @@ public class DataCollectorService {
         }
         if(null==latestWorkOrder.getCourseId()){
             RecommandCourseView recommandCourseView=defaultRecommendHandler.recommandCourseView(latestWorkOrder);
-            courseScheduleService.
+//            courseScheduleService.
         }
         ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
