@@ -14,6 +14,7 @@
         <module>boxfish-online-card-component</module>
         <module>boxfish-online-card-mail</module>
         <module>boxfish-online-card-comment-manage</module>
+        <module>boxfish-online-card-fixes</module>
     </modules>
 
 

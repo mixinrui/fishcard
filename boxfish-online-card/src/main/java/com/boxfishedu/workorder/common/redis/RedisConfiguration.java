@@ -86,6 +86,8 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         //  鱼卡后台 用户信息永久有效
         expires.put(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO,3600 * 24 * 30 *12 * 15L);
         expires.put(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY,60*10l);
+        // 防重复选时间缓存
+        expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 5l);
         cacheManager.setExpires(expires);
         return cacheManager;
     }

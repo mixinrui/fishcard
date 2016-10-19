@@ -25,4 +25,9 @@ public class ProductComboDetail extends BaseEntity {
     private TutorType tutorType;
 
     private Integer productCode;
+
+    /**
+     * 套餐分组,例如1001_INTELLIGENT_FRN_64
+     */
+    private String comboCode;
 }

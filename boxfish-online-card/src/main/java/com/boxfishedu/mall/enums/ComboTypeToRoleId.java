@@ -16,7 +16,9 @@ public enum ComboTypeToRoleId {
     CRITIQUE(2),
     EXCHANGE(3),
     UNKNOW(-1),
-    EXPERIENCE(3);
+    EXPERIENCE(3),
+    // 只能套餐
+    INTELLIGENT(3);
 
     private int value;
 

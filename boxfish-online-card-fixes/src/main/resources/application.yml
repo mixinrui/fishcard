@@ -1,0 +1,55 @@
+
+spring.application.name: boxfish-online-card
+logging:
+  level:
+    com:
+      boxfishedu: debug
+    org:
+      springframework: info
+  file: ${user.home}/logs/${spring.application.name}.log
+
+
+#spring.profiles.active: local_hucl
+spring.profiles.active: product
+#spring.profiles.active: local
+#spring.profiles.active: development
+#spring.profiles.active: luo
+#spring.profiles.active: test
+#spring.profiles.active: demo
+#spring.profiles.active: pretest
+
+
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: Box123456
+
+  mongo:
+    serverAddress: 123.56.13.168:27017
+    dbName: fishcard
+    username: root
+    password: Boxfish2016
+
+  profiles: luo
+
+##################接口调用地址
+server.port: 8080
+
+---
+spring:
+  datasource:
+    url: jdbc:mysql://boxfish-online-2016-outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&&zeroDateTimeBehavior=convertToNull
+    username: service
+    password: nEaJiP7hwoXEUkPDnDjaBK3hEJanHTec
+  mongo:
+    serverAddress: dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717,dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717
+    dbName: fishcard
+    username: root
+    password: sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
+  profiles: product
+
+server.servlet-path: /fishcard
+server.port: 9999
+##################接口调用地址

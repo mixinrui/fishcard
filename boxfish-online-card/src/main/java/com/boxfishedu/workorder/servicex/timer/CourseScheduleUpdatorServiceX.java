@@ -2,13 +2,16 @@ package com.boxfishedu.workorder.servicex.timer;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
@@ -69,7 +72,13 @@ public class CourseScheduleUpdatorServiceX {
     private CourseScheduleRepository courseScheduleRepository;
 
     @Autowired
+    private ScheduleCourseInfoService scheduleCourseInfoService;
+
+    @Autowired
     private DefaultRecommendHandler defaultRecommendHandler;
+
+    @Autowired
+    private UrlConf urlConf;
 
     //定时任务，向师生运营组获取教师
 //    @Scheduled(cron="*/10 * * * * ?")
@@ -183,7 +192,7 @@ public class CourseScheduleUpdatorServiceX {
     public void recommendCourses() {
         // 72小时以内
         Date endDate = DateUtil.convertToDate(LocalDate.now().plusDays(3));
-        // TODO 按照学生id进行分组
+        // 按照学生id进行分组
         List<WorkOrder> workOrderList = workOrderJpaRepository.findWithinHoursCreatedWorkOrderList(endDate);
         List<CourseSchedule> courseScheduleList =
                 courseScheduleRepository.findWithinHoursCreatedCourseScheduleList(endDate);
@@ -228,11 +237,16 @@ public class CourseScheduleUpdatorServiceX {
         @Transactional
         public void run() {
             for(int i = 0, size = workOrders.size(); i < size; i++) {
-                singleWorkRecommend(workOrders.get(i), courseScheduleMap.get(workOrders.get(i).getId()));
+                singleRecommend(workOrders.get(i), courseScheduleMap.get(workOrders.get(i).getId()));
             }
         }
 
-        private void singleWorkRecommend(WorkOrder workOrder, CourseSchedule courseSchedule) {
+        /**
+         * 单课程推荐
+         * @param workOrder
+         * @param courseSchedule
+         */
+        private void singleRecommend(WorkOrder workOrder, CourseSchedule courseSchedule) {
             Map<Integer, RecommandCourseView> recommendCourseMap =
                     defaultRecommendHandler.recommendCourse(
                             Collections.singletonList(workOrder),
@@ -244,19 +258,27 @@ public class CourseScheduleUpdatorServiceX {
                     && !Objects.isNull(workOrder.getTeacherId())) {
                 workOrderService.changeTeacherForTypeChanged(workOrder);
             }
-            workOrder.initCourseInfo(courseView);
 
+            // 保存鱼卡
+            workOrder.initCourseInfo(courseView);
             workOrderJpaRepository.save(workOrder);
-            // 记日志
+
+            // 记鱼卡日志
             workOrderLogService.saveWorkOrderLog(workOrder,
                     String.format("定时课程推荐,类型:[%s],课程Id:[%s],课程名:[%s]",
                             courseView.getCourseType(), courseView.getCourseId(), courseView.getCourseName()));
+
+            // 保存mongo课程信息
+            ScheduleCourseInfo scheduleCourseInfo = ScheduleCourseInfo.create(
+                    urlConf.getThumbnail_server(), courseSchedule, courseView);
+            scheduleCourseInfoService.save(scheduleCourseInfo);
 
             if(Objects.isNull(courseSchedule)) {
                 System.err.println(String.format("[%s]鱼卡无对应的课表记录", workOrder.getId()));
                 return;
             }
-            // 保存课表
+
+            // 保存课表数据
             courseSchedule.setStatus(workOrder.getStatus());
             courseSchedule.setCourseId(workOrder.getCourseId());
             courseSchedule.setCourseName(workOrder.getCourseName());

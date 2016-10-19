@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.service.fishcardcenter;
 
-import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -9,7 +8,6 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.FishCardStatusService;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.base.BaseService;
@@ -70,6 +68,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         scheduleCourseInfo.setCourseType(workOrder.getCourseType());
         scheduleCourseInfo.setCourseId(workOrder.getCourseId());
         scheduleCourseInfo.setName(workOrder.getCourseName());
+        scheduleCourseInfo.setEnglishName(recommandCourseView.getEnglishName());
         scheduleCourseInfo.setDifficulty(recommandCourseView.getDifficulty());
         scheduleCourseInfo.setPublicDate(recommandCourseView.getPublicDate());
         scheduleCourseInfo.setThumbnail(recommandCourseRequester.getThumbNailPath(recommandCourseView));

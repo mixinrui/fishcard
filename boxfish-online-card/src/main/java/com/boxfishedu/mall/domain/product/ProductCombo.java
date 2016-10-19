@@ -39,4 +39,7 @@ public class ProductCombo extends BaseEntity {
 
     @Transient
     private List<ProductComboDetail> comboDetails;
+
+    @Transient
+    private ComboDurations comboDurations;
 }

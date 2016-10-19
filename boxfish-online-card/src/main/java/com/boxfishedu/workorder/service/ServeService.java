@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.domain.order.OrderForm;
+import com.boxfishedu.mall.domain.product.ComboDurations;
 import com.boxfishedu.mall.domain.product.ProductCombo;
 import com.boxfishedu.mall.domain.product.ProductComboDetail;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
@@ -41,6 +42,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
@@ -299,29 +301,34 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         String orderRemark = orderView.getOrderRemark();
         ProductCombo productCombo = objectMapper.readValue(orderRemark, ProductCombo.class);
         //服务信息容器
-        Map<Object, Service> serviceHashMap = new HashMap<>();
+        Map<String, Service> serviceHashMap = new HashMap<>();
         List<Service> services = new ArrayList<>();
 
         // 混合型套餐特殊处理,合并为一个service
         boolean isOverAll = Objects.equals(productCombo.getComboType(), ComboTypeToRoleId.OVERALL);
 
         productCombo.getComboDetails().forEach( productComboDetail -> {
-                    // 课程
-                    Object key;
-                    if(isOverAll) {
-                        key = productCombo.getComboType();
-                    } else {
-                        key = productComboDetail.getTutorType();
-                    }
-                    Service service = serviceHashMap.get(key);
-                    if(service != null) {
-                        //增加有效期,数量
-                        setServiceExistedSpecs(service, productComboDetail);
-                    } else {
-                        service = getServiceByOrderView(orderView, productComboDetail, productCombo, isOverAll);
-                        services.add(service);
-                        serviceHashMap.put(key, service);
-                                }});
+            // 改成用comboCode作为分组字段
+            String key = productComboDetail.getComboCode();
+            // todo 兼容老版本
+            if(StringUtils.isEmpty(key)) {
+                if(isOverAll) {
+                    key = productCombo.getComboType().name();
+                } else {
+                    key = productComboDetail.getTutorType().name();
+                }
+
+            }
+            Service service = serviceHashMap.get(key);
+            if(service != null) {
+                //增加有效期,数量
+                setServiceExistedSpecs(service, productComboDetail);
+            } else {
+                service = getServiceByOrderView(orderView, productComboDetail, productCombo, isOverAll);
+                services.add(service);
+                serviceHashMap.put(key, service);
+            }
+        });
 
         // service的开始日期,结束日期设置
         addValidTimeForServices(services);
@@ -446,8 +453,6 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         } else {
             service.setTutorType(productComboDetail.getTutorType().name());
         }
-        // 几周消费完
-        service.setComboCycle(productCombo.getComboCycle());
         // 课程类型 兼容老版本
         service.setTeachingType(productCombo.getComboType().getValue());
         // 产品类型
@@ -458,6 +463,16 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setCoursesSelected(0);
         service.setValidityDay(365);
         service.setOrderChannel(orderView.getOrderChannel().name());
+
+        ComboDurations duration = productCombo.getComboDurations();
+        if(duration != null) {
+            if(duration.getDurationWeeks() != null) {
+                service.setComboCycle(duration.getDurationWeeks());
+            }
+            if(duration.getPerWeekCourseCount() != null) {
+                service.setCountInMonth(duration.getPerWeekCourseCount());
+            }
+        }
         return service;
     }
 

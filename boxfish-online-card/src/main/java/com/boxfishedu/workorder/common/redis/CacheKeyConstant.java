@@ -15,4 +15,6 @@ public class CacheKeyConstant {
     public static final String NOTIFY_TEACHER_PREPARE_CLASS_KEY="NOTIFY_TEACHER_PREPARE_CLASS_KEY";
 
     public static final String TIME_LIMIT_RULES_CACHE_KEY="TIME_LIMIT_RULES_CACHE_KEY";
+
+    public static final String WORKORDERS_REPEATED_SUBMISSION = "WORKORDERS_REPEATED_SUBMISSION";
 }
