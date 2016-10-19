@@ -19,6 +19,7 @@ import java.util.function.Predicate;
  * Created by LuoLiBing on 16/9/22.
  * 默认的课程推荐方式,工单本身来进行判断单独推荐
  */
+@SuppressWarnings("ALL")
 @Service
 public class DefaultRecommendHandler implements RecommendHandler {
 
@@ -49,5 +50,17 @@ public class DefaultRecommendHandler implements RecommendHandler {
             courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
         }
         return courseViewMap;
+    }
+
+    public RecommandCourseView recommandCourseView(WorkOrder workOrder){
+        RecommandCourseView recommandCourseView;
+        TutorType tutorType = TutorType.resolve(workOrder.getService().getTutorType());
+        switch (tutorType) {
+            case CN: recommandCourseView = recommandCourseRequester.getPromoteRecommend(workOrder); break;
+            case FRN: recommandCourseView = recommandCourseRequester.getUltimateRecommend(workOrder); break;
+            case MIXED: recommandCourseView = recommandCourseRequester.getPromoteRecommend(workOrder); break;
+            default: throw new BusinessException("未知类型的课程");
+        }
+        return recommandCourseView;
     }
 }
