@@ -55,7 +55,7 @@ public class ForeignTeacherController {
                 foreignTeacherService.commentTeacherPage(pageable,teacherForm));
     }
 
-    @RequestMapping(value = "/teacher/page/uncomment", method = RequestMethod.GET)
+    @RequestMapping(value = "/teacher/page/uncommentitem", method = RequestMethod.GET)
     public Object getUncommentTeacherList(Pageable pageable, TeacherForm teacherForm){
         return JsonResultModel.newJsonResultModel(
                 foreignTeacherService.uncommentTeacherPage(pageable,teacherForm));
