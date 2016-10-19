@@ -47,7 +47,7 @@ public class FishCardQueryController {
     /**
      * 用户id不做限制的查询  鱼卡管理
      */
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/listitem", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByCond(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
     }
@@ -55,7 +55,7 @@ public class FishCardQueryController {
     /**
      * 用户id不做限制的查询 鱼卡管理(中教)
      */
-    @RequestMapping(value = "/listzj", method = RequestMethod.GET)
+    @RequestMapping(value = "/listzjitem", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByCondZJ(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
     }
@@ -63,7 +63,7 @@ public class FishCardQueryController {
     /**
      * 用户id不做限制的查询 鱼卡管理(外教)
      */
-    @RequestMapping(value = "/listwj", method = RequestMethod.GET)
+    @RequestMapping(value = "/listwjitem", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByCondWJ(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
     }
@@ -71,10 +71,27 @@ public class FishCardQueryController {
     /**
      * 用户id不做限制的查询 鱼卡管理(补课)
      */
-    @RequestMapping(value = "/listbk", method = RequestMethod.GET)
+    @RequestMapping(value = "/listbkitem", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByCondBK(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
     }
+
+    /**
+     * 用户id不做限制的查询 鱼卡管理(退款)
+     */
+    @RequestMapping(value = "/listtkitem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondTK(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
+    }
+
+    /**
+     * 用户id不做限制的查询 鱼卡管理(确认状态)
+     */
+    @RequestMapping(value = "/listqritem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondQR(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
+    }
+
 
     /**
      * 提供状态的查询列表

@@ -68,14 +68,15 @@ public class BackOrderFilter extends OncePerRequestFilter {
         String URI  = request.getRequestURI();
         // 获取token
         if(StringUtils.isEmpty(token) || StringUtils.isEmpty(token.trim())){
-            errorTokenHandle(response, String.format("token为空,token:[%s]", token));
+            errorTokenHandle(response, String.format("token为空,token:[%s]", token),HttpStatus.SC_UNAUTHORIZED);
             return;
         } else {
             if(!loginService.checkToken(token)){
-                errorTokenHandle(response, String.format("token无效,token:[%s]", token));
+                errorTokenHandle(response, String.format("token无效,token:[%s]", token),HttpStatus.SC_UNAUTHORIZED);
                 return;
-            }else if(!loginService.checkURI(token,URI)){
-                errorTokenHandle(response, String.format("URI无效,token:[%s]", token));
+            }else if(URI!=null && URI.endsWith("item") &&!loginService.checkURI(token,URI)){
+                logger.info("URI无效,token:{[]}",token);
+                errorTokenHandle(response,String.format("您没有权限访问"),HttpStatus.SC_BAD_REQUEST);
                 return;
             }
         }
@@ -88,7 +89,7 @@ public class BackOrderFilter extends OncePerRequestFilter {
         filterChain.doFilter(authorRequestWrapper, response);
     }
 
-    public void errorTokenHandle(HttpServletResponse response, String message) throws IOException {
+    public void errorTokenHandle(HttpServletResponse response, String message,Integer code) throws IOException {
         response.setStatus(HttpStatus.SC_OK);
         response.setContentType("application/json;charset=UTF-8");
         /**
@@ -96,7 +97,7 @@ public class BackOrderFilter extends OncePerRequestFilter {
          */
         response.setHeader("Access-Control-Allow-Origin", "*");
         JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(null);
-        jsonResultModel.setReturnCode(HttpStatus.SC_UNAUTHORIZED);
+        jsonResultModel.setReturnCode(code);
         jsonResultModel.setReturnMsg(message);
         String json = new Gson().toJson(jsonResultModel);
         try(PrintWriter out = response.getWriter()){
@@ -161,5 +162,7 @@ public class BackOrderFilter extends OncePerRequestFilter {
             }
         }
     }
+
+
 }
 

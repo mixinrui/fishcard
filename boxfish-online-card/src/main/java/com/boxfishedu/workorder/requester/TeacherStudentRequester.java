@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Maps;
@@ -336,15 +337,15 @@ public class TeacherStudentRequester {
      * @param token
      * @return
      */
-    public JsonResultModel checkTokenCommon(String token) {
+    public TokenReturnBean checkTokenCommon(String token) {
         String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/query/self";
         logger.info("checkTokenPrivilege - [{}]",url);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("BoxFishAccessToken", token);
         HttpEntity request = new HttpEntity(httpHeaders);
-        JsonResultModel tokenCheckObject;
+        TokenReturnBean tokenCheckObject;
         try {
-            tokenCheckObject = restTemplate.postForObject(url, request, JsonResultModel.class);
+            tokenCheckObject = restTemplate.postForObject(url, request, TokenReturnBean.class);
         } catch (Exception e) {
             logger.error(e.getMessage());
             tokenCheckObject = null;
@@ -352,12 +353,15 @@ public class TeacherStudentRequester {
         return tokenCheckObject;
     }
 
-    public JsonResultModel checkTokenPrivilege(String token,String path) {
+    public TokenReturnBean checkTokenPrivilege(String token,String path) {
+        if(!path.startsWith("/comment") &&   !path.startsWith("/fishcard")){
+            path= "/fishcard"+path;
+        }
         String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/verification?systemName=" + "FishCardCenter" +"&accessToken="+token+"&requestURI="+path;
         logger.info("checkTokenPrivilege - [{}]",url);
-        JsonResultModel tokenReturnBean;
+        TokenReturnBean tokenReturnBean;
         try {
-            tokenReturnBean = restTemplate.getForObject(url, JsonResultModel.class);
+            tokenReturnBean = restTemplate.getForObject(url, TokenReturnBean.class);
         } catch (Exception e) {
             logger.error(e.getMessage());
             tokenReturnBean = null;
@@ -365,5 +369,6 @@ public class TeacherStudentRequester {
 
         return tokenReturnBean;
     }
+
 
 }

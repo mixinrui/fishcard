@@ -76,7 +76,7 @@ public class FishCardMakeUpController {
      * @param makeUpCourseParam
      * @return
      */
-    @RequestMapping(value = "/fishcard/confirm/recharge", method = RequestMethod.POST)
+    @RequestMapping(value = "/fishcard/confirm/rechargeitem", method = RequestMethod.POST)
     public JsonResultModel fishcardConfirmStatusRecharge(@RequestBody MakeUpCourseParam makeUpCourseParam)throws Exception{
         String username = makeUpCourseParam.getUsername();
         if(StringUtils.isEmpty(username)){

@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderUser;
 import com.boxfishedu.workorder.service.WorkOrderUserService;
+import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,10 +148,10 @@ public class LoginService {
     public boolean checkURI(String token,String URI){
         if(null == URI){
             logger.info("@checkURI - 非法登陆");
-            throw new RuntimeException("非法登陆,URL非空");
+            throw new RuntimeException("您没有权限访问");
         }
-        JsonResultModel  jsonResultModel = teacherStudentRequester.checkTokenPrivilege(token,URI);
-        if(jsonResultModel!=null && jsonResultModel.getReturnCode()==0){
+        TokenReturnBean  jsonResultModel = teacherStudentRequester.checkTokenPrivilege(token,URI);
+        if(jsonResultModel!=null && 0 == jsonResultModel.getCode()){
             return true;
         }else{
             return false;
@@ -168,8 +169,8 @@ public class LoginService {
             throw new RuntimeException("非法登陆,传入参数不能为空");
         }
 
-        JsonResultModel  jsonResultModel = teacherStudentRequester.checkTokenCommon(token);
-        if(jsonResultModel!=null && jsonResultModel.getReturnCode()==0){
+        TokenReturnBean jsonResultModel = teacherStudentRequester.checkTokenCommon(token);
+        if(jsonResultModel!=null && 0==jsonResultModel.getCode() ){
             return true;
         }else{
             return false;

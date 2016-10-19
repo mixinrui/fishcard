@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.web.controller.graborder;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.online.order.entity.TeacherForm;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.graborder.GrabOrderService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
@@ -54,6 +55,9 @@ public class GrabOrderController {
 
     @Autowired
     private GrabOrderService  grabOrderService;
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
 
 
