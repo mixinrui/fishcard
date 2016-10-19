@@ -49,13 +49,13 @@ public class ForeignTeacherController {
      * @param teacherForm
      * @return
      */
-    @RequestMapping(value = "/teacher/page/comment", method = RequestMethod.GET)
+    @RequestMapping(value = "/teacher/page/commentitem", method = RequestMethod.GET)
     public Object getTeacherList(Pageable pageable, TeacherForm teacherForm){
         return JsonResultModel.newJsonResultModel(
                 foreignTeacherService.commentTeacherPage(pageable,teacherForm));
     }
 
-    @RequestMapping(value = "/teacher/page/uncommentitem", method = RequestMethod.GET)
+    @RequestMapping(value = "/teacher/page/uncomment", method = RequestMethod.GET)
     public Object getUncommentTeacherList(Pageable pageable, TeacherForm teacherForm){
         return JsonResultModel.newJsonResultModel(
                 foreignTeacherService.uncommentTeacherPage(pageable,teacherForm));
