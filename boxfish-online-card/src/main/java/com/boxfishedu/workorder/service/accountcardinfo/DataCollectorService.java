@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
@@ -13,6 +14,7 @@ import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.DefaultRecommendHandler;
+import com.boxfishedu.workorder.servicex.timer.RecommendCourseTask;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
@@ -125,6 +127,14 @@ public class DataCollectorService {
         return scheduleCourseInfoMorphiaRepository.queryByWorkId(workOrderId);
     }
 
+    //如果最近一节课没有课程,调用课程推荐接口更新
+    public void getLatestRecommandCourse(WorkOrder latestWorkOrder){
+        if(null==latestWorkOrder.getCourseId()){
+            CourseSchedule latestCourseSchedule=courseScheduleService.findByWorkOrderId(latestWorkOrder.getId());
+            RecommendCourseTask.singleRecommend(latestWorkOrder,latestCourseSchedule);
+        }
+    }
+
     public AccountCourseBean updateForeignItem(Long studentId){
         AccountCourseBean accountCourseBean=new AccountCourseBean();
         List<WorkOrder> selectedLeftWorkOrders = getForeignSelectedLeftWorkOrders(studentId);
@@ -135,6 +145,7 @@ public class DataCollectorService {
             accountCourseBean.setCourseInfo(null);
             return accountCourseBean;
         }
+        this.getLatestRecommandCourse(latestWorkOrder);
         ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
         accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo,latestWorkOrder));
@@ -152,10 +163,7 @@ public class DataCollectorService {
             accountCourseBean.setCourseInfo(null);
             return accountCourseBean;
         }
-        if(null==latestWorkOrder.getCourseId()){
-            RecommandCourseView recommandCourseView=defaultRecommendHandler.recommandCourseView(latestWorkOrder);
-//            courseScheduleService.
-        }
+        this.getLatestRecommandCourse(latestWorkOrder);
         ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
         accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo,latestWorkOrder));
