@@ -434,7 +434,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentIdAndOrderChannelAndStartTimeAfter(studentId,orderChannel,date);
     }
 
-    private String[] enums2StringAray(List<ComboTypeEnum> comboTypeEnums){
+    public String[] enums2StringAray(List<ComboTypeEnum> comboTypeEnums){
         String[] comboTypes=new String[comboTypeEnums.size()];
         for(int i=0;i<comboTypeEnums.size();i++){
             comboTypes[i]=comboTypeEnums.get(i).toString();
@@ -447,10 +447,6 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums){
-        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),new Date());
-    }
-
-    public List<WorkOrder> getSelectedLeftAmountBy(Long studentId, List<ComboTypeEnum> comboTypeEnums){
         return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),new Date());
     }
 

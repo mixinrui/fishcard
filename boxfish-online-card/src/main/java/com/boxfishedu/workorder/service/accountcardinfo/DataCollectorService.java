@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service.accountcardinfo;
 
+import com.boxfishedu.card.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
@@ -49,73 +50,76 @@ public class DataCollectorService {
     private ThreadPoolManager threadPoolManager;
 
     @Autowired
-    private DefaultRecommendHandler defaultRecommendHandler;
-
-    @Autowired
     private CourseScheduleService courseScheduleService;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public WorkOrder getWorkOrderToStart(List<WorkOrder> workOrders) {
         if (CollectionUtils.isEmpty(workOrders)) {
             return null;
         }
-        workOrders.sort((o1, o2) ->o1.getStartTime().after(o2.getStartTime())?1:-1);
-        logger.debug("@getWorkOrderToStart#sort#end#[{}]",workOrders);
+        workOrders.sort((o1, o2) -> o1.getStartTime().after(o2.getStartTime()) ? 1 : -1);
+        logger.debug("@getWorkOrderToStart#sort#end#[{}]", workOrders);
         return workOrders.get(0);
     }
 
     public Integer selectedLeftNum(List<WorkOrder> workOrders) {
-        return CollectionUtils.isEmpty(workOrders)?0: workOrders.size();
+        return CollectionUtils.isEmpty(workOrders) ? 0 : workOrders.size();
     }
 
-    private Integer getAmountFromServices(List<Service> services){
-        return services.stream().filter(service -> service.getAmount()>0).mapToInt(Service::getAmount).sum();
+    private Integer getAmountFromServices(List<Service> services) {
+        return services.stream().filter(service -> service.getAmount() > 0).mapToInt(Service::getAmount).sum();
     }
 
     public Integer getChineseUnselectedServices(Long studentId) {
         List<Service> overAllServices = serveService.getUnselectedService(studentId, ComboTypeEnum.OVERALL, 0);
-        List<Service> exchangeChineseServices = serveService.getUnselectedService(studentId, ComboTypeEnum.EXCHANGE, TutorTypeEnum.CN ,0);
+        List<Service> otherChineseServices = serveService.getUnselectedService(studentId,
+                Lists.newArrayList(ComboTypeEnum.EXCHANGE,ComboTypeEnum.INTELLIGENT,ComboTypeEnum.EXPERIENCE), TutorTypeEnum.CN, 0);
 
         return (CollectionUtils.isEmpty(overAllServices) ? 0 : this.getAmountFromServices(overAllServices))
-                + (CollectionUtils.isEmpty(exchangeChineseServices) ? 0 : this.getAmountFromServices(exchangeChineseServices));
+                + (CollectionUtils.isEmpty(otherChineseServices) ? 0 : this.getAmountFromServices(otherChineseServices));
     }
 
     public Integer getForeignUnselectedServices(Long studentId) {
-        List<Service> communctionServices = serveService.getUnselectedService(studentId, ComboTypeEnum.FOREIGN, 0);
-        List<Service> finalDreamServices = serveService.getUnselectedService(studentId, ComboTypeEnum.CHINESE, 0);
-        List<Service> exchangeFrnServices = serveService.getUnselectedService(studentId, ComboTypeEnum.EXCHANGE, TutorTypeEnum.FRN, 0);
+        List<Service> communctionServices = serveService.getUnselectedService(studentId, Lists.newArrayList(ComboTypeEnum.FOREIGN,ComboTypeEnum.CHINESE), 0);
+        List<Service> otherFrnServices = serveService.getUnselectedService(studentId,
+                Lists.newArrayList(ComboTypeEnum.EXCHANGE,ComboTypeEnum.INTELLIGENT,ComboTypeEnum.EXPERIENCE), TutorTypeEnum.FRN, 0);
         return (CollectionUtils.isEmpty(communctionServices) ? 0 : this.getAmountFromServices(communctionServices))
-                + (CollectionUtils.isEmpty(finalDreamServices) ? 0 : this.getAmountFromServices(finalDreamServices))
-                + (CollectionUtils.isEmpty(exchangeFrnServices) ? 0 : this.getAmountFromServices(exchangeFrnServices));
+                + (CollectionUtils.isEmpty(otherFrnServices) ? 0 : this.getAmountFromServices(otherFrnServices));
+    }
+
+    private List<WorkOrder> getOtherCards(com.boxfishedu.card.bean.TeachingType teachingType,Long studentId){
+        switch (teachingType){
+            case ZHONGJIAO:
+                return workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.INTELLIGENT,
+                        ComboTypeEnum.EXCHANGE,ComboTypeEnum.EXPERIENCE), com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
+            case WAIJIAO:
+                return workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.INTELLIGENT,
+                        ComboTypeEnum.EXCHANGE,ComboTypeEnum.EXPERIENCE), com.boxfishedu.card.bean.TeachingType.WAIJIAO);
+            default: return null;
+        }
     }
 
     public List<WorkOrder> getChineseSelectedLeftWorkOrders(Long studentId) {
-        logger.debug("#getChineseSelectedLeftWorkOrders#用户[{}]",studentId);
+        logger.debug("#getChineseSelectedLeftWorkOrders#用户[{}]", studentId);
         //中教:核心素养
-        List<ComboTypeEnum> comboTypeEnumList=Lists.newArrayList();
-        comboTypeEnumList.add(ComboTypeEnum.OVERALL);
-        List<WorkOrder> overallCards = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.OVERALL);
-        List<WorkOrder> exchangeChineses = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.EXCHANGE, com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
+        List<WorkOrder> overallCards = workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.OVERALL));
+        List<WorkOrder> otherChineses = getOtherCards(com.boxfishedu.card.bean.TeachingType.ZHONGJIAO,studentId);
 
-        List<WorkOrder> chineseCards = Lists.newArrayList();
-
-        chineseCards.addAll(overallCards);
-        chineseCards.addAll(exchangeChineses);
+        List<WorkOrder> chineseCards = Lists.newArrayList(overallCards);
+        chineseCards.addAll(otherChineses);
 
         return chineseCards;
     }
 
     public List<WorkOrder> getForeignSelectedLeftWorkOrders(Long studentId) {
+        logger.debug("#getForeignSelectedLeftWorkOrders#用户[{}]", studentId);
         //外教+金币换课外教+终极梦想
-        List<WorkOrder> communictionCards = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.FOREIGN);
-        List<WorkOrder> finalDreamCards = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.CHINESE);
-        List<WorkOrder> exchangeForeigns = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.EXCHANGE, com.boxfishedu.card.bean.TeachingType.WAIJIAO);
+        List<WorkOrder> communictionCards = workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.FOREIGN,ComboTypeEnum.CHINESE));
+        List<WorkOrder> otherForeigns = getOtherCards(com.boxfishedu.card.bean.TeachingType.WAIJIAO,studentId);
 
-        List<WorkOrder> foreignCards = Lists.newArrayList();
-        foreignCards.addAll(communictionCards);
-        foreignCards.addAll(finalDreamCards);
-        foreignCards.addAll(exchangeForeigns);
+        List<WorkOrder> foreignCards = Lists.newArrayList(communictionCards);
+        foreignCards.addAll(otherForeigns);
 
         return foreignCards;
 
@@ -130,62 +134,61 @@ public class DataCollectorService {
     }
 
     //如果最近一节课没有课程,调用课程推荐接口更新
-    public void getLatestRecommandCourse(WorkOrder latestWorkOrder){
-        if(null==latestWorkOrder.getCourseId()){
-            CourseSchedule latestCourseSchedule=courseScheduleService.findByWorkOrderId(latestWorkOrder.getId());
-            RecommendCourseTask.singleRecommend(latestWorkOrder,latestCourseSchedule);
+    public void getLatestRecommandCourse(WorkOrder latestWorkOrder) {
+        if (null == latestWorkOrder.getCourseId()) {
+            CourseSchedule latestCourseSchedule = courseScheduleService.findByWorkOrderId(latestWorkOrder.getId());
+            RecommendCourseTask.singleRecommend(latestWorkOrder, latestCourseSchedule);
         }
     }
 
-    public AccountCourseBean updateForeignItem(Long studentId){
-        AccountCourseBean accountCourseBean=new AccountCourseBean();
+    public AccountCourseBean updateForeignItem(Long studentId) {
+        AccountCourseBean accountCourseBean = new AccountCourseBean();
         List<WorkOrder> selectedLeftWorkOrders = getForeignSelectedLeftWorkOrders(studentId);
-        int leftAmount=getForeignUnselectedServices(studentId)+selectedLeftNum(selectedLeftWorkOrders);
+        int leftAmount = getForeignUnselectedServices(studentId) + selectedLeftNum(selectedLeftWorkOrders);
         accountCourseBean.setLeftAmount(leftAmount);
-        WorkOrder latestWorkOrder=getWorkOrderToStart(selectedLeftWorkOrders);
-        if(null==latestWorkOrder){
+        WorkOrder latestWorkOrder = getWorkOrderToStart(selectedLeftWorkOrders);
+        if (null == latestWorkOrder) {
             accountCourseBean.setCourseInfo(null);
             return accountCourseBean;
         }
         this.getLatestRecommandCourse(latestWorkOrder);
-        ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
+        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
-        accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo,latestWorkOrder));
+        accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo, latestWorkOrder));
 
         return accountCourseBean;
     }
 
-    public AccountCourseBean updateChineseItem(Long studentId){
-        AccountCourseBean accountCourseBean=new AccountCourseBean();
-        List<WorkOrder> selectedWorkOrders=getChineseSelectedLeftWorkOrders(studentId);
-        int leftAmount=getChineseUnselectedServices(studentId)+selectedLeftNum(selectedWorkOrders);
+    public AccountCourseBean updateChineseItem(Long studentId) {
+        AccountCourseBean accountCourseBean = new AccountCourseBean();
+        List<WorkOrder> selectedWorkOrders = getChineseSelectedLeftWorkOrders(studentId);
+        int leftAmount = getChineseUnselectedServices(studentId) + selectedLeftNum(selectedWorkOrders);
         accountCourseBean.setLeftAmount(leftAmount);
-        WorkOrder latestWorkOrder=getWorkOrderToStart(selectedWorkOrders);
-        if(null==latestWorkOrder){
+        WorkOrder latestWorkOrder = getWorkOrderToStart(selectedWorkOrders);
+        if (null == latestWorkOrder) {
             accountCourseBean.setCourseInfo(null);
             return accountCourseBean;
         }
         this.getLatestRecommandCourse(latestWorkOrder);
-        ScheduleCourseInfo scheduleCourseInfo= scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
+        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(latestWorkOrder.getId());
 
-        accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo,latestWorkOrder));
+        accountCourseBean.setCourseInfo(scheduleCourseAdapter(scheduleCourseInfo, latestWorkOrder));
 
         return accountCourseBean;
     }
 
-    public void updateBothChnAndFnItemAsync(Long studentId){
-        threadPoolManager.execute(new Thread(()->this.updateBothChnAndFnItem(studentId)));
+    public void updateBothChnAndFnItemAsync(Long studentId) {
+        threadPoolManager.execute(new Thread(() -> this.updateBothChnAndFnItem(studentId)));
     }
 
-    public void updateBothChnAndFnItem(Long studentId){
+    public void updateBothChnAndFnItem(Long studentId) {
         try {
-            logger.debug("@updateBothChnAndFnItem#begin用户[{}]更新首页信息",studentId);
-            AccountCourseBean chineseCourseBean=updateChineseItem(studentId);
-            AccountCourseBean foreignCourseBean=updateForeignItem(studentId);
-            accountCardInfoService.saveOrUpdateChAndFrn(studentId,chineseCourseBean,foreignCourseBean);
-        }
-        catch (Exception ex){
-            logger.error("@updateBothChnAndFnItem#exception用户[{}]更新首页信息失败",studentId);
+            logger.debug("@updateBothChnAndFnItem#begin用户[{}]更新首页信息", studentId);
+            AccountCourseBean chineseCourseBean = updateChineseItem(studentId);
+            AccountCourseBean foreignCourseBean = updateForeignItem(studentId);
+            accountCardInfoService.saveOrUpdateChAndFrn(studentId, chineseCourseBean, foreignCourseBean);
+        } catch (Exception ex) {
+            logger.error("@updateBothChnAndFnItem#exception用户[{}]更新首页信息失败", studentId);
         }
     }
 
