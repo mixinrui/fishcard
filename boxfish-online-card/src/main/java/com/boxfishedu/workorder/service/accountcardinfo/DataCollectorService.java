@@ -92,7 +92,9 @@ public class DataCollectorService {
 
     public List<WorkOrder> getChineseSelectedLeftWorkOrders(Long studentId) {
         logger.debug("#getChineseSelectedLeftWorkOrders#用户[{}]",studentId);
-        //中教:核心素养+金币换课中教
+        //中教:核心素养
+        List<ComboTypeEnum> comboTypeEnumList=Lists.newArrayList();
+        comboTypeEnumList.add(ComboTypeEnum.OVERALL);
         List<WorkOrder> overallCards = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.OVERALL);
         List<WorkOrder> exchangeChineses = workOrderService.getSelectedLeftAmount(studentId, ComboTypeEnum.EXCHANGE, com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
 

@@ -13,7 +13,9 @@ public enum ComboTypeEnum {
     //金币换课
     EXCHANGE("EXCHANGE"),
     //终极梦想
-    CHINESE("CHINESE");
+    CHINESE("CHINESE"),
+    //终极梦想+考试指导
+    INTELLIGENT("INTELLIGENT");
 
     private String value;
 
