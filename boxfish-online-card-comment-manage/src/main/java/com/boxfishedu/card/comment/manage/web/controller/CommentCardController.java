@@ -23,7 +23,7 @@ public class CommentCardController {
     @Autowired
     private CommentCardService commentCardService;
 
-    @RequestMapping(value = "/page", method = RequestMethod.GET)
+    @RequestMapping(value = "/pageitem", method = RequestMethod.GET)
     public Object commentCardPage(CommentCardForm commentCardForm, Pageable pageable) {
         return JsonResultModel.newJsonResultModel(
                 commentCardService.findCommentCardByOptions(commentCardForm, pageable));
