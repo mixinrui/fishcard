@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
+import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,14 +86,16 @@ public class TemplateSelectMode implements SelectMode {
             int numPerWeek = (count == 1 ? 1: DEFAULT_EXCHANGE_NUM_PER_WEEK);
             return new SelectTemplateParam(loopOfWeek, numPerWeek, count);
         } else {
-//            int loopOfWeek = services.stream().collect(Collectors.summingInt(Service::getComboCycle));
-//            int per = (count / loopOfWeek == 0 ? 1 : count / loopOfWeek);
-//            logger.info("weekStrategy= loopOfWeek:[{}],per:[{}]", loopOfWeek, per);
-//            return new SelectTemplateParam((count + per -1) / per, per, count);
-
-            int loopOfWeek = services.get(0).getComboCycle();
-            int numPerWeek = services.get(0).getCountInMonth();
-            return new SelectTemplateParam(loopOfWeek, numPerWeek, count);
+            if(StringUtils.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.INTELLIGENT.name())) {
+                int loopOfWeek = services.get(0).getComboCycle();
+                int numPerWeek = services.get(0).getCountInMonth();
+                return new SelectTemplateParam(loopOfWeek, numPerWeek, count);
+            } else {
+                int loopOfWeek = services.stream().collect(Collectors.summingInt(Service::getComboCycle));
+                int per = (count / loopOfWeek == 0 ? 1 : count / loopOfWeek);
+                logger.info("weekStrategy= loopOfWeek:[{}],per:[{}]", loopOfWeek, per);
+                return new SelectTemplateParam((count + per -1) / per, per, count);
+            }
         }
     }
 

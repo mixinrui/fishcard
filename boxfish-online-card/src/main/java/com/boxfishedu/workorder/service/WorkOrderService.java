@@ -385,7 +385,6 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
     }
 
-
     /**************** 兼容历史版本 **********************/
     @Transactional
     public List<CourseSchedule> persistCardInfos(Service service,List<WorkOrder> workOrders,Map<Integer,

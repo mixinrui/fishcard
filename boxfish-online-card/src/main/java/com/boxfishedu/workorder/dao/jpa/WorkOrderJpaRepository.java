@@ -155,4 +155,5 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     // 查找48小时以内,没有推荐课程的鱼卡
     @Query("select w from WorkOrder w where w.startTime<?1 and w.courseId is null")
     List<WorkOrder> findWithinHoursCreatedWorkOrderList(Date endTime);
+
 }

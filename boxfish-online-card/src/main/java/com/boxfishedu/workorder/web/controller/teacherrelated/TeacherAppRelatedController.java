@@ -2,7 +2,6 @@ package com.boxfishedu.workorder.web.controller.teacherrelated;
 
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
-import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.teacherrelated.TeacherAppRelatedServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -33,8 +32,6 @@ public class TeacherAppRelatedController {
     private TimeLimitPolicy timeLimitPolicy;
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
-    @Autowired
-    private RandomSlotFilterService randomSlotFilterService;
     private final static DateTimeFormatter yearMonthFormatter = DateTimeFormatter.ofPattern("yyyyMM");
 
     /**
