@@ -110,6 +110,7 @@ public class WorkOrder{
     @Transient
     private String statusDesc;
 
+    /**  (TeachingType.WAIJIAO.getCode() ==wo.getSkuId()  **/
     @Column(name="sku_id")
     private Integer skuId;
 

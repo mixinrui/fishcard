@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Maps;
@@ -25,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -329,4 +332,44 @@ public class TeacherStudentRequester {
         }
         return (Boolean)jsonResultModel.getData();
     }
+
+    /**
+     * token验证接口
+     * @param token
+     * @return
+     */
+    public TokenReturnBean checkTokenCommon(String token) {
+        String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/query/self";
+        logger.info("checkTokenPrivilege - [{}]",url);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("BoxFishAccessToken", token);
+        HttpEntity request = new HttpEntity(httpHeaders);
+        TokenReturnBean tokenCheckObject;
+        try {
+            tokenCheckObject = restTemplate.postForObject(url, request, TokenReturnBean.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            tokenCheckObject = null;
+        }
+        return tokenCheckObject;
+    }
+
+    public TokenReturnBean checkTokenPrivilege(String token,String path) {
+        if(!path.startsWith("/comment") &&   !path.startsWith("/fishcard")){
+            path= "/fishcard"+path;
+        }
+        String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/verification?systemName=" + "FishCardCenter" +"&accessToken="+token+"&requestURI="+path;
+        logger.info("checkTokenPrivilege - [{}]",url);
+        TokenReturnBean tokenReturnBean;
+        try {
+            tokenReturnBean = restTemplate.getForObject(url, TokenReturnBean.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            tokenReturnBean = null;
+        }
+
+        return tokenReturnBean;
+    }
+
+
 }
