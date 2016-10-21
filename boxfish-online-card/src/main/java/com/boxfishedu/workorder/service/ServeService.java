@@ -473,6 +473,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                     break;
                 }
             }
+        } else {
+            service.setComboCycle(productCombo.getComboCycle());
         }
         return service;
     }
