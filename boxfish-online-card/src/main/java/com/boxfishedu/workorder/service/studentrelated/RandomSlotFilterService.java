@@ -2,9 +2,8 @@ package com.boxfishedu.workorder.service.studentrelated;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.OrderChannelDesc;
-import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.SlotRuleEnum;
-import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.mongo.TimeLimitRulesMorphiaRepository;
@@ -24,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -118,17 +116,12 @@ public class RandomSlotFilterService {
      * 时间片范围
      */
     private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getIncludeDateRange(String comboType,String tutorType, Date day) {
-        switch(ComboTypeToRoleId.resolve(comboType)){
-            case EXPERIENCE:
-                if(tutorType.equals(TutorTypeEnum.CN.toString())){
-                    comboType= OrderChannelDesc.OVERALL.toString();
-                }
-                else{
-                    comboType= OrderChannelDesc.CHINESE.toString();
-                }
-                break;
-            default:
-                break;
+        TutorType tt = TutorType.valueOf(tutorType);
+        switch (tt) {
+            case CN:
+            case MIXED: comboType= OrderChannelDesc.OVERALL.toString(); break;
+            case FRN: comboType= OrderChannelDesc.CHINESE.toString(); break;
+            default: comboType= OrderChannelDesc.OVERALL.toString(); break;
         }
         Optional<List<TimeLimitRules>> timeLimitRuleOptional = timeLimitRulesMorphiaRepository.queryByComboTypeAndRuleAndDay(comboType, SlotRuleEnum.RANGE, DateUtil.getDayOfWeek(day));
         if (!timeLimitRuleOptional.isPresent()) {
