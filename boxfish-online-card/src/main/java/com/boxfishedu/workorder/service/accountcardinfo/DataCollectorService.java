@@ -19,6 +19,7 @@ import com.boxfishedu.workorder.servicex.timer.RecommendCourseTask;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +136,7 @@ public class DataCollectorService {
 
     //如果最近一节课没有课程,调用课程推荐接口更新
     public void getLatestRecommandCourse(WorkOrder latestWorkOrder) {
-        if (null == latestWorkOrder.getCourseId()) {
+        if (StringUtils.isEmpty(latestWorkOrder.getCourseId())) {
             CourseSchedule latestCourseSchedule = courseScheduleService.findByWorkOrderId(latestWorkOrder.getId());
             RecommendCourseTask.singleRecommend(latestWorkOrder, latestCourseSchedule);
         }

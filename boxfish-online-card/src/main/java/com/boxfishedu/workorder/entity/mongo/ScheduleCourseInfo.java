@@ -45,14 +45,13 @@ public class ScheduleCourseInfo {
     }
 
     public void initRecommendCourse(String thumbnailServer, RecommandCourseView recommandCourseView) {
-        ScheduleCourseInfo scheduleCourseInfo=new ScheduleCourseInfo();
-        scheduleCourseInfo.setCourseType(recommandCourseView.getCourseType());
+        this.setCourseType(recommandCourseView.getCourseType());
         String thumbnail = String.format("%s%s", thumbnailServer, recommandCourseView.getCover());
-        scheduleCourseInfo.setThumbnail(thumbnail);
-        scheduleCourseInfo.setName(recommandCourseView.getCourseName());
-        scheduleCourseInfo.setEnglishName(recommandCourseView.getEnglishName());
-        scheduleCourseInfo.setDifficulty(recommandCourseView.getDifficulty());
-        scheduleCourseInfo.setCourseId(recommandCourseView.getCourseId());
-        scheduleCourseInfo.setPublicDate(recommandCourseView.getPublicDate());
+        this.setThumbnail(thumbnail);
+        this.setName(recommandCourseView.getCourseName());
+        this.setEnglishName(recommandCourseView.getEnglishName());
+        this.setDifficulty(recommandCourseView.getDifficulty());
+        this.setCourseId(recommandCourseView.getCourseId());
+        this.setPublicDate(recommandCourseView.getPublicDate());
     }
 }

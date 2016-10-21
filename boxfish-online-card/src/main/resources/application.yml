@@ -78,12 +78,12 @@ spring.datasource:
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
 
-spring.profiles.active: local_hucl
+#spring.profiles.active: local_hucl
 #spring.profiles.active: product
 #spring.profiles.active: local
 #spring.profiles.active: development
 #spring.profiles.active: development_new
-#spring.profiles.active: test
+spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
 
