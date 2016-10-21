@@ -52,4 +52,9 @@ public class UrlConf {
     /** 查询课程类型和难度 **/
     @Value("${interface.address.course_type_and_difficulty}")
     private String course_type_and_difficulty;
+
+    @Value("${interface.address.login_filter_url}")
+    private String login_filter_url;//登录验证URL
+
+
 }

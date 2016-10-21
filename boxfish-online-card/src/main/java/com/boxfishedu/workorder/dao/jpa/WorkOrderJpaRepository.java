@@ -139,7 +139,11 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     List<WorkOrder> findByStudentIdAndComboTypeAndSkuIdAndStartTimeAfter(Long studentId,String comboType,Integer skuId, Date date);
 
+    List<WorkOrder> findByStudentIdAndComboTypeInAndSkuIdAndStartTimeAfter(Long studentId,String[] comboType,Integer skuId, Date date);
+
     List<WorkOrder> findByStudentIdAndComboTypeAndStartTimeAfter(Long studentId,String comboType, Date date);
+
+    List<WorkOrder> findByStudentIdAndComboTypeInAndStartTimeAfter(Long studentId,String[] comboType, Date date);
 
     public WorkOrder findTop1ByStudentIdAndSkuIdAndStartTimeAfterOrderByStartTime(Long studentId,Integer skuId, Date date);
 

@@ -433,12 +433,24 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentIdAndOrderChannelAndStartTimeAfter(studentId,orderChannel,date);
     }
 
-    public List<WorkOrder> getSelectedLeftAmount(Long studentId, ComboTypeEnum comboTypeEnum, TeachingType teachingType){
-        return jpa.findByStudentIdAndComboTypeAndSkuIdAndStartTimeAfter(studentId,comboTypeEnum.toString(),teachingType.getCode(),new Date());
+    public String[] enums2StringAray(List<ComboTypeEnum> comboTypeEnums){
+        String[] comboTypes=new String[comboTypeEnums.size()];
+        for(int i=0;i<comboTypeEnums.size();i++){
+            comboTypes[i]=comboTypeEnums.get(i).toString();
+        }
+        return comboTypes;
     }
 
-    public List<WorkOrder> getSelectedLeftAmount(Long studentId, ComboTypeEnum comboTypeEnum){
-        return jpa.findByStudentIdAndComboTypeAndStartTimeAfter(studentId,comboTypeEnum.toString(),new Date());
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums, TeachingType teachingType){
+        return jpa.findByStudentIdAndComboTypeInAndSkuIdAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),teachingType.getCode(),new Date());
+    }
+
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums){
+        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),new Date());
+    }
+
+    public List<WorkOrder> getSelectedLeftAmountNew(Long studentId, List<ComboTypeEnum> comboTypeEnums){
+        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),new Date());
     }
 
     public WorkOrder getCardToStart(Long studentId){

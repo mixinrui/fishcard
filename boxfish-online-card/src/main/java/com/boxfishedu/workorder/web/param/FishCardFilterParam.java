@@ -51,4 +51,7 @@ public class FishCardFilterParam {
 
     private String demoType;
 
+
+    private Integer teachingType;// 1 中教  2 外教
+
 }

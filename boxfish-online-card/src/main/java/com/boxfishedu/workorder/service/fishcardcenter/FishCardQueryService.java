@@ -139,6 +139,10 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             }
         }
 
+        // 中外教
+        if(null!=fishCardFilterParam.getTeachingType()){
+            sql.append(" and wo.skuId = :teachingType ");
+        }
 
         if (null != fishCardFilterParam.getCreateBeginDateFormat()) {
             sql.append(" and wo.createTime>=:createbegin ");
@@ -295,6 +299,11 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             } else {
                 query.setParameter("statusRechargeValue", fishCardFilterParam.getRechargeValue());
             }
+        }
+
+        if(null != fishCardFilterParam.getTeachingType()){
+
+            query.setParameter("teachingType", fishCardFilterParam.getTeachingType());
         }
 
 

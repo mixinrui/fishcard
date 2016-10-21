@@ -676,11 +676,15 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return jpa.getServiceSelectedStatus(studentId,coursesSelected);
     }
 
-    public List<Service> getUnselectedService(Long studentId, ComboTypeEnum comboTypeEnum, TutorTypeEnum tutorTypeEnum,Integer selectedFlag){
-        return jpa.findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelectedAndProductType(studentId, comboTypeEnum.toString(),tutorTypeEnum.toString(),selectedFlag,ProductType.TEACHING.value());
+    public List<Service> getUnselectedService(Long studentId, List<ComboTypeEnum> comboTypeEnums, TutorTypeEnum tutorTypeEnum,Integer selectedFlag){
+        return jpa.findByStudentIdAndComboTypeInAndTutorTypeAndCoursesSelectedAndProductType(studentId, workOrderService.enums2StringAray(comboTypeEnums),tutorTypeEnum.toString(),selectedFlag,ProductType.TEACHING.value());
     }
 
     public List<Service> getUnselectedService(Long studentId,ComboTypeEnum comboTypeEnum,Integer selectedFlag){
         return jpa.findByStudentIdAndComboTypeAndCoursesSelectedAndProductType(studentId, comboTypeEnum.toString() ,selectedFlag,ProductType.TEACHING.value());
+    }
+
+    public List<Service> getUnselectedService(Long studentId,List<ComboTypeEnum> comboTypeEnums,Integer selectedFlag){
+        return jpa.findByStudentIdAndComboTypeInAndCoursesSelectedAndProductType(studentId, workOrderService.enums2StringAray(comboTypeEnums) ,selectedFlag,ProductType.TEACHING.value());
     }
 }
