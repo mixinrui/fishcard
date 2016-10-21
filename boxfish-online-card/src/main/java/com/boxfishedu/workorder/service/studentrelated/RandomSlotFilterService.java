@@ -1,10 +1,8 @@
 package com.boxfishedu.workorder.service.studentrelated;
 
-import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.SlotRuleEnum;
-import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.mongo.TimeLimitRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
@@ -70,17 +68,12 @@ public class RandomSlotFilterService {
 
     //互斥的时间片
     private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getExcludeDateRange(String comboType,String tutorType, Date day) {
-        switch(ComboTypeToRoleId.resolve(comboType)){
-            case EXPERIENCE:
-                if(tutorType.equals(TutorTypeEnum.CN.toString())){
-                    comboType= OrderChannelDesc.OVERALL.toString();
-                }
-                else{
-                    comboType= OrderChannelDesc.CHINESE.toString();
-                }
-                break;
-            default:
-                break;
+        TutorType tt = TutorType.valueOf(tutorType);
+        switch (tt) {
+            case CN:
+            case MIXED: comboType= OrderChannelDesc.OVERALL.toString(); break;
+            case FRN: comboType= OrderChannelDesc.CHINESE.toString(); break;
+            default: comboType= OrderChannelDesc.OVERALL.toString(); break;
         }
         logger.info("@getExcludeDateRange#comboType[{}]#day[{}]", comboType, day);
         Optional<List<TimeLimitRules>> timeLimitRuleOptional = timeLimitRulesMorphiaRepository.queryByComboTypeAndRuleAndDay(comboType, SlotRuleEnum.MUTEX, DateUtil.getDayOfWeek(day));
