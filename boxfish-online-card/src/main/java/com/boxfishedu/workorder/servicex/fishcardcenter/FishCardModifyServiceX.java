@@ -226,10 +226,11 @@ public class FishCardModifyServiceX {
     /**
      * 更改上课时间点
      * @param startTimeParam
+     * @param checkTimeflag  是否需要验证时间
      * @return
      */
     @Transactional
-    public JsonResultModel  changeStartTime(StartTimeParam startTimeParam){
+    public JsonResultModel  changeStartTime(StartTimeParam startTimeParam,boolean checkTimeflag){
         Map<String,String> resultMap = Maps.newHashMap();
         // 检查日期合法化
         boolean  dataFlag = checkDate(startTimeParam);
@@ -243,6 +244,13 @@ public class FishCardModifyServiceX {
 
         if(null == workOrder || courseSchedule ==null){
             throw new BusinessException("课程信息不存在");
+        }
+
+        if(checkTimeflag) {
+            boolean afterTomo = afterTomoDate(workOrder);
+            if (!afterTomo) {
+                throw new BusinessException("请提前48小时修改上课时间");
+            }
         }
 
         Long teacherId = workOrder.getTeacherId();
@@ -319,7 +327,115 @@ public class FishCardModifyServiceX {
     }
 
 
+    /**
+     * 更改上课时间点(后台)
+     * @param startTimeParam
+     * @return
+     */
+    @Transactional
+    public JsonResultModel  changeStartTimeHT(StartTimeParam startTimeParam){
+        Map<String,String> resultMap = Maps.newHashMap();
+        // 检查日期合法化
+        boolean  dataFlag = checkDate(startTimeParam);
+        if(!dataFlag){
+            throw new BusinessException("日期不合法");
+        }
 
+        //获取鱼卡信息
+        WorkOrder workOrder =workOrderService.findByIdForUpdate(startTimeParam.getWorkOrderId())   ;
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
+
+        if(null == workOrder || courseSchedule ==null){
+            throw new BusinessException("课程信息不存在");
+        }
+
+
+        Long teacherId = workOrder.getTeacherId();
+        String startTime = DateUtil.Date2String(  workOrder.getStartTime());
+
+        // 验证鱼卡状态 创建、分配课程、分配老师
+
+        //获取结束时间
+        startTimeParam.setEndDateFormat(     DateUtil.String2Date(startTimeParam.getEndDate()) );
+
+        //记录老教师,时间
+        Long oldTeacherId= workOrder.getTeacherId();
+        String oldStartTime=StringUtils.EMPTY;
+        if(null!=workOrder.getStartTime()){
+            oldStartTime=DateUtil.Date2String(workOrder.getStartTime());
+        }
+        String oldTeacherName= StringUtils.EMPTY;
+        if(!StringUtils.isEmpty(workOrder.getTeacherName())){
+            workOrder.getTeacherName();
+        }
+
+        //分配教师以后其实就已经是就绪,目前这两个状态有重叠
+        if(workOrder.getStatus()==FishCardStatusEnum.CREATED.getCode() || workOrder.getStatus()==FishCardStatusEnum.COURSE_ASSIGNED.getCode() || workOrder.getStatus()==FishCardStatusEnum.TEACHER_ASSIGNED.getCode()){
+
+
+            //******************* 先  进行1 ,2  在进行跟换鱼卡信息
+            // 1 通知师生运营释放教师资源
+            teacherStudentRequester.notifyCancelTeacher(workOrder);
+            //2 通知小马解散师生关系
+            courseOnlineRequester.releaseGroup(workOrder);
+
+
+
+            if(workOrder.getStatus()!=FishCardStatusEnum.CREATED.getCode()){
+                workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+                courseSchedule.setStatus( FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+            }
+            workOrder.setTeacherId(0L);
+            workOrder.setTeacherName("");
+            workOrder.setStartTime(startTimeParam.getBeginDateFormat() );
+            workOrder.setEndTime(startTimeParam.getEndDateFormat() );
+            workOrder.setSlotId(startTimeParam.getTimeslotId());
+            workOrder.setChangtimeTimes(workOrder.getChangtimeTimes()==null?(new Integer(1)):(workOrder.getChangtimeTimes()+1));// 换课次数
+            workOrderService.save(workOrder);
+
+            courseSchedule.setClassDate(DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
+            logger.info("changeStartTime : [{}]",DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
+            courseSchedule.setTeacherId(0L);
+            courseSchedule.setTimeSlotId(startTimeParam.getTimeslotId() );
+
+            courseScheduleService.save(courseSchedule);
+
+            // 推送教师更换时间推送
+            if(null!=teacherId && teacherId>0L){
+                this.pushTeacherList(teacherId,startTime);
+                // 发送短信   this.sendShortMessage(teacherId,startTime,workOrder);
+            }
+
+        }else {
+            throw new BusinessException("课程信息不能修改");
+        }
+
+        List<CourseSchedule> courseSchedules = Lists.newArrayList();
+        courseSchedules.add(courseSchedule);
+        // 3 调用分配老师接口
+        timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
+
+        // 记录日志
+        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");
+
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
+
+        return new JsonResultModel().newJsonResultModel("OK");
+    }
+
+
+    /**
+     * 开始时间从后天开始
+     * @param workOrder
+     * @return
+     */
+    private boolean afterTomoDate(WorkOrder workOrder){
+        Date end  = DateUtil.addMinutes(new Date(),60*24*2);
+        if(workOrder.getStartTime()  .after(end)){
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 判断日期合法性

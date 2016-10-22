@@ -121,6 +121,7 @@ public class ScheduleCourseInfoService {
             updateOperations.set("difficulty", mewScheduleCourseInfo.getDifficulty());
         }
         updateOperations.set("thumbnail", mewScheduleCourseInfo.getThumbnail());
+        updateOperations.set("englishName", mewScheduleCourseInfo.getEnglishName());
         UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
         if (updateResults.getUpdatedCount() < 1) {
             logger.error("updateTrialScheduleInfo方法更新失败");
