@@ -231,6 +231,7 @@ public class FishCardModifyServiceX {
      */
     @Transactional
     public JsonResultModel  changeStartTime(StartTimeParam startTimeParam,boolean checkTimeflag){
+        String source = checkTimeflag ? "APP端":"后台";
         Map<String,String> resultMap = Maps.newHashMap();
         // 检查日期合法化
         boolean  dataFlag = checkDate(startTimeParam);
@@ -265,7 +266,7 @@ public class FishCardModifyServiceX {
         Long oldTeacherId= workOrder.getTeacherId();
         String oldStartTime=StringUtils.EMPTY;
         if(null!=workOrder.getStartTime()){
-            oldStartTime=DateUtil.Date2String(workOrder.getStartTime());
+            oldStartTime=DateUtil.Date2String (workOrder.getStartTime());
         }
         String oldTeacherName= StringUtils.EMPTY;
         if(!StringUtils.isEmpty(workOrder.getTeacherName())){
@@ -319,7 +320,7 @@ public class FishCardModifyServiceX {
         timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
 
         // 记录日志
-        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");
+        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]"+",修改时间来源:"+source);
 
         dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
