@@ -85,6 +85,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
 
         AvaliableTimeParam avaliableTimeParam = new  AvaliableTimeParam();
         avaliableTimeParam.setComboType(workOrder.getService().getComboType());
+        avaliableTimeParam.setTutorType(workOrder.getService().getTutorType());
 
         /**
          * 获取该鱼卡所在订单有效周期
