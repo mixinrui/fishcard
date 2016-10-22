@@ -53,7 +53,7 @@ StudentAppRelatedChangeClassTimeController {
      */
     @RequestMapping(value = "/changeTime", method = RequestMethod.POST)
     public JsonResultModel changeStartTime(@RequestBody StartTimeParam startTimeParam) {
-        return fishCardModifyServiceX.changeStartTime(startTimeParam);
+        return fishCardModifyServiceX.changeStartTime(startTimeParam,true);
     }
 
 
@@ -65,7 +65,7 @@ StudentAppRelatedChangeClassTimeController {
      */
     @RequestMapping(value = "/changeTimeHT", method = RequestMethod.POST)
     public JsonResultModel changeStartTimeHT(@RequestBody StartTimeParam startTimeParam) {
-        return fishCardModifyServiceX.changeStartTimeHT(startTimeParam);
+        return fishCardModifyServiceX.changeStartTime(startTimeParam,false);
     }
 
 

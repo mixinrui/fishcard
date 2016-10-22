@@ -226,10 +226,11 @@ public class FishCardModifyServiceX {
     /**
      * 更改上课时间点
      * @param startTimeParam
+     * @param checkTimeflag  是否需要验证时间
      * @return
      */
     @Transactional
-    public JsonResultModel  changeStartTime(StartTimeParam startTimeParam){
+    public JsonResultModel  changeStartTime(StartTimeParam startTimeParam,boolean checkTimeflag){
         Map<String,String> resultMap = Maps.newHashMap();
         // 检查日期合法化
         boolean  dataFlag = checkDate(startTimeParam);
@@ -245,9 +246,11 @@ public class FishCardModifyServiceX {
             throw new BusinessException("课程信息不存在");
         }
 
-        boolean afterTomo =  afterTomoDate(workOrder);
-        if(!afterTomo){
-            throw  new BusinessException("请提前48小时修改上课时间");
+        if(checkTimeflag) {
+            boolean afterTomo = afterTomoDate(workOrder);
+            if (!afterTomo) {
+                throw new BusinessException("请提前48小时修改上课时间");
+            }
         }
 
         Long teacherId = workOrder.getTeacherId();
