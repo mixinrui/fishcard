@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.studentrelated.selectmode;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +33,8 @@ public class TemplateSelectMode implements SelectMode {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
 
     // TODO 修改
     @Override
@@ -43,13 +47,18 @@ public class TemplateSelectMode implements SelectMode {
         List<WorkOrder> workOrders = new ArrayList<>();
         Queue<ServiceChoice> serviceQueue = createServiceChoice(services);
 
-        int index = 1;
-        for (int i = 0, loopOfWeek = selectTemplateParam.getLoopOfWeek(); i < loopOfWeek; i++) {
+
+        // 获取序列集合
+        Map<Long, AtomicInteger> sequences = createSequences(workOrderJpaRepository, services,
+                (Objects.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.EXCHANGE.name())));
+
+        for (int i = 0, loopOfWeek = selectTemplateParam.getLoopOfWeek(), c = 0; i < loopOfWeek; i++) {
             for (int j = 0, numPerWeek = selectTemplateParam.getNumPerWeek(); j < numPerWeek; j++) {
-                if(index++ > count) {
+                if(++c > count) {
                     break;
                 }
                 Service service = services.get(choice(serviceQueue));
+                int index = sequences.get(service.getId()).incrementAndGet();
                 List<SelectedTime> selectedTimes = timeSlotParam.getSelectedTimes();
                 WorkOrder workOrder = initWorkOrder(service, index, timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
                 TimeSlots timeSlots = teacherStudentRequester.getTimeSlot(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
@@ -82,8 +91,9 @@ public class TemplateSelectMode implements SelectMode {
         int count = services.stream().collect(Collectors.summingInt(Service::getAmount));
         // 兑换默认为1周两次
         if(Objects.equals(timeSlotParam.getComboTypeEnum(), ComboTypeToRoleId.EXCHANGE)) {
-            int loopOfWeek = (count + DEFAULT_EXCHANGE_NUM_PER_WEEK - 1) / DEFAULT_EXCHANGE_NUM_PER_WEEK;
-            int numPerWeek = (count == 1 ? 1: DEFAULT_EXCHANGE_NUM_PER_WEEK);
+            int loopOfWeek = count <=2 ? count : (count + DEFAULT_EXCHANGE_NUM_PER_WEEK - 1) / DEFAULT_EXCHANGE_NUM_PER_WEEK;
+            // 小于等于2的每周一次课
+            int numPerWeek = count <= 2 ? 1: DEFAULT_EXCHANGE_NUM_PER_WEEK;
             return new SelectTemplateParam(loopOfWeek, numPerWeek, count);
         } else {
             if(StringUtils.equals(timeSlotParam.getComboType(), ComboTypeToRoleId.INTELLIGENT.name())) {

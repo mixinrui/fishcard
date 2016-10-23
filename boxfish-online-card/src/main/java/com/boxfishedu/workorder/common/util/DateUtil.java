@@ -340,7 +340,7 @@ public class DateUtil {
 
 
     public static void main(String[] args) throws ParseException {
-        System.out.println("withIn=" + within48Hours(new SimpleDateFormat("yyyy-MM-dd").parse("2016-10-26")));
+        System.out.println("withIn=" + within48Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-25 16:00:00")));
     }
 
 }
