@@ -1,10 +1,7 @@
 package com.boxfishedu.workorder.service.fishcardcenter;
 
 import com.boxfishedu.mall.enums.OrderChannelDesc;
-import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
-import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.common.bean.*;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -69,7 +66,17 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
 
             if(null!=workOrder.getOrderChannel()){
                 if(workOrder.getOrderChannel().equals(OrderChannelDesc.STANDARD.getCode() )){
-                    workOrder.setOrderTypeDesc(OrderChannelDesc.get(workOrder.getComboType()).getDesc() );
+                    //终极梦想
+                    if(workOrder.getComboType().equals( OrderChannelDesc.CHINESE.getCode()  ) ||
+                            (  workOrder.getComboType().equals( OrderChannelDesc.INTELLIGENT.getCode()) && workOrder.getService().getTutorType().equals(TutorTypeEnum.FRN ) )   ){
+                        workOrder.setOrderTypeDesc(OrderChannelDesc.CHINESE.getDesc());
+                    //考试指导
+                    }else if( workOrder.getComboType().equals( OrderChannelDesc.INTELLIGENT.getCode()) && workOrder.getService().getTutorType().equals(TutorTypeEnum.CN )){
+                        workOrder.setOrderTypeDesc(OrderChannelDesc.INTELLIGENT.getDesc() );
+                    }else{
+                        workOrder.setOrderTypeDesc(OrderChannelDesc.get(workOrder.getComboType()).getDesc() );
+                    }
+
                 }else {
                     workOrder.setOrderTypeDesc(OrderChannelDesc.get(workOrder.getOrderChannel()).getDesc() );
                 }
@@ -107,14 +114,17 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         StringBuilder sql = new StringBuilder("from WorkOrder wo where wo.startTime between :begin and :end ");
 
         if (null != fishCardFilterParam.getOrderType()) {
-            if(fishCardFilterParam.getOrderType().equals( OrderChannelDesc.OVERALL.getCode())
-              ||
-                    fishCardFilterParam.getOrderType().equals( OrderChannelDesc.CHINESE.getCode())
-              ||
-                  fishCardFilterParam.getOrderType().equals( OrderChannelDesc.FOREIGN.getCode())
+            if(  fishCardFilterParam.getOrderType().equals( OrderChannelDesc.OVERALL.getCode())
+                 ||
+                 fishCardFilterParam.getOrderType().equals( OrderChannelDesc.FOREIGN.getCode())
             ){
-                sql.append(" and wo.comboType=:orderChannel and wo.wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
-            }else{
+                sql.append(" and wo.comboType=:orderChannel and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("' ");
+            }else if(fishCardFilterParam.getOrderType().equals( OrderChannelDesc.CHINESE.getCode())){       // 终极梦想
+                sql.append(" and (wo.comboType=:orderChannel or ( wo.comboType= '").append(OrderChannelDesc.INTELLIGENT.getCode()).append("' ") .
+                    append(" and  wo.service.tutorType= '").append(TutorTypeEnum.FRN ).append("' )  )  and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
+            } else  if( fishCardFilterParam.getOrderType().equals( OrderChannelDesc.INTELLIGENT.getCode())){ // 考试指导
+                sql.append(" and wo.comboType=:orderChannel  ").append(" and  wo.service.tutorType= '").append(TutorTypeEnum.CN ).append("'   and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
+            } else {
                 sql.append(" and wo.orderChannel=:orderChannel ");
             }
 

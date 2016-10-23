@@ -197,12 +197,12 @@ public class FishCardExcelServiceX {
                wexcel.setRealStartTime(workOrder.getActualStartTime());
                wexcel.setRealEndTime(workOrder.getActualEndTime());
                wexcel.setOrderCode(workOrder.getOrderCode());
-
-            if(workOrder.getOrderChannel().equals(OrderChannelDesc.STANDARD.getCode() )){
-                wexcel.setOrderType(workOrder.getComboType());
-            }else {
-                wexcel.setOrderType(workOrder.getOrderChannel());
-            }
+               wexcel.setOrderType(workOrder.getOrderTypeDesc());
+//            if(workOrder.getOrderChannel().equals(OrderChannelDesc.STANDARD.getCode() )){
+//                wexcel.setOrderType(workOrder.getComboType());
+//            }else {
+//                wexcel.setOrderType(workOrder.getOrderChannel());
+//            }
             listexcel.add(wexcel);
         });
 
