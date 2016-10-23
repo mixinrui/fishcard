@@ -35,7 +35,8 @@ public class DefaultRecommendHandler implements RecommendHandler {
 
     public Map<Integer, RecommandCourseView> recommendCourse(List<WorkOrder> workOrders, Predicate<WorkOrder> predicate) {
         Map<Integer, RecommandCourseView> courseViewMap = Maps.newHashMap();
-        for (WorkOrder workOrder : workOrders) {
+        for (int i = 0, size = workOrders.size(); i < size; i++) {
+            WorkOrder workOrder = workOrders.get(i);
             logger.debug("鱼卡序号{}",workOrder.getSeqNum());
             // 判断tutorType 是中教外教还是中外教,对应的推课
             TutorType tutorType = TutorType.resolve(workOrder.getService().getTutorType());
@@ -47,7 +48,7 @@ public class DefaultRecommendHandler implements RecommendHandler {
                 case MIXED: recommandCourseView = recommandCourseRequester.getPromoteRecommend(workOrder, predicate); break;
                 default: throw new BusinessException("未知类型的课程");
             }
-            courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
+            courseViewMap.put(i, recommandCourseView);
         }
         return courseViewMap;
     }

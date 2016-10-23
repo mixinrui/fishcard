@@ -321,7 +321,7 @@ public class DateUtil {
      */
     public static boolean within48Hours(Date dateTime) {
         Duration duration = Duration.between(
-                LocalDate.now(), DateUtil.convertLocalDateTime(dateTime));
+                LocalDateTime.now(ZoneId.systemDefault()), DateUtil.convertLocalDateTime(dateTime));
         // 课程推荐, 否则推课程类型
         return duration.toHours() <= 48;
     }
@@ -333,14 +333,14 @@ public class DateUtil {
      */
     public static boolean within72Hours(Date dateTime) {
         Duration duration = Duration.between(
-                LocalDate.now().atStartOfDay(), DateUtil.convertLocalDateTime(dateTime));
+                LocalDateTime.now(ZoneId.systemDefault()), DateUtil.convertLocalDateTime(dateTime));
         // 课程推荐, 否则推课程类型
         return duration.toHours() <= 72;
     }
 
 
     public static void main(String[] args) throws ParseException {
-        System.out.println("withIn=" + within48Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-25 16:00:00")));
+        System.out.println("withIn=" + within48Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-25 21:00:00")));
     }
 
 }

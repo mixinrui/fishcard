@@ -9,6 +9,8 @@ import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceXV1;
+import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionChecker;
+import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -42,7 +44,8 @@ StudentAppRelatedController {
     private AvaliableTimeServiceXV1 avaliableTimeServiceXV1;
     @Autowired
     private AccountCardInfoService accountCardInfoService;
-
+    @Autowired
+    private RepeatedSubmissionChecker checker;
 
     /**
      * 学生端批量选择课程的接口
@@ -51,8 +54,18 @@ StudentAppRelatedController {
     @RequestMapping(value = "/v1/workorders", method = RequestMethod.POST)
     public JsonResultModel ensureCourseTimesV1(@RequestBody TimeSlotParam timeSlotParam, Long userId) {
         timeSlotParam.setStudentId(userId);
-        JsonResultModel jsonResultModel = timePickerServiceXV1.ensureCourseTimes(timeSlotParam);
-        return jsonResultModel;
+
+        try {
+            if(checker.checkRepeatedSubmission(timeSlotParam.getOrderId())) {
+                throw new RepeatedSubmissionException("正在提交当中,请稍候...");
+            }
+            JsonResultModel jsonResultModel = timePickerServiceXV1.ensureCourseTimes(timeSlotParam);
+            checker.evictRepeatedSubmission(timeSlotParam.getOrderId());
+            return jsonResultModel;
+        } catch (Exception e) {
+            evictRepeatedSubmission(e, timeSlotParam.getOrderId());
+            throw e;
+        }
     }
 
 
@@ -222,5 +235,10 @@ StudentAppRelatedController {
         return JsonResultModel.newJsonResultModel(accountCardInfo);
     }
 
+    private void evictRepeatedSubmission(Exception e, Long orderId) {
+        if(!(e instanceof RepeatedSubmissionException)) {
+            checker.evictRepeatedSubmission(orderId);
+        }
+    }
 
 }

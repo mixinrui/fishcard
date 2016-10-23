@@ -332,6 +332,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         // service的开始日期,结束日期设置
         addValidTimeForServices(services);
         save(services);
+
         for (Service service:services){
             logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
             if (Objects.equals(service.getProductType(),1002)){

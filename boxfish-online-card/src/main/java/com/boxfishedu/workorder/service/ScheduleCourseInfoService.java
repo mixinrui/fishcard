@@ -79,8 +79,9 @@ public class ScheduleCourseInfoService {
         for (CourseSchedule courseSchedule : courseSchedules) {
             courseScheduleMap.put(courseSchedule.getWorkorderId().toString(), courseSchedule);
         }
-        for (WorkOrder workOrder : workOrders) {
-            RecommandCourseView courseView = courseViewMap.get(workOrder.getSeqNum());
+        for (int i = 0, size = workOrders.size(); i < size; i++) {
+            WorkOrder workOrder = workOrders.get(i);
+            RecommandCourseView courseView = courseViewMap.get(i);
             ScheduleCourseInfo scheduleCourseInfo = new ScheduleCourseInfo();
             scheduleCourseInfo.setCourseId(courseView.getCourseId());
             scheduleCourseInfo.setCourseType(courseView.getCourseType());

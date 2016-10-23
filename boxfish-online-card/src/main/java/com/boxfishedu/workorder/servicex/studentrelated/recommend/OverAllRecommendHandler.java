@@ -32,12 +32,11 @@ public class OverAllRecommendHandler extends DefaultRecommendHandler {
         }
 
         Map<Integer, RecommandCourseView> resultMap = new HashMap<>();
-        int recommendIndex = 0;
         for(int i = 0, size = workOrders.size() / 8; i < size; i++) {
             List<RecommandCourseView> recommendCourseViews = recommandCourseRequester.getBatchRecommandCourse(
                     timeSlotParam.getStudentId());
             for(RecommandCourseView recommandCourseView : recommendCourseViews) {
-                resultMap.put(++recommendIndex, recommandCourseView);
+                resultMap.put(i, recommandCourseView);
             }
         }
         return resultMap;

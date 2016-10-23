@@ -23,9 +23,6 @@ public class StudentTimePickerValidatorSupport {
      */
     private List<StudentTimePickerValidator> validatorList;
 
-    @Autowired
-    private RepeatedSubmissionChecker checker;
-
 
     @Autowired
     public StudentTimePickerValidatorSupport(List<StudentTimePickerValidator> validatorList) {
@@ -34,32 +31,11 @@ public class StudentTimePickerValidatorSupport {
 
 
     public void prepareValidate(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> serviceList) {
-        try {
-            validatorList.forEach(validator -> validator.prepareValidate(timeSlotParam, selectMode, serviceList));
-        } catch (Exception e) {
-            evictRepeatedSubmission(e, serviceList);
-            throw e;
-        }
+        validatorList.forEach(validator -> validator.prepareValidate(timeSlotParam, selectMode, serviceList));
     }
 
 
     public void postValidate(List<Service> serviceList, List<WorkOrder> workOrderList, Set<String> unFinishWorkOrder) {
-        try {
-            validatorList.forEach(validator -> validator.postValidate(serviceList, workOrderList, unFinishWorkOrder));
-        } catch (Exception e) {
-            evictRepeatedSubmission(e, serviceList);
-            throw e;
-        }
-    }
-
-    /**
-     * 删除缓存
-     * @param e
-     * @param serviceList
-     */
-    public void evictRepeatedSubmission(Exception e, List<Service> serviceList) {
-        if(!(e instanceof RepeatedSubmissionException)) {
-            serviceList.forEach(service -> checker.evictRepeatedSubmission(service.getId()));
-        }
+        validatorList.forEach(validator -> validator.postValidate(serviceList, workOrderList, unFinishWorkOrder));
     }
 }

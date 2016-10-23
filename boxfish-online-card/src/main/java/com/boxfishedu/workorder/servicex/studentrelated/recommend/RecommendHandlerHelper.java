@@ -53,7 +53,7 @@ public class RecommendHandlerHelper {
                 WorkOrder workOrder = workOrders.get(i);
                 logger.debug("鱼卡序号{}", workOrder.getSeqNum());
 //            Integer index=recommandedCourseService.getCourseIndex(workOrder);
-                RecommandCourseView recommandCourseView = resultMap.get(workOrder.getSeqNum());
+                RecommandCourseView recommandCourseView = resultMap.get(i);
                 workOrder.initCourseInfo(recommandCourseView);
                 workOrder.setSkuId(CourseType2TeachingTypeService.courseType2TeachingType2(
                         recommandCourseView.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType())));

@@ -21,15 +21,15 @@ public class RepeatedSubmissionChecker {
 
     /**
      * 当是重复提交时返回true,不是重复提交时返回false,并且保存
-     * @param serviceId
+     * @param orderId
      * @return
      */
-    public boolean checkRepeatedSubmission(Long serviceId) {
+    public boolean checkRepeatedSubmission(Long orderId) {
         // 不存在的时候返回false,存在的时候返回true
-        return (cache.putIfAbsent(serviceId, true) != null);
+        return (cache.putIfAbsent(orderId, true) != null);
     }
 
-    public void evictRepeatedSubmission(Long serviceId) {
-        cache.evict(serviceId);
+    public void evictRepeatedSubmission(Long orderId) {
+        cache.evict(orderId);
     }
 }
