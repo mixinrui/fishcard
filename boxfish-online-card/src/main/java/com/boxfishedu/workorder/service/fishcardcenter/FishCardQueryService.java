@@ -118,12 +118,12 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                  ||
                  fishCardFilterParam.getOrderType().equals( OrderChannelDesc.FOREIGN.getCode())
             ){
-                sql.append(" and wo.comboType=:orderChannel and wo.wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
+                sql.append(" and wo.comboType=:orderChannel and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("' ");
             }else if(fishCardFilterParam.getOrderType().equals( OrderChannelDesc.CHINESE.getCode())){       // 终极梦想
-                sql.append(" and (wo.comboType=:orderChannel or ( wo.comboType= '").append(OrderChannelDesc.INTELLIGENT.getCode()).append("'") .
+                sql.append(" and (wo.comboType=:orderChannel or ( wo.comboType= '").append(OrderChannelDesc.INTELLIGENT.getCode()).append("' ") .
                     append(" and  wo.service.tutorType= '").append(TutorTypeEnum.FRN ).append("' )  )  and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
             } else  if( fishCardFilterParam.getOrderType().equals( OrderChannelDesc.INTELLIGENT.getCode())){ // 考试指导
-                sql.append(" and wo.comboType=:orderChannel  ").append(" and  wo.service.tutorType= '").append(TutorTypeEnum.CN ).append("'   and wo.wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
+                sql.append(" and wo.comboType=:orderChannel  ").append(" and  wo.service.tutorType= '").append(TutorTypeEnum.CN ).append("'   and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
             } else {
                 sql.append(" and wo.orderChannel=:orderChannel ");
             }
