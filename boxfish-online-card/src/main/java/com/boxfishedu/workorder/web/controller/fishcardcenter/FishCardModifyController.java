@@ -68,7 +68,7 @@ public class FishCardModifyController {
 
     /**
      * 更换上课时间(后台)
-     *
+     *  app 更换上课时间  StudentAppRelatedChangeClassTimeController
      * @param startTimeParam 包含鱼卡id  开始时间
      * @return
      */

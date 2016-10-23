@@ -46,8 +46,8 @@ StudentAppRelatedChangeClassTimeController {
     }
 
     /**
-     * 更换上课时间
-     *
+     * 更换上课时间(APP)
+     *  后台更换时间 FishCardModifyController
      * @param startTimeParam 包含鱼卡id  开始时间
      * @return
      */
@@ -56,17 +56,6 @@ StudentAppRelatedChangeClassTimeController {
         return fishCardModifyServiceX.changeStartTime(startTimeParam,true);
     }
 
-
-    /**
-     * 更换上课时间(后台)
-     *
-     * @param startTimeParam 包含鱼卡id  开始时间
-     * @return
-     */
-    @RequestMapping(value = "/changeTimeHT", method = RequestMethod.POST)
-    public JsonResultModel changeStartTimeHT(@RequestBody StartTimeParam startTimeParam) {
-        return fishCardModifyServiceX.changeStartTime(startTimeParam,false);
-    }
 
 
 }
