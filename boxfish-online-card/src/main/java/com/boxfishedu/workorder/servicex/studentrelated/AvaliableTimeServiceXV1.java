@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -106,7 +107,7 @@ public class AvaliableTimeServiceXV1 {
                 avaliableTimeParam.setTutorType(TutorType.MIXED.name());
             }
             workOrder = workOrderService.getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(
-                    avaliableTimeParam.getStudentId(), avaliableTimeParam.getProductType(), avaliableTimeParam.getTutorType());
+                    avaliableTimeParam.getStudentId(), ProductType.TEACHING.value(), avaliableTimeParam.getTutorType());
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");

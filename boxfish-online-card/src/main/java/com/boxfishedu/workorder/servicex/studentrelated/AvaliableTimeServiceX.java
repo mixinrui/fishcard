@@ -5,7 +5,6 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
@@ -34,9 +33,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class AvaliableTimeServiceX {
-
-    @Autowired
-    private TimeLimitPolicy timeLimitPolicy;
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
