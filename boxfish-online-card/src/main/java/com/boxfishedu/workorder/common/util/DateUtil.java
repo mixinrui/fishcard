@@ -323,7 +323,7 @@ public class DateUtil {
         Duration duration = Duration.between(
                 LocalDate.now().atStartOfDay(), DateUtil.convertLocalDateTime(dateTime));
         // 课程推荐, 否则推课程类型
-        return duration.toDays() <= 2;
+        return duration.toHours() <= 48;
     }
 
     /**
@@ -335,12 +335,12 @@ public class DateUtil {
         Duration duration = Duration.between(
                 LocalDate.now().atStartOfDay(), DateUtil.convertLocalDateTime(dateTime));
         // 课程推荐, 否则推课程类型
-        return duration.toDays() <= 3;
+        return duration.toHours() <= 72;
     }
 
 
-    public static void main(String[] args) {
-       within48Hours(new Date());
+    public static void main(String[] args) throws ParseException {
+        System.out.println("withIn=" + within48Hours(new SimpleDateFormat("yyyy-MM-dd").parse("2016-10-26")));
     }
 
 }
