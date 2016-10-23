@@ -321,7 +321,7 @@ public class DateUtil {
      */
     public static boolean within48Hours(Date dateTime) {
         Duration duration = Duration.between(
-                LocalDate.now().atStartOfDay(), DateUtil.convertLocalDateTime(dateTime));
+                LocalDate.now(), DateUtil.convertLocalDateTime(dateTime));
         // 课程推荐, 否则推课程类型
         return duration.toHours() <= 48;
     }
