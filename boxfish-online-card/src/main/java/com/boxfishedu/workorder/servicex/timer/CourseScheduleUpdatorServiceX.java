@@ -209,7 +209,7 @@ public class CourseScheduleUpdatorServiceX {
             e.printStackTrace();
         }
         System.out.println("recommend courses finished!!");
-        
+
         workOrderMap.forEach((studentId,list)->dataCollectorService.updateBothChnAndFnItemAsync(studentId));
     }
 }
