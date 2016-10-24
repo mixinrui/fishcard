@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.text.ParseException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -180,9 +180,10 @@ public class CourseScheduleUpdatorServiceX {
      */
     public void recommendCourses() {
         // 72小时以内
-        Date endDate = DateUtil.convertToDate(LocalDate.now().plusDays(3));
+        Date endDate = DateUtil.convertToDate(LocalDateTime.now().plusDays(3));
         // 按照学生id进行分组
         List<WorkOrder> workOrderList = workOrderJpaRepository.findWithinHoursCreatedWorkOrderList(endDate);
+        logger.info("exec [{}] workorders recommend!", workOrderList.size());
         List<CourseSchedule> courseScheduleList =
                 courseScheduleRepository.findWithinHoursCreatedCourseScheduleList(endDate);
 
@@ -200,7 +201,8 @@ public class CourseScheduleUpdatorServiceX {
             while (!exec.isTerminated()) {
                 exec.awaitTermination(100, TimeUnit.MILLISECONDS);
                 int progress = Math.round((exec.getCompletedTaskCount() * 100) / exec.getTaskCount());
-                String msg = progress + "% has done," + exec.getCompletedTaskCount() + " has completed!!";
+                String msg = progress + "% has done," + exec.getCompletedTaskCount()
+                        + " has completed!! count=" + exec.getTaskCount();
                 if(!StringUtils.equals(message, msg)) {
                     System.out.println(message = msg);
                 }
