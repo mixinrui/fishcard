@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.ShortMessageCodeConstant;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.ServiceSDK;
@@ -224,13 +225,39 @@ public class FishCardModifyServiceX {
 
 
     /**
+     * 更改时间
+     *
+     *
+     * 1 更改 鱼卡信息 和 课程信息
+     * 2 分配老师
+     *
+     * desc:    ********  解决问题,有可能分配老师 和 更改课程信息 导致 脏读 导致 课程鱼卡 classDate  和 StartTime 时间不一致问题
+     *
+     * @param startTimeParam
+     * @param checkTimeflag
+     * @return
+     */
+    public JsonResultModel changeStartTime(StartTimeParam startTimeParam,boolean checkTimeflag){
+
+        WorkOrder workOrder = this.changeStartTimeFishCard(startTimeParam,checkTimeflag);
+
+        if(workOrder.getTeacherId() == 0){
+            List<CourseSchedule> courseSchedules = Lists.newArrayList();
+            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
+            timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
+        }
+        return  new JsonResultModel().newJsonResultModel("OK");
+    }
+
+
+    /**
      * 更改上课时间点
      * @param startTimeParam
      * @param checkTimeflag  是否需要验证时间
      * @return
      */
     @Transactional
-    public JsonResultModel  changeStartTime(StartTimeParam startTimeParam,boolean checkTimeflag){
+    public WorkOrder  changeStartTimeFishCard(StartTimeParam startTimeParam,boolean checkTimeflag){
         String source = checkTimeflag ? "APP端":"后台";
         Map<String,String> resultMap = Maps.newHashMap();
         // 检查日期合法化
@@ -298,7 +325,7 @@ public class FishCardModifyServiceX {
             workOrderService.save(workOrder);
 
             courseSchedule.setClassDate(DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
-            logger.info("changeStartTime : [{}]",DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
+            logger.info("changeStartTime : [{}] ,workOrderId : [{}]",DateUtil.String2SimpleDate(startTimeParam.getBeginDate()),workOrder.getId());
             courseSchedule.setTeacherId(0L);
             courseSchedule.setTimeSlotId(startTimeParam.getTimeslotId() );
 
@@ -314,18 +341,16 @@ public class FishCardModifyServiceX {
             throw new BusinessException("课程信息不能修改");
         }
 
-        List<CourseSchedule> courseSchedules = Lists.newArrayList();
-        courseSchedules.add(courseSchedule);
-        // 3 调用分配老师接口
-        timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
 
         // 记录日志
-        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]"+",修改时间来源:"+source);
+        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"], #当前上课时间 ["+startTimeParam.getBeginDate()+"] ,#旧的教师id["+oldTeacherId+"],#旧的教师姓名["+oldTeacherName+"]"+",修改时间来源:"+source);
 
         dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
-        return new JsonResultModel().newJsonResultModel("OK");
+        return workOrder;
     }
+
+
 
 
     /**
