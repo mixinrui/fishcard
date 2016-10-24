@@ -117,6 +117,10 @@ public class DateUtil {
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
+    public static Date convertToDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
     public static String simpleDateLong2String(Long time) {
         return simpleDate2String(new Date(time));
     }

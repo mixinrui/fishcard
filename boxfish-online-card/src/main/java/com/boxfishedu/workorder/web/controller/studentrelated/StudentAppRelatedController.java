@@ -119,8 +119,17 @@ StudentAppRelatedController {
     @RequestMapping(value = "/workorders", method = RequestMethod.POST)
     public JsonResultModel ensureCourseTimes(@RequestBody TimeSlotParam timeSlotParam, Long userId) {
         timeSlotParam.setStudentId(userId);
-        JsonResultModel jsonResultModel = timePickerServiceX.ensureCourseTimes(timeSlotParam);
-        return jsonResultModel;
+        try {
+            if (checker.checkRepeatedSubmission(timeSlotParam.getOrderId())) {
+                throw new RepeatedSubmissionException("正在提交当中,请稍候...");
+            }
+            JsonResultModel jsonResultModel = timePickerServiceX.ensureCourseTimes(timeSlotParam);
+            checker.evictRepeatedSubmission(timeSlotParam.getOrderId());
+            return jsonResultModel;
+        } catch (Exception e) {
+            evictRepeatedSubmission(e, timeSlotParam.getOrderId());
+            throw e;
+        }
     }
 
     @RequestMapping(value = "/time/available", method = RequestMethod.GET)

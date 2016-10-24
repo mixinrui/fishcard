@@ -85,7 +85,7 @@ public class RecommendCourseTask implements Runnable {
                 defaultRecommendHandler.recommendCourse(
                         Collections.singletonList(workOrder),
                         (w -> DateUtil.within72Hours(w.getStartTime())));
-        RecommandCourseView courseView = recommendCourseMap.get(workOrder.getSeqNum());
+        RecommandCourseView courseView = recommendCourseMap.get(0);
 
         // 如果已经分配老师,课程类型如果与课程推荐不匹配重新更换老师
         if(!StringUtils.equals(courseView.getCourseType(), workOrder.getCourseType())
