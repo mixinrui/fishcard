@@ -88,6 +88,6 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     Set<String> findUnfinishByStudentIdAndCurrentDate(Long studentId, Date Date);
 
     // 查找48小时以内,没有课程推荐的课表
-    @Query("select c from CourseSchedule c where c.classDate<?1 and c.courseId is null")
+    @Query("select c from CourseSchedule c,WorkOrder w where c.workorderId=w.id and w.startTime<=?1 and w.courseId is null")
     List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
 }

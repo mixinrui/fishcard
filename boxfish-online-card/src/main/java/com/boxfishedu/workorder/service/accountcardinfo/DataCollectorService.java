@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.service.accountcardinfo;
 
-import com.boxfishedu.card.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
@@ -14,9 +13,7 @@ import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.servicex.studentrelated.recommend.DefaultRecommendHandler;
-import com.boxfishedu.workorder.servicex.timer.RecommendCourseTask;
-import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.servicex.timer.SingleRecommendHandler;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +49,9 @@ public class DataCollectorService {
 
     @Autowired
     private CourseScheduleService courseScheduleService;
+
+    @Autowired
+    private SingleRecommendHandler singleRecommendHandler;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -138,7 +138,7 @@ public class DataCollectorService {
     public void getLatestRecommandCourse(WorkOrder latestWorkOrder) {
         if (StringUtils.isEmpty(latestWorkOrder.getCourseId())) {
             CourseSchedule latestCourseSchedule = courseScheduleService.findByWorkOrderId(latestWorkOrder.getId());
-            RecommendCourseTask.singleRecommend(latestWorkOrder, latestCourseSchedule);
+            singleRecommendHandler.singleRecommend(latestWorkOrder, latestCourseSchedule);
         }
     }
 
