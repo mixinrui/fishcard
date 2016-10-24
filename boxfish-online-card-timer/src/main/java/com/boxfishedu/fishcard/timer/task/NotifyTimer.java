@@ -197,7 +197,7 @@ public class NotifyTimer {
     /**
      * 通知学生明天 有几节课
      */
-    //@Scheduled(cron = "0 30 18 * * ?")
+    @Scheduled(cron = "0 30 18 * * ?")
     public void notifyTomoStudentHasClass() {
         logger.info("<<<<<<notifyTomoStudentHasClass<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<学生明天有课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
@@ -209,7 +209,7 @@ public class NotifyTimer {
     /**
      * 7点通知老师今天有几节课 第一节什么时间上
      */
-    //@Scheduled(cron = "0 30 07 * * ?")
+    @Scheduled(cron = "0 30 07 * * ?")
     public void notifyTodyTeacherHasClass() {
         logger.info("<<<<<<notifyTodyTeacherHasClass<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<老师今天有课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
