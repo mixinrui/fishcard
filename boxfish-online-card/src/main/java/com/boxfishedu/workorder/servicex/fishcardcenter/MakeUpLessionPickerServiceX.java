@@ -80,6 +80,7 @@ public class MakeUpLessionPickerServiceX {
 
                 AvaliableTimeParam avaliableTimeParam=new AvaliableTimeParam();
                 avaliableTimeParam.setComboType(workOrder.getService().getComboType());
+                avaliableTimeParam.setTutorType(workOrder.getService().getTutorType());
                 //获取时间片范围内的数据
                 DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
 
