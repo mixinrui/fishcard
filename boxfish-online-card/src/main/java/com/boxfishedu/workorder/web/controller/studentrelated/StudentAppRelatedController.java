@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
+import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
@@ -14,6 +15,8 @@ import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmis
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,6 +33,7 @@ import java.util.Locale;
 @CrossOrigin
 @RestController
 @RequestMapping("/service/student")
+@SuppressWarnings("ALL")
 public class
 StudentAppRelatedController {
     @Autowired
@@ -46,6 +50,10 @@ StudentAppRelatedController {
     private AccountCardInfoService accountCardInfoService;
     @Autowired
     private RepeatedSubmissionChecker checker;
+    @Autowired
+    private OnlineAccountService onlineAccountService;
+
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     /**
      * 学生端批量选择课程的接口
@@ -150,6 +158,10 @@ StudentAppRelatedController {
 
     @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.GET)
     public JsonResultModel userCardInfo(String order_type,@PathVariable("student_id") Long studentId) {
+        if(!onlineAccountService.isMember(studentId)){
+            logger.debug("@userCardInfo#{}不是在线购买用户,直接返回");
+            return JsonResultModel.newJsonResultModel(AccountCardInfo.buildEmpty());
+        }
         AccountCardInfo accountCardInfo=accountCardInfoService.queryByStudentId(studentId);
         if(null!=order_type) {
             switch (order_type) {
