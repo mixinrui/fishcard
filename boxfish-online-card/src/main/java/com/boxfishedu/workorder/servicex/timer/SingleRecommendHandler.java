@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.servicex.timer;
 
 import com.boxfishedu.workorder.common.config.UrlConf;
-import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
@@ -20,6 +19,7 @@ import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Created by LuoLiBing on 16/10/24.
@@ -48,6 +48,11 @@ public class SingleRecommendHandler {
     @Autowired
     private CourseScheduleRepository courseScheduleRepository;
 
+    @Transactional
+    public void singleRecommend(WorkOrder workOrder, CourseSchedule courseSchedule) {
+        singleRecommend(workOrder, courseSchedule, (w) -> true);
+    }
+
 
     /**
      * 单课程推荐
@@ -55,11 +60,11 @@ public class SingleRecommendHandler {
      * @param courseSchedule
      */
     @Transactional
-    public void singleRecommend(WorkOrder workOrder, CourseSchedule courseSchedule) {
+    public void singleRecommend(WorkOrder workOrder, CourseSchedule courseSchedule, Predicate<WorkOrder> predicate) {
         Map<Integer, RecommandCourseView> recommendCourseMap =
                 defaultRecommendHandler.recommendCourse(
                         Collections.singletonList(workOrder),
-                        (w -> DateUtil.within72Hours(w.getStartTime())));
+                        predicate);
         RecommandCourseView courseView = recommendCourseMap.get(0);
 
         // 如果已经分配老师,课程类型如果与课程推荐不匹配重新更换老师

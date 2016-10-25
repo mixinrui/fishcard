@@ -337,14 +337,14 @@ public class DateUtil {
      */
     public static boolean within72Hours(Date dateTime) {
         Duration duration = Duration.between(
-                LocalDateTime.now(ZoneId.systemDefault()), DateUtil.convertLocalDateTime(dateTime));
+                LocalDateTime.now(), DateUtil.convertLocalDateTime(dateTime));
         // 课程推荐, 否则推课程类型
-        return duration.toHours() <= 72 * 60;
+        return duration.toMinutes() <= 72 * 60;
     }
 
 
     public static void main(String[] args) throws ParseException {
-        System.out.println("withIn=" + within48Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-26 20:00:00")));
+        System.out.println("withIn=" + within72Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-28 19:00:00")));
     }
 
 }
