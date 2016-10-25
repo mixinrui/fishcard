@@ -212,52 +212,63 @@ public class RecommandCourseRequester {
 
 
     private URI createOverAllRecommend(Long studentId) {
-        return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
                 .path("/online/" + studentId)
                 .build()
                 .toUri();
-
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
     }
 
     private URI create8BatchDreamRecommend(Long studentId) {
-        return UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
                 .path(String.format("/ultimate/%s", studentId.toString()))
                 .build()
                 .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
     }
 
 
     // 核心素养 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/promote/18826/9
     private URI createPromoteRecommend(Long studentId, int index) {
-        return UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
                 .path(String.format("/promote/%s/%s", studentId, index))
                 .build()
                 .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
     }
 
     // 终极梦想 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/ultimate/18826/1
     private URI createUltimateRecommend(Long studentId, int index) {
-        return UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
                 .path(String.format("/ultimate/%s/%s", studentId, index))
                 .build()
                 .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
     }
 
 
     // 终极梦想换课 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/ultimate/exchange/18826/L3NoYXJlL3N2bi9GdW5jdGlvbiDlhbPliIcvMzEyLuWmguS9leihqOi-vuaLheW_g-afkOS6i--8ny54bHN4
     private URI createUltimateExchangeCourse(Long studentId, int index, String lessonId) {
-        return UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
                 .path(String.format("/ultimate/exchange/%s/%s/%s", studentId.toString(), index, lessonId))
                 .build()
                 .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
     }
 
     // 核心素养换课 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/exchange/promote/18826/1/L3NoYXJlL3N2bi9GdW5jdGlvbiDlhbPliIcvMzEyLuWmguS9leihqOi-vuaLheW_g-afkOS6i—8ny54bHN4
     private URI createPromoteExchangeCourse(Long studentId, int index, String lessonId) {
-        return UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
                 .path(String.format("/exchange/promote/%s/%s/%s", studentId.toString(), index, lessonId))
                 .build()
                 .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
     }
 
 }
