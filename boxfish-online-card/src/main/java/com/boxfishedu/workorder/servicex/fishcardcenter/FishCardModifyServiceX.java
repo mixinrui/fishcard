@@ -2,38 +2,33 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NotFoundException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.ShortMessageCodeConstant;
-import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
-import com.boxfishedu.workorder.entity.mysql.Service;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
-import com.boxfishedu.workorder.requester.RecommandCourseRequester;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
+import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.FishCardDeleteParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.workorder.common.config.UrlConf;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.ServeService;
-import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -46,7 +41,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * Created by hucl on 16/5/10.
@@ -158,7 +152,9 @@ public class FishCardModifyServiceX {
             throw new NotFoundException();
         }
         workOrders.forEach(workOrder -> {
-            fishCardModifyService.changeCourse(workOrder);
+            if(StringUtils.isNotEmpty(workOrder.getCourseId())) {
+                fishCardModifyService.changeCourse(workOrder);
+            }
         });
         dataCollectorService.updateBothChnAndFnItemAsync(studentId);
     }
