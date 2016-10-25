@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.timer;
 
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,9 @@ public class RecommendCourseTask implements Runnable {
     @Override
     public void run() {
         for(int i = 0, size = workOrders.size(); i < size; i++) {
-            handler.singleRecommend(workOrders.get(i), courseScheduleMap.get(workOrders.get(i).getId()));
+            handler.singleRecommend(
+                    workOrders.get(i), courseScheduleMap.get(workOrders.get(i).getId()),
+                    (w -> DateUtil.within72Hours(w.getStartTime())));
         }
     }
 
