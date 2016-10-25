@@ -40,9 +40,6 @@ public class LoginService {
     @Autowired
     private WorkOrderUserService workOrderUserService;
 
-    @Autowired
-    private TeacherStudentRequester teacherStudentRequester;
-
     /**
      * 从db中加载用户信息 到redis中
      * @param userName
@@ -62,6 +59,9 @@ public class LoginService {
         }
         return  null;
     }
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
     /**
      *  登陆方法

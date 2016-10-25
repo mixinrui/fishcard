@@ -189,7 +189,7 @@ public class DataCollectorService {
             AccountCourseBean foreignCourseBean = updateForeignItem(studentId);
             accountCardInfoService.saveOrUpdateChAndFrn(studentId, chineseCourseBean, foreignCourseBean);
         } catch (Exception ex) {
-            logger.error("@updateBothChnAndFnItem#exception用户[{}]更新首页信息失败", studentId);
+            logger.error("@updateBothChnAndFnItem#exception用户[{}]更新首页信息失败", studentId,ex);
         }
     }
 
