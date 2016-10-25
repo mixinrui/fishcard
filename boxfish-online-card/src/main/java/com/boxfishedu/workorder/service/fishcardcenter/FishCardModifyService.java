@@ -82,7 +82,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
 
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         courseSchedule.setCourseId(workOrder.getCourseId());
-        courseSchedule.setCourseName(workOrder.getCourseType());
+        courseSchedule.setCourseName(workOrder.getCourseName());
         courseSchedule.setCourseType(workOrder.getCourseType());
 
         //修改课程信息
