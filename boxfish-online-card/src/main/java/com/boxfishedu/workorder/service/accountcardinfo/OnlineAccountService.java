@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service.accountcardinfo;
 
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqConstant;
 import com.boxfishedu.workorder.common.threadpool.AsyncNotifyPoolManager;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.dao.mongo.OnlineAccountSetMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.OnlineAccountSet;
 import org.slf4j.Logger;
@@ -32,6 +33,9 @@ public class OnlineAccountService {
 
     private final String ONLINE_ACCOUNT_KEY="account:online";
 
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
+
     private Logger logger=LoggerFactory.getLogger(this.getClass());
 
     //更新mongo,更新redis
@@ -60,6 +64,8 @@ public class OnlineAccountService {
                 result = redisTemplate.opsForSet().isMember(ONLINE_ACCOUNT_KEY, studentId.toString());
             }
             else{
+                //将mongo的数据同步到redis中去
+                threadPoolManager.execute(new Thread(()->{syncMongo2Redis();}));
                 return (onlineAccountSetMorphiaRepository.queryByStudentId(studentId)!=null);
             }
             return result;
@@ -74,10 +80,10 @@ public class OnlineAccountService {
         Long mongoCount=onlineAccountSetMorphiaRepository.count();
         Long redisCount=redisTemplate.opsForSet().size(ONLINE_ACCOUNT_KEY);
         logger.debug("@syncMongo2Redis#mongo的个数:{},redis的个数:{}",mongoCount,redisCount);
-        if(!mongoCount.equals(redisCount)) {
+        if(mongoCount.longValue()>redisCount.longValue()) {
             logger.info("@syncMongo2Redis###############mongo#notif#equal#redis,同步数据开始");
             List<OnlineAccountSet> allAccounts = onlineAccountSetMorphiaRepository.getAll();
-            allAccounts.forEach(onlineAccount -> redisTemplate.opsForSet().add(onlineAccount.getStudentId().toString()));
+            allAccounts.forEach(onlineAccount -> redisTemplate.opsForSet().add(ONLINE_ACCOUNT_KEY,onlineAccount.getStudentId().toString()));
         }
     }
 }

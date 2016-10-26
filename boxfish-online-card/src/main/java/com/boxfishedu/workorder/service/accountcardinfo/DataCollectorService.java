@@ -184,12 +184,12 @@ public class DataCollectorService {
 
     public void updateBothChnAndFnItem(Long studentId) {
         try {
-            logger.debug("@updateBothChnAndFnItem#begin用户[{}]更新首页信息", studentId);
+            logger.debug("@updateBothChnAndFnItem#begin#user[{}]更新首页信息>>>", studentId);
             AccountCourseBean chineseCourseBean = updateChineseItem(studentId);
             AccountCourseBean foreignCourseBean = updateForeignItem(studentId);
             accountCardInfoService.saveOrUpdateChAndFrn(studentId, chineseCourseBean, foreignCourseBean);
         } catch (Exception ex) {
-            logger.error("@updateBothChnAndFnItem#exception用户[{}]更新首页信息失败", studentId,ex);
+            logger.error("@updateBothChnAndFnItem#exception#user[{}]更新首页信息失败", studentId,ex);
         }
     }
 
