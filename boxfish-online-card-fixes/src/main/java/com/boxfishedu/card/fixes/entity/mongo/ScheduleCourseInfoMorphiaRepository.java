@@ -8,11 +8,14 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.LongAdder;
 
 @Component
 public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<ScheduleCourseInfo> {
 
     private final static String url = "http://base.boxfish.cn/course/info/%s";
+
+    private LongAdder longAdder = new LongAdder();
 
     public void updateCourseInfos() {
 
@@ -52,8 +55,9 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
     public void updateCourseDifficultys() {
         Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
         List<ScheduleCourseInfo> list = query.asList();
-        System.out.println(list.size());
+        System.out.println("updateCount = " + list.size());
         list.parallelStream().forEach(this::updateCourseDifficulty);
+        System.out.println("modifyCount = " + longAdder.sumThenReset());
     }
 
     private void updateCourseDifficulty(ScheduleCourseInfo sci) {
@@ -63,6 +67,7 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
                 System.out.println("before update= [{" + sci + "}]");
                 sci.setDifficulty("LEVEL_" + difficulty);
                 datastore.save(sci);
+                longAdder.increment();
                 System.out.println("after  update= [{" + sci + "}]");
             }
         }
