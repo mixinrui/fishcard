@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
+import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Maps;
@@ -67,6 +68,9 @@ public class InitDataController {
 
     @Autowired
     private ThreadPoolManager threadPoolManager;
+
+    @Autowired
+    private OnlineAccountService onlineAccountService;
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -159,5 +163,14 @@ public class InitDataController {
         param.put("status", ConstantUtil.WORKORDER_COMPLETED);
         rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
         return JsonResultModel.newJsonResultModel("ok");
+    }
+
+    //将在线用户的数据初始化到mongo和redis中去
+    @RequestMapping(value = "/async/online/account", method = RequestMethod.POST)
+    public JsonResultModel asyncInitOnlineUser(){
+        List<Service> services = serveService.findAll();
+        Set<Long> useIdSet=services.stream().map(service ->service.getStudentId()).collect(Collectors.toSet());
+        threadPoolManager.execute(new Thread(()->useIdSet.forEach(userId-> onlineAccountService.add(userId))));
+        return JsonResultModel.newJsonResultModel("OK");
     }
 }

@@ -151,12 +151,19 @@ public class FishCardModifyServiceX {
         if(CollectionUtils.isEmpty(workOrders)){
             throw new NotFoundException();
         }
-        workOrders.forEach(workOrder -> {
-            if(StringUtils.isNotEmpty(workOrder.getCourseId())) {
-                fishCardModifyService.changeCourse(workOrder);
-            }
-        });
+        try {
+            workOrders.forEach(workOrder -> {
+                if(StringUtils.isNotEmpty(workOrder.getCourseId())) {
+                    fishCardModifyService.changeCourse(workOrder);
+                }
+            });
+        }
+        catch (Exception ex){
+            logger.error("修改课程失败@changerderCourses",ex);
+
+        }
         dataCollectorService.updateBothChnAndFnItemAsync(studentId);
+
     }
 
     public void changCourse(Long workOrderId) {

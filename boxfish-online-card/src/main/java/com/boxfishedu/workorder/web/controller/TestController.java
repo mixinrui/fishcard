@@ -9,6 +9,8 @@ import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +38,9 @@ public class TestController {
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private OnlineAccountService onlineAccountService;
 
     @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
     public void changeFishCardTime(@RequestBody Map<String,String> param){
@@ -112,5 +117,20 @@ public class TestController {
     public void testTeacher(@PathVariable("workOrderId") Long workOrderId){
         WorkOrder workOrder=workOrderService.findOne(workOrderId);
         workOrderService.changeTeacherForTypeChanged(workOrder);
+    }
+
+    @RequestMapping(value = "/add/redis/user/{user_id}", method = RequestMethod.POST)
+    public void addUser(@PathVariable("user_id") Long userId){
+        onlineAccountService.add(userId);
+    }
+
+    @RequestMapping(value = "/redis/user/{user_id}", method = RequestMethod.GET)
+    public JsonResultModel getUser(@PathVariable("user_id") Long userId){
+        return JsonResultModel.newJsonResultModel(onlineAccountService.isMember(userId));
+    }
+
+    @RequestMapping(value = "/add/redis/sync", method = RequestMethod.POST)
+    public void syncMongo2Redis(){
+        onlineAccountService.syncMongo2Redis();
     }
 }

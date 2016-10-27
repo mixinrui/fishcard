@@ -78,6 +78,7 @@ public class MongoConfiguration {
         morphia.map(TimeLimitRules.class);
         morphia.map(ContinousAbsenceRecord.class);
         morphia.map(AccountCardInfo.class);
+        morphia.map(OnlineAccountSet.class);
         Datastore datastore = morphia.createDatastore(mongoClient(),mongoProperties.getDbName());
         datastore.ensureIndexes();
         return  datastore;
