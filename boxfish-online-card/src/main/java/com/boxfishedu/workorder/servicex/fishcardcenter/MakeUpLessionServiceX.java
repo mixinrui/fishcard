@@ -240,6 +240,10 @@ public class MakeUpLessionServiceX {
                 resultMap.put("2", "请核实鱼卡信息,该课程未开始或者已经正在进行中!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
+            if("0".equals(wo.getConfirmFlag())){
+                resultMap.put("2", "该鱼卡已经确认过状态!");
+                return JsonResultModel.newJsonResultModel(resultMap);
+            }
             wo.setConfirmFlag("0");
             wo.setStatusRecharge(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
             wo.setUpdatetimeRecharge(new Date());
