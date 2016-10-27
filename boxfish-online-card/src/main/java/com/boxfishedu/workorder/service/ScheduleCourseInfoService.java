@@ -123,7 +123,7 @@ public class ScheduleCourseInfoService {
             scheduleCourseInfo.setName(mewScheduleCourseInfo.getName());
             scheduleCourseInfo.setEnglishName(mewScheduleCourseInfo.getEnglishName());
             scheduleCourseInfo.setCourseType(mewScheduleCourseInfo.getCourseType());
-            scheduleCourseInfo.setDifficulty(mewScheduleCourseInfo.getCourseType());
+            scheduleCourseInfo.setDifficulty(mewScheduleCourseInfo.getDifficulty());
             scheduleCourseInfo.setThumbnail(mewScheduleCourseInfo.getThumbnail());
             datastore.save(scheduleCourseInfo);
         }
