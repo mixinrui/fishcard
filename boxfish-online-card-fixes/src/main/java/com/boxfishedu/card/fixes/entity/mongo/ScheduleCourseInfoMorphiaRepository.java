@@ -8,11 +8,14 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.LongAdder;
 
 @Component
 public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<ScheduleCourseInfo> {
 
     private final static String url = "http://base.boxfish.cn/course/info/%s";
+
+    private LongAdder longAdder = new LongAdder();
 
     public void updateCourseInfos() {
 
@@ -31,7 +34,7 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
 
     private void updateCourseInfo(ScheduleCourseInfo sci) {
         System.out.println("before update= [{" + sci + "}]");
-        if(StringUtils.isNotEmpty(sci.getCourseId())) {
+        if(StringUtils.isNotBlank(sci.getCourseId())) {
             try {
                 Map courseMap = new RestTemplate().getForObject(
                         String.format(url, sci.getCourseId()), Map.class);
@@ -44,6 +47,28 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
                 System.out.println("after  update= [{" + sci + "}]");
             } catch (Exception e) {
 //                    e.printStackTrace();
+            }
+        }
+    }
+
+
+    public void updateCourseDifficultys() {
+        Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
+        List<ScheduleCourseInfo> list = query.asList();
+        System.out.println("updateCount = " + list.size());
+        list.parallelStream().forEach(this::updateCourseDifficulty);
+        System.out.println("modifyCount = " + longAdder.sumThenReset());
+    }
+
+    private void updateCourseDifficulty(ScheduleCourseInfo sci) {
+        String difficulty = sci.getDifficulty();
+        if(StringUtils.isNotBlank(difficulty)) {
+            if(difficulty.trim().length() == 1) {
+                System.out.println("before update= [{" + sci + "}]");
+                sci.setDifficulty("LEVEL_" + difficulty);
+                datastore.save(sci);
+                longAdder.increment();
+                System.out.println("after  update= [{" + sci + "}]");
             }
         }
     }
