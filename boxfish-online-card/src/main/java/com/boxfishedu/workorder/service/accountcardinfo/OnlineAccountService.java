@@ -1,18 +1,15 @@
 package com.boxfishedu.workorder.service.accountcardinfo;
 
-import com.boxfishedu.workorder.common.rabbitmq.RabbitMqConstant;
 import com.boxfishedu.workorder.common.threadpool.AsyncNotifyPoolManager;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.dao.mongo.OnlineAccountSetMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.OnlineAccountSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -53,8 +50,8 @@ public class OnlineAccountService {
     //如果redis出问题,直接查mongo
     public boolean isMember(Long studentId){
         boolean result=false;
-        //分流
-        if(studentId%2==0){
+        //分流;mongo效率更低
+        if(studentId%3==0){
             logger.debug("<<<@OnlineAccountService#isMember#user:[{}]########<<mongo>>>>",studentId);
             return (onlineAccountSetMorphiaRepository.queryByStudentId(studentId)!=null);
         }

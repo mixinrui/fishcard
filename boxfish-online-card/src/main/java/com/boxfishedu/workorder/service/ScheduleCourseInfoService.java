@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.dao.mongo.TrialCourseMorphiaRepository;
+import com.boxfishedu.workorder.entity.mongo.OnlineAccountSet;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mongo.TrialCourse;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -18,6 +19,7 @@ import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -113,20 +115,17 @@ public class ScheduleCourseInfoService {
     public void updateCourseIntoScheduleInfo(ScheduleCourseInfo mewScheduleCourseInfo) {
         Query<ScheduleCourseInfo> updateQuery = datastore.createQuery(ScheduleCourseInfo.class);
         updateQuery.criteria("workOrderId").equal(mewScheduleCourseInfo.getWorkOrderId());
-        UpdateOperations<ScheduleCourseInfo> updateOperations = datastore.createUpdateOperations(ScheduleCourseInfo.class);
-        updateOperations.set("courseId", mewScheduleCourseInfo.getCourseId());
-        updateOperations.set("name", mewScheduleCourseInfo.getName());
-        updateOperations.set("englishName", mewScheduleCourseInfo.getEnglishName());
-        updateOperations.set("courseType", mewScheduleCourseInfo.getCourseType());
-        if(null!=mewScheduleCourseInfo.getDifficulty()) {
-            updateOperations.set("difficulty", mewScheduleCourseInfo.getDifficulty());
-        }
-        updateOperations.set("thumbnail", mewScheduleCourseInfo.getThumbnail());
-        updateOperations.set("englishName", mewScheduleCourseInfo.getEnglishName());
-        UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
-        if (updateResults.getUpdatedCount() < 1) {
-            logger.error("updateTrialScheduleInfo方法更新失败");
-            throw new BusinessException("@updateCourseIntoScheduleInfo更新课程信息失败");
+
+        ScheduleCourseInfo scheduleCourseInfo= updateQuery.get();
+        if(null!=scheduleCourseInfo){
+            scheduleCourseInfo.setCourseId(mewScheduleCourseInfo.getCourseId());
+            scheduleCourseInfo.setCourseType(mewScheduleCourseInfo.getCourseType());
+            scheduleCourseInfo.setName(mewScheduleCourseInfo.getName());
+            scheduleCourseInfo.setEnglishName(mewScheduleCourseInfo.getEnglishName());
+            scheduleCourseInfo.setCourseType(mewScheduleCourseInfo.getCourseType());
+            scheduleCourseInfo.setDifficulty(mewScheduleCourseInfo.getDifficulty());
+            scheduleCourseInfo.setThumbnail(mewScheduleCourseInfo.getThumbnail());
+            datastore.save(scheduleCourseInfo);
         }
     }
 }
