@@ -52,7 +52,7 @@ public class WorkOrderNoCourseIdNotify {
 
     private List<Map<String, Object>> getNoCourseIdTimeOutList() {
         LocalDateTime startTime = LocalDateTime.now();
-        Date endTime = Date.from(startTime.plusHours(47).atZone(ZoneId.systemDefault()).toInstant());
+        Date endTime = Date.from(startTime.plusHours(48).atZone(ZoneId.systemDefault()).toInstant());
 
         return workOrderJpaRepository.findNoCourseIdTimeOutList(
                 Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant()), endTime);
