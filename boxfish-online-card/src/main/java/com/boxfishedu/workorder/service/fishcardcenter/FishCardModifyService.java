@@ -226,8 +226,6 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         // 记录日志
         workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"], #当前上课时间 ["+startTimeParam.getBeginDate()+"] ,#旧的教师id["+oldTeacherId+"],#旧的教师姓名["+oldTeacherName+"]"+",修改时间来源:"+source);
 
-        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
-
         return workOrder.getId();
     }
 

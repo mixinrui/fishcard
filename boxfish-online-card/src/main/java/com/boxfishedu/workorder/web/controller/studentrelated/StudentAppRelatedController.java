@@ -159,7 +159,7 @@ StudentAppRelatedController {
     @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.GET)
     public JsonResultModel userCardInfo(String order_type,@PathVariable("student_id") Long studentId) {
         if(!onlineAccountService.isMember(studentId)){
-            logger.debug("@userCardInfo#{}不是在线购买用户,直接返回");
+            logger.debug("@userCardInfo#{}不是在线购买用户,直接返回",studentId);
             return JsonResultModel.newJsonResultModel(AccountCardInfo.buildEmpty());
         }
         AccountCardInfo accountCardInfo=accountCardInfoService.queryByStudentId(studentId);

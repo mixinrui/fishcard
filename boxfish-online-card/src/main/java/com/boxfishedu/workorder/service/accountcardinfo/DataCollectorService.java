@@ -182,6 +182,10 @@ public class DataCollectorService {
         threadPoolManager.execute(new Thread(() -> this.updateBothChnAndFnItem(studentId)));
     }
 
+    public void updateBothChnAndFnItemForCardId(Long fishcardId){
+        updateBothChnAndFnItem(workOrderService.findOne(fishcardId).getStudentId());
+    }
+
     public void updateBothChnAndFnItem(Long studentId) {
         try {
             logger.debug("@updateBothChnAndFnItem#begin#user[{}]更新首页信息>>>", studentId);

@@ -196,6 +196,13 @@ public class MakeUpLessionServiceX {
             resultMap.put("4", "该课程不存在");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
+
+        // 已经确认过状态的鱼卡不可以进行状态更正
+        if("0".equals(workOrder.getConfirmFlag())){
+            resultMap.put("5", "该课程已经进行过状态确认,可能进行状态更正");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
         // 课程
         courseSchedule.setStatus(makeUpCourseParam.getFishStatus());
         courseSchedule.setUpdateTime(DateTime.now().toDate());
@@ -238,6 +245,10 @@ public class MakeUpLessionServiceX {
             // 1 正常  0  未开始 或者正在进行
             if ("0".equals(wo.getIsCourseOver())) {
                 resultMap.put("2", "请核实鱼卡信息,该课程未开始或者已经正在进行中!");
+                return JsonResultModel.newJsonResultModel(resultMap);
+            }
+            if("0".equals(wo.getConfirmFlag())){
+                resultMap.put("2", "该鱼卡已经确认过状态!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
             wo.setConfirmFlag("0");
