@@ -112,7 +112,7 @@ public class TimePickerServiceXV1 {
         // 批量保存鱼卡与课表
         List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
 
-        dataCollectorService.updateBothChnAndFnItemAsync(serviceList.get(0).getStudentId());
+        dataCollectorService.updateBothChnAndFnItem(serviceList.get(0).getStudentId());
 
         // 保存日志
         workOrderLogService.batchSaveWorkOrderLogs(workOrderList);
