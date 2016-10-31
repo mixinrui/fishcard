@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>鱼卡列表</title>
+</head>
+<body>
+<table class="table table-striped">
+    <caption>48小时未课程推荐的鱼卡列表</caption>
+    <thead>
+    <tr>
+        <th style="width: 100px;">序号</th>
+        <th style="width: 100px;">鱼卡ID</th>
+        <th style="width: 100px;">学生ID</th>
+        <th style="width: 200px;">上课时间</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="card,iterCard: ${workOrders}">
+        <td th:text="${iterCard.index + 1}"></td>
+        <td th:text="${card.id}"></td>
+        <td th:text="${card.student_id}"></td>
+        <td th:text="${card.start_time}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
