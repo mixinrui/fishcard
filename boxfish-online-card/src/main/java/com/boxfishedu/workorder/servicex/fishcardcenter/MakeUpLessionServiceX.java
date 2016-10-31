@@ -202,7 +202,7 @@ public class MakeUpLessionServiceX {
             resultMap.put("5", "该课程已经进行过状态确认,可能进行状态更正");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
-        
+
         // 课程
         courseSchedule.setStatus(makeUpCourseParam.getFishStatus());
         courseSchedule.setUpdateTime(DateTime.now().toDate());
