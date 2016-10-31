@@ -111,7 +111,7 @@ public class TimePickerServiceX {
 
         Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(timeSlotParam.getStudentId());
 
-        // 对初始化的workOrderList进行验证
+        // 对初始化的workOrderList进行验证w
         studentTimePickerValidatorSupport.postValidate(Collections.singletonList(service),workOrders, classDateTimeslotsSet);
 
         //TODO:推荐课的接口目前为单词请求
@@ -123,7 +123,7 @@ public class TimePickerServiceX {
         List<CourseSchedule> courseSchedules=workOrderService.persistCardInfos(
                 service,workOrders,recommandCoursesMap);
 
-        dataCollectorService.updateBothChnAndFnItemAsync(service.getStudentId());
+        dataCollectorService.updateBothChnAndFnItem(service.getStudentId());
 
         //TODO:等测
         workOrderLogService.batchSaveWorkOrderLogs(workOrders);

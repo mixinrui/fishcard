@@ -243,6 +243,7 @@ public class FishCardModifyServiceX {
     public JsonResultModel changeStartTime(StartTimeParam startTimeParam,boolean checkTimeflag){
 
         Long workOrderId= fishCardModifyService.changeStartTimeFishCard(startTimeParam,checkTimeflag);
+        dataCollectorService.updateBothChnAndFnItemForCardId(workOrderId);
         WorkOrder workOrder =workOrderService.findOne(workOrderId);
         logger.info("changeStartTime 准备 分配老师 workOrderId {[]}",workOrder.getId());
         if(workOrder.getTeacherId() == 0){
