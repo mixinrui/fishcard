@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.bean.TeachingOnlineListMsg;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -20,6 +21,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.WorkOrderView;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -56,6 +58,9 @@ public class MakeWorkOrderServiceX {
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
 
 
     // send to redis
@@ -393,11 +398,19 @@ public class MakeWorkOrderServiceX {
     }
 
 
+    public void clearGrabData(){
+        threadPoolManager.execute(new Thread(() -> {
+                     this.clearGrabDataDB();
+                })
+        );
+    }
+
+
     /**
      * 每天 17:40 清理前一天的数据进历史表
      */
     @Transactional
-    public void clearGrabData() {
+    public void clearGrabDataDB() {
 
         List<WorkOrderGrab> workOrderGrabList = makeWorkOrderService.getGrabDataBeforeDay();
         if (null != workOrderGrabList && workOrderGrabList.size() > 0) {
