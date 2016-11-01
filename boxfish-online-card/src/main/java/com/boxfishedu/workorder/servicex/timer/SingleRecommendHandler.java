@@ -70,12 +70,15 @@ public class SingleRecommendHandler {
                         predicate);
         RecommandCourseView courseView = recommendCourseMap.get(0);
 
+        String oldCOurseType=workOrder.getCourseType();
+
+        persistCoursesHandler.persistCourseInfos(workOrder, courseSchedule, courseView);
+
         // 如果已经分配老师,课程类型如果与课程推荐不匹配重新更换老师
-        if(!StringUtils.equals(courseView.getCourseType(), workOrder.getCourseType())
+        if(!StringUtils.equals(courseView.getCourseType(), oldCOurseType)
                 && !Objects.isNull(workOrder.getTeacherId())) {
             workOrderService.changeTeacherForTypeChanged(workOrder);
         }
-        persistCoursesHandler.persistCourseInfos(workOrder, courseSchedule, courseView);
     }
 
 
