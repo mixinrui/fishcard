@@ -399,6 +399,7 @@ public class MakeWorkOrderServiceX {
 
 
     public void clearGrabData(){
+
         threadPoolManager.execute(new Thread(() -> {
                      this.clearGrabDataDB();
                 })
@@ -429,8 +430,16 @@ public class MakeWorkOrderServiceX {
                 workOrderGrabHistoryList.add(wgh);
             }
 
-            // 2 删除数据
-            makeWorkOrderService.deleteGrabData(workOrderGrabList);
+
+            int count = workOrderGrabList.size() / 1000;
+            int yushu = workOrderGrabList.size() % 1000;
+            for (int i = 0; i < count; i++) {
+                makeWorkOrderService.deleteGrabData(workOrderGrabList.subList(i * 1000, (i+1) * 1000));
+            }
+            if(yushu > 0){
+                makeWorkOrderService.deleteGrabData(workOrderGrabList.subList(count * 1000, count * 1000 + yushu));
+
+            }
             // 3 新增数据
             makeWorkOrderService.initGrabOrderHistory(workOrderGrabHistoryList);
         }
