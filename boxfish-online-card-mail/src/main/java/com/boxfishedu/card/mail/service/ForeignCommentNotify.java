@@ -1,6 +1,6 @@
 package com.boxfishedu.card.mail.service;
 
-import com.boxfishedu.card.mail.config.JavaMailConfig;
+import com.boxfishedu.card.mail.config.CommentCardJavaMailConfig;
 import com.boxfishedu.card.mail.dto.CommentCardDto;
 import com.boxfishedu.card.mail.entity.CommentCard;
 import com.boxfishedu.card.mail.entity.jpa.CommentCardJpaRepository;
@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 
@@ -30,14 +29,14 @@ public class ForeignCommentNotify {
     private CommentCardJpaRepository commentCardJpaRepository;
 
     @Autowired
-    @Qualifier(value = "templateMessage")
+    @Qualifier(value = "notAnswerTemplate")
     private SimpleMailMessage templateMessage;
 
     @Autowired
     private DTOBinder dtoBinder;
 
     @Autowired
-    private JavaMailConfig javaMailConfig;
+    private CommentCardJavaMailConfig javaMailConfig;
 
     @Autowired
     public void initMailSender(JavaMailSender mailSender, TemplateEngine templateEngine) {
@@ -46,7 +45,7 @@ public class ForeignCommentNotify {
 
 
     //9-23/2
-    @Scheduled(cron = "0 0 9-23/2 * * *")
+//    @Scheduled(cron = "0 0 9-23/2 * * *")
 //    @Scheduled(cron = "5-50/20 * * * * *")
 //    @Scheduled(cron = "* 0/2 * * * *")
     public void notifyNotAnswerOver12Hours() throws MessagingException {
@@ -60,9 +59,11 @@ public class ForeignCommentNotify {
                 .sendMail();
     }
 
+
     private List<CommentCard> getNotAnswerOver12HoursList() {
         LocalDateTime now = LocalDateTime.now();
         Date startTime = Date.from(now.minusHours(12).atZone(ZoneId.systemDefault()).toInstant());
         return commentCardJpaRepository.findNotAnswerOver12Hours(startTime);
     }
+
 }

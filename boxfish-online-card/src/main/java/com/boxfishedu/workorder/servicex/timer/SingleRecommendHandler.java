@@ -46,6 +46,9 @@ public class SingleRecommendHandler {
     private UrlConf urlConf;
 
     @Autowired
+    private PersistCoursesHandler persistCoursesHandler;
+
+    @Autowired
     private CourseScheduleRepository courseScheduleRepository;
 
     @Transactional
@@ -72,29 +75,8 @@ public class SingleRecommendHandler {
                 && !Objects.isNull(workOrder.getTeacherId())) {
             workOrderService.changeTeacherForTypeChanged(workOrder);
         }
-
-        // 保存鱼卡
-        workOrder.initCourseInfo(courseView);
-        workOrderJpaRepository.save(workOrder);
-
-        // 记鱼卡日志
-        workOrderLogService.saveWorkOrderLog(workOrder,
-                String.format("定时课程推荐,类型:[%s],课程Id:[%s],课程名:[%s]",
-                        courseView.getCourseType(), courseView.getCourseId(), courseView.getCourseName()));
-
-        // 保存课表数据
-        courseSchedule.setStatus(workOrder.getStatus());
-        courseSchedule.setCourseId(workOrder.getCourseId());
-        courseSchedule.setCourseName(workOrder.getCourseName());
-        courseSchedule.setCourseType(workOrder.getCourseType());
-        courseScheduleRepository.save(courseSchedule);
-
-        // 保存mongo课程信息
-        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(workOrder.getId());
-        if(scheduleCourseInfo == null) {
-            scheduleCourseInfo = new ScheduleCourseInfo(workOrder.getId(), courseSchedule.getId());
-        }
-        scheduleCourseInfo.initRecommendCourse(urlConf.getThumbnail_server(), courseView);
-        scheduleCourseInfoService.save(scheduleCourseInfo);
+        persistCoursesHandler.persistCourseInfos(workOrder, courseSchedule, courseView);
     }
+
+
 }

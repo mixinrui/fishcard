@@ -246,13 +246,15 @@ public class CourseNotifyOneDayServiceX {
             List list1 = list.subList(i * base_count, i * base_count + base_count);
             //System.out.println(list1.get(0)+"-----"+list1.get(list1.size()-1));
             teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(i * base_count, i * base_count + base_count));
-            logger.info("splitByTwoThousandsMessage:[{}] :begin:[{}]:end:[{}]", i, i * base_count, i * base_count + base_count);
+
+            logger.info("splitByTwoThousandsMessage:[{}] :begin:[{}]:end:[{}]",i,i * base_count,i * base_count + base_count);
         }
         List list2 = list.subList(count * base_count, count * base_count + yushu);
 
         //System.out.println(list2.get(0)+"-----"+list2.get(list2.size()-1));
-        teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(count * base_count, count * base_count + yushu));
-        logger.info("splitByTwoThousandsMessage: last :begin:[{}]:end:[{}]", count * base_count, count * base_count + yushu);
+
+        teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(count * base_count, count * base_count + yushu ));
+        logger.info("splitByTwoThousandsMessage: last :begin:[{}]:end:[{}]",count * base_count,count * base_count + yushu);
 
     }
 

@@ -21,6 +21,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.WorkOrderView;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -396,10 +397,11 @@ public class MakeWorkOrderServiceX {
     }
 
 
-    public void clearGrabData() {
+
+    public void clearGrabData(){
 
         threadPoolManager.execute(new Thread(() -> {
-                    this.clearGrabDataDB();
+                     this.clearGrabDataDB();
                 })
         );
     }
@@ -434,7 +436,8 @@ public class MakeWorkOrderServiceX {
             for (int i = 0; i < count; i++) {
                 makeWorkOrderService.deleteGrabData(workOrderGrabList.subList(i * 1000, (i + 1) * 1000));
             }
-            if (yushu > 0) {
+
+            if(yushu > 0){
                 makeWorkOrderService.deleteGrabData(workOrderGrabList.subList(count * 1000, count * 1000 + yushu));
 
             }

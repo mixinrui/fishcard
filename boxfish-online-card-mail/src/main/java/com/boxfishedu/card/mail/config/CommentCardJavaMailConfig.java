@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "mail.notAnswerOver12HoursRecipients")
-public class JavaMailConfig {
+public class CommentCardJavaMailConfig {
 
     private List<String> recipients;
 
@@ -22,11 +22,12 @@ public class JavaMailConfig {
 
     private String subject;
 
-    @Bean
+    @Bean(name = "notAnswerTemplate")
     public SimpleMailMessage templateMessage() {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(sender);
         simpleMailMessage.setSubject(subject);
         return simpleMailMessage;
     }
+
 }
