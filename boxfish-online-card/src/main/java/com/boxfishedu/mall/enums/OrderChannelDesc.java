@@ -22,7 +22,8 @@ public enum OrderChannelDesc {
     EXPERIENCE("EXPERIENCE","免费体验",""),
   //  ADJUST(    "ADJUST","后台调整",""),
     EXCHANGE(  "EXCHANGE","金币兑换",""),
-    UNKNOWN("UNKNOWN","未知","");
+    UNKNOWN("UNKNOWN","未知",""),
+    ALLOWANCE("ALLOWANCE","折扣订单","");
 
     OrderChannelDesc(){}
 
