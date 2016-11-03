@@ -55,8 +55,8 @@ public class WorkOrderService {
         if(op.isPresent()) {
             CourseSchedule cs = op.get();
             if(!Objects.equals(workOrder.getCourseId(), cs.getCourseId())) {
-                logger.info(counter.incrementAndGet() + " : workOrder and courseSchedule not equals, workOrderId=[{}], courseId=[{}]",
-                        workOrder.getId(), workOrder.getCourseId());
+                logger.info(counter.incrementAndGet() + " : workOrder and courseSchedule not equals, workOrderId=[{}], courseId=[{}], createTime=[{}]",
+                        workOrder.getId(), workOrder.getCourseId(), workOrder.getCreateTime());
                 cs.setCourseName(workOrder.getCourseName());
                 cs.setCourseId(workOrder.getCourseId());
                 cs.setCourseType(workOrder.getCourseType());
@@ -72,8 +72,8 @@ public class WorkOrderService {
     private void handleWorkOrderAndScheduleCourse(WorkOrder workOrder) {
         ScheduleCourseInfo sc = scheduleCourseInfoMorphiaRepository.findByWorkOrderId(workOrder.getId());
         if(Objects.nonNull(sc) && !Objects.equals(workOrder.getCourseId(), sc.getCourseId())) {
-            logger.info(counter.incrementAndGet() + " : workOrder and mongoScheduleCourse not equals, workOrderId=[{}], courseId=[{}]",
-                    workOrder.getId(), workOrder.getCourseId());
+            logger.info(counter.incrementAndGet() + " : workOrder and mongoScheduleCourse not equals, workOrderId=[{}], courseId=[{}], createTime=[{}]",
+                    workOrder.getId(), workOrder.getCourseId(), workOrder.getCreateTime());
             sc.setCourseId(workOrder.getCourseId());
             scheduleCourseInfoMorphiaRepository.updateCourseInfo(sc);
         }
