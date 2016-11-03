@@ -12,6 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
+    private int type = 0;
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
@@ -22,19 +24,11 @@ public class Application implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         try {
-//            for (int i = 0, size = args.length; i < size; i++) {
-//                if (StringUtils.startsWith(args[i], "single=")) {
-//                    String[] params = args[i].split("=");
-//                    if (params.length == 2) {
-//                        repository.updateCourseInfo(Long.valueOf(params[1]));
-//                        return;
-//                    }
-//                }
-//            }
-//            repository.updateCourseInfos();
-            repository.updateCourseDifficultys();
+            switch (type) {
+                case 0: repository.updateCourseInfos(); break;
+                case 1: repository.updateCourseDifficultys(); break;
+            }
             System.out.println("finish fixes");
-
             Runtime.getRuntime().exit(0);
         } catch (Exception e) {
             Runtime.getRuntime().exit(1);
