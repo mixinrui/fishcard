@@ -251,8 +251,27 @@ public class MakeUpLessionServiceX {
                 resultMap.put("2", "该鱼卡已经确认过状态!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
+        }
+
+
+        this.fishcardStatusRechargeChangeLast(workOrders);
+
+        resultMap.put("0", "更新成功");
+        return JsonResultModel.newJsonResultModel(resultMap);
+    }
+
+    // db操作 确认状态
+    public void fishcardStatusRechargeChangeLast(List<WorkOrder> workOrders){
+        for (WorkOrder wo : workOrders) {
             wo.setConfirmFlag("0");
-            wo.setStatusRecharge(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
+            // 50 52 60 三种状态为退款状态
+            if(     wo.getStatus() == FishCardStatusEnum.TEACHER_ABSENT.getCode() ||
+                    wo.getStatus() == FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode() ||
+                    wo.getStatus() == FishCardStatusEnum.EXCEPTION.getCode()
+                    ){
+                wo.setStatusRecharge(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
+            }
+
             wo.setUpdatetimeRecharge(new Date());
         }
 
@@ -261,9 +280,8 @@ public class MakeUpLessionServiceX {
 
         // 记录日志
         workOrderLogService.batchSaveWorkOrderLogs(workOrders);
-        resultMap.put("0", "更新成功");
-        return JsonResultModel.newJsonResultModel(resultMap);
     }
+
 
     @Autowired
     private GrabOrderService grabOrderService;
