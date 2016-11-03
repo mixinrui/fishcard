@@ -60,7 +60,7 @@ public class WorkOrderService {
                 cs.setCourseName(workOrder.getCourseName());
                 cs.setCourseId(workOrder.getCourseId());
                 cs.setCourseType(workOrder.getCourseType());
-//                courseScheduleJpaRepository.save(cs);
+                courseScheduleJpaRepository.save(cs);
             }
         }
     }
@@ -75,7 +75,7 @@ public class WorkOrderService {
             logger.info(counter.incrementAndGet() + " : workOrder and mongoScheduleCourse not equals, workOrderId=[{}], courseId=[{}]",
                     workOrder.getId(), workOrder.getCourseId());
             sc.setCourseId(workOrder.getCourseId());
-//            scheduleCourseInfoMorphiaRepository.updateCourseInfo(sc);
+            scheduleCourseInfoMorphiaRepository.updateCourseInfo(sc);
         }
     }
 }
