@@ -32,7 +32,7 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         updateCourseInfo(courseInfo);
     }
 
-    private void updateCourseInfo(ScheduleCourseInfo sci) {
+    public void updateCourseInfo(ScheduleCourseInfo sci) {
         System.out.println("before update= [{" + sci + "}]");
         if(StringUtils.isNotBlank(sci.getCourseId())) {
             try {
@@ -58,6 +58,12 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         System.out.println("updateCount = " + list.size());
         list.parallelStream().forEach(this::updateCourseDifficulty);
         System.out.println("modifyCount = " + longAdder.sumThenReset());
+    }
+
+    public ScheduleCourseInfo findByWorkOrderId(Long workOrderId) {
+        Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
+        query.criteria("workOrderId").equal(workOrderId);
+        return query.get();
     }
 
     private void updateCourseDifficulty(ScheduleCourseInfo sci) {
