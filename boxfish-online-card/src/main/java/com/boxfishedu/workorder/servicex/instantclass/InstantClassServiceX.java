@@ -18,9 +18,13 @@ import org.springframework.stereotype.Component;
 public class InstantClassServiceX {
 
     @Autowired
-    private RedisRepository redisRepository;
+    private StringRedisTemplate stringRedisTemplate;
 
     public JsonResultModel instantClass(InstantRequestParam instantRequestParam){
+//        if(stringRedisTemplate.opsForValue().get(instantRequestParam.getStudentId())<1){
+//
+//        }
+
         return null;
     }
 }
