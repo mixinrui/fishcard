@@ -256,7 +256,10 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
-    @Scheduled(cron = "0 0 18 * * ?")
+    /**
+     * 鱼卡自动确认状态
+     */
+    @Scheduled(cron = "0 0 4 * * ?")
     public void autoConfirmStatus(){
         logger.info("<<<<<<autoConfirmStatus<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<自动确认状态<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
