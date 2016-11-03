@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.LongAdder;
 @Component
 public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<ScheduleCourseInfo> {
 
-    private final static String url = "http://base.boxfish.cn/course/info/%s";
+    private final static String url = "http://base.boxfish.cn/boxfish-wudaokou-course/course/info/%s";
 
     private LongAdder longAdder = new LongAdder();
 
