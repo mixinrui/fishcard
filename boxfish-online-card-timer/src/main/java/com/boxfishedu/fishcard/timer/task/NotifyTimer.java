@@ -255,4 +255,13 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
+
+    @Scheduled(cron = "0 0 18 * * ?")
+    public void autoConfirmStatus(){
+        logger.info("<<<<<<autoConfirmStatus<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<自动确认状态<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 }

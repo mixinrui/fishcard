@@ -42,7 +42,10 @@ public enum TimerMessageType {
     FREEZE_UPDATE_HOME(120),
 
     // 课程推荐
-    RECOMMEND_COURSES(130);
+    RECOMMEND_COURSES(130),
+
+    // 课程推荐
+    AUTO_CONFIRM_STATUS(135);
     private int code;
 
     private TimerMessageType(int code) {
