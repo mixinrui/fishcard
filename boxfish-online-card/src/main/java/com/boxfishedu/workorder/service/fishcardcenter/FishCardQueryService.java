@@ -68,10 +68,10 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                 if(workOrder.getOrderChannel().equals(OrderChannelDesc.STANDARD.getCode() )){
                     //终极梦想
                     if(workOrder.getComboType().equals( OrderChannelDesc.CHINESE.getCode()  ) ||
-                            (  workOrder.getComboType().equals( OrderChannelDesc.INTELLIGENT.getCode()) && workOrder.getService().getTutorType().equals(TutorTypeEnum.FRN ) )   ){
+                            (  workOrder.getComboType().equals( OrderChannelDesc.INTELLIGENT.getCode()) && workOrder.getService().getTutorType().equals(TutorTypeEnum.FRN.name() ) )   ){
                         workOrder.setOrderTypeDesc(OrderChannelDesc.CHINESE.getDesc());
                     //考试指导
-                    }else if( workOrder.getComboType().equals( OrderChannelDesc.INTELLIGENT.getCode()) && workOrder.getService().getTutorType().equals(TutorTypeEnum.CN )){
+                    }else if( workOrder.getComboType().equals( OrderChannelDesc.INTELLIGENT.getCode()) && workOrder.getService().getTutorType().equals(TutorTypeEnum.CN.name() )){
                         workOrder.setOrderTypeDesc(OrderChannelDesc.INTELLIGENT.getDesc() );
                     }else{
                         workOrder.setOrderTypeDesc(OrderChannelDesc.get(workOrder.getComboType()).getDesc() );
