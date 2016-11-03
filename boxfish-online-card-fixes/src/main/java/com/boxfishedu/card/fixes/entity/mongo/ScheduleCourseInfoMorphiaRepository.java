@@ -46,7 +46,7 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
                 datastore.save(sci);
                 System.out.println("after  update= [{" + sci + "}]");
             } catch (Exception e) {
-//                    e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
