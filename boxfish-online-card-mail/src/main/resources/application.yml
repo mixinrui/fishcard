@@ -35,7 +35,7 @@ mail:
     subject: 12小时未回复点评列表
 
   noCourseIdOver24HoursRecipients:
-    recipients: luolibing@boxfish.cn, huchunlin@boxfish.cn, liuzheng@boxfish.cn, jiaozijun@boxfish.cn, liyinghao@boxfish.cn
+    recipients: luolibing@boxfish.cn, huchunlin@boxfish.cn, liuzheng@boxfish.cn, jiaozijun@boxfish.cn, liyinghao@boxfish.cn, wuxi@boxfish.cn
 #    recipients: luolibing@boxfish.cn
     sender: nobody@send.boxfish.cn
     subject: 48小时以内未成功推荐课程的鱼卡id列表

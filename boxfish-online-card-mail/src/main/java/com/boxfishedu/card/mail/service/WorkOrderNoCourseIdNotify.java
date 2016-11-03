@@ -45,7 +45,7 @@ public class WorkOrderNoCourseIdNotify {
     }
 
 //    @Scheduled(cron = "0 0 9-23/2 * * *")
-    @Scheduled(cron = "0 20 11 * * *")
+    @Scheduled(cron = "0 0 5 * * *")
     public void notifyNoCourseIdTimeOut() throws MessagingException {
         List<Map<String, Object>> workOrders = getNoCourseIdTimeOutList();
         logger.info("scan no lesson workOrder, find out size=[{}]", workOrders == null ? 0 : workOrders.size());
