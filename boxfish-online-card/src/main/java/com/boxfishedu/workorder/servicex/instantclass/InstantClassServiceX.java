@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.instantclass;
 import ch.qos.logback.core.joran.conditional.ElseAction;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
+import com.boxfishedu.workorder.servicex.instantclass.instantvalidator.InstantClassValidators;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
@@ -24,6 +25,9 @@ public class InstantClassServiceX {
     private ValueOperations<String, Long> opsForValue;
 
     @Autowired
+    private InstantClassValidators instantClassValidators;
+
+    @Autowired
     private
     @Qualifier("stringLongRedisTemplate")
     RedisTemplate<String, Long> stringLongRedisTemplate;
@@ -38,6 +42,12 @@ public class InstantClassServiceX {
     }
 
     public JsonResultModel instantClass(InstantRequestParam instantRequestParam) {
+        //对用户当前行为进行校验
+        int validateResult=instantClassValidators.preValidate(instantRequestParam);
+        if(validateResult>InstantClassRequestStatus.UNKNOWN.getCode()){
+            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.getEnumByCode(validateResult)));
+        }
+
         long visitCount = opsForValue.increment(generateKey(instantRequestParam.getStudentId()), 1l);
         if (visitCount % 8 == 0) {
             return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.MATCHED, "11111221221212QQWW"));
