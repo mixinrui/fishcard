@@ -103,6 +103,14 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         return template;
     }
 
+    @Bean(name="stringLongRedisTemplate")
+    public RedisTemplate<String, Long> stringLongTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String,Long> stringLongTemplate = new RedisTemplate<>();
+        stringLongTemplate.setConnectionFactory(factory);
+        stringLongTemplate.afterPropertiesSet();;
+        return stringLongTemplate;
+    }
+
     private void setSerializer(RedisTemplate template) {
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
         ObjectMapper om = new ObjectMapper();

@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.common.bean;
+package com.boxfishedu.workorder.common.bean.instanclass;
 
 public enum InstantClassRequestStatus {
     WAIT_TO_MATCH(10,"等待匹配教师"),
@@ -8,19 +8,19 @@ public enum InstantClassRequestStatus {
     MATCHED(50,"匹配上教师");
 
     private int code;
-    private String status;
+    private String desc;
 
-    InstantClassRequestStatus(int code, String status){
-        this.status = status;
+    InstantClassRequestStatus(int code, String desc){
+        this.desc = desc;
         this.code = code;
     }
     public int getCode(){
         return this.code;
     }
-    public String getStatus(){
+    public String getDesc(){
         for (InstantClassRequestStatus instantClassRequestStatus: InstantClassRequestStatus.values()){
             if (instantClassRequestStatus.code == this.getCode())
-                return instantClassRequestStatus.status;
+                return instantClassRequestStatus.desc;
         }
         return null;
     }

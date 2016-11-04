@@ -15,7 +15,6 @@ public class InstantRequestParam {
     private Integer productType;
     private String tutorType;
     private String comboType;
-    @JsonIgnore
     private Long studentId;
     /**
      * 选时间方式, 0 课程表的入口 1 其他入口
