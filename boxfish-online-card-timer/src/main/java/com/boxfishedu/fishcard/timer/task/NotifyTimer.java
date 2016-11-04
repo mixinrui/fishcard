@@ -255,4 +255,17 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
+
+    /**
+     * 鱼卡自动确认状态
+     */
+    //@Scheduled(cron = "0 0 4 * * ?")
+    @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+    public void autoConfirmStatus(){
+        logger.info("<<<<<<autoConfirmStatus<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<自动确认状态<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 }
