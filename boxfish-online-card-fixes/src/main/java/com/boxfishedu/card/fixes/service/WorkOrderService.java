@@ -46,6 +46,21 @@ public class WorkOrderService {
                 });
     }
 
+    public void handleScheduleCourseInfo() {
+        List<WorkOrder> workOrders = workOrderJpaRepository.findNotFinishWorkOrder();
+        workOrders.parallelStream()
+                .filter(workOrder -> !StringUtils.isEmpty(workOrder.getCourseId()))
+                .forEach(workOrder -> {
+                    ScheduleCourseInfo sc = scheduleCourseInfoMorphiaRepository.findByWorkOrderId(workOrder.getId());
+                    if(sc != null && !Objects.equals(sc.getName(), workOrder.getCourseName())) {
+                        logger.info(counter.incrementAndGet() + " : workOrder and mongoScheduleCourse not equals, workOrderId=[{}], courseId=[{}], createTime=[{}]",
+                                workOrder.getId(), workOrder.getCourseId(), workOrder.getCreateTime());
+                        sc.setCourseId(workOrder.getCourseId());
+                        scheduleCourseInfoMorphiaRepository.updateCourseInfo(sc);
+                    }
+                });
+    }
+
     /**
      * 鱼卡与课表的差异
      * @param workOrder

@@ -43,6 +43,11 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
                 } else {
                     sci.setEnglishName("");
                 }
+                sci.setName((String) courseMap.get("courseName"));
+                sci.setCourseType((String) courseMap.get("type"));
+                sci.setDifficulty((String) courseMap.get("difficulty"));
+                sci.setLastModified((long) courseMap.get("lastModified"));
+                sci.setPublicDate((String) courseMap.get("publicDate"));
                 datastore.save(sci);
                 System.out.println("after  update= [{" + sci + "}]");
             } catch (Exception e) {
