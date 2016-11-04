@@ -380,7 +380,7 @@ public class MakeUpLessionServiceX {
         }
 
         Long orderId = workOrders.get(0).getOrderId();
-        Boolean successFlag = makeUpCourseParam.getSuccessFlag();
+        String successFlag = makeUpCourseParam.getSuccessFlag();
         if (null == successFlag) {
             resultMap.put("3", "无成功失败标示");
             logger.info("fixedStateFromOrder订单id[{}],无成功失败标示", orderId);
@@ -388,12 +388,14 @@ public class MakeUpLessionServiceX {
         }
         for (WorkOrder wo : workOrders) {
 
-            if (successFlag) {
+            if ("true".equals( successFlag)) {
                 // 推送成功消息
                 sendMessageRefund(wo);
                 wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGEBACK_SUCCESS.getCode());
-            } else {
+            } else if("false".equals(successFlag)){
                 wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGEBACK_FAILED.getCode());
+            }else if("refused".equals(successFlag)){
+                wo.setStatusRecharge(FishCardChargebackStatusEnum.REFUSED.getCode());
             }
             wo.setUpdatetimeRecharge(new Date());
         }
