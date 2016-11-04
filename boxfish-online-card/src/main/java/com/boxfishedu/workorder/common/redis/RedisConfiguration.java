@@ -19,6 +19,8 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.lang.reflect.Method;
@@ -106,6 +108,8 @@ public class RedisConfiguration extends CachingConfigurerSupport {
     @Bean(name="stringLongRedisTemplate")
     public RedisTemplate<String, Long> stringLongTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String,Long> stringLongTemplate = new RedisTemplate<>();
+        RedisSerializer<String> stringSerializer = new StringRedisSerializer();
+        stringLongTemplate.setKeySerializer(stringSerializer);
         stringLongTemplate.setConnectionFactory(factory);
         stringLongTemplate.afterPropertiesSet();;
         return stringLongTemplate;
