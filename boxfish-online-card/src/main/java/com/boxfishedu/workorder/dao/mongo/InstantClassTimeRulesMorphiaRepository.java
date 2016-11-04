@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class InstantClassTimeRulesMorphiaRepository extends BaseMorphiaRepository<TimeLimitRules> {
+public class InstantClassTimeRulesMorphiaRepository extends BaseMorphiaRepository<InstantClassTimeRules> {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -23,7 +23,7 @@ public class InstantClassTimeRulesMorphiaRepository extends BaseMorphiaRepositor
 
     public Optional<List<InstantClassTimeRules>> getByDay(String day) {
         Query<InstantClassTimeRules> query = datastore.createQuery(InstantClassTimeRules.class);
-        query.criteria("day").equal((day);
+        query.criteria("day").equal(day);
         return Optional.ofNullable(query.asList());
     }
 }

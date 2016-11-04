@@ -19,6 +19,8 @@ public class InstantClassTimeRules {
 
     //日期
     @Indexed(background = true)
+    private String date;
+
     private String day;
 
     //开始时间

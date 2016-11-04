@@ -8,6 +8,8 @@ import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 /**
  * Created by hucl on 16/11/4.
  */
+@Order(0)
+@Component
 public class TimeRangeValidator implements InstantClassValidator {
     @Autowired
     private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
@@ -35,12 +39,11 @@ public class TimeRangeValidator implements InstantClassValidator {
                             ,DateUtil.String2Date(String.join(" ",day,instantClassTimeRules.getEnd()))))
                     .collect(Collectors.toList())
                     .stream().filter(dateRange -> dateRange.inRange(date)).count();
-            if(inRange>0){
+            if(inRange==0){
                 return InstantClassRequestStatus.NOT_IN_RANGE.getCode();
             }
         }
-
-        return InstantClassRequestStatus.NOT_IN_RANGE.getCode();
+        return InstantClassRequestStatus.UNKNOWN.getCode();
     }
 
     @Data
