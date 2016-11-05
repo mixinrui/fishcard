@@ -23,7 +23,7 @@ public class InstantClassTimeRulesMorphiaRepository extends BaseMorphiaRepositor
 
     public Optional<List<InstantClassTimeRules>> getByDay(String day) {
         Query<InstantClassTimeRules> query = datastore.createQuery(InstantClassTimeRules.class);
-        query.criteria("day").equal(day);
+        query.criteria("date").equal(day);
         return Optional.ofNullable(query.asList());
     }
 }

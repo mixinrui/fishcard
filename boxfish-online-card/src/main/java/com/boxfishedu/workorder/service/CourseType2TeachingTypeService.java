@@ -29,7 +29,6 @@ public class CourseType2TeachingTypeService {
             }
             default:
                 return TeachingType.ZHONGJIAO.getCode();
-
         }
     }
 

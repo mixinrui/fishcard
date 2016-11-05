@@ -54,7 +54,7 @@ public class InstantClassServiceX {
         } else if (visitCount % 33 == 0) {
             return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.ASK_TOO_BUSY));
         } else {
-            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.NO_MATCH));
+            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.WAIT_TO_MATCH));
         }
     }
 

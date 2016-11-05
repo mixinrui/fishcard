@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Created by hucl on 16/11/4.
  */
-@Order(0)
+@Order(1)
 @Component
 public class TimeRangeValidator implements InstantClassValidator {
     @Autowired
