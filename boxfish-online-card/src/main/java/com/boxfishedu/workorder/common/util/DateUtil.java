@@ -35,6 +35,10 @@ public class DateUtil {
         return date;
     }
 
+    public static LocalDateTime string2LocalDateTime(String dateStr){
+       return convertLocalDateTime(String2Date(dateStr));
+    }
+
     public static String Date2ForForeignDate(Date date) {
         return new SimpleDateFormat(" HH:mm,MM/dd ").format(date);
     }

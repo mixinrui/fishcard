@@ -8,6 +8,7 @@ public enum InstantClassRequestStatus {
     NOT_IN_RANGE(31,"该时间段不允许即时上课"),
     TUTOR_TYPE_NOT_SUPPORT(32,"目前只支持外教实时上课"),
     OUT_OF_NUM(33,"没有可上的课程"),
+    FAIL_RECOMMAND_COURSE(34,"获取推荐课程失败"),
     NO_MATCH(40,"无可用教师"),
     MATCHED(50,"匹配上教师");
 
