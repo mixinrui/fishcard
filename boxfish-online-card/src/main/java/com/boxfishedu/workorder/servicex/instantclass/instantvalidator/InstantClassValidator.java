@@ -11,5 +11,5 @@ import java.util.List;
  * Created by hucl on 16/11/4.
  */
 public interface InstantClassValidator {
-    default int preValidate(InstantRequestParam instantRequestParam) {return 0;}
+    default int preValidate() {return 0;}
 }

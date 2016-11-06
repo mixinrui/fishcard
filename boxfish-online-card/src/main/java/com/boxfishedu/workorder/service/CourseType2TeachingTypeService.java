@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.service;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.card.bean.CourseTypeEnum;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,5 +42,16 @@ public class CourseType2TeachingTypeService {
     public static int courseType2TeachingType2(String courseType, TutorType tutorType) {
         return getTeachingType(courseType, tutorType);
 
+    }
+
+    public static int instantCourseType2TeachingType(TutorType tutorType) {
+        switch (tutorType) {
+            case CN:
+                return TeachingType.ZHONGJIAO.getCode();
+            case FRN:
+                return TeachingType.WAIJIAO.getCode();
+            default:
+                throw new BusinessException("不支持的参数类型");
+        }
     }
 }

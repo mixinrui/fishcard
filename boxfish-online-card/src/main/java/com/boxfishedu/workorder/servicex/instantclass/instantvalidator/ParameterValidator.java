@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatu
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -34,12 +35,13 @@ public class ParameterValidator implements InstantClassValidator {
     private WorkOrderJpaRepository workOrderJpaRepository;
 
     @Override
-    public int preValidate(InstantRequestParam instantRequestParam) {
+    public int preValidate() {
+        InstantRequestParam instantRequestParam= ThreadLocalUtil.instantRequestParamThreadLocal.get();
         if(Objects.isNull(instantRequestParam.getStudentId())){
             throw new BusinessException("用户参数为必填");
         }
         if(!StringUtils.isEmpty(instantRequestParam.getTutorType())){
-            if(!instantRequestParam.getTutorType().equals(TutorTypeEnum.FRN)){
+            if(!instantRequestParam.getTutorType().equals(TutorTypeEnum.FRN.toString())){
                 return InstantClassRequestStatus.TUTOR_TYPE_NOT_SUPPORT.getCode();
             }
         }

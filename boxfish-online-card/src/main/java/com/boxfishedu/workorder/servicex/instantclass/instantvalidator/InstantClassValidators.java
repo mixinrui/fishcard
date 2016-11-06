@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.instantclass.instantvalidator;
 
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,9 +18,9 @@ public class InstantClassValidators {
     @Autowired
     private List<InstantClassValidator> preValidators;
 
-    public int preValidate(InstantRequestParam instantRequestParam) {
+    public int preValidate() {
         for(InstantClassValidator preValidator:preValidators){
-            int result=preValidator.preValidate(instantRequestParam);
+            int result=preValidator.preValidate();
             if(result > InstantClassRequestStatus.UNKNOWN.getCode()) {
                 return result;
             }

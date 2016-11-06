@@ -3,6 +3,8 @@ package com.boxfishedu.workorder.servicex.instantclass;
 import ch.qos.logback.core.joran.conditional.ElseAction;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
+import com.boxfishedu.workorder.service.instantclass.InstantClassService;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.instantvalidator.InstantClassValidators;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
@@ -28,6 +30,9 @@ public class InstantClassServiceX {
     private InstantClassValidators instantClassValidators;
 
     @Autowired
+    private InstantClassService instantClassService;
+
+    @Autowired
     private
     @Qualifier("stringLongRedisTemplate")
     RedisTemplate<String, Long> stringLongRedisTemplate;
@@ -42,20 +47,24 @@ public class InstantClassServiceX {
     }
 
     public JsonResultModel instantClass(InstantRequestParam instantRequestParam) {
+        putParameterIntoThreadLocal(instantRequestParam);
+
         //对用户当前行为进行校验
-        int validateResult=instantClassValidators.preValidate(instantRequestParam);
+        int validateResult=instantClassValidators.preValidate();
         if(validateResult>InstantClassRequestStatus.UNKNOWN.getCode()){
             return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.getEnumByCode(validateResult)));
         }
 
-        long visitCount = opsForValue.increment(generateKey(instantRequestParam.getStudentId()), 1l);
-        if (visitCount % 8 == 0) {
-            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.MATCHED, "11111221221212QQWW"));
-        } else if (visitCount % 33 == 0) {
-            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.ASK_TOO_BUSY));
-        } else {
-            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.WAIT_TO_MATCH));
-        }
+        return JsonResultModel.newJsonResultModel(instantClassService.getMatchResult());
+
+//        long visitCount = opsForValue.increment(generateKey(instantRequestParam.getStudentId()), 1l);
+//        if (visitCount % 8 == 0) {
+//            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.MATCHED, "11111221221212QQWW"));
+//        } else if (visitCount % 33 == 0) {
+//            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.ASK_TOO_BUSY));
+//        } else {
+//            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.WAIT_TO_MATCH));
+//        }
     }
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
@@ -71,5 +80,9 @@ public class InstantClassServiceX {
             instantClassResult.setDesc(TeacherInstantClassStatus.MATCHED.getDesc());
         }
         return JsonResultModel.newJsonResultModel(instantClassResult);
+    }
+
+    private void putParameterIntoThreadLocal(InstantRequestParam instantRequestParam){
+        ThreadLocalUtil.instantRequestParamThreadLocal.set(instantRequestParam);
     }
 }

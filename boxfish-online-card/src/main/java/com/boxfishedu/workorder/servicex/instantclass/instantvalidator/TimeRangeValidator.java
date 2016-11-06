@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatu
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class TimeRangeValidator implements InstantClassValidator {
     private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
 
     @Override
-    public int preValidate(InstantRequestParam instantRequestParam) {
+    public int preValidate() {
         Date date=new Date();
         String day=DateUtil.date2SimpleString(date);
         Optional<List<InstantClassTimeRules>> instantClassTimeRulesList=instantClassTimeRulesMorphiaRepository.getByDay(day);

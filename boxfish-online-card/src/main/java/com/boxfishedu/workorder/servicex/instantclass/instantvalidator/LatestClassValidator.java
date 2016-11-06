@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import lombok.Data;
@@ -37,7 +38,8 @@ public class LatestClassValidator implements InstantClassValidator {
     private WorkOrderJpaRepository workOrderJpaRepository;
 
     @Override
-    public int preValidate(InstantRequestParam instantRequestParam) {
+    public int preValidate() {
+        InstantRequestParam instantRequestParam=ThreadLocalUtil.instantRequestParamThreadLocal.get();
         if(!onlineAccountService.isMember(instantRequestParam.getStudentId())){
             logger.debug("@LatestClassValidator#preValidate#[{}]不是购买用户",instantRequestParam.getStudentId());
             return InstantClassRequestStatus.UNKNOWN.getCode();

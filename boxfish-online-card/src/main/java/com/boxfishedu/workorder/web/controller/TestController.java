@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
+import com.boxfishedu.workorder.service.instantclass.InstantClassService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -27,6 +28,9 @@ import java.util.*;
 public class TestController {
     @Autowired
     private WorkOrderService workOrderService;
+
+    @Autowired
+    private InstantClassService instantClassService;
 
     @Autowired
     private ServeService serveService;
@@ -133,4 +137,11 @@ public class TestController {
     public void syncMongo2Redis(){
         onlineAccountService.syncMongo2Redis();
     }
+
+    @RequestMapping(value = "/slot/latest", method = RequestMethod.GET)
+    public void slot(){
+        System.out.println(instantClassService.getMostSimilarSlot(2l));
+    }
+
+
 }
