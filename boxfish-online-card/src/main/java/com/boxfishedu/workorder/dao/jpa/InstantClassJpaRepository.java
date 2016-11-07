@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
@@ -18,4 +19,16 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
     public Optional<InstantClassCard> findByWorkorderId(Long workOrderId);
 
     public Optional<InstantClassCard> findByStudentIdAndClassDateAndSlotId(Long studentId, Date classDate, Long slotId) ;
+
+    @Modifying
+    @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1 where icc.id= ?1")
+    public void incrementrequestTeacherTimes(Long id);
+
+    @Modifying
+    @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1,status=?2 where icc.id= ?1")
+    public void updateRequestTeacherTimesAndStatus(Long id,Integer status);
+
+    @Modifying
+    @Query("update InstantClassCard icc set status=?2 where icc.id= ?1")
+    public void updateStatus(Long id,Integer status);
 }

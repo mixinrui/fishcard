@@ -21,18 +21,24 @@ public class InstantClassResult {
         this.desc=instantClassRequestStatus.getDesc();
     }
 
-    public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus, InstantClassCard instantClassCard){
+    public InstantClassResult(InstantClassCard instantClassCard){
+        InstantClassRequestStatus instantClassRequestStatus=InstantClassRequestStatus.getEnumByCode(instantClassCard.getStatus());
         this.status=instantClassRequestStatus.getCode();
         this.desc=instantClassRequestStatus.getDesc();
-        this.groupInfo.setGroupId(instantClassCard.getGroupId());
+        if(instantClassCard.getStatus().equals(InstantClassRequestStatus.MATCHED.getCode())) {
+            this.groupInfo.setGroupId(instantClassCard.getGroupId());
+            this.groupInfo.setGroupName(instantClassCard.getGroupName());
+            this.groupInfo.setChatRoomId(instantClassCard.getChatRoomId());
+            this.groupInfo.setWorkOrderId(instantClassCard.getWorkorderId());
+        }
     }
 
     public static InstantClassResult newInstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         return new InstantClassResult(instantClassRequestStatus);
     }
 
-    public static InstantClassResult newInstantClassResult(InstantClassRequestStatus instantClassRequestStatus,String groupId){
-        return new InstantClassResult(instantClassRequestStatus,groupId);
+    public static InstantClassResult newInstantClassResult(InstantClassCard instantClassCard){
+        return new InstantClassResult(instantClassCard);
     }
 
     public InstantClassResult(){

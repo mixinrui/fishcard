@@ -1,10 +1,12 @@
 package com.boxfishedu.workorder.requester;
 
+import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingNotificationEnum;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.google.common.collect.Lists;
@@ -47,6 +49,15 @@ public class CourseOnlineRequester {
                 urlConf.getCourse_online_service(),workOrderId,TeachingNotificationEnum.toString());
         logger.debug("<<<<<<<<<<<<<@[notifyTeachingOnlinePushMessage]向在线教育发起通知操作,[[[[通知在线教学中心推送消息]]]],url[{}]",url);
         threadPoolManager.execute(new Thread(()->{restTemplate.getForObject(url,Object.class);}));
+    }
+
+    public void notifyInstantClassMsg(InstantClassCard instantClassCard){
+        TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();
+        //TODO:即时上课,推送给教师的信息
+        teachingOnlineMsg.setPush_title("即时上课title");
+        teachingOnlineMsg.setUser_id(instantClassCard.getTeacherId());
+        teachingOnlineMsg.setPush_type(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
+
     }
 
     /**

@@ -54,7 +54,7 @@ public class InstantClassService {
         Optional<TimeSlots> timeSlotsOptional=getMostSimilarSlot(new Long(CourseType2TeachingTypeService
                 .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType()))));
         if(!timeSlotsOptional.isPresent()){
-            return InstantClassRequestStatus.NOT_IN_RANGE;
+            return this.matchResultWrapper(InstantClassRequestStatus.NOT_IN_RANGE);
         }
         logger.debug("@InstantClassService#user{}#最接近的时间片是{}",getInstantRequestParam().getStudentId(),timeSlotsOptional.get().getSlotId());
         Optional<InstantClassCard> instantClassCardOptional=getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
@@ -65,10 +65,10 @@ public class InstantClassService {
             //发起获取推荐教师
 
             //TODO:发起教师请求，同时将匹配的结果返回给App
-            return InstantClassRequestStatus.WAIT_TO_MATCH;
+            return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH);
         }
         else{
-            return InstantClassRequestStatus.getEnumByCode(instantClassCardOptional.get().getStatus());
+            return matchResultWrapper(instantClassCardOptional.get());
         }
     }
 
@@ -98,8 +98,8 @@ public class InstantClassService {
         return InstantClassResult.newInstantClassResult(instantClassRequestStatus);
     }
 
-    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus,InstantClassCard instantClassCard){
-        return InstantClassResult.newInstantClassResult(instantClassRequestStatus,instantClassCard);
+    private InstantClassResult matchResultWrapper(InstantClassCard instantClassCard){
+        return InstantClassResult.newInstantClassResult(instantClassCard);
     }
 
     private InstantClassCard initClassCardWithCourse(TimeSlots timeSlots){

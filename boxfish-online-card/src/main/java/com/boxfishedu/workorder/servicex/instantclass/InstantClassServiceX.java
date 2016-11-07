@@ -56,8 +56,7 @@ public class InstantClassServiceX {
                     .newInstantClassResult(InstantClassRequestStatus.getEnumByCode(validateResult)));
         }
 
-        return JsonResultModel.newJsonResultModel(InstantClassResult
-                .newInstantClassResult(instantClassService.getMatchResult()));
+        return JsonResultModel.newJsonResultModel(instantClassService.getMatchResult());
 
 //        long visitCount = opsForValue.increment(generateKey(instantRequestParam.getStudentId()), 1l);
 //        if (visitCount % 8 == 0) {

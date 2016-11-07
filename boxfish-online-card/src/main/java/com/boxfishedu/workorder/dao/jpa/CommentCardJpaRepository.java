@@ -126,4 +126,5 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
      */
     @Query("SELECT c FROM CommentCard c  where c.service = ?1 order by c.teacherAnswerTime DESC")
     public List<CommentCard> getSystemCommentCard(Service service);
+
 }
