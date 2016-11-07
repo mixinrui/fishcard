@@ -276,10 +276,11 @@ public class RecommandCourseRequester {
     /**
      * 实时上课
      */
-    public RecommandCourseView getInstantCourseView(TutorType tutorType) {
+    public RecommandCourseView getInstantCourseView(Long studentId,int index,TutorType tutorType) {
+        logger.debug("@getInstantCourseView->获取实时推荐课程");
         switch (tutorType){
-            case FRN:return RecommendCourseType.recommendFRN(1);
-            case CN:return RecommendCourseType.recommendCN(1);
+            case FRN:return this.getUltimateRecommend(studentId,index);
+            case CN:return this.getPromoteRecommend(studentId,index);
             default:
                 throw  new BusinessException("不支持的参数类型");
         }

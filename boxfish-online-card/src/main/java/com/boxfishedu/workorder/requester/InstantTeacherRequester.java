@@ -1,8 +1,11 @@
 package com.boxfishedu.workorder.requester;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
+import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +61,7 @@ public class InstantTeacherRequester {
     }
 
     private Optional<List<Long>> parseFetchTeachers(JsonResultModel jsonResultModel){
-        List<Long> teachers=(List<Long>)jsonResultModel.getData();
+        List<Long> teachers= jsonResultModel.getListData(Long.class);
         return Optional.ofNullable(teachers);
     }
 

@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatu
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,9 @@ public class InstantClassTeacherService {
     @Autowired
     private ThreadPoolManager threadPoolManager;
 
+    @Autowired
+    private CourseOnlineRequester courseOnlineRequester;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
@@ -50,7 +54,7 @@ public class InstantClassTeacherService {
             this.updateNomatchStatus(instantClassCard);
         }
         //匹配上老师,则向教师推送抢单的消息
-
+        courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
     }
 
     private void updateNomatchStatus(InstantClassCard instantClassCard){

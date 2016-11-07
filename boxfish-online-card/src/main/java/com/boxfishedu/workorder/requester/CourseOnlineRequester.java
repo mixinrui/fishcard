@@ -51,13 +51,28 @@ public class CourseOnlineRequester {
         threadPoolManager.execute(new Thread(()->{restTemplate.getForObject(url,Object.class);}));
     }
 
-    public void notifyInstantClassMsg(InstantClassCard instantClassCard){
-        TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();
-        //TODO:即时上课,推送给教师的信息
-        teachingOnlineMsg.setPush_title("即时上课title");
-        teachingOnlineMsg.setUser_id(instantClassCard.getTeacherId());
-        teachingOnlineMsg.setPush_type(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
+    public void notifyInstantClassMsg(InstantClassCard instantClassCard,List<Long> teacherIds){
+        String url=String.format("%s/teaching/callback/push",
+                urlConf.getCourse_online_service());
+        List<TeachingOnlineMsg> teachingOnlineMsgList=Lists.newArrayList();
+        teacherIds.forEach(teacherId->{
+            TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();
+            //TODO:即时上课,推送给教师的信息;需要到配置项中去
+            teachingOnlineMsg.setPush_title("Received a call from a student for online LIVE teaching. Click and start teaching now");
+            teachingOnlineMsg.setUser_id(teacherId);
+            teachingOnlineMsg.setPush_type(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
 
+            TeachingOnlineMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach=new  TeachingOnlineMsg.TeachingOnlineMsgAttach();
+            teachingOnlineMsgAttach.setType(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
+            teachingOnlineMsgAttach.setCount(teacherIds.size());
+
+            teachingOnlineMsg.setData(teachingOnlineMsgAttach);
+
+            teachingOnlineMsgList.add(teachingOnlineMsg);
+        });
+        logger.debug(">>>>>>@notifyInstantClassMsg,向教师发起推送实时上课请求,courseInfo[{}],教师信息[{}]"
+                ,JacksonUtil.toJSon(teachingOnlineMsgList),teacherIds);
+        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineMsgList,Object.class);}));
     }
 
     /**

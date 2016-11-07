@@ -48,6 +48,9 @@ public class InstantClassService {
     @Autowired
     private RecommandCourseRequester recommandCourseRequester;
 
+    @Autowired
+    private InstantClassTeacherService instantClassTeacherService;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public InstantClassResult getMatchResult(){
@@ -61,13 +64,13 @@ public class InstantClassService {
         if(!instantClassCardOptional.isPresent()){
             logger.debug("@InstantClassService#user{}时间片{}在instant_class_card表中无数据"
                     ,getInstantRequestParam().getStudentId(),timeSlotsOptional.get().getSlotId());
-            persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
-            //发起获取推荐教师
-
+            InstantClassCard instantClassCard=persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
+            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard);
             //TODO:发起教师请求，同时将匹配的结果返回给App
             return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH);
         }
         else{
+            //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
             return matchResultWrapper(instantClassCardOptional.get());
         }
     }
@@ -90,8 +93,8 @@ public class InstantClassService {
                         ,DateUtil.date2SimpleDate(new Date()),timeSlots.getSlotId());
     }
 
-    public void persistInstantCard(InstantClassCard instantClassCard){
-        instantClassJpaRepository.save(instantClassCard);
+    public InstantClassCard persistInstantCard(InstantClassCard instantClassCard){
+        return instantClassJpaRepository.save(instantClassCard);
     }
 
     private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus){
@@ -119,6 +122,8 @@ public class InstantClassService {
         instantClassCard.setStudentRequestTimes(0);
         instantClassCard.setResultReadFlag(0);
         instantClassCard.setTeacherId(0l);
+        instantClassCard.setChatRoomId(0l);
+        instantClassCard.setRequestMatchTeacherTime(new Date());
         instantClassCard.setStatus(InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
         return instantClassCard;
     }
@@ -132,7 +137,8 @@ public class InstantClassService {
                 recommandCourseView.setCourseType(latestWorkOrder.getCourseType());
                 return recommandCourseView;
             case OTHER_ENTERANCE:
-                return recommandCourseRequester.getInstantCourseView(TutorType.resolve(getInstantRequestParam().getTutorType()));
+                return recommandCourseRequester.getInstantCourseView(getInstantRequestParam().getStudentId()
+                        ,1,TutorType.resolve(getInstantRequestParam().getTutorType()));
             default:
                 throw new BusinessException("参数的入口参数错误");
         }
