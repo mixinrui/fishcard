@@ -47,7 +47,7 @@ public class ScheduleCourseValidator implements InstantClassValidator {
         switch (InstantRequestParam.SelectModeEnum.getSelectMode(instantRequestParam.getSelectMode())){
             case COURSE_SCHEDULE_ENTERANCE:
                 Optional<WorkOrder> haveClass=workOrderJpaRepository
-                        .findLatestClassDateByStudentIdAndSkuId(instantRequestParam.getStudentId(),new Date(),TeachingType.WAIJIAO.getCode());
+                        .findTop1ByStudentIdAndSkuIdAndStartTimeAfterOrderByStartTimeAsc(instantRequestParam.getStudentId(),TeachingType.WAIJIAO.getCode(),new Date());
                 if(!haveClass.isPresent()){
                     return InstantClassRequestStatus.OUT_OF_NUM.getCode();
                 }

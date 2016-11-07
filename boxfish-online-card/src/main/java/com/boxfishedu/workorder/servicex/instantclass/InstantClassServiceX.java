@@ -52,10 +52,12 @@ public class InstantClassServiceX {
         //对用户当前行为进行校验
         int validateResult=instantClassValidators.preValidate();
         if(validateResult>InstantClassRequestStatus.UNKNOWN.getCode()){
-            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.getEnumByCode(validateResult)));
+            return JsonResultModel.newJsonResultModel(InstantClassResult
+                    .newInstantClassResult(InstantClassRequestStatus.getEnumByCode(validateResult)));
         }
 
-        return JsonResultModel.newJsonResultModel(instantClassService.getMatchResult());
+        return JsonResultModel.newJsonResultModel(InstantClassResult
+                .newInstantClassResult(instantClassService.getMatchResult()));
 
 //        long visitCount = opsForValue.increment(generateKey(instantRequestParam.getStudentId()), 1l);
 //        if (visitCount % 8 == 0) {
@@ -71,11 +73,11 @@ public class InstantClassServiceX {
         InstantClassResult instantClassResult = new InstantClassResult();
         long value = new Date().getTime();
         if (value % 3 != 0) {
-            instantClassResult.setGroupId("sasasasasasasasa");
+//            instantClassResult.setGroupId("sasasasasasasasa");
             instantClassResult.setStatus(TeacherInstantClassStatus.FAIL_TO_MATCH.getCode());
             instantClassResult.setDesc(TeacherInstantClassStatus.FAIL_TO_MATCH.getDesc());
         } else {
-            instantClassResult.setGroupId("sasasasasasasasa");
+//            instantClassResult.setGroupId("sasasasasasasasa");
             instantClassResult.setStatus(TeacherInstantClassStatus.MATCHED.getCode());
             instantClassResult.setDesc(TeacherInstantClassStatus.MATCHED.getDesc());
         }

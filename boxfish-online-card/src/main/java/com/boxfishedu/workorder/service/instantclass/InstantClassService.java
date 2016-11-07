@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
+import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class InstantClassService {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    public InstantClassRequestStatus getMatchResult(){
+    public InstantClassResult getMatchResult(){
         Optional<TimeSlots> timeSlotsOptional=getMostSimilarSlot(new Long(CourseType2TeachingTypeService
                 .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType()))));
         if(!timeSlotsOptional.isPresent()){
@@ -86,11 +87,19 @@ public class InstantClassService {
     public Optional<InstantClassCard> getClassCardByStudentIdAndTimeParam(TimeSlots timeSlots){
         return instantClassJpaRepository
                 .findByStudentIdAndClassDateAndSlotId(getInstantRequestParam().getStudentId()
-                        ,DateUtil.date2SimpleDate(new Date()),timeSlots.getSlotId().intValue());
+                        ,DateUtil.date2SimpleDate(new Date()),timeSlots.getSlotId());
     }
 
     public void persistInstantCard(InstantClassCard instantClassCard){
         instantClassJpaRepository.save(instantClassCard);
+    }
+
+    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus){
+        return InstantClassResult.newInstantClassResult(instantClassRequestStatus);
+    }
+
+    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus,InstantClassCard instantClassCard){
+        return InstantClassResult.newInstantClassResult(instantClassRequestStatus,instantClassCard);
     }
 
     private InstantClassCard initClassCardWithCourse(TimeSlots timeSlots){
@@ -108,6 +117,8 @@ public class InstantClassService {
         instantClassCard.setStudentId(getInstantRequestParam().getStudentId());
         instantClassCard.setRequestTeacherTimes(0);
         instantClassCard.setStudentRequestTimes(0);
+        instantClassCard.setResultReadFlag(0);
+        instantClassCard.setTeacherId(0l);
         instantClassCard.setStatus(InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
         return instantClassCard;
     }

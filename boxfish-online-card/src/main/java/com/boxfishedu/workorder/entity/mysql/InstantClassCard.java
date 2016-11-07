@@ -70,7 +70,16 @@ public class InstantClassCard {
 
     //返回学生的结果标志,0:未返回,1:已返回
     @Column(name = "result_read_flag", nullable = true)
-    private Short resultReadFlag;
+    private Integer resultReadFlag;
+
+    @Column(name = "group_name", nullable = true)
+    private String groupName;
+
+    @Column(name = "group_id")
+    private String groupId;
+
+    @Column(name = "chat_room_id")
+    private Long chatRoomId;
 
     public InstantClassCard(){
     }

@@ -17,5 +17,5 @@ import java.util.Optional;
 public interface InstantClassJpaRepository extends JpaRepository<InstantClassCard,Long> {
     public Optional<InstantClassCard> findByWorkorderId(Long workOrderId);
 
-    public Optional<InstantClassCard> findByStudentIdAndClassDateAndSlotId(Long studentId, Date classDate, Integer slotId) ;
+    public Optional<InstantClassCard> findByStudentIdAndClassDateAndSlotId(Long studentId, Date classDate, Long slotId) ;
 }
