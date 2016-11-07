@@ -32,7 +32,7 @@ public class Application implements CommandLineRunner {
         String type;
         // args.length == 0
         if(true) {
-            type = "3";
+            type = "4";
         } else {
             type = args[0];
         }
@@ -42,6 +42,7 @@ public class Application implements CommandLineRunner {
                 case "1": repository.updateCourseDifficultys(); break;
                 case "2": workOrderService.handleAllDifferent(); break;
                 case "3": workOrderService.handleScheduleCourseInfo(); break;
+                case "4": repository.updateCourseEnglishNames(); break;
             }
             System.out.println("finish fixes");
             Runtime.getRuntime().exit(0);
