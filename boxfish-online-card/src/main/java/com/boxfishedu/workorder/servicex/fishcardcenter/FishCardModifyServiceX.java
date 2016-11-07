@@ -38,6 +38,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -153,8 +156,20 @@ public class FishCardModifyServiceX {
         }
         try {
             workOrders.forEach(workOrder -> {
-                if(StringUtils.isNotEmpty(workOrder.getCourseId())) {
-                    fishCardModifyService.changeCourse(workOrder);
+                Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
+                        DateUtil.convertLocalDateTime(workOrder.getStartTime()));
+                long hours = duration.toHours();
+                // 24小时以内如果有课,不再换课,无课则直接推荐
+                if(hours <= 24) {
+                    if(StringUtils.isEmpty(workOrder.getCourseId())) {
+                        fishCardModifyService.changeCourse(workOrder);
+                    }
+                }
+                // 24小时以上的课,有课再换
+                else {
+                    if(StringUtils.isNotEmpty(workOrder.getCourseId())) {
+                        fishCardModifyService.changeCourse(workOrder);
+                    }
                 }
             });
         }
