@@ -72,6 +72,10 @@ public class InstantClassCard {
     @Column(name = "result_read_flag", nullable = true)
     private Integer resultReadFlag;
 
+    //返回学生的结果标志,0:课程表入口,1:其他入口
+    @Column(name = "entrance", nullable = true)
+    private Integer entrance;
+
     @Column(name = "group_name", nullable = true)
     private String groupName;
 

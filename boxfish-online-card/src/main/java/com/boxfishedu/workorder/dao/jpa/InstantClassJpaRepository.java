@@ -31,7 +31,7 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
     @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1,status=?2 where icc.id= ?1")
     public void updateRequestTeacherTimesAndStatus(Long id,Integer status);
 
-    @Transactional
+
     @Modifying
     @Query("update InstantClassCard icc set status=?2 where icc.id= ?1")
     public void updateStatus(Long id,Integer status);

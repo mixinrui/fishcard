@@ -14,7 +14,7 @@ import lombok.Data;
 public class InstantClassResult {
     private Integer status;
     private String desc;
-    private GroupInfo groupInfo;
+    private GroupInfo groupInfo=new GroupInfo();
 
     public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         this.status=instantClassRequestStatus.getCode();

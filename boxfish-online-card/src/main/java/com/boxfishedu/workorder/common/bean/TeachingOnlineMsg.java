@@ -22,6 +22,7 @@ public class TeachingOnlineMsg {
         private Long studentId;
         private String day;
         private Long slotId;
+        private Long cardId;
     }
 }
 

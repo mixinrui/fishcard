@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.service.instantclass.InstantRecommandAlthom;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import lombok.Data;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,13 @@ public class InstantTeacherRequester {
         InstantFetchTeacherParam instantFetchTeacherParam=new InstantFetchTeacherParam();
         instantFetchTeacherParam.setDay(instantClassCard.getClassDate().getTime());
         instantFetchTeacherParam.setCourseType(instantClassCard.getCourseType());
-        //TODO:这里要做成配置;暂时不符合需求
-        instantFetchTeacherParam.setCountStart(instantClassCard.getRequestTeacherTimes());
-        instantFetchTeacherParam.setCountEnd(instantClassCard.getRequestTeacherTimes()*2);
+        //TODO:这里暂时假数据,到时候会替换
+//        InstantRecommandAlthom instantRecommandAlthom=new InstantRecommandAlthom(instantClassCard.getRequestTeacherTimes());
+//        instantFetchTeacherParam.setCountStart(instantRecommandAlthom.getCountStart());
+//        instantFetchTeacherParam.setCountEnd(instantRecommandAlthom.getCountEnd());
+
+        instantFetchTeacherParam.setCountStart(0);
+        instantFetchTeacherParam.setCountEnd(50);
         instantFetchTeacherParam.setRoleId(instantClassCard.getRoleId());
         instantFetchTeacherParam.setSlotId(instantClassCard.getSlotId());
         return this.parseFetchTeachers(this.getInstantTeachers(instantFetchTeacherParam));
