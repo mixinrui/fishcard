@@ -120,7 +120,7 @@ public class AutuConfirmFishCardServiceX {
                 }
 
             }else {
-                Date endHoliday = getHoliday(holidayDays,baseDate);
+                Date endHoliday = getHoliday(holidayDays,wo.getEndTime(),baseDate);
                 if( endHoliday.before(new Date())){
                     wo.setConfirmFlag("0");
                     workOrderListchange.add(wo);
@@ -140,17 +140,35 @@ public class AutuConfirmFishCardServiceX {
     /**
      * 获取期间假期
      * @param holidays
-     * @param baseDate
+     * @param endTime1
+     * @param endTime2
      * @return
      */
-    public Date getHoliday(List<HolidayDay> holidays,Date baseDate){
+    public Date getHoliday(List<HolidayDay> holidays,Date endTime1,Date endTime2){
+        Date confirmDate = null;// 能够自动确认的日期
         for (HolidayDay holidayDay:holidays){
-            if(baseDate.after(holidayDay.getStartTime()) && baseDate.before(holidayDay.getEndTime())){
-                return holidayDay.getEndTime();
+            //1  鱼卡时间段 在 holiday之间
+            if(endTime1.after(holidayDay.getStartTime()) && endTime2.before(holidayDay.getEndTime())){
+                confirmDate = DateUtil.addMinutes(holidayDay.getEndTime(),60*24*2);
+            }
+            //2  鱼卡时间段 包含holiday
+            if(holidayDay.getStartTime().after(endTime1) && holidayDay.getEndTime().before(endTime2)){
+                confirmDate = DateUtil.addMinutes(endTime2,60*24*2);
+            }
+            //3  鱼卡时间段 holiday区间包含 开始时间
+            if(holidayDay.getEndTime().after(endTime1) && holidayDay.getEndTime().before(endTime2) && holidayDay.getStartTime().before(endTime1)){
+                confirmDate = DateUtil.addMinutes(endTime2,DateUtil.getBetweenMinus(endTime1,holidayDay.getEndTime()));
+            }
+            //4  鱼卡时间段 holiday区间包含 结束时间
+            if(holidayDay.getStartTime().after(endTime1) && holidayDay.getStartTime().before(endTime2) &&  holidayDay.getEndTime().after(endTime2)){
+                confirmDate = DateUtil.addMinutes(holidayDay.getEndTime(),  DateUtil.getBetweenMinus(holidayDay.getStartTime(),endTime2) );
+            }
+            if(null != confirmDate){
+                return confirmDate;
             }
         }
 
-        return baseDate;
+        return endTime2;
 
     }
 }

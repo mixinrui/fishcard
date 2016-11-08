@@ -273,27 +273,33 @@ public class MakeWorkOrderServiceX {
         List<WorkOrder> list = Lists.newArrayList();
         for (WorkOrder wo : workOrderNOteacher) {
             if (TeachingType.WAIJIAO.getCode() == teacherForm.getTeacherType() && TeachingType.WAIJIAO.getCode() == wo.getSkuId()) { //判断外教
-                if (null != teacherForm.getCourseIds()    // 老师能教的课程类型集合
-                        &&
-                        !StringUtils.isEmpty(wo.getCourseType())  // 鱼卡的课程类型
-                        &&
-                        CourseTypeEnum.PHONICS.toString().equals(wo.getCourseType())
-                        &&
-                        teacherForm.getCourseIds().contains(CourseTypeEnum.PHONICS.toString())
-                        ) {
-                    list.add(wo);
-                } else if (!CourseTypeEnum.PHONICS.toString().equals(wo.getCourseType())) {
+                if (teachingLimit(wo,teacherForm)) {//根据鱼卡的课程类型,判断老师是否有权限
                     list.add(wo);
                 }
-
             }
-
             if (TeachingType.ZHONGJIAO.getCode() == teacherForm.getTeacherType() && !(TeachingType.WAIJIAO.getCode() == wo.getSkuId())) {
-                list.add(wo);
+                if (teachingLimit(wo,teacherForm)) {//根据鱼卡的课程类型,判断老师是否有权限
+                    list.add(wo);
+                }
             }
         }
-
         return list;
+    }
+
+    /**
+     * 判断老师是否有授课权限
+     * create date 2016-11-04
+     * @param wo
+     * @param teacherForm
+     * @return
+     */
+    private boolean teachingLimit(WorkOrder wo,TeacherForm teacherForm){
+        return  (null != teacherForm.getCourseIds()    // 老师能教的课程类型集合
+                &&
+                !StringUtils.isEmpty(wo.getCourseType())  // 鱼卡的课程类型
+                &&
+                teacherForm.getCourseIds().contains(wo.getCourseType())
+                ) ;
     }
 
     /**
