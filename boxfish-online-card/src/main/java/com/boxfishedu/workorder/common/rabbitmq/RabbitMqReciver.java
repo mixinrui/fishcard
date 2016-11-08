@@ -196,6 +196,8 @@ public class RabbitMqReciver {
             } else  if(serviceTimerMessage.getType() == TimerMessageType.AUTO_CONFIRM_STATUS.value()){
                 logger.info("==========>AutuConfirmFishCardServiceX ===>>> 自动确认鱼卡状态");
                 autuConfirmFishCardServiceX.autoConfirmFishCard();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS.value()){
+                logger.info("==========>INSTANT_CLASS ===>>> 立即上课");
             }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);

@@ -10,11 +10,10 @@ import lombok.Data;
  * Created by hucl on 16/11/3.
  */
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InstantClassResult {
     private Integer status;
     private String desc;
-    private GroupInfo groupInfo=new GroupInfo();
+    private GroupInfo groupInfo=null;
 
     public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         this.status=instantClassRequestStatus.getCode();
@@ -26,6 +25,7 @@ public class InstantClassResult {
         this.status=instantClassRequestStatus.getCode();
         this.desc=instantClassRequestStatus.getDesc();
         if(instantClassCard.getStatus().equals(InstantClassRequestStatus.MATCHED.getCode())) {
+            this.groupInfo=new GroupInfo();
             this.groupInfo.setGroupId(instantClassCard.getGroupId());
             this.groupInfo.setGroupName(instantClassCard.getGroupName());
             this.groupInfo.setChatRoomId(instantClassCard.getChatRoomId());
@@ -46,6 +46,7 @@ public class InstantClassResult {
     }
 
     @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     class GroupInfo{
         private Long workOrderId;
         private String groupName;
