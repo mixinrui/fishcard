@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.common.rabbitmq;
 import com.boxfishedu.workorder.common.bean.FishCardDelayMessage;
 import com.boxfishedu.workorder.common.bean.FishCardDelayMsgType;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.servicex.timer.FishCardUpdatorServiceX;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,5 +72,11 @@ public class RabbitMqDealyReceiver {
                 logger.error("@teacherPrepareClassDelaer通知教师准备上课失败");
             }
         }
+    }
+
+    @RabbitListener(queues = RabbitMqConstant.DELAY_INSTANT_CLASS_DEALER_QUEUE)
+    public void instantClassDealer(InstantClassCard instantClassCard) throws Exception {
+        logger.info("@===============>[instantClassDealer],开始接受即时上课处理消息message{}", instantClassCard);
+
     }
 }

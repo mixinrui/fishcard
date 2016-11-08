@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.instantclass;
 
 import ch.qos.logback.core.joran.conditional.ElseAction;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
@@ -10,6 +11,8 @@ import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -84,6 +87,9 @@ public class InstantClassServiceX {
     }
 
     private void putParameterIntoThreadLocal(InstantRequestParam instantRequestParam){
+        if(StringUtils.isEmpty(instantRequestParam.getTutorType())){
+            instantRequestParam.setTutorType(TutorType.FRN.toString());
+        }
         ThreadLocalUtil.instantRequestParamThreadLocal.set(instantRequestParam);
     }
 }
