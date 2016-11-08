@@ -35,6 +35,7 @@ public class InstantClassTeacherService {
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
+        instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId());
         threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassCard);}));
     }
 

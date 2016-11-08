@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.FishCardDelayMessage;
 import com.boxfishedu.workorder.common.bean.FishCardDelayMsgType;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerDealer;
 import com.boxfishedu.workorder.servicex.timer.FishCardUpdatorServiceX;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,9 @@ public class RabbitMqDealyReceiver {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private FishCardUpdatorServiceX fishCardUpdatorServiceX;
+
+    @Autowired
+    private InstantClassTimerDealer instantClassTimerDealer;
 
     @RabbitListener(queues = RabbitMqConstant.DELAY_TEACHER_DEALER_QUEUE)
     public void teacherAbsentDealer(FishCardDelayMessage fishCardDelayMessage) throws Exception {
@@ -77,6 +81,12 @@ public class RabbitMqDealyReceiver {
     @RabbitListener(queues = RabbitMqConstant.DELAY_INSTANT_CLASS_DEALER_QUEUE)
     public void instantClassDealer(InstantClassCard instantClassCard) throws Exception {
         logger.info("@===============>[instantClassDealer],开始接受即时上课处理消息message{}", instantClassCard);
+        try {
+            instantClassTimerDealer.timerGetInstantTeachers(instantClassCard);
+        }
+        catch (Exception ex){
+            logger.error("@!!!!!!!!![instantClassDealer],处理消息失败,message{}", instantClassCard,ex);
+        }
 
     }
 }

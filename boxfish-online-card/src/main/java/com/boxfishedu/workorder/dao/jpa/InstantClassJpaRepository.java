@@ -20,6 +20,9 @@ import java.util.Optional;
 public interface InstantClassJpaRepository extends JpaRepository<InstantClassCard, Long> {
     Optional<InstantClassCard> findByWorkorderId(Long workOrderId);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    InstantClassCard findForUpdate(Long id);
+
     Optional<InstantClassCard> findByStudentIdAndClassDateAndSlotId(Long studentId, Date classDate, Long slotId);
 
     @Transactional

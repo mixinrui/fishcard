@@ -1,7 +1,11 @@
 package com.boxfishedu.workorder.servicex.instantclass.timer;
 
+import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.service.instantclass.InstantClassTeacherService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +18,34 @@ public class InstantClassTimerDealer {
     @Autowired
     private InstantClassJpaRepository instantClassJpaRepository;
 
+    @Autowired
+    private InstantClassTeacherService instantClassTeacherService;
+
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
+
     @Transactional
     public void timerGetInstantTeachers(InstantClassCard instantClassCard){
-        InstantClassCard dbInstantCard =instantClassJpaRepository.findOne(instantClassCard.getId());
+        InstantClassCard dbInstantCard =instantClassJpaRepository.findForUpdate(instantClassCard.getId());
+        if(dbInstantCard.getRequestTeacherTimes()!=instantClassCard.getRequestTeacherTimes()){
+            logger.debug("@timerGetInstantTeachers#repeat#已经请求过一次教师,放弃该消息#[{}]",instantClassCard);
+            return;
+        }
+        if(dbInstantCard.getStatus()== InstantClassRequestStatus.WAIT_TO_MATCH.getCode()){
+            //TODO:3应该写成配置
+            if(dbInstantCard.getRequestTeacherTimes()%3==0){
+                dbInstantCard.setStatus(InstantClassRequestStatus.NO_MATCH.getCode());
+                instantClassJpaRepository.save(instantClassCard);
+                return;
+            }
+        }
+        if(dbInstantCard.getStatus()== InstantClassRequestStatus.NO_MATCH.getCode()){
+            logger.debug("@timerGetInstantTeachers#unmatch#已被标记为无匹配,card#[{}],返回",instantClassCard);
+            return;
+        }
+        if(dbInstantCard.getStatus()==InstantClassRequestStatus.MATCHED.getCode()){
+            logger.debug("@timerGetInstantTeachers#matched#已被标记为匹配,card#[{}],返回",instantClassCard);
+            return;
+        }
+        instantClassTeacherService.dealFetchedTeachersAsync(dbInstantCard);
     }
 }
