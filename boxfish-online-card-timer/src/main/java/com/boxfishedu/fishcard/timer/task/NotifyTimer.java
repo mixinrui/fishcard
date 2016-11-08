@@ -260,7 +260,7 @@ public class NotifyTimer {
      * 鱼卡自动确认状态
      */
     //@Scheduled(cron = "0 0 4 * * ?")
-    @Scheduled(cron = "0 30 04 * * ?")
+    @Scheduled(cron = "0 10 15 * * ?")
     public void autoConfirmStatus(){
         logger.info("<<<<<<autoConfirmStatus<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<自动确认状态<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
