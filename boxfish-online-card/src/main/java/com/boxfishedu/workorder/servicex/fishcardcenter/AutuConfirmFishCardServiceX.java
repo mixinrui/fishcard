@@ -149,7 +149,7 @@ public class AutuConfirmFishCardServiceX {
         for (HolidayDay holidayDay:holidays){
             //1  鱼卡时间段 在 holiday之间
             if(endTime1.after(holidayDay.getStartTime()) && endTime2.before(holidayDay.getEndTime())){
-                confirmDate = DateUtil.addMinutes(endTime2,60*24*2);
+                confirmDate = DateUtil.addMinutes(holidayDay.getEndTime(),60*24*2);
             }
             //2  鱼卡时间段 包含holiday
             if(holidayDay.getStartTime().after(endTime1) && holidayDay.getEndTime().before(endTime2)){
