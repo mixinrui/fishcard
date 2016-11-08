@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.dao.jpa;
 
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.Service;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,23 +17,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public interface InstantClassJpaRepository extends JpaRepository<InstantClassCard,Long> {
-    public Optional<InstantClassCard> findByWorkorderId(Long workOrderId);
+public interface InstantClassJpaRepository extends JpaRepository<InstantClassCard, Long> {
+    Optional<InstantClassCard> findByWorkorderId(Long workOrderId);
 
-    public Optional<InstantClassCard> findByStudentIdAndClassDateAndSlotId(Long studentId, Date classDate, Long slotId) ;
+    Optional<InstantClassCard> findByStudentIdAndClassDateAndSlotId(Long studentId, Date classDate, Long slotId);
 
     @Transactional
     @Modifying
     @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1 where icc.id= ?1")
-    public void incrementrequestTeacherTimes(Long id);
+    void incrementrequestTeacherTimes(Long id);
 
     @Transactional
     @Modifying
     @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1,status=?2 where icc.id= ?1")
-    public void updateRequestTeacherTimesAndStatus(Long id,Integer status);
+    void updateRequestTeacherTimesAndStatus(Long id, Integer status);
 
 
     @Modifying
     @Query("update InstantClassCard icc set status=?2 where icc.id= ?1")
-    public void updateStatus(Long id,Integer status);
+    void updateStatus(Long id, Integer status);
+
+    List<InstantClassCard> findByRequestMatchTeacherTimeBetweenAndStatusIn(Date startDate, Date endDate, Integer[] statuses);
 }
