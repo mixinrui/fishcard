@@ -9,6 +9,7 @@ import lombok.Data;
 public class TeacherInstantRequestParam {
     private Long teacherId;
     private Long studentId;
-    private String classDate;
-    private Integer slot;
+    private String day;
+    private Long slotId;
+    private Long cardId;
 }

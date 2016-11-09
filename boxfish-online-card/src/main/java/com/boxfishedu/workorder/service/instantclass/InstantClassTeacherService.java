@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ public class InstantClassTeacherService {
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
-        instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId());
+        instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId(),new Date());
         threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassCard);}));
     }
 

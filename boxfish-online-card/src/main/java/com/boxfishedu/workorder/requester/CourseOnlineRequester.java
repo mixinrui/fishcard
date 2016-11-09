@@ -70,6 +70,7 @@ public class CourseOnlineRequester {
             teachingOnlineMsgAttach.setDay(DateUtil.simpleDate2String(instantClassCard.getClassDate()));
             teachingOnlineMsgAttach.setSlotId(instantClassCard.getSlotId());
             teachingOnlineMsgAttach.setCount(teacherIds.size());
+            teachingOnlineMsgAttach.setStudentId(instantClassCard.getStudentId());
 
             teachingOnlineMsg.setData(teachingOnlineMsgAttach);
 

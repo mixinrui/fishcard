@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
@@ -11,8 +12,10 @@ import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
+import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +48,9 @@ public class TestController {
 
     @Autowired
     private OnlineAccountService onlineAccountService;
+
+    @Autowired
+    private ScheduleEntranceDataGenerator scheduleEntranceDataGenerator;
 
     @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
     public void changeFishCardTime(@RequestBody Map<String,String> param){
@@ -143,5 +149,11 @@ public class TestController {
         System.out.println(instantClassService.getMostSimilarSlot(2l));
     }
 
-
+    @RequestMapping(value = "/queue", method = RequestMethod.GET)
+    public void queueTest(){
+        InstantClassCard instantClassCard=new InstantClassCard();
+        instantClassCard.setWorkorderId(59295l);
+        instantClassCard.setSlotId(29l);
+        scheduleEntranceDataGenerator.initCardAndSchedule(instantClassCard);
+    }
 }

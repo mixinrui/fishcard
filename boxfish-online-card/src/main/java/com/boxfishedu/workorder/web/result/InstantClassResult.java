@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.result;
 
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
+import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,13 +12,36 @@ import lombok.Data;
  */
 @Data
 public class InstantClassResult {
-    private Integer status;
-    private String desc;
-    private GroupInfo groupInfo=null;
+    protected Integer status;
+    protected String desc;
+    protected GroupInfo groupInfo=null;
 
     public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         this.status=instantClassRequestStatus.getCode();
         this.desc=instantClassRequestStatus.getDesc();
+    }
+
+    public InstantClassResult(TeacherInstantClassStatus teacherInstantClassStatus){
+        this.status=teacherInstantClassStatus.getCode();
+        this.desc=teacherInstantClassStatus.getDesc();
+    }
+
+    public InstantClassResult(InstantClassCard instantClassCard,TeacherInstantClassStatus teacherInstantClassStatus){
+        this.status=teacherInstantClassStatus.getCode();
+        this.desc=teacherInstantClassStatus.getDesc();
+        switch (teacherInstantClassStatus){
+            case MATCHED:{
+                this.groupInfo=new GroupInfo();
+                this.groupInfo.setGroupId(instantClassCard.getGroupId());
+                this.groupInfo.setGroupName(instantClassCard.getGroupName());
+                this.groupInfo.setChatRoomId(instantClassCard.getChatRoomId());
+                this.groupInfo.setWorkOrderId(instantClassCard.getWorkorderId());
+                break;
+            }
+            default:
+                break;
+
+        }
     }
 
     public InstantClassResult(InstantClassCard instantClassCard){
@@ -37,8 +61,16 @@ public class InstantClassResult {
         return new InstantClassResult(instantClassRequestStatus);
     }
 
+    public static InstantClassResult newInstantClassResult(TeacherInstantClassStatus teacherInstantClassStatus){
+        return new InstantClassResult(teacherInstantClassStatus);
+    }
+
     public static InstantClassResult newInstantClassResult(InstantClassCard instantClassCard){
         return new InstantClassResult(instantClassCard);
+    }
+
+    public static InstantClassResult newInstantClassResult(InstantClassCard instantClassCard,TeacherInstantClassStatus teacherInstantClassStatus){
+        return new InstantClassResult(instantClassCard,teacherInstantClassStatus);
     }
 
     public InstantClassResult(){

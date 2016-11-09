@@ -12,6 +12,7 @@ import javax.persistence.LockModeType;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -71,6 +72,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     //按照订单ID  和  状态 查找鱼卡
     public List<WorkOrder> findByOrderIdAndStatus(Long orderId, int status);
+
+    public List<WorkOrder> findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(Long orderId, Date date);
 
     //状态为退卡状态 并且 剩余课程不为零
     @Query("select wo from WorkOrder wo where wo.status =?1 and wo.service.amount>0")

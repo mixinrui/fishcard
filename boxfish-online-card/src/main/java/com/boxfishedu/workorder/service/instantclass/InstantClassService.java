@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service.instantclass;
 
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -70,6 +71,13 @@ public class InstantClassService {
             //TODO:发起教师请求，同时将匹配的结果返回给App
             return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH);
         }
+        if(instantClassCardOptional.get().getResultReadFlag()==1
+                &&instantClassCardOptional.get().getStatus()==InstantClassRequestStatus.NO_MATCH.getCode()){
+            instantClassJpaRepository.updateReadFlagAnsStatus(instantClassCardOptional.get().getId()
+                    ,0,InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
+            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCardOptional.get());
+            return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH);
+        }
         else{
             //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
             return matchResultWrapper(instantClassCardOptional.get());
@@ -103,6 +111,12 @@ public class InstantClassService {
     }
 
     private InstantClassResult matchResultWrapper(InstantClassCard instantClassCard){
+        if(instantClassCard.getStatus()==InstantClassRequestStatus.NO_MATCH.getCode()){
+            if(instantClassCard.getResultReadFlag()==0) {
+                //将结果的读取值设置为1;表示已经读取了
+                instantClassJpaRepository.updateReadFlag(instantClassCard.getId(), 1);
+            }
+        }
         return InstantClassResult.newInstantClassResult(instantClassCard);
     }
 
@@ -124,7 +138,17 @@ public class InstantClassService {
         instantClassCard.setResultReadFlag(0);
         instantClassCard.setTeacherId(0l);
         instantClassCard.setChatRoomId(0l);
+        instantClassCard.setCreateTime(new Date());
         instantClassCard.setRequestMatchTeacherTime(DateTime.now().toDate());
+        instantClassCard.setEntrance(getInstantRequestParam().getSelectMode());
+        //课程表入口
+        if(getInstantRequestParam().getSelectMode()==0){
+            instantClassCard.setWorkorderId(getAvaliableWorkOrder().getId());
+            instantClassCard.setRoleId(getAvaliableWorkOrder().getSkuId());
+        }
+        else{
+            instantClassCard.setRoleId(TeachingType.WAIJIAO.getCode());
+        }
         instantClassCard.setStatus(InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
         return instantClassCard;
     }
@@ -147,6 +171,10 @@ public class InstantClassService {
 
     private InstantRequestParam getInstantRequestParam(){
         return ThreadLocalUtil.instantRequestParamThreadLocal.get();
+    }
+
+    private WorkOrder getAvaliableWorkOrder(){
+        return ThreadLocalUtil.latestWorkOrderThreadLocal.get();
     }
 
 }

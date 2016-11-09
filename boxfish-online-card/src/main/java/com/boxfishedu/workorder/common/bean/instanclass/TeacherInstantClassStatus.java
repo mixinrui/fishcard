@@ -1,8 +1,9 @@
 package com.boxfishedu.workorder.common.bean.instanclass;
 
 public enum TeacherInstantClassStatus {
-    FAIL_TO_MATCH(10,"未匹配到学生"),
-    MATCHED(50,"匹配成功");
+    UNKNOWN(0,"未知"),
+    FAIL_TO_MATCH(10,"抢单失败"),
+    MATCHED(20,"抢单成功");
 
     private int code;
     private String desc;
@@ -11,6 +12,14 @@ public enum TeacherInstantClassStatus {
         this.desc = desc;
         this.code = code;
     }
+    public static TeacherInstantClassStatus getEnumByCode(int code){
+        for (TeacherInstantClassStatus teacherInstantClassStatus: TeacherInstantClassStatus.values()){
+            if (teacherInstantClassStatus.code == code)
+                return teacherInstantClassStatus;
+        }
+        return TeacherInstantClassStatus.UNKNOWN;
+    }
+
     public int getCode(){
         return this.code;
     }

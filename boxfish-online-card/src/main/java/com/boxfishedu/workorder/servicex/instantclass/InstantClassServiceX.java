@@ -71,25 +71,6 @@ public class InstantClassServiceX {
 //        }
     }
 
-    public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
-
-        //查看redis是否已经有人在抢该数据,有将其标记为已抢
-
-        //
-
-        InstantClassResult instantClassResult = new InstantClassResult();
-        long value = new Date().getTime();
-        if (value % 3 != 0) {
-//            instantClassResult.setGroupId("sasasasasasasasa");
-            instantClassResult.setStatus(TeacherInstantClassStatus.FAIL_TO_MATCH.getCode());
-            instantClassResult.setDesc(TeacherInstantClassStatus.FAIL_TO_MATCH.getDesc());
-        } else {
-//            instantClassResult.setGroupId("sasasasasasasasa");
-            instantClassResult.setStatus(TeacherInstantClassStatus.MATCHED.getCode());
-            instantClassResult.setDesc(TeacherInstantClassStatus.MATCHED.getDesc());
-        }
-        return JsonResultModel.newJsonResultModel(instantClassResult);
-    }
 
     private void putParameterIntoThreadLocal(InstantRequestParam instantRequestParam){
         if(StringUtils.isEmpty(instantRequestParam.getTutorType())){

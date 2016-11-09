@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.web.controller.instantclass;
 
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.servicex.instantclass.InstantClassServiceX;
+import com.boxfishedu.workorder.servicex.instantclass.TeacherInstantClassServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
@@ -26,6 +27,9 @@ public class InstantClassController {
     @Autowired
     private InstantClassServiceX instantClassServiceX;
 
+    @Autowired
+    private TeacherInstantClassServiceX teacherInstantClassServiceX;
+
     @RequestMapping(value = "/service/student/instantclass", method = RequestMethod.POST)
     public JsonResultModel instantClass(@RequestBody InstantRequestParam instantRequestParam, Long userId) {
         return instantClassServiceX.instantClass(instantRequestParam);
@@ -33,6 +37,6 @@ public class InstantClassController {
 
     @RequestMapping(value = "/service/teacher/instantclass", method = RequestMethod.POST)
     public JsonResultModel instantClass(@RequestBody TeacherInstantRequestParam teacherInstantRequestParam, Long userId) {
-        return instantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
+        return teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
     }
 }

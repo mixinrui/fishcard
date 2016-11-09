@@ -6,6 +6,8 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
+import com.sun.media.jfxmedia.logging.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,17 +30,19 @@ public class InstantClassTimerServiceX {
     @Autowired
     private RabbitMqDelaySender rabbitMqDelaySender;
 
+    private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
+
     public void putCardsToMatchTeachers() {
         //TODO:此处需要使用配置
-        LocalDateTime beginLocal = LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(20 + 5);
+        LocalDateTime beginLocal = LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(20 + 10);
 
         List<InstantClassCard> instantClassCards = instantClassJpaRepository.findByRequestMatchTeacherTimeBetweenAndStatusIn(
                 DateUtil.localDate2Date(beginLocal), new Date(), new Integer[]{InstantClassRequestStatus.WAIT_TO_MATCH.getCode()});
-        System.out.println("====排序前===>>>>>");
-        instantClassCards.forEach(instantClassCard1 -> System.out.println(instantClassCard1));
+        logger.debug("====排序前===>>>>>:begin:{}",DateUtil.localDate2Date(beginLocal));
+        instantClassCards.forEach(instantClassCard1 -> logger.debug(instantClassCard1.toString()));
         instantClassCards.sort(Comparator.comparing(instantClassCard->instantClassCard.getRequestMatchTeacherTime().getTime()));
-        System.out.println("====排序后===<<<<<");
-        instantClassCards.forEach(instantClassCard1 -> System.out.println(instantClassCard1));
+        logger.debug("====排序后===<<<<<");
+        instantClassCards.forEach(instantClassCard1 -> logger.debug(instantClassCard1.toString()));
 
         instantClassCards.forEach(instantClassCard -> rabbitMqDelaySender
                 .sendInstantClassMsg(instantClassCard,InstantClassMessageProperties.getMsgProperties(instantClassCard)));

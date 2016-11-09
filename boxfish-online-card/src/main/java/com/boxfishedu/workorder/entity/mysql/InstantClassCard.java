@@ -65,6 +65,9 @@ public class InstantClassCard {
     private Integer roleId;
 
     @Temporal(TemporalType.TIMESTAMP)
+    private Date createTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
     private Date updateTime = DateTime.now().toDate();
 
