@@ -2,7 +2,7 @@ package com.boxfishedu.workorder.common.bean.instanclass;
 
 public enum TeacherInstantClassStatus {
     FAIL_TO_MATCH(10,"未匹配到学生"),
-    MATCHED(20,"匹配成功");
+    MATCHED(50,"匹配成功");
 
     private int code;
     private String desc;

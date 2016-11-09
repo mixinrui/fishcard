@@ -18,6 +18,7 @@ import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +124,7 @@ public class InstantClassService {
         instantClassCard.setResultReadFlag(0);
         instantClassCard.setTeacherId(0l);
         instantClassCard.setChatRoomId(0l);
-        instantClassCard.setRequestMatchTeacherTime(new Date());
+        instantClassCard.setRequestMatchTeacherTime(DateTime.now().toDate());
         instantClassCard.setStatus(InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
         return instantClassCard;
     }

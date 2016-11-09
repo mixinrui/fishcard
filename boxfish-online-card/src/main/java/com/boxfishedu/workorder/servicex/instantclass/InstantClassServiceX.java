@@ -72,6 +72,11 @@ public class InstantClassServiceX {
     }
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
+
+        //查看redis是否已经有人在抢该数据,有将其标记为已抢
+
+        //
+
         InstantClassResult instantClassResult = new InstantClassResult();
         long value = new Date().getTime();
         if (value % 3 != 0) {

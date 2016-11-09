@@ -21,6 +21,7 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
     Optional<InstantClassCard> findByWorkorderId(Long workOrderId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select icc from  InstantClassCard icc where icc.id=?1 ")
     InstantClassCard findForUpdate(Long id);
 
     Optional<InstantClassCard> findByStudentIdAndClassDateAndSlotId(Long studentId, Date classDate, Long slotId);

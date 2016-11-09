@@ -40,7 +40,6 @@ public class InstantClassTeacherService {
     }
 
     public void dealInstantFetchedTeachers(InstantClassCard instantClassCard){
-        instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId());
         Optional<List<Long>> teacherIdsOptional=Optional.empty();
         try {
             teacherIdsOptional=instantTeacherRequester.getInstantTeacherIds(instantClassCard);

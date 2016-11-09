@@ -80,7 +80,7 @@ public class RabbitMqDealyReceiver {
 
     @RabbitListener(queues = RabbitMqConstant.DELAY_INSTANT_CLASS_DEALER_QUEUE)
     public void instantClassDealer(InstantClassCard instantClassCard) throws Exception {
-        logger.info("@===============>[instantClassDealer],开始接受即时上课处理消息message{}", instantClassCard);
+        logger.info("@************************[instantClassDealer],开始接受即时上课处理消息message{}", instantClassCard);
         try {
             instantClassTimerDealer.timerGetInstantTeachers(instantClassCard);
         }

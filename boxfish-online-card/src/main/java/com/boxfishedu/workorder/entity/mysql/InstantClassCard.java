@@ -84,7 +84,4 @@ public class InstantClassCard {
 
     @Column(name = "chat_room_id")
     private Long chatRoomId;
-
-    public InstantClassCard(){
-    }
 }
