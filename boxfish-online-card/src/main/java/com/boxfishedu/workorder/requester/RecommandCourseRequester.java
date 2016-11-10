@@ -286,4 +286,11 @@ public class RecommandCourseRequester {
         }
     }
 
+    public RecommandCourseView getCourseViewDetail(String courseId) {
+        String url=String.format("%s/%s",urlConf.getCourse_wudaokou_detail_service(),courseId);
+        logger.debug("@getCourseViewDetail->获取课程详细信息courseId:[{}],url:[{}]",courseId,url);
+        RecommandCourseView recommandCourseView=restTemplate.getForObject(url, RecommandCourseView.class);
+        return recommandCourseView;
+    }
+
 }

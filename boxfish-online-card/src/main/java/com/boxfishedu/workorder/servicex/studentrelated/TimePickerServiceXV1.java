@@ -134,7 +134,7 @@ public class TimePickerServiceXV1 {
     }
 
 
-    private List<Service> ensureConvertOver(TimeSlotParam timeSlotParam) {
+    public List<Service> ensureConvertOver(TimeSlotParam timeSlotParam) {
         return ensureConvertOver(timeSlotParam, 0);
     }
 
@@ -147,7 +147,7 @@ public class TimePickerServiceXV1 {
     }
 
 
-    private List<Service> ensureConvertOver(TimeSlotParam timeSlotParam, int pivot) {
+    public List<Service> ensureConvertOver(TimeSlotParam timeSlotParam, int pivot) {
         pivot++;
         // TODO 需要更改获取服务的方式
         List<Service> services = serveService.findByOrderIdAndProductType(

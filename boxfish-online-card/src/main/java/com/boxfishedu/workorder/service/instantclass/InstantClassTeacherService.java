@@ -1,15 +1,21 @@
 package com.boxfishedu.workorder.service.instantclass;
 
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
+import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.OtherEntranceDataGenerator;
+import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
+import com.boxfishedu.workorder.web.param.InstantRequestParam;
+import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
@@ -32,6 +38,12 @@ public class InstantClassTeacherService {
 
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
+
+    @Autowired
+    private OtherEntranceDataGenerator otherEntranceDataGenerator;
+
+    @Autowired
+    private ScheduleEntranceDataGenerator scheduleEntranceDataGenerator;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -62,5 +74,27 @@ public class InstantClassTeacherService {
         instantClassJpaRepository.updateStatus(instantClassCard.getId(), InstantClassRequestStatus.NO_MATCH.getCode());
     }
 
-
+    @Transactional
+    public InstantClassCard initCardAndSchedule(InstantClassCard instantClassCard,InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher) {
+        instantClassCard=instantClassJpaRepository.findForUpdate(instantClassCard.getId());
+        if(instantClassCard.getStatus()==InstantClassRequestStatus.MATCHED.getCode()
+                ||instantClassCard.getStatus()==InstantClassRequestStatus.NO_MATCH.getCode()){
+            throw new BusinessException("抢单失败.数据库的数据已经被更新为不可抢单状态");
+        }
+        instantClassCard.setTeacherId(instantAssignTeacher.getTeacherId());
+        instantClassCard.setTeacherName(instantAssignTeacher.getTeacherName());
+        instantClassCard.setStatus(InstantClassRequestStatus.MATCHED.getCode());
+        instantClassJpaRepository.save(instantClassCard);
+        switch (InstantRequestParam.SelectModeEnum.getSelectMode(instantClassCard.getEntrance())){
+            case COURSE_SCHEDULE_ENTERANCE:
+                scheduleEntranceDataGenerator.initCardAndSchedule(instantClassCard);
+                break;
+            case OTHER_ENTERANCE:
+                otherEntranceDataGenerator.initCardAndSchedule(instantClassCard);
+                break;
+            default:
+                throw new BusinessException("不合法的入口参数");
+        }
+        return instantClassJpaRepository.save(instantClassCard);
+    }
 }

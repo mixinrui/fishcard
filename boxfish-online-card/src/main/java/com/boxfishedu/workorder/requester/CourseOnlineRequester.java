@@ -10,6 +10,8 @@ import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.web.result.InstantGroupInfo;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -92,5 +94,15 @@ public class CourseOnlineRequester {
         logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起通知操作,[[[[通知用户[{}]推送消息[{}]]]]],url[{}],内容:{}",url,
                 teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title(), JacksonUtil.toJSon(requestBody));
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,requestBody,Object.class);}));
+    }
+
+    public InstantGroupInfo instantCreateGroup(WorkOrder workOrder){
+        String url=String.format("%s/teaching/group/create?work_order_id=%s&stu_id=%s&tea_id=%s",
+                urlConf.getCourse_online_service(),workOrder.getId(),workOrder.getStudentId(),workOrder.getTeacherId());
+        logger.debug("@>>>>>>>>>>>instantCreateGroup#begin向在线上课发起实时上课发起建群请求,url:[{}]",url);
+        JsonResultModel jsonResultModel=restTemplate.postForObject(url,null,JsonResultModel.class);
+        logger.debug("@>>>>>>>>>>>instantCreateGroup#end#获取师生运营实时建群结果,result:[{}]",jsonResultModel);
+        return jsonResultModel.getData(InstantGroupInfo.class);
+
     }
 }

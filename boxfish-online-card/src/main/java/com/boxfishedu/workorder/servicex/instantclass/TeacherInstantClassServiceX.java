@@ -4,11 +4,15 @@ import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatu
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
+import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.instantclass.InstantClassTeacherService;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstantClassValidators;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
+import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +42,15 @@ public class TeacherInstantClassServiceX {
     @Autowired
     private GrabInstantClassValidators grabInstantClassValidators;
 
+    @Autowired
+    private InstantClassTeacherService instantClassTeacherService;
+
+    @Autowired
+    private CourseOnlineRequester courseOnlineRequester;
+
+    @Autowired
+    private WorkOrderService workOrderService;
+
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
         putParameterIntoThreadLocal(teacherInstantRequestParam);
@@ -59,38 +72,24 @@ public class TeacherInstantClassServiceX {
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
         }
 
-        //入InstantCard库
+        //入InstantCard库,初始化鱼卡信息
+        instantClassTeacherService.initCardAndSchedule(instantClassCard,instantAssignTeacher);
 
+        InstantGroupInfo instantGroupInfo=courseOnlineRequester.instantCreateGroup(workOrderService.findOne(instantClassCard.getWorkorderId()));
 
-
-
-        //将数据移到work_order,course_schedule,将数据保存到mongo
-
-        //通知小马生成群组关系
-
-        //将群组关系等数据返回给App
-
-
-
-
-
-
-
-        InstantClassResult instantClassResult = new InstantClassResult();
-        long value = new Date().getTime();
-        if (value % 3 != 0) {
-//            instantClassResult.setGroupId("sasasasasasasasa");
-            instantClassResult.setStatus(TeacherInstantClassStatus.FAIL_TO_MATCH.getCode());
-            instantClassResult.setDesc(TeacherInstantClassStatus.FAIL_TO_MATCH.getDesc());
-        } else {
-//            instantClassResult.setGroupId("sasasasasasasasa");
-            instantClassResult.setStatus(TeacherInstantClassStatus.MATCHED.getCode());
-            instantClassResult.setDesc(TeacherInstantClassStatus.MATCHED.getDesc());
-        }
-        return JsonResultModel.newJsonResultModel(instantClassResult);
+        //创建群组,将群组数据返回给App
+        return JsonResultModel.newJsonResultModel(InstantClassResult
+                .newInstantClassResult(updateGroupInfoInstantCard(instantGroupInfo,instantClassCard),TeacherInstantClassStatus.MATCHED));
     }
 
     private void putParameterIntoThreadLocal(TeacherInstantRequestParam teacherInstantRequestParam){
         ThreadLocalUtil.TeacherInstantParamThreadLocal.set(teacherInstantRequestParam);
+    }
+
+    private InstantClassCard updateGroupInfoInstantCard(InstantGroupInfo instantGroupInfo,InstantClassCard instantClassCard){
+        instantClassCard.setGroupName(instantGroupInfo.getGroupName());
+        instantClassCard.setGroupId(instantGroupInfo.getGroupId());
+        instantClassCard.setChatRoomId(instantGroupInfo.getChatRoomId());
+        return instantClassJpaRepository.save(instantClassCard);
     }
 }

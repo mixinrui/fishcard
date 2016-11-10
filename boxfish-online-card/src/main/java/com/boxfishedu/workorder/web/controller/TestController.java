@@ -152,7 +152,7 @@ public class TestController {
     @RequestMapping(value = "/queue", method = RequestMethod.GET)
     public void queueTest(){
         InstantClassCard instantClassCard=new InstantClassCard();
-        instantClassCard.setWorkorderId(59295l);
+        instantClassCard.setWorkorderId(58805l);
         instantClassCard.setSlotId(29l);
         scheduleEntranceDataGenerator.initCardAndSchedule(instantClassCard);
     }

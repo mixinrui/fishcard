@@ -21,6 +21,9 @@ public class UrlConf {
     @Value(("${interface.address.course_wudaokou_recommend_service}"))
     private String course_wudaokou_recommend_service;
 
+    @Value(("${interface.address.course_wudaokou_detail_service}"))
+    private String course_wudaokou_detail_service;
+
     @Value("${interface.address.fishcard_service}")
     private String fishcard_service;
     @Value("${interface.address.course_online_service}")

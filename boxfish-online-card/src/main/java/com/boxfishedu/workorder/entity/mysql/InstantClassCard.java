@@ -1,11 +1,14 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.web.param.SelectedTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Component
 @Data
@@ -17,11 +20,26 @@ public class InstantClassCard {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(name = "order_id", nullable = true)
+    private Long orderId;
+
+    @Column(name = "product_type", nullable = true)
+    private Integer productType;
+
+    @Column(name = "tutor_type", nullable = true)
+    private String tutorType;
+
+    @Column(name = "combo_type", nullable = true)
+    private String comboType;
+
     @Column(name = "student_id", nullable = true)
     private Long studentId;
 
     @Column(name = "teacher_id", nullable = true)
     private Long teacherId;
+
+    @Column(name = "teacher_name", nullable = true)
+    private String teacherName;
 
     //记录最后一次访问时间，详细访问日志在mongo的InstantClassCardLog
     @Column(name = "student_request_time", nullable = true)

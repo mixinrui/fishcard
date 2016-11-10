@@ -7,7 +7,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
  * Created by hucl on 16/11/9.
  */
 public interface IClassDataGenerator {
-    void initCardAndSchedule(InstantClassCard instantClassCard);
+    InstantClassCard initCardAndSchedule(InstantClassCard instantClassCard);
 
     void initCourses(WorkOrder workOrder);
 }

@@ -147,6 +147,10 @@ public class InstantClassService {
             instantClassCard.setRoleId(getAvaliableWorkOrder().getSkuId());
         }
         else{
+            instantClassCard.setOrderId(getInstantRequestParam().getOrderId());
+            instantClassCard.setProductType(getInstantRequestParam().getProductType());
+            instantClassCard.setTutorType(getInstantRequestParam().getTutorType());
+            instantClassCard.setComboType(getInstantRequestParam().getComboType());
             instantClassCard.setRoleId(TeachingType.WAIJIAO.getCode());
         }
         instantClassCard.setStatus(InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
@@ -165,7 +169,7 @@ public class InstantClassService {
                 return recommandCourseRequester.getInstantCourseView(getInstantRequestParam().getStudentId()
                         ,1,TutorType.resolve(getInstantRequestParam().getTutorType()));
             default:
-                throw new BusinessException("参数的入口参数错误");
+                throw new BusinessException("入口参数错误");
         }
     }
 

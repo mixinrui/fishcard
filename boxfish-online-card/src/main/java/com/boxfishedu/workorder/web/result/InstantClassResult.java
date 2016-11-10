@@ -85,4 +85,11 @@ public class InstantClassResult {
         private String groupId;
         private Long chatRoomId;
     }
+
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    class CourseInfo{
+        private String courseId;
+        private String courseName;
+    }
 }

@@ -1,9 +1,11 @@
 package com.boxfishedu.workorder.servicex.instantclass.classdatagenerator;
 
+import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
+import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -18,12 +20,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
-import java.util.logging.LogManager;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/11/9.
@@ -51,42 +53,50 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
     @Autowired
     private LogPoolManager logPoolManager;
 
+    @Autowired
+    private InstantClassJpaRepository instantClassJpaRepository;
+
     private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public void initCardAndSchedule(InstantClassCard instantClassCard) {
+    public InstantClassCard initCardAndSchedule(InstantClassCard instantClassCard) {
         WorkOrder workOrder=workOrderJpaRepository.findOne(instantClassCard.getWorkorderId());
-        List<WorkOrder> workOrders=workOrderJpaRepository.findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(workOrder.getService().getOrderId(),new Date());
-        Queue<WorkOrder> workOrderQueue=new LinkedList<>(workOrders);
-        List<WorkOrder> dealedCardList=new ArrayList<>();
+        List<WorkOrder> workOrders=workOrderJpaRepository
+                .findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(workOrder.getService().getOrderId(),new Date());
+
         Map<WorkOrder,String> logMap= Maps.newHashMap();
 
-        WorkOrder firstWorkOrder=workOrderQueue.poll();
         WorkOrder oldCard=new WorkOrder();
-        BeanUtils.copyProperties(firstWorkOrder,oldCard);
+        BeanUtils.copyProperties(workOrders.get(0),oldCard);
 
-        dealFirstWorkOrder(instantClassCard,firstWorkOrder,logMap);
+        dealFirstWorkOrder(instantClassCard,workOrders.get(0),logMap);
 
-        //最近一个鱼卡:workOrder
-        WorkOrder currentWorkOrder=workOrderQueue.poll();
-        while(currentWorkOrder!=null){
+        for(int i=1;i<workOrders.size();i++){
             WorkOrder tmp= new WorkOrder();
-            BeanUtils.copyProperties(currentWorkOrder,tmp);
+            BeanUtils.copyProperties(workOrders.get(i),tmp);
 
-            currentWorkOrder.setStartTime(oldCard.getStartTime());
-            currentWorkOrder.setEndTime(oldCard.getEndTime());
-            currentWorkOrder.setSlotId(oldCard.getSlotId());
+            workOrders.get(i).setStartTime(oldCard.getStartTime());
+            workOrders.get(i).setEndTime(oldCard.getEndTime());
+            workOrders.get(i).setSlotId(oldCard.getSlotId());
             //TODO:更换时间以后,可能需要更换教师;需要师生运营提供接口判断是否可以上那个时间点的课程;可以异步操作
-            currentWorkOrder.setTeacherId(oldCard.getTeacherId());
-            currentWorkOrder=workOrderQueue.poll();
+            workOrders.get(i).setTeacherId(oldCard.getTeacherId());
+
+            logMap.put(workOrders.get(i),"实时上课数据移动,旧时间:["+DateUtil.Date2String(tmp.getStartTime())+"],教师:["+tmp.getTeacherId()+"]");
 
             BeanUtils.copyProperties(tmp,oldCard);
-            dealedCardList.add(currentWorkOrder);
-            logMap.put(currentWorkOrder,"实时上课数据移动,旧时间:["+DateUtil.Date2String(oldCard.getStartTime())+"],教师:["+oldCard.getTeacherId()+"]");
         }
 
-        dealedCardList.forEach(card->workOrderService.saveWorkOrderAndSchedule(workOrder,initSchedule(workOrder)));
+        workOrders.forEach(card->workOrderService.saveWorkOrderAndSchedule(workOrder,initSchedule(workOrder)));
         printLog(logMap);
+
+        return instantClassCard;
+    }
+
+    public void regenerateGroupInfo(List<WorkOrder> workOrders){
+        for(int i=1;i<workOrders.size();i++){
+
+        }
+
     }
 
     private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder,Map<WorkOrder,String> logMap) {
@@ -101,6 +111,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         firstWorkOrder.setStartTime(DateUtil.localDate2Date(localDateTime));
         firstWorkOrder.setEndTime(DateUtil.localDate2Date(localDateTime.plusMinutes(25)));
         firstWorkOrder.setTeacherId(instantClassCard.getTeacherId());
+        firstWorkOrder.setTeacherName(instantClassCard.getTeacherName());
         firstWorkOrder.setSlotId(instantClassCard.getSlotId().intValue());
         logMap.put(firstWorkOrder,"生成实时上课鱼卡,旧时间["+oldTime+"],旧教师:["+oldTeacher+"]");
         return firstWorkOrder;
