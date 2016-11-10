@@ -53,7 +53,8 @@ public class CommentCardLogDto {
         logs = Maps.newLinkedHashMap();
         logs.put("创建", firstCommentCard.getStudentAskTime());
         if(Objects.nonNull(firstCommentCard.getTeacherId())) {
-            logs.put("分配老师" + firstCommentCard.getId() + ":" + firstCommentCard.getTeacherName(), new Date());
+            logs.put("分配老师" + firstCommentCard.getId() + ":" + firstCommentCard.getTeacherName(),
+                    firstCommentCard.getAssignTeacherTime());
         }
         if(Objects.nonNull(firstCommentCard.getTeacherAnswerTime())) {
             logs.put("已点评", firstCommentCard.getTeacherAnswerTime());
