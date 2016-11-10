@@ -161,6 +161,7 @@ public class FishCardModifyServiceX {
                 Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
                         DateUtil.convertLocalDateTime(workOrder.getStartTime()));
                 long hours = duration.toHours();
+                logger.info("workOrder startTime=[{}] and duration=[{}]", workOrder.getStartTime(), duration.toHours());
                 // 24小时以内如果有课,不再换课,无课则直接推荐
                 if(hours <= 24) {
                     if(StringUtils.isEmpty(workOrder.getCourseId())) {
@@ -270,7 +271,7 @@ public class FishCardModifyServiceX {
             courseSchedules.add(courseSchedule);
             timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
         }
-        return  new JsonResultModel().newJsonResultModel("OK");
+        return  JsonResultModel.newJsonResultModel("OK");
     }
 
 
@@ -292,12 +293,5 @@ public class FishCardModifyServiceX {
         map.put("data",jo);
 
         rabbitMqSender.send(map, QueueTypeEnum.SHORT_MESSAGE);
-    }
-
-
-    public static void main(String[] args) throws ParseException {
-        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-11-06 10:00:00");
-        Duration d = Duration.between(DateUtil.convertLocalDateTime(date), LocalDateTime.now());
-        System.out.println("duration=" + d.toDays());
     }
 }
