@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.instantclass.classdatagenerator;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -65,6 +66,7 @@ public class OtherEntranceDataGenerator implements IClassDataGenerator{
         workOrder.setStudentId(instantClassCard.getStudentId());
         workOrder.setTeacherId(instantClassCard.getTeacherId());
         workOrder.setTeacherName(instantClassCard.getTeacherName());
+        workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
 
         RecommandCourseView recommandCourseView=recommandCourseRequester.getCourseViewDetail(instantClassCard.getCourseId());
         java.util.Map<Integer,RecommandCourseView> recommandCourseViewMap= Maps.newHashMap();
