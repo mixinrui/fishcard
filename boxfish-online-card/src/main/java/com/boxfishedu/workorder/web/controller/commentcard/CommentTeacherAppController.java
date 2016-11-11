@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
+import com.boxfishedu.workorder.common.bean.CommentCardTeacherAppTip;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
@@ -68,14 +69,21 @@ public class CommentTeacherAppController {
     @RequestMapping(value = "/check_teacher/{cardId}", method = RequestMethod.GET)
     public JsonResultModel checkTeacher(@PathVariable Long cardId,Long userId){
         JsonResultModel jsonResultModel = new JsonResultModel();
-        if (commentTeacherAppServiceX.checkTeacher(cardId,userId) != null){
+        CommentCard commentCard = commentTeacherAppServiceX.checkTeacher(cardId,userId);
+        if (commentCard != null){
+            switch (commentCard.getStatus()){
+                case 100:
+                case 200:
+                case 300:
+
+            }
             jsonResultModel.setReturnMsg("允许该外教进行点评。");
             jsonResultModel.setData("OK");
             jsonResultModel.setReturnCode(HttpStatus.SC_OK);
         }else {
-            jsonResultModel.setReturnMsg("禁止该外教进行点评!");
+            jsonResultModel.setReturnMsg("Something’s wrong. There’s no such evaluation order actually…");
             jsonResultModel.setData("Unauthorized");
-            jsonResultModel.setReturnCode(HttpStatus.SC_UNAUTHORIZED);
+            jsonResultModel.setReturnCode(CommentCardTeacherAppTip.COMMENT_CARD_NON_EXISTENT.getCode());
         }
         return jsonResultModel;
     }
