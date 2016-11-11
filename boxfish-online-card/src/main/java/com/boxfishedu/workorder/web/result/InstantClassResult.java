@@ -11,9 +11,11 @@ import lombok.Data;
  * Created by hucl on 16/11/3.
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InstantClassResult {
     protected Integer status;
     protected String desc;
+    protected Long slotId;
     protected GroupInfo groupInfo=null;
 
     public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
@@ -29,6 +31,7 @@ public class InstantClassResult {
     public InstantClassResult(InstantClassCard instantClassCard,TeacherInstantClassStatus teacherInstantClassStatus){
         this.status=teacherInstantClassStatus.getCode();
         this.desc=teacherInstantClassStatus.getDesc();
+        this.slotId=instantClassCard.getSlotId();
         switch (teacherInstantClassStatus){
             case MATCHED:{
                 this.groupInfo=new GroupInfo();

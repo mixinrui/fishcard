@@ -137,6 +137,8 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         CourseSchedule courseSchedule=courseScheduleRepository.findByWorkorderId(workOrder.getId());
         courseSchedule.setClassDate(workOrder.getStartTime());
         courseSchedule.setTimeSlotId(workOrder.getSlotId());
+        courseSchedule.setTeacherId(workOrder.getTeacherId());
+        courseSchedule.setUpdateTime(workOrder.getUpdateTime());
         return courseSchedule;
     }
 
