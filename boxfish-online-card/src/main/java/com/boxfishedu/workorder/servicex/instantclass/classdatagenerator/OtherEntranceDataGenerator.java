@@ -24,10 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hucl on 16/11/9.
@@ -55,7 +52,7 @@ public class OtherEntranceDataGenerator implements IClassDataGenerator{
 
 
     @Override
-    public InstantClassCard initCardAndSchedule(InstantClassCard instantClassCard) {
+    public List<WorkOrder> initCardAndSchedule(InstantClassCard instantClassCard) {
         TimeSlotParam timeSlotParam=TimeSlotParam.instantCard2TimeParam(instantClassCard);
         //根据订单id,type获取对应的服务
         List<Service> serviceList = timePickerServiceXV1.ensureConvertOver(timeSlotParam);
@@ -87,7 +84,7 @@ public class OtherEntranceDataGenerator implements IClassDataGenerator{
 
         instantClassCard.setWorkorderId(workOrder.getId());
 
-        return instantClassCard;
+        return Collections.emptyList();
     }
 
     private Map<Integer, RecommandCourseView> wrapCourseViewMap(InstantClassCard instantClassCard) {

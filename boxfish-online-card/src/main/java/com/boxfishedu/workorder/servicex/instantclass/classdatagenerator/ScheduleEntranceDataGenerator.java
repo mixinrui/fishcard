@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
@@ -12,6 +13,7 @@ import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -55,15 +58,22 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
     private LogPoolManager logPoolManager;
 
     @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
     private InstantClassJpaRepository instantClassJpaRepository;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
 
     private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public InstantClassCard initCardAndSchedule(InstantClassCard instantClassCard) {
+    public List<WorkOrder> initCardAndSchedule(InstantClassCard instantClassCard) {
         WorkOrder workOrder=workOrderJpaRepository.findOne(instantClassCard.getWorkorderId());
         List<WorkOrder> workOrders=workOrderJpaRepository
                 .findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(workOrder.getService().getOrderId(),new Date());
+        List<WorkOrder> typeChangedList= Collections.emptyList();
 
         Map<WorkOrder,String> logMap= Maps.newHashMap();
 
@@ -82,6 +92,10 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
             //TODO:更换时间以后,可能需要更换教师;需要师生运营提供接口判断是否可以上那个时间点的课程;可以异步操作
             workOrders.get(i).setTeacherId(oldCard.getTeacherId());
 
+            if(!oldCard.getCourseType().equals(workOrders.get(i).getClassType())){
+                typeChangedList.add(workOrders.get(i));
+            }
+
             logMap.put(workOrders.get(i),"实时上课数据移动,旧时间:["+DateUtil.Date2String(tmp.getStartTime())+"],教师:["+tmp.getTeacherId()+"]");
 
             BeanUtils.copyProperties(tmp,oldCard);
@@ -90,14 +104,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         workOrders.forEach(card->workOrderService.saveWorkOrderAndSchedule(workOrder,initSchedule(workOrder)));
         printLog(logMap);
 
-        return instantClassCard;
-    }
-
-    public void regenerateGroupInfo(List<WorkOrder> workOrders){
-        for(int i=1;i<workOrders.size();i++){
-
-        }
-
+        return typeChangedList;
     }
 
     private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder,Map<WorkOrder,String> logMap) {

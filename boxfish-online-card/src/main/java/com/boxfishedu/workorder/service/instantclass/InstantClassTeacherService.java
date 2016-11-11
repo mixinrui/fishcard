@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
@@ -13,6 +14,7 @@ import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.Schedul
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -84,13 +87,22 @@ public class InstantClassTeacherService {
     }
 
     @Transactional
-    public InstantGroupInfo prepareForInstantClass(InstantClassCard instantClassCard,InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher){
-        this.initCardAndSchedule(instantClassCard,instantAssignTeacher);
-        return courseOnlineRequester.instantCreateGroup(workOrderService.findOne(instantClassCard.getWorkorderId()));
+    public List<WorkOrder> prepareForInstantClass(InstantClassCard instantClassCard
+            ,InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher,InstantGroupInfo instantGroupInfo){
+        List<WorkOrder> workOrders=this.initCardAndSchedule(instantClassCard,instantAssignTeacher);
+        try {
+            BeanUtils.copyProperties(instantGroupInfo
+                    , courseOnlineRequester.instantCreateGroup(workOrderService.findOne(instantClassCard.getWorkorderId())));
+        }
+        catch (Exception ex){
+            logger.error("@prepareForInstantClass#创建群组失败,instantcard:{}",instantClassCard);
+            throw new BusinessException("创建群组失败");
+        }
+        return workOrders;
 
     }
 
-    public InstantClassCard initCardAndSchedule(InstantClassCard instantClassCard,InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher) {
+    public List<WorkOrder> initCardAndSchedule(InstantClassCard instantClassCard, InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher) {
         instantClassCard=instantClassJpaRepository.findForUpdate(instantClassCard.getId());
         if(instantClassCard.getStatus()==InstantClassRequestStatus.MATCHED.getCode()
                 ||instantClassCard.getStatus()==InstantClassRequestStatus.NO_MATCH.getCode()){
@@ -100,16 +112,18 @@ public class InstantClassTeacherService {
         instantClassCard.setTeacherName(instantAssignTeacher.getTeacherName());
         instantClassCard.setStatus(InstantClassRequestStatus.MATCHED.getCode());
         instantClassJpaRepository.save(instantClassCard);
+        List<WorkOrder> workOrders= Collections.emptyList();
         switch (InstantRequestParam.SelectModeEnum.getSelectMode(instantClassCard.getEntrance())){
             case COURSE_SCHEDULE_ENTERANCE:
-                scheduleEntranceDataGenerator.initCardAndSchedule(instantClassCard);
+                workOrders=scheduleEntranceDataGenerator.initCardAndSchedule(instantClassCard);
                 break;
             case OTHER_ENTERANCE:
-                otherEntranceDataGenerator.initCardAndSchedule(instantClassCard);
+                workOrders=otherEntranceDataGenerator.initCardAndSchedule(instantClassCard);
                 break;
             default:
                 throw new BusinessException("不合法的入口参数");
         }
-        return instantClassJpaRepository.save(instantClassCard);
+        instantClassJpaRepository.save(instantClassCard);
+        return workOrders;
     }
 }
