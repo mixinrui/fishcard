@@ -11,4 +11,10 @@ public class GrabInstatntClassKeyGenerator {
                 .append(teacherInstantRequestParam.getCardId())
                 .toString();
     }
+
+    public static String matchedKey(Long cardId){
+        return new StringBuilder("matched.instantcard:")
+                .append(cardId)
+                .toString();
+    }
 }

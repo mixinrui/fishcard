@@ -41,6 +41,7 @@ public class ImmutableDbValidator implements IGrabInstantClassValidator {
         switch (InstantClassRequestStatus.getEnumByCode(instantClassCard.getStatus())){
             case MATCHED:
             case NO_MATCH:
+                logger.debug("@<<<<<1:fail:ImmutableDbValidator.preValidate");
                 return TeacherInstantClassStatus.FAIL_TO_MATCH;
             default:
                 return TeacherInstantClassStatus.UNKNOWN;

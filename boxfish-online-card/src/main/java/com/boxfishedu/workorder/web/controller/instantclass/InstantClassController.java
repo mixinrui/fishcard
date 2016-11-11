@@ -53,7 +53,7 @@ public class InstantClassController {
             throw ex;
         }
         finally {
-            String key= GrabInstatntClassKeyGenerator.generateKey(ThreadLocalUtil.getTeacherInstantParam());
+            String key= GrabInstatntClassKeyGenerator.generateKey(teacherInstantRequestParam);
             //无论是否成功都删除当前用户的资源
             redisTemplate.delete(key);
         }

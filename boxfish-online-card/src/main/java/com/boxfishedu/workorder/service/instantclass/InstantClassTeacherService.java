@@ -7,10 +7,12 @@ import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.OtherEntranceDataGenerator;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
+import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,9 @@ public class InstantClassTeacherService {
     @Autowired
     private ScheduleEntranceDataGenerator scheduleEntranceDataGenerator;
 
+    @Autowired
+    private WorkOrderService workOrderService;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
@@ -62,10 +67,14 @@ public class InstantClassTeacherService {
                     ,instantClassCard.getStudentId());
             this.updateNomatchStatus(instantClassCard);
         }
-        if(CollectionUtils.isEmpty(teacherIdsOptional.get())){
-            //没有教师的情况,需要返回无匹配
-            this.updateNomatchStatus(instantClassCard);
+        if(!teacherIdsOptional.isPresent()){
+            logger.debug("@dealInstantFetchedTeachers没有获取到可 用的教师列表,instantcard{}",instantClassCard);
+            return;
         }
+//        if(CollectionUtils.isEmpty(teacherIdsOptional.get())){
+//            //没有教师的情况,需要返回无匹配
+//            this.updateNomatchStatus(instantClassCard);
+//        }
         //匹配上老师,则向教师推送抢单的消息
         courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
     }
@@ -75,6 +84,12 @@ public class InstantClassTeacherService {
     }
 
     @Transactional
+    public InstantGroupInfo prepareForInstantClass(InstantClassCard instantClassCard,InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher){
+        this.initCardAndSchedule(instantClassCard,instantAssignTeacher);
+        return courseOnlineRequester.instantCreateGroup(workOrderService.findOne(instantClassCard.getWorkorderId()));
+
+    }
+
     public InstantClassCard initCardAndSchedule(InstantClassCard instantClassCard,InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher) {
         instantClassCard=instantClassJpaRepository.findForUpdate(instantClassCard.getId());
         if(instantClassCard.getStatus()==InstantClassRequestStatus.MATCHED.getCode()

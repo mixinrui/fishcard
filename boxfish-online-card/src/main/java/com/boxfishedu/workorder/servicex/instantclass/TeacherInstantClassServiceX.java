@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassTeacherService;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstantClassValidators;
+import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstatntClassKeyGenerator;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
@@ -21,6 +22,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by hucl on 16/11/9.
@@ -72,14 +74,22 @@ public class TeacherInstantClassServiceX {
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
         }
 
-        //入InstantCard库,初始化鱼卡信息
-        instantClassTeacherService.initCardAndSchedule(instantClassCard,instantAssignTeacher);
+        //入InstantCard库,初始化鱼卡信息,创建群组
+        InstantGroupInfo instantGroupInfo =instantClassTeacherService
+                .prepareForInstantClass(instantClassCard,instantAssignTeacher);
 
-        InstantGroupInfo instantGroupInfo=courseOnlineRequester.instantCreateGroup(workOrderService.findOne(instantClassCard.getWorkorderId()));
+        //将该鱼卡标记为已匹配教师;时间为1天
+        this.markMatchedIntoRedis(teacherInstantRequestParam);
 
         //创建群组,将群组数据返回给App
         return JsonResultModel.newJsonResultModel(InstantClassResult
                 .newInstantClassResult(updateGroupInfoInstantCard(instantGroupInfo,instantClassCard),TeacherInstantClassStatus.MATCHED));
+    }
+
+    private void markMatchedIntoRedis(TeacherInstantRequestParam teacherInstantRequestParam){
+        String matchedKey=GrabInstatntClassKeyGenerator.matchedKey(teacherInstantRequestParam.getCardId());
+        redisTemplate.opsForValue().setIfAbsent(matchedKey, teacherInstantRequestParam.getTeacherId().toString());
+        redisTemplate.expire(matchedKey,1, TimeUnit.DAYS);
     }
 
     private void putParameterIntoThreadLocal(TeacherInstantRequestParam teacherInstantRequestParam){

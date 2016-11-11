@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.instantclass.classdatagenerator;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
@@ -113,6 +114,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         firstWorkOrder.setTeacherId(instantClassCard.getTeacherId());
         firstWorkOrder.setTeacherName(instantClassCard.getTeacherName());
         firstWorkOrder.setSlotId(instantClassCard.getSlotId().intValue());
+        firstWorkOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
         logMap.put(firstWorkOrder,"生成实时上课鱼卡,旧时间["+oldTime+"],旧教师:["+oldTeacher+"]");
         return firstWorkOrder;
     }
