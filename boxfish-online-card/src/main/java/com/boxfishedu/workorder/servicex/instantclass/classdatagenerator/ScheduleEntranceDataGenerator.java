@@ -26,10 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hucl on 16/11/9.
@@ -73,7 +70,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         WorkOrder workOrder=workOrderJpaRepository.findOne(instantClassCard.getWorkorderId());
         List<WorkOrder> workOrders=workOrderJpaRepository
                 .findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(workOrder.getService().getOrderId(),new Date());
-        List<WorkOrder> typeChangedList= Collections.emptyList();
+        List<WorkOrder> typeChangedList= new ArrayList<>();
 
         Map<WorkOrder,String> logMap= Maps.newHashMap();
 
