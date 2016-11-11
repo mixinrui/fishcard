@@ -87,9 +87,14 @@ public class TeacherInstantClassServiceX {
     }
 
     private void markMatchedIntoRedis(TeacherInstantRequestParam teacherInstantRequestParam){
-        String matchedKey=GrabInstatntClassKeyGenerator.matchedKey(teacherInstantRequestParam.getCardId());
-        redisTemplate.opsForValue().setIfAbsent(matchedKey, teacherInstantRequestParam.getTeacherId().toString());
-        redisTemplate.expire(matchedKey,1, TimeUnit.DAYS);
+        try {
+            String matchedKey = GrabInstatntClassKeyGenerator.matchedKey(teacherInstantRequestParam.getCardId());
+            redisTemplate.opsForValue().setIfAbsent(matchedKey, teacherInstantRequestParam.getTeacherId().toString());
+            redisTemplate.expire(matchedKey, 1, TimeUnit.DAYS);
+        }
+        catch (Exception ex){
+            logger.error("@markMatchedIntoRedis#将匹配结果保存入redis报错",ex);
+        }
     }
 
     private void putParameterIntoThreadLocal(TeacherInstantRequestParam teacherInstantRequestParam){
@@ -97,9 +102,9 @@ public class TeacherInstantClassServiceX {
     }
 
     private InstantClassCard updateGroupInfoInstantCard(InstantGroupInfo instantGroupInfo,InstantClassCard instantClassCard){
-        instantClassCard.setGroupName(instantGroupInfo.getGroupName());
-        instantClassCard.setGroupId(instantGroupInfo.getGroupId());
-        instantClassCard.setChatRoomId(instantGroupInfo.getChatRoomId());
-        return instantClassJpaRepository.save(instantClassCard);
+            instantClassCard.setGroupName(instantGroupInfo.getGroupName());
+            instantClassCard.setGroupId(instantGroupInfo.getGroupId());
+            instantClassCard.setChatRoomId(instantGroupInfo.getChatRoomId());
+            return instantClassJpaRepository.save(instantClassCard);
     }
 }

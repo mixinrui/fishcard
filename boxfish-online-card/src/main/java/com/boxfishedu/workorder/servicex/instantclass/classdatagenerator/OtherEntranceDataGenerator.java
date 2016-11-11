@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.instantclass.classdatagenerator;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -26,6 +27,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/11/9.
@@ -67,11 +69,9 @@ public class OtherEntranceDataGenerator implements IClassDataGenerator{
         workOrder.setTeacherId(instantClassCard.getTeacherId());
         workOrder.setTeacherName(instantClassCard.getTeacherName());
         workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        workOrder.setClassType(ClassTypeEnum.INSTNAT.toString());
 
-        RecommandCourseView recommandCourseView=recommandCourseRequester.getCourseViewDetail(instantClassCard.getCourseId());
-        java.util.Map<Integer,RecommandCourseView> recommandCourseViewMap= Maps.newHashMap();
-        recommandCourseViewMap.put(0,recommandCourseView);
-        recommandCourseViewMap.put(1,recommandCourseView);
+        java.util.Map<Integer, RecommandCourseView> recommandCourseViewMap = wrapCourseViewMap(instantClassCard);
 
         workOrderService.batchSaveCoursesIntoCard(Arrays.asList(workOrder),recommandCourseViewMap);
         //入库,workorder和coursechedule的插入放入一个事务中,保证数据的一致性
@@ -88,6 +88,14 @@ public class OtherEntranceDataGenerator implements IClassDataGenerator{
         instantClassCard.setWorkorderId(workOrder.getId());
 
         return instantClassCard;
+    }
+
+    private Map<Integer, RecommandCourseView> wrapCourseViewMap(InstantClassCard instantClassCard) {
+        RecommandCourseView recommandCourseView=recommandCourseRequester.getCourseViewDetail(instantClassCard.getCourseId());
+        Map<Integer,RecommandCourseView> recommandCourseViewMap= Maps.newHashMap();
+        recommandCourseViewMap.put(0,recommandCourseView);
+        recommandCourseViewMap.put(1,recommandCourseView);
+        return recommandCourseViewMap;
     }
 
     @Override
