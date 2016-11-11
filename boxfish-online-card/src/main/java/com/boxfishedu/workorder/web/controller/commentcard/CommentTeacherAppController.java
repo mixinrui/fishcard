@@ -75,11 +75,22 @@ public class CommentTeacherAppController {
                 case 100:
                 case 200:
                 case 300:
-
+                    jsonResultModel.setReturnMsg("允许该外教进行点评。");
+                    jsonResultModel.setData("OK");
+                    jsonResultModel.setReturnCode(CommentCardTeacherAppTip.COMMENT_CARD_ADOPT.getCode());
+                    break;
+                case 400:
+                case 600:
+                    jsonResultModel.setReturnMsg("You have evaluated the answer; No need to do it again.");
+                    jsonResultModel.setData("Unauthorized");
+                    jsonResultModel.setReturnCode(CommentCardTeacherAppTip.COMMENTED.getCode());
+                    break;
+                case 500:
+                    jsonResultModel.setReturnMsg("Warning! You did not assess the answer in 24 hours. If you should fail again, you would never have the chance to assess answers any more.");
+                    jsonResultModel.setData("Unauthorized");
+                    jsonResultModel.setReturnCode(CommentCardTeacherAppTip.COMMENT_CARD_TIME_OUT.getCode());
+                    break;
             }
-            jsonResultModel.setReturnMsg("允许该外教进行点评。");
-            jsonResultModel.setData("OK");
-            jsonResultModel.setReturnCode(HttpStatus.SC_OK);
         }else {
             jsonResultModel.setReturnMsg("Something’s wrong. There’s no such evaluation order actually…");
             jsonResultModel.setData("Unauthorized");
