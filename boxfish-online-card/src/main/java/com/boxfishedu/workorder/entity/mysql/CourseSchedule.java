@@ -68,6 +68,16 @@ public class CourseSchedule {
     @Column(name = "is_freeze", nullable = true)
     private Integer isFreeze;
 
+    //立即上课:INSTANT
+    @Column(name = "class_type", nullable = true)
+    private String classType;
+
+    @Column(name = "instant_start_time", nullable = true)
+    private String instantStartTtime;
+
+    @Column(name = "instant_end_time", nullable = true)
+    private String instantEndTtime;
+
 //    @Column(name="schedule_type")
 //    private Integer scheduleType;
 }

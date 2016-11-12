@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.instantclass.classdatagenerator;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
@@ -18,6 +19,7 @@ import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -119,6 +121,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         firstWorkOrder.setTeacherName(instantClassCard.getTeacherName());
         firstWorkOrder.setSlotId(instantClassCard.getSlotId().intValue());
         firstWorkOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        firstWorkOrder.setClassType(ClassTypeEnum.INSTNAT.toString());
         logMap.put(firstWorkOrder,"生成实时上课鱼卡,旧时间["+oldTime+"],旧教师:["+oldTeacher+"]");
         return firstWorkOrder;
     }
@@ -143,6 +146,11 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         courseSchedule.setTimeSlotId(workOrder.getSlotId());
         courseSchedule.setTeacherId(workOrder.getTeacherId());
         courseSchedule.setUpdateTime(workOrder.getUpdateTime());
+        courseSchedule.setClassType(workOrder.getClassType());
+        if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),workOrder.getClassType())){
+           courseSchedule.setInstantStartTtime(DateUtil.dateTrimYear(workOrder.getStartTime()));
+            courseSchedule.setInstantEndTtime(DateUtil.dateTrimYear(workOrder.getEndTime()));
+        }
         return courseSchedule;
     }
 

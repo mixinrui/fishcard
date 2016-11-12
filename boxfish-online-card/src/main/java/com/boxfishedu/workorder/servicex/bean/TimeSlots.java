@@ -1,12 +1,14 @@
 package com.boxfishedu.workorder.servicex.bean;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -55,6 +57,14 @@ public class TimeSlots implements Cloneable, Serializable {
         this.status = TimeSlotsStatus.ASSIGNED;
         this.workOrderId = courseSchedule.getWorkorderId();
         this.courseScheduleStatus = courseSchedule.getStatus();
+        if(isInstant(courseSchedule)){
+            this.startTime=courseSchedule.getInstantStartTtime();
+            this.endTime=courseSchedule.getInstantEndTtime();
+        }
+    }
+
+    private boolean isInstant(CourseSchedule courseSchedule){
+        return StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType());
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.common.util;
 
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -75,6 +76,10 @@ public class DateUtil {
     public static Date date2SimpleDate(Date dateWithTime) {
         String dateWithTimeStr = Date2String(dateWithTime);
         return String2SimpleDate(dateWithTimeStr);
+    }
+
+    public static String dateTrimYear(Date date){
+        return StringUtils.split(DateUtil.Date2String(date)," ")[1];
     }
 
     public static String simpleDate2String(Date date) {
