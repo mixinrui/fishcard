@@ -1,5 +1,7 @@
 package com.boxfishedu.card.mail.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,6 +18,8 @@ import java.util.Map;
  * Created by LuoLiBing on 16/8/31.
  */
 public class CardMimeMailSender {
+
+    private final static Logger logger = LoggerFactory.getLogger(CardMimeMailSender.class);
 
     private MimeMessage mimeMailMessage;
 
@@ -87,6 +91,7 @@ public class CardMimeMailSender {
      * 发送
      */
     public void sendMail() {
+        logger.info("send mail to Recipients");
         mailSender.send(mimeMailMessage);
     }
 }
