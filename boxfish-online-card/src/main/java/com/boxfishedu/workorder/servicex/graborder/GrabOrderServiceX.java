@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.graborder.GrabOrderService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -68,6 +69,9 @@ public class GrabOrderServiceX {
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
 
 
     public JsonResultModel getWorkOrderListByTeacherId(Long teacherId) {
@@ -163,7 +167,7 @@ public class GrabOrderServiceX {
 
                     if (updateCount != 1) {
                         //抢单失败
-                        logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:3");
+                        logger.info("grabOrderByOneTeacher:setFlagFailAndTeacherId:3 抢单失败 鱼卡id[{}] 老师id[{}]",grabOrderView.getWorkOrderId(),grabOrderView.getTeacherId());
                         grabOrderService.setFlagFailAndTeacherId(grabOrderView);
                         jsonObject.put("msg", WorkOrderConstant.GRABORDER_FAIL);
                         jsonObject.put("code", "1");
@@ -172,7 +176,8 @@ public class GrabOrderServiceX {
 
                     // 更新抢单表
                     grabOrderService.setFlagSuccessAndTeacherId(grabOrderView);
-
+                    // 设置数据更改的字段  JPA  如果不设置 会失败
+                    workOrder.setTeacherName(grabOrderView.getTeacherName());
                     workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
                     workOrder.setTeacherId(grabOrderView.getTeacherId());
                     workOrder.setUpdateTime(new Date());
@@ -190,6 +195,8 @@ public class GrabOrderServiceX {
 
                     // 向在线运营发送建组(小马)
                     serviceSDK.createGroup(workOrder);
+
+                    dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
                     logger.info("::::::::::::::::::成功抢单::::::::::::::::::");
                 }
             }

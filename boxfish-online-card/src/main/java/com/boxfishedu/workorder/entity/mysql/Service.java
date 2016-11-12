@@ -58,6 +58,13 @@ public class Service {
     @Column(name = "sku_name", nullable = true, length = 45)
     private String skuName;
 
+
+    /** 第一次鱼卡开始时间  **/
+    @Column(name = "first_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date firstTime;
+
+
     @Column(name = "create_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
@@ -83,13 +90,13 @@ public class Service {
 //    @Column(name = "role_id", nullable = true)
 //    private Integer roleId;
 
-    //一共几个月
+    //一共几周
     @Column(name = "combo_cycle", nullable = true)
     private Integer comboCycle;
 
-//    //每月的的上课次数
-//    @Column(name = "count_in_month", nullable = true)
-//    private Integer countInMonth;
+    //每月的的上课次数
+    @Column(name = "count_in_month", nullable = true)
+    private Integer countInMonth;
 
     @Transient
     private Date currDate;

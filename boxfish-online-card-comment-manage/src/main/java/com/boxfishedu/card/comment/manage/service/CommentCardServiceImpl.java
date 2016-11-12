@@ -221,8 +221,12 @@ public class CommentCardServiceImpl implements CommentCardService {
             }
             // 已点评
             else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.ANSWERED.value())) {
-                predicateList.add(criteriaBuilder.equal(
-                        root.get("status"), CommentCardStatus.ANSWERED.getCode()));
+                predicateList.add(
+                    criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("status"), CommentCardStatus.ANSWERED.getCode()),
+                        criteriaBuilder.equal(root.get("status"), CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())
+                    )
+                );
             }
             // 超时未点评
             else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.TIMEOUT.value())) {

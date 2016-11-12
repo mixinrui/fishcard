@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -90,7 +91,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
         this.day = day;
     }
 
-    public void override(List<CourseSchedule> courseScheduleList, ServiceSDK serviceSDK) {
+    public void override(List<CourseSchedule> courseScheduleList, ServiceSDK serviceSDK, Locale locale) {
         // 世超返回的是long型
         if(CollectionUtils.isEmpty(courseScheduleList)) {
             return;
@@ -105,7 +106,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
                 if (checkCourseSchedule(courseSchedule)) {
                     timeSlots.initTimeSlots(courseSchedule);
                     if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-                        timeSlots.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()));
+                        timeSlots.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
                     }
                 }
             }
@@ -119,7 +120,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
      * @param serviceSDK
      */
     public void override(Map<String, Map<String, CourseSchedule>> courseSchedules,
-                         ServiceSDK serviceSDK) {
+                         ServiceSDK serviceSDK, Locale locale) {
         Map<String, CourseSchedule> courseScheduleMap = courseSchedules.get(day);
         if(courseScheduleMap == null) {
             courseScheduleMap = Maps.newHashMap();
@@ -136,8 +137,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
                 if (checkCourseSchedule(courseSchedule)) {
                     timeSlots.initTimeSlots(courseSchedule);
                     if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-                        timeSlots.setCourseView(
-                                serviceSDK.getCourseInfo(courseSchedule.getId()));
+                        timeSlots.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
                     }
                 }
             }

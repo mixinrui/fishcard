@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.view.course;
 
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -87,8 +88,8 @@ public class ServiceWorkOrderCombination {
         for(WorkOrder workOrder : workOrderList) {
             RecommandCourseView recommandCourseView = recommendCourseViewMap.get(workOrder.getSeqNum());
             workOrder.initCourseInfo(recommandCourseView);
-            workOrder.setSkuId((long) CourseType2TeachingTypeService.courseType2TeachingType2(
-                    recommandCourseView.getCourseType()));
+            workOrder.setSkuId( CourseType2TeachingTypeService.courseType2TeachingType2(
+                    recommandCourseView.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType())));
         }
         return this;
     }

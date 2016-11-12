@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.orderrelated;
 
 
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -104,7 +105,7 @@ public class BackOrderServiceX{
                 int teacher_c=0 ,teacher_f =0;//国内教师   外国教师
                 for (WorkOrder workOrder: workOrderUseList){
 
-                    if(TeachingType.WAIJIAO.getCode() ==  courseType2TeachingTypeService.courseType2TeachingType ( workOrder.getCourseType().toUpperCase()) ) {
+                    if(TeachingType.WAIJIAO.getCode() ==  courseType2TeachingTypeService.courseType2TeachingType ( workOrder.getCourseType().toUpperCase(), TutorType.resolve(workOrder.getService().getTutorType()))) {
                         teacher_f++;
                     }else {
                         teacher_c++;
@@ -201,7 +202,7 @@ public class BackOrderServiceX{
         if(null != backWorkOrderList && backWorkOrderList.size()>0){
 
             for(WorkOrder workOrder : backWorkOrderList){
-                if(TeachingType.WAIJIAO.getCode() ==  courseType2TeachingTypeService.courseType2TeachingType ( workOrder.getCourseType().toUpperCase()) ) {
+                if(TeachingType.WAIJIAO.getCode() ==  courseType2TeachingTypeService.courseType2TeachingType ( workOrder.getCourseType().toUpperCase(),TutorType.resolve(workOrder.getService().getTutorType())) ) {
                     teacher_f +=1;
                 }else {
                     teacher_c +=1;

@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.view.course;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -9,9 +10,12 @@ import lombok.Data;
 public class RecommandCourseView {
     private String courseId;
     private String courseName;
+    private String englishName;
+    @JsonProperty(value = "type")
     private String courseType;
     private String publicDate;
     private Integer bundleOrder;
-    private Integer difficulty;
+    private String difficulty;
     private String cover;
+
 }

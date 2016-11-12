@@ -207,15 +207,51 @@ public class NotifyTimer {
     }
 
     /**
+     * 7点通知老师今天有几节课 第一节什么时间上
+     */
+    @Scheduled(cron = "0 30 07 * * ?")
+    public void notifyTodyTeacherHasClass() {
+        logger.info("<<<<<<notifyTodyTeacherHasClass<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<开始通知<<<老师今天有课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.CLASSS_TODY_TEA_NOTIFY.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    /**
      * 查询旷课的学生,对其扣积分
      */
 
-//    @Scheduled(cron = "0 0 0 * * ?")
-    @Scheduled(cron = "0 0/5 * * * ?")    //测试时5分钟检查一次
+    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(cron = "0 0/5 * * * ?")    //测试时5分钟检查一次
     public void deductScore(){
         logger.info("<<<<<<deductScore<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<查询旷课的学生<<<<<<扣积分,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.STUDENT_ABSENT_DEDUCT_SCORE.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+
+    //定时任务，处理冻结的课程
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void dealFreeze() {
+        logger.info("<<<<<<开始通知<<<开始通知处理冻结的鱼卡,并更新首页>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage();
+        serviceTimerMessage.setStatus(0);
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        serviceTimerMessage.setType(TimerMessageType.FREEZE_UPDATE_HOME.value());
+        serviceTimerMessage.setBody(null);
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    // 课程推荐
+    @Scheduled(cron = "0 0 3 * * ?")
+//    @Scheduled(cron = "0 0/5 * * * ?")
+    public void recommendCourses(){
+        logger.info("<<<<<<recommendCourses<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<课程推荐<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

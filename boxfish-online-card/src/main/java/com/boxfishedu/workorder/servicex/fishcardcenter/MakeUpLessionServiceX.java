@@ -133,6 +133,7 @@ public class MakeUpLessionServiceX {
         newWorkOrder.setUpdateTime(null);
         newWorkOrder.setActualStartTime(null);
         newWorkOrder.setActualEndTime(null);
+        newWorkOrder.setIsCourseOver((short) 0);
         //已经安排补课
         newWorkOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         if (null == oldWorkOrder.getMakeUpSeq() || 0 == oldWorkOrder.getMakeUpSeq()) {
@@ -178,7 +179,7 @@ public class MakeUpLessionServiceX {
         }
 
         // 该课程已经更改过一次
-        if (workOrder.getUpdateManulFlag().equals("0")) {
+        if ("0" .equals( workOrder.getUpdateManulFlag() )) {
             resultMap.put("2", "该课程已经更改过");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
@@ -195,6 +196,13 @@ public class MakeUpLessionServiceX {
             resultMap.put("4", "该课程不存在");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
+
+        // 已经确认过状态的鱼卡不可以进行状态更正
+        if("0".equals(workOrder.getConfirmFlag())){
+            resultMap.put("5", "该课程已经进行过状态确认,可能进行状态更正");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+ 
         // 课程
         courseSchedule.setStatus(makeUpCourseParam.getFishStatus());
         courseSchedule.setUpdateTime(DateTime.now().toDate());
@@ -237,6 +245,10 @@ public class MakeUpLessionServiceX {
             // 1 正常  0  未开始 或者正在进行
             if ("0".equals(wo.getIsCourseOver())) {
                 resultMap.put("2", "请核实鱼卡信息,该课程未开始或者已经正在进行中!");
+                return JsonResultModel.newJsonResultModel(resultMap);
+            }
+            if("0".equals(wo.getConfirmFlag())){
+                resultMap.put("2", "该鱼卡已经确认过状态!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
             wo.setConfirmFlag("0");
@@ -307,7 +319,7 @@ public class MakeUpLessionServiceX {
             int count = workOrderService.updateWorkFishRechargeOne(FishCardChargebackStatusEnum.RECHARGBACKING.getCode(), wo.getId());
             logger.info("fishcardConfirmStatusRecharge7:count[{}]", count);
             if (count > 0) {
-                logger.info("fishcardConfirmStatusRecharge6 鱼卡id[{}]  用户账号 [{}]发送退款请求成功 ", wo.getId(),makeUpCourseParam.getUserName());
+                logger.info("fishcardConfirmStatusRecharge6 鱼卡id[{}]  用户账号 [{}]发送退款请求成功 ", wo.getId(),makeUpCourseParam.getUsername());
                 msg += (wo.getId() + "success");
                 JSONObject message = generator(wo);
                 logger.info("::::::fishcardConfirmStatusRecharge:::::[{}]", message);

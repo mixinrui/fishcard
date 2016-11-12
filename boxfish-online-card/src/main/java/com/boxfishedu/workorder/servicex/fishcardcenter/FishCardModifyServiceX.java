@@ -2,32 +2,33 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
+import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.NotFoundException;
+import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.common.util.WorkOrderConstant;
+import com.boxfishedu.workorder.common.util.ShortMessageCodeConstant;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
-import com.boxfishedu.workorder.requester.RecommandCourseRequester;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
+import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
+import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.FishCardDeleteParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.workorder.common.config.UrlConf;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.ServeService;
-import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,10 +38,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * Created by hucl on 16/5/10.
@@ -68,8 +71,6 @@ public class FishCardModifyServiceX {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
-    private FishCardModifyService fishCardModifyService;
 
     @Autowired
     private CourseOnlineRequester  courseOnlineRequester;
@@ -79,6 +80,14 @@ public class FishCardModifyServiceX {
 
     @Autowired
     private UrlConf urlConf;
+
+    @Autowired
+    private RabbitMqSender rabbitMqSender;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
+    @Autowired FishCardModifyService fishCardModifyService;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -111,6 +120,8 @@ public class FishCardModifyServiceX {
         //更新新的教师到workorder和courseschedule,此处做事务控制
         workOrderService.updateWorkOrderAndSchedule(workOrder, courseSchedule);
 
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
+
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
 
@@ -141,11 +152,33 @@ public class FishCardModifyServiceX {
     public void changerderCourses(Long studentId) {
         List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndStatusLessThan(studentId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
         if(CollectionUtils.isEmpty(workOrders)){
-            return;
+            throw new NotFoundException();
         }
-        workOrders.forEach(workOrder -> {
-            fishCardModifyService.changeCourse(workOrder);
-        });
+        try {
+            workOrders.forEach(workOrder -> {
+                Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
+                        DateUtil.convertLocalDateTime(workOrder.getStartTime()));
+                long hours = duration.toHours();
+                // 24小时以内如果有课,不再换课,无课则直接推荐
+                if(hours <= 24) {
+                    if(StringUtils.isEmpty(workOrder.getCourseId())) {
+                        fishCardModifyService.changeCourse(workOrder);
+                    }
+                }
+                // 24小时以上的课,有课再换
+                else {
+                    if(StringUtils.isNotEmpty(workOrder.getCourseId())) {
+                        fishCardModifyService.changeCourse(workOrder);
+                    }
+                }
+            });
+        }
+        catch (Exception ex){
+            logger.error("修改课程失败@changerderCourses",ex);
+
+        }
+        dataCollectorService.updateBothChnAndFnItemAsync(studentId);
+
     }
 
     public void changCourse(Long workOrderId) {
@@ -210,167 +243,53 @@ public class FishCardModifyServiceX {
 
 
     /**
-     * 更改上课时间点
+     * 更改时间
+     *
+     *
+     * 1 更改 鱼卡信息 和 课程信息
+     * 2 分配老师
+     *
+     * desc:    ********  解决问题,有可能分配老师 和 更改课程信息 导致 脏读 导致 课程鱼卡 classDate  和 StartTime 时间不一致问题
+     *
      * @param startTimeParam
+     * @param checkTimeflag
      * @return
      */
-    @Transactional
-    public JsonResultModel  changeStartTime(StartTimeParam startTimeParam){
-        Map<String,String> resultMap = Maps.newHashMap();
-        // 检查日期合法化
-        boolean  dataFlag = checkDate(startTimeParam);
-        if(!dataFlag){
-            resultMap.put("code","1");
-            resultMap.put("msg","日期不合法");
-            return  JsonResultModel.newJsonResultModel(resultMap);
+    public JsonResultModel changeStartTime(StartTimeParam startTimeParam,boolean checkTimeflag){
+
+        Long workOrderId= fishCardModifyService.changeStartTimeFishCard(startTimeParam,checkTimeflag);
+        dataCollectorService.updateBothChnAndFnItemForCardId(workOrderId);
+        WorkOrder workOrder =workOrderService.findOne(workOrderId);
+        logger.info("changeStartTime 准备 分配老师 workOrderId {[]}",workOrder.getId());
+        if(workOrder.getTeacherId() == 0){
+            logger.info("changeStartTime 满足 分配老师 条件 workOrderId {[]}",workOrder.getId());
+            List<CourseSchedule> courseSchedules = Lists.newArrayList();
+            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
+            courseSchedules.add(courseSchedule);
+            timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
         }
-
-        //获取鱼卡信息
-        WorkOrder workOrder =workOrderService.findByIdForUpdate(startTimeParam.getWorkOrderId())   ;
-        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
-
-        if(null == workOrder || courseSchedule ==null){
-            resultMap.put("code","2");
-            resultMap.put("msg","鱼卡或者课程信息不存在");
-            return JsonResultModel.newJsonResultModel(resultMap);
-        }
-
-        Long teacherId = workOrder.getTeacherId();
-        String startTime = DateUtil.Date2String(  workOrder.getStartTime());
-
-        // 验证鱼卡状态 创建、分配课程、分配老师
-
-        //获取结束时间
-        startTimeParam.setEndDateFormat(     DateUtil.String2Date(startTimeParam.getEndDate()) );
-
-        //记录老教师,时间
-        Long oldTeacherId= workOrder.getTeacherId();
-        String oldStartTime=StringUtils.EMPTY;
-        if(null!=workOrder.getStartTime()){
-            oldStartTime=DateUtil.date2SimpleString(workOrder.getStartTime());
-        }
-        String oldTeacherName= StringUtils.EMPTY;
-        if(!StringUtils.isEmpty(workOrder.getTeacherName())){
-            workOrder.getTeacherName();
-        }
-
-        //分配教师以后其实就已经是就绪,目前这两个状态有重叠
-        if(workOrder.getStatus()==FishCardStatusEnum.CREATED.getCode() || workOrder.getStatus()==FishCardStatusEnum.COURSE_ASSIGNED.getCode() || workOrder.getStatus()==FishCardStatusEnum.TEACHER_ASSIGNED.getCode()){
-            if(workOrder.getStatus()!=FishCardStatusEnum.CREATED.getCode()){
-                workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
-                courseSchedule.setStatus( FishCardStatusEnum.COURSE_ASSIGNED.getCode());
-            }
-            workOrder.setTeacherId(0L);
-            workOrder.setTeacherName("");
-            workOrder.setStartTime(startTimeParam.getBeginDateFormat() );
-            workOrder.setEndTime(startTimeParam.getEndDateFormat() );
-            workOrder.setSlotId(startTimeParam.getTimeslotId());
-            workOrderService.save(workOrder);
-
-            courseSchedule.setClassDate(DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
-            logger.info("changeStartTime : [{}]",DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
-            courseSchedule.setTeacherId(0L);
-            courseSchedule.setTimeSlotId(startTimeParam.getTimeslotId() );
-
-            courseScheduleService.save(courseSchedule);
-
-            // 推送教师更换时间推送
-            if(null!=teacherId && teacherId>0L){
-                this.pushTeacherList(teacherId,startTime);
-            }
-
-        }else {
-            resultMap.put("code","2");
-            resultMap.put("msg","鱼卡状态不正确");
-            return JsonResultModel.newJsonResultModel(resultMap);
-        }
-
-        List<CourseSchedule> courseSchedules = Lists.newArrayList();
-        courseSchedules.add(courseSchedule);
-        // 调用分配老师接口
-        timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
-
-
-        // 如果 含有 教室id  进行教室资源释放
-
-        //通知师生运营释放教师资源
-       // teacherStudentRequester.releaseTeacher(workOrder);
-        teacherStudentRequester.notifyCancelTeacher(workOrder);
-        //通知小马解散师生关系
-        courseOnlineRequester.releaseGroup(workOrder);
-
-        // 记录日志
-        workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"],旧的教师id["+oldTeacherId+"],旧的教师姓名["+oldTeacherName+"]");
-
-
-        return new JsonResultModel().newJsonResultModel("OK");
-    }
-
-
-
-
-    /**
-     * 判断日期合法性
-     * @param startTimeParam
-     * @return
-     */
-    private boolean checkDate(StartTimeParam startTimeParam){
-        logger.info("checkDate :[{}]",startTimeParam.getBeginDate());
-        // 日期为空判断
-        if(startTimeParam == null || null ==startTimeParam.getBeginDate())
-            return false;
-        //日期长度判断
-        if(startTimeParam.getBeginDate().length()<16)
-            return false;
-
-        String minutes = startTimeParam.getBeginDate().substring(14,16);
-        if(minutes.equals("00") || minutes.equals("30")){
-        }else {
-            return false;
-        }
-
-        startTimeParam.setBeginDateFormat(DateUtil.String2Date(startTimeParam.getBeginDate()));
-
-        // 大于现在的时间
-        if(startTimeParam.getBeginDateFormat().before(new Date())){
-            logger.info("checkDate :1");
-            return false;
-        }
-        return true;
-
+        return  new JsonResultModel().newJsonResultModel("OK");
     }
 
 
 
     /**
-     * 推送通知老师 更换时间
-     * @param teahcerId  老师id
-     * @param startTime  原来课程 开始时间
+     * 短信通知老师 课程取消
+     * @param teahcerId
+     * @param startTime
+     * @param workOrder
      */
-    private  void pushTeacherList(Long teahcerId,String startTime) {
-        logger.info("notiFyTeahcerchangeStartTime::begin");
-        List list = Lists.newArrayList();
-            startTime = DateUtil.Date2ForForeignDate( DateUtil.String2Date( startTime) );
+    private void  sendShortMessage(Long teahcerId,String startTime,WorkOrder workOrder){
+        Map map =  Maps.newHashMap();
+        map.put("user_id",teahcerId);
+        map.put("template_code", ShortMessageCodeConstant.SMS_TEA_NOTITY_CLASS_CANCEL_CODE);
+        JSONObject jo =new JSONObject();
+        jo.put("startTime",workOrder.getStartTime());
+        jo.put("courseName",workOrder.getCourseName());
+        jo.put("cancelReason",ShortMessageCodeConstant.CANCELREASON);
+        map.put("data",jo);
 
-            String pushTitle = WorkOrderConstant.SEND_TEACHER_CHANGETIME_BEGIN+startTime+WorkOrderConstant.SEND_TEACHER_CHANGETIME_END;
-            Integer count = 1;
-            Map map1 = Maps.newHashMap();
-            map1.put("user_id", teahcerId);
-            map1.put("push_title", pushTitle);
-
-            JSONObject jo = new JSONObject();
-            //jo.put("type", MessagePushTypeEnum.SEND_TEACHER_CHANGE_CLASSTIME_TYPE.toString());
-            jo.put("count", count);
-            jo.put("push_title", pushTitle);
-
-            map1.put("data", jo);
-
-            list.add(map1);
-
-
-        teacherStudentRequester.pushTeacherListOnlineMsg(list);
-
-        logger.info("notiFyTeahcerchangeStartTime::end");
+        rabbitMqSender.send(map, QueueTypeEnum.SHORT_MESSAGE);
     }
 
 }

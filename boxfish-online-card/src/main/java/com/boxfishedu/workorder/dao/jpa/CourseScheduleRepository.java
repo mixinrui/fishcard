@@ -4,6 +4,7 @@
 package com.boxfishedu.workorder.dao.jpa;
 
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,10 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.persistence.LockModeType;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with Intellij IDEA
@@ -88,4 +86,8 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     @Query("select concat(c.classDate,' ',c.timeSlotId) from CourseSchedule c where c.studentId=?1 and c.classDate=?2 and c.status<40")
     Set<String> findUnfinishByStudentIdAndCurrentDate(Long studentId, Date Date);
+
+    // 查找48小时以内,没有课程推荐的课表
+    @Query("select c from CourseSchedule c,WorkOrder w where c.workorderId=w.id and w.startTime<=?1 and w.courseId is null")
+    List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
 }

@@ -20,7 +20,7 @@ public class TrialCourse {
     private String name;
     private String courseType;
     private String publicDate;
-    private Integer difficulty;
+    private String difficulty;
     private String thumbnail;
     private Long lastModified;
     //课表的类型:"TRIAL"试讲 "NORMAL"正常

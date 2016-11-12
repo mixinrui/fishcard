@@ -83,6 +83,16 @@ public class DateUtil {
         return dateStr;
     }
 
+    public static String date2ShortString(Date date) {
+        String dateStr = null;
+        try {
+            dateStr = new SimpleDateFormat("HH:mm").format(date);
+        } catch (Exception ex) {
+            throw new RuntimeException("日期格式不合法");
+        }
+        return dateStr;
+    }
+
     public static LocalDate convertLocalDate(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }
@@ -105,6 +115,10 @@ public class DateUtil {
 
     public static Date convertToDate(LocalDate localDate) {
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static Date convertToDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static String simpleDateLong2String(Long time) {
@@ -301,12 +315,36 @@ public class DateUtil {
     */
     public static int getBetweenDays(Date begin, Date end) {
         long l = end.getTime() - begin.getTime();
-        return  (int)( l / (24 * 60 * 60 * 1000));
+        return  ((int)( l / (24 * 60 * 60 * 1000)) -1);
+    }
+
+    /**
+     * 48小时以内
+     * @param dateTime
+     * @return
+     */
+    public static boolean within48Hours(Date dateTime) {
+        Duration duration = Duration.between(
+                LocalDateTime.now(), DateUtil.convertLocalDateTime(dateTime));
+        // 课程推荐, 否则推课程类型
+        return duration.toMinutes() <= 48 * 60;
+    }
+
+    /**
+     * 72小时以内
+     * @param dateTime
+     * @return
+     */
+    public static boolean within72Hours(Date dateTime) {
+        Duration duration = Duration.between(
+                LocalDateTime.now(), DateUtil.convertLocalDateTime(dateTime));
+        // 课程推荐, 否则推课程类型
+        return duration.toMinutes() <= 72 * 60;
     }
 
 
-    public static void main(String[] args) {
-       System.out.print(  DateUtil.getBetweenDays(new Date(),DateUtil.addSecond(new Date(),60*24*5)));
+    public static void main(String[] args) throws ParseException {
+        System.out.println("withIn=" + within72Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-28 19:00:00")));
     }
 
 }

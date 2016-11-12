@@ -1,34 +1,37 @@
 package com.boxfishedu.workorder.servicex.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.workorder.common.bean.AccountCourseBean;
+import com.boxfishedu.workorder.common.bean.AccountCourseEnum;
 import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
+import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
-import com.boxfishedu.workorder.entity.mysql.CommentCardUnanswerTeacher;
-import com.boxfishedu.workorder.requester.TeacherStudentCommentCardRequester;
-import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.service.ServeService;
+import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.commentcard.CommentCardLogService;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
 import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
-import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.boxfishedu.workorder.web.param.commentcard.TeacherReadMsgParam;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/7/20.
@@ -46,10 +49,25 @@ public class CommentTeacherAppServiceX {
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
 
     @Autowired
+    CommentCardSDK commentCardSDK;
+
+    @Autowired
     private ServiceJpaRepository serviceJpaRepository;
 
     @Autowired
     private RabbitMqSender rabbitMqSender;
+
+    @Autowired
+    private AccountCardInfoService accountCardInfoService;
+
+    @Autowired
+    ServeService serveService;
+
+    @Autowired
+    CommentCardJpaRepository commentCardJpaRepository;
+
+    @Autowired
+    UrlConf urlConf;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -96,10 +114,106 @@ public class CommentTeacherAppServiceX {
             logger.info("@CommentTeacherAppServiceX 调用notifyOrderUpdateStatus,通知修改状态...");
             notifyOrderUpdateStatus(service.getOrderId(), ConstantUtil.WORKORDER_COMPLETED);
         }
+        //填充主页内容
+//        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId());
+//        if (Objects.equals(homeCommentCard.getId(),commentCard.getId())){
+//            logger.info("@submitComment 更新首页中外教点评项...");
+//            commentHomePage(commentCard);
+//        }
+        logger.info("@submitComment 更新首页中外教点评项...");
+        findHomeComment(commentCard.getStudentId());
     }
 
     public CommentCard checkTeacher(Long id, Long teacherId){
         return commentCardTeacherAppService.checkTeacher(id, teacherId);
+    }
+
+    public void findHomeComment(Long studentId) {
+        Integer amount = serveService.getForeignCommentServiceCount(studentId).get("amount");
+        if (amount == 0){
+            List<CommentCard> commentCardList0 = commentCardJpaRepository.getUncommentedCard(studentId);
+            if (commentCardList0.size() == 0){
+                logger.info("@findHomeComment1 次数用尽,且点评都已查看!");
+                accountCardInfoService.saveOrUpdate(studentId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
+                return;
+            }
+        }
+        List<CommentCard> commentCardList1 = commentCardJpaRepository.getTeacherNewCommentCard(studentId);
+        if (commentCardList1.size() != 0){
+//            CommentCard commentCard = commentCardList1.get(0);
+//            if (commentCard.getStatus().equals(CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())){
+//                commentCard.setStatus(CommentCardStatus.ANSWERED.getCode());
+//            }
+            setCommentHomePage(commentCardList1.get(0));
+        }else {
+            List<CommentCard> commentCardList2 = commentCardJpaRepository.getStudentNewCommentCard(studentId);
+            if (commentCardList2.size() != 0){
+                logger.info("@findHomeComment2 尚未有已完成的点评记录!");
+                setCommentHomePage(commentCardList2.get(0));
+            }else {
+                setDefaultHomeComment(studentId);
+            }
+        }
+    }
+
+    public void setCommentHomePage(CommentCard commentCard) {
+        AccountCourseBean accountCourseBean = new AccountCourseBean();
+        AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
+        cardCourseInfo.setCourseId(commentCard.getCourseId());
+        cardCourseInfo.setCourseName(commentCard.getCourseName());
+        if (Objects.nonNull(commentCard.getCourseId())){
+            //外教点评不需要显示课程难度和类型
+//            Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
+//            if (Objects.nonNull(typeAndDifficultyMap)){
+//                if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
+//                    cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
+//                }
+//                if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
+//                    cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()));
+//                }
+//            }
+        }
+        cardCourseInfo.setThumbnail(urlConf.getThumbnail_server()+commentCard.getCover());
+        cardCourseInfo.setStudentReadFlag(commentCard.getStudentReadFlag());
+        cardCourseInfo.setStatus(commentCard.getStatus());
+        accountCourseBean.setLeftAmount(serveService.getForeignCommentServiceCount(commentCard.getStudentId()).get("amount"));
+        accountCourseBean.setCourseInfo(cardCourseInfo);
+        logger.info("@setCommentHomePage 设置外教点评首页信息...");
+        accountCardInfoService.saveOrUpdate(commentCard.getStudentId(),accountCourseBean, AccountCourseEnum.CRITIQUE);
+    }
+
+    public void setDefaultHomeComment(Long userId){
+        logger.info("@setDefaultHomeComment 首次购买外教点评,设置首页信息...");
+        AccountCourseBean accountCourseBean = new AccountCourseBean();
+        accountCourseBean.setLeftAmount(serveService.getForeignCommentServiceCount(userId).get("amount"));
+        accountCardInfoService.saveOrUpdate(userId,accountCourseBean, AccountCourseEnum.CRITIQUE);
+    }
+
+    private Integer getLevel(String levelStr){
+        switch (levelStr){
+            case "LEVEL_1":
+                return 1;
+            case "LEVEL_2":
+                return 2;
+            case "LEVEL_3":
+                return 3;
+            case "LEVEL_4":
+                return 4;
+            case "LEVEL_5":
+                return 5;
+        }
+        return -1;
+    }
+
+    //初始化所有外教点评主页相关
+    public void initializeCommentHomePage(){
+        List<Long> longs = commentCardJpaRepository.getCommentCardHomePageList();
+        int sum = 0;
+        for(Long studentId: longs){
+            findHomeComment(studentId);
+            sum +=1 ;
+        }
+        logger.info("@initializeCommentHomePage 初始化首页中外教点评相关项完毕,初始化个数为:"+sum);
     }
 
     private void notifyOrderUpdateStatus(Long orderId, Integer status) {

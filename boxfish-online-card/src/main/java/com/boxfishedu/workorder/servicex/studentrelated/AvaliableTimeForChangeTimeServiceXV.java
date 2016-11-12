@@ -4,29 +4,33 @@ import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
+import com.boxfishedu.workorder.servicex.bean.CourseView;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.fishcard.MyCourseView;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +55,9 @@ public class AvaliableTimeForChangeTimeServiceXV {
     @Autowired
     private RandomSlotFilterService randomSlotFilterService;
 
+    @Autowired
+    private ServeService serveService;
+
     /**
      * 选时间生效天数,默认为第二天生效
      */
@@ -68,11 +75,17 @@ public class AvaliableTimeForChangeTimeServiceXV {
         WorkOrder workOrder = validateAndGetWorkOrder(workOrderId);
 
 
-//        //获取该订单所有鱼卡信息
-//        List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(workOrder.getOrderId());
+        boolean afterTomo =  afterTomoDate(workOrder);
+        if(!afterTomo){
+            throw  new BusinessException("请提前48小时修改上课时间");
+        }
+
+        //首次鱼卡时间
+        Date beginDate = serveService.getFirstTimeOfService(workOrder);
 
         AvaliableTimeParam avaliableTimeParam = new  AvaliableTimeParam();
         avaliableTimeParam.setComboType(workOrder.getService().getComboType());
+        avaliableTimeParam.setTutorType(workOrder.getService().getTutorType());
 
         /**
          * 获取该鱼卡所在订单有效周期
@@ -83,14 +96,16 @@ public class AvaliableTimeForChangeTimeServiceXV {
             throw new BusinessException("该鱼卡不允许更改时间");
         }
 
+        List<MyCourseView>  myCourseViews =   courseScheduleService.findMyClasses(workOrder.getStudentId());// 该学生以后的课程
+
         // 判断是免费还是正常购买
         Integer days =  comboCycle* daysOfWeek;
 
         //获取截至日期 (T+2原则  下单之后选时间最早后台)
-        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(workOrder.getCreateTime()),60*24*(days+2)  );
+        Date endDate  = DateUtil.addMinutes( DateUtil.date2SimpleDate(beginDate),60*24*(days-1)  );
 
         // 获取时间区间
-        DateRange dateRange = getEnableDateRange(workOrder, endDate);
+        DateRange dateRange = getEnableDateRange(endDate);
 
         // TODO
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(workOrder.getStudentId());
@@ -113,9 +128,66 @@ public class AvaliableTimeForChangeTimeServiceXV {
             result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
                     .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
                     .collect(Collectors.toList()));
+            if(result.getDay().equals(DateUtil.date2SimpleString(DateUtil.localDate2Date(dateRange.getFrom())  ))){
+
+                result.setDailyScheduleTime(result.getDailyScheduleTime().stream().filter(
+                        t ->   validateFirstDate(clone.getDay(),t.getStartTime(),DateUtil.localDate2Date(dateRange.getFrom())
+
+                )).collect(Collectors.toList()));
+
+            }
+
             return result;
         });
-        return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
+
+        List<DayTimeSlots> lastDayTimeSlots = Lists.newArrayList();
+
+        if(!CollectionUtils.isEmpty(dayTimeSlotsList)){
+            for(DayTimeSlots dts :dayTimeSlotsList){
+                if(CollectionUtils.isEmpty(myCourseViews)){
+                    if(! CollectionUtils.isEmpty( dts.getDailyScheduleTime() )){
+                        lastDayTimeSlots.add(dts);
+                    }
+
+                }else {
+                    boolean flag =true;
+                    for(MyCourseView  mcv: myCourseViews){
+                        if(dts.getDay().equals( mcv.getClassDate() )){
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if(flag){
+                        if(! CollectionUtils.isEmpty( dts.getDailyScheduleTime() )){
+                            lastDayTimeSlots.add(dts);
+                        }
+                    }
+                }
+            }
+        }
+
+        //return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
+        return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(lastDayTimeSlots).getData());
+    }
+
+
+
+    private  boolean validateFirstDate(String day ,String startTime,Date from){
+        Date startDate  = DateUtil.String2Date(day+" "+startTime);
+        return startDate.after(from);
+    }
+
+    /**
+     * 开始时间从后天开始
+     * @param workOrder
+     * @return
+     */
+    private boolean afterTomoDate(WorkOrder workOrder){
+        Date end  = DateUtil.addMinutes(new Date(),60*24*2);
+        if(workOrder.getStartTime()  .after(end)){
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -123,8 +195,8 @@ public class AvaliableTimeForChangeTimeServiceXV {
      *
      * @return
      */
-    private DateRange getEnableDateRange(WorkOrder workOrder, Date endDate) {
-        Date date  = DateUtil.date2SimpleDate(new Date());
+    private DateRange getEnableDateRange(Date endDate) {
+        Date date  = new Date();// DateUtil.date2SimpleDate(new Date());
         int days = DateUtil.getBetweenDays(date,endDate);
         if(days<2){
             throw new BusinessException("该鱼卡更改时间超出修改范围");
@@ -155,6 +227,11 @@ public class AvaliableTimeForChangeTimeServiceXV {
         }
         return workOrder;
     }
+
+
+
+
+
 
 
 }

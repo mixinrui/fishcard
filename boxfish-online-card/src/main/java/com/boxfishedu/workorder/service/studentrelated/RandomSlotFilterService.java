@@ -1,8 +1,8 @@
 package com.boxfishedu.workorder.service.studentrelated;
 
-import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
+import com.boxfishedu.mall.enums.OrderChannelDesc;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.SlotRuleEnum;
-import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.mongo.TimeLimitRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +42,7 @@ public class RandomSlotFilterService {
             return dayTimeSlots;
         }
         Date day = DateUtil.String2SimpleDate(dayTimeSlots.getDay());
-        Optional<List<SimpleTimeLimitPolicy.TimeRange>> timeRangeOptional = getExcludeDateRange(avaliableTimeParam.getComboType(), day);
+        Optional<List<SimpleTimeLimitPolicy.TimeRange>> timeRangeOptional = getExcludeDateRange(avaliableTimeParam.getComboType(),avaliableTimeParam.getTutorType(), day);
         if (!timeRangeOptional.isPresent()) {
             return dayTimeSlots;
         }
@@ -68,7 +67,14 @@ public class RandomSlotFilterService {
     }
 
     //互斥的时间片
-    private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getExcludeDateRange(String comboType, Date day) {
+    private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getExcludeDateRange(String comboType,String tutorType, Date day) {
+        TutorType tt = TutorType.valueOf(tutorType);
+        switch (tt) {
+            case CN:
+            case MIXED: comboType= OrderChannelDesc.OVERALL.toString(); break;
+            case FRN: comboType= OrderChannelDesc.CHINESE.toString(); break;
+            default: comboType= OrderChannelDesc.OVERALL.toString(); break;
+        }
         logger.info("@getExcludeDateRange#comboType[{}]#day[{}]", comboType, day);
         Optional<List<TimeLimitRules>> timeLimitRuleOptional = timeLimitRulesMorphiaRepository.queryByComboTypeAndRuleAndDay(comboType, SlotRuleEnum.MUTEX, DateUtil.getDayOfWeek(day));
         if (!timeLimitRuleOptional.isPresent()) {
@@ -102,7 +108,14 @@ public class RandomSlotFilterService {
     /**
      * 时间片范围
      */
-    private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getIncludeDateRange(String comboType, Date day) {
+    private Optional<List<SimpleTimeLimitPolicy.TimeRange>> getIncludeDateRange(String comboType,String tutorType, Date day) {
+        TutorType tt = TutorType.valueOf(tutorType);
+        switch (tt) {
+            case CN:
+            case MIXED: comboType= OrderChannelDesc.OVERALL.toString(); break;
+            case FRN: comboType= OrderChannelDesc.CHINESE.toString(); break;
+            default: comboType= OrderChannelDesc.OVERALL.toString(); break;
+        }
         Optional<List<TimeLimitRules>> timeLimitRuleOptional = timeLimitRulesMorphiaRepository.queryByComboTypeAndRuleAndDay(comboType, SlotRuleEnum.RANGE, DateUtil.getDayOfWeek(day));
         if (!timeLimitRuleOptional.isPresent()) {
             return Optional.empty();
@@ -128,10 +141,10 @@ public class RandomSlotFilterService {
             return dayTimeSlots;
         }
         Date day = DateUtil.String2SimpleDate(dayTimeSlots.getDay());
-        Optional<List<SimpleTimeLimitPolicy.TimeRange>> timeRangeOptional = getIncludeDateRange(avaliableTimeParam.getComboType(), day);
+        Optional<List<SimpleTimeLimitPolicy.TimeRange>> timeRangeOptional = getIncludeDateRange(avaliableTimeParam.getComboType(),avaliableTimeParam.getTutorType(), day);
         if (!timeRangeOptional.isPresent()) {
             logger.debug("@removeSlotsNotInRange无可显示的slot");
-            return null;
+            return dayTimeSlots;
         }
         dayTimeSlots.setDailyScheduleTime(
                 dayTimeSlots.getDailyScheduleTime().stream().filter(
@@ -140,11 +153,11 @@ public class RandomSlotFilterService {
         return dayTimeSlots;
     }
 
-    public DayTimeSlots removeSlotsNotInRange(DayTimeSlots dayTimeSlots, Long teacherId) {
-        AvaliableTimeParam avaliableTimeParam = new AvaliableTimeParam();
-        avaliableTimeParam.setComboType(getComboTypeByTeacherId(teacherId));
-        return this.removeSlotsNotInRange(dayTimeSlots, avaliableTimeParam);
-    }
+//    public DayTimeSlots removeSlotsNotInRange(DayTimeSlots dayTimeSlots, Long teacherId) {
+//        AvaliableTimeParam avaliableTimeParam = new AvaliableTimeParam();
+//        avaliableTimeParam.setComboType(getComboTypeByTeacherId(teacherId));
+//        return this.removeSlotsNotInRange(dayTimeSlots, avaliableTimeParam);
+//    }
 
     //是否为该包含的时间片
     private boolean isInTimeRange(TimeSlots timeSlots, String comboType, Date day, List<SimpleTimeLimitPolicy.TimeRange> timeRanges) {
@@ -159,17 +172,17 @@ public class RandomSlotFilterService {
         return false;
     }
 
-    private String getComboTypeByTeacherId(Long teacherId) {
-        try {
-            int teacherType = teacherStudentRequester.getTeacherType(teacherId);
-            if (teacherType == TeachingType.WAIJIAO.getCode()) {
-                return ComboTypeEnum.FOREIGN.toString();
-            } else {
-                return ComboTypeEnum.OVERALL.toString();
-            }
-        } catch (Exception ex) {
-            logger.error("@getComboTypeByTeacherId#eror", ex);
-            return ComboTypeEnum.OVERALL.toString();
-        }
-    }
+//    private String getComboTypeByTeacherId(Long teacherId) {
+//        try {
+//            int teacherType = teacherStudentRequester.getTeacherType(teacherId);
+//            if (teacherType == TeachingType.WAIJIAO.getCode()) {
+//                return ComboTypeEnum.FOREIGN.toString();
+//            } else {
+//                return ComboTypeEnum.OVERALL.toString();
+//            }
+//        } catch (Exception ex) {
+//            logger.error("@getComboTypeByTeacherId#eror", ex);
+//            return ComboTypeEnum.OVERALL.toString();
+//        }
+//    }
 }

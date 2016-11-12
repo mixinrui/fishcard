@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.fishcardcenter;
 
+import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.servicex.bean.WorkOrderView;
 import com.boxfishedu.workorder.servicex.bean.WorkOrderViewExcel;
@@ -196,7 +197,12 @@ public class FishCardExcelServiceX {
                wexcel.setRealStartTime(workOrder.getActualStartTime());
                wexcel.setRealEndTime(workOrder.getActualEndTime());
                wexcel.setOrderCode(workOrder.getOrderCode());
-               wexcel.setOrderType(workOrder.getOrderChannel());
+               wexcel.setOrderType(workOrder.getOrderTypeDesc());
+//            if(workOrder.getOrderChannel().equals(OrderChannelDesc.STANDARD.getCode() )){
+//                wexcel.setOrderType(workOrder.getComboType());
+//            }else {
+//                wexcel.setOrderType(workOrder.getOrderChannel());
+//            }
             listexcel.add(wexcel);
         });
 

@@ -179,9 +179,10 @@ public class WorkOrderViewExcel {
 
 
     public String setOrderType(String orderType) {
-        if(StringUtils.isNullOrEmpty(OrderChannelDesc.get(orderType).getDesc() ))
-            return orderType;
-        return this.orderType = OrderChannelDesc.get(orderType).getDesc();
+        return this.orderType=orderType;
+//        if(StringUtils.isNullOrEmpty(OrderChannelDesc.get(orderType).getDesc() ))
+//            return orderType;
+//        return this.orderType = OrderChannelDesc.get(orderType).getDesc();
     }
     public String getOrderType() {
         return orderType;

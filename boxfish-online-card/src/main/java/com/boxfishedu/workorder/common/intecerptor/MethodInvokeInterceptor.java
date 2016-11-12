@@ -33,8 +33,7 @@ public class MethodInvokeInterceptor {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String className = joinPoint.getTarget().getClass().getName();
         String lastName = className.substring(className.lastIndexOf("."));
-
-        logger.debug("@>>>>>>>>>>>>>>>>>类{}#########方法:{}#########url:{}", lastName, joinPoint.getSignature().getName(), request.getRequestURI());
+        StringBuilder logBuilder=new StringBuilder("@>>>>>>>>>>>>>>>>>类").append(lastName).append("#########方法:").append(joinPoint.getSignature().getName()).append("#########url:").append(request.getRequestURI());
         Object[] args = joinPoint.getArgs();
         if (null != args && args.length > 0) {
             for (int i = 0; i < args.length; i++) {
@@ -46,13 +45,14 @@ public class MethodInvokeInterceptor {
                      * java.lang.IllegalStateException :getWriter() has already been called for this response
                      */
                 }else if(null==args[i]||ClassTypeJudge.isBaseDataType(args[i].getClass()) ){
-                    logger.debug(">>>参数[{}]: {}", i, args[i]);
+                    logBuilder.append(">>>参数[").append(i).append("]:").append(args[i]);
                 }
                 else {
-                    logger.debug(">>>参数[{}]: {}", i, JacksonUtil.toJSon(args[i]));
+                    logBuilder.append(">>>参数[").append(i).append("]:").append(JacksonUtil.toJSon(args[i]));
                 }
             }
         }
+        logger.debug(logBuilder.toString());
     }
 
     @AfterReturning(pointcut = interceptLogUrl,returning = "returnValue")

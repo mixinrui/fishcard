@@ -5,7 +5,6 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
@@ -18,11 +17,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,9 +33,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class AvaliableTimeServiceX {
-
-    @Autowired
-    private TimeLimitPolicy timeLimitPolicy;
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
@@ -80,6 +78,9 @@ public class AvaliableTimeServiceX {
 //            DayTimeSlots result = timeLimitPolicy.limit(clone);
             //获取时间片范围内的数据
             DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
+            if(Objects.isNull(result) || CollectionUtils.isEmpty(result.getDailyScheduleTime())) {
+                return null;
+            }
             //随机显示热点时间片
             result=randomSlotFilterService.removeExculdeSlot(result,avaliableTimeParam);
             result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
@@ -115,6 +116,9 @@ public class AvaliableTimeServiceX {
 //            DayTimeSlots result = timeLimitPolicy.limit(clone);
             //获取时间片范围内的数据
             DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
+            result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+                    .collect(Collectors.toList()));
             return result;
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());

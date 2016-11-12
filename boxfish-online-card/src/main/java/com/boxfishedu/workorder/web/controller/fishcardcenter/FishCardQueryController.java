@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
+import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
@@ -44,12 +45,53 @@ public class FishCardQueryController {
     }
 
     /**
-     * 用户id不做限制的查询
+     * 用户id不做限制的查询  鱼卡管理
      */
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/listitem", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByCond(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
     }
+
+    /**
+     * 用户id不做限制的查询 鱼卡管理(中教)
+     */
+    @RequestMapping(value = "/listzjitem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondZJ(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
+    }
+
+    /**
+     * 用户id不做限制的查询 鱼卡管理(外教)
+     */
+    @RequestMapping(value = "/listwjitem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondWJ(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
+    }
+
+    /**
+     * 用户id不做限制的查询 鱼卡管理(补课)
+     */
+    @RequestMapping(value = "/listbkitem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondBK(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
+    }
+
+    /**
+     * 用户id不做限制的查询 鱼卡管理(退款)
+     */
+    @RequestMapping(value = "/listtkitem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondTK(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
+    }
+
+    /**
+     * 用户id不做限制的查询 鱼卡管理(确认状态)
+     */
+    @RequestMapping(value = "/listqritem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondQR(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
+    }
+
 
     /**
      * 提供状态的查询列表
@@ -83,7 +125,13 @@ public class FishCardQueryController {
      */
     @RequestMapping(value = "/orderType/list", method = RequestMethod.GET)
     public JsonResultModel listOrderType() throws Exception {
-        return JsonResultModel.newJsonResultModel( OrderChannelDesc.values());
+        JSONObject json = new JSONObject();
+        for (OrderChannelDesc v : OrderChannelDesc.values()) {
+            if(!v.getCode().equals( OrderChannelDesc.STANDARD.getCode())){
+                json.put(v.getCode(),v.getDesc());
+            }
+        }
+        return JsonResultModel.newJsonResultModel( json);
     }
 
 

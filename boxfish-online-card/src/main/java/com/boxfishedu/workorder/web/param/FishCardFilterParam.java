@@ -9,6 +9,7 @@ import java.util.Date;
  */
 @Data
 public class FishCardFilterParam {
+    private Long id;
     private Long studentId;
     private Long teacherId;
     private String orderCode;
@@ -20,6 +21,8 @@ public class FishCardFilterParam {
     private String statuses;// 以数组的方式传递
 
     private String teacherName;
+    /** desc asc **/
+    private String teacherNameSort;
     private String createBeginDate;
     private String createEndDate;
     private Date createBeginDateFormat;
@@ -44,5 +47,11 @@ public class FishCardFilterParam {
 
     private String orderType;// 订单类型
 
+    /** 是否查询demo课程 true 显示 false 不显示**/
+
+    private String demoType;
+
+
+    private Integer teachingType;// 1 中教  2 外教
 
 }

@@ -16,8 +16,12 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.*;
+import com.boxfishedu.workorder.service.CourseOnlineService;
+import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServeService;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardFreezeServiceX;
 import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
@@ -73,6 +77,10 @@ public class CourseOnlineServiceX {
     @Autowired
     private FishCardFreezeServiceX fishCardFreezeServiceX;
 
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public Page<WorkOrder> getWorkOrdersByTeacher(Long teacherId, String startDateStr, String endDateStr, Pageable pageable) throws BusinessException {
@@ -107,6 +115,7 @@ public class CourseOnlineServiceX {
 
         //处理完成的情况
         if (status == FishCardStatusEnum.COMPLETED.getCode() || status == FishCardStatusEnum.COMPLETED_FORCE.getCode()) {
+            logger.debug("@updateTeachingStatus#complete#fishcard{}完成上课,开始做完成处理",workOrder.getId());
             completeCourse(workOrder, courseSchedule, status);
         }
         //处理早退的情况(定时器不到不应该减去服务)
@@ -192,12 +201,15 @@ public class CourseOnlineServiceX {
         this.handleContinusAbsence(workOrder, status);
         // 服务消费扣除
         serveService.decreaseService(workOrder, courseSchedule, status);
+        //异步更新首页数据
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
         //通知师生运营释放教师资源
         teacherStudentRequester.releaseTeacher(workOrder);
         //通知小马解散师生关系
         courseOnlineRequester.releaseGroup(workOrder);
         //通知订单修改状态
         serveService.notifyOrderUpdateStatus(workOrder, ConstantUtil.WORKORDER_COMPLETED);
+
         //通知推荐课服务,目前由App调用
 //        recommandCourseRequester.notifyCompleteCourse(workOrder);
     }
@@ -231,11 +243,11 @@ public class CourseOnlineServiceX {
                 //连续旷课超过两次,
                 if(continousAbsenceRecord.getContinusAbsenceNum()>1){
                     //如果超过两次,直接全部冻结
-                    if(workOrder.getCourseType().equals(ComboTypeEnum.EXCHANGE.toString())){
+                    if(workOrder.getOrderChannel().equals(ComboTypeEnum.EXCHANGE.toString())){
                         logger.debug("@handleContinusAbsence#user[{}],workorder[{}],次数[{}]连续旷课次数超过一次处理逻辑",workOrder.getStudentId(),workOrder.getId(),continousAbsenceRecord.getContinusAbsenceNum());
                         List<WorkOrder> workOrders=workOrderService.findByStudentIdAndOrderChannelAndStartTimeAfter(workOrder.getStudentId(),ComboTypeEnum.EXCHANGE.toString(),new Date());
                         workOrders.forEach(workOrder1 -> {
-                            logger.info("handleContinusAbsence#冻结鱼卡[{}]",workOrder1.getId());
+                            logger.info("@handleContinusAbsence#freeze#冻结鱼卡[{}]",workOrder1.getId());
                             fishCardFreezeServiceX.freeze(workOrder1.getId());
                         });
                     }

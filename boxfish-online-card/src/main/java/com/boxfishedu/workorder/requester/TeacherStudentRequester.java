@@ -10,13 +10,13 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
-import com.boxfishedu.workorder.common.util.RestTemplateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Maps;
@@ -26,18 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -309,6 +305,71 @@ public class TeacherStudentRequester {
         logger.info("::::::::::::::::::::::::::::::::@[getTeachersBelongToStudent]向师生运营发起获取教师列表长度size[{}]  Datais[{}]::::::::::::::::::::::::::::::::",
                 teacherList == null ? 0 : teacherList.size(), JSON.toJSON(teacherList));
         return teacherList;
-
     }
+
+    /**
+     * 获取课程过程中,如果课程类型发生变化,向师生运营发送更换教师请求
+     */
+    public Boolean changeTeacherForTypeChanged(WorkOrder workOrder){
+       String url = new StringBuilder(urlConf.getTeacher_service()).append("/course/schedule/teacher/changeYN").toString();
+        Map map = Maps.newHashMap();
+        map.put("day", DateUtil.date2SimpleDate(workOrder.getStartTime()).getTime());
+        map.put("timeSlotId", workOrder.getSlotId());
+        map.put("teacherId", workOrder.getTeacherId());
+        map.put("studentId", workOrder.getStudentId());
+        map.put("courseType",workOrder.getCourseType());
+        logger.debug("@changeTeacherForTypeChanged#{}向师生运营发起换教师的请求[{}],参数[{}]", workOrder.getId(), url,JacksonUtil.toJSon(map));
+        JsonResultModel jsonResultModel = null;
+        try {
+            jsonResultModel = restTemplate.postForObject(url, map, JsonResultModel.class);
+        } catch (Exception ex) {
+            logger.error("@changeTeacherForTypeChanged#{}#exception向师生运营发送判断是否更换老师失败",workOrder.getId(), ex);
+            throw new BusinessException("向师生运营请求更换教师失败");
+        }
+        if (HttpStatus.OK.value() != jsonResultModel.getReturnCode()) {
+            logger.error("@changeTeacherForTypeChanged#{}#returnException向师生运营发送判断是否更换老师失败:[{}]", workOrder.getId(),jsonResultModel.getReturnMsg());
+            throw new BusinessException("教师更换失败:" + jsonResultModel.getReturnMsg());
+        }
+        return (Boolean)jsonResultModel.getData();
+    }
+
+    /**
+     * token验证接口
+     * @param token
+     * @return
+     */
+    public TokenReturnBean checkTokenCommon(String token) {
+        String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/query/self";
+        logger.info("checkTokenPrivilege - [{}]",url);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("BoxFishAccessToken", token);
+        HttpEntity request = new HttpEntity(httpHeaders);
+        TokenReturnBean tokenCheckObject;
+        try {
+            tokenCheckObject = restTemplate.postForObject(url, request, TokenReturnBean.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            tokenCheckObject = null;
+        }
+        return tokenCheckObject;
+    }
+
+    public TokenReturnBean checkTokenPrivilege(String token,String path) {
+        if(!path.startsWith("/comment") &&   !path.startsWith("/fishcard")){
+            path= "/fishcard"+path;
+        }
+        String url = urlConf.getLogin_filter_url() + "/box/fish/access/token/verification?systemName=" + "FishCardCenter" +"&accessToken="+token+"&requestURI="+path;
+        logger.info("checkTokenPrivilege - [{}]",url);
+        TokenReturnBean tokenReturnBean;
+        try {
+            tokenReturnBean = restTemplate.getForObject(url, TokenReturnBean.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            tokenReturnBean = null;
+        }
+
+        return tokenReturnBean;
+    }
+
+
 }

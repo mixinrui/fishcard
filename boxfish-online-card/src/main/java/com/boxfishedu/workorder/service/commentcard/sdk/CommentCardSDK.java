@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service.commentcard.sdk;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.config.CommentCardUrlConf;
+import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.entity.mysql.PushToStudentAndTeacher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,9 @@ public class CommentCardSDK {
     @Autowired
     private CommentCardUrlConf commentCardUrlConf;
 
+    @Autowired
+    private UrlConf urlConf;
+
     public JsonResultModel setTeacherAbsence(Long teacherId,Long studentId, Long id){
         Map<String,String> paramMap = new HashMap<>();
         paramMap.put("teacherId", Objects.toString(teacherId));
@@ -50,6 +54,10 @@ public class CommentCardSDK {
         map.put("type",type);
         pushToStudentAndTeacher.setData(map);
         return restTemplate.postForObject(createPushURI(), Arrays.asList(pushToStudentAndTeacher),JsonResultModel.class);
+    }
+
+    public Map commentTypeAndDifficulty(String courseId){
+        return restTemplate.getForObject(getCourseTypeAndDifficulty(courseId),Map.class);
     }
 
     public JsonResultModel getInnerTeacherId(Map paramMap){
@@ -87,6 +95,16 @@ public class CommentCardSDK {
         logger.info("Accessing getInnerTeacher in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getInnerTeacherUrl())
                 .path("/f_teacher_review/get_inner_f_review_teacher")
+                .queryParam("")
+                .build()
+                .toUri();
+    }
+
+    private URI getCourseTypeAndDifficulty(String courseId){
+        logger.info("Accessing getCourseTypeAndDifficulty in CommentCardSDK......");
+        String url = "/course/info/" + courseId;
+        return UriComponentsBuilder.fromUriString(urlConf.getCourse_type_and_difficulty())
+                .path(url)
                 .queryParam("")
                 .build()
                 .toUri();

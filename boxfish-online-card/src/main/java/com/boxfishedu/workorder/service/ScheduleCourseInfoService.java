@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.dao.mongo.TrialCourseMorphiaRepository;
+import com.boxfishedu.workorder.entity.mongo.OnlineAccountSet;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mongo.TrialCourse;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -18,6 +19,7 @@ import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,7 @@ import java.util.Optional;
 /**
  * Created by hucl on 16/4/13.
  */
+@SuppressWarnings("ALL")
 @Component
 public class ScheduleCourseInfoService {
     @Autowired
@@ -78,11 +81,13 @@ public class ScheduleCourseInfoService {
         for (CourseSchedule courseSchedule : courseSchedules) {
             courseScheduleMap.put(courseSchedule.getWorkorderId().toString(), courseSchedule);
         }
-        for (WorkOrder workOrder : workOrders) {
-            RecommandCourseView courseView = courseViewMap.get(workOrder.getSeqNum());
+        for (int i = 0, size = workOrders.size(); i < size; i++) {
+            WorkOrder workOrder = workOrders.get(i);
+            RecommandCourseView courseView = courseViewMap.get(i);
             ScheduleCourseInfo scheduleCourseInfo = new ScheduleCourseInfo();
             scheduleCourseInfo.setCourseId(courseView.getCourseId());
             scheduleCourseInfo.setCourseType(courseView.getCourseType());
+            scheduleCourseInfo.setEnglishName(courseView.getEnglishName());
             scheduleCourseInfo.setDifficulty(courseView.getDifficulty());
             scheduleCourseInfo.setName(courseView.getCourseName());
             String thumbnail = String.format("%s%s", urlConf.getThumbnail_server(), courseView.getCover());
@@ -93,19 +98,6 @@ public class ScheduleCourseInfoService {
         }
         save(scheduleCourseInfos);
     }
-
-//    public ScheduleCourseInfo queryByCourseIdAndScheduleType(String courseId, String scheduleType) {
-//        ScheduleCourseInfo scheduleCourseInfo = null;
-//        try {
-//            scheduleCourseInfo = scheduleCourseInfoMorphiaRepository.queryByCourseIdAndScheduleType(courseId, scheduleType);
-//            if (null == scheduleCourseInfo) {
-//                throw new BusinessException("不存在课程");
-//            }
-//        } catch (Exception ex) {
-//            throw new BusinessException("不存在对应的课程,请确认");
-//        }
-//        return scheduleCourseInfo;
-//    }
 
     public TrialCourse queryByCourseIdAndScheduleType(String courseId, String scheduleType) {
         TrialCourse trialCourse = null;
@@ -123,37 +115,17 @@ public class ScheduleCourseInfoService {
     public void updateCourseIntoScheduleInfo(ScheduleCourseInfo mewScheduleCourseInfo) {
         Query<ScheduleCourseInfo> updateQuery = datastore.createQuery(ScheduleCourseInfo.class);
         updateQuery.criteria("workOrderId").equal(mewScheduleCourseInfo.getWorkOrderId());
-        UpdateOperations<ScheduleCourseInfo> updateOperations = datastore.createUpdateOperations(ScheduleCourseInfo.class);
-        updateOperations.set("courseId", mewScheduleCourseInfo.getCourseId());
-        updateOperations.set("name", mewScheduleCourseInfo.getName());
-        updateOperations.set("courseType", mewScheduleCourseInfo.getCourseType());
-        if(null!=mewScheduleCourseInfo.getDifficulty()) {
-            updateOperations.set("difficulty", mewScheduleCourseInfo.getDifficulty());
-        }
-        updateOperations.set("thumbnail", mewScheduleCourseInfo.getThumbnail());
-        UpdateResults updateResults = datastore.updateFirst(updateQuery, updateOperations);
-        if (updateResults.getUpdatedCount() < 1) {
-            logger.error("updateTrialScheduleInfo方法更新失败");
-            throw new BusinessException("@updateCourseIntoScheduleInfo更新课程信息失败");
+
+        ScheduleCourseInfo scheduleCourseInfo= updateQuery.get();
+        if(null!=scheduleCourseInfo){
+            scheduleCourseInfo.setCourseId(mewScheduleCourseInfo.getCourseId());
+            scheduleCourseInfo.setCourseType(mewScheduleCourseInfo.getCourseType());
+            scheduleCourseInfo.setName(mewScheduleCourseInfo.getName());
+            scheduleCourseInfo.setEnglishName(mewScheduleCourseInfo.getEnglishName());
+            scheduleCourseInfo.setCourseType(mewScheduleCourseInfo.getCourseType());
+            scheduleCourseInfo.setDifficulty(mewScheduleCourseInfo.getDifficulty());
+            scheduleCourseInfo.setThumbnail(mewScheduleCourseInfo.getThumbnail());
+            datastore.save(scheduleCourseInfo);
         }
     }
-
-//    public void updateTrialScheduleInfo(TrialLectureModifyParam trialLectureModifyParam, WorkOrder workOrder, CourseSchedule courseSchedule){
-//        Query<ScheduleCourseInfo> updateQuery = datastore.createQuery(ScheduleCourseInfo.class);
-//        updateQuery.criteria("workOrderId").equal(workOrder.getId());
-//        TrialLectureParam after=trialLectureModifyParam.getAfter();
-//        ScheduleCourseInfo scheduleCourseInfo=queryByCourseIdAndScheduleType(after.getCourseId().toString(), ScheduleTypeEnum.TRIAL.getDesc());
-//        UpdateOperations<ScheduleCourseInfo> updateOperations = datastore.createUpdateOperations(ScheduleCourseInfo.class);
-//        updateOperations.set("courseId",scheduleCourseInfo.getCourseId());
-//        updateOperations.set("name",scheduleCourseInfo.getName());
-//        updateOperations.set("courseType",scheduleCourseInfo.getCourseType());
-//        updateOperations.set("difficulty",scheduleCourseInfo.getDifficulty());
-//        updateOperations.set("thumbnail",scheduleCourseInfo.getThumbnail());
-//        updateOperations.set("scheduleId",courseSchedule.getId().toString());
-//        UpdateResults updateResults = datastore.updateFirst(updateQuery,updateOperations);
-//        if(updateResults.getUpdatedCount()<1){
-//            logger.error("updateTrialScheduleInfo方法更新失败");
-//           throw new  BusinessException("更新失败");
-//        }
-//    }
 }

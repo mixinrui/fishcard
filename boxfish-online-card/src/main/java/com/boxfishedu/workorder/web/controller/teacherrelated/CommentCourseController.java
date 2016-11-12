@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Locale;
+
 /**
  * Created by hucl on 16/8/14.
  */
@@ -20,7 +22,7 @@ public class CommentCourseController {
     private CommentCourseInfoServiceX commentCourseInfoServiceX;
 
     @RequestMapping(value = "/course_info/{fishcard_id}")
-    public JsonResultModel getFishCardCourseInfo(@PathVariable("fishcard_id") Long fishcardId) {
-        return commentCourseInfoServiceX.getFishCardCourseInfo(fishcardId);
+    public JsonResultModel getFishCardCourseInfo(@PathVariable("fishcard_id") Long fishcardId, Locale locale) {
+        return commentCourseInfoServiceX.getFishCardCourseInfo(fishcardId, locale);
     }
 }

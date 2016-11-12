@@ -5,9 +5,12 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.RecommandedCourseService;
+import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendCourseType;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.course.RecommandCourseViews;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Created by hucl on 16/6/17.
@@ -39,78 +44,34 @@ public class RecommandCourseRequester {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-    public RecommandCourseView getRecommandCourse(WorkOrder workOrder, Integer index) {
-        String url = String.format("%s/online/%s/%s", urlConf.getCourse_recommended_service(), workOrder.getStudentId(), index);
-        logger.debug("@<-<-<-<-<-<-向推荐课发起获取推荐课的请求,url:[{}]", url);
-        RecommandCourseView recommandCourseView = null;
-        try {
-            recommandCourseView = restTemplate.postForObject(url, null, RecommandCourseView.class);
-            if (null == recommandCourseView) {
-                throw new BusinessException();
-            }
-            logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
-        } catch (Exception ex) {
-            logger.error("!!!!!!!!!!!!!!向推荐课发起请求失败[{}]", ex.getMessage(), ex);
-            throw new BusinessException("获取推荐课程失败");
-        }
-        return recommandCourseView;
-    }
-
-    public RecommandCourseView getRecomendCourse(WorkOrder workOrder, TutorType tutorType) {
-        try {
-            String type;
-            switch (tutorType) {
-                case CN: type = "chinese"; break;
-                case FRN: type = "foreigner"; break;
-                default: throw new BusinessException("未知类型的课程");
-            }
-            RecommandCourseView recommandCourseView = restTemplate.postForObject(
-                    createRecommendUri(workOrder.getStudentId(), type),
-                    HttpEntity.EMPTY,
-                    RecommandCourseView.class);
-            logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
-            return recommandCourseView;
-        } catch (Exception ex) {
-            logger.error("!!!!!!!!!!!!!!向推荐课发起请求失败[{}]", ex.getMessage(), ex);
-            throw new BusinessException("获取推荐课程失败");
-        }
-    }
-
+    /**
+     * 换课
+     * @param workOrder
+     * @return
+     */
     public RecommandCourseView changeCourse(WorkOrder workOrder) {
-        String tutorType=workOrder.getService().getTutorType();
+        Service service = workOrder.getService();
+        String tutorType = service.getTutorType();
         logger.debug("@RecommandCourseRequester#changeCourse,参数tutorType[{}]",tutorType);
-        if(Objects.equals(tutorType, TutorType.CN.name())) {
+        if(Objects.equals(tutorType, TutorType.CN.name()) || Objects.equals(tutorType, TutorType.MIXED.name())) {
             return changeChineseCourse(workOrder);
         }
-        else if(Objects.equals(tutorType,TutorType.FRN.name())){
+        else{
+            // 终极梦想换课
             return changeForeignCourse(workOrder);
         }
-        else {
-            return changeOverAllCourse(workOrder);
-        }
-    }
-
-    //目前为中教的换课
-    public RecommandCourseView changeOverAllCourse(WorkOrder workOrder) {
-        String url = String.format("%s/exchange/online/%s/%s/%s", urlConf.getCourse_recommended_service(),
-                workOrder.getStudentId(), workOrder.getSeqNum(), workOrder.getCourseId());
-        try {
-            logger.info("@changeCourse#request发起换课请求,url[{}]", url);
-            RecommandCourseView recommandCourseView = restTemplate.postForObject(url, null, RecommandCourseView.class);
-            logger.info("@changeCourse#result获取换课结果,url[{}],结果;[{}]", url, JacksonUtil.toJSon(recommandCourseView));
-            return recommandCourseView;
-        } catch (Exception ex) {
-            logger.error("@changeCourse#exception#[{}]!!!!!!!!!!!!!!向推荐课发起更换请求失败[{}]", url, ex);
-            throw new BusinessException("更换推荐课程失败");
-        }
     }
 
 
-    //目前为中教的换课
+    /**
+     * 核心素养
+     * @param workOrder
+     * @return
+     */
     public RecommandCourseView changeChineseCourse(WorkOrder workOrder) {
-        String url = String.format("%s/exchange/chinese/%s/%s", urlConf.getCourse_recommended_service(),
-                workOrder.getStudentId(), workOrder.getCourseId());
+
+        URI url = createPromoteExchangeCourse(
+                workOrder.getStudentId(), workOrder.getRecommendSequence(), workOrder.getCourseId());
         try {
             logger.info("@changeChineseCourse#request发起换课请求,url[{}]", url);
             RecommandCourseView recommandCourseView = restTemplate.postForObject(url, null, RecommandCourseView.class);
@@ -122,13 +83,18 @@ public class RecommandCourseRequester {
         }
     }
 
-    //目前为中教的换课
+
+    /**
+     * 终极梦想
+     * @param workOrder
+     * @return
+     */
     public RecommandCourseView changeForeignCourse(WorkOrder workOrder) {
-        String url = String.format("%s/exchange/foreigner/%s/%s", urlConf.getCourse_recommended_service(),
-                workOrder.getStudentId(), workOrder.getCourseId());
+
+        URI url = createUltimateExchangeCourse(workOrder.getStudentId(), workOrder.getRecommendSequence(), workOrder.getCourseId());
         try {
             logger.info("@changeForeignCourse#request发起换课请求,url[{}]", url);
-            RecommandCourseView recommandCourseView = restTemplate.postForObject(url, null, RecommandCourseView.class);
+            RecommandCourseView recommandCourseView = restTemplate.postForObject(url, HttpEntity.EMPTY, RecommandCourseView.class);
             logger.info("@changeForeignCourse#result获取换课结果,url[{}],结果;[{}]", url, JacksonUtil.toJSon(recommandCourseView));
             return recommandCourseView;
         } catch (Exception ex) {
@@ -137,13 +103,25 @@ public class RecommandCourseRequester {
         }
     }
 
+
     public String getThumbNailPath(RecommandCourseView courseView) {
         return String.format("%s%s", urlConf.getThumbnail_server(), courseView.getCover());
     }
 
+    public List<RecommandCourseView> getBatchRecommandCourse(Long studentId) {
+        try {
+            RecommandCourseViews overAllRecommandViews = restTemplate.getForObject(
+                    createOverAllRecommend(studentId), RecommandCourseViews.class);
+            return overAllRecommandViews.getSingle();
+        } catch (Exception e) {
+            throw new BusinessException("调用课程推荐失败");
+        }
+    }
 
-    public RecommandCourseView getRecommandCourse(WorkOrder workOrder) {
-        return getRecommandCourse(workOrder, recommandedCourseService.getCourseIndex(workOrder));
+    public List<RecommandCourseView> getBatch8DreamRecommandCourse(Long studentId) {
+        RecommandCourseViews recommandCourseViews = restTemplate.getForObject(
+                create8BatchDreamRecommend(studentId), RecommandCourseViews.class);
+        return recommandCourseViews.getSingle();
     }
 
 
@@ -162,37 +140,135 @@ public class RecommandCourseRequester {
         }));
     }
 
-    private URI createRecommendUri(Long studentId, String tutorType) {
-        return UriComponentsBuilder
-                .fromUriString(urlConf.getCourse_recommended_service())
-                .path("/online/" + tutorType + "/" + studentId)
-                .build()
-                .toUri();
-    }
 
-
-    /*************** 兼容老版本 ***************/
-    public RecommandCourseView getForeignRecomandCourse(WorkOrder workOrder) {
-        try {
-            RecommandCourseView recommandCourseView = restTemplate.postForObject(
-                    createForeignRecommendUri(workOrder.getStudentId()),
-                    HttpEntity.EMPTY,
-                    RecommandCourseView.class);
-            logger.info("@->->->->->->->获取推荐课成功,返回值:{}", JacksonUtil.toJSon(recommandCourseView));
-            return recommandCourseView;
-        } catch (Exception ex) {
-            logger.error("!!!!!!!!!!!!!!向推荐课发起请求失败[{}]", ex.getMessage(), ex);
-            throw new BusinessException("获取推荐课程失败");
+    /**
+     * 核心素养
+     * @param workOrder
+     * @param predicate
+     * @return
+     */
+    public RecommandCourseView getPromoteRecommend(WorkOrder workOrder, Predicate<WorkOrder> predicate) {
+        if(predicate.test(workOrder)) {
+            return getPromoteRecommend(workOrder);
+        } else {
+            return RecommendCourseType.recommendCN(workOrder.getRecommendSequence());
         }
     }
 
+    /**
+     * 核心素养
+     * @param workorder
+     * @return
+     */
+    public RecommandCourseView getPromoteRecommend(WorkOrder workorder) {
+        return getPromoteRecommend(workorder.getStudentId(), workorder.getRecommendSequence());
+    }
 
-    private URI createForeignRecommendUri(Long studentId) {
-        return UriComponentsBuilder
-                .fromUriString(urlConf.getCourse_recommended_service())
-                .path("/online/foreigner/" + studentId)
+    /**
+     * 核心素养
+     * @param workorder
+     * @return
+     */
+    public RecommandCourseView getPromoteRecommend(Long studentId, int index) {
+        return restTemplate.getForObject(
+                createPromoteRecommend(studentId, index),
+                RecommandCourseView.class);
+    }
+
+    /**
+     * 终极梦想
+     * @param workOrder
+     * @param predicate
+     * @return
+     */
+    public RecommandCourseView getUltimateRecommend(WorkOrder workOrder, Predicate<WorkOrder> predicate) {
+        if(predicate.test(workOrder)) {
+            return getUltimateRecommend(workOrder);
+        } else {
+            return RecommendCourseType.recommendFRN(workOrder.getRecommendSequence());
+        }
+    }
+
+    /**
+     * 终极梦想
+     * @param workorder
+     * @return
+     */
+    public RecommandCourseView getUltimateRecommend(WorkOrder workorder) {
+        return getUltimateRecommend(workorder.getStudentId(), workorder.getRecommendSequence());
+    }
+
+    /**
+     * 终极梦想
+     * @param studentId
+     * @param index
+     * @return
+     */
+    public RecommandCourseView getUltimateRecommend(Long studentId, int index) {
+        return restTemplate.getForObject(
+                createUltimateRecommend(studentId, index),
+                RecommandCourseView.class);
+    }
+
+
+    private URI createOverAllRecommend(Long studentId) {
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
+                .path("/online/" + studentId)
                 .build()
                 .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
+    }
+
+    private URI create8BatchDreamRecommend(Long studentId) {
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
+                .path(String.format("/ultimate/%s", studentId.toString()))
+                .build()
+                .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
+    }
+
+
+    // 核心素养 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/promote/18826/9
+    private URI createPromoteRecommend(Long studentId, int index) {
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
+                .path(String.format("/promote/%s/%s", studentId, index))
+                .build()
+                .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
+    }
+
+    // 终极梦想 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/ultimate/18826/1
+    private URI createUltimateRecommend(Long studentId, int index) {
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
+                .path(String.format("/ultimate/%s/%s", studentId, index))
+                .build()
+                .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
+    }
+
+
+    // 终极梦想换课 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/ultimate/exchange/18826/L3NoYXJlL3N2bi9GdW5jdGlvbiDlhbPliIcvMzEyLuWmguS9leihqOi-vuaLheW_g-afkOS6i--8ny54bHN4
+    private URI createUltimateExchangeCourse(Long studentId, int index, String lessonId) {
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
+                .path(String.format("/ultimate/exchange/%s/%s/%s", studentId.toString(), index, lessonId))
+                .build()
+                .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
+    }
+
+    // 核心素养换课 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/exchange/promote/18826/1/L3NoYXJlL3N2bi9GdW5jdGlvbiDlhbPliIcvMzEyLuWmguS9leihqOi-vuaLheW_g-afkOS6i—8ny54bHN4
+    private URI createPromoteExchangeCourse(Long studentId, int index, String lessonId) {
+        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
+                .path(String.format("/exchange/promote/%s/%s/%s", studentId.toString(), index, lessonId))
+                .build()
+                .toUri();
+        logger.info("recommendURL: [{}]", uri);
+        return uri;
     }
 
 }

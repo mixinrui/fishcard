@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
  * Created by hucl on 16/6/12.
  */
 @Component
+@Deprecated
 public class RecommandedCourseService {
     @Autowired
     private UrlConf urlConf;

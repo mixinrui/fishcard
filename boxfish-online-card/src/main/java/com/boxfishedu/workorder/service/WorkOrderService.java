@@ -1,6 +1,9 @@
 package com.boxfishedu.workorder.service;
 
+import com.boxfishedu.card.bean.TeachingType;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
@@ -13,13 +16,17 @@ import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
+import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.course.ServiceWorkOrderCombination;
 import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
+import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +70,12 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Autowired
     TeacherStudentRequester  teacherStudentRequester;
+
+    @Autowired
+    private WorkOrderLogService workOrderLogService;
+
+    @Autowired
+    private TimePickerService timePickerService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -328,7 +341,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             workOrder.setCourseName(courseView.getCourseName());
             workOrder.setCourseType(courseView.getCourseType());
             workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
-            workOrder.setSkuId(new Long(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType())));
+            workOrder.setSkuId(new Integer(courseType2TeachingTypeService.courseType2TeachingType(workOrder.getCourseType(), TutorType.resolve(workOrder.getService().getTutorType()))));
         }
     }
 
@@ -371,7 +384,6 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         List resultList = query.getResultList();
         return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
     }
-
 
     /**************** 兼容历史版本 **********************/
     @Transactional
@@ -419,6 +431,56 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     public List<WorkOrder> findByStudentIdAndOrderChannelAndStartTimeAfter(Long studentId,String orderChannel,Date date){
         return jpa.findByStudentIdAndOrderChannelAndStartTimeAfter(studentId,orderChannel,date);
+    }
+
+    public String[] enums2StringAray(List<ComboTypeEnum> comboTypeEnums){
+        String[] comboTypes=new String[comboTypeEnums.size()];
+        for(int i=0;i<comboTypeEnums.size();i++){
+            comboTypes[i]=comboTypeEnums.get(i).toString();
+        }
+        return comboTypes;
+    }
+
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums, TeachingType teachingType){
+        return jpa.findByStudentIdAndComboTypeInAndSkuIdAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),teachingType.getCode(),new Date());
+    }
+
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums){
+        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),new Date());
+    }
+
+    public List<WorkOrder> getSelectedLeftAmountNew(Long studentId, List<ComboTypeEnum> comboTypeEnums){
+        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),new Date());
+    }
+
+    public WorkOrder getCardToStart(Long studentId){
+//        return jpa.findTop1ByStudentIdAndStartTimeAfterOrderByStartTime(studentId,new Date());
+        return null;
+    }
+
+    public List<WorkOrder> findFreezeCardsToUpdate() {
+        return jpa.findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(new Integer(1),new Short((short)0),FishCardStatusEnum.WAITFORSTUDENT.getCode(),new Date());
+    }
+
+    //课程类型发生变化后修改教师
+    public void changeTeacherForTypeChanged(WorkOrder workOrder){
+        logger.debug("@changeTeacherForTypeChanged#{}课程类型发生变化向师生运营发起判断是否换课请求",workOrder.getId());
+        workOrderLogService.saveWorkOrderLog(workOrder,"课程类型发生变化,向师生运营发起判断是否换课请求");
+        Boolean result=teacherStudentRequester.changeTeacherForTypeChanged(workOrder);
+        if(BooleanUtils.isFalse(result)){
+            logger.debug("@changeTeacherForTypeChanged#{}#result#{}",workOrder.getId(),result.booleanValue());
+            workOrderLogService.saveWorkOrderLog(workOrder,"课程类型变化,教师能上此种类型课程");
+            return;
+        }
+        logger.debug("@changeTeacherForTypeChanged#{}#result#{}",workOrder.getId(),result.booleanValue());
+        Long oldTeacherId=workOrder.getTeacherId();
+        workOrderLogService.saveWorkOrderLog(workOrder,"课程类型变化,教师不能上此种类型课程,需要更换教师,旧教师:"+oldTeacherId);
+        workOrder.setTeacherId(0l);
+        workOrder.setTeacherName(null);
+        CourseSchedule courseSchedule=courseScheduleService.findByWorkOrderId(workOrder.getId());
+        courseSchedule.setTeacherId(0l);
+        saveWorkOrderAndSchedule(workOrder,courseSchedule);
+        timePickerService.getRecommandTeachers(workOrder);
     }
 
 }

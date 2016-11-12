@@ -88,4 +88,17 @@ public class RabbitMqConstant {
     //退款队列名称
     public static final String RECHARGE_WORKORDER_QUEUE= "boxfish.fishcard.recharge.queue";
 
+    /** 短信que end **/
+    public static final String SHORT_MESSAGE_TEMPLATE_NAME = "com.boxfishedu.teaching.send_sms_queue";
+    public static final String SHORT_MESSAGE_REPLY_TEMPLATE_NAME = "com.boxfishedu.teaching.send_sms_queue.reply";
+    /** 短信que end **/
+
+    /**同步鱼卡信息到客服系统**/
+    public static final String SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME = "com.boxfishedu.sync_fishcard_template_name";
+    public static final String SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE="com.boxfishedu.sync_fishcard_queue";
+
+    /**同步外教点评到客服系统**/
+    public static final String SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME = "com.boxfishedu.sync_commentcard_template_name";
+    public static final String SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE="com.boxfishedu.sync_commentcard_queue";
+
 }

@@ -2,6 +2,8 @@ package com.boxfishedu.workorder.web.filter;
 
 
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -12,6 +14,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -33,17 +36,12 @@ public class UserIdComparison {
      * @param accessToken
      * @return
      */
-    public Long getUserId(String accessToken){
+    public Long getUserId(String accessToken) throws IOException {
         if(StringUtils.isNotBlank(accessToken)) {
-            Map<String, Object> map = null;
-            try {
-                map = getUserMap(accessToken);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Map<String, Object> map = getUserMap(accessToken);
             return MapUtils.getLong(map,"id");
         }
-        return null;
+        throw new UnauthorizedException();
     }
 
     private Map<String, Object> getUserMap(String accessToken) throws IOException {
@@ -52,9 +50,15 @@ public class UserIdComparison {
         logger.debug("token_url: " + tempUrl);
         HttpGet httpGet = new HttpGet(tempUrl);
         HttpResponse response = httpClient.execute(httpGet);
+        int status = response.getStatusLine().getStatusCode();
+        if(status == HttpStatus.NOT_FOUND.value()) {
+            throw new UnauthorizedException();
+        } else if(status != HttpStatus.OK.value()) {
+            throw new BusinessException();
+        }
+
         ObjectMapper objectMapper = new ObjectMapper();
-        Map<String, Object> map = objectMapper.readValue(response.getEntity().getContent(), Map.class);
-        return map;
+        return objectMapper.readValue(response.getEntity().getContent(), Map.class);
     }
 
 }

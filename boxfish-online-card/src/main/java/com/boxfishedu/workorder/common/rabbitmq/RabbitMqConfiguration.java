@@ -38,6 +38,7 @@ public class RabbitMqConfiguration {
     public static final String FOREIGN_COMMENT_EXCHANGE="foreign-comment-exchange";
     public static final String DEAD_LETTER_EXCHANGE_ROUTING_KEY="x-dead-letter-routing-key";
     public static final String AMQ_DIRECT_EXCHANGE="amq.direct";
+    public static final String SYNC_COMMENT_2_SYSTEM_EXCHANGE="sync-comment-2-system-exchange";
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -75,6 +76,11 @@ public class RabbitMqConfiguration {
         return new DirectExchange(FOREIGN_COMMENT_EXCHANGE, true, false);
     }
 
+    @Bean(name=SYNC_COMMENT_2_SYSTEM_EXCHANGE)
+    public Exchange syncComment2SystemExchange(){
+        return new DirectExchange(SYNC_COMMENT_2_SYSTEM_EXCHANGE, true, false);
+    }
+
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory, Exchange exchange) {
         RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
@@ -84,6 +90,15 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareExchange(scheduleExchange());
         rabbitAdmin.declareExchange(delayExchange());
         rabbitAdmin.declareExchange(foreignCommentExchange());
+        rabbitAdmin.declareExchange(syncComment2SystemExchange());
+
+
+        /**
+         *  发送短信队列
+         */
+        Queue notifyMessageQueue = new Queue(RabbitMqConstant.SHORT_MESSAGE_TEMPLATE_NAME, true);
+        rabbitAdmin.declareQueue(notifyMessageQueue);
+        Binding notifyMessageQueueBinding = BindingBuilder.bind(notifyMessageQueue).to(directExchange()).with(RabbitMqConstant.SHORT_MESSAGE_TEMPLATE_NAME).noargs();
 
         /**
          * 通知订单退款申请
@@ -218,7 +233,22 @@ public class RabbitMqConfiguration {
          */
         Queue updatePictureQueue = new Queue(RabbitMqConstant.UPDATE_PICTURE_QUEUE, true);
         rabbitAdmin.declareQueue(updatePictureQueue);
-        Binding updatePictureQueueBinding = BindingBuilder.bind(updatePictureQueue).to(foreignCommentExchange()).with(RabbitMqConstant.UPDATE_PICTURE_QUEUE).noargs();
+        Binding updatePictureQueueBinding = BindingBuilder.bind(updatePictureQueue).to(directExchange()).with(RabbitMqConstant.UPDATE_PICTURE_QUEUE).noargs();
+
+        /**
+         * 同步鱼卡信息到客服系统
+         */
+        Queue syncFishCard2CustomerServiceQueue = new Queue(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE, true);
+        rabbitAdmin.declareQueue(syncFishCard2CustomerServiceQueue);
+        Binding syncFishCard2CustomerServiceQueueBinding = BindingBuilder.bind(syncFishCard2CustomerServiceQueue).to(directExchange()).with(RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE).noargs();
+
+        /**
+         * 同步外教点评到客服系统
+         */
+        Queue syncCommentCard2CustomerServiceQueue = new Queue(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE, true);
+        rabbitAdmin.declareQueue(syncCommentCard2CustomerServiceQueue);
+        Binding syncCommentCard2CustomerServiceQueueBinding = BindingBuilder.bind(syncCommentCard2CustomerServiceQueue).to(syncComment2SystemExchange()).with(RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE).noargs();
+
 
         rabbitAdmin.declareBinding(unassignedTeacherFailQueueBinding);
         rabbitAdmin.declareBinding(notifyOrderQueueBinding);
@@ -237,6 +267,9 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareDealerQueueBinding);
         rabbitAdmin.declareBinding(updatePictureQueueBinding);
         rabbitAdmin.declareBinding(notifyRechargeWorkOrderQueueBinding);
+        rabbitAdmin.declareBinding(notifyMessageQueueBinding); /** 短信 **/
+        rabbitAdmin.declareBinding(syncFishCard2CustomerServiceQueueBinding);/**同步鱼卡信息到客服系统**/
+        rabbitAdmin.declareBinding(syncCommentCard2CustomerServiceQueueBinding);/**同步外教点评到客服系统**/
         return rabbitAdmin;
     }
 
@@ -300,6 +333,18 @@ public class RabbitMqConfiguration {
         template.setExchange(NOTIFICATION_TASK_EXCHANGE);
         return template;
     }
+
+    /**
+     * 发送短信 template
+     */
+    @Bean(name = RabbitMqConstant.SHORT_MESSAGE_REPLY_TEMPLATE_NAME)
+    public RabbitTemplate notifyMessageTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SHORT_MESSAGE_TEMPLATE_NAME);
+        template.setExchange(NOTIFICATION_TASK_EXCHANGE);
+        return template;
+    }
+
+
 
     /**
      *定时器回复template
@@ -427,6 +472,36 @@ public class RabbitMqConfiguration {
     public RabbitTemplate notifyOrderPrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
         RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.RECHARGE_WORKORDER_QUEUE);
         template.setExchange(DELAY_QUEUE_EXCHANGE);
+        return template;
+    }
+
+    /**
+     *通知订单退款
+     */
+    @Bean(name = RabbitMqConstant.SHORT_MESSAGE_REPLY_TEMPLATE_NAME)
+    public RabbitTemplate syncFishCard2CustomerServiceTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SHORT_MESSAGE_TEMPLATE_NAME);
+        template.setExchange(NOTIFICATION_TASK_EXCHANGE);
+        return template;
+    }
+
+    /**
+     *同步鱼卡数据到客服系统
+     */
+    @Bean(name = RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)
+    public RabbitTemplate notifyMessagePrepareTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_FISHCARD_2_CUSTOMERSERVICE_QUEUE);
+        template.setExchange(NOTIFICATION_TASK_EXCHANGE);
+        return template;
+    }
+
+    /**
+     *同步外教点评到客服系统
+     */
+    @Bean(name = RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME)
+    public RabbitTemplate syncCommentCard2CustomerServiceTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE);
+        template.setExchange(SYNC_COMMENT_2_SYSTEM_EXCHANGE);
         return template;
     }
 

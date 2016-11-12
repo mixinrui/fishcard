@@ -27,11 +27,13 @@ public class CommentCardLogDto {
         logs.put("创建", firstCommentCard.getStudentAskTime());
 
         if(Objects.nonNull(firstCommentCard.getTeacherId())) {
-            logs.put("分配老师" + firstCommentCard.getId() + ":" + firstCommentCard.getTeacherName(), new Date());
+            logs.put("分配老师" + firstCommentCard.getId() + ":" + firstCommentCard.getTeacherName(),
+                    firstCommentCard.getAssignTeacherTime());
         }
 
         // 中间值
-        commentCardList.forEach( card -> logs.put("分配老师" + card.getId() + ":" + card.getTeacherName(), new Date()));
+        commentCardList.forEach( card -> logs.put("分配老师" + card.getId() + ":" + card.getTeacherName(),
+                card.getAssignTeacherTime()));
         CommentCard latestCommentCard = commentCardList.get(commentCardList.size() - 1);
 
         // 最后一个
@@ -53,7 +55,8 @@ public class CommentCardLogDto {
         logs = Maps.newLinkedHashMap();
         logs.put("创建", firstCommentCard.getStudentAskTime());
         if(Objects.nonNull(firstCommentCard.getTeacherId())) {
-            logs.put("分配老师" + firstCommentCard.getId() + ":" + firstCommentCard.getTeacherName(), new Date());
+            logs.put("分配老师" + firstCommentCard.getId() + ":" + firstCommentCard.getTeacherName(),
+                    firstCommentCard.getAssignTeacherTime());
         }
         if(Objects.nonNull(firstCommentCard.getTeacherAnswerTime())) {
             logs.put("已点评", firstCommentCard.getTeacherAnswerTime());

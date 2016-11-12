@@ -12,6 +12,8 @@ import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.absenteeism.AbsenteeismService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
+import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
@@ -25,8 +27,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.lang.annotation.ElementType;
 import java.util.Date;
 import java.util.Map;
 
@@ -34,6 +41,8 @@ import java.util.Map;
  * Created by hucl on 16/4/15.
  */
 @Component
+@Configuration
+@Profile({"local_hucl","product","local","development","development_new","test","demo","pretest"})
 public class RabbitMqReciver {
     @Autowired
     private OrderRelatedServiceX orderRelatedServiceX;
@@ -74,6 +83,12 @@ public class RabbitMqReciver {
     @Autowired
     private AbsenteeismService absenteeismService;
 
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
+    @Autowired
+    private OnlineAccountService onlineAccountService;
+
     /**
      * 订单中心转换请求
      */
@@ -87,11 +102,10 @@ public class RabbitMqReciver {
             logger.error("订单[{}]转换失败", orderView.getId());
 //            throw new Exception("转换失败放回队列");
         }
-//        logger.info("收到来自订单中心的转换请求,订单id:[{}]",orderView.getId());
-//        orderRelatedServiceX.preHandleOrder(orderView);
-////        orderRelatedServiceX.order2ServiceAndWorkOrder(orderView);
-//        System.out.println("##############");
-//        return null;
+
+        //更新首页和用户信息
+        dataCollectorService.updateBothChnAndFnItemAsync(orderView.getUserId());
+        onlineAccountService.add(orderView.getUserId());
     }
 
 
@@ -168,8 +182,14 @@ public class RabbitMqReciver {
             }else if(serviceTimerMessage.getType() == TimerMessageType.STUDENT_ABSENT_DEDUCT_SCORE.value()){
                 logger.info("@CommentCardTimer>>>>>STUDENT_ABSENT_DEDUCT_SCORE>>>>查询旷课的学生,扣积分");
                 absenteeismService.queryAbsentStudent();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.CLASSS_TODY_TEA_NOTIFY.value()){
+                logger.info("=========>notifyTomoStudentHasClass=====>>>>通知老师今天有课");
+                courseNotifyOneDayServiceX.notiFyTeacherClass();
+            }else if(serviceTimerMessage.getType()==TimerMessageType.FREEZE_UPDATE_HOME.value()){
+                courseScheduleUpdatorServiceX.freezeUpdateHome();
+            } else if(serviceTimerMessage.getType() == TimerMessageType.RECOMMEND_COURSES.value()) {
+                courseScheduleUpdatorServiceX.recommendCourses();
             }
-
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);

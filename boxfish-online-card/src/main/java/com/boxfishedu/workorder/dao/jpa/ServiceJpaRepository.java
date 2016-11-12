@@ -1,10 +1,13 @@
 package com.boxfishedu.workorder.dao.jpa;
 
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
+import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
@@ -39,6 +42,9 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     @Query("select s from Service s where s.studentId=?1 and s.productType=?2")
     List<Service> getForeignCommentServiceCount(long studentId, int productType);
 
+    @Query("select s from Service s where s.studentId=?1 and s.coursesSelected=?2")
+    List<Service> getServiceSelectedStatus(long studentId,int coursesSelected);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0")
     Page<Service> getFirstAvailableForeignCommentService(long studentId, int productType, Pageable pageable);
@@ -51,4 +57,22 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     /*********兼容老版本*************/
     Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
+
+    List<Service> findByStudentIdAndCoursesSelected(Long studentId,Integer coursesSelected);
+
+    List<Service> findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelectedAndProductType(Long studentId, String comboType,String tutorType,Integer selectedFlag,Integer productType);
+
+    List<Service> findByStudentIdAndComboTypeInAndTutorTypeAndCoursesSelectedAndProductType(Long studentId, String[] comboTypes,String tutorType,Integer selectedFlag,Integer productType);
+
+    List<Service> findByStudentIdAndComboTypeAndCoursesSelectedAndProductType(Long studentId, String comboType ,Integer selectedFlag,Integer productType);
+
+    List<Service> findByStudentIdAndComboTypeInAndCoursesSelectedAndProductType(Long studentId, String[] comboType ,Integer selectedFlag,Integer productType);
+
+    //查找出学生所有状态的工单
+    @Query("select distinct sv.studentId from Service sv")
+    public List<Long> findDistinctUsersFromService();
+
+    //初始化客服系统中外教点评
+    @Query("SELECT s FROM Service s where s.productType = '1002'")
+    List<Service> findByProductType();
 }

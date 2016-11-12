@@ -40,8 +40,9 @@ public class FishCardMakeUpService {
         if(status!= FishCardStatusEnum.TEACHER_ABSENT.getCode()){
             if(status!=FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()){
                 if(status<FishCardStatusEnum.EXCEPTION.getCode()){
-                    logger.info("鱼卡[{}]的状态[{}]不允许换课",oldWorkOrder.getId(),FishCardStatusEnum.getDesc(oldWorkOrder.getStatus()));
-                    throw new BusinessException(msgTips);
+                    // 补课控制逻辑
+                    //logger.info("鱼卡[{}]的状态[{}]不允许换课",oldWorkOrder.getId(),FishCardStatusEnum.getDesc(oldWorkOrder.getStatus()));
+                    //throw new BusinessException(msgTips);
                 }
             }
         }

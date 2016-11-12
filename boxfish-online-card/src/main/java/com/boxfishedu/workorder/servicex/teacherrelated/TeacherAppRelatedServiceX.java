@@ -144,7 +144,8 @@ public class TeacherAppRelatedServiceX {
         return map;
     }
 
-    public MonthTimeSlots getScheduleByIdAndDateRange(Long teacherId, YearMonth yearMonth, Integer count) {
+    public MonthTimeSlots getScheduleByIdAndDateRange(Long teacherId, YearMonth yearMonth,
+                                                      Integer count, Locale locale) {
         DateRangeForm dateRangeForm;
         // 如果没有指定查询的年月,则默认查询半年的数据
         if (yearMonth == null) {
@@ -170,7 +171,7 @@ public class TeacherAppRelatedServiceX {
         Map<String, Map<String, CourseSchedule>> courseScheduleMap = courseSchedule(teacherId, dateRangeForm);
 
         // 3 覆盖处理
-        resultMonthTimeSlots.override(courseScheduleMap, serviceSDK);
+        resultMonthTimeSlots.override(courseScheduleMap, serviceSDK, locale);
 
         return resultMonthTimeSlots.filter(
                 // 第一个条件为当前时间之前
@@ -181,7 +182,7 @@ public class TeacherAppRelatedServiceX {
     }
 
 
-    public JsonResultModel getScheduleByIdAndDate(Long teacherId, Date date) {
+    public JsonResultModel getScheduleByIdAndDate(Long teacherId, Date date, Locale locale) {
         logger.info("用户[{}]发起获取{}课程请求", teacherId, date);
 
         // 1 获取一天老师选择的时间片
@@ -204,7 +205,7 @@ public class TeacherAppRelatedServiceX {
                 .findByClassDateAndTeacherId(date, teacherId);
 
         // 3 覆盖
-        dayTimeSlots.override(courseScheduleList, serviceSDK);
+        dayTimeSlots.override(courseScheduleList, serviceSDK, locale);
         return JsonResultModel.newJsonResultModel(timeLimitPolicy.limit(dayTimeSlots).filter(
                 d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
                 t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()
@@ -228,7 +229,7 @@ public class TeacherAppRelatedServiceX {
         return courseScheduleService.groupCourseScheduleByDate(courseSchedules);
     }
 
-    public JsonResultModel getScheduleAssignedByIdAndDate(Long teacherId, Date date) {
+    public JsonResultModel getScheduleAssignedByIdAndDate(Long teacherId, Date date, Locale locale) {
         List<CourseSchedule> courseScheduleList = courseScheduleService
                 .findByClassDateAndTeacherId(date, teacherId);
         if (CollectionUtils.isEmpty(courseScheduleList)) {
@@ -244,7 +245,7 @@ public class TeacherAppRelatedServiceX {
             timeSlots.setEndTime(time.getEndTime());
             timeSlots.setSelected(true);
             if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-                timeSlots.setCourseView(serviceSDK.getCourseInfo(courseSchedule.getId()));
+                timeSlots.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
             }
         });
         return JsonResultModel.newJsonResultModel(dayTimeSlots);
@@ -323,7 +324,7 @@ public class TeacherAppRelatedServiceX {
         return dayTimeSlots;
     }
 
-    public JsonResultModel getInternationalScheduleByIdAndDate(Long teacherId, Date date) throws CloneNotSupportedException {
+    public JsonResultModel getInternationalScheduleByIdAndDate(Long teacherId, Date date, Locale locale) throws CloneNotSupportedException {
         logger.info("用户[{}]发起获取{}课程请求", teacherId, date);
 
         // 1 获取一天老师选择的时间片
@@ -346,7 +347,7 @@ public class TeacherAppRelatedServiceX {
                 .map(d -> this.filterInternationalDayTimeSlots(d, getInternationalDateTimeRange(date)))
                 .filter(this::notEmptyPredicate)
                 // 3 覆盖,课程信息覆盖
-                .peek(d -> d.override(courseScheduleList, serviceSDK))
+                .peek(d -> d.override(courseScheduleList, serviceSDK, locale))
                 // 历史日期时间片过滤,只显示有课的
                 .map(dayTimeSLots -> dayTimeSLots.filter(
                         d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),

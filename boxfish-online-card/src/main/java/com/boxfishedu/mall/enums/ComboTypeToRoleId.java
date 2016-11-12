@@ -15,7 +15,10 @@ public enum ComboTypeToRoleId {
     CRITIQUE_CN(1),
     CRITIQUE(2),
     EXCHANGE(3),
-    UNKNOW(-1);
+    UNKNOW(-1),
+    EXPERIENCE(3),
+    // 只能套餐
+    INTELLIGENT(3);
 
     private int value;
 
@@ -31,15 +34,8 @@ public enum ComboTypeToRoleId {
         if(StringUtils.isBlank(comboType)) {
             return UNKNOW;
         }
-        switch (comboType) {
-            case "OVERALL": return OVERALL;
-            case "FOREIGN": return FOREIGN;
-            case "CHINESE": return CHINESE;
-            case "CRITIQUE_CN": return CRITIQUE_CN;
-            case "CRITIQUE": return CRITIQUE;
-            case "EXCHANGE" : return EXCHANGE;
-            default: return UNKNOW;
-        }
+        ComboTypeToRoleId result = ComboTypeToRoleId.valueOf(comboType);
+        return result == null ? UNKNOW : result;
     }
 
 }

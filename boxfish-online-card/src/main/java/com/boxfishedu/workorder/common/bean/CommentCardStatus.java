@@ -4,6 +4,7 @@ package com.boxfishedu.workorder.common.bean;
  * Created by ansel on 16/7/18.
  */
 public enum CommentCardStatus {
+    UNASKED(0,"未提问"),
     ASKED(100,"已提问"),
     REQUEST_ASSIGN_TEACHER(200,"请求分配教师"),
     ASSIGNED_TEACHER(300,"已分配教师"),

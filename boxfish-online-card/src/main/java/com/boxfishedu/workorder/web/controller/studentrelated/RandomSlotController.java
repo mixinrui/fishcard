@@ -185,28 +185,47 @@ public class RandomSlotController {
             TimeLimitRules timeLimitRules1 = new TimeLimitRules();
             timeLimitRules1.setComboType("FOREIGN");
             timeLimitRules1.setDay(i);
-            timeLimitRules1.setLimitMini("20:00:00");
+            timeLimitRules1.setLimitMini("19:00:00");
             timeLimitRules1.setLimitMax("22:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.RANGE.toString());
+
+            //chinese
+            TimeLimitRules timeLimitRules2=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules2);
+            timeLimitRules2.setComboType("CHINESE");
+
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
+            timeLimitRulesMorphiaRepository.save(timeLimitRules2);
         }
 
         { //周六
             TimeLimitRules timeLimitRules1 = new TimeLimitRules();
             timeLimitRules1.setComboType("FOREIGN");
             timeLimitRules1.setDay(6);
-            timeLimitRules1.setLimitMini("08:00:00");
-            timeLimitRules1.setLimitMax("10:55:00");
+            timeLimitRules1.setLimitMini("09:00:00");
+            timeLimitRules1.setLimitMax("11:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.RANGE.toString());
+
+            TimeLimitRules timeLimitRules11=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules11);
+            timeLimitRules11.setComboType("CHINESE");
+
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
+            timeLimitRulesMorphiaRepository.save(timeLimitRules11);
 
             TimeLimitRules timeLimitRules2 = new TimeLimitRules();
             timeLimitRules2.setComboType("FOREIGN");
             timeLimitRules2.setDay(6);
-            timeLimitRules2.setLimitMini("15:00:00");
+            timeLimitRules2.setLimitMini("19:00:00");
             timeLimitRules2.setLimitMax("22:55:00");
             timeLimitRules2.setRule(SlotRuleEnum.RANGE.toString());
+
+            TimeLimitRules timeLimitRules21=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules2,timeLimitRules21);
+            timeLimitRules21.setComboType("CHINESE");
+
             timeLimitRulesMorphiaRepository.save(timeLimitRules2);
+            timeLimitRulesMorphiaRepository.save(timeLimitRules21);
         }
 
         {
@@ -214,18 +233,30 @@ public class RandomSlotController {
             TimeLimitRules timeLimitRules1 = new TimeLimitRules();
             timeLimitRules1.setComboType("FOREIGN");
             timeLimitRules1.setDay(0);
-            timeLimitRules1.setLimitMini("08:00:00");
-            timeLimitRules1.setLimitMax("10:55:00");
+            timeLimitRules1.setLimitMini("09:00:00");
+            timeLimitRules1.setLimitMax("11:55:00");
             timeLimitRules1.setRule(SlotRuleEnum.RANGE.toString());
+
+            TimeLimitRules timeLimitRules11=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules1,timeLimitRules11);
+            timeLimitRules11.setComboType("CHINESE");
+
             timeLimitRulesMorphiaRepository.save(timeLimitRules1);
+            timeLimitRulesMorphiaRepository.save(timeLimitRules11);
 
             TimeLimitRules timeLimitRules2 = new TimeLimitRules();
             timeLimitRules2.setComboType("FOREIGN");
             timeLimitRules2.setDay(0);
-            timeLimitRules2.setLimitMini("15:00:00");
+            timeLimitRules2.setLimitMini("19:00:00");
             timeLimitRules2.setLimitMax("22:55:00");
             timeLimitRules2.setRule(SlotRuleEnum.RANGE.toString());
+
+            TimeLimitRules timeLimitRules21=new TimeLimitRules();
+            BeanUtils.copyProperties(timeLimitRules2,timeLimitRules21);
+            timeLimitRules21.setComboType("CHINESE");
+
             timeLimitRulesMorphiaRepository.save(timeLimitRules2);
+            timeLimitRulesMorphiaRepository.save(timeLimitRules21);
         }
         return JsonResultModel.newJsonResultModel("ok");
     }

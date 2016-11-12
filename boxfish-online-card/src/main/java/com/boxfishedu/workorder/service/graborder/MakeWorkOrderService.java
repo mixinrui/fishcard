@@ -105,7 +105,7 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
 
     public void  deleteGrabData(List<WorkOrderGrab> list){
         logger.info("删除grab数据");
-        workOrderGrabJpaRepository.delete(list);
+        workOrderGrabJpaRepository.deleteInBatch(list);
     }
 
     public void initGrabOrderHistory(List<WorkOrderGrabHistory> list){

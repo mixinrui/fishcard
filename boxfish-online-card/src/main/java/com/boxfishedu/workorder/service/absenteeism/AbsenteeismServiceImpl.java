@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.service.absenteeism;
 
-import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.config.ServiceGateWayType;
@@ -47,11 +46,15 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
         LocalDateTime now = LocalDateTime.now();
         List<WorkOrder> workOrderList = null;
         if (serviceGateWayType.getType().equals("test") || serviceGateWayType.getType().equals("development_new")){
-            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(5)),DateUtil.localDate2Date(now.minusMinutes(0)), ComboTypeEnum.EXCHANGE.toString());
+            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(30)),DateUtil.localDate2Date(now.minusMinutes(0)), ComboTypeEnum.EXCHANGE.toString());
 
         }else{
-            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(1)),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
+            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.String2Date("2016-09-20 00:00:00"),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
         }
+//        else{
+//            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(1)),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
+//        }
+        int sum = 0;
         for (WorkOrder workOrder: workOrderList) {
             logger.info("@queryAbsentStudent Deducting score " + workOrder.getId());
             Map map = absenteeismDeductScore(workOrder);
@@ -60,8 +63,55 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
                 if ( map.get("success").equals("true")) {
                     workOrder.setDeductScoreStatus(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
                     workOrderJpaRepository.save(workOrder);
+                    logger.info("@queryAbsentStudent Deducted score and id was "+ workOrder.getId());
+                    sum += 1;
                 }
             }
         }
+        logger.info("@queryAbsentStudent Deducting score succeed! Sum ="+ sum);
+    }
+
+    @Override
+    public int testQueryAbsentStudent() {
+        LocalDateTime now = LocalDateTime.now();
+        List<WorkOrder> workOrderList =  workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(30)),DateUtil.localDate2Date(now.minusMinutes(0)), ComboTypeEnum.EXCHANGE.toString());
+        int sum = 0;
+        for (WorkOrder workOrder: workOrderList) {
+            logger.info("@testQueryAbsentStudent Deducting score " + workOrder.getId());
+            Map map = absenteeismDeductScore(workOrder);
+            logger.info("@testQueryAbsentStudent Deducted result:" + map);
+            if(!ObjectUtils.isEmpty(map)){
+                if ( map.get("success").equals("true")) {
+                    workOrder.setDeductScoreStatus(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
+                    workOrderJpaRepository.save(workOrder);
+                    logger.info("@testQueryAbsentStudent Deducted score and id was "+ workOrder.getId());
+                    sum += 1;
+                }
+            }
+        }
+        logger.info("@testQueryAbsentStudent Deducting score succeed! Sum ="+ sum);
+        return sum;
+    }
+
+    @Override
+    public int productQueryAbsentStudent() {
+        LocalDateTime now = LocalDateTime.now();
+        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.String2Date("2016-09-20 00:00:00"),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
+        int sum = 0;
+        for (WorkOrder workOrder: workOrderList) {
+            logger.info("@handleQueryAbsentStudent Deducting score " + workOrder.getId());
+            Map map = absenteeismDeductScore(workOrder);
+            logger.info("@handleQueryAbsentStudent Deducted result:" + map);
+            if(!ObjectUtils.isEmpty(map)){
+                if ( map.get("success").equals("true")) {
+                    workOrder.setDeductScoreStatus(FishCardStatusEnum.DEDUCT_SCORE_STATUS.getCode());
+                    workOrderJpaRepository.save(workOrder);
+                    logger.info("@productQueryAbsentStudent Deducted score and id was "+ workOrder.getId());
+                    sum += 1;
+                }
+            }
+        }
+        logger.info("@productQueryAbsentStudent Deducting score succeed! Sum ="+ sum);
+        return sum;
     }
 }

@@ -3,6 +3,7 @@ package com.boxfishedu.mall.domain.product;
 import com.boxfishedu.mall.common.BaseEntity;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.Flag;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Data(staticConstructor = "getInstance")
 @EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductCombo extends BaseEntity {
 
     private static final long serialVersionUID = 884403589206290959L;
@@ -39,4 +41,7 @@ public class ProductCombo extends BaseEntity {
 
     @Transient
     private List<ProductComboDetail> comboDetails;
+
+    @Transient
+    private List<ComboDurations> comboDurations;
 }

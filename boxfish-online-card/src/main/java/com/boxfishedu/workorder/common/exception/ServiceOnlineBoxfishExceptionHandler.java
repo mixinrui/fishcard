@@ -44,6 +44,11 @@ public class ServiceOnlineBoxfishExceptionHandler {
         return boxfishExceptionReturn(e);
     }
 
+    @ExceptionHandler(value = NotFoundException.class)
+    public Object notFoundException(NotFoundException e) {
+        return boxfishExceptionReturn(e);
+    }
+
     /**
      * 业务异常
      *

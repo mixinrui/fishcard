@@ -197,6 +197,7 @@ public class FishCardUpdatorServiceX {
         }
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         if (null == courseSchedule) {
+            logger.error("无对应的courseschedule,鱼卡[{" + fishCardDelayMessage.getId() + "}]");
             throw new BusinessException("无对应的courseschedule,鱼卡[{" + fishCardDelayMessage.getId() + "}]");
         }
         if (!workOrder.getStatus().equals(fishCardDelayMessage.getStatus())) {
