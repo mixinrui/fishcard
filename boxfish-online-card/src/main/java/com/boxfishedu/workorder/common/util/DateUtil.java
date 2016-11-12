@@ -35,6 +35,10 @@ public class DateUtil {
         return date;
     }
 
+    public static LocalDateTime string2LocalDateTime(String dateStr){
+       return convertLocalDateTime(String2Date(dateStr));
+    }
+
     public static String Date2ForForeignDate(Date date) {
         return new SimpleDateFormat(" HH:mm,MM/dd ").format(date);
     }
@@ -318,6 +322,17 @@ public class DateUtil {
         return  ((int)( l / (24 * 60 * 60 * 1000)) -1);
     }
 
+    public static int getBetweenMinus(Date begin, Date end) {
+        long l = end.getTime() - begin.getTime();
+        return  ((int)( l / ( 60 * 1000)) -1);
+    }
+
+    public static void main(String[] args) throws ParseException {
+        System.out.println(getBetweenMinus(String2Date("2016-10-28 19:00:00"),String2Date("2016-10-29 19:20:30")));
+    }
+
+
+
     /**
      * 48小时以内
      * @param dateTime
@@ -343,8 +358,8 @@ public class DateUtil {
     }
 
 
-    public static void main(String[] args) throws ParseException {
-        System.out.println("withIn=" + within72Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-28 19:00:00")));
-    }
+//    public static void main(String[] args) throws ParseException {
+//        System.out.println("withIn=" + within72Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-28 19:00:00")));
+//    }
 
 }

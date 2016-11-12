@@ -194,6 +194,10 @@ public class WorkOrder{
     @Column(name = "combo_type", nullable = true)
     private String comboType;
 
+    //class_type[区分该鱼卡的生成方式,传统方式?实时上课?]
+    @Column(name = "class_type", nullable = true)
+    private String classType;
+
     @Transient
     private Boolean freezeBtnShowFlag=false;
 

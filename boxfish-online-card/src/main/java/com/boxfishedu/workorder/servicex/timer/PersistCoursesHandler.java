@@ -42,7 +42,7 @@ public class PersistCoursesHandler {
 
         // 记鱼卡日志
         workOrderLogService.saveWorkOrderLog(workOrder,
-                String.format("定时课程推荐,类型:[%s],课程Id:[%s],课程名:[%s]",
+                String.format("课程推荐,类型:[%s],课程Id:[%s],课程名:[%s]",
                         courseView.getCourseType(), courseView.getCourseId(), courseView.getCourseName()));
 
         // 保存课表数据

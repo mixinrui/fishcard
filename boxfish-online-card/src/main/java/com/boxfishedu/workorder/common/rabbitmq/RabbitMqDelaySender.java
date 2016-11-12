@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.common.rabbitmq;
 
 import com.boxfishedu.workorder.common.bean.FishCardDelayMessage;
 import com.boxfishedu.workorder.common.bean.FishCardDelayMsgType;
+import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.service.FishCardStatusService;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,16 +18,22 @@ import org.springframework.stereotype.Component;
 public class RabbitMqDelaySender {
     @Autowired
     private @Qualifier(RabbitMqConstant.DELAY_QUEUE_TEACHER_ABSENT_TEMPLATE_NAME) RabbitTemplate rabbitDelayTeacherTemplate;
+
     @Autowired
     private @Qualifier(RabbitMqConstant.DELAY_QUEUE_STUDENT_ABSENT_TEMPLATE_NAME) RabbitTemplate rabbitDelayStudentTemplate;
+
     @Autowired
     private @Qualifier(RabbitMqConstant.DELAY_QUEUE_FORCE_COMPLETE_TEMPLATE_NAME) RabbitTemplate rabbitDelayForceCompleteTemplate;
+
+    @Autowired
+    private @Qualifier(RabbitMqConstant.DELAY_QUEUE_INSTANT_CLASS_TEMPLATE_NAME) RabbitTemplate rabbitDelayInstantClassTemplate;
 
     @Autowired
     private @Qualifier(RabbitMqConstant.DELAY_QUEUE_NOTIFY_TEACHER_PREPARE_TEMPLATE_NAME) RabbitTemplate rabbitDelayPrepareClassTemplate;
 
     @Autowired
     private Jackson2JsonMessageConverter jackson2JsonMessageConverter;
+
     @Autowired
     private FishCardStatusService fishCardStatusService;
 
@@ -59,5 +66,10 @@ public class RabbitMqDelaySender {
             rabbitDelayPrepareClassTemplate.send(RabbitMqConstant.DELAY__NOTIFY_TEACHER_PREPARE_QUEUE,
                     jackson2JsonMessageConverter.toMessage(fishCardDelayMessage, messageProperties));
         }
+    }
+
+    public void sendInstantClassMsg(InstantClassCard instantClassCard, MessageProperties messageProperties){
+        rabbitDelayInstantClassTemplate.send(RabbitMqConstant.DELAY_INSTANT_CLASS_QUEUE,
+                jackson2JsonMessageConverter.toMessage(instantClassCard, messageProperties));
     }
 }

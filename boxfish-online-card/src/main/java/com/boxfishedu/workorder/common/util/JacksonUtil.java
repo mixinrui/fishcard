@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JacksonUtil {
 
     public static ObjectMapper objectMapper = new ObjectMapper();
-    ;
 
     public static <T> T readValue(String jsonStr, Class<T> valueType) {
 
