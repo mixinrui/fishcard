@@ -69,7 +69,7 @@ public class CommentCardTeacherAppService {
 
     public CommentCard checkTeacher(Long id, Long teacherId){
         logger.info("###checkTeacher###" + "id=" + id + ", teacherId=" + teacherId);
-        return commentCardJpaRepository.findByIdAndTeacherIdAndStatus(id, teacherId);
+        return commentCardJpaRepository.findByIdAndTeacherId(id, teacherId);
     }
 
     public long countTeacherDoneUnread(Long teacherId){

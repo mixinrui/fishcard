@@ -23,7 +23,7 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
 //    public CommentCard findByIdAndTeacherIdAndStatus(Long id, Long teacherId, Integer status);
 
     //2016-11-12 修改为老师端根据status给多种提示
-    public CommentCard findByIdAndTeacherIdAndStatus(Long id, Long teacherId);
+    public CommentCard findByIdAndTeacherId(Long id, Long teacherId);
 
     @Query("select count(c) as count from CommentCard c where c.studentId=?1 and c.studentReadFlag = 0")
     public long countStudentUnreadCommentCards(Long studentId);
