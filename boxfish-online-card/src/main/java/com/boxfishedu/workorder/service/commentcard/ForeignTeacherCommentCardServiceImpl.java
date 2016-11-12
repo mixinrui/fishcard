@@ -376,7 +376,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
                 commentCard.setService(serviceTemp);
                 if (commentCard.getTeacherId() != null) {
-                    logger.info("@foreignTeacherCommentUnAnswer22 调用师生运营接口,设置参与该点评卡的外教为旷课......", commentCard);
+                    logger.info("@foreignTeacherCommentUnAnswer22 调用师生运营接口,设置参与该点评卡的外教为旷课......" + commentCard);
                     JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(), commentCard.getStudentId(), commentCard.getId());
                     logger.info("调用师生运营接口结果", jsonResultModel);
                     logger.info("向老师端推送消息,告知其点评超时......");

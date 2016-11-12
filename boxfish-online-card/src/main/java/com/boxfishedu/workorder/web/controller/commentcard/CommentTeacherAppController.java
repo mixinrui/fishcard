@@ -10,6 +10,8 @@ import com.boxfishedu.workorder.web.param.CommentCardSubmitParam;
 import com.boxfishedu.workorder.web.param.commentcard.TeacherReadMsgParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.apache.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/comment/foreign")
 public class CommentTeacherAppController {
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private CommentTeacherAppServiceX commentTeacherAppServiceX;
@@ -37,21 +41,25 @@ public class CommentTeacherAppController {
 
     @RequestMapping(value = "/teacher/answer_list", method = RequestMethod.GET)
     public JsonResultModel teacherAnswerList(Pageable pageable,Long userId){
+        logger.info("###teacherAnswerList###");
         return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherAnswerList(pageable,userId));
     }
 
     @RequestMapping(value = "/teacher/unanswer_list", method = RequestMethod.GET)
     public JsonResultModel teacherUnAnswerList(Pageable pageable,Long userId){
+        logger.info("###teacherUnAnswerList###");
         return JsonResultModel.newJsonResultModel(commentCardTeacherAppService.queryTeacherUnanswerList(pageable,userId));
     }
     @RequestMapping(value = "/card/{card_id}/detail", method = RequestMethod.GET)
     public JsonResultModel listOne(@PathVariable("card_id") Long cardId){
+        logger.info("###listOne###");
         CommentCard commentCard = commentTeacherAppServiceX.findById(cardId);
         return JsonResultModel.newJsonResultModel(commentCard);
     }
 
     @RequestMapping(value = "/card", method = RequestMethod.POST)
     public JsonResultModel submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam,Long userId,String access_token){
+        logger.info("###submitComment###");
         commonServeServiceX.checkToken(commentCardSubmitParam.getTeacherId(),userId);
         commentCardSubmitParam.setTeacherPicturePath(foreignTeacherCommentCardService.getUserPicture(access_token));
         //commentCardSubmitParam.setTeacherId(userId);//测试时使用,正式去掉
@@ -61,6 +69,7 @@ public class CommentTeacherAppController {
 
     @RequestMapping(value = "/teacher/read_message", method = RequestMethod.PUT)
     public JsonResultModel markReadFlag(@RequestBody TeacherReadMsgParam teacherReadMsgParam,Long userId){
+        logger.info("###markReadFlag###");
         commonServeServiceX.checkToken(teacherReadMsgParam.getTeacherId(),userId);
         commentTeacherAppServiceX.markTeacherRead(teacherReadMsgParam);
         return JsonResultModel.newJsonResultModel(null);
@@ -70,6 +79,7 @@ public class CommentTeacherAppController {
     public JsonResultModel checkTeacher(@PathVariable Long cardId,Long userId){
         JsonResultModel jsonResultModel = new JsonResultModel();
         CommentCard commentCard = commentTeacherAppServiceX.checkTeacher(cardId,userId);
+        logger.info("###checkTeacher###" + commentCard.getStatus());
         if (commentCard != null){
             switch (commentCard.getStatus()){
                 case 100:
@@ -101,6 +111,7 @@ public class CommentTeacherAppController {
 
     @RequestMapping(value = "count_teacher_unread", method = RequestMethod.GET)
     public com.boxfishedu.beans.view.JsonResultModel countTeacherUnreadCommentCards(Long userId){
+        logger.info("###countTeacherUnreadCommentCards###");
         return foreignTeacherCommentCardService.countTeacherUnreadCommentCards(userId);
     }
 
