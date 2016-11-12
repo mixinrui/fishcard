@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
@@ -236,7 +237,12 @@ public class TimePickerServiceX {
         studentCourseSchedule.setId(courseSchedule.getId());
         studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
         studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
-        studentCourseSchedule.setTime(timeSlots.getStartTime());
+        if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType())){
+            studentCourseSchedule.setTime(courseSchedule.getInstantStartTtime());
+        }
+        else {
+            studentCourseSchedule.setTime(timeSlots.getStartTime());
+        }
         studentCourseSchedule.setWorkOrderId(courseSchedule.getWorkorderId());
         studentCourseSchedule.setStatus(courseSchedule.getStatus());
         studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
