@@ -79,8 +79,8 @@ public class CommentTeacherAppController {
     public JsonResultModel checkTeacher(@PathVariable Long cardId,Long userId){
         JsonResultModel jsonResultModel = new JsonResultModel();
         CommentCard commentCard = commentTeacherAppServiceX.checkTeacher(cardId,userId);
-        logger.info("###checkTeacher###" + commentCard.getStatus());
         if (commentCard != null){
+            logger.info("###checkTeacher1###" + commentCard.getStatus());
             switch (commentCard.getStatus()){
                 case 100:
                 case 200:
@@ -102,6 +102,7 @@ public class CommentTeacherAppController {
                     break;
             }
         }else {
+            logger.info("###checkTeacher2### 点评卡不存在");
             jsonResultModel.setReturnMsg("Something’s wrong. There’s no such evaluation order actually…");
             jsonResultModel.setData("Unauthorized");
             jsonResultModel.setReturnCode(CommentCardTeacherAppTip.COMMENT_CARD_NON_EXISTENT.getCode());
