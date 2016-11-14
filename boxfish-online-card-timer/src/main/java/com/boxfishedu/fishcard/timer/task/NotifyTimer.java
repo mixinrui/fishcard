@@ -262,10 +262,10 @@ public class NotifyTimer {
     //@Scheduled(cron = "0 0 4 * * ?")
     //@Scheduled(cron = "0 10 15 * * ?")
     public void autoConfirmStatus(){
-        logger.info("<<<<<<autoConfirmStatus<<<<<<<<<<<<<<<<");
-        logger.info("<<<<<<自动确认状态<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
-        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
-        rabbitMqSender.send(serviceTimerMessage);
+//        logger.info("<<<<<<autoConfirmStatus<<<<<<<<<<<<<<<<");
+//        logger.info("<<<<<<自动确认状态<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
+//        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
+//        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+//        rabbitMqSender.send(serviceTimerMessage);
     }
 }

@@ -195,5 +195,5 @@ spring:
     port: 25
     username: nobody@send.boxfish.cn
     password: Boxfish123
-    tousers: huchunlin@boxfish.cn,fenglei@boxfish.cn,suhaijiang@boxfish.cn,jiaozijun@boxfish.cn
+    tousers: huchunlin@boxfish.cn,fenglei@boxfish.cn,suhaijiang@boxfish.cn,jiaozijun@boxfish.cn,liyinghao@boxfish.cn,liruixue@boxfish.cn
   profiles: product
