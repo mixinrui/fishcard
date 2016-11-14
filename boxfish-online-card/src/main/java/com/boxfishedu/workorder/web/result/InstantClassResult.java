@@ -23,6 +23,11 @@ public class InstantClassResult {
         this.desc=instantClassRequestStatus.getDesc();
     }
 
+    public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus,String desc){
+        this.status=instantClassRequestStatus.getCode();
+        this.desc=desc;
+    }
+
     public InstantClassResult(TeacherInstantClassStatus teacherInstantClassStatus){
         this.status=teacherInstantClassStatus.getCode();
         this.desc=teacherInstantClassStatus.getDesc();
@@ -62,6 +67,10 @@ public class InstantClassResult {
 
     public static InstantClassResult newInstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         return new InstantClassResult(instantClassRequestStatus);
+    }
+
+    public static InstantClassResult newInstantClassResult(InstantClassRequestStatus instantClassRequestStatus,String desc){
+        return new InstantClassResult(instantClassRequestStatus,desc);
     }
 
     public static InstantClassResult newInstantClassResult(TeacherInstantClassStatus teacherInstantClassStatus){

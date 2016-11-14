@@ -35,8 +35,7 @@ public class TimeRangeValidator implements InstantClassValidator {
                     instantClassTimeRules -> new DateRange(
                             DateUtil.String2Date(String.join(" ",day,instantClassTimeRules.getBegin()))
                             ,DateUtil.String2Date(String.join(" ",day,instantClassTimeRules.getEnd()))))
-                    .collect(Collectors.toList())
-                    .stream().filter(dateRange -> dateRange.inRange(date)).count();
+                            .filter(dateRange -> dateRange.inRange(date)).count();
             if(inRange==0){
                 return InstantClassRequestStatus.NOT_IN_RANGE.getCode();
             }

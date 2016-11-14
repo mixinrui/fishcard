@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
@@ -57,5 +58,14 @@ public class InstantClassController {
             //无论是否成功都删除当前用户的资源
             redisTemplate.delete(key);
         }
+    }
+
+    @RequestMapping(value = "/service/student/instant/timerange", method = RequestMethod.GET)
+    public JsonResultModel timeRange(){
+        String timeDesc=instantClassServiceX.timeRange();
+        if(StringUtils.isEmpty(timeDesc)){
+            return JsonResultModel.newJsonResultModel(null);
+        }
+        return JsonResultModel.newJsonResultModel(instantClassServiceX.timeRange()+" 开启");
     }
 }
