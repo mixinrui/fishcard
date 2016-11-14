@@ -84,7 +84,7 @@ public class InstantClassServiceX {
             switch (instantStatus){
                 case NOT_IN_RANGE:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus,this.timeRange()));
+                            .newInstantClassResult(instantStatus, this.timeRange()));
                 default:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus));
