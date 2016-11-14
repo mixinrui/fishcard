@@ -64,12 +64,13 @@ public class InstantClassService {
         logger.debug("@InstantClassService#user{}#最接近的时间片是{}",getInstantRequestParam().getStudentId(),timeSlotsOptional.get().getSlotId());
         Optional<InstantClassCard> instantClassCardOptional=getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
         if(!instantClassCardOptional.isPresent()){
-            logger.debug("@InstantClassService#user{}时间片{}在instant_class_card表中无数据"
-                    ,getInstantRequestParam().getStudentId(),timeSlotsOptional.get().getSlotId());
-            InstantClassCard instantClassCard=persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
-            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard);
-            //TODO:发起教师请求，同时将匹配的结果返回给App
-            return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH);
+            return dealFirstRequest(timeSlotsOptional);
+        }
+        //入口变化
+        if(getInstantRequestParam().getSelectMode()!=instantClassCardOptional.get().getEntrance()){
+            dealDifferentEntrance(instantClassCardOptional);
+            instantClassJpaRepository.delete(instantClassCardOptional.get());
+            dealFirstRequest(timeSlotsOptional);
         }
         if(instantClassCardOptional.get().getResultReadFlag()==1
                 &&instantClassCardOptional.get().getStatus()==InstantClassRequestStatus.NO_MATCH.getCode()){
@@ -82,6 +83,24 @@ public class InstantClassService {
             //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
             return matchResultWrapper(instantClassCardOptional.get());
         }
+    }
+
+    private void dealDifferentEntrance(Optional<InstantClassCard> instantClassCardOptional) {
+        if(instantClassCardOptional.get().getStatus()== InstantClassRequestStatus.WAIT_TO_MATCH.getCode()){
+            throw new BusinessException("您有别的课程正在等待匹配，请稍后再试");
+        }
+        if(instantClassCardOptional.get().getStatus()==InstantClassRequestStatus.MATCHED.getCode()){
+            throw new BusinessException("您当前还有未完成的课程，请稍后再试");
+        }
+    }
+
+    private InstantClassResult dealFirstRequest(Optional<TimeSlots> timeSlotsOptional) {
+        logger.debug("@InstantClassService#user{}时间片{}在instant_class_card表中无数据"
+                ,getInstantRequestParam().getStudentId(),timeSlotsOptional.get().getSlotId());
+        InstantClassCard instantClassCard=persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
+        instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard);
+        //TODO:发起教师请求，同时将匹配的结果返回给App
+        return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH);
     }
 
     public Optional<TimeSlots> getMostSimilarSlot(Long roleId){

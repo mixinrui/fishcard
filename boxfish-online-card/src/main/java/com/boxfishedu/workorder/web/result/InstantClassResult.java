@@ -44,6 +44,7 @@ public class InstantClassResult {
                 this.groupInfo.setGroupName(instantClassCard.getGroupName());
                 this.groupInfo.setChatRoomId(instantClassCard.getChatRoomId());
                 this.groupInfo.setWorkOrderId(instantClassCard.getWorkorderId());
+                this.groupInfo.setStudentId(instantClassCard.getStudentId());
                 break;
             }
             default:
@@ -62,6 +63,9 @@ public class InstantClassResult {
             this.groupInfo.setGroupName(instantClassCard.getGroupName());
             this.groupInfo.setChatRoomId(instantClassCard.getChatRoomId());
             this.groupInfo.setWorkOrderId(instantClassCard.getWorkorderId());
+            this.groupInfo.setTeacherName(instantClassCard.getTeacherName());
+            this.groupInfo.setStudentId(instantClassCard.getStudentId());
+            this.groupInfo.setTeacherThumbNail(null);
         }
     }
 
@@ -96,6 +100,9 @@ public class InstantClassResult {
         private String groupName;
         private String groupId;
         private Long chatRoomId;
+        private String teacherName;
+        private String teacherThumbNail;
+        private Long studentId;
     }
 
     @Data
