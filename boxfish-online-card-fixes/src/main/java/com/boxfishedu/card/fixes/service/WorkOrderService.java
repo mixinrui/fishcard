@@ -9,6 +9,7 @@ import com.boxfishedu.card.fixes.entity.mongo.ScheduleCourseInfoMorphiaRepositor
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -33,6 +34,9 @@ public class WorkOrderService {
 
     @Autowired
     private ScheduleCourseInfoMorphiaRepository scheduleCourseInfoMorphiaRepository;
+
+    @Value("${recommend.url.courseInfo}")
+    private String url;
 
     private AtomicInteger counter = new AtomicInteger(0);
 
@@ -59,6 +63,11 @@ public class WorkOrderService {
                         scheduleCourseInfoMorphiaRepository.updateCourseInfo(sc);
                     }
                 });
+    }
+
+    public void synchronousCourseInfoById(String courseId) {
+        List<ScheduleCourseInfo> list = scheduleCourseInfoMorphiaRepository.findByCourseId(courseId);
+        list.parallelStream().forEach( sc -> scheduleCourseInfoMorphiaRepository.updateCourseInfo(sc));
     }
 
     /**

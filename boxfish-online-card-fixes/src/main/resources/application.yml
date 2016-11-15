@@ -18,6 +18,12 @@ spring.profiles.active: luo
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
 
+recommend.url.courseInfo: http://base.boxfish.cn/boxfish-wudaokou-course/course/info/%s
+recommend.token: bCA0X0Z1bmN0aW9uMi8wMDAu5aaC5L2V6K
+
+server:
+  servlet-path: /fixes
+  port: 7777
 
 ---
 spring:
@@ -35,7 +41,6 @@ spring:
   profiles: luo
 
 ##################接口调用地址
-server.port: 7777
 
 ---
 spring:
@@ -50,6 +55,4 @@ spring:
     password: sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
   profiles: product
 
-server.servlet-path: /fishcard
-server.port: 7777
 ##################接口调用地址

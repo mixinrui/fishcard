@@ -2,6 +2,7 @@ package com.boxfishedu.card.fixes.entity.mongo;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.query.Query;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,7 +14,8 @@ import java.util.concurrent.atomic.LongAdder;
 @Component
 public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<ScheduleCourseInfo> {
 
-    private final static String url = "http://base.boxfish.cn/boxfish-wudaokou-course/course/info/%s";
+    @Value("${recommend.url.courseInfo}")
+    private String url;
 
     private LongAdder longAdder = new LongAdder();
 
@@ -89,6 +91,12 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
         query.criteria("workOrderId").equal(workOrderId);
         return query.get();
+    }
+
+    public List<ScheduleCourseInfo> findByCourseId(String courseId) {
+        Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
+        query.criteria("courseId").equal(courseId);
+        return query.asList();
     }
 
     private void updateCourseDifficulty(ScheduleCourseInfo sci) {

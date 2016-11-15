@@ -60,7 +60,7 @@ public class CourseView implements Serializable {
         courseTypeList.add(scheduleCourseInfo.getCourseType());
         List<String> difficultyList = Lists.newArrayList();
         if (scheduleCourseInfo.getDifficulty() != null) {
-            difficultyList.add(scheduleCourseInfo.getDifficulty().toString());
+            difficultyList.add(scheduleCourseInfo.getDifficulty());
         }
         courseView.setCourseType(courseTypeList);
         courseView.setDifficulty(difficultyList);
