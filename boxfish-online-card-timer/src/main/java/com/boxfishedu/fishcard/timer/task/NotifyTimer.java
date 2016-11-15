@@ -268,4 +268,5 @@ public class NotifyTimer {
 //        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
 //        rabbitMqSender.send(serviceTimerMessage);
     }
+    
 }
