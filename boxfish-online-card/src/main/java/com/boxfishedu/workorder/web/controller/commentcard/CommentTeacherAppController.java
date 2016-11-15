@@ -124,23 +124,22 @@ public class CommentTeacherAppController {
         return foreignTeacherCommentCardService.countTeacherUnreadCommentCards(userId);
     }
 
-    @RequestMapping(value = "/comment_student_star", method = RequestMethod.PUT) 
-    public JsonResultModel commentStar2Student(@RequestBody CommentCardStarForm commentCardStarForm, Long teacherId)
-    { 
-        CommentCardStar commentCardStar = commentCardStarTeacherAppService.saveTeacher2StudentStar(commentCardStarForm,teacherId); 
-        JsonResultModel jsonResultModel; 
-        if (Objects.isNull(commentCardStar.getId())){ 
-            jsonResultModel = new JsonResultModel(); 
-            jsonResultModel.setData("对学生评星失败!"); 
-            jsonResultModel.setReturnCode(500); 
-            jsonResultModel.setReturnMsg("Failed!"); 
-        }else { 
-            jsonResultModel = new JsonResultModel(); 
-            jsonResultModel.setData("对学生评星成功!"); 
-            jsonResultModel.setReturnCode(200); 
-            jsonResultModel.setReturnMsg("Succeed!"); 
-        } 
-        return jsonResultModel; 
+    @RequestMapping(value = "/comment_student_star", method = RequestMethod.PUT)
+    public JsonResultModel commentStar2Student(@RequestBody CommentCardStarForm commentCardStarForm,Long teacherId){
+        CommentCardStar commentCardStar = commentCardStarTeacherAppService.saveTeacher2StudentStar(commentCardStarForm,teacherId);
+        JsonResultModel jsonResultModel;
+        if (Objects.isNull(commentCardStar.getId())){
+            jsonResultModel = new JsonResultModel();
+            jsonResultModel.setData("对学生评星失败!");
+            jsonResultModel.setReturnCode(500);
+            jsonResultModel.setReturnMsg("Failed!");
+        }else {
+            jsonResultModel = new JsonResultModel();
+            jsonResultModel.setData("对学生评星成功!");
+            jsonResultModel.setReturnCode(200);
+            jsonResultModel.setReturnMsg("Succeed!");
+        }
+        return jsonResultModel;
     }
 
 }
