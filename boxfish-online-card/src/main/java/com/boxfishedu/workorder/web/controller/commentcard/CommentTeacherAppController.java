@@ -2,6 +2,9 @@ package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.workorder.common.bean.CommentCardTeacherAppTip;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.CommentCardStar;
+import com.boxfishedu.workorder.entity.mysql.CommentCardStarForm;
+import com.boxfishedu.workorder.service.commentcard.CommentCardStarTeacherAppService;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
@@ -15,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/7/20.
@@ -38,6 +43,9 @@ public class CommentTeacherAppController {
 
     @Autowired
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
+
+    @Autowired
+    private CommentCardStarTeacherAppService commentCardStarTeacherAppService;
 
     @RequestMapping(value = "/teacher/answer_list", method = RequestMethod.GET)
     public JsonResultModel teacherAnswerList(Pageable pageable,Long userId){
@@ -110,10 +118,29 @@ public class CommentTeacherAppController {
         return jsonResultModel;
     }
 
-    @RequestMapping(value = "count_teacher_unread", method = RequestMethod.GET)
+    @RequestMapping(value = "/count_teacher_unread", method = RequestMethod.GET)
     public com.boxfishedu.beans.view.JsonResultModel countTeacherUnreadCommentCards(Long userId){
         logger.info("###countTeacherUnreadCommentCards###");
         return foreignTeacherCommentCardService.countTeacherUnreadCommentCards(userId);
+    }
+
+    @RequestMapping(value = "/comment_student_star", method = RequestMethod.PUT) 
+    public JsonResultModel commentStar2Student(@RequestBody CommentCardStarForm commentCardStarForm, Long teacherId)
+    { 
+        CommentCardStar commentCardStar = commentCardStarTeacherAppService.saveTeacher2StudentStar(commentCardStarForm,teacherId); 
+        JsonResultModel jsonResultModel; 
+        if (Objects.isNull(commentCardStar.getId())){ 
+            jsonResultModel = new JsonResultModel(); 
+            jsonResultModel.setData("对学生评星失败!"); 
+            jsonResultModel.setReturnCode(500); 
+            jsonResultModel.setReturnMsg("Failed!"); 
+        }else { 
+            jsonResultModel = new JsonResultModel(); 
+            jsonResultModel.setData("对学生评星成功!"); 
+            jsonResultModel.setReturnCode(200); 
+            jsonResultModel.setReturnMsg("Succeed!"); 
+        } 
+        return jsonResultModel; 
     }
 
 }
