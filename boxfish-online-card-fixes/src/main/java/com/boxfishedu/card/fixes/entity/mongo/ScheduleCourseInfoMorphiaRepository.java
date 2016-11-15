@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.LongAdder;
 @Component
 public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<ScheduleCourseInfo> {
 
-    private final static String url = "http://base.boxfish.cn/course/info/%s";
+    private final static String url = "http://base.boxfish.cn/boxfish-wudaokou-course/course/info/%s";
 
     private LongAdder longAdder = new LongAdder();
 
@@ -25,14 +25,39 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         list.parallelStream().forEach(this::updateCourseInfo);
     }
 
-    public void updateCourseInfo(Long id) {
+    public void updateCourseEnglishNames() {
         Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
-        query.criteria("workOrderId").equal(id);
-        ScheduleCourseInfo courseInfo = query.get();
-        updateCourseInfo(courseInfo);
+        List<ScheduleCourseInfo> list = query.asList();
+        System.out.println(list.size());
+        list.parallelStream().forEach(this::updateCourseEnglishName);
     }
 
-    private void updateCourseInfo(ScheduleCourseInfo sci) {
+    public void updateCourseInfo(ScheduleCourseInfo sci) {
+        System.out.println("before update= [{" + sci + "}]");
+        if(StringUtils.isNotBlank(sci.getCourseId())) {
+            try {
+                Map courseMap = new RestTemplate().getForObject(
+                        String.format(url, sci.getCourseId()), Map.class);
+                if(!Objects.isNull(courseMap) && !Objects.isNull(courseMap.get("englishName"))) {
+                    sci.setEnglishName((String) courseMap.get("englishName"));
+                } else {
+                    sci.setEnglishName("");
+                }
+                sci.setName((String) courseMap.get("courseName"));
+                sci.setCourseType((String) courseMap.get("type"));
+                sci.setDifficulty((String) courseMap.get("difficulty"));
+                sci.setLastModified((long) courseMap.get("lastModified"));
+                sci.setPublicDate(courseMap.get("publicDate").toString());
+                datastore.save(sci);
+                System.out.println("after  update= [{" + sci + "}]");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public void updateCourseEnglishName(ScheduleCourseInfo sci) {
         System.out.println("before update= [{" + sci + "}]");
         if(StringUtils.isNotBlank(sci.getCourseId())) {
             try {
@@ -46,7 +71,7 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
                 datastore.save(sci);
                 System.out.println("after  update= [{" + sci + "}]");
             } catch (Exception e) {
-//                    e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
@@ -58,6 +83,12 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         System.out.println("updateCount = " + list.size());
         list.parallelStream().forEach(this::updateCourseDifficulty);
         System.out.println("modifyCount = " + longAdder.sumThenReset());
+    }
+
+    public ScheduleCourseInfo findByWorkOrderId(Long workOrderId) {
+        Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
+        query.criteria("workOrderId").equal(workOrderId);
+        return query.get();
     }
 
     private void updateCourseDifficulty(ScheduleCourseInfo sci) {

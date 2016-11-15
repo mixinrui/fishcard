@@ -228,6 +228,28 @@ public class RabbitMqConfiguration {
         Binding delayNotifyTeacherPrepareDealerQueueBinding;
         delayNotifyTeacherPrepareDealerQueueBinding = BindingBuilder.bind(delayNotifyTeacherPrepareDealerQueue).to(amqDirectExchange()).with(RabbitMqConstant.DELAY_NOTIFY_TEACHER_PREPARE_DEALER_QUEUE).noargs();
 
+
+        /**
+         * 实时上课延迟队列
+         */
+        HashMap<String, Object> notifyInstantClassArguments = new HashMap<String, Object>();
+        notifyInstantClassArguments.put(DEAD_LETTER_EXCHANGE, "amq.direct");
+        notifyInstantClassArguments.put(DEAD_LETTER_EXCHANGE_ROUTING_KEY, RabbitMqConstant.DELAY_INSTANT_CLASS_DEALER_QUEUE);
+        Queue delayInstantClassQueue=new Queue(RabbitMqConstant.DELAY_INSTANT_CLASS_QUEUE,true,false,false,notifyInstantClassArguments);
+        rabbitAdmin.declareQueue(delayInstantClassQueue);
+        Binding delayInstantClassQueueBinding=BindingBuilder.bind(delayInstantClassQueue).to(delayExchange()).with(RabbitMqConstant.DELAY_INSTANT_CLASS_QUEUE).and(notifyInstantClassArguments);
+
+
+        /**
+         * 实时上课延时处理队列
+         */
+        Queue delayInstantClassDealerQueue = new Queue(RabbitMqConstant.DELAY_INSTANT_CLASS_DEALER_QUEUE, true);
+        rabbitAdmin.declareQueue(delayInstantClassDealerQueue);
+        Binding delayInstantClassDealerQueueQueueBinding
+                = BindingBuilder.bind(delayInstantClassDealerQueue).to(amqDirectExchange()).with(RabbitMqConstant.DELAY_INSTANT_CLASS_DEALER_QUEUE).noargs();
+
+
+
         /**
          * 通知外教点评卡修改学生或老师头像
          */
@@ -265,6 +287,11 @@ public class RabbitMqConfiguration {
         rabbitAdmin.declareBinding(delayForceCompleteDealerQueueBinding);
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareQueueBinding);
         rabbitAdmin.declareBinding(delayNotifyTeacherPrepareDealerQueueBinding);
+
+        /*实时上课*/
+        rabbitAdmin.declareBinding(delayInstantClassQueueBinding);
+        rabbitAdmin.declareBinding(delayInstantClassDealerQueueQueueBinding);
+
         rabbitAdmin.declareBinding(updatePictureQueueBinding);
         rabbitAdmin.declareBinding(notifyRechargeWorkOrderQueueBinding);
         rabbitAdmin.declareBinding(notifyMessageQueueBinding); /** 短信 **/
@@ -463,6 +490,17 @@ public class RabbitMqConfiguration {
         template.setExchange(DELAY_QUEUE_EXCHANGE);
         return template;
     }
+
+    /**
+     *立即上课,发送待匹配的消息
+     */
+    @Bean(name = RabbitMqConstant.DELAY_QUEUE_INSTANT_CLASS_TEMPLATE_NAME)
+    public RabbitTemplate delayInstantClassTemplate(ConnectionFactory factory, MessageConverter messageConverter) {
+        RabbitTemplate template = getRabbitTemplate(factory, messageConverter, RabbitMqConstant.DELAY_INSTANT_CLASS_QUEUE);
+        template.setExchange(DELAY_QUEUE_EXCHANGE);
+        return template;
+    }
+
 
 
     /**

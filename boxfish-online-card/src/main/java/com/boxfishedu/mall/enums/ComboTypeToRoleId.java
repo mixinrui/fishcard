@@ -17,6 +17,8 @@ public enum ComboTypeToRoleId {
     EXCHANGE(3),
     UNKNOW(-1),
     EXPERIENCE(3),
+    // 老师奖励课
+    REWARD(2),
     // 只能套餐
     INTELLIGENT(3);
 

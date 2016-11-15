@@ -268,4 +268,13 @@ public class NotifyTimer {
 //        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
 //        rabbitMqSender.send(serviceTimerMessage);
     }
+
+    // 即时上课,每20S一次
+    @Scheduled(cron = "0/20 * * * * ?")
+    public void instantClasses(){
+        logger.info("<<<<<<instantClasses<<<<<<<<<<<<<<<<");
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.INSTANT_CLASS.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 }

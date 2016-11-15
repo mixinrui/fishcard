@@ -38,6 +38,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -292,4 +294,10 @@ public class FishCardModifyServiceX {
         rabbitMqSender.send(map, QueueTypeEnum.SHORT_MESSAGE);
     }
 
+
+    public static void main(String[] args) throws ParseException {
+        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-11-06 10:00:00");
+        Duration d = Duration.between(DateUtil.convertLocalDateTime(date), LocalDateTime.now());
+        System.out.println("duration=" + d.toDays());
+    }
 }

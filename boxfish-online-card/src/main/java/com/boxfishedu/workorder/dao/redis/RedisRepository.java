@@ -14,9 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisRepository {
 
     @Autowired
-    private
-    @Qualifier("teachingServiceRedisTemplate")
-    StringRedisTemplate template;
+    private @Qualifier("teachingServiceRedisTemplate") StringRedisTemplate template;
 
     public String get(String id) {
         return template.boundValueOps(id).get();

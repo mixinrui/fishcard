@@ -45,7 +45,11 @@ public enum TimerMessageType {
     RECOMMEND_COURSES(130),
 
     // 自动确认状态
-    AUTO_CONFIRM_STATUS(135);
+    AUTO_CONFIRM_STATUS(135),
+
+    //即时上课
+    INSTANT_CLASS(145);
+
     private int code;
 
     private TimerMessageType(int code) {

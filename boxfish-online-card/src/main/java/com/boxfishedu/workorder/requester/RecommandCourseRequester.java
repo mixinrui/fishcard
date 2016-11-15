@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -269,6 +270,27 @@ public class RecommandCourseRequester {
                 .toUri();
         logger.info("recommendURL: [{}]", uri);
         return uri;
+    }
+
+
+    /**
+     * 实时上课
+     */
+    public RecommandCourseView getInstantCourseView(Long studentId,int index,TutorType tutorType) {
+        logger.debug("@getInstantCourseView->获取实时推荐课程");
+        switch (tutorType){
+            case FRN:return this.getUltimateRecommend(studentId,index);
+            case CN:return this.getPromoteRecommend(studentId,index);
+            default:
+                throw  new BusinessException("不支持的参数类型");
+        }
+    }
+
+    public RecommandCourseView getCourseViewDetail(String courseId) {
+        String url=String.format("%s/%s",urlConf.getCourse_wudaokou_detail_service(),courseId);
+        logger.debug("@getCourseViewDetail->获取课程详细信息courseId:[{}],url:[{}]",courseId,url);
+        RecommandCourseView recommandCourseView=restTemplate.getForObject(url, RecommandCourseView.class);
+        return recommandCourseView;
     }
 
 }
