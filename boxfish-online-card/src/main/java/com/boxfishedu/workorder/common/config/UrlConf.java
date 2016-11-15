@@ -59,5 +59,8 @@ public class UrlConf {
     @Value("${interface.address.login_filter_url}")
     private String login_filter_url;//登录验证URL
 
+    //教师图像
+    @Value("${interface.address.teacher_photo}")
+    private String teacher_photo;//登录验证URL
 
 }

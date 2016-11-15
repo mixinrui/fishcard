@@ -4,19 +4,27 @@ import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatu
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by hucl on 16/11/3.
  */
 @Data
+@Component
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InstantClassResult {
     protected Integer status;
     protected String desc;
     protected Long slotId;
     protected GroupInfo groupInfo=null;
+
+    @Autowired
+    private TeacherPhotoRequester teacherPhotoRequester;
 
     public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         this.status=instantClassRequestStatus.getCode();
@@ -65,7 +73,7 @@ public class InstantClassResult {
             this.groupInfo.setWorkOrderId(instantClassCard.getWorkorderId());
             this.groupInfo.setTeacherName(instantClassCard.getTeacherName());
             this.groupInfo.setStudentId(instantClassCard.getStudentId());
-            this.groupInfo.setTeacherThumbNail(null);
+            this.groupInfo.setTeacherThumbNail(teacherPhotoRequester.getTeacherPhoto(instantClassCard.getTeacherId()));
         }
     }
 
@@ -101,6 +109,7 @@ public class InstantClassResult {
         private String groupId;
         private Long chatRoomId;
         private String teacherName;
+        @JsonProperty("teacherPhoto")
         private String teacherThumbNail;
         private Long studentId;
     }
