@@ -53,5 +53,5 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
 
     List<InstantClassCard> findByRequestMatchTeacherTimeBetweenAndStatusIn(Date startDate, Date endDate, Integer[] statuses);
 
-    Optional<InstantClassCard> findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(Long studentId);
+    Optional<InstantClassCard> findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(Long studentId,Date date);
 }
