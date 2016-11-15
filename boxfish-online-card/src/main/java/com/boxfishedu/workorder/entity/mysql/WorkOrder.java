@@ -23,7 +23,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "work_order")
 @EqualsAndHashCode(exclude = "workOrderLogs")
-public class WorkOrder{
+public class WorkOrder implements Cloneable{
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -259,5 +259,16 @@ public class WorkOrder{
         else{
             return seqNum%8;
         }
+    }
+
+    @Override
+    public WorkOrder clone(){
+        WorkOrder prototypeClass = null;
+        try {
+            prototypeClass = (WorkOrder) super.clone();
+        } catch (CloneNotSupportedException e) {
+            System.out.println("克隆对象失败");
+        }
+        return prototypeClass;
     }
 }

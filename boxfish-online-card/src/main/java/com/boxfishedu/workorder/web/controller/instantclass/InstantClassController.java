@@ -45,7 +45,7 @@ public class InstantClassController {
     }
 
     @RequestMapping(value = "/service/teacher/instantclass", method = RequestMethod.POST)
-    public JsonResultModel instantClass(@RequestBody TeacherInstantRequestParam teacherInstantRequestParam, Long userId) {
+    public JsonResultModel teacherInstantClass(@RequestBody TeacherInstantRequestParam teacherInstantRequestParam, Long userId) {
         try {
             JsonResultModel jsonResultModel= teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
             return jsonResultModel;
