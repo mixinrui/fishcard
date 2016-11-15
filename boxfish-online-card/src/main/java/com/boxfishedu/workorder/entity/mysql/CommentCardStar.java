@@ -42,6 +42,8 @@ public class CommentCardStar {
     @Column(name = "create_time")
     private Date createTime;
 
+    public CommentCardStar(){}
+
     public CommentCardStar(Long cardId, Long studentId,Long teacherId,int starLevel){
         this.commentCardId = cardId;
         this.studentId = studentId;
