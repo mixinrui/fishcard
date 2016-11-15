@@ -70,21 +70,23 @@ public class InstantClassService {
         logger.debug("@InstantClassService#user{}#最接近的时间片是{}", getInstantRequestParam().getStudentId(), timeSlotsOptional.get().getSlotId());
         Optional<InstantClassCard> instantClassCardOptional = getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
         if (!instantClassCardOptional.isPresent()) {
+            //处理学生跨时间片的请求,如果当前请求在29:55这时候下一个请求在30:01;则返回上一个请求卡的匹配情况
+            Optional<InstantClassCard> latestInstantCardOptional=instantClassJpaRepository
+                    .findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(getInstantRequestParam().getStudentId()
+                            , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(60)));
+            if(latestInstantCardOptional.isPresent()){
+                return matchResultWrapper(latestInstantCardOptional.get());
+            }
             return dealFirstRequest(timeSlotsOptional);
         }
+
         //入口变化
         if (getInstantRequestParam().getSelectMode() != instantClassCardOptional.get().getEntrance()) {
             dealDifferentEntrance(instantClassCardOptional);
             instantClassJpaRepository.delete(instantClassCardOptional.get());
             dealFirstRequest(timeSlotsOptional);
         }
-        //处理学生跨时间片的请求,如果当前请求在29:55这时候下一个请求在30:01;则返回上一个请求卡的匹配情况
-        Optional<InstantClassCard> latestInstantCardOptional=instantClassJpaRepository
-                .findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(getInstantRequestParam().getStudentId()
-                        , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(60)));
-        if(latestInstantCardOptional.isPresent()){
-            return matchResultWrapper(latestInstantCardOptional.get());
-        }
+
         if (instantClassCardOptional.get().getResultReadFlag() == 1
                 && instantClassCardOptional.get().getStatus() == InstantClassRequestStatus.NO_MATCH.getCode()) {
             instantClassJpaRepository.updateReadFlagAnsStatus(instantClassCardOptional.get().getId()
