@@ -26,11 +26,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Optional;
+
 /**
  * Created by hucl on 16/11/3.
  */
@@ -57,102 +59,108 @@ public class InstantClassService {
     @Autowired
     private TeacherPhotoRequester teacherPhotoRequester;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public InstantClassResult getMatchResult(){
-        Optional<TimeSlots> timeSlotsOptional=getMostSimilarSlot(new Long(CourseType2TeachingTypeService
+    public InstantClassResult getMatchResult() {
+        Optional<TimeSlots> timeSlotsOptional = getMostSimilarSlot(new Long(CourseType2TeachingTypeService
                 .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType()))));
-        if(!timeSlotsOptional.isPresent()){
-            return this.matchResultWrapper(InstantClassRequestStatus.NOT_IN_RANGE,teacherPhotoRequester);
+        if (!timeSlotsOptional.isPresent()) {
+            return this.matchResultWrapper(InstantClassRequestStatus.NOT_IN_RANGE, teacherPhotoRequester);
         }
-        logger.debug("@InstantClassService#user{}#最接近的时间片是{}",getInstantRequestParam().getStudentId(),timeSlotsOptional.get().getSlotId());
-        Optional<InstantClassCard> instantClassCardOptional=getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
-        if(!instantClassCardOptional.isPresent()){
+        logger.debug("@InstantClassService#user{}#最接近的时间片是{}", getInstantRequestParam().getStudentId(), timeSlotsOptional.get().getSlotId());
+        Optional<InstantClassCard> instantClassCardOptional = getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
+        if (!instantClassCardOptional.isPresent()) {
             return dealFirstRequest(timeSlotsOptional);
         }
         //入口变化
-        if(getInstantRequestParam().getSelectMode()!=instantClassCardOptional.get().getEntrance()){
+        if (getInstantRequestParam().getSelectMode() != instantClassCardOptional.get().getEntrance()) {
             dealDifferentEntrance(instantClassCardOptional);
             instantClassJpaRepository.delete(instantClassCardOptional.get());
             dealFirstRequest(timeSlotsOptional);
         }
-        if(instantClassCardOptional.get().getResultReadFlag()==1
-                &&instantClassCardOptional.get().getStatus()==InstantClassRequestStatus.NO_MATCH.getCode()){
-            instantClassJpaRepository.updateReadFlagAnsStatus(instantClassCardOptional.get().getId()
-                    ,0,InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
-            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCardOptional.get());
-            return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH,teacherPhotoRequester);
+        //处理学生跨时间片的请求,如果当前请求在29:55这时候下一个请求在30:01;则返回上一个请求卡的匹配情况
+        Optional<InstantClassCard> latestInstantCardOptional=instantClassJpaRepository
+                .findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(getInstantRequestParam().getStudentId()
+                        , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(60));
+        if(latestInstantCardOptional.isPresent()){
+            return matchResultWrapper(latestInstantCardOptional.get());
         }
-        else{
+        if (instantClassCardOptional.get().getResultReadFlag() == 1
+                && instantClassCardOptional.get().getStatus() == InstantClassRequestStatus.NO_MATCH.getCode()) {
+            instantClassJpaRepository.updateReadFlagAnsStatus(instantClassCardOptional.get().getId()
+                    , 0, InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
+            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCardOptional.get());
+            return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH, teacherPhotoRequester);
+        } else {
             //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
             return matchResultWrapper(instantClassCardOptional.get());
         }
     }
 
     private void dealDifferentEntrance(Optional<InstantClassCard> instantClassCardOptional) {
-        if(instantClassCardOptional.get().getStatus()== InstantClassRequestStatus.WAIT_TO_MATCH.getCode()){
+        if (instantClassCardOptional.get().getStatus() == InstantClassRequestStatus.WAIT_TO_MATCH.getCode()) {
             throw new BusinessException("您有别的课程正在等待匹配，请稍后再试");
         }
-        if(instantClassCardOptional.get().getStatus()==InstantClassRequestStatus.MATCHED.getCode()){
+        if (instantClassCardOptional.get().getStatus() == InstantClassRequestStatus.MATCHED.getCode()) {
             throw new BusinessException("您当前还有未完成的课程，请稍后再试");
         }
     }
 
     private InstantClassResult dealFirstRequest(Optional<TimeSlots> timeSlotsOptional) {
         logger.debug("@InstantClassService#user{}时间片{}在instant_class_card表中无数据"
-                ,getInstantRequestParam().getStudentId(),timeSlotsOptional.get().getSlotId());
-        InstantClassCard instantClassCard=persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
+                , getInstantRequestParam().getStudentId(), timeSlotsOptional.get().getSlotId());
+        InstantClassCard instantClassCard = persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
         instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard);
         //TODO:发起教师请求，同时将匹配的结果返回给App
-        return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH,teacherPhotoRequester);
+        return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH, teacherPhotoRequester);
     }
 
-    public Optional<TimeSlots> getMostSimilarSlot(Long roleId){
+    public Optional<TimeSlots> getMostSimilarSlot(Long roleId) {
         return this.getMostSimilarSlot(teacherStudentRequester.dayTimeSlotsTemplate(roleId));
     }
 
-    private Optional<TimeSlots> getMostSimilarSlot(DayTimeSlots dayTimeSlots){
-        LocalDateTime nextSlotTime=LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30);
+    private Optional<TimeSlots> getMostSimilarSlot(DayTimeSlots dayTimeSlots) {
+        LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30);
         return dayTimeSlots.getDailyScheduleTime().stream()
-                .filter(timeSlot->nextSlotTime
-                        .isAfter(DateUtil.string2LocalDateTime(String.join(" ",DateUtil.date2SimpleString(new Date()),timeSlot.getStartTime()))))
+                .filter(timeSlot -> nextSlotTime
+                        .isAfter(DateUtil.string2LocalDateTime(String.join(" ", DateUtil.date2SimpleString(new Date()), timeSlot.getStartTime()))))
                 .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
     }
 
-    public Optional<InstantClassCard> getClassCardByStudentIdAndTimeParam(TimeSlots timeSlots){
+    public Optional<InstantClassCard> getClassCardByStudentIdAndTimeParam(TimeSlots timeSlots) {
         return instantClassJpaRepository
                 .findByStudentIdAndClassDateAndSlotId(getInstantRequestParam().getStudentId()
-                        ,DateUtil.date2SimpleDate(new Date()),timeSlots.getSlotId());
+                        , DateUtil.date2SimpleDate(new Date()), timeSlots.getSlotId());
     }
 
-    public InstantClassCard persistInstantCard(InstantClassCard instantClassCard){
+    public InstantClassCard persistInstantCard(InstantClassCard instantClassCard) {
         return instantClassJpaRepository.save(instantClassCard);
     }
 
-    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus,TeacherPhotoRequester teacherPhotoRequester){
+    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus, TeacherPhotoRequester teacherPhotoRequester) {
         return InstantClassResult.newInstantClassResult(instantClassRequestStatus);
     }
 
-    private InstantClassResult matchResultWrapper(InstantClassCard instantClassCard){
-        if(instantClassCard.getStatus()==InstantClassRequestStatus.NO_MATCH.getCode()){
-            if(instantClassCard.getResultReadFlag()==0) {
+    private InstantClassResult matchResultWrapper(InstantClassCard instantClassCard) {
+        if (instantClassCard.getStatus() == InstantClassRequestStatus.NO_MATCH.getCode()) {
+            if (instantClassCard.getResultReadFlag() == 0) {
                 //将结果的读取值设置为1;表示已经读取了
                 instantClassJpaRepository.updateReadFlag(instantClassCard.getId(), 1);
             }
         }
-        return InstantClassResult.newInstantClassResult(instantClassCard,teacherPhotoRequester);
+        return InstantClassResult.newInstantClassResult(instantClassCard, teacherPhotoRequester);
     }
 
-    private InstantClassCard initClassCardWithCourse(TimeSlots timeSlots){
-        InstantClassCard instantClassCard= this.initClassCard(timeSlots);
+    private InstantClassCard initClassCardWithCourse(TimeSlots timeSlots) {
+        InstantClassCard instantClassCard = this.initClassCard(timeSlots);
         RecommandCourseView recommandCourseView = this.getCourseInfo();
         instantClassCard.setCourseId(recommandCourseView.getCourseId());
         instantClassCard.setCourseType(recommandCourseView.getCourseType());
         return instantClassCard;
     }
 
-    private InstantClassCard initClassCard(TimeSlots timeSlots){
-        InstantClassCard instantClassCard=new InstantClassCard();
+    private InstantClassCard initClassCard(TimeSlots timeSlots) {
+        InstantClassCard instantClassCard = new InstantClassCard();
         instantClassCard.setClassDate(DateUtil.date2SimpleDate(new Date()));
         instantClassCard.setSlotId(timeSlots.getSlotId());
         instantClassCard.setStudentId(getInstantRequestParam().getStudentId());
@@ -165,11 +173,10 @@ public class InstantClassService {
         instantClassCard.setRequestMatchTeacherTime(DateTime.now().toDate());
         instantClassCard.setEntrance(getInstantRequestParam().getSelectMode());
         //课程表入口
-        if(getInstantRequestParam().getSelectMode()==0){
+        if (getInstantRequestParam().getSelectMode() == 0) {
             instantClassCard.setWorkorderId(getAvaliableWorkOrder().getId());
             instantClassCard.setRoleId(getAvaliableWorkOrder().getSkuId());
-        }
-        else{
+        } else {
             instantClassCard.setOrderId(getInstantRequestParam().getOrderId());
             instantClassCard.setProductType(getInstantRequestParam().getProductType());
             instantClassCard.setTutorType(getInstantRequestParam().getTutorType());
@@ -180,27 +187,27 @@ public class InstantClassService {
         return instantClassCard;
     }
 
-    private RecommandCourseView getCourseInfo(){
-        RecommandCourseView recommandCourseView=new RecommandCourseView();
-        switch (InstantRequestParam.SelectModeEnum.getSelectMode(getInstantRequestParam().getSelectMode())){
+    private RecommandCourseView getCourseInfo() {
+        RecommandCourseView recommandCourseView = new RecommandCourseView();
+        switch (InstantRequestParam.SelectModeEnum.getSelectMode(getInstantRequestParam().getSelectMode())) {
             case COURSE_SCHEDULE_ENTERANCE:
-                WorkOrder latestWorkOrder=ThreadLocalUtil.latestWorkOrderThreadLocal.get();
+                WorkOrder latestWorkOrder = ThreadLocalUtil.latestWorkOrderThreadLocal.get();
                 recommandCourseView.setCourseId(latestWorkOrder.getCourseId());
                 recommandCourseView.setCourseType(latestWorkOrder.getCourseType());
                 return recommandCourseView;
             case OTHER_ENTERANCE:
                 return recommandCourseRequester.getInstantCourseView(getInstantRequestParam().getStudentId()
-                        ,1,TutorType.resolve(getInstantRequestParam().getTutorType()));
+                        , 1, TutorType.resolve(getInstantRequestParam().getTutorType()));
             default:
                 throw new BusinessException("入口参数错误");
         }
     }
 
-    private InstantRequestParam getInstantRequestParam(){
+    private InstantRequestParam getInstantRequestParam() {
         return ThreadLocalUtil.instantRequestParamThreadLocal.get();
     }
 
-    private WorkOrder getAvaliableWorkOrder(){
+    private WorkOrder getAvaliableWorkOrder() {
         return ThreadLocalUtil.latestWorkOrderThreadLocal.get();
     }
 

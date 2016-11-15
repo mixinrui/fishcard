@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.instantclass;
 
+import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.servicex.instantclass.InstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.TeacherInstantClassServiceX;
@@ -9,8 +10,11 @@ import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmis
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
+import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
@@ -39,6 +43,8 @@ public class InstantClassController {
     private @Qualifier("teachingServiceRedisTemplate")
     StringRedisTemplate redisTemplate;
 
+    private final Logger logger= LoggerFactory.getLogger(this.getClass());
+
     @RequestMapping(value = "/service/student/instantclass", method = RequestMethod.POST)
     public JsonResultModel instantClass(@RequestBody InstantRequestParam instantRequestParam, Long userId) {
         return instantClassServiceX.instantClass(instantRequestParam);
@@ -51,7 +57,9 @@ public class InstantClassController {
             return jsonResultModel;
         }
         catch (Exception ex){
-            throw ex;
+            logger.error("@teacherInstantClass抢课失败",ex);
+            return JsonResultModel.newJsonResultModel(InstantClassResult
+                    .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
         }
         finally {
             String key= GrabInstatntClassKeyGenerator.generateKey(teacherInstantRequestParam);
