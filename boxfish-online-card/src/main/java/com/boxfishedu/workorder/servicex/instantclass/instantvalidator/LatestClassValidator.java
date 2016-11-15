@@ -44,7 +44,7 @@ public class LatestClassValidator implements InstantClassValidator {
             logger.debug("@LatestClassValidator#preValidate#[{}]不是购买用户",instantRequestParam.getStudentId());
             return InstantClassRequestStatus.UNKNOWN.getCode();
         }
-        Optional<Date> dateOptional = workOrderJpaRepository.findLatestClassDateByStudentId(instantRequestParam.getStudentId(),new Date());
+        Optional<Date> dateOptional = workOrderJpaRepository.findLatestClassDateByStudentId(instantRequestParam.getStudentId(),new Integer(0),new Date());
         if(dateOptional.isPresent()){
             if(LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30).isAfter(
                     LocalDateTime.ofInstant(dateOptional.get().toInstant(), ZoneId.systemDefault()))) {
