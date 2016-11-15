@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
+import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseType2TeachingTypeService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
@@ -53,13 +54,16 @@ public class InstantClassService {
     @Autowired
     private InstantClassTeacherService instantClassTeacherService;
 
+    @Autowired
+    private TeacherPhotoRequester teacherPhotoRequester;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public InstantClassResult getMatchResult(){
         Optional<TimeSlots> timeSlotsOptional=getMostSimilarSlot(new Long(CourseType2TeachingTypeService
                 .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType()))));
         if(!timeSlotsOptional.isPresent()){
-            return this.matchResultWrapper(InstantClassRequestStatus.NOT_IN_RANGE);
+            return this.matchResultWrapper(InstantClassRequestStatus.NOT_IN_RANGE,teacherPhotoRequester);
         }
         logger.debug("@InstantClassService#user{}#最接近的时间片是{}",getInstantRequestParam().getStudentId(),timeSlotsOptional.get().getSlotId());
         Optional<InstantClassCard> instantClassCardOptional=getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
@@ -77,7 +81,7 @@ public class InstantClassService {
             instantClassJpaRepository.updateReadFlagAnsStatus(instantClassCardOptional.get().getId()
                     ,0,InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
             instantClassTeacherService.dealFetchedTeachersAsync(instantClassCardOptional.get());
-            return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH);
+            return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH,teacherPhotoRequester);
         }
         else{
             //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
@@ -100,7 +104,7 @@ public class InstantClassService {
         InstantClassCard instantClassCard=persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
         instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard);
         //TODO:发起教师请求，同时将匹配的结果返回给App
-        return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH);
+        return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH,teacherPhotoRequester);
     }
 
     public Optional<TimeSlots> getMostSimilarSlot(Long roleId){
@@ -125,7 +129,7 @@ public class InstantClassService {
         return instantClassJpaRepository.save(instantClassCard);
     }
 
-    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus){
+    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus,TeacherPhotoRequester teacherPhotoRequester){
         return InstantClassResult.newInstantClassResult(instantClassRequestStatus);
     }
 
@@ -136,7 +140,7 @@ public class InstantClassService {
                 instantClassJpaRepository.updateReadFlag(instantClassCard.getId(), 1);
             }
         }
-        return InstantClassResult.newInstantClassResult(instantClassCard);
+        return InstantClassResult.newInstantClassResult(instantClassCard,teacherPhotoRequester);
     }
 
     private InstantClassCard initClassCardWithCourse(TimeSlots timeSlots){

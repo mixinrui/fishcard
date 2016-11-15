@@ -15,16 +15,12 @@ import org.springframework.stereotype.Component;
  * Created by hucl on 16/11/3.
  */
 @Data
-@Component
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InstantClassResult {
     protected Integer status;
     protected String desc;
     protected Long slotId;
     protected GroupInfo groupInfo=null;
-
-    @Autowired
-    private TeacherPhotoRequester teacherPhotoRequester;
 
     public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         this.status=instantClassRequestStatus.getCode();
@@ -61,7 +57,7 @@ public class InstantClassResult {
         }
     }
 
-    public InstantClassResult(InstantClassCard instantClassCard){
+    public InstantClassResult(InstantClassCard instantClassCard,TeacherPhotoRequester teacherPhotoRequester){
         InstantClassRequestStatus instantClassRequestStatus=InstantClassRequestStatus.getEnumByCode(instantClassCard.getStatus());
         this.status=instantClassRequestStatus.getCode();
         this.desc=instantClassRequestStatus.getDesc();
@@ -89,8 +85,8 @@ public class InstantClassResult {
         return new InstantClassResult(teacherInstantClassStatus);
     }
 
-    public static InstantClassResult newInstantClassResult(InstantClassCard instantClassCard){
-        return new InstantClassResult(instantClassCard);
+    public static InstantClassResult newInstantClassResult(InstantClassCard instantClassCard,TeacherPhotoRequester teacherPhotoRequester){
+        return new InstantClassResult(instantClassCard,teacherPhotoRequester);
     }
 
     public static InstantClassResult newInstantClassResult(InstantClassCard instantClassCard,TeacherInstantClassStatus teacherInstantClassStatus){
@@ -102,7 +98,6 @@ public class InstantClassResult {
     }
 
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     class GroupInfo{
         private Long workOrderId;
         private String groupName;

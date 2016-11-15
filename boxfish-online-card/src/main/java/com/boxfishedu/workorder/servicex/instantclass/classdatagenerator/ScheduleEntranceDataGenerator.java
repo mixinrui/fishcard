@@ -76,14 +76,12 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
 
         Map<WorkOrder,String> logMap= Maps.newHashMap();
 
-        WorkOrder oldCard=new WorkOrder();
-        BeanUtils.copyProperties(workOrders.get(0),oldCard);
+        WorkOrder oldCard=workOrders.get(0).clone();
 
         dealFirstWorkOrder(instantClassCard,workOrders.get(0),logMap);
 
         for(int i=1;i<workOrders.size();i++){
-            WorkOrder tmp= new WorkOrder();
-            BeanUtils.copyProperties(workOrders.get(i),tmp);
+            WorkOrder tmp= workOrders.get(i).clone();
 
             workOrders.get(i).setStartTime(oldCard.getStartTime());
             workOrders.get(i).setEndTime(oldCard.getEndTime());

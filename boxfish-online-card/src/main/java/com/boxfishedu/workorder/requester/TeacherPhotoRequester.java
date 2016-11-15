@@ -62,7 +62,7 @@ public class TeacherPhotoRequester {
             return map.get("figure_url").toString();
         } catch (Exception ex) {
             logger.error("获取教师图像失败,url[{}]",url, ex);
-            return StringUtils.EMPTY;
+            return null;
         }
     }
 
