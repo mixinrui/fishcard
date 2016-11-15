@@ -170,7 +170,7 @@ public class NotifyTimer {
     /**
      * 抢单:每天17:40清理数据
      */
-   // @Scheduled(cron = "0 40 17 * * ?")
+     @Scheduled(cron = "0 40 17 * * ?")
     public void clearGrabOrderDataForeigh() {
         logger.info("<<<<<<graborder-clearGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<清理昨天抢单历史数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
@@ -183,7 +183,7 @@ public class NotifyTimer {
     /**
      * 每天18:00 向教师发送 从现在开始  未来48+6小时内 变更课程的数量  的消息
      */
-    @Scheduled(cron = "0 0 18 * * ?")
+     @Scheduled(cron = "0 0 18 * * ?")
     public void courseChangeSendMessage() {
         logger.info("<<<<<<courseChangeSendMessage<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<< 变更课程的数量  >>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
@@ -252,6 +252,28 @@ public class NotifyTimer {
         logger.info("<<<<<<recommendCourses<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<课程推荐<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    /**
+     * 鱼卡自动确认状态
+     */
+    //@Scheduled(cron = "0 0 4 * * ?")
+    @Scheduled(cron = "0 10 15 * * ?")
+    public void autoConfirmStatus(){
+        logger.info("<<<<<<autoConfirmStatus<<<<<<<<<<<<<<<<");
+        logger.info("<<<<<<自动确认状态<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    // 即时上课,每20S一次
+    @Scheduled(cron = "0/20 * * * * ?")
+    public void instantClasses(){
+        logger.info("<<<<<<instantClasses<<<<<<<<<<<<<<<<");
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.INSTANT_CLASS.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.param;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -26,5 +27,15 @@ public class TimeSlotParam {
 
     public ComboTypeToRoleId getComboTypeEnum() {
         return ComboTypeToRoleId.resolve(comboType);
+    }
+
+    public static TimeSlotParam instantCard2TimeParam(InstantClassCard instantClassCard){
+        TimeSlotParam timeSlotParam=new TimeSlotParam();
+        timeSlotParam.setTutorType(instantClassCard.getTutorType());
+        timeSlotParam.setComboType(instantClassCard.getComboType());
+        timeSlotParam.setOrderId(instantClassCard.getOrderId());
+        timeSlotParam.setProductType(instantClassCard.getProductType());
+        timeSlotParam.setStudentId(instantClassCard.getStudentId());
+        return timeSlotParam;
     }
 }

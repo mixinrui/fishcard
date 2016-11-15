@@ -202,7 +202,7 @@ public class MakeUpLessionServiceX {
             resultMap.put("5", "该课程已经进行过状态确认,可能进行状态更正");
             return JsonResultModel.newJsonResultModel(resultMap);
         }
-
+ 
         // 课程
         courseSchedule.setStatus(makeUpCourseParam.getFishStatus());
         courseSchedule.setUpdateTime(DateTime.now().toDate());
@@ -251,8 +251,27 @@ public class MakeUpLessionServiceX {
                 resultMap.put("2", "该鱼卡已经确认过状态!");
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
+        }
+
+
+        this.fishcardStatusRechargeChangeLast(workOrders);
+
+        resultMap.put("0", "更新成功");
+        return JsonResultModel.newJsonResultModel(resultMap);
+    }
+
+    // db操作 确认状态
+    public void fishcardStatusRechargeChangeLast(List<WorkOrder> workOrders){
+        for (WorkOrder wo : workOrders) {
             wo.setConfirmFlag("0");
-            wo.setStatusRecharge(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
+            // 50 52 60 三种状态为退款状态
+            if(     wo.getStatus() == FishCardStatusEnum.TEACHER_ABSENT.getCode() ||
+                    wo.getStatus() == FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode() ||
+                    wo.getStatus() == FishCardStatusEnum.EXCEPTION.getCode()
+                    ){
+                wo.setStatusRecharge(FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
+            }
+
             wo.setUpdatetimeRecharge(new Date());
         }
 
@@ -261,9 +280,8 @@ public class MakeUpLessionServiceX {
 
         // 记录日志
         workOrderLogService.batchSaveWorkOrderLogs(workOrders);
-        resultMap.put("0", "更新成功");
-        return JsonResultModel.newJsonResultModel(resultMap);
     }
+
 
     @Autowired
     private GrabOrderService grabOrderService;
@@ -362,7 +380,7 @@ public class MakeUpLessionServiceX {
         }
 
         Long orderId = workOrders.get(0).getOrderId();
-        Boolean successFlag = makeUpCourseParam.getSuccessFlag();
+        String successFlag = makeUpCourseParam.getSuccessFlag();
         if (null == successFlag) {
             resultMap.put("3", "无成功失败标示");
             logger.info("fixedStateFromOrder订单id[{}],无成功失败标示", orderId);
@@ -370,12 +388,14 @@ public class MakeUpLessionServiceX {
         }
         for (WorkOrder wo : workOrders) {
 
-            if (successFlag) {
+            if ("true".equals( successFlag)) {
                 // 推送成功消息
                 sendMessageRefund(wo);
                 wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGEBACK_SUCCESS.getCode());
-            } else {
+            } else if("false".equals(successFlag)){
                 wo.setStatusRecharge(FishCardChargebackStatusEnum.RECHARGEBACK_FAILED.getCode());
+            }else if("refused".equals(successFlag)){
+                wo.setStatusRecharge(FishCardChargebackStatusEnum.REFUSED.getCode());
             }
             wo.setUpdatetimeRecharge(new Date());
         }

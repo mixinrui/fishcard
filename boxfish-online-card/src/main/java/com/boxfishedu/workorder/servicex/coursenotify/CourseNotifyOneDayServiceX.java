@@ -50,7 +50,6 @@ public class CourseNotifyOneDayServiceX {
     private RabbitMqSender rabbitMqSender;
 
 
-
     /**
      * 通知明天学生有课
      */
@@ -84,7 +83,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
         /**  begin  发送短信 **/
-        sendShortMessage(studentHasClassMap,"1");
+        sendShortMessage(studentHasClassMap, "1");
         /**  end    发送短信 **/
 
         //开始发送通知
@@ -99,13 +98,13 @@ public class CourseNotifyOneDayServiceX {
 
         listWorkOrders.forEach(workOrder -> {
 
-            List<WorkOrder>  listWorkOrder= studentHasClassMap.get(workOrder.getStudentId());
+            List<WorkOrder> listWorkOrder = studentHasClassMap.get(workOrder.getStudentId());
             if (null != listWorkOrder) {
                 studentHasClassMap.get(workOrder.getStudentId()).add(workOrder);
             } else {
                 listWorkOrder = Lists.newArrayList();
                 listWorkOrder.add(workOrder);
-                studentHasClassMap.put(workOrder.getStudentId(),listWorkOrder );
+                studentHasClassMap.put(workOrder.getStudentId(), listWorkOrder);
             }
         });
         return studentHasClassMap;
@@ -158,21 +157,22 @@ public class CourseNotifyOneDayServiceX {
 
     /**
      * 给学生发送短信
+     *
      * @param classMap
-     * @param type  1 给学生发短信
-     *              2 给老师发送短信
+     * @param type     1 给学生发短信
+     *                 2 给老师发送短信
      */
-    private void sendShortMessage(Map<Long,List<WorkOrder>> classMap,String type){
-        for(Long key :classMap.keySet()){
+    private void sendShortMessage(Map<Long, List<WorkOrder>> classMap, String type) {
+        for (Long key : classMap.keySet()) {
             threadPoolManager.execute(new Thread(() -> {
                 // 发送短信 向短信队列发送q消息
                 List<WorkOrder> list = classMap.get(key);
-                if(null!=list){
+                if (null != list) {
                     Object o = null;
-                    if("1".equals(type)){
-                        o= getMessageStu(key,list);
-                    }else if("2".equals(type)){
-                        o= getMessageteacher(key,list);
+                    if ("1".equals(type)) {
+                        o = getMessageStu(key, list);
+                    } else if ("2".equals(type)) {
+                        o = getMessageteacher(key, list);
                     }
 
                     rabbitMqSender.send(o, QueueTypeEnum.SHORT_MESSAGE);
@@ -184,51 +184,53 @@ public class CourseNotifyOneDayServiceX {
 
     /**
      * 学生消息体
+     *
      * @param userId
      * @param list
      * @return
      */
-   private Object getMessageStu(Long userId,List<WorkOrder> list){
-       Map map = Maps.newHashMap();
-       map.put("user_id",userId);
-       map.put("template_code", ShortMessageCodeConstant.SMS_STU_NOTITY_TOMO_CODE);
+    private Object getMessageStu(Long userId, List<WorkOrder> list) {
+        Map map = Maps.newHashMap();
+        map.put("user_id", userId);
+        map.put("template_code", ShortMessageCodeConstant.SMS_STU_NOTITY_TOMO_CODE);
 
-       JSONObject jo = new JSONObject();
-       jo.put("quantity", String.valueOf(list.size()));
+        JSONObject jo = new JSONObject();
+        jo.put("quantity", String.valueOf(list.size()));
 
-       StringBuffer startTime = new StringBuffer("");
-       list.forEach(workOrder -> {
-           startTime.append(DateUtil.date2ShortString(workOrder.getStartTime())).append(",");
-       });
+        StringBuffer startTime = new StringBuffer("");
+        list.forEach(workOrder -> {
+            startTime.append(DateUtil.date2ShortString(workOrder.getStartTime())).append(",");
+        });
 
-       jo.put("startTime", startTime.substring(0,startTime.length()-1));
+        jo.put("startTime", startTime.substring(0, startTime.length() - 1));
 
-       map.put("data",jo.toJSONString());
-       return map;
+        map.put("data", jo.toJSONString());
+        return map;
 
-   }
+    }
 
 
     /**
      * 老师消息体
+     *
      * @param userId
      * @param list
      * @return
      */
-    private Object getMessageteacher(Long userId,List<WorkOrder> list){
+    private Object getMessageteacher(Long userId, List<WorkOrder> list) {
         Map map = Maps.newHashMap();
-        map.put("user_id",userId);
+        map.put("user_id", userId);
         map.put("template_code", ShortMessageCodeConstant.SMS_TEA_NOTITY_CLASS_TODY_CODE);
 
         JSONObject jo = new JSONObject();
-            jo.put("quantity", String.valueOf(list .size()));
-            jo.put("startTime", CollectionUtils.isEmpty(list)?"":DateUtil.date2ShortString(list.get(0).getStartTime())     );
+        jo.put("quantity", String.valueOf(list.size()));
+        jo.put("startTime", CollectionUtils.isEmpty(list) ? "" : DateUtil.date2ShortString(list.get(0).getStartTime()));
         try {
-            logger.info(":::getMessageteacher::fishcardId [{}]::startTime [{}]",list.get(0).getId(),list.get(0).getStartTime());
-        }catch (Exception e){
+            logger.info(":::getMessageteacher::fishcardId [{}]::startTime [{}]", list.get(0).getId(), list.get(0).getStartTime());
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        map.put("data",jo.toJSONString());
+        map.put("data", jo.toJSONString());
         return map;
 
     }
@@ -244,11 +246,13 @@ public class CourseNotifyOneDayServiceX {
             List list1 = list.subList(i * base_count, i * base_count + base_count);
             //System.out.println(list1.get(0)+"-----"+list1.get(list1.size()-1));
             teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(i * base_count, i * base_count + base_count));
+
             logger.info("splitByTwoThousandsMessage:[{}] :begin:[{}]:end:[{}]",i,i * base_count,i * base_count + base_count);
         }
         List list2 = list.subList(count * base_count, count * base_count + yushu);
 
         //System.out.println(list2.get(0)+"-----"+list2.get(list2.size()-1));
+
         teacherStudentRequester.pushTeacherListOnlineMsg(list.subList(count * base_count, count * base_count + yushu ));
         logger.info("splitByTwoThousandsMessage: last :begin:[{}]:end:[{}]",count * base_count,count * base_count + yushu);
 
@@ -266,8 +270,6 @@ public class CourseNotifyOneDayServiceX {
 
         t.splitByTwoThousandsMessage(list);
     }
-
-
 
 
     /**
@@ -303,7 +305,7 @@ public class CourseNotifyOneDayServiceX {
         }
 
         /**  begin  发送短信 **/
-        sendShortMessage(teacherHasClassMap,"2");
+        sendShortMessage(teacherHasClassMap, "2");
         /**  end    发送短信 **/
 
         logger.info("notiFyTeacherClass:::::通知完成");
@@ -311,32 +313,31 @@ public class CourseNotifyOneDayServiceX {
     }
 
 
-
     private Map<Long, List<WorkOrder>> getTeacherClassess(Map<Long, List<WorkOrder>> teacherHasClassMap, List<WorkOrder> listWorkOrders) {
 
         listWorkOrders.forEach(workOrder -> {
 
-            List<WorkOrder>  listWorkOrder= teacherHasClassMap.get(workOrder.getTeacherId());
+            List<WorkOrder> listWorkOrder = teacherHasClassMap.get(workOrder.getTeacherId());
             if (null != listWorkOrder) {
                 teacherHasClassMap.get(workOrder.getTeacherId()).add(workOrder);
             } else {
                 listWorkOrder = Lists.newLinkedList();
                 final Function<WorkOrder, Date> byName = wo -> wo.getStartTime();
                 listWorkOrder.add(workOrder);
-                teacherHasClassMap.put(workOrder.getTeacherId(),listWorkOrder );
+                teacherHasClassMap.put(workOrder.getTeacherId(), listWorkOrder);
             }
         });
 
         // 按照开始时间排序
-        if(!teacherHasClassMap.isEmpty()){
-            teacherHasClassMap.forEach((id,wolist)->{
-                if(null!=wolist && wolist.size()>0){
+        if (!teacherHasClassMap.isEmpty()) {
+            teacherHasClassMap.forEach((id, wolist) -> {
+                if (null != wolist && wolist.size() > 0) {
                     wolist.sort(new Comparator<WorkOrder>() {
                         @Override
                         public int compare(WorkOrder o1, WorkOrder o2) {
-                             if(o1.getStartTime().after(o2.getStartTime())){
-                                 return 0;
-                             }
+                            if (o1.getStartTime().after(o2.getStartTime())) {
+                                return 0;
+                            }
                             return -1;
                         }
                     });

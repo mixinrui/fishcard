@@ -19,7 +19,9 @@ public enum FishCardChargebackStatusEnum {
     /**  退款成功  **/
     RECHARGEBACK_SUCCESS(30, "退款成功",""),
     /**  退款失败   **/
-    RECHARGEBACK_FAILED(40, "退款失败","");
+    RECHARGEBACK_FAILED(40, "退款失败",""),
+    /**  驳回 **/
+    REFUSED(50, "退款驳回","");
 
     FishCardChargebackStatusEnum() {
     }

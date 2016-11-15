@@ -34,14 +34,17 @@ public class CommentCardTeacherAppService {
     }
 
     public CommentCard findById(Long id){
+        logger.info("###findById###" + id);
         return commentCardJpaRepository.findOne(id);
     }
 
     public CommentCard save(CommentCard commentCard){
+        logger.info("###save###" + commentCard);
         return commentCardJpaRepository.save(commentCard);
     }
 
     public Map queryTeacherAnswerList(Pageable pageable, Long teacherId){
+        logger.info("###queryTeacherAnswerList###" + teacherId);
         Page<CommentCard> commentCardPage = commentCardJpaRepository.queryTeacherAnsweredList(pageable,teacherId);
         Map commentCardsMap = new LinkedHashMap<>();
         commentCardsMap.put("content",commentCardPage.getContent());
@@ -53,6 +56,7 @@ public class CommentCardTeacherAppService {
     }
 
     public Map queryTeacherUnanswerList(Pageable pageable, Long teacherId){
+        logger.info("###queryTeacherUnanswerList###" + teacherId);
         Page<CommentCard> commentCardPage = commentCardJpaRepository.queryTeacherUnAnsweredList(pageable,teacherId);
         Map commentCardsMap = new LinkedHashMap<>();
         commentCardsMap.put("content",commentCardPage.getContent());
@@ -64,7 +68,8 @@ public class CommentCardTeacherAppService {
     }
 
     public CommentCard checkTeacher(Long id, Long teacherId){
-        return commentCardJpaRepository.findByIdAndTeacherIdAndStatus(id, teacherId,300);
+        logger.info("###checkTeacher###" + "id=" + id + ", teacherId=" + teacherId);
+        return commentCardJpaRepository.findByIdAndTeacherId(id, teacherId);
     }
 
     public long countTeacherDoneUnread(Long teacherId){

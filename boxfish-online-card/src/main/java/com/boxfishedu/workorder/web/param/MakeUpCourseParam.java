@@ -16,6 +16,6 @@ public class MakeUpCourseParam {
     private Integer fishStatus;
     private Long workOrderIds[];
     private String orderCode;
-    private Boolean successFlag;
+    private String successFlag;
 
 }

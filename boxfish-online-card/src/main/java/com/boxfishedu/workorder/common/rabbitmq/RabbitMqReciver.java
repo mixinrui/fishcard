@@ -17,8 +17,10 @@ import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
+import com.boxfishedu.workorder.servicex.fishcardcenter.AutuConfirmFishCardServiceX;
 import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
+import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -88,6 +90,12 @@ public class RabbitMqReciver {
 
     @Autowired
     private OnlineAccountService onlineAccountService;
+
+    @Autowired
+    private AutuConfirmFishCardServiceX autuConfirmFishCardServiceX;
+
+    @Autowired
+    private InstantClassTimerServiceX instantClassTimerServiceX;
 
     /**
      * 订单中心转换请求
@@ -189,6 +197,12 @@ public class RabbitMqReciver {
                 courseScheduleUpdatorServiceX.freezeUpdateHome();
             } else if(serviceTimerMessage.getType() == TimerMessageType.RECOMMEND_COURSES.value()) {
                 courseScheduleUpdatorServiceX.recommendCourses();
+            } else  if(serviceTimerMessage.getType() == TimerMessageType.AUTO_CONFIRM_STATUS.value()){
+                logger.info("==========>AutuConfirmFishCardServiceX ===>>> 自动确认鱼卡状态");
+                autuConfirmFishCardServiceX.autoConfirmFishCard();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS.value()){
+                logger.info("==========>INSTANT_CLASS ===>>> 立即上课");
+                instantClassTimerServiceX.putCardsToMatchTeachers();
             }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);

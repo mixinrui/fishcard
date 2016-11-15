@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.common.util;
 
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +34,10 @@ public class DateUtil {
             throw new RuntimeException("日期格式不合法");
         }
         return date;
+    }
+
+    public static LocalDateTime string2LocalDateTime(String dateStr){
+       return convertLocalDateTime(String2Date(dateStr));
     }
 
     public static String Date2ForForeignDate(Date date) {
@@ -71,6 +76,10 @@ public class DateUtil {
     public static Date date2SimpleDate(Date dateWithTime) {
         String dateWithTimeStr = Date2String(dateWithTime);
         return String2SimpleDate(dateWithTimeStr);
+    }
+
+    public static String dateTrimYear(Date date){
+        return StringUtils.split(DateUtil.Date2String(date)," ")[1];
     }
 
     public static String simpleDate2String(Date date) {
@@ -318,6 +327,17 @@ public class DateUtil {
         return  ((int)( l / (24 * 60 * 60 * 1000)) -1);
     }
 
+    public static int getBetweenMinus(Date begin, Date end) {
+        long l = end.getTime() - begin.getTime();
+        return  ((int)( l / ( 60 * 1000)) -1);
+    }
+
+    public static void main(String[] args) throws ParseException {
+        System.out.println(getBetweenMinus(String2Date("2016-10-28 19:00:00"),String2Date("2016-10-29 19:20:30")));
+    }
+
+
+
     /**
      * 48小时以内
      * @param dateTime
@@ -343,8 +363,8 @@ public class DateUtil {
     }
 
 
-    public static void main(String[] args) throws ParseException {
-        System.out.println("withIn=" + within72Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-28 19:00:00")));
-    }
+//    public static void main(String[] args) throws ParseException {
+//        System.out.println("withIn=" + within72Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-28 19:00:00")));
+//    }
 
 }
