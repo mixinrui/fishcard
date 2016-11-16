@@ -57,7 +57,7 @@ public class InstantClassTeacherService {
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
         instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId(),new Date());
-        threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassCard);}));
+        threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassJpaRepository.findOne(instantClassCard.getId()));}));
     }
 
     public void dealInstantFetchedTeachers(InstantClassCard instantClassCard){
