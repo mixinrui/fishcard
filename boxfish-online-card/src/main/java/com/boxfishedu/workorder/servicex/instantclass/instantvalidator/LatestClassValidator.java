@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.instantclass.instantvalidator;
 
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
@@ -32,6 +33,9 @@ public class LatestClassValidator implements InstantClassValidator {
     @Autowired
     private OnlineAccountService onlineAccountService;
 
+    @Autowired
+    private InstantClassJpaRepository instantClassJpaRepository;
+
     private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -48,6 +52,15 @@ public class LatestClassValidator implements InstantClassValidator {
         if(dateOptional.isPresent()){
             if(LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30).isAfter(
                     LocalDateTime.ofInstant(dateOptional.get().toInstant(), ZoneId.systemDefault()))) {
+                //判断当前是否有刚匹配上的课程,如果有,则跳过这个验证
+                Optional<Date> latestMatchedDateOptional=instantClassJpaRepository.findLatestMatchedInstantCard(instantRequestParam.getStudentId(),InstantClassRequestStatus.MATCHED.getCode());
+                if(latestMatchedDateOptional.isPresent()){
+                    //3分钟之内匹配上的,则放行
+                    LocalDateTime localDateTimeBegin=LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(3);
+                    if(latestMatchedDateOptional.get().after(DateUtil.localDate2Date(localDateTimeBegin))){
+                        return InstantClassRequestStatus.UNKNOWN.getCode();
+                    }
+                }
                 logger.debug("@LatestClassValidator#preValidate#[{}]30分钟内有课",instantRequestParam.getStudentId());
                 ThreadLocalUtil.classDateIn30Minutes.set(dateOptional.get());
                 return InstantClassRequestStatus.HAVE_CLASS_IN_HALF_HOURS.getCode();

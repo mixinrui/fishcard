@@ -88,7 +88,7 @@ public class InstantClassServiceX {
                             .newInstantClassResult(instantStatus, "实时上课会在[ " + this.timeRange()+" ]内开启,请到时间再重试~"));
                 case HAVE_CLASS_IN_HALF_HOURS:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus, "您预约了 " + DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()) +" 内开启,马上就开始了,此时不能实时上课~"));
+                            .newInstantClassResult(instantStatus, "您预约了[ " + DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()) +" ]的课程,马上就开始了,此时不能实时上课~"));
                 default:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus));

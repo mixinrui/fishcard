@@ -204,6 +204,10 @@ public class RabbitMqReciver {
                 logger.info("==========>INSTANT_CLASS ===>>> 立即上课");
                 instantClassTimerServiceX.putCardsToMatchTeachers();
             }
+            else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS_MARK_UNMATCH.value()){
+                logger.info("==========>INSTANT_CLASS_MARK_UNMATCH ===>>> 一分钟未匹配教师,标记未匹配");
+                instantClassTimerServiceX.markUnmatchCard();
+            }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);

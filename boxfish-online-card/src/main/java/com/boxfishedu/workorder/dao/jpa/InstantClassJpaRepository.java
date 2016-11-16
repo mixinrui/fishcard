@@ -54,4 +54,7 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
     List<InstantClassCard> findByRequestMatchTeacherTimeBetweenAndStatusIn(Date startDate, Date endDate, Integer[] statuses);
 
     Optional<InstantClassCard> findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(Long studentId,Date date);
+
+    @Query(value = "select max(icc.requestMatchTeacherTime) from InstantClassCard icc where studentId=? and status=?")
+    Optional<Date> findLatestMatchedInstantCard(Long studentId,Integer status);
 }

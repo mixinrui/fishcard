@@ -48,4 +48,15 @@ public class InstantClassTimerServiceX {
                 .sendInstantClassMsg(instantClassCard,InstantClassMessageProperties.getMsgProperties(instantClassCard)));
 
     }
+
+    public void markUnmatchCard(){
+        //TODO:需要使用配置
+        LocalDateTime endLocal = LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(70);
+        LocalDateTime beginLocal = endLocal.minusHours(1);
+        List<InstantClassCard> instantClassCards = instantClassJpaRepository.findByRequestMatchTeacherTimeBetweenAndStatusIn(
+                DateUtil.localDate2Date(beginLocal), DateUtil.localDate2Date(endLocal), new Integer[]{InstantClassRequestStatus.WAIT_TO_MATCH.getCode()});
+        logger.warn("超过一分钟未匹配教师,通过定时器强制设置为未匹配的抢单卡",instantClassCards);
+        instantClassCards.forEach(instantClassCard -> instantClassJpaRepository.updateStatus(instantClassCard.getId(),InstantClassRequestStatus.NO_MATCH.getCode()));
+
+    }
 }
