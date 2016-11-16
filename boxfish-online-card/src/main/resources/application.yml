@@ -317,8 +317,8 @@ spring:
     username: root
     password: Boxfish2016
   redis:
-    hostName: 127.0.0.1
-    password:
+    hostName: 8619f2f4a93c4a70.m.cnbja.kvstore.aliyuncs.com
+    password: Box12345678
     port: 6379
     timeout: 10000
   rabbitmq:
