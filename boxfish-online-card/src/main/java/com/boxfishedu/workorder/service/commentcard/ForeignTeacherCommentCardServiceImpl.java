@@ -412,13 +412,12 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     private String createPushUnAnswer2InfoToStudentAndTeacherMessage(CommentCard commentCard) {
-        String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
-                "UNKNOW" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
-        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
-                "UNKNOW" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
-        return  "You have not assessed the answer at "+ assignTeacherTime +
-                " on "+ englishAssignTeacherTime + ",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
-                "GET IT";
+        //2016-11-16 由于推送时间无法转换时区,所以修改.
+//        String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+//                "UNKNOW" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
+//        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+//                "UNKNOW" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
+        return  "You have not assessed an answer in 24 hours. If you should fail to do that again, you would be disqualified.";
     }
 
     /**
