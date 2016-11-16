@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
@@ -15,6 +16,7 @@ import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +26,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -99,29 +98,46 @@ public class AvaliableTimeServiceXV1 {
      * @return
      */
     private DateRange getEnableDateRange(AvaliableTimeParam avaliableTimeParam, Integer days) {
-        // 如果没有未消费的订单,则取得当前时间;否则换成订单的最后结束时间
-        WorkOrder workOrder = null;
-        try {
-            // 如果是overall,设置为MIXED
-            if(Objects.equals(avaliableTimeParam.getComboType(), ComboTypeToRoleId.OVERALL.name())) {
-                avaliableTimeParam.setTutorType(TutorType.MIXED.name());
+        LocalDateTime startDate = null;
+        if(null == avaliableTimeParam.getDelayWeek()) {
+
+
+            // 如果没有未消费的订单,则取得当前时间;否则换成订单的最后结束时间
+            WorkOrder workOrder = null;
+            try {
+                // 如果是overall,设置为MIXED
+                if (Objects.equals(avaliableTimeParam.getComboType(), ComboTypeToRoleId.OVERALL.name())) {
+                    avaliableTimeParam.setTutorType(TutorType.MIXED.name());
+                }
+                workOrder = workOrderService.getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(
+                        avaliableTimeParam.getStudentId(), ProductType.TEACHING.value(), avaliableTimeParam.getTutorType());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");
             }
-            workOrder = workOrderService.getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(
-                    avaliableTimeParam.getStudentId(), ProductType.TEACHING.value(), avaliableTimeParam.getTutorType());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");
-        }
-        Date date = new Date();
-        int afterDays = consumerStartDay;
-        // 同类型工单的最后一个工单
-        if (null != workOrder && workOrder.getEndTime().after(date)) {
-            date = workOrder.getEndTime();
-            afterDays = 1;
-        }
-        LocalDateTime startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-        if(afterDays > 0) {
-            startDate = startDate.plusDays(afterDays);
+            Date date = new Date();
+            int afterDays = consumerStartDay;
+
+            // 推迟上课周数
+            if (null != avaliableTimeParam.getDelayWeek()) {
+                afterDays += (daysOfWeek * avaliableTimeParam.getDelayWeek());
+            }
+
+
+            // 同类型工单的最后一个工单
+            if (null != workOrder && workOrder.getEndTime().after(date)) {
+                date = workOrder.getEndTime();
+                afterDays = 1;
+            }
+            startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+            if (afterDays > 0) {
+                startDate = startDate.plusDays(afterDays);
+            }
+
+        }else{
+            // 延迟上课
+            startDate = LocalDateTime.ofInstant(DateUtil.String2Date(avaliableTimeParam.getRangeStartTime()) .toInstant(), ZoneId.systemDefault());
+            days =daysOfWeek;
         }
         return new DateRange(startDate, days);
     }
@@ -139,6 +155,42 @@ public class AvaliableTimeServiceXV1 {
         } else {
             return avaliableTimeParam.getIsFree() ? freeExperienceDay : daysOfMonth;
         }
+    }
+
+
+    /**
+     *获取延迟时间列表
+     */
+    public JsonResultModel getDelayWeekDays()  throws Exception {
+        Map<Integer,Object> delayRange = Maps.newHashMap();
+        Date currentDate = new Date();
+        boolean weekFlag = DateUtil.getWeekDay();
+        // 1 周末
+//        if(weekFlag){
+            for(int i=1;i<9;i++){
+                JSONObject jb = new JSONObject();
+
+                String firstWeek = weekFlag ? "下周" :"本周";
+                String text = i==1 ?  firstWeek+ "("+DateUtil.formatMonthDay2String(DateUtil.getAfterTomoDate(currentDate))+"起)"    :
+                                      "第"+String.valueOf(i)+"周"+ "("+DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,i-1)))+"起)";
+                Date  date  = i==1 ? DateUtil.getAfterTomoDate(currentDate) : DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,i-1));
+                jb.put("text", text);
+                jb.put("date",DateUtil.Date2String24(date));
+                delayRange.put(i,jb);
+            }
+        // 非周末
+//        }else {
+//            for(int i=1;i<9;i++){
+//                JSONObject jb = new JSONObject();
+//                String text = i==1 ?  "本周"+ "("+DateUtil.formatMonthDay2String(DateUtil.getAfterTomoDate(currentDate))+"起)"    :
+//                        "第"+String.valueOf(i)+"周"+ "("+DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,i-1)))+"起)";
+//                Date  date  = i==1 ? DateUtil.getAfterTomoDate(currentDate) : DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,i-1));
+//                jb.put("text", text);
+//                jb.put("date",DateUtil.Date2String24(date));
+//                delayRange.put(i,jb);
+//            }
+//        }
+        return JsonResultModel.newJsonResultModel(delayRange);
     }
 
 }
