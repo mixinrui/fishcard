@@ -51,12 +51,12 @@ public class InstantTeacherRequester {
         instantFetchTeacherParam.setDay(instantClassCard.getClassDate().getTime());
         instantFetchTeacherParam.setCourseType(instantClassCard.getCourseType());
         //TODO:这里暂时假数据,到时候会替换
-//        InstantRecommandAlthom instantRecommandAlthom=new InstantRecommandAlthom(instantClassCard.getRequestTeacherTimes());
-//        instantFetchTeacherParam.setCountStart(instantRecommandAlthom.getCountStart());
-//        instantFetchTeacherParam.setCountEnd(instantRecommandAlthom.getCountEnd());
+        InstantRecommandAlthom instantRecommandAlthom=new InstantRecommandAlthom(instantClassCard.getRequestTeacherTimes());
+        instantFetchTeacherParam.setCountStart(instantRecommandAlthom.getCountStart());
+        instantFetchTeacherParam.setCountEnd(instantRecommandAlthom.getCountEnd());
 
-        instantFetchTeacherParam.setCountStart(0);
-        instantFetchTeacherParam.setCountEnd(50);
+//        instantFetchTeacherParam.setCountStart(0);
+//        instantFetchTeacherParam.setCountEnd(50);
         instantFetchTeacherParam.setRoleId(instantClassCard.getRoleId());
         instantFetchTeacherParam.setSlotId(instantClassCard.getSlotId());
         return this.parseFetchTeachers(this.getInstantTeachers(instantFetchTeacherParam));

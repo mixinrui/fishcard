@@ -49,6 +49,7 @@ public class LatestClassValidator implements InstantClassValidator {
             if(LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30).isAfter(
                     LocalDateTime.ofInstant(dateOptional.get().toInstant(), ZoneId.systemDefault()))) {
                 logger.debug("@LatestClassValidator#preValidate#[{}]30分钟内有课",instantRequestParam.getStudentId());
+                ThreadLocalUtil.classDateIn30Minutes.set(dateOptional.get());
                 return InstantClassRequestStatus.HAVE_CLASS_IN_HALF_HOURS.getCode();
             }
         }
