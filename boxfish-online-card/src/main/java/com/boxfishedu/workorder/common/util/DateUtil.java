@@ -332,9 +332,7 @@ public class DateUtil {
         return  ((int)( l / ( 60 * 1000)) -1);
     }
 
-    public static void main(String[] args) throws ParseException {
-        System.out.println(getBetweenMinus(String2Date("2016-10-28 19:00:00"),String2Date("2016-10-29 19:20:30")));
-    }
+
 
 
 
@@ -362,9 +360,47 @@ public class DateUtil {
         return duration.toMinutes() <= 72 * 60;
     }
 
+    public static String formatMonthDay2String(Date date) {
+        String dateStr = null;
+        try {
+            dateStr = new SimpleDateFormat("MM月dd日").format(date);
+        } catch (Exception ex) {
+            throw new RuntimeException("日期格式不合法");
+        }
+        return dateStr;
+    }
 
-//    public static void main(String[] args) throws ParseException {
-//        System.out.println("withIn=" + within72Hours(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-10-28 19:00:00")));
-//    }
+    public static boolean getWeekDay(){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        int w =  cal.get(Calendar.DAY_OF_WEEK) - 1;
+        return (w==0 ||w==6) ?true:false;
+
+    }
+
+
+    //注：周日是一周的开始 获取周一的日期
+    public static Date getMonday(Date date)throws Exception{
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int week = cal.get(Calendar.DAY_OF_WEEK);
+        if(week>2){
+            cal.add(Calendar.DAY_OF_MONTH,-(week-2)+7);
+        }else{
+            cal.add(Calendar.DAY_OF_MONTH,2-week+7);
+        }
+        return cal.getTime();
+    }
+
+
+    public static Date getAfterTomoDate(Date date){
+        return  addMinutes(date,60*24*2);
+    }
+    public static Date getAfter7Days(Date date,int i ){
+        return  (i-1)==0?date : addMinutes(date,60*24*(i-1)*7);
+    }
+
+
+
 
 }

@@ -15,6 +15,7 @@ import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmis
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/3/31.
@@ -95,6 +97,15 @@ StudentAppRelatedController {
         return timePickerServiceX.getCourseSchedulePage(studentId, pageable, locale);
     }
 
+    /**
+     * 获取延迟上课的周数
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/v1/delay/week/class" ,method = RequestMethod.GET)
+    public JsonResultModel getDelayClassWeeks(Long userId)throws  Exception{
+        return avaliableTimeServiceXV1.getDelayWeekDays();
+    }
 
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
     public JsonResultModel timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
