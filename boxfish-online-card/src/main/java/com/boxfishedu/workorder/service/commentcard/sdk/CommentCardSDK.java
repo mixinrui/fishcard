@@ -64,6 +64,10 @@ public class CommentCardSDK {
         return restTemplate.postForObject(getInnerTeacherURI(), paramMap,JsonResultModel.class);
     }
 
+    public Object addScore2Student(){
+        return restTemplate.postForObject(getAddScoreURI(),"",Object.class);
+    }
+
     private URI createTeacherAbsenceURI(){
         logger.info("Accessing createTeacherAbsenceURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getTeacherAbsenceUrl())
@@ -105,6 +109,16 @@ public class CommentCardSDK {
         String url = "/course/info/" + courseId;
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_type_and_difficulty())
                 .path(url)
+                .queryParam("")
+                .build()
+                .toUri();
+    }
+
+    //TODO: 待小胖修改接口
+    private URI getAddScoreURI(){
+        logger.info("Accessing getAddScoreURI in CommentCardSDK......");
+        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getScoreUrl())
+                .path("/statistic/user/score")
                 .queryParam("")
                 .build()
                 .toUri();

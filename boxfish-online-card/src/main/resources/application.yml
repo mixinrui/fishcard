@@ -355,8 +355,11 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9090
     innerTeacherUrl: http://123.56.13.168:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
     type: test
+
+
 
 
 server.port: 8080
@@ -411,6 +414,7 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: pretest
 
@@ -470,6 +474,7 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: demo
 #===============================================================预生产环境===============================================================
@@ -528,6 +533,7 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: preproduct
 
@@ -595,6 +601,7 @@ service:
     getPictureUrl: http://base.boxfish.cn/passbook
     pushInfoIrl: http://online-api.boxfish.cn/teaching-service
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
+    scoreUrl: api.boxfish.cn
   gateway:
     type: product
 
@@ -662,5 +669,6 @@ service:
     getPictureUrl: http://base.boxfish.cn/passbook
     pushInfoIrl: http://online-api.boxfish.cn/teaching-service
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
+    scoreUrl: api.boxfish.cn
   gateway:
     type: product
