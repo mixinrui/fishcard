@@ -98,7 +98,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
             BeanUtils.copyProperties(tmp,oldCard);
         }
 
-        workOrders.forEach(card->workOrderService.saveWorkOrderAndSchedule(workOrder,initSchedule(workOrder)));
+        workOrders.forEach(card->workOrderService.saveWorkOrderAndSchedule(card,initSchedule(card)));
         printLog(logMap);
 
         return typeChangedList;
