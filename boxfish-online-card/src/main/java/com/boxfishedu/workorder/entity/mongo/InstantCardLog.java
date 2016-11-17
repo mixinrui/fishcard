@@ -30,7 +30,7 @@ public class InstantCardLog {
     private Date createTime;
 
     @Indexed(background = true)
-    private Long instantCardLog;
+    private Long instantCardId;
 
     private Long workOrderId;
 

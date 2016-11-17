@@ -8,6 +8,7 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,13 +24,32 @@ public class InstantCardLogMorphiaRepository extends BaseMorphiaRepository<Insta
             InstantCardLog instantCardLog=new InstantCardLog();
             instantCardLog.setStudentId(instantClassCard.getStudentId());
             instantCardLog.setPullTeacherIds(pullTeacherIds);
+            instantCardLog.setInstantCardId(instantClassCard.getId());
             instantCardLog.setDesc("获取推荐教师列表");
+            instantCardLog.setCreateTime(new Date());
             if(!Objects.isNull(instantClassCard.getWorkorderId())) {
                 instantCardLog.setWorkOrderId(instantClassCard.getWorkorderId());
                 datastore.save(instantCardLog);
             }
         }));
+    }
 
+    public List<InstantCardLog> findByInstantCardId(Long instantCardId){
+        Query<InstantCardLog> query = datastore.createQuery(InstantCardLog.class);
+        query.and(query.criteria("instantCardId").equal(instantCardId));
+        //倒序
+//        query.order("-createTime");
+        query.order("createTime");
+        return query.asList();
+    }
+
+    public List<InstantCardLog> findByInstantStudentId(Long studentId){
+        Query<InstantCardLog> query = datastore.createQuery(InstantCardLog.class);
+        query.and(query.criteria("studentId").equal(studentId));
+        //倒序
+//        query.order("-createTime");
+        query.order("createTime");
+        return query.asList();
     }
 
 }

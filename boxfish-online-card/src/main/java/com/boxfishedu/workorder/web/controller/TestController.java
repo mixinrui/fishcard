@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.web.controller;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -51,6 +52,9 @@ public class TestController {
 
     @Autowired
     private ScheduleEntranceDataGenerator scheduleEntranceDataGenerator;
+
+    @Autowired
+    private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
 
     @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
     public void changeFishCardTime(@RequestBody Map<String,String> param){
@@ -155,5 +159,15 @@ public class TestController {
         instantClassCard.setWorkorderId(58805l);
         instantClassCard.setSlotId(29l);
         scheduleEntranceDataGenerator.initCardAndSchedule(instantClassCard);
+    }
+
+    @RequestMapping(value = "/instantcard/{instant_id}", method = RequestMethod.GET)
+    public JsonResultModel notiFyTeachers(@PathVariable("instant_id") Long instantId){
+        return JsonResultModel.newJsonResultModel(instantCardLogMorphiaRepository.findByInstantCardId(instantId));
+    }
+
+    @RequestMapping(value = "/instantlog/student/{student_id}", method = RequestMethod.GET)
+    public JsonResultModel notiFyTeachersByStudent(@PathVariable("student_id") Long studentId){
+        return JsonResultModel.newJsonResultModel(instantCardLogMorphiaRepository.findByInstantStudentId(studentId));
     }
 }

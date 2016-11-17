@@ -55,8 +55,8 @@ public class LatestClassValidator implements InstantClassValidator {
                 //判断当前是否有刚匹配上的课程,如果有,则跳过这个验证
                 Optional<Date> latestMatchedDateOptional=instantClassJpaRepository.findLatestMatchedInstantCard(instantRequestParam.getStudentId(),InstantClassRequestStatus.MATCHED.getCode());
                 if(latestMatchedDateOptional.isPresent()){
-                    //3分钟之内匹配上的,则放行
-                    LocalDateTime localDateTimeBegin=LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(3);
+                    //TODO:25分钟之内匹配上的,则放行;需要做配置
+                    LocalDateTime localDateTimeBegin=LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(25);
                     if(latestMatchedDateOptional.get().after(DateUtil.localDate2Date(localDateTimeBegin))){
                         return InstantClassRequestStatus.UNKNOWN.getCode();
                     }
