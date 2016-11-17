@@ -13,7 +13,7 @@ logging:
 #spring.profiles.active: product
 #spring.profiles.active: local
 #spring.profiles.active: development
-spring.profiles.active: luo
+spring.profiles.active: product
 #spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
@@ -38,7 +38,7 @@ spring:
     username: root
     password: Boxfish2016
 
-  profiles: luo
+  profiles: test
 
 ##################接口调用地址
 

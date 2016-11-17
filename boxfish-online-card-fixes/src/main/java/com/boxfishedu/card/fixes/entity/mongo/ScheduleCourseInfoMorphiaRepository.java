@@ -1,11 +1,15 @@
 package com.boxfishedu.card.fixes.entity.mongo;
 
+import com.boxfishedu.card.fixes.entity.jpa.WorkOrder;
+import com.boxfishedu.card.fixes.entity.jpa.WorkOrderJpaRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +21,9 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
     @Value("${recommend.url.courseInfo}")
     private String url;
 
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
+
     private LongAdder longAdder = new LongAdder();
 
     public void updateCourseInfos() {
@@ -25,6 +32,17 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         List<ScheduleCourseInfo> list = query.asList();
         System.out.println(list.size());
         list.parallelStream().forEach(this::updateCourseInfo);
+    }
+
+
+    public void updateCourseInfosByDateRange(Date from, Date to) {
+        List<WorkOrder> workOrders = workOrderJpaRepository.findByStartTimeRange(from, to);
+        workOrders.parallelStream().forEach(workOrder -> {
+            ScheduleCourseInfo courseInfo = findByWorkOrderId(workOrder.getId());
+            if(courseInfo != null) {
+                updateCourseInfo(courseInfo);
+            }
+        });
     }
 
     public void updateCourseEnglishNames() {

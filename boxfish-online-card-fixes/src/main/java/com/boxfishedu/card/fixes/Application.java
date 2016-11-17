@@ -5,15 +5,22 @@ import com.boxfishedu.card.fixes.service.WorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+
 /**
  * Created by LuoLiBing on 16/10/17.
  */
 @RestController
+@EnableScheduling
 @SpringBootApplication
 public class Application {
 
@@ -43,5 +50,17 @@ public class Application {
             case 4: repository.updateCourseEnglishNames(); break;
         }
         System.out.println("finish fixes");
+    }
+
+    @Scheduled(cron = "0 30 2 * * ?")
+    public void synchronousCourseInfo() {
+        LocalDateTime now = LocalDateTime.now();
+        repository.updateCourseInfosByDateRange(
+                convertToDate(now), convertToDate(now.plusWeeks(1))
+        );
+    }
+
+    private static Date convertToDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 }
