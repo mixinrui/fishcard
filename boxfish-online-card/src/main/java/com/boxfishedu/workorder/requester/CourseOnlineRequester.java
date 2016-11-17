@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -36,6 +37,8 @@ public class CourseOnlineRequester {
     private ThreadPoolManager threadPoolManager;
     @Autowired
     private WorkOrderLogService workOrderLogService;
+    @Autowired
+    private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
     public void releaseGroup(WorkOrder workOrder){
@@ -58,6 +61,7 @@ public class CourseOnlineRequester {
     public void notifyInstantClassMsg(InstantClassCard instantClassCard,List<Long> teacherIds){
         String url=String.format("%s/teaching/callback/push",
                 urlConf.getCourse_online_service());
+        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
         List<TeachingOnlineMsg> teachingOnlineMsgList=Lists.newArrayList();
         teacherIds.forEach(teacherId->{
             TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();

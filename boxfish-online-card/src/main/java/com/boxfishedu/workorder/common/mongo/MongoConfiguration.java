@@ -80,6 +80,7 @@ public class MongoConfiguration {
         morphia.map(AccountCardInfo.class);
         morphia.map(OnlineAccountSet.class);
         morphia.map(InstantClassTimeRules.class);
+        morphia.map(InstantCardLog.class);
         Datastore datastore = morphia.createDatastore(mongoClient(),mongoProperties.getDbName());
         datastore.ensureIndexes();
         return  datastore;
