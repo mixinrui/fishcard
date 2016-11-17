@@ -319,11 +319,17 @@ spring:
     password: Box12345678
     port: 6379
     timeout: 10000
+#  rabbitmq:
+#    address: 123.56.13.168:5672
+##    port: 5672
+#    username: admin
+#    password: boxfish123
+#    virtualHost: local
   rabbitmq:
-    address: 123.56.13.168:5672
+    address: 101.201.237.252
 #    port: 5672
-    username: admin
-    password: boxfish123
+    username: boxfish
+    password: boxfish
     virtualHost: local
   profiles: test
 

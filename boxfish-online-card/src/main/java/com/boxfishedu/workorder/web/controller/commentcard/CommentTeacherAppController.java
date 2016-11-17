@@ -128,32 +128,25 @@ public class CommentTeacherAppController {
         return foreignTeacherCommentCardService.countTeacherUnreadCommentCards(userId);
     }
 
-    @RequestMapping(value = "/comment_student_star", method = RequestMethod.PUT)
-    public JsonResultModel commentStar2Student(@RequestBody CommentCardStarForm commentCardStarForm,Long userId){
+    @RequestMapping(value = "/comment_student_star/{userId}", method = RequestMethod.POST)
+    public JsonResultModel commentStar2Student(@RequestBody CommentCardStarForm commentCardStarForm,@PathVariable  Long userId,String access_token){
         JsonResultModel jsonResultModel;
         CommentCardStar commentCardStarOld = commentCardStarJpaRepository.findByCommentCardId(commentCardStarForm.getCommentCardId());
-        if (Objects.equals(commentCardStarOld.getCommentCardId(),commentCardStarForm.getCommentCardId())){
-            jsonResultModel = new JsonResultModel();
-            jsonResultModel.setData("已经评星成功，不需要再次评星!");
-            jsonResultModel.setReturnCode(400);
-            jsonResultModel.setReturnMsg("Commented!");
+        if (Objects.equals(commentCardStarOld,null)){
+            CommentCardStar commentCardStar = commentCardStarTeacherAppService.saveTeacher2StudentStar(commentCardStarForm,userId,access_token);
+           jsonResultModel = commentCardStarTeacherAppService.showStarInfo(commentCardStar);
         }else {
-            CommentCardStar commentCardStar = commentCardStarTeacherAppService.saveTeacher2StudentStar(commentCardStarForm,userId);
-
-            if (Objects.isNull(commentCardStar.getId())){
+            if (Objects.equals(commentCardStarOld.getCommentCardId(),commentCardStarForm.getCommentCardId())){
                 jsonResultModel = new JsonResultModel();
-                jsonResultModel.setData("对学生评星失败!");
-                jsonResultModel.setReturnCode(500);
-                jsonResultModel.setReturnMsg("Failed!");
+                jsonResultModel.setData("已经评星成功，不需要再次评星!");
+                jsonResultModel.setReturnCode(400);
+                jsonResultModel.setReturnMsg("Commented!");
             }else {
-                jsonResultModel = new JsonResultModel();
-                jsonResultModel.setData("对学生评星成功!");
-                jsonResultModel.setReturnCode(200);
-                jsonResultModel.setReturnMsg("Succeed!");
+                CommentCardStar commentCardStar = commentCardStarTeacherAppService.saveTeacher2StudentStar(commentCardStarForm,userId,access_token);
+                jsonResultModel = commentCardStarTeacherAppService.showStarInfo(commentCardStar);
             }
         }
 
         return jsonResultModel;
     }
-
 }

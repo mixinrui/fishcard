@@ -241,8 +241,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 //                }
 //            }
 //        }
-        logger.info("@foreignTeacherCommentDetailQuery 查看详情时设置首页...");
-        commentTeacherAppServiceX.findHomeComment(userId);
+//        logger.info("@foreignTeacherCommentDetailQuery 查看详情时设置首页...");
+//        commentTeacherAppServiceX.findHomeComment(userId);
         return commentCard;
     }
 
@@ -323,6 +323,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     newCommentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
                     newCommentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
                     newCommentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+                    newCommentCard.setCreateTime(updateDate);
                     if(Objects.nonNull(commentCard.getPrevious_id())) {
                         newCommentCard.setPrevious_id(commentCard.getPrevious_id());
                     } else {

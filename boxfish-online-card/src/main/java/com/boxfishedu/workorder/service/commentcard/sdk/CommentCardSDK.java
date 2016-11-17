@@ -64,8 +64,8 @@ public class CommentCardSDK {
         return restTemplate.postForObject(getInnerTeacherURI(), paramMap,JsonResultModel.class);
     }
 
-    public Object addScore2Student(){
-        return restTemplate.postForObject(getAddScoreURI(),"",Object.class);
+    public Object addScore2Student(Long studentId,String accessToken, Integer point){
+        return restTemplate.postForObject(getAddScoreURI(studentId,accessToken,point),null,Object.class);
     }
 
     private URI createTeacherAbsenceURI(){
@@ -114,12 +114,14 @@ public class CommentCardSDK {
                 .toUri();
     }
 
-    //TODO: 待小胖修改接口
-    private URI getAddScoreURI(){
+    private URI getAddScoreURI(Long studentId,String accessToken, Integer point){
         logger.info("Accessing getAddScoreURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getScoreUrl())
-                .path("/statistic/user/score")
-                .queryParam("")
+                .path("/statistic/user/score/" + studentId)
+                .queryParam("access_token",accessToken)
+                .queryParam("lesson_id","外教点评")
+                .queryParam("channel","online")
+                .queryParam("score",point)
                 .build()
                 .toUri();
     }
