@@ -4,6 +4,7 @@ import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by hucl on 16/5/12.
@@ -27,6 +28,11 @@ public class AvaliableTimeParam implements Serializable {
 
     //给换课时候判断换课的可用时间使用
     private Long workOrderId;
+
+    // 推迟周数
+    private Integer delayWeek;
+    // 推迟时间开始点
+    private String    rangeStartTime;
 
     public ComboTypeToRoleId getComboTypeEnum() {
         return ComboTypeToRoleId.resolve(comboType);

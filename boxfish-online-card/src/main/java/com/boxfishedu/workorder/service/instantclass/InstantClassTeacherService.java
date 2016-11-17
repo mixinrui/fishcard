@@ -57,7 +57,7 @@ public class InstantClassTeacherService {
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
         instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId(),new Date());
-        threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassCard);}));
+        threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassJpaRepository.findOne(instantClassCard.getId()));}));
     }
 
     public void dealInstantFetchedTeachers(InstantClassCard instantClassCard){
@@ -74,10 +74,6 @@ public class InstantClassTeacherService {
             logger.debug("@dealInstantFetchedTeachers没有获取到可 用的教师列表,instantcard{}",instantClassCard);
             return;
         }
-//        if(CollectionUtils.isEmpty(teacherIdsOptional.get())){
-//            //没有教师的情况,需要返回无匹配
-//            this.updateNomatchStatus(instantClassCard);
-//        }
         //匹配上老师,则向教师推送抢单的消息
         courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
     }

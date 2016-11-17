@@ -56,17 +56,18 @@ public class InstantClassServiceX {
     RedisTemplate<String, Long> stringLongRedisTemplate;
 
     @Autowired
-    private @Qualifier("teachingServiceRedisTemplate")
+    private
+    @Qualifier("teachingServiceRedisTemplate")
     StringRedisTemplate redisTemplate;
 
-    private final org.slf4j.Logger logger= org.slf4j.LoggerFactory.getLogger(this.getClass());
+    private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     private String generateKey(Long studentId) {
         return "InstantClass:user:" + studentId;
     }
 
-    private String timeRangeKey(){
-        return "range:"+DateUtil.date2SimpleString(new Date());
+    private String timeRangeKey() {
+        return "range:" + DateUtil.date2SimpleString(new Date());
     }
 
     @PostConstruct
@@ -78,34 +79,27 @@ public class InstantClassServiceX {
         putParameterIntoThreadLocal(instantRequestParam);
 
         //对用户当前行为进行校验
-        int validateResult=instantClassValidators.preValidate();
-        if(validateResult>InstantClassRequestStatus.UNKNOWN.getCode()){
-           InstantClassRequestStatus instantStatus=InstantClassRequestStatus.getEnumByCode(validateResult);
-            switch (instantStatus){
+        int validateResult = instantClassValidators.preValidate();
+        if (validateResult > InstantClassRequestStatus.UNKNOWN.getCode()) {
+            InstantClassRequestStatus instantStatus = InstantClassRequestStatus.getEnumByCode(validateResult);
+            switch (instantStatus) {
                 case NOT_IN_RANGE:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus, this.timeRange()));
+                            .newInstantClassResult(instantStatus, "实时上课会在[ " + this.timeRange()+" ]内开启,请到时间再重试~"));
+                case HAVE_CLASS_IN_HALF_HOURS:
+                    return JsonResultModel.newJsonResultModel(InstantClassResult
+                            .newInstantClassResult(instantStatus, "您预约了[ " + DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()) +" ]的课程,马上就开始了,此时不能实时上课~"));
                 default:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus));
             }
         }
-
         return JsonResultModel.newJsonResultModel(instantClassService.getMatchResult());
-
-//        long visitCount = opsForValue.increment(generateKey(instantRequestParam.getStudentId()), 1l);
-//        if (visitCount % 8 == 0) {
-//            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.MATCHED, "11111221221212QQWW"));
-//        } else if (visitCount % 33 == 0) {
-//            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.ASK_TOO_BUSY));
-//        } else {
-//            return JsonResultModel.newJsonResultModel(new InstantClassResult(InstantClassRequestStatus.WAIT_TO_MATCH));
-//        }
     }
 
 
-    private void putParameterIntoThreadLocal(InstantRequestParam instantRequestParam){
-        if(StringUtils.isEmpty(instantRequestParam.getTutorType())){
+    private void putParameterIntoThreadLocal(InstantRequestParam instantRequestParam) {
+        if (StringUtils.isEmpty(instantRequestParam.getTutorType())) {
             instantRequestParam.setTutorType(TutorType.FRN.toString());
         }
         ThreadLocalUtil.instantRequestParamThreadLocal.set(instantRequestParam);
@@ -114,33 +108,32 @@ public class InstantClassServiceX {
     public String timeRange() {
         String timeDesc;
         try {
-            timeDesc=redisTemplate.opsForValue().get(timeRangeKey());
-            if(StringUtils.isNotEmpty(timeDesc)){
-               return timeDesc;
+            timeDesc = redisTemplate.opsForValue().get(timeRangeKey());
+            if (StringUtils.isNotEmpty(timeDesc)) {
+                return timeDesc;
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             logger.error("从redis获取当天可上课时间片失败，从mongo获取");
         }
-        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList=instantClassTimeRulesMorphiaRepository.getByDay(DateUtil.date2SimpleString(new Date()));
-        if(!instantClassTimeRulesList.isPresent()){
+        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = instantClassTimeRulesMorphiaRepository.getByDay(DateUtil.date2SimpleString(new Date()));
+        if (!instantClassTimeRulesList.isPresent()) {
             return StringUtils.EMPTY;
         }
-        timeDesc=this.timeDesc(this.getSortedTimeRulesList(instantClassTimeRulesList.get()));
-        redisTemplate.opsForValue().setIfAbsent(this.timeRangeKey(),timeDesc);
+        timeDesc = this.timeDesc(this.getSortedTimeRulesList(instantClassTimeRulesList.get()));
+        redisTemplate.opsForValue().setIfAbsent(this.timeRangeKey(), timeDesc);
         return timeDesc;
     }
 
-    public List<InstantClassTimeRules> getSortedTimeRulesList(List<InstantClassTimeRules> rawTimeRules){
+    public List<InstantClassTimeRules> getSortedTimeRulesList(List<InstantClassTimeRules> rawTimeRules) {
         return rawTimeRules.stream().sorted(Comparator.comparing(instantClassTimeRules ->
-                DateUtil.String2Date(String.join(" ",DateUtil.date2SimpleString(new Date()),instantClassTimeRules.getBegin())).getTime()
+                DateUtil.String2Date(String.join(" ", DateUtil.date2SimpleString(new Date()), instantClassTimeRules.getBegin())).getTime()
         )).collect(Collectors.toList());
     }
 
-    public String timeDesc(List<InstantClassTimeRules> rawTimeRules){
-        List<String> timeStringRules=rawTimeRules.stream()
-                .map(timeLimitRule->String.join("-",timeLimitRule.getBegin().substring(0,5),timeLimitRule.getEnd().substring(0,5)))
+    public String timeDesc(List<InstantClassTimeRules> rawTimeRules) {
+        List<String> timeStringRules = rawTimeRules.stream()
+                .map(timeLimitRule -> String.join("-", timeLimitRule.getBegin().substring(0, 5), timeLimitRule.getEnd().substring(0, 5)))
                 .collect(Collectors.toList());
-        return StringUtils.join(timeStringRules," & ");
+        return StringUtils.join(timeStringRules, " & ");
     }
 }
