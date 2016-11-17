@@ -4,6 +4,7 @@ import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -58,6 +59,9 @@ public class InstantClassService {
 
     @Autowired
     private TeacherPhotoRequester teacherPhotoRequester;
+
+    @Autowired
+    private LogPoolManager logPoolManager;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
