@@ -5,6 +5,8 @@ import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseType2TeachingTypeService;
@@ -18,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,6 +45,9 @@ public class ScheduleCourseValidator implements InstantClassValidator {
     @Autowired
     private DataCollectorService dataCollectorService;
 
+    @Autowired
+    private InstantClassJpaRepository instantClassJpaRepository;
+
     @Override
     public int preValidate() {
         InstantRequestParam instantRequestParam=ThreadLocalUtil.instantRequestParamThreadLocal.get();
@@ -49,6 +56,15 @@ public class ScheduleCourseValidator implements InstantClassValidator {
                 Optional<WorkOrder> haveClass=workOrderJpaRepository
                         .findTop1ByStudentIdAndSkuIdAndStartTimeAfterOrderByStartTimeAsc(instantRequestParam.getStudentId(),TeachingType.WAIJIAO.getCode(),new Date());
                 if(!haveClass.isPresent()){
+                    //判断当前是否有刚匹配上的课程,如果有,则跳过这个验证
+                    Optional<Date> latestMatchedDateOptional=instantClassJpaRepository.findLatestMatchedInstantCard(instantRequestParam.getStudentId(),InstantClassRequestStatus.MATCHED.getCode());
+                    if(latestMatchedDateOptional.isPresent()){
+                        //TODO:25分钟之内匹配上的,则放行;需要做配置
+                        LocalDateTime localDateTimeBegin=LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(25);
+                        if(latestMatchedDateOptional.get().after(DateUtil.localDate2Date(localDateTimeBegin))){
+                            return InstantClassRequestStatus.UNKNOWN.getCode();
+                        }
+                    }
                     return InstantClassRequestStatus.OUT_OF_NUM.getCode();
                 }
                 if(StringUtils.isEmpty(haveClass.get().getCourseId())){
