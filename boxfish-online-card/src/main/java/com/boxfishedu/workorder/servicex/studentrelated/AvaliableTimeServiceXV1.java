@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +163,7 @@ public class AvaliableTimeServiceXV1 {
      *获取延迟时间列表
      */
     public JsonResultModel getDelayWeekDays()  throws Exception {
-        Map<Integer,Object> delayRange = Maps.newHashMap();
+        List delayRange = Lists.newArrayList();
         Date currentDate = new Date();
         boolean weekFlag = DateUtil.getWeekDay();
         // 1 周末
@@ -174,9 +175,10 @@ public class AvaliableTimeServiceXV1 {
                 String text = i==1 ?  firstWeek+ "("+DateUtil.formatMonthDay2String(DateUtil.getAfterTomoDate(currentDate))+"起)"    :
                                       "第"+String.valueOf(i)+"周"+ "("+DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,i-1)))+"起)";
                 Date  date  = i==1 ? DateUtil.getAfterTomoDate(currentDate) : DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,i-1));
+                jb.put("id",i);
                 jb.put("text", text);
                 jb.put("date",DateUtil.Date2String24(date));
-                delayRange.put(i,jb);
+                delayRange.add(jb);
             }
         // 非周末
 //        }else {
