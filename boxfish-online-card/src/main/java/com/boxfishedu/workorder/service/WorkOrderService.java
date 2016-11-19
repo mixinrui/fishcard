@@ -170,6 +170,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
                 courseSchedule.setCourseType(courseView.getCourseType().get(0));
             }
             courseSchedule.setClassDate(workOrder.getStartTime());
+            courseSchedule.setStartTime(workOrder.getStartTime());
             courseSchedule.setTimeSlotId(workOrder.getSlotId());
             courseSchedule.setWorkorderId(workOrder.getId());
             courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
@@ -189,6 +190,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedule.setCourseName(workOrder.getCourseName());
             courseSchedule.setCourseType(workOrder.getCourseType());
             courseSchedule.setClassDate(DateUtil.date2SimpleDate(workOrder.getStartTime()));
+            courseSchedule.setStartTime(workOrder.getStartTime());
             //TODO:此处如果是外教,需要修改roleId为外教的Id
             courseSchedule.setRoleId(workOrder.getSkuId().intValue());
             courseSchedule.setTimeSlotId(workOrder.getSlotId());
@@ -414,6 +416,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedule.setCourseName(workOrder.getCourseName());
             courseSchedule.setCourseType(workOrder.getCourseType());
             courseSchedule.setClassDate(DateUtil.date2SimpleDate(workOrder.getStartTime()));
+            courseSchedule.setStartTime(workOrder.getStartTime());
             //TODO:此处如果是外教,需要修改roleId为外教的Id
             courseSchedule.setRoleId(workOrder.getSkuId().intValue());
             courseSchedule.setTimeSlotId(workOrder.getSlotId());

@@ -29,6 +29,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -159,7 +161,9 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     }
 
     public Page<CourseSchedule> findByStudentId(Long studentId, Pageable pageable) {
-        return courseScheduleRepository.findByStudentIdAfterClassDate(studentId, new Date(), pageable);
+        //TODO:显示30分钟之前往后的所有课程;30可以做成配置选项
+        Date startTime=DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(30));
+        return courseScheduleRepository.findByStudentIdAfterClassDate(studentId, startTime, pageable);
     }
 
     public List<TeacherAlterView> getOutNumOfTeacher(Date beginDate, Date endDate){

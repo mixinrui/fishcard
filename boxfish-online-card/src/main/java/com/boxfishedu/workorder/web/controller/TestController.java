@@ -86,6 +86,7 @@ public class TestController {
             workOrder.setEndTime(end);
         if(null!=begin) {
             courseSchedule.setClassDate(DateUtil.date2SimpleDate(begin));
+            courseSchedule.setStartTime(begin);
             workOrder.setStartTime(begin);
         }
         if(null!=timeSlotId) {

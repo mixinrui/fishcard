@@ -78,6 +78,10 @@ public class CourseSchedule {
     @Column(name = "instant_end_time", nullable = true)
     private String instantEndTtime;
 
+    @Column(name = "start_time", nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startTime;
+
 //    @Column(name="schedule_type")
 //    private Integer scheduleType;
 }

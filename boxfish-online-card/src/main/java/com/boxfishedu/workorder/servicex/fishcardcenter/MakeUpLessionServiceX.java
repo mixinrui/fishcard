@@ -154,6 +154,7 @@ public class MakeUpLessionServiceX {
         newCourseSchedule.setTimeSlotId(makeUpCourseParam.getTimeSlotId());
         newCourseSchedule.setTeacherId(0l);
         newCourseSchedule.setClassDate(DateUtil.String2SimpleDate(makeUpCourseParam.getEndTime()));
+        newCourseSchedule.setStartTime(DateUtil.String2Date(makeUpCourseParam.getStartTime()));
         newCourseSchedule.setId(null);
         newCourseSchedule.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         newCourseSchedule.setCreateTime(new Date());

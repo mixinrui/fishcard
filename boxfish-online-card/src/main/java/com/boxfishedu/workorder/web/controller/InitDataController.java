@@ -13,8 +13,10 @@ import com.boxfishedu.workorder.dao.mongo.ContinousAbsenceMorphiaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ContinousAbsenceRecord;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
@@ -27,6 +29,7 @@ import com.google.common.collect.Sets;
 import com.sun.javafx.collections.MappingChange;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -80,6 +83,9 @@ public class InitDataController {
 
     @Autowired
     private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
+
+    @Autowired
+    private CourseScheduleService courseScheduleService;
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -228,9 +234,9 @@ public class InitDataController {
 
     @RequestMapping(value = "/instanttimes/date", method = RequestMethod.POST)
     public JsonResultModel instantDayClassTimes(@RequestBody Map<String, String> dateInfo) {
-        Date date = DateUtil.String2Date(String.join(" ",dateInfo.get("date"),"00:00:00"));
-        String begin=dateInfo.get("begin");
-        String end=dateInfo.get("end");
+        Date date = DateUtil.String2Date(String.join(" ", dateInfo.get("date"), "00:00:00"));
+        String begin = dateInfo.get("begin");
+        String end = dateInfo.get("end");
         LocalDateTime dateLocal = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
         InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
         instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(dateLocal));
@@ -241,4 +247,26 @@ public class InitDataController {
         return JsonResultModel.newJsonResultModel("ok");
     }
 
+    @RequestMapping(value = "/schedule/starttime", method = RequestMethod.POST)
+    public JsonResultModel initScheduleStartTime() {
+        List<Service> services = serveService.findAll();
+        Set<Long> useIdSet = services.stream().map(service -> service.getStudentId()).collect(Collectors.toSet());
+        useIdSet.forEach(userId -> {
+            List<WorkOrder> workOrders = workOrderJpaRepository.findByStudentIdAndStatusLessThan(userId, 100);
+            threadPoolManager.execute(new Thread(() -> {
+                if (!CollectionUtils.isEmpty(workOrders)) {
+                    workOrders.forEach(workOrder -> {
+                        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
+                        if (courseSchedule != null) {
+                            courseSchedule.setStartTime(workOrder.getStartTime());
+                            courseScheduleService.save(courseSchedule);
+                            System.out.print(courseSchedule.getStartTime());
+                        }
+                    });
+                }
+            }
+            ));
+        });
+        return JsonResultModel.newJsonResultModel("ok");
+    }
 }
