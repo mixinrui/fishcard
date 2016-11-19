@@ -173,8 +173,8 @@ public class AvaliableTimeServiceXV1 {
 
                 String firstWeek = weekFlag ? "下周开始" :"本周开始";
                 String text = i==1 ?  firstWeek+ " ("+DateUtil.formatMonthDay2String(DateUtil.getAfterTomoDate(currentDate))+")"    :
-                                      "第"+String.valueOf(i)+"周开始"+ " ("+DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,i-1)))+")";
-                Date  date  = i==1 ? DateUtil.getAfterTomoDate(currentDate) : DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,i-1));
+                                      "第"+String.valueOf(i)+"周开始"+ " ("+DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(currentDate, weekFlag?(i):(i-1)   )))+")";
+                Date  date  = i==1 ? DateUtil.getAfterTomoDate(currentDate) : DateUtil.getMonday(DateUtil.getAfter7Days(currentDate,weekFlag?i:(i-1)));
                 jb.put("id",i);
                 jb.put("text", text);
                 jb.put("date",DateUtil.Date2String24(date));
