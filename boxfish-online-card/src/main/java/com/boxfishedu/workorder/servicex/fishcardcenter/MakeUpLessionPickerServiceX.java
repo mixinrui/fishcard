@@ -89,7 +89,7 @@ public class MakeUpLessionPickerServiceX {
 
                                 ( !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString()))
 
-                                        &&(  ! (clone.getDay().contains( DateUtil.date2SimpleString(new Date()) )  &&   t.getSlotId() < getMostSimilarSlot(result)))
+                                        &&(  ! (clone.getDay().contains( DateUtil.date2SimpleString(new Date()) )  &&   t.getSlotId() <= getMostSimilarSlot(result)))
                                 )
 
                         )
