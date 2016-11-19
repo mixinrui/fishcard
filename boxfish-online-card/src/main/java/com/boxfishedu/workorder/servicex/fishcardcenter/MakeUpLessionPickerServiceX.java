@@ -85,7 +85,14 @@ public class MakeUpLessionPickerServiceX {
                 DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
 
                 result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
-                        .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+                        .filter(t ->
+
+                                ( !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString()))
+
+                                        &&(  ! (clone.getDay().contains( DateUtil.date2SimpleString(new Date()) )  &&   t.getSlotId() < getMostSimilarSlot(result)))
+                                )
+
+                        )
                         .collect(Collectors.toList()));
                 monthTimeSlots.add(result);
             } catch (Exception ex) {
@@ -97,6 +104,16 @@ public class MakeUpLessionPickerServiceX {
 //        avaliableTimeParam.setStudentId(workOrder.getStudentId());
 //        addTagForSlotTemplate(avaliableTimeParam, monthTimeSlots, dateRange);
         return JsonResultModel.newJsonResultModel(monthTimeSlots);
+    }
+
+
+    private Integer getMostSimilarSlot(DayTimeSlots dayTimeSlots) {
+        LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault());
+        Optional<TimeSlots> ts = dayTimeSlots.getDailyScheduleTime().stream()
+                .filter(timeSlot -> nextSlotTime
+                        .isAfter(DateUtil.string2LocalDateTime(String.join(" ", DateUtil.date2SimpleString(new Date()), timeSlot.getStartTime()))))
+                .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
+        return ts.isPresent()? ts.get().getSlotId().intValue():null;
     }
 
     private AvaliableTimeParam getTimeParam(WorkOrder workOrder) {
