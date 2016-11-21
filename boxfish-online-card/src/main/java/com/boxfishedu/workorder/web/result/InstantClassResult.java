@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@SuppressWarnings("ALL")
 public class InstantClassResult {
     protected Integer status;
     protected String desc;
@@ -35,6 +36,26 @@ public class InstantClassResult {
     public InstantClassResult(TeacherInstantClassStatus teacherInstantClassStatus){
         this.status=teacherInstantClassStatus.getCode();
         this.desc=teacherInstantClassStatus.getDesc();
+    }
+
+    public InstantClassResult(InstantClassCard instantClassCard,InstantClassRequestStatus instantClassRequestStatus){
+        this.status=instantClassRequestStatus.getCode();
+        this.desc=instantClassRequestStatus.getDesc();
+        this.slotId=instantClassCard.getSlotId();
+        switch (instantClassRequestStatus){
+            case MATCHED:{
+                this.groupInfo=new GroupInfo();
+                this.groupInfo.setGroupId(instantClassCard.getGroupId());
+                this.groupInfo.setGroupName(instantClassCard.getGroupName());
+                this.groupInfo.setChatRoomId(instantClassCard.getChatRoomId());
+                this.groupInfo.setWorkOrderId(instantClassCard.getWorkorderId());
+                this.groupInfo.setStudentId(instantClassCard.getStudentId());
+                break;
+            }
+            default:
+                break;
+
+        }
     }
 
     public InstantClassResult(InstantClassCard instantClassCard,TeacherInstantClassStatus teacherInstantClassStatus){
@@ -91,6 +112,10 @@ public class InstantClassResult {
 
     public static InstantClassResult newInstantClassResult(InstantClassCard instantClassCard,TeacherInstantClassStatus teacherInstantClassStatus){
         return new InstantClassResult(instantClassCard,teacherInstantClassStatus);
+    }
+
+    public static InstantClassResult newInstantClassResult(InstantClassCard instantClassCard,InstantClassRequestStatus instantClassRequestStatus){
+        return new InstantClassResult(instantClassCard,instantClassRequestStatus);
     }
 
     public InstantClassResult(){
