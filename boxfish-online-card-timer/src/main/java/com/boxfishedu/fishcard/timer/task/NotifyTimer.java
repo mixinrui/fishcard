@@ -282,7 +282,7 @@ public class NotifyTimer {
     public void markUnmatchInstantClass(){
         logger.info("<<<<<<markUnmatchInstantClass<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<自动将超过一分钟没匹配上教师的instantCard标记为未匹配教师<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.INSTANT_CLASS_MARK_UNMATCH.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

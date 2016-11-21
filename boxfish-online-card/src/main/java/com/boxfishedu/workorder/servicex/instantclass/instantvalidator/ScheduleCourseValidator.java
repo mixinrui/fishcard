@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseType2TeachingTypeService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
@@ -57,12 +58,13 @@ public class ScheduleCourseValidator implements InstantClassValidator {
                         .findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterOrderByStartTimeAsc(instantRequestParam.getStudentId(),TeachingType.WAIJIAO.getCode(),new Integer(0),new Date());
                 if(!haveClass.isPresent()){
                     //判断当前是否有刚匹配上的课程,如果有,则跳过这个验证
-                    Optional<Date> latestMatchedDateOptional=instantClassJpaRepository.findLatestMatchedInstantCard(instantRequestParam.getStudentId(),InstantClassRequestStatus.MATCHED.getCode());
+                    Optional<InstantClassCard> latestMatchedDateOptional=instantClassJpaRepository.findLatestMatchedInstantCard(instantRequestParam.getStudentId(),InstantClassRequestStatus.MATCHED.getCode());
                     if(latestMatchedDateOptional.isPresent()){
                         //TODO:25分钟之内匹配上的,则放行;需要做配置
-                        LocalDateTime localDateTimeBegin=LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(25);
-                        if(latestMatchedDateOptional.get().after(DateUtil.localDate2Date(localDateTimeBegin))){
-                            return InstantClassRequestStatus.UNKNOWN.getCode();
+                        LocalDateTime localDateTimeBegin=LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(30);
+                        if(latestMatchedDateOptional.get().getRequestMatchTeacherTime().after(DateUtil.localDate2Date(localDateTimeBegin))){
+                            ThreadLocalUtil.instantCardMatched30Minutes.set(latestMatchedDateOptional.get());
+                            return InstantClassRequestStatus.MATCHED_LESS_THAN_30MINUTES.getCode();
                         }
                     }
                     return InstantClassRequestStatus.OUT_OF_NUM.getCode();

@@ -89,6 +89,9 @@ public class InstantClassServiceX {
                 case HAVE_CLASS_IN_HALF_HOURS:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus, "您预约了[ " + DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()) +" ]的课程,马上就开始了,此时不能实时上课~"));
+                case MATCHED_LESS_THAN_30MINUTES:
+                    return JsonResultModel.newJsonResultModel(InstantClassResult
+                            .newInstantClassResult(ThreadLocalUtil.instantCardMatched30Minutes.get(),InstantClassRequestStatus.MATCHED));
                 default:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus));

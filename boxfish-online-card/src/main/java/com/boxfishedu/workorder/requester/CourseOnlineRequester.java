@@ -66,7 +66,7 @@ public class CourseOnlineRequester {
         teacherIds.forEach(teacherId->{
             TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();
             //TODO:即时上课,推送给教师的信息;需要到配置项中去
-            teachingOnlineMsg.setPush_title("Received a call from a student for online LIVE teaching. Click and start teaching now");
+            teachingOnlineMsg.setPush_title("Many a student calls in for online LIVE teaching. Click and get prepared.");
             teachingOnlineMsg.setUser_id(teacherId);
             teachingOnlineMsg.setPush_type(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
 
