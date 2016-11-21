@@ -69,7 +69,7 @@ public class MakeUpLessionPickerServiceX {
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(workOrder, days);
 
-        Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(workOrder.getStudentId());
+        Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDateSec(workOrder.getStudentId());
         // 获取时间片模板,并且复制
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(workOrder.getTeacherId());
         List<DayTimeSlots> monthTimeSlots = Lists.newArrayList();
@@ -87,6 +87,10 @@ public class MakeUpLessionPickerServiceX {
                 result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
                         .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
                         .collect(Collectors.toList()));
+                result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+                        .filter(t ->  (  ! (clone.getDay().contains( DateUtil.date2SimpleString(new Date()) )  &&   t.getSlotId() <= getMostSimilarSlot(result)))
+                        )
+                        .collect(Collectors.toList()));
                 monthTimeSlots.add(result);
             } catch (Exception ex) {
                 logger.error("鱼卡[{}]获取可用时间片失败", workOrderId, ex);
@@ -97,6 +101,15 @@ public class MakeUpLessionPickerServiceX {
 //        avaliableTimeParam.setStudentId(workOrder.getStudentId());
 //        addTagForSlotTemplate(avaliableTimeParam, monthTimeSlots, dateRange);
         return JsonResultModel.newJsonResultModel(monthTimeSlots);
+    }
+
+    private Integer getMostSimilarSlot(DayTimeSlots dayTimeSlots) {
+        LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault());
+        Optional<TimeSlots> ts = dayTimeSlots.getDailyScheduleTime().stream()
+                .filter(timeSlot -> nextSlotTime
+                        .isAfter(DateUtil.string2LocalDateTime(String.join(" ", DateUtil.date2SimpleString(new Date()), timeSlot.getStartTime()))))
+                .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
+        return ts.isPresent()? ts.get().getSlotId().intValue():0;
     }
 
     private AvaliableTimeParam getTimeParam(WorkOrder workOrder) {
