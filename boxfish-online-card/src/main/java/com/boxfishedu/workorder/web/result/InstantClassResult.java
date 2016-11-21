@@ -29,8 +29,6 @@ public class InstantClassResult {
     protected Long slotId;
     protected GroupInfo groupInfo=null;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
-
     public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         this.status=instantClassRequestStatus.getCode();
         this.desc=instantClassRequestStatus.getDesc();
@@ -53,7 +51,6 @@ public class InstantClassResult {
                 this.desc = getMatchedDesc(instantClassCard);
             }
             catch (Exception ex){
-                logger.error("@InstantClassResult获取匹配的结果描述失败",ex);
                 this.desc = instantClassRequestStatus.getDesc();
             }
         }
@@ -106,7 +103,6 @@ public class InstantClassResult {
                 this.desc = getMatchedDesc(instantClassCard);
             }
             catch (Exception ex){
-                logger.error("@InstantClassResult获取匹配的结果描述失败",ex);
                 this.desc = instantClassRequestStatus.getDesc();
             }
         }
@@ -129,9 +125,9 @@ public class InstantClassResult {
         Date begin=instantClassCard.getRequestMatchTeacherTime();
         Date end= DateUtil.addMinutes(begin,25);
         Date deadLine=DateUtil.addMinutes(begin,30);
-        long minute=(deadLine.getTime()-begin.getTime())/(1000*60);
+        long minute=(deadLine.getTime()-new Date().getTime())/(1000*60);
         String beginStr=DateUtil.dateTrimYear(begin).substring(0,5);
-        String endStr=DateUtil.dateTrimYear(begin).substring(0,5);
+        String endStr=DateUtil.dateTrimYear(end).substring(0,5);
         StringBuilder builder=new StringBuilder().append("已安排")
                 .append(String.join("-",beginStr,endStr)).append("的实时课程;请等待外教发起邀请,或").append(minute).append("分钟后再试");
         return builder.toString();

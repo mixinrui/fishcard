@@ -74,14 +74,7 @@ public class InstantClassService {
         logger.debug("@InstantClassService#user{}#最接近的时间片是{}", getInstantRequestParam().getStudentId(), timeSlotsOptional.get().getSlotId());
         Optional<InstantClassCard> instantClassCardOptional = getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
         if (!instantClassCardOptional.isPresent()) {
-            //处理学生跨时间片的请求,如果当前请求在29:55这时候下一个请求在30:01;则返回上一个请求卡的匹配情况
-            Optional<InstantClassCard> latestInstantCardOptional=instantClassJpaRepository
-                    .findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(getInstantRequestParam().getStudentId()
-                            , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(60)));
-            if(latestInstantCardOptional.isPresent()){
-                return matchResultWrapper(latestInstantCardOptional.get());
-            }
-            return dealFirstRequest(timeSlotsOptional);
+            return getFirstInstantClassResult(timeSlotsOptional);
         }
 
         //入口变化
@@ -101,6 +94,33 @@ public class InstantClassService {
             //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
             return matchResultWrapper(instantClassCardOptional.get());
         }
+    }
+
+    //当无对应的鱼卡数据时候,获取第一条数据
+    private InstantClassResult getFirstInstantClassResult(Optional<TimeSlots> timeSlotsOptional) {
+        //处理学生跨时间片的请求,如果当前请求在29:55这时候下一个请求在30:01;则返回上一个请求卡的匹配情况
+        Optional<InstantClassCard> latestInstantCardOptional = instantClassJpaRepository
+                .findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(getInstantRequestParam().getStudentId()
+                        , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(60)));
+        if (latestInstantCardOptional.isPresent()) {
+            return matchResultWrapper(latestInstantCardOptional.get());
+        }
+        Optional<InstantClassCard> latestInstantCardOptional30Minutes = instantClassJpaRepository
+                .findTop1ByStudentIdAndRequestMatchTeacherTimeAfterOrderByCreateTimeDesc(getInstantRequestParam().getStudentId()
+                        , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(30)));
+        if (latestInstantCardOptional30Minutes.isPresent()) {
+            //如果30分钟内有已经匹配的数据,同一个接口则返回相同的数据;不同的入口返回另外的数据
+            if (latestInstantCardOptional30Minutes.get().getStatus() == InstantClassRequestStatus.MATCHED.getCode()) {
+                if (getInstantRequestParam().getSelectMode() != latestInstantCardOptional30Minutes.get().getEntrance()) {
+                    throw new BusinessException("您当前还有未完成的课程，请稍后再试");
+                }
+                else {
+                    return matchResultWrapper(latestInstantCardOptional30Minutes.get());
+                }
+            }
+
+        }
+        return dealFirstRequest(timeSlotsOptional);
     }
 
     private void dealDifferentEntrance(Optional<InstantClassCard> instantClassCardOptional) {
@@ -154,11 +174,10 @@ public class InstantClassService {
                 instantClassJpaRepository.updateReadFlag(instantClassCard.getId(), 1);
             }
         }
-        if(instantClassCard.getStatus()==InstantClassRequestStatus.MATCHED.getCode()){
-            if(instantClassCard.getMatchResultReadFlag()==0){
-                instantClassJpaRepository.updateMatchedReadFlag(instantClassCard.getId(),1);
-            }
-            else{
+        if (instantClassCard.getStatus() == InstantClassRequestStatus.MATCHED.getCode()) {
+            if (instantClassCard.getMatchResultReadFlag() == 0) {
+                instantClassJpaRepository.updateMatchedReadFlag(instantClassCard.getId(), 1);
+            } else {
                 return InstantClassResult.newInstantClassResult(instantClassCard, teacherPhotoRequester);
             }
         }
