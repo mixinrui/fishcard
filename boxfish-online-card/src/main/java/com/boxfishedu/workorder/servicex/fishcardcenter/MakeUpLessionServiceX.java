@@ -94,6 +94,10 @@ public class MakeUpLessionServiceX {
         if (null == oldCourseSchedule) {
             throw new BusinessException("无对应的排课表");
         }
+
+        if(null == makeUpCourseParam.getTimeSlotId() ){
+            throw new BusinessException("所传参数不合法");
+        }
         fishCardMakeUpService.processMakeUpParam(oldWorkOrder);
 
         WorkOrder newWorkOrder = getMakeUpWorkOrder(oldWorkOrder, makeUpCourseParam);
