@@ -148,7 +148,7 @@ public class WorkOrder implements Cloneable{
     @Column(name="make_up_seq")
     private Integer makeUpSeq;
 
-    //是否已安排补课
+    //是否已安排补课 (1 表示已经不过课)
     @Column(name="make_up_flag")
     private Short makeUpFlag;
 
