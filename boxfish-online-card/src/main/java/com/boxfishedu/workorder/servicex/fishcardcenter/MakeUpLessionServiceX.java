@@ -115,9 +115,9 @@ public class MakeUpLessionServiceX {
         workOrderLogService.saveWorkOrderLog(newWorkOrder,"补课生成鱼卡");
 
         //调用教师资源分配
-        List<CourseSchedule> newCourseScheduleList = Lists.newArrayList();
-        newCourseScheduleList.add(newCourseSchedule);
-        timePickerService.getRecommandTeachers(oldWorkOrder.getService(), newCourseScheduleList);
+//        List<CourseSchedule> newCourseScheduleList = Lists.newArrayList();
+//        newCourseScheduleList.add(newCourseSchedule);
+//        timePickerService.getRecommandTeachers(oldWorkOrder.getService(), newCourseScheduleList);
     }
 
     private WorkOrder getMakeUpWorkOrder(WorkOrder oldWorkOrder, MakeUpCourseParam makeUpCourseParam) {
