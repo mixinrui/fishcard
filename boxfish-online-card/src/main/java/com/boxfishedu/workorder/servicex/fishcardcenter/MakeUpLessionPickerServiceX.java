@@ -158,7 +158,10 @@ public class MakeUpLessionPickerServiceX {
 
         Date now = new Date();
         LocalDateTime startDate = LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault());
-        startDate = startDate.plusDays(durationFromParentCourse);
+
+        if(DateUtil.addMinutes(now,32).after(  DateUtil.parseTime(now,1)   )){
+            startDate = startDate.plusDays(durationFromParentCourse);
+        }
 
         if (startDate.isAfter(deadLineDate)) {
             logger.info("!!!!!!!!!鱼卡[{}]已超出补课时间,不能进行补课", workOrder.getId());
