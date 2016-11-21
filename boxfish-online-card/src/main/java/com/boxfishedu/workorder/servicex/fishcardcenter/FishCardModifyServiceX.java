@@ -102,6 +102,9 @@ public class FishCardModifyServiceX {
     public JsonResultModel changeTeacher(TeacherChangeParam teacherChangeParam) {
         //获取对应的workorder和courseschedule
         WorkOrder workOrder = workOrderService.findOne(teacherChangeParam.getWorkOrderId());
+        if(workOrder.getIsCourseOver()==1){
+            throw new BusinessException("课程已经结束,不能更换教师");
+        }
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(teacherChangeParam.getWorkOrderId());
 
         if ((null == workOrder) || (null == courseSchedule)) {
