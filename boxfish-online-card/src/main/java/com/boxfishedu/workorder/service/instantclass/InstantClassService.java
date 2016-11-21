@@ -154,6 +154,14 @@ public class InstantClassService {
                 instantClassJpaRepository.updateReadFlag(instantClassCard.getId(), 1);
             }
         }
+        if(instantClassCard.getStatus()==InstantClassRequestStatus.MATCHED.getCode()){
+            if(instantClassCard.getMatchResultReadFlag()==0){
+                instantClassJpaRepository.updateMatchedReadFlag(instantClassCard.getId(),1);
+            }
+            else{
+                return InstantClassResult.newInstantClassResult(instantClassCard, teacherPhotoRequester);
+            }
+        }
         return InstantClassResult.newInstantClassResult(instantClassCard, teacherPhotoRequester);
     }
 
@@ -173,6 +181,7 @@ public class InstantClassService {
         instantClassCard.setRequestTeacherTimes(0);
         instantClassCard.setStudentRequestTimes(0);
         instantClassCard.setResultReadFlag(0);
+        instantClassCard.setMatchResultReadFlag(0);
         instantClassCard.setTeacherId(0l);
         instantClassCard.setChatRoomId(0l);
         instantClassCard.setCreateTime(new Date());

@@ -7,6 +7,7 @@ import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
@@ -51,6 +52,9 @@ public class InstantClassServiceX {
     private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
 
     @Autowired
+    private InstantClassJpaRepository instantClassJpaRepository;
+
+    @Autowired
     private
     @Qualifier("stringLongRedisTemplate")
     RedisTemplate<String, Long> stringLongRedisTemplate;
@@ -89,9 +93,14 @@ public class InstantClassServiceX {
                 case HAVE_CLASS_IN_HALF_HOURS:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus, "您预约了[ " + DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()) +" ]的课程,马上就开始了,此时不能实时上课~"));
-                case MATCHED_LESS_THAN_30MINUTES:
-                    return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(ThreadLocalUtil.instantCardMatched30Minutes.get(),InstantClassRequestStatus.MATCHED));
+                case MATCHED_LESS_THAN_30MINUTES: {
+                    JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
+                            .newInstantClassResult(ThreadLocalUtil.instantCardMatched30Minutes.get(), InstantClassRequestStatus.MATCHED));
+                    if(ThreadLocalUtil.instantCardMatched30Minutes.get().getMatchResultReadFlag()!=1){
+                        instantClassJpaRepository.updateMatchedReadFlag(ThreadLocalUtil.instantCardMatched30Minutes.get().getId(),1);
+                    }
+                    return jsonResultModel;
+                }
                 default:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus));

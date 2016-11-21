@@ -43,6 +43,11 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
 
     @Transactional
     @Modifying
+    @Query("update InstantClassCard icc set icc.matchResultReadFlag = ?2 where icc.id= ?1")
+    void updateMatchedReadFlag(Long id, Integer resultReadFlag );
+
+    @Transactional
+    @Modifying
     @Query("update InstantClassCard icc set icc.resultReadFlag = ?2 ,icc.status=?3  where icc.id= ?1")
     void updateReadFlagAnsStatus(Long id, Integer resultReadFlag ,Integer status);
 

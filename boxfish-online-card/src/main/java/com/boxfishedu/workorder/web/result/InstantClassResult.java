@@ -2,14 +2,20 @@ package com.boxfishedu.workorder.web.result;
 
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * Created by hucl on 16/11/3.
@@ -22,6 +28,8 @@ public class InstantClassResult {
     protected String desc;
     protected Long slotId;
     protected GroupInfo groupInfo=null;
+
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public InstantClassResult(InstantClassRequestStatus instantClassRequestStatus){
         this.status=instantClassRequestStatus.getCode();
@@ -40,7 +48,18 @@ public class InstantClassResult {
 
     public InstantClassResult(InstantClassCard instantClassCard,InstantClassRequestStatus instantClassRequestStatus){
         this.status=instantClassRequestStatus.getCode();
-        this.desc=instantClassRequestStatus.getDesc();
+        if(instantClassCard.getMatchResultReadFlag()==1){
+            try {
+                this.desc = getMatchedDesc(instantClassCard);
+            }
+            catch (Exception ex){
+                logger.error("@InstantClassResult获取匹配的结果描述失败",ex);
+                this.desc = instantClassRequestStatus.getDesc();
+            }
+        }
+        else {
+            this.desc = instantClassRequestStatus.getDesc();
+        }
         this.slotId=instantClassCard.getSlotId();
         switch (instantClassRequestStatus){
             case MATCHED:{
@@ -81,7 +100,19 @@ public class InstantClassResult {
     public InstantClassResult(InstantClassCard instantClassCard,TeacherPhotoRequester teacherPhotoRequester){
         InstantClassRequestStatus instantClassRequestStatus=InstantClassRequestStatus.getEnumByCode(instantClassCard.getStatus());
         this.status=instantClassRequestStatus.getCode();
-        this.desc=instantClassRequestStatus.getDesc();
+        //提示用户当前已经匹配了课程或者稍后再试
+        if(instantClassCard.getMatchResultReadFlag()==1){
+            try {
+                this.desc = getMatchedDesc(instantClassCard);
+            }
+            catch (Exception ex){
+                logger.error("@InstantClassResult获取匹配的结果描述失败",ex);
+                this.desc = instantClassRequestStatus.getDesc();
+            }
+        }
+        else {
+            this.desc = instantClassRequestStatus.getDesc();
+        }
         if(instantClassCard.getStatus().equals(InstantClassRequestStatus.MATCHED.getCode())) {
             this.groupInfo=new GroupInfo();
             this.groupInfo.setGroupId(instantClassCard.getGroupId());
@@ -92,6 +123,18 @@ public class InstantClassResult {
             this.groupInfo.setStudentId(instantClassCard.getStudentId());
             this.groupInfo.setTeacherThumbNail(teacherPhotoRequester.getTeacherPhoto(instantClassCard.getTeacherId()));
         }
+    }
+
+    private String getMatchedDesc(InstantClassCard instantClassCard) {
+        Date begin=instantClassCard.getRequestMatchTeacherTime();
+        Date end= DateUtil.addMinutes(begin,25);
+        Date deadLine=DateUtil.addMinutes(begin,30);
+        long minute=(deadLine.getTime()-begin.getTime())/(1000*60);
+        String beginStr=DateUtil.dateTrimYear(begin).substring(0,5);
+        String endStr=DateUtil.dateTrimYear(begin).substring(0,5);
+        StringBuilder builder=new StringBuilder().append("已安排")
+                .append(String.join("-",beginStr,endStr)).append("的实时课程;请等待外教发起邀请,或").append(minute).append("分钟后再试");
+        return builder.toString();
     }
 
     public static InstantClassResult newInstantClassResult(InstantClassRequestStatus instantClassRequestStatus){

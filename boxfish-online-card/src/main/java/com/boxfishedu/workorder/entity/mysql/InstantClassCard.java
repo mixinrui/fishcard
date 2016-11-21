@@ -89,9 +89,13 @@ public class InstantClassCard {
     @Column(updatable = false)
     private Date updateTime = DateTime.now().toDate();
 
-    //返回学生的结果标志,0:未返回,1:已返回
+    //返回学生的未匹配结果标志,0:未返回,1:已返回
     @Column(name = "result_read_flag", nullable = true)
     private Integer resultReadFlag;
+
+    //返回学生的结果标志,0:未返回,1:已返回
+    @Column(name = "match_result_read_flag", nullable = true)
+    private Integer matchResultReadFlag;
 
     //返回学生的结果标志,0:课程表入口,1:其他入口
     @Column(name = "entrance", nullable = true)
