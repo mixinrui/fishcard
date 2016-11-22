@@ -168,5 +168,4 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     Optional<Date> findLatestClassDateByStudentId(Long studentId,Integer isFreeze,Date date);
 
     Optional<WorkOrder> findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterOrderByStartTimeAsc(Long studentId,Integer skuId,Integer isFreeze,Date date);
-
 }

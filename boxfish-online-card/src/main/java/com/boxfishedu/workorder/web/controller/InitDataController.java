@@ -249,24 +249,18 @@ public class InitDataController {
 
     @RequestMapping(value = "/schedule/starttime", method = RequestMethod.POST)
     public JsonResultModel initScheduleStartTime() {
-        List<Service> services = serveService.findAll();
-        Set<Long> useIdSet = services.stream().map(service -> service.getStudentId()).collect(Collectors.toSet());
-        useIdSet.forEach(userId -> {
-            List<WorkOrder> workOrders = workOrderJpaRepository.findByStudentIdAndStatusLessThan(userId, 100);
-            threadPoolManager.execute(new Thread(() -> {
-                if (!CollectionUtils.isEmpty(workOrders)) {
-                    workOrders.forEach(workOrder -> {
-                        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
-                        if (courseSchedule != null) {
-                            courseSchedule.setStartTime(workOrder.getStartTime());
-                            courseScheduleService.save(courseSchedule);
-                            System.out.print(courseSchedule.getStartTime());
-                        }
-                    });
-                }
-            }
-            ));
-        });
+        threadPoolManager.execute(new Thread(()->{
+            logger.debug("开始处理.....");
+            workOrderJpaRepository.findAllWorkOrderId().forEach(cardId ->
+                    {
+                        WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
+                        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
+                        courseSchedule.setStartTime(workOrder.getStartTime());
+                        courseScheduleService.save(courseSchedule);
+                    }
+            );
+            logger.debug("处理完成....");
+        }));
         return JsonResultModel.newJsonResultModel("ok");
     }
 }

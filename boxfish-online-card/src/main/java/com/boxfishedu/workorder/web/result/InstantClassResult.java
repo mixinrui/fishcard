@@ -121,7 +121,7 @@ public class InstantClassResult {
         }
     }
 
-    private String getMatchedDesc(InstantClassCard instantClassCard) {
+    private static String getMatchedDesc(InstantClassCard instantClassCard) {
         Date begin=instantClassCard.getRequestMatchTeacherTime();
         Date end= DateUtil.addMinutes(begin,25);
         Date deadLine=DateUtil.addMinutes(begin,30);
