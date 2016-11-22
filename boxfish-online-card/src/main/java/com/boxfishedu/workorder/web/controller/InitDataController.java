@@ -235,28 +235,25 @@ public class InitDataController {
 
     @RequestMapping(value = "/schedule/starttime", method = RequestMethod.POST)
     public JsonResultModel initScheduleStartTime() {
-        threadPoolManager.execute(new Thread(()->{
-            logger.debug("开始处理.....");
-            workOrderJpaRepository.findAllWorkOrderId().forEach(cardId ->
-                    {
-                        threadPoolManager.execute(new Thread(()->{
-                            try {
-                                logger.debug("->"+cardId);
-                                WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
-                                CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
-                                courseSchedule.setStartTime(workOrder.getStartTime());
-                                courseScheduleService.save(courseSchedule);
-                            }
-                            catch (Exception ex){
-                                logger.error("失败",ex);
-                            }
-                        }));
-
-
-                    }
-            );
-            logger.debug("处理完成....");
-        }));
+        logger.debug("开始处理.....");
+        workOrderJpaRepository.findAllWorkOrderId().forEach(cardId ->
+                {
+                    threadPoolManager.execute(new Thread(() -> {
+                        try {
+                            logger.debug("->" + cardId);
+                            WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
+                            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
+                            courseSchedule.setStartTime(workOrder.getStartTime());
+                            courseSchedule.setClassDate(workOrder.getStartTime());
+                            courseSchedule.setTimeSlotId(workOrder.getSlotId());
+                            courseScheduleService.save(courseSchedule);
+                        } catch (Exception ex) {
+                            logger.error("失败", ex);
+                        }
+                    }));
+                }
+        );
+        logger.debug("处理完成....");
         return JsonResultModel.newJsonResultModel("ok");
     }
 }
