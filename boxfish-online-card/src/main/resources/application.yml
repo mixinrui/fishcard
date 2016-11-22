@@ -173,7 +173,7 @@ interface:
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
 #  获取课程类型和难度
-    course_type_and_difficulty: http://base.boxfish.cn
+    course_type_and_difficulty: http://123.56.13.168:8001
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
@@ -287,7 +287,7 @@ interface:
 #  学生旷课扣积分
     absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #  获取课程类型和难度
-    course_type_and_difficulty: http://base.boxfish.cn
+    course_type_and_difficulty: http://123.56.13.168:8001
 #支付系统
     pay_service: http://101.201.237.252:8888/pay-inside
 #   login_token
@@ -327,6 +327,12 @@ spring:
     username: admin
     password: boxfish123
     virtualHost: local
+#  rabbitmq:
+#    address: 101.201.237.252
+##    port: 5672
+#    username: boxfish
+#    password: boxfish
+#    virtualHost: local
   profiles: test
 
 ##################接口调用地址
@@ -348,7 +354,7 @@ interface:
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
 #  获取课程类型和难度
-    course_type_and_difficulty: http://base.boxfish.cn
+    course_type_and_difficulty: http://123.56.13.168:8001
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
@@ -358,8 +364,11 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9090
     innerTeacherUrl: http://123.56.13.168:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
     type: test
+
+
 
 
 server.port: 8080
@@ -409,12 +418,15 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
+#  获取课程类型和难度
+    course_type_and_difficulty: http://123.56.13.168:8001
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: pretest
 
@@ -465,6 +477,8 @@ interface:
     absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #支付系统
     pay_service: http://101.201.66.32:8888/pay-inside
+#  获取课程类型和难度
+    course_type_and_difficulty: http://123.56.13.168:8001
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
@@ -475,6 +489,7 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: demo
 #===============================================================预生产环境===============================================================
@@ -527,12 +542,16 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
+#  获取课程类型和难度
+    course_type_and_difficulty: http://base.boxfish.cn
+
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: preproduct
 
@@ -601,6 +620,7 @@ service:
     getPictureUrl: http://base.boxfish.cn/passbook
     pushInfoIrl: http://online-api.boxfish.cn/teaching-service
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
+    scoreUrl: api.boxfish.cn
   gateway:
     type: product
 
@@ -669,5 +689,6 @@ service:
     getPictureUrl: http://base.boxfish.cn/passbook
     pushInfoIrl: http://online-api.boxfish.cn/teaching-service
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
+    scoreUrl: api.boxfish.cn
   gateway:
     type: product

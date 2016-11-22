@@ -170,7 +170,7 @@ public class NotifyTimer {
     /**
      * 抢单:每天17:40清理数据
      */
-     @Scheduled(cron = "0 40 17 * * ?")
+    //@Scheduled(cron = "0 40 17 * * ?")
     public void clearGrabOrderDataForeigh() {
         logger.info("<<<<<<graborder-clearGrabOrderDataForeigh<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<清理昨天抢单历史数据外教>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));

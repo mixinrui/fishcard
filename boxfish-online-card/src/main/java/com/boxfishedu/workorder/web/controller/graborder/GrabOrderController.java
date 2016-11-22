@@ -8,7 +8,6 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.graborder.GrabOrderService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
-import com.boxfishedu.workorder.servicex.fishcardcenter.AutuConfirmFishCardServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.MakeUpLessionServiceX;
 import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
@@ -58,21 +57,17 @@ public class GrabOrderController {
     private GrabOrderService  grabOrderService;
 
     @Autowired
-    private AutuConfirmFishCardServiceX autuConfirmFishCardServiceX;
-
-    @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
 
 
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
     public JsonResultModel tomonotify()throws Exception {
-        autuConfirmFishCardServiceX.autoConfirmFishCard();
-//        //测试明天有课推送
-//        courseNotifyOneDayServiceX.notiFyStudentClass();
-//
-//        //测试今天有课
-//        courseNotifyOneDayServiceX.notiFyTeacherClass();
+        //测试明天有课推送
+        courseNotifyOneDayServiceX.notiFyStudentClass();
+
+        //测试今天有课
+        courseNotifyOneDayServiceX.notiFyTeacherClass();
 //
 //        Thread.sleep(2000);
 //

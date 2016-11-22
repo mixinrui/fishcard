@@ -15,4 +15,5 @@ public class CommentCardUrlConf {
     private String getPictureUrl;
     private String pushInfoIrl;
     private String innerTeacherUrl;
+    private String scoreUrl;
 }
