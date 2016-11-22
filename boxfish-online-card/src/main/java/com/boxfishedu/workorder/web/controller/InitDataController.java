@@ -253,10 +253,17 @@ public class InitDataController {
             logger.debug("开始处理.....");
             workOrderJpaRepository.findAllWorkOrderId().forEach(cardId ->
                     {
-                        WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
-                        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
-                        courseSchedule.setStartTime(workOrder.getStartTime());
-                        courseScheduleService.save(courseSchedule);
+                        try {
+                            logger.debug("->"+cardId);
+                            WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
+                            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
+                            courseSchedule.setStartTime(workOrder.getStartTime());
+                            courseScheduleService.save(courseSchedule);
+                        }
+                        catch (Exception ex){
+                            logger.error("失败",ex);
+                        }
+
                     }
             );
             logger.debug("处理完成....");
