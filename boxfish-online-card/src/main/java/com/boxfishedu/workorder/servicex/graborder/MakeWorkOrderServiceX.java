@@ -299,6 +299,7 @@ public class MakeWorkOrderServiceX {
                 !StringUtils.isEmpty(wo.getCourseType())  // 鱼卡的课程类型
                 &&
                 teacherForm.getCourseIds().contains(wo.getCourseType())
+
                 ) ;
     }
 

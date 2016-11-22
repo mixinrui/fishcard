@@ -130,4 +130,11 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Query("SELECT c FROM CommentCard c  where c.service = ?1 order by c.teacherAnswerTime DESC")
     public List<CommentCard> getSystemCommentCard(Service service);
 
+    /**
+     *  外教点评添加课程类型和难度,查询结果用于初始化类型和难度
+     * @return
+     */
+    @Query("SELECT c FROM CommentCard c  where c.courseType is null or c.courseDifficulty is null")
+    public List<CommentCard> initiateCourseTypeAndDifficulty();
+
 }

@@ -1,7 +1,11 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.workorder.common.bean.CommentCardTeacherAppTip;
+import com.boxfishedu.workorder.dao.jpa.CommentCardStarJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
+import com.boxfishedu.workorder.entity.mysql.CommentCardStar;
+import com.boxfishedu.workorder.entity.mysql.CommentCardStarForm;
+import com.boxfishedu.workorder.service.commentcard.CommentCardStarTeacherAppService;
 import com.boxfishedu.workorder.service.commentcard.CommentCardTeacherAppService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
@@ -15,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/7/20.
@@ -38,6 +44,12 @@ public class CommentTeacherAppController {
 
     @Autowired
     private ForeignTeacherCommentCardService foreignTeacherCommentCardService;
+
+    @Autowired
+    private CommentCardStarTeacherAppService commentCardStarTeacherAppService;
+
+    @Autowired
+    private CommentCardStarJpaRepository commentCardStarJpaRepository;
 
     @RequestMapping(value = "/teacher/answer_list", method = RequestMethod.GET)
     public JsonResultModel teacherAnswerList(Pageable pageable,Long userId){
@@ -110,10 +122,31 @@ public class CommentTeacherAppController {
         return jsonResultModel;
     }
 
-    @RequestMapping(value = "count_teacher_unread", method = RequestMethod.GET)
+    @RequestMapping(value = "/count_teacher_unread", method = RequestMethod.GET)
     public com.boxfishedu.beans.view.JsonResultModel countTeacherUnreadCommentCards(Long userId){
         logger.info("###countTeacherUnreadCommentCards###");
         return foreignTeacherCommentCardService.countTeacherUnreadCommentCards(userId);
     }
 
+    @RequestMapping(value = "/comment_student_star/{userId}", method = RequestMethod.POST)
+    public JsonResultModel commentStar2Student(@RequestBody CommentCardStarForm commentCardStarForm,@PathVariable  Long userId,String access_token){
+        JsonResultModel jsonResultModel;
+        CommentCardStar commentCardStarOld = commentCardStarJpaRepository.findByCommentCardId(commentCardStarForm.getCommentCardId());
+        if (Objects.equals(commentCardStarOld,null)){
+            CommentCardStar commentCardStar = commentCardStarTeacherAppService.saveTeacher2StudentStar(commentCardStarForm,userId,access_token);
+           jsonResultModel = commentCardStarTeacherAppService.showStarInfo(commentCardStar);
+        }else {
+            if (Objects.equals(commentCardStarOld.getCommentCardId(),commentCardStarForm.getCommentCardId())){
+                jsonResultModel = new JsonResultModel();
+                jsonResultModel.setData("已经评星成功，不需要再次评星!");
+                jsonResultModel.setReturnCode(400);
+                jsonResultModel.setReturnMsg("Commented!");
+            }else {
+                CommentCardStar commentCardStar = commentCardStarTeacherAppService.saveTeacher2StudentStar(commentCardStarForm,userId,access_token);
+                jsonResultModel = commentCardStarTeacherAppService.showStarInfo(commentCardStar);
+            }
+        }
+
+        return jsonResultModel;
+    }
 }
