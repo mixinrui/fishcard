@@ -362,8 +362,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("@foreignTeacherCommentUnAnswer21 调用--查询48小时未点评的外教--接口");
         LocalDateTime now = LocalDateTime.now();
         List<CommentCard> list = null;
-//        if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
-        if(serviceGateWayType.getType().trim().equals("development_new")){
+        if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
             list = commentCardJpaRepository.findByDateRangeAndStatus2(
                     DateUtil.localDate2Date(now.minusMinutes(6000)),
                     DateUtil.localDate2Date(now.minusMinutes(20)),
