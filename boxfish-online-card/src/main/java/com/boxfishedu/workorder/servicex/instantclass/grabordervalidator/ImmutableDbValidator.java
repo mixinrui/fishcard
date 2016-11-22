@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.instantclass.grabordervalidator;
 
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
@@ -18,6 +19,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,6 +40,9 @@ public class ImmutableDbValidator implements IGrabInstantClassValidator {
         TeacherInstantRequestParam teacherInstantRequestParam=ThreadLocalUtil.getTeacherInstantParam();
         //如果状态被标记为已匹配或者未匹配,则直接返回抢单失败
         InstantClassCard instantClassCard=instantClassJpaRepository.findOne(teacherInstantRequestParam.getCardId());
+        if(Objects.isNull(instantClassCard)){
+            throw new BusinessException("@ImmutableDbValidator不存在对应的instantclassCard");
+        }
         switch (InstantClassRequestStatus.getEnumByCode(instantClassCard.getStatus())){
             case MATCHED:
             case NO_MATCH:

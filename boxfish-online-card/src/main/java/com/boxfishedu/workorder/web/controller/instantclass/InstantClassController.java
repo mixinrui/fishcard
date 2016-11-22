@@ -57,7 +57,7 @@ public class InstantClassController {
             return jsonResultModel;
         }
         catch (Exception ex){
-            logger.error("@teacherInstantClass抢课失败",ex);
+            logger.error("@teacherInstantClass抢课失败,参数{}",teacherInstantRequestParam,ex);
             return JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
         }
