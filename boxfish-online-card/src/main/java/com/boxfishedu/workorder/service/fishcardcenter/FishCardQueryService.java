@@ -222,6 +222,15 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             sql.append("and orderId !=:orderId ");
         }
 
+        if(null !=fishCardFilterParam.getMakeUpFlag()){
+            if(fishCardFilterParam.getMakeUpFlag()){
+                sql.append(" and parentId is not null ");
+            }else {
+                sql.append(" and parentId is  null  ");
+            }
+        }
+
+
         if (null != fishCardFilterParam.getStartTimeSort()) {
             sql.append("order by wo.startTime   ").append(fishCardFilterParam.getStartTimeSort().toLowerCase());
         }
@@ -237,6 +246,8 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         if(null != fishCardFilterParam.getTeacherNameSort()){
             sql.append(" order by teacherName ").append(fishCardFilterParam.getTeacherNameSort());
         }
+
+
 
         return sql.toString();
     }
