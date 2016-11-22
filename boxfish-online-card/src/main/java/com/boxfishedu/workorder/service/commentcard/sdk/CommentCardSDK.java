@@ -3,14 +3,19 @@ package com.boxfishedu.workorder.service.commentcard.sdk;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.config.CommentCardUrlConf;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.util.RestTemplateForCommentCard;
 import com.boxfishedu.workorder.entity.mysql.PushToStudentAndTeacher;
+import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +32,10 @@ public class CommentCardSDK {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    @Qualifier("comment_card")
+    private RestTemplate templateForCommentCard;
 
     @Autowired
     private CommentCardUrlConf commentCardUrlConf;
@@ -58,6 +67,10 @@ public class CommentCardSDK {
 
     public Map commentTypeAndDifficulty(String courseId){
         return restTemplate.getForObject(getCourseTypeAndDifficulty(courseId),Map.class);
+    }
+
+    public Map initiateTypeAndDifficulty(String courseId){
+        return templateForCommentCard.getForObject(initiateCourseTypeAndDifficulty(courseId),Map.class);
     }
 
     public JsonResultModel getInnerTeacherId(Map paramMap){
@@ -106,7 +119,17 @@ public class CommentCardSDK {
 
     private URI getCourseTypeAndDifficulty(String courseId){
         logger.info("Accessing getCourseTypeAndDifficulty in CommentCardSDK......");
-        String url = "/course/info/" + courseId;
+        String url = "/boxfish-wudaokou-course/course/info/" + courseId;
+        return UriComponentsBuilder.fromUriString(urlConf.getCourse_type_and_difficulty())
+                .path(url)
+                .queryParam("")
+                .build()
+                .toUri();
+    }
+
+    private URI initiateCourseTypeAndDifficulty(String courseId){
+        logger.info("Accessing initiateCourseTypeAndDifficulty in CommentCardSDK......");
+        String url = "/boxfish-wudaokou-course/course/info/" + courseId;
         return UriComponentsBuilder.fromUriString(urlConf.getCourse_type_and_difficulty())
                 .path(url)
                 .queryParam("")

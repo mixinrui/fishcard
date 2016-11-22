@@ -75,6 +75,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Override
     @Transactional
     public CommentCard foreignTeacherCommentCardAdd(CommentCardForm commentCardForm, Long userId, String access_token) {
+        Map courseMap = commentCardSDK.commentTypeAndDifficulty(commentCardForm.getCourseId());
+        if (Objects.nonNull(courseMap)){
+            commentCardForm.setCourseType(courseMap.get("type") == null?"":courseMap.get("type").toString());
+            commentCardForm.setCourseDifficulty(courseMap.get("difficulty") == null?"":courseMap.get("difficulty").toString());
+        }
         CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
         if(!serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
