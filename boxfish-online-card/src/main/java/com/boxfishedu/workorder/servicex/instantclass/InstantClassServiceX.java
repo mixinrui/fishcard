@@ -6,12 +6,14 @@ import com.alibaba.fastjson.JSON;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
+import com.boxfishedu.workorder.servicex.instantclass.config.DayRangeBean;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.instantvalidator.InstantClassValidators;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
@@ -27,8 +29,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -147,5 +152,32 @@ public class InstantClassServiceX {
                 .map(timeLimitRule -> String.join("-", timeLimitRule.getBegin().substring(0, 5), timeLimitRule.getEnd().substring(0, 5)))
                 .collect(Collectors.toList());
         return StringUtils.join(timeStringRules, " & ");
+    }
+
+    public void initTimeRange(DayRangeBean dateInfo) {
+        Date date = DateUtil.String2Date(String.join(" ", dateInfo.getDate(), "00:00:00"));
+        if(CollectionUtils.isEmpty(dateInfo.getRange())){
+            throw new BusinessException("参数不合法");
+        }
+        Optional<List<InstantClassTimeRules>> listOldOptional=instantClassTimeRulesMorphiaRepository.getByDay(dateInfo.getDate());
+
+        //新增新规则
+        dateInfo.getRange().forEach(range->{
+            LocalDateTime dateLocal = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+            InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
+            instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(dateLocal));
+            instantClassTimeRules.setDay(dateLocal.getDayOfWeek().toString());
+            instantClassTimeRules.setBegin(range.getBegin());
+            instantClassTimeRules.setEnd(range.getEnd());
+            instantClassTimeRulesMorphiaRepository.save(instantClassTimeRules);
+        });
+
+        //删除旧的规则
+        listOldOptional.get().forEach(oldRange->{
+            instantClassTimeRulesMorphiaRepository.delete(oldRange);
+        });
+
+        //清空缓存
+        redisTemplate.delete(timeRangeKey());
     }
 }

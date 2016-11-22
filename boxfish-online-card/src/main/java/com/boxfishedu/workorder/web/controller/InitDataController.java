@@ -232,20 +232,6 @@ public class InitDataController {
         return JsonResultModel.newJsonResultModel("OK");
     }
 
-    @RequestMapping(value = "/instanttimes/date", method = RequestMethod.POST)
-    public JsonResultModel instantDayClassTimes(@RequestBody Map<String, String> dateInfo) {
-        Date date = DateUtil.String2Date(String.join(" ", dateInfo.get("date"), "00:00:00"));
-        String begin = dateInfo.get("begin");
-        String end = dateInfo.get("end");
-        LocalDateTime dateLocal = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-        InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
-        instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(dateLocal));
-        instantClassTimeRules.setDay(dateLocal.getDayOfWeek().toString());
-        instantClassTimeRules.setBegin(begin);
-        instantClassTimeRules.setEnd(end);
-        instantClassTimeRulesMorphiaRepository.save(instantClassTimeRules);
-        return JsonResultModel.newJsonResultModel("ok");
-    }
 
     @RequestMapping(value = "/schedule/starttime", method = RequestMethod.POST)
     public JsonResultModel initScheduleStartTime() {

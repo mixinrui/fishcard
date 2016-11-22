@@ -21,6 +21,10 @@ public class InstantClassTimeRulesMorphiaRepository extends BaseMorphiaRepositor
         return this.getByDay(DateUtil.date2SimpleString(date));
     }
 
+    public void delete(){
+
+    }
+
     public Optional<List<InstantClassTimeRules>> getByDay(String day) {
         Query<InstantClassTimeRules> query = datastore.createQuery(InstantClassTimeRules.class);
         query.criteria("date").equal(day);

@@ -1,9 +1,14 @@
 package com.boxfishedu.workorder.web.controller.instantclass;
 
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
+import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.servicex.instantclass.InstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.TeacherInstantClassServiceX;
+import com.boxfishedu.workorder.servicex.instantclass.config.DayRangeBean;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstatntClassKeyGenerator;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
@@ -20,9 +25,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by hucl on 16/11/3.
@@ -38,6 +50,8 @@ public class InstantClassController {
 
     @Autowired
     private TeacherInstantClassServiceX teacherInstantClassServiceX;
+
+    private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
 
     @Autowired
     private @Qualifier("teachingServiceRedisTemplate")
@@ -75,5 +89,14 @@ public class InstantClassController {
             return JsonResultModel.newJsonResultModel(null);
         }
         return JsonResultModel.newJsonResultModel(instantClassServiceX.timeRange()+" 开启");
+    }
+
+    //初始化数据
+    @RequestMapping(value = "/instanttimes/date", method = RequestMethod.POST)
+    public JsonResultModel instantDayClassTimes(@RequestBody DayRangeBean dateInfo) {
+
+        instantClassServiceX.initTimeRange(dateInfo);
+
+        return JsonResultModel.newJsonResultModel("ok");
     }
 }
