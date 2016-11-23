@@ -333,6 +333,24 @@ public class TeacherStudentRequester {
         return (Boolean)jsonResultModel.getData();
     }
 
+
+    /**
+     * 关闭订单
+     * @param orderCode
+     */
+    public void closeOrderByOrderCode(String orderCode){
+        String url = new StringBuffer(urlConf.getOrder_service()).append("/order/closed/").append(orderCode).toString();
+        logger.info("@closeOrderByOrderCode#{}",orderCode);
+        JsonResultModel jsonResultModel = null;
+        try {
+            jsonResultModel = restTemplate.postForObject(url,null,JsonResultModel.class);
+        }catch (Exception e){
+            logger.error("@closeOrderByOrderCoded#{}#returnException 关闭订单:[{}]", orderCode,jsonResultModel.getReturnMsg());
+            throw new BusinessException("关闭订单失败:" + jsonResultModel.getReturnMsg());
+        }
+
+    }
+
     /**
      * token验证接口
      * @param token

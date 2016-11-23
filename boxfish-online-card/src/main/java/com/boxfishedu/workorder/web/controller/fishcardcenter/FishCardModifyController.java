@@ -66,6 +66,24 @@ public class FishCardModifyController {
         return fishCardFreezeServiceX.unfreeze(map.get("workOrderId"));
     }
 
+
+    /**
+     * 按照订单查询已上红包  和 未上 课程 数量
+     */
+    @RequestMapping(value = "/classesinfo", method = RequestMethod.PUT)
+    public JsonResultModel getClassesInfo(@RequestBody java.util.Map<String, Long> map) {
+        return fishCardFreezeServiceX.freeze(map.get("workOrderId"));
+    }
+
+    /**
+     * 冻结金币换课的鱼卡
+     */
+    @RequestMapping(value = "/freezeAll", method = RequestMethod.PUT)
+    public JsonResultModel freezeAllFishCards(@RequestBody java.util.Map<String, Long> map) {
+        fishCardFreezeServiceX.freezeAllFishCards(map.get("workOrderId"));
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
     /**
      * 更换上课时间(后台)
      *  app 更换上课时间  StudentAppRelatedChangeClassTimeController
