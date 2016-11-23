@@ -111,7 +111,7 @@ public class MakeUpLessionServiceX {
         clone.setWorkOrderId(newWorkOrder.getId());
         clone.setScheduleId(newCourseSchedule.getId());
         scheduleCourseInfoService.save(clone);
-
+        workOrderLogService.saveWorkOrderLog(oldWorkOrder,"该鱼卡产生补课");
         workOrderLogService.saveWorkOrderLog(newWorkOrder,"补课生成鱼卡");
 
         //调用教师资源分配
