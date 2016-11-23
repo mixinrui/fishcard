@@ -13,11 +13,6 @@ public enum TutorType {
         if(StringUtils.isEmpty(tutorType)) {
             return UNKNOW;
         }
-        switch (tutorType) {
-            case "CN": return CN;
-            case "FRN": return FRN;
-            case "MIXED": return MIXED;
-            default: return UNKNOW;
-        }
+        return valueOf(tutorType);
     }
 }

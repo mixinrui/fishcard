@@ -5,19 +5,20 @@ import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
+import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -38,16 +42,13 @@ import java.util.stream.Collectors;
 public class AvaliableTimeServiceXV1 {
 
     @Autowired
-    private TeacherStudentRequester teacherStudentRequester;
-
-    @Autowired
     private CourseScheduleService courseScheduleService;
 
     @Autowired
     private WorkOrderService workOrderService;
 
     @Autowired
-    private RandomSlotFilterService randomSlotFilterService;
+    private BaseTimeSlotJpaRepository baseTimeSlotJpaRepository;
 
     /**
      * 免费体验的天数
@@ -64,7 +65,10 @@ public class AvaliableTimeServiceXV1 {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     *获取可以修改鱼卡的时间片列表
+     * 选时间
+     * @param avaliableTimeParam
+     * @return
+     * @throws CloneNotSupportedException
      */
     public JsonResultModel getTimeAvailable(AvaliableTimeParam avaliableTimeParam) throws CloneNotSupportedException {
 
@@ -73,25 +77,45 @@ public class AvaliableTimeServiceXV1 {
 
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(avaliableTimeParam.getStudentId());
         // 获取时间片模板,并且复制
-        DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(
-                (long) TutorType.resolve(avaliableTimeParam.getTutorType()).ordinal());
-        List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(dayTimeSlots, (localDateTime, d) -> {
-            DayTimeSlots clone = (DayTimeSlots) d.clone();
-            clone.setDay(DateUtil.formatLocalDate(localDateTime));
-            //获取时间片范围内的数据
-            DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone, avaliableTimeParam);
-            if(Objects.isNull(result) || CollectionUtils.isEmpty(result.getDailyScheduleTime())) {
-                return null;
-            }
-            //随机显示热点时间片
-            result=randomSlotFilterService.removeExculdeSlot(result,avaliableTimeParam);
-            result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
-                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
-                    .collect(Collectors.toList()));
-            return CollectionUtils.isEmpty(result.getDailyScheduleTime()) ? null : result;
-        });
+        List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(
+            // 过滤掉时间片
+            (localDateTime, dayTimeSlot) -> {
+                dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
+                        .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString())))
+                        .collect(Collectors.toList()));
+                return CollectionUtils.isEmpty(dayTimeSlot.getDailyScheduleTime()) ? null : dayTimeSlot;
+            },
+            // 根据日期获取到对应的DayTimeSlots
+            (d) -> {
+                int teachingType = BaseTimeSlots.TEACHING_TYPE_CN;
+                if(StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
+                    teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
+                }
+                List<BaseTimeSlots> timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType(
+                        DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
+                return createDayTimeSlots(d, timeSlotsList);
+            });
+
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
     }
+
+
+    private DayTimeSlots createDayTimeSlots(LocalDateTime date, List<BaseTimeSlots> timeSlotsList) {
+        DayTimeSlots result = new DayTimeSlots();
+        result.setDay(DateUtil.formatLocalDate(date));
+        List<TimeSlots> list = timeSlotsList.stream()
+            .filter(BaseTimeSlots::roll)
+            .map(baseTimeSlots -> {
+                TimeSlots timeSlots = new TimeSlots();
+                timeSlots.setSlotId(baseTimeSlots.getSlotId().longValue());
+                timeSlots.setStartTime(DateUtil.timeShortString(baseTimeSlots.getStartTime()));
+                timeSlots.setEndTime(DateUtil.timeShortString(baseTimeSlots.getEndTime()));
+                return timeSlots;
+            }).collect(Collectors.toList());
+        result.setDailyScheduleTime(list);
+        return result;
+    }
+
 
     /**
      * 获取可选的时间区间
@@ -137,7 +161,7 @@ public class AvaliableTimeServiceXV1 {
 
         }else{
             // 延迟上课
-            startDate = LocalDateTime.ofInstant(DateUtil.String2Date(avaliableTimeParam.getRangeStartTime()) .toInstant(), ZoneId.systemDefault());
+            startDate = LocalDateTime.ofInstant(DateUtil.String2Date(avaliableTimeParam.getRangeStartTime()).toInstant(), ZoneId.systemDefault());
             days =daysOfWeek;
         }
         return new DateRange(startDate, days);

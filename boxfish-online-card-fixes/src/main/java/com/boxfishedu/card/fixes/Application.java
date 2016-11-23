@@ -1,13 +1,16 @@
 package com.boxfishedu.card.fixes;
 
 import com.boxfishedu.card.fixes.entity.mongo.ScheduleCourseInfoMorphiaRepository;
+import com.boxfishedu.card.fixes.service.BaseTimeSlotService;
 import com.boxfishedu.card.fixes.service.WorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -33,6 +36,9 @@ public class Application {
     @Autowired
     private WorkOrderService workOrderService;
 
+    @Autowired
+    private BaseTimeSlotService baseTimeSlotService;
+
 //    @RequestMapping(value = "/courseInfo/synchronous/{courseId}", method = RequestMethod.GET)
     public void courseInfoSynchronous(@PathVariable String courseId) {
         workOrderService.synchronousCourseInfoById(courseId);
@@ -48,6 +54,12 @@ public class Application {
             case 4: repository.updateCourseEnglishNames(); break;
         }
         System.out.println("finish fixes");
+    }
+
+    @RequestMapping(value = "/baseTime/init/{days}")
+    public Object initBaseTimeSlots(@PathVariable Integer days) {
+        baseTimeSlotService.initBaseTimeSlots(days);
+        return ResponseEntity.ok().build();
     }
 
     @Scheduled(cron = "0 30 2 * * ?")
