@@ -33,7 +33,7 @@ public class TeacherInstantRangeBean {
 
     public static TeacherInstantRangeBean defaultRange(){
         TeacherInstantRangeBean teacherInstantRangeBean=new TeacherInstantRangeBean();
-        teacherInstantRangeBean.setDate(DateUtil.date2ShortString(new Date()));
+        teacherInstantRangeBean.setDate(DateUtil.date2SimpleString(new Date()));
         InstantRange instantRange=new InstantRange();
         instantRange.setBegin("00:00:00");
         instantRange.setEnd("23:59:59");

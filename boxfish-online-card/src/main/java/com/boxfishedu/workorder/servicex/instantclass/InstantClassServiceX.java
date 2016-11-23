@@ -185,7 +185,7 @@ public class InstantClassServiceX {
     public JsonResultModel getTeacherRangeByDay() {
         Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = instantClassTimeRulesMorphiaRepository
                 .getByDay(DateUtil.date2SimpleString(new Date()));
-        if(instantClassTimeRulesList.isPresent()){
+        if(!instantClassTimeRulesList.isPresent()){
             return JsonResultModel.newJsonResultModel(TeacherInstantRangeBean.defaultRange());
         }
         List<InstantClassTimeRules> instantClassTimeRules = this.getSortedTimeRulesList(instantClassTimeRulesList.get());
