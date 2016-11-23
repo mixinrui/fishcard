@@ -612,7 +612,7 @@ interface:
     course_type_and_difficulty: http://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: http://api.boxfish.cn//online/figure
 #外教点评接口调用地址
 service:
   sdk:
@@ -681,7 +681,7 @@ interface:
     course_type_and_difficulty: http://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: http://api.boxfish.cn/online/figure
 #外教点评接口调用地址
 service:
   sdk:
