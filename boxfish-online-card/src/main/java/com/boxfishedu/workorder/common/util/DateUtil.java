@@ -102,6 +102,16 @@ public class DateUtil {
         return dateStr;
     }
 
+    public static String timeShortString(Date date) {
+        String dateStr;
+        try {
+            dateStr = new SimpleDateFormat("HH:mm:ss").format(date);
+        } catch (Exception ex) {
+            throw new RuntimeException("日期格式不合法");
+        }
+        return dateStr;
+    }
+
     public static LocalDate convertLocalDate(Date date) {
         return Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
     }

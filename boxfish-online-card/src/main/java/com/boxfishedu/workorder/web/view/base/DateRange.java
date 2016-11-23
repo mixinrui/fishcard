@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Created by LuoLiBing on 16/5/3.
@@ -44,5 +45,13 @@ public class DateRange {
     @FunctionalInterface
     public interface Handle<K> {
         K transfer(LocalDateTime dateTime, K k) throws CloneNotSupportedException;
+    }
+
+    public <K> List<K> forEach(Handle<? super K> handle, Function<LocalDateTime,K> producer) throws CloneNotSupportedException {
+        ArrayList<K> results = Lists.newArrayList();
+        for(int i=0; i < range; i++) {
+            results.add((K) handle.transfer(from.plusDays(i), producer.apply(from.plusDays(i))));
+        }
+        return results;
     }
 }
