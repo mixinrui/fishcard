@@ -187,6 +187,8 @@ public class CommentCard {
         temp.setStudentAskTime(studentAskTime);
         temp.setCourseId(courseId);
         temp.setCourseName(courseName);
+        temp.setCourseType(courseType);
+        temp.setCourseDifficulty(courseDifficulty);
         temp.setQuestionName(questionName);
         temp.setCover(cover);
         temp.setService(service);
