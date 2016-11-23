@@ -37,6 +37,7 @@ public class ParameterValidator implements InstantClassValidator {
     @Override
     public int preValidate() {
         InstantRequestParam instantRequestParam= ThreadLocalUtil.instantRequestParamThreadLocal.get();
+        logger.debug("@instantcard_{}_validate0#ParameterValidator,参数校验开始",instantRequestParam.getStudentId());
         if(Objects.isNull(instantRequestParam.getStudentId())){
             throw new BusinessException("用户参数为必填");
         }
