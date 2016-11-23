@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
+import com.boxfishedu.workorder.servicex.instantclass.bean.TeacherInstantRangeBean;
 import com.boxfishedu.workorder.servicex.instantclass.config.DayRangeBean;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.instantvalidator.InstantClassValidators;
@@ -179,5 +180,15 @@ public class InstantClassServiceX {
 
         //清空缓存
         redisTemplate.delete(timeRangeKey());
+    }
+
+    public JsonResultModel getTeacherRangeByDay() {
+        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = instantClassTimeRulesMorphiaRepository
+                .getByDay(DateUtil.date2SimpleString(new Date()));
+        if(instantClassTimeRulesList.isPresent()){
+            return JsonResultModel.newJsonResultModel(TeacherInstantRangeBean.defaultRange());
+        }
+        List<InstantClassTimeRules> instantClassTimeRules = this.getSortedTimeRulesList(instantClassTimeRulesList.get());
+        return JsonResultModel.newJsonResultModel(TeacherInstantRangeBean.getInstantRange(instantClassTimeRules));
     }
 }

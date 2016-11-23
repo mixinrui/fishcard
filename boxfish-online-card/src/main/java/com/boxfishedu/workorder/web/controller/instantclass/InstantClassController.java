@@ -103,6 +103,14 @@ public class InstantClassController {
         return JsonResultModel.newJsonResultModel(instantClassServiceX.getSortedTimeRulesList(instantClassTimeRulesList.get()));
     }
 
+    /**
+     * 教师端显示时间片用
+     */
+    @RequestMapping(value = "/service/teacher/instant/range", method = RequestMethod.GET)
+    public JsonResultModel getTeacherRangeByDay(){
+        return instantClassServiceX.getTeacherRangeByDay();
+    }
+
     //初始化数据
     @RequestMapping(value = "/instanttimes/date", method = RequestMethod.POST)
     public JsonResultModel instantDayClassTimes(@RequestBody DayRangeBean dateInfo) {
