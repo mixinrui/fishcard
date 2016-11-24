@@ -55,3 +55,19 @@ method:GET
   "returnCode": 200,
   "returnMsg": "success"
 }
+
+##########冻结所有订单
+url:http://127.0.0.1:8080/backend/fishcard/freezeAll?test=true
+method:put
+{
+    "orderId":9223372036854775807
+}
+
+
+#########获取订单信息
+http://127.0.0.1:8080/backend/fishcard/classesinfo?test=true
+method:put
+parameter:
+{
+    "orderId":9223372036854775807
+}

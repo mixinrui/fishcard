@@ -75,6 +75,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Override
     @Transactional
     public CommentCard foreignTeacherCommentCardAdd(CommentCardForm commentCardForm, Long userId, String access_token) {
+        commentCardForm.setCourseType(null);
+        commentCardForm.setCourseDifficulty(null);
         Map courseMap = commentCardSDK.commentTypeAndDifficulty(commentCardForm.getCourseId());
         if (Objects.nonNull(courseMap)){
             commentCardForm.setCourseType(courseMap.get("type") == null?"":courseMap.get("type").toString());
