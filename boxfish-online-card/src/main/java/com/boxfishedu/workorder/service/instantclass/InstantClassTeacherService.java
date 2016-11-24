@@ -72,7 +72,7 @@ public class InstantClassTeacherService {
             this.updateNomatchStatus(instantClassCard);
         }
         if(!teacherIdsOptional.isPresent()){
-            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 没有获取到可 用的教师列表,instantcard{}",instantClassCard);
+            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 没有获取到可用的教师列表,cardId{},studentId{}",instantClassCard.getId(),instantClassCard.getStudentId());
             return;
         }
         logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 获取到教师列表[{}],instantcard{}",instantClassCard,teacherIdsOptional.get().toString(), JacksonUtil.toJSon(instantClassCard));
