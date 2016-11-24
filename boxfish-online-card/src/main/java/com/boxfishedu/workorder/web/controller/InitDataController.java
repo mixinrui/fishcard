@@ -24,17 +24,20 @@ import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sun.javafx.collections.MappingChange;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -234,26 +237,47 @@ public class InitDataController {
 
 
     @RequestMapping(value = "/schedule/starttime", method = RequestMethod.POST)
-    public JsonResultModel initScheduleStartTime() {
-        logger.debug("开始处理.....");
-        workOrderJpaRepository.findAllWorkOrderId().forEach(cardId ->
+    public JsonResultModel initScheduleStartTime() throws InterruptedException {
+        List<Long> cardIds=workOrderJpaRepository.findAllWorkOrderId();
+        StopWatch stopWatch=new StopWatch();
+        int totalNum=cardIds.size();
+        logger.debug("开始处理.....总数{}",totalNum);
+        stopWatch.start();
+        AtomicInteger successNum=new AtomicInteger();
+        AtomicInteger failNum=new AtomicInteger();
+        List<Long> failList=new Vector<>();
+        cardIds.forEach(cardId ->
                 {
                     threadPoolManager.execute(new Thread(() -> {
                         try {
-                            logger.debug("->" + cardId);
                             WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
                             CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
                             courseSchedule.setStartTime(workOrder.getStartTime());
                             courseSchedule.setClassDate(workOrder.getStartTime());
                             courseSchedule.setTimeSlotId(workOrder.getSlotId());
                             courseScheduleService.save(courseSchedule);
+                            int dealNum=successNum.addAndGet(1);
+                            logger.debug("->" + cardId+";已经处理{}条,剩余{}条",dealNum,(totalNum-dealNum));
                         } catch (Exception ex) {
-                            logger.error("失败", ex);
+                            failNum.addAndGet(1);
+                            failList.add(cardId);
+                            logger.error("失败[{}]", cardId,ex);
                         }
                     }));
                 }
         );
-        logger.debug("处理完成....");
-        return JsonResultModel.newJsonResultModel("ok");
+        while(true){
+            if(failNum.get()+successNum.get()==totalNum){
+                stopWatch.stop();
+                logger.debug("处理完成....,总数{};处理成功数{};失败数{};花费{}秒",totalNum,successNum,failNum,stopWatch.getTotalTimeSeconds());
+                if(!CollectionUtils.isEmpty(failList)){
+                    logger.error("失败的鱼卡列表{}", failList);
+                }
+                return JsonResultModel.newJsonResultModel("ok");
+            }
+            Thread.sleep(100);
+        }
+
+
     }
 }
