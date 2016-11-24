@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
+import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.servicex.instantclass.InstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.TeacherInstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.config.DayRangeBean;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,9 +57,11 @@ public class InstantClassController {
     @Autowired
     private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
 
+
     @Autowired
-    private
-    @Qualifier("teachingServiceRedisTemplate")
+    private @Qualifier("teachingServiceRedisTemplate")
+
+
     StringRedisTemplate redisTemplate;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -123,4 +127,5 @@ public class InstantClassController {
         instantClassServiceX.initTimeRange(dateInfo);
         return JsonResultModel.newJsonResultModel("ok");
     }
+    
 }

@@ -12,12 +12,14 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
+import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -55,6 +57,9 @@ public class TestController {
 
     @Autowired
     private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
+
+    @Autowired
+    private BaseTimeSlotService baseTimeSlotService;
 
     @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
     public void changeFishCardTime(@RequestBody Map<String,String> param){
@@ -170,5 +175,16 @@ public class TestController {
     @RequestMapping(value = "/instantlog/student/{student_id}", method = RequestMethod.GET)
     public JsonResultModel notiFyTeachersByStudent(@PathVariable("student_id") Long studentId){
         return JsonResultModel.newJsonResultModel(instantCardLogMorphiaRepository.findByInstantStudentId(studentId));
+    }
+
+    /**
+     * 初始化 新的时间片
+     * @param days
+     * @return
+     */
+    @RequestMapping(value = "/baseTime/init/{days}")
+    public Object initBaseTimeSlots(@PathVariable Integer days) {
+        baseTimeSlotService.initBaseTimeSlots(days);
+        return ResponseEntity.ok().build();
     }
 }

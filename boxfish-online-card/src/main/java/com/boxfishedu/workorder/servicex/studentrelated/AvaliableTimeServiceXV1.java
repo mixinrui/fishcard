@@ -100,7 +100,7 @@ public class AvaliableTimeServiceXV1 {
     }
 
 
-    private DayTimeSlots createDayTimeSlots(LocalDateTime date, List<BaseTimeSlots> timeSlotsList) {
+    public DayTimeSlots createDayTimeSlots(LocalDateTime date, List<BaseTimeSlots> timeSlotsList) {
         DayTimeSlots result = new DayTimeSlots();
         result.setDay(DateUtil.formatLocalDate(date));
         List<TimeSlots> list = timeSlotsList.stream()
