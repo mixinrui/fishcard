@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.instantclass;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
@@ -73,7 +74,7 @@ public class TeacherInstantClassServiceX {
             JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(validateResult));
             logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~grab fail,校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
-                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), jsonResultModel);
+                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel));
             return jsonResultModel;
         }
 
@@ -87,7 +88,7 @@ public class TeacherInstantClassServiceX {
             JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
             logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~grab fail,前往师生运营校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
-                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), jsonResultModel,ex);
+                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel),ex);
             return jsonResultModel;
         }
 
@@ -106,7 +107,7 @@ public class TeacherInstantClassServiceX {
         JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                 .newInstantClassResult(updateGroupInfoInstantCard(instantGroupInfo,instantClassCard),TeacherInstantClassStatus.MATCHED));
         logger.info("~^o^~~^o^~~^o^~~^o^~~^o^~,grab success,instantcard:[{}],teacher:[{}]~^o^~~^o^~~^o^~~^o^~~^o^~成功,结果:{}"
-                , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), jsonResultModel);
+                , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel));
         return jsonResultModel;
     }
 
