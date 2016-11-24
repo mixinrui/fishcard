@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.RedisMapService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
@@ -49,6 +50,9 @@ public class AvaliableTimeServiceXV1 {
 
     @Autowired
     private BaseTimeSlotJpaRepository baseTimeSlotJpaRepository;
+
+    @Autowired
+    private RedisMapService redisMapService;
 
     /**
      * 免费体验的天数
@@ -91,8 +95,11 @@ public class AvaliableTimeServiceXV1 {
                 if(StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
                     teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
                 }
-                List<BaseTimeSlots> timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType(
-                        DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
+                List<BaseTimeSlots> timeSlotsList = redisMapService.getMap( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d)) ;
+                if(CollectionUtils.isEmpty(timeSlotsList)){
+                    timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType( DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
+                    redisMapService.setMap ( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d),timeSlotsList); ;
+                }
                 return createDayTimeSlots(d, timeSlotsList);
             });
 

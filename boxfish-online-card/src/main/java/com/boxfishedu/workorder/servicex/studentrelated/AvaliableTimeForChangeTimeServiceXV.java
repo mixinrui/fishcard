@@ -9,15 +9,13 @@ import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.ServeService;
-import com.boxfishedu.workorder.service.TimeLimitPolicy;
-import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.*;
 import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.service.studentrelated.RandomSlotFilterService;
 import com.boxfishedu.workorder.servicex.bean.CourseView;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
+import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -64,7 +62,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
 
 
     @Autowired
-    private AvaliableTimeServiceXV1 avaliableTimeServiceXV1;
+    private RedisMapService redisMapService;
 
 
     @Autowired
@@ -124,16 +122,12 @@ public class AvaliableTimeForChangeTimeServiceXV {
 
 
         List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(
+
                 // 过滤掉时间片
                 (localDateTime, dayTimeSlot) -> {
                     dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
                             .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString())))
                             .collect(Collectors.toList()));
-                    if( CollectionUtils.isEmpty(dayTimeSlot.getDailyScheduleTime())  ){
-                        return null;
-                    }
-
-
                     return CollectionUtils.isEmpty(dayTimeSlot.getDailyScheduleTime()) ? null : dayTimeSlot;
                 },
                 // 根据日期获取到对应的DayTimeSlots
@@ -142,9 +136,14 @@ public class AvaliableTimeForChangeTimeServiceXV {
                     if(StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
                         teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
                     }
-                    List<BaseTimeSlots> timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType(
-                            DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
-                    return avaliableTimeServiceXV1.createDayTimeSlots(d, timeSlotsList);
+
+
+                    List<BaseTimeSlots> timeSlotsList = redisMapService.getMap( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d)) ;
+                    if(CollectionUtils.isEmpty(timeSlotsList)){
+                        timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType( DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
+                        redisMapService.setMap ( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d),timeSlotsList); ;
+                    }
+                    return createDayTimeSlots(d, timeSlotsList);
                 });
 
 
@@ -207,7 +206,21 @@ public class AvaliableTimeForChangeTimeServiceXV {
     }
 
 
-
+    private DayTimeSlots createDayTimeSlots(LocalDateTime date, List<BaseTimeSlots> timeSlotsList) {
+        DayTimeSlots result = new DayTimeSlots();
+        result.setDay(DateUtil.formatLocalDate(date));
+        List<TimeSlots> list = timeSlotsList.stream()
+                .filter(BaseTimeSlots::roll)
+                .map(baseTimeSlots -> {
+                    TimeSlots timeSlots = new TimeSlots();
+                    timeSlots.setSlotId(baseTimeSlots.getSlotId().longValue());
+                    timeSlots.setStartTime(DateUtil.timeShortString(baseTimeSlots.getStartTime()));
+                    timeSlots.setEndTime(DateUtil.timeShortString(baseTimeSlots.getEndTime()));
+                    return timeSlots;
+                }).collect(Collectors.toList());
+        result.setDailyScheduleTime(list);
+        return result;
+    }
     private  boolean validateFirstDate(String day ,String startTime,Date from){
         Date startDate  = DateUtil.String2Date(day+" "+startTime);
         return startDate.after(from);
@@ -263,6 +276,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
         }
         return workOrder;
     }
+
 
 
 
