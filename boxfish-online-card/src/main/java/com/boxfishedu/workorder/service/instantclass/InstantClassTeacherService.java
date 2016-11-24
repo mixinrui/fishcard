@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.service.instantclass;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -66,14 +67,15 @@ public class InstantClassTeacherService {
             teacherIdsOptional=instantTeacherRequester.getInstantTeacherIds(instantClassCard);
         }
         catch (Exception ex){
-            logger.error("@dealInstantFetchedTeachers#user:{}获取实时推荐教师失败,将匹配状态设置为未匹配上"
-                    ,instantClassCard.getStudentId());
+            logger.error("@dealInstantFetchedTeachers#user:[{}] card[{}] IIIIIIIIIIIIII    获取实时推荐教师失败,将匹配状态设置为未匹配上"
+                    ,instantClassCard.getStudentId(),instantClassCard.getId());
             this.updateNomatchStatus(instantClassCard);
         }
         if(!teacherIdsOptional.isPresent()){
-            logger.debug("@dealInstantFetchedTeachers没有获取到可 用的教师列表,instantcard{}",instantClassCard);
+            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 没有获取到可 用的教师列表,instantcard{}",instantClassCard);
             return;
         }
+        logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 获取到教师列表[{}],instantcard{}",instantClassCard,teacherIdsOptional.get().toString(), JacksonUtil.toJSon(instantClassCard));
         //匹配上老师,则向教师推送抢单的消息
         courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
     }
