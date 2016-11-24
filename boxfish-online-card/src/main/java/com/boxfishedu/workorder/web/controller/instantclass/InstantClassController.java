@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
+import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.servicex.instantclass.InstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.TeacherInstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.config.DayRangeBean;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +55,9 @@ public class InstantClassController {
 
     @Autowired
     private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
+
+    @Autowired
+    private BaseTimeSlotService baseTimeSlotService;
 
     @Autowired
     private @Qualifier("teachingServiceRedisTemplate")
@@ -116,5 +121,16 @@ public class InstantClassController {
     public JsonResultModel instantDayClassTimes(@RequestBody DayRangeBean dateInfo) {
         instantClassServiceX.initTimeRange(dateInfo);
         return JsonResultModel.newJsonResultModel("ok");
+    }
+
+    /**
+     * 初始化 新的时间片
+     * @param days
+     * @return
+     */
+    @RequestMapping(value = "/baseTime/init/{days}")
+    public Object initBaseTimeSlots(@PathVariable Integer days) {
+        baseTimeSlotService.initBaseTimeSlots(days);
+        return ResponseEntity.ok().build();
     }
 }
