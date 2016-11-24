@@ -70,7 +70,7 @@ public class InstantClassController {
     public JsonResultModel instantClass(@RequestBody InstantRequestParam instantRequestParam, Long userId) {
         logger.debug("→_→→_→→_→→_→→_→→_>>>>>>>> IIIIIIIIIIII 学生立即上课请求,参数{}",JacksonUtil.toJSon(instantRequestParam));
         JsonResultModel jsonResultModel= instantClassServiceX.instantClass(instantRequestParam);
-        logger.debug("→_→→_→→_→→_→→_→→_<<<<<<<< IIIIIIIIIIII 学生立即上课返回,参数{},结果{}",JacksonUtil.toJSon(instantRequestParam),jsonResultModel);
+        logger.debug("→_→→_→→_→→_→→_→→_<<<<<<<< IIIIIIIIIIII 学生立即上课返回,参数{},结果{}",JacksonUtil.toJSon(instantRequestParam),JacksonUtil.toJSon(jsonResultModel));
         return jsonResultModel;
     }
 
