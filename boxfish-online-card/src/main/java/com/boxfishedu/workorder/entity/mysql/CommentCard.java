@@ -194,7 +194,7 @@ public class CommentCard {
         temp.setService(service);
         temp.setOrderId(orderId);
         temp.setOrderCode(orderCode);
-        temp.setCreateTime(createTime);
+        temp.setCreateTime(new Date());
         temp.setUpdateTime(new Date());
         return temp;
     }
