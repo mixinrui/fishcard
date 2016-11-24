@@ -55,10 +55,11 @@ public class InstantClassController {
     private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
 
     @Autowired
-    private @Qualifier("teachingServiceRedisTemplate")
+    private
+    @Qualifier("teachingServiceRedisTemplate")
     StringRedisTemplate redisTemplate;
 
-    private final Logger logger= LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "/service/student/instantclass", method = RequestMethod.POST)
     public JsonResultModel instantClass(@RequestBody InstantRequestParam instantRequestParam, Long userId) {
@@ -68,28 +69,28 @@ public class InstantClassController {
     @RequestMapping(value = "/service/teacher/instantclass", method = RequestMethod.POST)
     public JsonResultModel teacherInstantClass(@RequestBody TeacherInstantRequestParam teacherInstantRequestParam, Long userId) {
         try {
-            JsonResultModel jsonResultModel= teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
+            JsonResultModel jsonResultModel = teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
             return jsonResultModel;
-        }
-        catch (Exception ex){
-            logger.error("@teacherInstantClass抢课失败,参数{}",teacherInstantRequestParam,ex);
-            return JsonResultModel.newJsonResultModel(InstantClassResult
+        } catch (Exception ex) {
+            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
-        }
-        finally {
-            String key= GrabInstatntClassKeyGenerator.generateKey(teacherInstantRequestParam);
+            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~grab fail,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
+                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), jsonResultModel,ex);
+            return jsonResultModel;
+        } finally {
+            String key = GrabInstatntClassKeyGenerator.generateKey(teacherInstantRequestParam);
             //无论是否成功都删除当前用户的资源
             redisTemplate.delete(key);
         }
     }
 
     @RequestMapping(value = "/service/student/instant/timerange", method = RequestMethod.GET)
-    public JsonResultModel timeRange(){
-        String timeDesc=instantClassServiceX.timeRange();
-        if(StringUtils.isEmpty(timeDesc)){
+    public JsonResultModel timeRange() {
+        String timeDesc = instantClassServiceX.timeRange();
+        if (StringUtils.isEmpty(timeDesc)) {
             return JsonResultModel.newJsonResultModel(null);
         }
-        return JsonResultModel.newJsonResultModel(instantClassServiceX.timeRange()+" 开启");
+        return JsonResultModel.newJsonResultModel(instantClassServiceX.timeRange() + " 开启");
     }
 
     /**
@@ -97,7 +98,7 @@ public class InstantClassController {
      * @return
      */
     @RequestMapping(value = "/instanttimes/date/{date}", method = RequestMethod.GET)
-    public JsonResultModel getRangeByDay(@PathVariable("date") String date){
+    public JsonResultModel getRangeByDay(@PathVariable("date") String date) {
         Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = instantClassTimeRulesMorphiaRepository
                 .getByDay(date);
         return JsonResultModel.newJsonResultModel(instantClassServiceX.getSortedTimeRulesList(instantClassTimeRulesList.get()));
@@ -107,7 +108,7 @@ public class InstantClassController {
      * 教师端显示时间片用
      */
     @RequestMapping(value = "/service/teacher/instant/range", method = RequestMethod.GET)
-    public JsonResultModel getTeacherRangeByDay(){
+    public JsonResultModel getTeacherRangeByDay() {
         return instantClassServiceX.getTeacherRangeByDay();
     }
 
