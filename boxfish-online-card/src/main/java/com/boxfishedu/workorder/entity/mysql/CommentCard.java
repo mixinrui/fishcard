@@ -150,7 +150,7 @@ public class CommentCard {
         commentCard.setCourseName(commentCardForm.getCourseName());
         commentCard.setCover(commentCardForm.getCover());
         commentCard.setCourseType(commentCardForm.getCourseType());
-        commentCard.setCourseDifficulty(commentCardForm.getCourseDifficult());
+        commentCard.setCourseDifficulty(commentCardForm.getCourseDifficulty());
         commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
         commentCard.setVoiceTime(commentCardForm.getVoiceTime());
         return commentCard;
