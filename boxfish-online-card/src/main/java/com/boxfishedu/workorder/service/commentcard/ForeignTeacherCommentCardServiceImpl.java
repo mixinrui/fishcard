@@ -577,7 +577,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             newCommentCard.setTeacherId(toTeacherId);
             newCommentCard.setAssignTeacherTime(date);
             newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
-            newCommentCard.setUpdateTime(date);
             commentCardJpaRepository.save(newCommentCard);
         }
     }
