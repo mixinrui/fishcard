@@ -424,7 +424,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 //                "UNKNOW" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
 //        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
 //                "UNKNOW" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
-        return  "You have not assessed an answer in 24 hours. If you should fail to do that again, you would be disqualified.";
+        return  "You have not assessed an answer in 24 hours. \n" +
+                "If you should fail to do that again, you would be disqualified.";
     }
 
     /**
