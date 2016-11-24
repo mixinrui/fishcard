@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatu
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
@@ -78,8 +79,8 @@ public class InstantClassController {
         } catch (Exception ex) {
             JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
-            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~grab fail,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
-                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), jsonResultModel,ex);
+            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~  grabresult ,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
+                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel),ex);
             return jsonResultModel;
         } finally {
             String key = GrabInstatntClassKeyGenerator.generateKey(teacherInstantRequestParam);
