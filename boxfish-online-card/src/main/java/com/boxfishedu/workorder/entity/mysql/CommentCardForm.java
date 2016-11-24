@@ -13,7 +13,7 @@ public class CommentCardForm {
     private String courseId;
     private String courseName;
     private String courseType;
-    private String courseDifficult;
+    private String courseDifficulty;
     private String cover;
     private String askVoicePath;
     private Long voiceTime;
