@@ -68,18 +68,22 @@ public class InstantClassController {
 
     @RequestMapping(value = "/service/student/instantclass", method = RequestMethod.POST)
     public JsonResultModel instantClass(@RequestBody InstantRequestParam instantRequestParam, Long userId) {
-        return instantClassServiceX.instantClass(instantRequestParam);
+        logger.debug("→_→→_→→_→→_→→_→→_>>>>>>>> IIIIIIIIIIII 学生立即上课请求,参数{}",JacksonUtil.toJSon(instantRequestParam));
+        JsonResultModel jsonResultModel= instantClassServiceX.instantClass(instantRequestParam);
+        logger.debug("→_→→_→→_→→_→→_→→_<<<<<<<< IIIIIIIIIIII 学生立即上课返回,参数{},结果{}",JacksonUtil.toJSon(instantRequestParam),jsonResultModel);
+        return jsonResultModel;
     }
 
     @RequestMapping(value = "/service/teacher/instantclass", method = RequestMethod.POST)
     public JsonResultModel teacherInstantClass(@RequestBody TeacherInstantRequestParam teacherInstantRequestParam, Long userId) {
+        logger.info("x__xx__xx__xx__x>>>> IIIIIIIIIIII 教师立即上课抢单,参数{}",JacksonUtil.toJSon(teacherInstantRequestParam));
         try {
             JsonResultModel jsonResultModel = teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
             return jsonResultModel;
         } catch (Exception ex) {
             JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
-            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~  grabresult ,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
+            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIII  grabresult ,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
                     , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel),ex);
             return jsonResultModel;
         } finally {
