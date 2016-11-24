@@ -392,7 +392,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                             commentCard.getTeacherId().toString()),
                             createPushUnAnswer2InfoToStudentAndTeacherMessage(commentCard),
                             "FOREIGNCOMMENT");
-                    logger.info("@foreignTeacherCommentUnAnswer23 向老师端推送消息结果" + pushResult);
+                    logger.info("@foreignTeacherCommentUnAnswer23 向老师端推送消息结果" + pushResult + ", 推送消息为:" + createPushUnAnswer2InfoToStudentAndTeacherMessage(commentCard));
                 }
                 commentCardJpaRepository.save(commentCard);
                 serviceTemp.setAmount(serviceTemp.getAmount() + 1);
