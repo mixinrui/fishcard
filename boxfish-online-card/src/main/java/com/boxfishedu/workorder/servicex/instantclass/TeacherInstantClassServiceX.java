@@ -73,7 +73,7 @@ public class TeacherInstantClassServiceX {
         if(!validateResult.toString().equals(InstantClassRequestStatus.UNKNOWN.toString())){
             JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(validateResult));
-            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ grabresult ,校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
+            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIII grabresult ,校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
                     , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel));
             return jsonResultModel;
         }
@@ -87,7 +87,7 @@ public class TeacherInstantClassServiceX {
         catch (Exception ex){
             JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
-            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~  grabresult fail,前往师生运营校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
+            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIII  grabresult fail,前往师生运营校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
                     , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel),ex);
             return jsonResultModel;
         }
@@ -106,7 +106,7 @@ public class TeacherInstantClassServiceX {
         //创建群组,将群组数据返回给App
         JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                 .newInstantClassResult(updateGroupInfoInstantCard(instantGroupInfo,instantClassCard),TeacherInstantClassStatus.MATCHED));
-        logger.info("~^o^~~^o^~~^o^~~^o^~~^o^~, grabresult ,instantcard:[{}],teacher:[{}]~^o^~~^o^~~^o^~~^o^~~^o^~成功,结果:{}"
+        logger.info("~^o^~~^o^~~^o^~~^o^~~^o^~, IIIIIIIIIIII grabresult ,instantcard:[{}],teacher:[{}]~^o^~~^o^~~^o^~~^o^~~^o^~成功,结果:{}"
                 , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel));
         return jsonResultModel;
     }
