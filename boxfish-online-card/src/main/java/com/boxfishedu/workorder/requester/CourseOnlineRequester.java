@@ -82,7 +82,7 @@ public class CourseOnlineRequester {
 
             teachingOnlineMsgList.add(teachingOnlineMsg);
         });
-        logger.debug(">>>>>>@notifyInstantClassMsg,向教师发起推送实时上课请求,courseInfo[{}],教师信息[{}]"
+        logger.debug(">>>>>>@notifyInstantClassMsg, IIIIIIIIIIIIIII 向教师发起推送实时上课请求,courseInfo[{}],教师信息[{}]"
                 ,JacksonUtil.toJSon(teachingOnlineMsgList),teacherIds);
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineMsgList,Object.class);}));
     }
