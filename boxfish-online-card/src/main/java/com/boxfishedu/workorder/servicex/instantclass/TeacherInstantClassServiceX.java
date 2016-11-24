@@ -70,8 +70,11 @@ public class TeacherInstantClassServiceX {
         //校验是否需要走抢单的流程
         TeacherInstantClassStatus validateResult=grabInstantClassValidators.preValidate();
         if(!validateResult.toString().equals(InstantClassRequestStatus.UNKNOWN.toString())){
-            return JsonResultModel.newJsonResultModel(InstantClassResult
+            JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(validateResult));
+            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~grab fail,校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
+                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), jsonResultModel);
+            return jsonResultModel;
         }
 
         //前往师生运营校验
@@ -81,8 +84,11 @@ public class TeacherInstantClassServiceX {
             instantAssignTeacher=instantTeacherRequester.assignGrabteacher(instantClassCard,teacherInstantRequestParam);
         }
         catch (Exception ex){
-            return JsonResultModel.newJsonResultModel(InstantClassResult
+            JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
+            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~grab fail,前往师生运营校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
+                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), jsonResultModel,ex);
+            return jsonResultModel;
         }
 
         //入InstantCard库,初始化鱼卡信息,创建群组
@@ -97,8 +103,11 @@ public class TeacherInstantClassServiceX {
         regenerateGroupInfo(workOrders,instantClassCard);
 
         //创建群组,将群组数据返回给App
-        return JsonResultModel.newJsonResultModel(InstantClassResult
+        JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
                 .newInstantClassResult(updateGroupInfoInstantCard(instantGroupInfo,instantClassCard),TeacherInstantClassStatus.MATCHED));
+        logger.info("~^o^~~^o^~~^o^~~^o^~~^o^~,grab success,instantcard:[{}],teacher:[{}]~^o^~~^o^~~^o^~~^o^~~^o^~成功,结果:{}"
+                , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), jsonResultModel);
+        return jsonResultModel;
     }
 
     //如果当前教师不能上这些课程,将会发生教师更换
