@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.common.bean;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  */
 @Data
 public class TeachingOnlineGroupMsg {
-    private List<String> alias;
+    private List<String> alias=new ArrayList<>();
     private String push_title;
     private TeachingOnlineMsgAttach data;
 

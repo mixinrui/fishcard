@@ -75,7 +75,8 @@ public class InstantClassTeacherService {
             logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 没有获取到可用的教师列表,cardId{},studentId{}",instantClassCard.getId(),instantClassCard.getStudentId());
             return;
         }
-        logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 获取到教师列表[{}],instantcard{}",instantClassCard,teacherIdsOptional.get().toString(), JacksonUtil.toJSon(instantClassCard));
+        logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 获取到教师列表[{}],card{},学生{}"
+                ,teacherIdsOptional.get().toString(),instantClassCard.getId(),instantClassCard.getStudentId());
         //匹配上老师,则向教师推送抢单的消息
         courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
     }
