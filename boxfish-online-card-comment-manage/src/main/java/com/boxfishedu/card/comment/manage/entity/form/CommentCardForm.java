@@ -44,6 +44,13 @@ public class CommentCardForm {
 
     private String orderCode;
 
+    /**
+     * 课程信息
+     */
+    private String courseType;
+
+    private String courseDifficulty;
+
     @Data
     public class DateRange {
         private Date from;
