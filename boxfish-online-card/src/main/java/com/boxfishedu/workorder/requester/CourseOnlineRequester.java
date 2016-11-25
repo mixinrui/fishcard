@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingNotificationEnum;
+import com.boxfishedu.workorder.common.bean.TeachingOnlineGroupMsg;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -59,32 +60,28 @@ public class CourseOnlineRequester {
     }
 
     public void notifyInstantClassMsg(InstantClassCard instantClassCard,List<Long> teacherIds){
-        String url=String.format("%s/teaching/callback/push",
+        String url=String.format("%s/teaching/callback/push/group",
                 urlConf.getCourse_online_service());
         instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
-        List<TeachingOnlineMsg> teachingOnlineMsgList=Lists.newArrayList();
-        teacherIds.forEach(teacherId->{
-            TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();
-            //TODO:即时上课,推送给教师的信息;需要到配置项中去
-            teachingOnlineMsg.setPush_title("Many a student calls in for online LIVE teaching. Click and get prepared.");
-            teachingOnlineMsg.setUser_id(teacherId);
-            teachingOnlineMsg.setPush_type(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
+        TeachingOnlineGroupMsg teachingOnlineGroupMsg=new TeachingOnlineGroupMsg();
+        teachingOnlineGroupMsg.setPush_title("Many a student calls in for online LIVE teaching. Click and get prepared.");
 
-            TeachingOnlineMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach=new  TeachingOnlineMsg.TeachingOnlineMsgAttach();
-            teachingOnlineMsgAttach.setType(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
-            teachingOnlineMsgAttach.setCardId(instantClassCard.getId());
-            teachingOnlineMsgAttach.setDay(DateUtil.simpleDate2String(instantClassCard.getClassDate()));
-            teachingOnlineMsgAttach.setSlotId(instantClassCard.getSlotId());
-            teachingOnlineMsgAttach.setCount(teacherIds.size());
-            teachingOnlineMsgAttach.setStudentId(instantClassCard.getStudentId());
+        TeachingOnlineGroupMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach=new  TeachingOnlineGroupMsg.TeachingOnlineMsgAttach();
+        teachingOnlineMsgAttach.setType(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
+        teachingOnlineMsgAttach.setCardId(instantClassCard.getId());
+        teachingOnlineMsgAttach.setDay(DateUtil.simpleDate2String(instantClassCard.getClassDate()));
+        teachingOnlineMsgAttach.setSlotId(instantClassCard.getSlotId());
+        teachingOnlineMsgAttach.setCount(teacherIds.size());
+        teachingOnlineMsgAttach.setStudentId(instantClassCard.getStudentId());
+        teachingOnlineGroupMsg.setData(teachingOnlineMsgAttach);
 
-            teachingOnlineMsg.setData(teachingOnlineMsgAttach);
+        List<String> alias=Lists.newArrayList();
+        teacherIds.forEach(teacherId-> alias.add(teacherId.toString()));
 
-            teachingOnlineMsgList.add(teachingOnlineMsg);
-        });
+        teachingOnlineGroupMsg.setAlias(alias);
         logger.debug(">>>>>>@notifyInstantClassMsg, IIIIIIIIIIIIIII 向教师发起推送实时上课请求,courseInfo[{}],教师信息[{}]"
-                ,JacksonUtil.toJSon(teachingOnlineMsgList),teacherIds);
-        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineMsgList,Object.class);}));
+                ,JacksonUtil.toJSon(teachingOnlineGroupMsg),teacherIds);
+        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineGroupMsg,Object.class);}));
     }
 
     /**
