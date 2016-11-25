@@ -94,7 +94,7 @@ public class InstantTeacherRequester {
 
     private JsonResultModel getInstantTeachers(InstantFetchTeacherParam fetchTeacherParam) {
         String url = String.format("%s/immediately/course/schedule/online/getRecommendImmediatelyTeachers", urlConf.getTeacher_service());
-        logger.debug(">>>>>>>>>>>@InstantTeacherRequester# IIIIIIIIIIIIIIIIIII 获取教师列表 getInstantTeachers#url:{}#param:{}"
+        logger.debug(">>>>>>>>>>>@InstantTeacherRequester# IIIIIIIIIIIIIII 获取教师列表 getInstantTeachers#url:{}#param:{}"
                 ,url, JacksonUtil.toJSon(fetchTeacherParam));
         JsonResultModel jsonResultModel=null;
         try{

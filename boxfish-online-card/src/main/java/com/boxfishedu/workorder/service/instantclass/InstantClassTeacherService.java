@@ -67,16 +67,16 @@ public class InstantClassTeacherService {
             teacherIdsOptional=instantTeacherRequester.getInstantTeacherIds(instantClassCard);
         }
         catch (Exception ex){
-            logger.error("@dealInstantFetchedTeachers#user:[{}] card[{}] IIIIIIIIIIIIII    获取实时推荐教师失败,将匹配状态设置为未匹配上"
+            logger.error("@dealInstantFetchedTeachers#user:[{}] card[{}] IIIIIIIIIIIIIII    获取实时推荐教师失败,将匹配状态设置为未匹配上"
                     ,instantClassCard.getStudentId(),instantClassCard.getId());
             this.updateNomatchStatus(instantClassCard);
         }
         if(!teacherIdsOptional.isPresent()||CollectionUtils.isEmpty(teacherIdsOptional.get())){
-            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 没有获取到可用的教师列表,cardId{},studentId{}"
+            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 没有获取到可用的教师列表,cardId{},studentId{}"
                     ,instantClassCard.getId(),instantClassCard.getStudentId());
             return;
         }
-        logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 获取到教师列表[{}],card{},学生{}"
+        logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 获取到教师列表[{}],card{},学生{}"
                 ,teacherIdsOptional.get().toString(),instantClassCard.getId(),instantClassCard.getStudentId());
         //匹配上老师,则向教师推送抢单的消息
         courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
