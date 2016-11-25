@@ -318,7 +318,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     logger.info("向老师端推送消息,告知其点评超时......");
                     JsonResultModel pushResult = pushInfoToStudentAndTeacher(
                             Long.parseLong(commentCard.getTeacherId().toString()),
-                            createPushUnAnswerInfoToStudentAndTeacherMessage(commentCard),
+                            createPushUnAnswer2InfoToStudentAndTeacherMessage(commentCard),
                             "FOREIGNCOMMENT");
                     logger.info("向老师端推送消息结果" + pushResult);
                     CommentCard oldCommentCard = commentCardJpaRepository.save(commentCard);
@@ -343,16 +343,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             }
             logger.info("@foreignTeacherCommentUnAnswer16 所有在24小时内为被点评的学生已重新请求分配外教完毕,一共重新分配外教点评的个数为:" + list.size());
         }
-    }
-
-    private String createPushUnAnswerInfoToStudentAndTeacherMessage(CommentCard commentCard) {
-        String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
-                "UNKNOWN" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
-        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
-                "UNKNOWN" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
-        return  "You have not assessed the answer at "+ assignTeacherTime+
-                " on "+ englishAssignTeacherTime +",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
-                "GET IT";
     }
 
     /**
@@ -417,6 +407,16 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }
         logger.info("@foreignTeacherCommentUnAnswer26 所有学生外教点评次数返还完毕,一共返回次数为:"+list.size());
     }
+
+//    private String createPushUnAnswerInfoToStudentAndTeacherMessage(CommentCard commentCard) {
+//        String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+//                "UNKNOWN" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
+//        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+//                "UNKNOWN" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
+//        return  "You have not assessed the answer at "+ assignTeacherTime+
+//                " on "+ englishAssignTeacherTime +",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
+//                "GET IT";
+//    }
 
     private String createPushUnAnswer2InfoToStudentAndTeacherMessage(CommentCard commentCard) {
         //2016-11-16 由于推送时间无法转换时区,所以修改.
