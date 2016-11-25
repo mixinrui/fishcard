@@ -106,6 +106,12 @@ public class CommentCard implements Serializable {
     @Column(name = "course_name", nullable = true, length = 500)
     private String courseName;
 
+    @Column(name = "course_type", nullable = true, length = 45)
+    private String courseType;
+
+    @Column(name = "course_difficulty", nullable = true, length = 45)
+    private String courseDifficulty;
+
     @Column(name = "question_name", nullable = true, length = 1024)
     private String questionName;
 

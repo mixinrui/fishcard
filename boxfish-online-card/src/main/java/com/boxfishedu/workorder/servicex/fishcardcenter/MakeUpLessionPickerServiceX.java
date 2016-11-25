@@ -85,7 +85,13 @@ public class MakeUpLessionPickerServiceX {
                 DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
 
                 result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
-                        .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+                        .filter(t ->
+
+                                  !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString()))
+
+
+
+                        )
                         .collect(Collectors.toList()));
                 result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
                         .filter(t ->  (  ! (clone.getDay().contains( DateUtil.date2SimpleString(new Date()) )  &&   t.getSlotId() <= getMostSimilarSlot(result)))

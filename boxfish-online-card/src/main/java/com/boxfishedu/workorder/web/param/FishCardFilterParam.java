@@ -56,5 +56,4 @@ public class FishCardFilterParam {
 
     private Boolean   makeUpFlag ;//  是否是补课   true  是   flase  不是    空 全部
 
-
 }
