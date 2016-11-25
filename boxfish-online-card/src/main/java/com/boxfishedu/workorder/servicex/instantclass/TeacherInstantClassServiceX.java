@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassTeacherService;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstantClassValidators;
@@ -65,6 +66,9 @@ public class TeacherInstantClassServiceX {
     @Autowired
     private WorkOrderService workOrderService;
 
+    @Autowired
+    private DataCollectorService dataCollectorService;
+
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
         putParameterIntoThreadLocal(teacherInstantRequestParam);
@@ -102,6 +106,9 @@ public class TeacherInstantClassServiceX {
         this.markMatchedIntoRedis(teacherInstantRequestParam);
         //异步调用,如果类型发生标变化,教师不能上该节课则变化
         regenerateGroupInfo(workOrders,instantClassCard);
+
+        //更新首页信息
+        dataCollectorService.updateBothChnAndFnItemAsync(instantClassCard.getStudentId());
 
         //创建群组,将群组数据返回给App
         JsonResultModel jsonResultModel= JsonResultModel.newJsonResultModel(InstantClassResult
