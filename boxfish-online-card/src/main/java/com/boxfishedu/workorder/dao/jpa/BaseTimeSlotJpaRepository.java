@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface BaseTimeSlotJpaRepository extends JpaRepository<BaseTimeSlots, Long> {
 
-    @Cacheable(value = CacheKeyConstant.BASE_TIME_SLOTS, key = "T(java.util.Objects).hash(#classDate,#teachingType,#clientType)")
+    //@Cacheable(value = CacheKeyConstant.BASE_TIME_SLOTS, key = "T(java.util.Objects).hash(#classDate,#teachingType,#clientType)")
     List<BaseTimeSlots> findByClassDateAndTeachingTypeAndClientType(Date classDate, Integer teachingType, Integer clientType);
 
     @Query(value = "select max(e.classDate) from BaseTimeSlots e")
