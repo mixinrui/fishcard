@@ -179,25 +179,29 @@ public class AvaliableTimeForChangeTimeServiceXV {
 
         if(!CollectionUtils.isEmpty(dayTimeSlotsList)){
             for(DayTimeSlots dts :dayTimeSlotsList){
-                if(CollectionUtils.isEmpty(myCourseViews)){
-                    if(! CollectionUtils.isEmpty( dts.getDailyScheduleTime() )){
-                        lastDayTimeSlots.add(dts);
-                    }
-
-                }else {
-                    boolean flag =true;
-                    for(MyCourseView  mcv: myCourseViews){
-                        if(dts.getDay().equals( mcv.getClassDate() )){
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if(flag){
+                if(null!=dts){
+                    if(CollectionUtils.isEmpty(myCourseViews)){
                         if(! CollectionUtils.isEmpty( dts.getDailyScheduleTime() )){
                             lastDayTimeSlots.add(dts);
                         }
+
+                    }else {
+                        boolean flag =true;
+                        for(MyCourseView  mcv: myCourseViews){
+
+                            if(dts.getDay().equals( mcv.getClassDate() )){
+                                flag = false;
+                                break;
+                            }
+                        }
+                        if(flag){
+                            if(! CollectionUtils.isEmpty( dts.getDailyScheduleTime() )){
+                                lastDayTimeSlots.add(dts);
+                            }
+                        }
                     }
                 }
+
             }
         }
 
