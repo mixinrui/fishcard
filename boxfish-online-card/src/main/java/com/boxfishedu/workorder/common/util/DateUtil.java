@@ -37,7 +37,7 @@ public class DateUtil {
     }
 
     public static LocalDateTime string2LocalDateTime(String dateStr){
-        return convertLocalDateTime(String2Date(dateStr));
+       return convertLocalDateTime(String2Date(dateStr));
     }
 
     public static String Date2ForForeignDate(Date date) {
@@ -96,6 +96,16 @@ public class DateUtil {
         String dateStr = null;
         try {
             dateStr = new SimpleDateFormat("HH:mm").format(date);
+        } catch (Exception ex) {
+            throw new RuntimeException("日期格式不合法");
+        }
+        return dateStr;
+    }
+
+    public static String timeShortString(Date date) {
+        String dateStr;
+        try {
+            dateStr = new SimpleDateFormat("HH:mm:ss").format(date);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }

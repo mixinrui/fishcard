@@ -93,15 +93,10 @@ public class MakeUpLessionPickerServiceX {
 
                         )
                         .collect(Collectors.toList()));
-
                 result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
-                        .filter(t ->
-
-                                        (  ! (clone.getDay().contains( DateUtil.date2SimpleString(new Date()) )  &&   t.getSlotId() <= getMostSimilarSlot(result)))
-
+                        .filter(t ->  (  ! (clone.getDay().contains( DateUtil.date2SimpleString(new Date()) )  &&   t.getSlotId() <= getMostSimilarSlot(result)))
                         )
                         .collect(Collectors.toList()));
-
                 monthTimeSlots.add(result);
             } catch (Exception ex) {
                 logger.error("鱼卡[{}]获取可用时间片失败", workOrderId, ex);
@@ -113,7 +108,6 @@ public class MakeUpLessionPickerServiceX {
 //        addTagForSlotTemplate(avaliableTimeParam, monthTimeSlots, dateRange);
         return JsonResultModel.newJsonResultModel(monthTimeSlots);
     }
-
 
     private Integer getMostSimilarSlot(DayTimeSlots dayTimeSlots) {
         LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault());

@@ -17,7 +17,7 @@ threadpool:
     # 线程池维护线程所允许的空闲时间
     time_keep_alive: 2000
     # 线程池所使用的缓冲队列大小
-    size_work_queue: 20000
+    size_work_queue: 100000
     # 缓冲队列任务调度周期,可以考虑放到redis等其他外围存储,防止内存泄漏
     period_task_qos: 1000
 
@@ -161,6 +161,7 @@ interface:
     teacher_service_admin: http://123.56.13.168:8098
     course_recommended_service: http://123.56.13.168:8001/recommend
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://123.56.13.168:8080
     order_service: http://123.56.13.168:8082
     course_online_service: http://123.56.13.168:9090
@@ -172,9 +173,10 @@ interface:
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
 #  获取课程类型和难度
-    course_type_and_difficulty: http://base.boxfish.cn
+    course_type_and_difficulty: http://123.56.13.168:8001
 #   login_token
     login_filter_url: http://114.55.140.96:6901
+    teacher_photo: http://api.online.test.boxfish.cn/online/figure
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099
@@ -217,6 +219,7 @@ interface:
     teacher_service_admin: http://101.201.237.252:8099
     course_recommended_service: http://123.56.13.168:8001/recommend
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://127.0.0.1:8080
     order_service: http://101.201.237.252:8082
     course_online_service: http://101.201.239.116:9090
@@ -230,6 +233,7 @@ interface:
     course_type_and_difficulty: http://123.56.13.168:8001
 #   login_token
     login_filter_url: http://114.55.140.96:6901
+    teacher_photo: http://api.online.test.boxfish.cn/online/figure
 
 service:
   sdk:
@@ -272,6 +276,7 @@ interface:
     teacher_service_admin: http://101.201.237.252:8099
     course_recommended_service: http://123.56.13.168:8001/recommend
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://101.201.237.252:8080
     order_service: http://101.201.237.252:8082
     course_online_service: http://101.201.237.252:9090
@@ -282,12 +287,12 @@ interface:
 #  学生旷课扣积分
     absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #  获取课程类型和难度
-    course_type_and_difficulty: http://base.boxfish.cn
+    course_type_and_difficulty: http://123.56.13.168:8001
 #支付系统
     pay_service: http://101.201.237.252:8888/pay-inside
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-
+    teacher_photo: http://api.online.test.boxfish.cn/online/figure
 service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099
@@ -322,6 +327,12 @@ spring:
     username: admin
     password: boxfish123
     virtualHost: local
+#  rabbitmq:
+#    address: 101.201.237.252
+##    port: 5672
+#    username: boxfish
+#    password: boxfish
+#    virtualHost: local
   profiles: test
 
 ##################接口调用地址
@@ -331,6 +342,7 @@ interface:
     teacher_service_admin: http://123.56.13.168:8098
     course_recommended_service: http://123.56.13.168:8001/recommend
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://123.56.13.168:8080
     order_service: http://123.56.13.168:8082
     course_online_service: http://123.56.13.168:9090
@@ -342,17 +354,21 @@ interface:
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
 #  获取课程类型和难度
-    course_type_and_difficulty: http://base.boxfish.cn
+    course_type_and_difficulty: http://123.56.13.168:8001
 #   login_token
     login_filter_url: http://114.55.140.96:6901
+    teacher_photo: http://api.online.test.boxfish.cn/online/figure
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9090
     innerTeacherUrl: http://123.56.13.168:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
     type: test
+
+
 
 
 server.port: 8080
@@ -390,6 +406,7 @@ interface:
     teacher_service_admin: http://127.0.0.1:8098
     course_recommended_service: http://127.0.0.1:8001/recommend
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://127.0.0.1:8080
     order_service: http://127.0.0.1:8082
     course_online_service: http://127.0.0.1:9090
@@ -400,12 +417,16 @@ interface:
     absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
+    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+#  获取课程类型和难度
+    course_type_and_difficulty: http://123.56.13.168:8001
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: pretest
 
@@ -445,6 +466,7 @@ interface:
     teacher_service_admin: http://localhost:8099
     course_recommended_service: http://114.55.40.98:8001
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://localhost:8080
     order_service: http://localhost:8082
     course_online_service: http://localhost:9090
@@ -455,8 +477,11 @@ interface:
     absenteeism_deduct_score: http://api.online.test.boxfish.cn
 #支付系统
     pay_service: http://101.201.66.32:8888/pay-inside
+#  获取课程类型和难度
+    course_type_and_difficulty: http://123.56.13.168:8001
 #   login_token
     login_filter_url: http://114.55.140.96:6901
+    teacher_photo: http://api.online.test.boxfish.cn/online/figure
 
 service:
   sdk:
@@ -464,6 +489,7 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: demo
 #===============================================================预生产环境===============================================================
@@ -504,6 +530,7 @@ interface:
     teacher_service_admin: http://localhost:8099
     course_recommended_service: http://114.55.40.98:8001
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://localhost:8080
     order_service: http://localhost:8082
     course_online_service: http://localhost:9090
@@ -514,6 +541,9 @@ interface:
     absenteeism_deduct_score: http://api.test.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
+    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+#  获取课程类型和难度
+    course_type_and_difficulty: http://base.boxfish.cn
 
 service:
   sdk:
@@ -521,6 +551,7 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090
     innerTeacherUrl: http://127.0.0.1:8099
+    scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: preproduct
 
@@ -564,6 +595,7 @@ interface:
 
     course_recommended_service: http://base.boxfish.cn/recommend
     course_wudaokou_recommend_service: http://base.boxfish.cn/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://base.boxfish.cn/boxfish-wudaokou-course/course/info
     fishcard_service: http://online-api.boxfish.cn/fishcard
     order_service: http://online-api.boxfish.cn/order
     course_online_service: http://online-api.boxfish.cn/teaching-service
@@ -580,6 +612,7 @@ interface:
     course_type_and_difficulty: http://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
+    teacher_photo: http://api.boxfish.cn//online/figure
 #外教点评接口调用地址
 service:
   sdk:
@@ -587,6 +620,7 @@ service:
     getPictureUrl: http://base.boxfish.cn/passbook
     pushInfoIrl: http://online-api.boxfish.cn/teaching-service
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
+    scoreUrl: api.boxfish.cn
   gateway:
     type: product
 
@@ -630,6 +664,7 @@ interface:
 
     course_recommended_service: http://base.boxfish.cn/recommend
     course_wudaokou_recommend_service: http://base.boxfish.cn/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: http://base.boxfish.cn/boxfish-wudaokou-course/course/info
     fishcard_service: http://online-api.boxfish.cn/fishcard
     order_service: http://online-api.boxfish.cn/order
     course_online_service: http://online-api.boxfish.cn/teaching-service
@@ -646,6 +681,7 @@ interface:
     course_type_and_difficulty: http://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
+    teacher_photo: http://api.boxfish.cn/online/figure
 #外教点评接口调用地址
 service:
   sdk:
@@ -653,5 +689,6 @@ service:
     getPictureUrl: http://base.boxfish.cn/passbook
     pushInfoIrl: http://online-api.boxfish.cn/teaching-service
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
+    scoreUrl: api.boxfish.cn
   gateway:
     type: product

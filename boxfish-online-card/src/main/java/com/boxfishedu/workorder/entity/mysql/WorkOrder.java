@@ -23,7 +23,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "work_order")
 @EqualsAndHashCode(exclude = "workOrderLogs")
-public class WorkOrder{
+public class WorkOrder implements Cloneable{
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -148,7 +148,7 @@ public class WorkOrder{
     @Column(name="make_up_seq")
     private Integer makeUpSeq;
 
-    //是否已安排补课
+    //是否已安排补课 (1 表示已经不过课)
     @Column(name="make_up_flag")
     private Short makeUpFlag;
 
@@ -193,6 +193,10 @@ public class WorkOrder{
 
     @Column(name = "combo_type", nullable = true)
     private String comboType;
+
+    //class_type[区分该鱼卡的生成方式,传统方式?实时上课?]
+    @Column(name = "class_type", nullable = true)
+    private String classType;
 
     @Transient
     private Boolean freezeBtnShowFlag=false;
@@ -255,5 +259,16 @@ public class WorkOrder{
         else{
             return seqNum%8;
         }
+    }
+
+    @Override
+    public WorkOrder clone(){
+        WorkOrder prototypeClass = null;
+        try {
+            prototypeClass = (WorkOrder) super.clone();
+        } catch (CloneNotSupportedException e) {
+            System.out.println("克隆对象失败");
+        }
+        return prototypeClass;
     }
 }

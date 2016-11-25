@@ -496,6 +496,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         courseSchedule.setCreateTime(workOrder.getCreateTime());
         courseSchedule.setTimeSlotId(workOrder.getSlotId());
         courseSchedule.setClassDate(workOrder.getStartTime());
+        courseSchedule.setStartTime(workOrder.getStartTime());
         courseSchedule.setWorkorderId(workOrder.getId());
         courseSchedule.setTeacherId(workOrder.getTeacherId());
         courseScheduleService.save(courseSchedule);

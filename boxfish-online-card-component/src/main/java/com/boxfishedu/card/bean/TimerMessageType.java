@@ -45,7 +45,14 @@ public enum TimerMessageType {
     RECOMMEND_COURSES(130),
 
     // 自动确认状态
-    AUTO_CONFIRM_STATUS(135);
+    AUTO_CONFIRM_STATUS(135),
+
+    //即时上课
+    INSTANT_CLASS(145),
+
+    //标记超过一分钟未匹配教师的课程
+    INSTANT_CLASS_MARK_UNMATCH(146);
+
     private int code;
 
     private TimerMessageType(int code) {

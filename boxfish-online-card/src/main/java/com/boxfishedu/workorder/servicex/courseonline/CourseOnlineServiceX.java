@@ -107,11 +107,11 @@ public class CourseOnlineServiceX {
         dealNullFishCard(workOrderId, workOrder, courseSchedule);
 
         //未到上课时间尝试更新,不做处理
-        Date now = new Date();
-        if (now.before(workOrder.getStartTime())) {
-            tooEarlyReport(status, workOrder);
-            return;
-        }
+//        Date now = new Date();
+//        if (now.before(workOrder.getStartTime())) {
+//            tooEarlyReport(status, workOrder);
+//            return;
+//        }
 
         //处理完成的情况
         if (status == FishCardStatusEnum.COMPLETED.getCode() || status == FishCardStatusEnum.COMPLETED_FORCE.getCode()) {

@@ -94,6 +94,10 @@ public class MakeUpLessionServiceX {
         if (null == oldCourseSchedule) {
             throw new BusinessException("无对应的排课表");
         }
+
+        if(null == makeUpCourseParam.getTimeSlotId() ){
+            throw new BusinessException("所传参数不合法");
+        }
         fishCardMakeUpService.processMakeUpParam(oldWorkOrder);
 
         WorkOrder newWorkOrder = getMakeUpWorkOrder(oldWorkOrder, makeUpCourseParam);
@@ -154,6 +158,7 @@ public class MakeUpLessionServiceX {
         newCourseSchedule.setTimeSlotId(makeUpCourseParam.getTimeSlotId());
         newCourseSchedule.setTeacherId(0l);
         newCourseSchedule.setClassDate(DateUtil.String2SimpleDate(makeUpCourseParam.getEndTime()));
+        newCourseSchedule.setStartTime(DateUtil.String2Date(makeUpCourseParam.getStartTime()));
         newCourseSchedule.setId(null);
         newCourseSchedule.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         newCourseSchedule.setCreateTime(new Date());
@@ -320,7 +325,7 @@ public class MakeUpLessionServiceX {
                 return JsonResultModel.newJsonResultModel(resultMap);
             }
 
-            if (null== wo.getStatusRecharge() || FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode() != wo.getStatusRecharge().intValue()) {
+            if (FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode() != wo.getStatusRecharge().intValue()) {
                 logger.info("::fishcardConfirmStatusRecharge3:0[{}]:1[{}]::2[{}]", wo.getId(), FishCardChargebackStatusEnum.RECHARGBACKING.getCode(), wo.getStatusRecharge());
                 resultMap.put("3", "请核实鱼卡信息,鱼卡退款状态有不符合标准退款流程,请合适数据!");
                 return JsonResultModel.newJsonResultModel(resultMap);

@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
+import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
@@ -15,6 +16,7 @@ import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmis
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +25,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/3/31.
@@ -95,14 +100,55 @@ StudentAppRelatedController {
         return timePickerServiceX.getCourseSchedulePage(studentId, pageable, locale);
     }
 
+    /**
+     * 获取延迟上课的周数
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/v1/delay/week/class" ,method = RequestMethod.GET)
+    public JsonResultModel getDelayClassWeeks(Long userId)throws  Exception{
+        return avaliableTimeServiceXV1.getDelayWeekDays();
+    }
 
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
     public JsonResultModel timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
         commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(), userId);
-        avaliableTimeParam.setStudentId(userId);
+        if(null != avaliableTimeParam.getStudentId())
+            avaliableTimeParam.setStudentId(userId);
         return avaliableTimeServiceXV1.getTimeAvailable(avaliableTimeParam);
     }
 
+
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public JsonResultModel test(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
+
+        Map<String,Integer> querData =Maps.newHashMap();
+
+        for(int i=0;i<100;i++){
+            JsonResultModel jsonResultModel =  avaliableTimeServiceXV1.getTimeAvailable(avaliableTimeParam);
+
+            List<DayTimeSlots> list = (List<DayTimeSlots>)jsonResultModel.getData();
+            for(DayTimeSlots dts : list){
+                final String day = dts.getDay();
+                dts.getDailyScheduleTime().stream().forEach(timeSlots -> {
+                    this.putValue(querData,day + " " + timeSlots.getSlotId() );
+                });
+
+            }
+        }
+
+        return JsonResultModel.newJsonResultModel(querData);
+    }
+
+
+    private  void putValue(Map<String,Integer> map,String key){
+        if(null !=map.get(key)){
+            map.put(key,(Integer)map.get(key)+1);
+        }else {
+            map.put(key,1);
+        }
+    }
     @RequestMapping(value = "schedule/finish/page")
     public JsonResultModel getFinishCourseSchedulePage(
             Long userId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},

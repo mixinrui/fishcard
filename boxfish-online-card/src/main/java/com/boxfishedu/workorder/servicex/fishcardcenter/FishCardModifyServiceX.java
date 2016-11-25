@@ -38,6 +38,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -100,6 +102,9 @@ public class FishCardModifyServiceX {
     public JsonResultModel changeTeacher(TeacherChangeParam teacherChangeParam) {
         //获取对应的workorder和courseschedule
         WorkOrder workOrder = workOrderService.findOne(teacherChangeParam.getWorkOrderId());
+        if(workOrder.getIsCourseOver()==1){
+            throw new BusinessException("课程已经结束,不能更换教师");
+        }
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(teacherChangeParam.getWorkOrderId());
 
         if ((null == workOrder) || (null == courseSchedule)) {
@@ -159,6 +164,7 @@ public class FishCardModifyServiceX {
                 Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
                         DateUtil.convertLocalDateTime(workOrder.getStartTime()));
                 long hours = duration.toHours();
+                logger.info("workOrder startTime=[{}] and duration=[{}]", workOrder.getStartTime(), duration.toHours());
                 // 24小时以内如果有课,不再换课,无课则直接推荐
                 if(hours <= 24) {
                     if(StringUtils.isEmpty(workOrder.getCourseId())) {
@@ -268,7 +274,7 @@ public class FishCardModifyServiceX {
             courseSchedules.add(courseSchedule);
             timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
         }
-        return  new JsonResultModel().newJsonResultModel("OK");
+        return  JsonResultModel.newJsonResultModel("OK");
     }
 
 
@@ -291,5 +297,4 @@ public class FishCardModifyServiceX {
 
         rabbitMqSender.send(map, QueueTypeEnum.SHORT_MESSAGE);
     }
-
 }

@@ -6,12 +6,17 @@ import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.ContinousAbsenceMorphiaRepository;
+import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.ContinousAbsenceRecord;
+import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
@@ -19,14 +24,20 @@ import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sun.javafx.collections.MappingChange;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -37,6 +48,7 @@ import java.util.stream.Collectors;
 @CrossOrigin
 @RestController
 @RequestMapping("/init")
+@SuppressWarnings("ALL")
 public class InitDataController {
 
     @Autowired
@@ -71,6 +83,12 @@ public class InitDataController {
 
     @Autowired
     private OnlineAccountService onlineAccountService;
+
+    @Autowired
+    private InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository;
+
+    @Autowired
+    private CourseScheduleService courseScheduleService;
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -136,20 +154,20 @@ public class InitDataController {
     @RequestMapping(value = "/async/order/complete", method = RequestMethod.POST)
     public JsonResultModel asyncNotifyOrder() {
         List<Service> services = serveService.findAll();
-        Map<Long,Integer> selectedAndCompletedMap=services.stream().filter(service -> service.getProductType()==1001&&service.getCoursesSelected()==1).collect(Collectors.groupingBy(Service::getOrderId,Collectors.summingInt(Service::getAmount)));
-        Set<Long> selectedSet = selectedAndCompletedMap.entrySet().stream().filter(entry->entry.getValue()>0).map(entry->entry.getKey()).collect(Collectors.toSet());
-        Set<Long> completedSet = selectedAndCompletedMap.entrySet().stream().filter(entry->entry.getValue()==0).map(entry->entry.getKey()).collect(Collectors.toSet());
+        Map<Long, Integer> selectedAndCompletedMap = services.stream().filter(service -> service.getProductType() == 1001 && service.getCoursesSelected() == 1).collect(Collectors.groupingBy(Service::getOrderId, Collectors.summingInt(Service::getAmount)));
+        Set<Long> selectedSet = selectedAndCompletedMap.entrySet().stream().filter(entry -> entry.getValue() > 0).map(entry -> entry.getKey()).collect(Collectors.toSet());
+        Set<Long> completedSet = selectedAndCompletedMap.entrySet().stream().filter(entry -> entry.getValue() == 0).map(entry -> entry.getKey()).collect(Collectors.toSet());
 //        selectedSet.forEach(orderId->{
 //            Map param = Maps.newHashMap();
 //                param.put("id", orderId);
 //                param.put("status", ConstantUtil.WORKORDER_SELECTED);
 //                rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
 //        });
-        completedSet.forEach(orderId->{
+        completedSet.forEach(orderId -> {
             Map param = Maps.newHashMap();
-                param.put("id", orderId);
-                param.put("status", ConstantUtil.WORKORDER_COMPLETED);
-                rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
+            param.put("id", orderId);
+            param.put("status", ConstantUtil.WORKORDER_COMPLETED);
+            rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
         });
         System.out.println(completedSet);
         return JsonResultModel.newJsonResultModel("ok");
@@ -167,10 +185,99 @@ public class InitDataController {
 
     //将在线用户的数据初始化到mongo和redis中去
     @RequestMapping(value = "/async/online/account", method = RequestMethod.POST)
-    public JsonResultModel asyncInitOnlineUser(){
+    public JsonResultModel asyncInitOnlineUser() {
         List<Service> services = serveService.findAll();
-        Set<Long> useIdSet=services.stream().map(service ->service.getStudentId()).collect(Collectors.toSet());
-        threadPoolManager.execute(new Thread(()->useIdSet.forEach(userId-> onlineAccountService.add(userId))));
+        Set<Long> useIdSet = services.stream().map(service -> service.getStudentId()).collect(Collectors.toSet());
+        threadPoolManager.execute(new Thread(() -> useIdSet.forEach(userId -> onlineAccountService.add(userId))));
         return JsonResultModel.newJsonResultModel("OK");
+    }
+
+    //即时上课时间片限制生成
+    @RequestMapping(value = "/instanttimes", method = RequestMethod.POST)
+    public JsonResultModel instantClassTimes(@RequestBody Map<String, String> dateInfo) {
+        Date beginDate = DateUtil.String2Date(dateInfo.get("begin"));
+        Date endDate = DateUtil.String2Date(dateInfo.get("end"));
+        LocalDateTime beginLocal = LocalDateTime.ofInstant(beginDate.toInstant(), ZoneId.systemDefault());
+        LocalDateTime endLocal = LocalDateTime.ofInstant(endDate.toInstant(), ZoneId.systemDefault());
+        for (LocalDateTime localDateTime = beginLocal; localDateTime.isBefore(endLocal); localDateTime = localDateTime.plusDays(1)) {
+            logger.debug("正在初始化数据:[" + DateUtil.localDate2SimpleString(localDateTime) + "]");
+            switch (localDateTime.getDayOfWeek()) {
+                case SATURDAY:
+                case SUNDAY: {
+                    {
+                        InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
+                        instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(localDateTime));
+                        instantClassTimeRules.setDay(localDateTime.getDayOfWeek().toString());
+                        instantClassTimeRules.setBegin("09:00:00");
+                        instantClassTimeRules.setEnd("12:00:00");
+                        instantClassTimeRulesMorphiaRepository.save(instantClassTimeRules);
+                    }
+                    {
+                        InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
+                        instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(localDateTime));
+                        instantClassTimeRules.setDay(localDateTime.getDayOfWeek().toString());
+                        instantClassTimeRules.setBegin("19:00:00");
+                        instantClassTimeRules.setEnd("23:30:00");
+                        instantClassTimeRulesMorphiaRepository.save(instantClassTimeRules);
+                    }
+                    break;
+                }
+                default:
+                    InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
+                    instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(localDateTime));
+                    instantClassTimeRules.setDay(localDateTime.getDayOfWeek().toString());
+                    instantClassTimeRules.setBegin("19:00:00");
+                    instantClassTimeRules.setEnd("23:30:00");
+                    instantClassTimeRulesMorphiaRepository.save(instantClassTimeRules);
+                    break;
+            }
+        }
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
+
+    @RequestMapping(value = "/schedule/starttime", method = RequestMethod.POST)
+    public JsonResultModel initScheduleStartTime() throws InterruptedException {
+        List<Long> cardIds=workOrderJpaRepository.findAllWorkOrderId();
+        StopWatch stopWatch=new StopWatch();
+        int totalNum=cardIds.size();
+        logger.debug("开始处理.....总数{}",totalNum);
+        stopWatch.start();
+        AtomicInteger successNum=new AtomicInteger();
+        AtomicInteger failNum=new AtomicInteger();
+        List<Long> failList=new Vector<>();
+        cardIds.forEach(cardId ->
+                {
+                    threadPoolManager.execute(new Thread(() -> {
+                        try {
+                            WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
+                            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
+                            courseSchedule.setStartTime(workOrder.getStartTime());
+                            courseSchedule.setClassDate(workOrder.getStartTime());
+                            courseSchedule.setTimeSlotId(workOrder.getSlotId());
+                            courseScheduleService.save(courseSchedule);
+                            int dealNum=successNum.addAndGet(1);
+                            logger.debug("->" + cardId+";已经处理{}条,剩余{}条",dealNum,(totalNum-dealNum));
+                        } catch (Exception ex) {
+                            failNum.addAndGet(1);
+                            failList.add(cardId);
+                            logger.error("失败[{}]", cardId,ex);
+                        }
+                    }));
+                }
+        );
+        while(true){
+            if(failNum.get()+successNum.get()==totalNum){
+                stopWatch.stop();
+                logger.debug("处理完成....,总数{};处理成功数{};失败数{};花费{}秒",totalNum,successNum,failNum,stopWatch.getTotalTimeSeconds());
+                if(!CollectionUtils.isEmpty(failList)){
+                    logger.error("失败的鱼卡列表{}", failList);
+                }
+                return JsonResultModel.newJsonResultModel("ok");
+            }
+            Thread.sleep(100);
+        }
+
+
     }
 }

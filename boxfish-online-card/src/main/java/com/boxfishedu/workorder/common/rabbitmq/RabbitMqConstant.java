@@ -60,6 +60,18 @@ public class RabbitMqConstant {
     //教师旷课处理
     public static final String DELAY_TEACHER_DEALER_QUEUE="boxfish.delay.teacher.dealer.queue";
 
+
+    /**
+     * 立即上课
+     */
+    //模板,用于发送获取正在轮询课程的消息
+    public static final String DELAY_QUEUE_INSTANT_CLASS_TEMPLATE_NAME="boxfish.delay.instantclass.template";
+    //无需接听
+    public static final String DELAY_INSTANT_CLASS_QUEUE="boxfish.delay.instantclass.queue";
+    //教师旷课处理
+    public static final String DELAY_INSTANT_CLASS_DEALER_QUEUE="boxfish.delay.instantclass.dealer.queue";
+
+
     //延迟队列,用于学生旷课
     public static final String DELAY_QUEUE_STUDENT_ABSENT_TEMPLATE_NAME="boxfish.delay.absent.student.template";
     //延迟队列,无需接听

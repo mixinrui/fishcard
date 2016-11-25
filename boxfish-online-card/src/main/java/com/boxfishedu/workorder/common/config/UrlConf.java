@@ -21,6 +21,9 @@ public class UrlConf {
     @Value(("${interface.address.course_wudaokou_recommend_service}"))
     private String course_wudaokou_recommend_service;
 
+    @Value(("${interface.address.course_wudaokou_detail_service}"))
+    private String course_wudaokou_detail_service;
+
     @Value("${interface.address.fishcard_service}")
     private String fishcard_service;
     @Value("${interface.address.course_online_service}")
@@ -56,5 +59,8 @@ public class UrlConf {
     @Value("${interface.address.login_filter_url}")
     private String login_filter_url;//登录验证URL
 
+    //教师图像
+    @Value("${interface.address.teacher_photo}")
+    private String teacher_photo;//登录验证URL
 
 }

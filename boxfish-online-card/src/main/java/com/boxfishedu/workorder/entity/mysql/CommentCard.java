@@ -93,6 +93,12 @@ public class CommentCard {
     @Column(name = "course_name", nullable = true, length = 500)
     private String courseName;
 
+    @Column(name = "course_type", nullable = true, length = 45)
+    private String courseType;
+
+    @Column(name = "course_difficulty", nullable = true, length = 45)
+    private String courseDifficulty;
+
     @Column(name = "question_name", nullable = true, length = 1024)
     private String questionName;
 
@@ -143,6 +149,8 @@ public class CommentCard {
         commentCard.setCourseId(commentCardForm.getCourseId());
         commentCard.setCourseName(commentCardForm.getCourseName());
         commentCard.setCover(commentCardForm.getCover());
+        commentCard.setCourseType(commentCardForm.getCourseType());
+        commentCard.setCourseDifficulty(commentCardForm.getCourseDifficulty());
         commentCard.setAskVoicePath(commentCardForm.getAskVoicePath());
         commentCard.setVoiceTime(commentCardForm.getVoiceTime());
         return commentCard;
@@ -179,12 +187,14 @@ public class CommentCard {
         temp.setStudentAskTime(studentAskTime);
         temp.setCourseId(courseId);
         temp.setCourseName(courseName);
+        temp.setCourseType(this.courseType);
+        temp.setCourseDifficulty(this.courseDifficulty);
         temp.setQuestionName(questionName);
         temp.setCover(cover);
         temp.setService(service);
         temp.setOrderId(orderId);
         temp.setOrderCode(orderCode);
-        temp.setCreateTime(createTime);
+        temp.setCreateTime(new Date());
         temp.setUpdateTime(new Date());
         return temp;
     }

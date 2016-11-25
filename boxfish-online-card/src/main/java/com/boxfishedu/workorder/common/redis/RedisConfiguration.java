@@ -19,6 +19,8 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.lang.reflect.Method;
@@ -88,6 +90,10 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         expires.put(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY,60*10l);
         // 防重复选时间缓存
         expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 2L);
+        //立即上课,缓存三分钟
+        expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 3*60L);
+        // 选时间缓存一周
+        expires.put(CacheKeyConstant.BASE_TIME_SLOTS, 3600 * 24 * 7L);
         cacheManager.setExpires(expires);
         return cacheManager;
     }
@@ -98,6 +104,16 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         setSerializer(template); //设置序列化工具，这样ReportBean不需要实现Serializable接口
         template.afterPropertiesSet();
         return template;
+    }
+
+    @Bean(name="stringLongRedisTemplate")
+    public RedisTemplate<String, Long> stringLongTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String,Long> stringLongTemplate = new RedisTemplate<>();
+        RedisSerializer<String> stringSerializer = new StringRedisSerializer();
+        stringLongTemplate.setKeySerializer(stringSerializer);
+        stringLongTemplate.setConnectionFactory(factory);
+        stringLongTemplate.afterPropertiesSet();;
+        return stringLongTemplate;
     }
 
     private void setSerializer(RedisTemplate template) {

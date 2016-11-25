@@ -75,6 +75,13 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Override
     @Transactional
     public CommentCard foreignTeacherCommentCardAdd(CommentCardForm commentCardForm, Long userId, String access_token) {
+        commentCardForm.setCourseType(null);
+        commentCardForm.setCourseDifficulty(null);
+        Map courseMap = commentCardSDK.commentTypeAndDifficulty(commentCardForm.getCourseId());
+        if (Objects.nonNull(courseMap)){
+            commentCardForm.setCourseType(courseMap.get("type") == null?"":courseMap.get("type").toString());
+            commentCardForm.setCourseDifficulty(courseMap.get("difficulty") == null?"":courseMap.get("difficulty").toString());
+        }
         CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
         if(!serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
@@ -241,8 +248,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 //                }
 //            }
 //        }
-        logger.info("@foreignTeacherCommentDetailQuery 查看详情时设置首页...");
-        commentTeacherAppServiceX.findHomeComment(userId);
+//        logger.info("@foreignTeacherCommentDetailQuery 查看详情时设置首页...");
+//        commentTeacherAppServiceX.findHomeComment(userId);
         return commentCard;
     }
 
@@ -323,6 +330,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     newCommentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
                     newCommentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
                     newCommentCard.setStatus(CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
+                    newCommentCard.setCreateTime(updateDate);
                     if(Objects.nonNull(commentCard.getPrevious_id())) {
                         newCommentCard.setPrevious_id(commentCard.getPrevious_id());
                     } else {
@@ -357,7 +365,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         LocalDateTime now = LocalDateTime.now();
         List<CommentCard> list = null;
         if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
-             list = commentCardJpaRepository.findByDateRangeAndStatus2(
+            list = commentCardJpaRepository.findByDateRangeAndStatus2(
                     DateUtil.localDate2Date(now.minusMinutes(6000)),
                     DateUtil.localDate2Date(now.minusMinutes(20)),
                     CommentCardStatus.ASSIGNED_TEACHER.getCode());
@@ -376,7 +384,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 com.boxfishedu.workorder.entity.mysql.Service serviceTemp = serviceJpaRepository.findById(commentCard.getService().getId());
                 commentCard.setService(serviceTemp);
                 if (commentCard.getTeacherId() != null) {
-                    logger.info("@foreignTeacherCommentUnAnswer22 调用师生运营接口,设置参与该点评卡的外教为旷课......", commentCard);
+                    logger.info("@foreignTeacherCommentUnAnswer22 调用师生运营接口,设置参与该点评卡的外教为旷课......" + commentCard);
                     JsonResultModel jsonResultModel = commentCardSDK.setTeacherAbsence(commentCard.getTeacherId(), commentCard.getStudentId(), commentCard.getId());
                     logger.info("调用师生运营接口结果", jsonResultModel);
                     logger.info("向老师端推送消息,告知其点评超时......");
@@ -384,7 +392,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                             commentCard.getTeacherId().toString()),
                             createPushUnAnswer2InfoToStudentAndTeacherMessage(commentCard),
                             "FOREIGNCOMMENT");
-                    logger.info("@foreignTeacherCommentUnAnswer23 向老师端推送消息结果" + pushResult);
+                    logger.info("@foreignTeacherCommentUnAnswer23 向老师端推送消息结果" + pushResult + ", 推送消息为:" + createPushUnAnswer2InfoToStudentAndTeacherMessage(commentCard));
                 }
                 commentCardJpaRepository.save(commentCard);
                 serviceTemp.setAmount(serviceTemp.getAmount() + 1);
@@ -411,13 +419,13 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     }
 
     private String createPushUnAnswer2InfoToStudentAndTeacherMessage(CommentCard commentCard) {
-        String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
-                "UNKNOW" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
-        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
-                "UNKNOW" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
-        return  "You have not assessed the answer at "+ assignTeacherTime +
-                " on "+ englishAssignTeacherTime + ",in 24 hours. If you should not assess an answer again, you would be disqualified.\n" +
-                "GET IT";
+        //2016-11-16 由于推送时间无法转换时区,所以修改.
+//        String assignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+//                "UNKNOW" : SimpleDateUtil.getTimeFromDate(commentCard.getAssignTeacherTime());
+//        String englishAssignTeacherTime = commentCard.getAssignTeacherTime() == null ?
+//                "UNKNOW" : SimpleDateUtil.getEnglishDate2(commentCard.getAssignTeacherTime());
+        return  "You have not assessed an answer in 24 hours. \n" +
+                "If you should fail to do that again, you would be disqualified.";
     }
 
     /**
@@ -570,7 +578,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             newCommentCard.setTeacherId(toTeacherId);
             newCommentCard.setAssignTeacherTime(date);
             newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
-            newCommentCard.setUpdateTime(date);
             commentCardJpaRepository.save(newCommentCard);
         }
     }

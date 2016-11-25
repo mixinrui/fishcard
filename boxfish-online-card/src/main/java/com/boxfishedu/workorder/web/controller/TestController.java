@@ -3,16 +3,23 @@ package com.boxfishedu.workorder.web.controller;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
+import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
+import com.boxfishedu.workorder.service.instantclass.InstantClassService;
+import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -29,6 +36,9 @@ public class TestController {
     private WorkOrderService workOrderService;
 
     @Autowired
+    private InstantClassService instantClassService;
+
+    @Autowired
     private ServeService serveService;
 
     @Autowired
@@ -41,6 +51,15 @@ public class TestController {
 
     @Autowired
     private OnlineAccountService onlineAccountService;
+
+    @Autowired
+    private ScheduleEntranceDataGenerator scheduleEntranceDataGenerator;
+
+    @Autowired
+    private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
+
+    @Autowired
+    private BaseTimeSlotService baseTimeSlotService;
 
     @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
     public void changeFishCardTime(@RequestBody Map<String,String> param){
@@ -72,6 +91,7 @@ public class TestController {
             workOrder.setEndTime(end);
         if(null!=begin) {
             courseSchedule.setClassDate(DateUtil.date2SimpleDate(begin));
+            courseSchedule.setStartTime(begin);
             workOrder.setStartTime(begin);
         }
         if(null!=timeSlotId) {
@@ -132,5 +152,39 @@ public class TestController {
     @RequestMapping(value = "/add/redis/sync", method = RequestMethod.POST)
     public void syncMongo2Redis(){
         onlineAccountService.syncMongo2Redis();
+    }
+
+    @RequestMapping(value = "/slot/latest", method = RequestMethod.GET)
+    public void slot(){
+        System.out.println(instantClassService.getMostSimilarSlot(2l));
+    }
+
+    @RequestMapping(value = "/queue", method = RequestMethod.GET)
+    public void queueTest(){
+        InstantClassCard instantClassCard=new InstantClassCard();
+        instantClassCard.setWorkorderId(58805l);
+        instantClassCard.setSlotId(29l);
+        scheduleEntranceDataGenerator.initCardAndSchedule(instantClassCard);
+    }
+
+    @RequestMapping(value = "/instantcard/{instant_id}", method = RequestMethod.GET)
+    public JsonResultModel notiFyTeachers(@PathVariable("instant_id") Long instantId){
+        return JsonResultModel.newJsonResultModel(instantCardLogMorphiaRepository.findByInstantCardId(instantId));
+    }
+
+    @RequestMapping(value = "/instantlog/student/{student_id}", method = RequestMethod.GET)
+    public JsonResultModel notiFyTeachersByStudent(@PathVariable("student_id") Long studentId){
+        return JsonResultModel.newJsonResultModel(instantCardLogMorphiaRepository.findByInstantStudentId(studentId));
+    }
+
+    /**
+     * 初始化 新的时间片
+     * @param days
+     * @return
+     */
+    @RequestMapping(value = "/baseTime/init/{days}")
+    public Object initBaseTimeSlots(@PathVariable Integer days) {
+        baseTimeSlotService.initBaseTimeSlots(days);
+        return ResponseEntity.ok().build();
     }
 }

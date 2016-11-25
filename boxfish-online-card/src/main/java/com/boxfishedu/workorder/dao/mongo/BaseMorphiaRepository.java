@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.dao.mongo;
 
+import com.mongodb.WriteResult;
 import org.mongodb.morphia.Datastore;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,6 +17,10 @@ public class BaseMorphiaRepository<T> {
 
     public void save(Iterable<T> ts){
         datastore.save(ts);
+    }
+
+    public <T> WriteResult delete(T entity){
+        return datastore.delete(entity);
     }
 
 }

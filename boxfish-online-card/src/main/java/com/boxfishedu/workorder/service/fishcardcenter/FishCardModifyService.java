@@ -206,6 +206,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
             workOrderService.save(workOrder);
 
             courseSchedule.setClassDate(DateUtil.String2SimpleDate(startTimeParam.getBeginDate()));
+            courseSchedule.setStartTime(startTimeParam.getBeginDateFormat() );
             logger.info("changeStartTime : [{}] ,workOrderId : [{}]",DateUtil.String2SimpleDate(startTimeParam.getBeginDate()),workOrder.getId());
             courseSchedule.setTeacherId(0L);
             courseSchedule.setTimeSlotId(startTimeParam.getTimeslotId() );
