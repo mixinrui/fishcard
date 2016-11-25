@@ -71,8 +71,9 @@ public class InstantClassTeacherService {
                     ,instantClassCard.getStudentId(),instantClassCard.getId());
             this.updateNomatchStatus(instantClassCard);
         }
-        if(!teacherIdsOptional.isPresent()){
-            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 没有获取到可用的教师列表,cardId{},studentId{}",instantClassCard.getId(),instantClassCard.getStudentId());
+        if(!teacherIdsOptional.isPresent()||CollectionUtils.isEmpty(teacherIdsOptional.get())){
+            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 没有获取到可用的教师列表,cardId{},studentId{}"
+                    ,instantClassCard.getId(),instantClassCard.getStudentId());
             return;
         }
         logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIII 获取到教师列表[{}],card{},学生{}"
