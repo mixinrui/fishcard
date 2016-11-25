@@ -212,6 +212,14 @@ public class CommentCardServiceImpl implements CommentCardService {
             predicateList.add(criteriaBuilder.equal(root.get("studentName"), commentCardForm.getStudentName()));
         }
 
+        // 课程类型
+        if(StringUtils.isNotBlank(commentCardForm.getCourseType())) {
+            predicateList.add(criteriaBuilder.equal(root.get("courseType"), commentCardForm.getCourseType()));
+        }
+        // 课程难度
+        if(StringUtils.isNotBlank(commentCardForm.getCourseDifficulty())) {
+            predicateList.add(criteriaBuilder.equal(root.get("courseDifficulty"), commentCardForm.getCourseDifficulty()));
+        }
         // 状态
         if(Objects.nonNull(commentCardForm.getStatus())) {
             // 未点评

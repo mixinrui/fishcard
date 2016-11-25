@@ -58,6 +58,10 @@ public class CommentCardDto {
 
     private String courseName;
 
+    private String courseType;
+
+    private String courseDifficulty;
+
     private String questionName;
 
     private String cover;
