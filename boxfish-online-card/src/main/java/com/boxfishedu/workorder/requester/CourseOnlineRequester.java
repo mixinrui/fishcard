@@ -75,10 +75,8 @@ public class CourseOnlineRequester {
         teachingOnlineMsgAttach.setStudentId(instantClassCard.getStudentId());
         teachingOnlineGroupMsg.setData(teachingOnlineMsgAttach);
 
-        List<String> alias=Lists.newArrayList();
-        teacherIds.forEach(teacherId-> alias.add(teacherId.toString()));
+        teacherIds.forEach(teacherId-> teachingOnlineGroupMsg.getAlias().add(teacherId.toString()));
 
-        teachingOnlineGroupMsg.setAlias(alias);
         logger.debug(">>>>>>@notifyInstantClassMsg, IIIIIIIIIIIIIII 向教师发起推送实时上课请求,courseInfo[{}],教师信息[{}]"
                 ,JacksonUtil.toJSon(teachingOnlineGroupMsg),teacherIds);
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineGroupMsg,Object.class);}));
