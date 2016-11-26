@@ -163,6 +163,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select w from WorkOrder w where w.startTime<?1 and w.courseId is null")
     List<WorkOrder> findWithinHoursCreatedWorkOrderList(Date endTime);
 
+    //查找最新一节上过的课程
+    Optional<WorkOrder> findTop1ByStudentIdAndStartTimeLessThanOrderByStartTimeDesc(Long studentId,Date date);
+
 
     @Query(value = "select min(wo.startTime) from WorkOrder wo where studentId=? and isFreeze=? and startTime>?")
     Optional<Date> findLatestClassDateByStudentId(Long studentId,Integer isFreeze,Date date);

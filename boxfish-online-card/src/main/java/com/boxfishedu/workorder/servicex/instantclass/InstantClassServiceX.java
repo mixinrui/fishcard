@@ -107,6 +107,10 @@ public class InstantClassServiceX {
                     }
                     return jsonResultModel;
                 }
+                case UNFINISHED_COURSE:{
+                    return JsonResultModel.newJsonResultModel(InstantClassResult
+                            .newInstantClassResult(instantStatus,ThreadLocalUtil.unFinishedCourses30MinutesTips.get()));
+                }
                 default:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus));

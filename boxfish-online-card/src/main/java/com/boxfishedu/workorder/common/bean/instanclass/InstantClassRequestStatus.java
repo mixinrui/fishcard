@@ -12,6 +12,7 @@ public enum InstantClassRequestStatus {
     OUT_OF_NUM(33,"先去购买外教课程吧,然后才能实时上课~"),
     FAIL_RECOMMAND_COURSE(34,"暂时没有与你Level匹配的课程,请调整起点Level或者稍后再试吧"),
     MATCHED_LESS_THAN_30MINUTES(35,"半小时之内有匹配上的课程"),
+    UNFINISHED_COURSE(36,"有还未完成的课程"),
     NO_MATCH(40,"现在是上课高峰,稍后再来试试吧"),
     MATCHED(50,"老师即将开始上课...");
 

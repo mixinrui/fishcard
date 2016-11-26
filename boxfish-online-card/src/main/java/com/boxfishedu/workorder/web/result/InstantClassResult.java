@@ -129,7 +129,14 @@ public class InstantClassResult {
         String beginStr=DateUtil.dateTrimYear(begin).substring(0,5);
         String endStr=DateUtil.dateTrimYear(end).substring(0,5);
         StringBuilder builder=new StringBuilder().append("已安排")
-                .append(String.join("-",beginStr,endStr)).append("的实时课程;请等待外教发起邀请,或").append(minute).append("分钟后再试");
+                .append(String.join("-",beginStr,endStr)).append("的实时课程;请等待外教发起邀请,或");
+        if(minute!=0){
+            builder.append(minute).append("分钟后再试");
+        }
+        else {
+            long second=(deadLine.getTime()-new Date().getTime())/(1000);
+            builder.append(second).append("秒钟后再试");
+        }
         return builder.toString();
     }
 
