@@ -47,8 +47,8 @@ spring:
   mail:
     host: smtpdm.aliyun.com
     port: 25
-    username: nobody@send.boxfish.cn
-    password: Boxfish123
+    username: online@send.boxfish.cn
+    password: 7AkAiuUKPAfW2yXfsgCG
     tousers: huchunlinnk@163.com,huchunlinnk14@163.com
   rabbitmq:
     host: 192.168.77.91
@@ -86,8 +86,8 @@ spring:
   mail:
     host: smtpdm.aliyun.com
     port: 25
-    username: nobody@send.boxfish.cn
-    password: Boxfish123
+    username: online@send.boxfish.cn
+    password: 7AkAiuUKPAfW2yXfsgCG
     tousers: huchunlinnk@163.com,huchunlinnk14@163.com
   profiles: test
 
@@ -117,8 +117,8 @@ spring:
   mail:
     host: smtpdm.aliyun.com
     port: 25
-    username: nobody@send.boxfish.cn
-    password: Boxfish123
+    username: online@send.boxfish.cn
+    password: 7AkAiuUKPAfW2yXfsgCG
     tousers: huchunlinnk@163.com,huchunlinnk14@163.com
   profiles: pretest
 
@@ -133,8 +133,8 @@ spring:
   mail:
     host: smtpdm.aliyun.com
     port: 25
-    username: nobody@send.boxfish.cn
-    password: Boxfish123
+    username: online@send.boxfish.cn
+    password: 7AkAiuUKPAfW2yXfsgCG
     tousers: 393269748@qq.com
   rabbitmq:
     address: 101.201.239.116
@@ -155,8 +155,8 @@ spring:
   mail:
     host: smtpdm.aliyun.com
     port: 25
-    username: nobody@send.boxfish.cn
-    password: Boxfish123
+    username: online@send.boxfish.cn
+    password: 7AkAiuUKPAfW2yXfsgCG
     tousers: 393269748@qq.com
   rabbitmq:
     address: 127.0.0.1
@@ -193,7 +193,7 @@ spring:
   mail:
     host: smtpdm.aliyun.com
     port: 25
-    username: nobody@send.boxfish.cn
-    password: Boxfish123
+    username: online@send.boxfish.cn
+    password: 7AkAiuUKPAfW2yXfsgCG
     tousers: huchunlin@boxfish.cn,fenglei@boxfish.cn,suhaijiang@boxfish.cn,jiaozijun@boxfish.cn,liyinghao@boxfish.cn,liruixue@boxfish.cn
   profiles: product
