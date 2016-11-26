@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class InstantClassValidators {
 
-    //参数校验->时间片验证->半小时内有课验证->课程表入口是否有课校验
+    //参数校验->时间片验证->半小时内有课验证->课程表入口是否有课校验->30分钟内是否还有课
     @Autowired
     private List<InstantClassValidator> preValidators;
 
