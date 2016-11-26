@@ -1,18 +1,11 @@
 package com.boxfishedu.workorder.servicex.instantclass.instantvalidator;
 
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
-import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
-import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
-import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
-import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
-import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import lombok.Data;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -20,9 +13,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.Optional;
 
 /**
  * Created by hucl on 16/11/4.
@@ -32,9 +24,6 @@ import java.util.stream.Collectors;
 public class LatestClassValidator implements InstantClassValidator {
     @Autowired
     private OnlineAccountService onlineAccountService;
-
-    @Autowired
-    private InstantClassJpaRepository instantClassJpaRepository;
 
     private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
 
