@@ -4,6 +4,7 @@ import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.SystemUtil;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
 import com.boxfishedu.workorder.entity.mysql.Service;
@@ -22,6 +23,7 @@ import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.fishcard.MyCourseView;
 import com.google.common.collect.Lists;
 import org.apache.commons.codec.binary.StringUtils;
+import org.apache.poi.ddf.EscherColorRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +82,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
      *获取可以修改鱼卡的时间片列表
      */
     public JsonResultModel getTimeAvailable(Long workOrderId) throws CloneNotSupportedException {
-
+        long begin  = System.currentTimeMillis();
         //获取鱼卡信息
         WorkOrder workOrder = validateAndGetWorkOrder(workOrderId);
 
@@ -204,7 +206,8 @@ public class AvaliableTimeForChangeTimeServiceXV {
 
             }
         }
-
+        long end  = System.currentTimeMillis();
+        logger.info("getTimeAvailable@workorderId:[{}]@更换时间查询耗时[{}]毫秒", workOrderId, end-begin);
         //return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
         return   JsonResultModel.newJsonResultModel(new MonthTimeSlots(lastDayTimeSlots).getData());
     }
@@ -280,9 +283,6 @@ public class AvaliableTimeForChangeTimeServiceXV {
         }
         return workOrder;
     }
-
-
-
 
 
 
