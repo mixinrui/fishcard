@@ -1,8 +1,13 @@
 package com.boxfishedu.workorder.service.baseTime;
 
+import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
+import com.boxfishedu.workorder.web.param.BaseTimeSlotParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -62,7 +67,37 @@ public class BaseTimeSlotService {
         return t1;
     }
 
+
+    public Page<BaseTimeSlots> findByTeachingTypeAndClassDateBetween(BaseTimeSlotParam baseTimeSlotParam, Pageable pageable){
+        validate(baseTimeSlotParam);
+        processDateParam(baseTimeSlotParam);
+        return  baseTimeSlotJpaRepository.findByTeachingTypeAndClassDateBetween(baseTimeSlotParam.getTeachingType(), baseTimeSlotParam.getBeginDateFormat(),baseTimeSlotParam.getEndDateFormat(), pageable);
+    }
+
+    public List<BaseTimeSlots>  findByTeachingTypeAndClassDateBetween(BaseTimeSlotParam baseTimeSlotParam){
+        validate(baseTimeSlotParam);
+        processDateParam(baseTimeSlotParam);
+        return  baseTimeSlotJpaRepository.findByTeachingTypeAndClassDateBetween(baseTimeSlotParam.getTeachingType(),  baseTimeSlotParam.getBeginDateFormat(),baseTimeSlotParam.getEndDateFormat());
+    }
+
+    private void  validate(BaseTimeSlotParam baseTimeSlotParam){
+        if(null==baseTimeSlotParam || baseTimeSlotParam.getTeachingType()==null   || null ==  baseTimeSlotParam.getBeginDate() || null == baseTimeSlotParam.getEndDate()){
+            throw new BusinessException("参数有误,请重新输入");
+        }
+    }
+
+
+    public void processDateParam(BaseTimeSlotParam baseTimeSlotParam) {
+        if (null != baseTimeSlotParam.getBeginDate()) {
+            baseTimeSlotParam.setBeginDateFormat(DateUtil.String2Date(baseTimeSlotParam.getBeginDate()+" 00:00:00"));
+        }
+
+        if (null != baseTimeSlotParam.getEndDate()) {
+            baseTimeSlotParam.setEndDateFormat(DateUtil.String2Date(baseTimeSlotParam.getEndDate()+" 23:59:59"));
+        }
+    }
     public static void main(String[] args) {
+        System.out.println(DateUtil.String2Date("2012-12-12 00:00:00"));
         System.out.println(LocalDate.now().getDayOfWeek().getValue());
     }
 }
