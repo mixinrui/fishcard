@@ -53,7 +53,9 @@ public class BaseTimeSlotController {
 
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
     public JsonResultModel listBaseSlots(@RequestBody List<BaseTimeSlots> baseTimeSlots) {
-        System.out.print("111111111111111111111"+baseTimeSlots.size());
+
+        baseTimeSlotService.modify(baseTimeSlots);
+
         return JsonResultModel.newJsonResultModel("OK");
     }
 

@@ -4,7 +4,10 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
+import com.boxfishedu.workorder.service.RedisMapService;
 import com.boxfishedu.workorder.web.param.BaseTimeSlotParam;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +21,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LuoLiBing on 16/11/23.
@@ -27,6 +31,9 @@ public class BaseTimeSlotService {
 
     @Autowired
     private BaseTimeSlotJpaRepository baseTimeSlotJpaRepository;
+
+    @Autowired
+    private RedisMapService redisMapService;
 
     public void initBaseTimeSlots(int days) {
         Date date = baseTimeSlotJpaRepository.findMaxDate();
@@ -87,6 +94,29 @@ public class BaseTimeSlotService {
         if(CollectionUtils.isEmpty(baseTimeSlotsList)){
             return;
         }
+        Map<String ,List<BaseTimeSlots>> rediscache = Maps.newHashMap();
+        for(BaseTimeSlots baseTimeSlots:baseTimeSlotsList){
+            String key = baseTimeSlots.getTeachingType()+""+BaseTimeSlots.CLIENT_TYPE_STU+  DateUtil.date2SimpleString(baseTimeSlots.getClassDate());
+            if(null!=rediscache.get(key)){
+                List temp = rediscache.get(key);
+                temp.add(baseTimeSlots);
+                rediscache.put(key,  temp   );
+            }else {
+                List temp = Lists.newArrayList();
+                temp.add(baseTimeSlots);
+                rediscache.put(key, temp);
+            }
+            //redisMapService.setMap ( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d),timeSlotsList);
+        }
+
+
+        for(String key:rediscache.keySet()){
+            BaseTimeSlots baseTimeSlots = rediscache.get(key).get(0);
+            if(null != baseTimeSlots){
+                redisMapService.delMap(baseTimeSlots.getTeachingType() +""+BaseTimeSlots.CLIENT_TYPE_STU ,DateUtil.date2SimpleString(baseTimeSlots.getClassDate()) );
+            }
+        }
+
         baseTimeSlotJpaRepository.save(baseTimeSlotsList);
     }
 
