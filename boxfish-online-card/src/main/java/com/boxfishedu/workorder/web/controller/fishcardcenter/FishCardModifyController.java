@@ -80,7 +80,7 @@ public class FishCardModifyController {
      */
     @RequestMapping(value = "/freezeAll", method = RequestMethod.PUT)
     public JsonResultModel freezeAllFishCards(@RequestBody java.util.Map<String, Long> map) {
-        fishCardFreezeServiceX.freezeAllFishCards(map.get("workOrderId"));
+        fishCardFreezeServiceX.freezeAllFishCards(map.get("orderId"));
         return JsonResultModel.newJsonResultModel("OK");
     }
 
