@@ -102,9 +102,7 @@ public class BaseTimeSlotService {
                 temp.add(baseTimeSlots);
                 rediscache.put(key,  temp   );
             }else {
-                List temp = Lists.newArrayList();
-                temp.add(baseTimeSlots);
-                rediscache.put(key, temp);
+                rediscache.put(key, Lists.newArrayList(baseTimeSlots));
             }
             //redisMapService.setMap ( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d),timeSlotsList);
         }

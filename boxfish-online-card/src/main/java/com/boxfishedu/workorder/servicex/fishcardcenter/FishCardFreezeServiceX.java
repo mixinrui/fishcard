@@ -183,7 +183,7 @@ public class FishCardFreezeServiceX {
             this.freezeSec(workOrder.getId(),false);
         });
 
-        if(!CollectionUtils.isEmpty(unfinishedClass) && (workOrders.size() == unfinishedClass.size())){
+        if(!CollectionUtils.isEmpty(unfinishedClass) ){
             teacherStudentRequester.closeOrderByOrderCode(workOrders.get(0).getOrderCode());
         }
     }
