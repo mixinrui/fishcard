@@ -72,7 +72,7 @@ public class FishCardModifyController {
      */
     @RequestMapping(value = "/classesinfo", method = RequestMethod.PUT)
     public JsonResultModel getClassesInfo(@RequestBody java.util.Map<String, Long> map) {
-        return fishCardFreezeServiceX.freeze(map.get("workOrderId"));
+        return fishCardFreezeServiceX.getFishCardsInfo(map.get("orderId"));
     }
 
     /**
@@ -80,7 +80,7 @@ public class FishCardModifyController {
      */
     @RequestMapping(value = "/freezeAll", method = RequestMethod.PUT)
     public JsonResultModel freezeAllFishCards(@RequestBody java.util.Map<String, Long> map) {
-        fishCardFreezeServiceX.freezeAllFishCards(map.get("workOrderId"));
+        fishCardFreezeServiceX.freezeAllFishCards(map.get("orderId"));
         return JsonResultModel.newJsonResultModel("OK");
     }
 
