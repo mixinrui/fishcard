@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -78,6 +80,14 @@ public class BaseTimeSlotService {
         validate(baseTimeSlotParam);
         processDateParam(baseTimeSlotParam);
         return  baseTimeSlotJpaRepository.findByTeachingTypeAndClassDateBetween(baseTimeSlotParam.getTeachingType(),  baseTimeSlotParam.getBeginDateFormat(),baseTimeSlotParam.getEndDateFormat());
+    }
+
+    @Transactional
+    public void modify(List<BaseTimeSlots> baseTimeSlotsList){
+        if(CollectionUtils.isEmpty(baseTimeSlotsList)){
+            return;
+        }
+        baseTimeSlotJpaRepository.save(baseTimeSlotsList);
     }
 
     private void  validate(BaseTimeSlotParam baseTimeSlotParam){

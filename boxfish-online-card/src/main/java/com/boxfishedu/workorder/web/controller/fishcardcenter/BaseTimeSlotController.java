@@ -5,6 +5,7 @@ import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
 import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardQueryServiceX;
@@ -49,6 +50,13 @@ public class BaseTimeSlotController {
     public JsonResultModel listBaseSlots(BaseTimeSlotParam baseTimeSlotParam) {
         return JsonResultModel.newJsonResultModel(baseTimeSlotService.findByTeachingTypeAndClassDateBetween( baseTimeSlotParam));
     }
+
+    @RequestMapping(value = "/modify", method = RequestMethod.POST)
+    public JsonResultModel listBaseSlots(@RequestBody List<BaseTimeSlots> baseTimeSlots) {
+        System.out.print("111111111111111111111"+baseTimeSlots.size());
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
 
 
 }

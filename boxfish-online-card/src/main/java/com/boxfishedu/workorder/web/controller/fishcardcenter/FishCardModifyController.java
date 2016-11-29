@@ -72,7 +72,7 @@ public class FishCardModifyController {
      */
     @RequestMapping(value = "/classesinfo", method = RequestMethod.PUT)
     public JsonResultModel getClassesInfo(@RequestBody java.util.Map<String, Long> map) {
-        return fishCardFreezeServiceX.freeze(map.get("workOrderId"));
+        return fishCardFreezeServiceX.getFishCardsInfo(map.get("orderId"));
     }
 
     /**
