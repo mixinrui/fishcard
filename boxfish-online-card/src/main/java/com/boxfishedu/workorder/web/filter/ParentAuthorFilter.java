@@ -67,9 +67,9 @@ public class ParentAuthorFilter extends OncePerRequestFilter {
         }
 
         //将access_token转换为userId,如果返回null则表示用户不存在,直接返回
-        Map relationMap= MapUtils.EMPTY_MAP;
+        ParentAuthBean parentAuthBean=null;
         try {
-            relationMap = parentRelationGetter.getRelation(Long.parseLong(studentIdStr),accessToken);
+            parentAuthBean = parentRelationGetter.getRelation(Long.parseLong(studentIdStr),accessToken);
         } catch (UnauthorizedException e) {
             errorHandle(response, "", HttpStatus.SC_UNAUTHORIZED);
             return;
@@ -78,23 +78,23 @@ public class ParentAuthorFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (MapUtils.isEmpty(relationMap)) {
+        if (Objects.isNull(parentAuthBean)) {
             errorHandle(response, "", HttpStatus.SC_UNAUTHORIZED);
             return;
         }
 
         //家长id
-        Long suorceId=MapUtils.getLong(relationMap,"source_id");
+        Long parentId=parentAuthBean.getId();
         //学生id
-        Long targetId=MapUtils.getLong(relationMap,"target_id");
+        Long studentId=Long.parseLong(parentAuthBean.getTarget().get("id"));
 
         logger.debug("请求接口 = [{}],access_token = [{}],parentId = [{}],studentId = [{}]"
-                , request.getRequestURI(), accessToken, suorceId,targetId);
+                , request.getRequestURI(), accessToken, parentId,studentId);
 
         Map<String, Object> params = Maps.newHashMap();
 
-        params.put("parentId", suorceId);
-        params.put("studentId", targetId);
+        params.put("parentId", parentId);
+        params.put("studentId", studentId);
 
         AuthorRequestWrapper authorRequestWrapper = new AuthorRequestWrapper(request, params);
         filterChain.doFilter(authorRequestWrapper, response);

@@ -31,12 +31,12 @@ public class ParentRelationGetter {
     @Autowired
     private UrlConf urlConf;
 
-    public Map getRelation(Long studentId,String accessToken) throws IOException {
+    public ParentAuthBean getRelation(Long studentId,String accessToken) throws IOException {
       return getUserMap(studentId,accessToken);
     }
 
 
-    private Map<String, Object> getUserMap(Long studentId,String accessToken) throws IOException {
+    private ParentAuthBean getUserMap(Long studentId,String accessToken) throws IOException {
         HttpClient httpClient = HttpClients.createDefault();
         String authUrl=String.format("%s/relation/user/%s?access_token=%s",urlConf.getAuth_user(),studentId,accessToken);
         logger.debug("token_url: " + authUrl);
@@ -50,6 +50,6 @@ public class ParentRelationGetter {
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(response.getEntity().getContent(), Map.class);
+        return objectMapper.readValue(response.getEntity().getContent(), ParentAuthBean.class);
     }
 }
