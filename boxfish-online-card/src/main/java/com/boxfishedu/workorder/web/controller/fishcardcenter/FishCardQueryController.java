@@ -155,8 +155,8 @@ public class FishCardQueryController {
      * @param studentId
      * @return
      */
-    @RequestMapping(value = "/query/studentlist",method = RequestMethod.GET)
-    public JsonResultModel getFishCardListByStudentId(@PathVariable Long studentId){
+    @RequestMapping(value = "/{studentId}/studentlist",method = RequestMethod.GET)
+    public JsonResultModel getFishCardListByStudentId(@PathVariable("studentId") Long studentId){
         return JsonResultModel.newJsonResultModel(workOrderService.findByStudentId(studentId));
     }
 }
