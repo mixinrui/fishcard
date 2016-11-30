@@ -151,8 +151,13 @@ public class FishCardFreezeServiceX {
                 )
         ).count();
 
+        Long freezed = workOrders.stream().filter(workOrder -> (
+            1==workOrder.getIsFreeze()
+        )).count();
 
-        jsonObject.put("finished",afterClasses);//以上课程
+
+        jsonObject.put("finished",afterClasses);//已上课程
+        jsonObject.put("freezed",freezed);      //冻结课程
         jsonObject.put("unfinished",workOrders.size()-afterClasses);//未上课程
 
         return JsonResultModel.newJsonResultModel(jsonObject);
@@ -183,7 +188,8 @@ public class FishCardFreezeServiceX {
             this.freezeSec(workOrder.getId(),false);
         });
 
-        if(!CollectionUtils.isEmpty(unfinishedClass) &&  (workOrders.size() == unfinishedClass.size())){
+
+        if(!CollectionUtils.isEmpty(unfinishedClass) ){
             teacherStudentRequester.closeOrderByOrderCode(workOrders.get(0).getOrderCode());
         }
     }

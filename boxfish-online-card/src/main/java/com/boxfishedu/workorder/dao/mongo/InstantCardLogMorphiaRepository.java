@@ -29,8 +29,8 @@ public class InstantCardLogMorphiaRepository extends BaseMorphiaRepository<Insta
             instantCardLog.setCreateTime(new Date());
             if(!Objects.isNull(instantClassCard.getWorkorderId())) {
                 instantCardLog.setWorkOrderId(instantClassCard.getWorkorderId());
-                datastore.save(instantCardLog);
             }
+            datastore.save(instantCardLog);
         }));
     }
 

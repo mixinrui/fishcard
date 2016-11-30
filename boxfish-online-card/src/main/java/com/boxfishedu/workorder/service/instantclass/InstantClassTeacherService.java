@@ -70,6 +70,7 @@ public class InstantClassTeacherService {
             logger.error("@dealInstantFetchedTeachers#user:[{}] card[{}] IIIIIIIIIIIIIII    获取实时推荐教师失败,将匹配状态设置为未匹配上"
                     ,instantClassCard.getStudentId(),instantClassCard.getId());
             this.updateNomatchStatus(instantClassCard);
+            return;
         }
         if(!teacherIdsOptional.isPresent()||CollectionUtils.isEmpty(teacherIdsOptional.get())){
             logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 没有获取到可用的教师列表,cardId{},studentId{}"
