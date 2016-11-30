@@ -34,4 +34,11 @@ public class RedisMapService {
         Object text = redisTemplate.opsForHash().get(key,date);
         return    JSONObject.parseArray(null==text?null:text.toString() , BaseTimeSlots.class) ;
     }
+
+    public void delMap(String key,String date){
+        String key_Front= CacheKeyConstant.BASE_TIME_SLOTS;
+        key = key_Front+key;
+        Object text = redisTemplate.opsForHash().get(key,date);
+        redisTemplate.opsForHash().delete(key,date);
+    }
 }

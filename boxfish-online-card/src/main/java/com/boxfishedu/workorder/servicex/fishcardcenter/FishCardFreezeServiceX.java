@@ -173,7 +173,7 @@ public class FishCardFreezeServiceX {
         }
         Date now = new Date();
         List<WorkOrder> unfinishedClass =  workOrders.stream().filter(workOrder ->
-                now.after( workOrder.getStartTime() ) && 1!=workOrder.getIsFreeze()
+                now.before( workOrder.getStartTime() ) && 1!=workOrder.getIsFreeze()
         ).collect(Collectors.toList());
 
         if(CollectionUtils.isEmpty(unfinishedClass)){
@@ -183,7 +183,7 @@ public class FishCardFreezeServiceX {
             this.freezeSec(workOrder.getId(),false);
         });
 
-        if(workOrders.size() == unfinishedClass.size()){
+        if(!CollectionUtils.isEmpty(unfinishedClass) ){
             teacherStudentRequester.closeOrderByOrderCode(workOrders.get(0).getOrderCode());
         }
     }
