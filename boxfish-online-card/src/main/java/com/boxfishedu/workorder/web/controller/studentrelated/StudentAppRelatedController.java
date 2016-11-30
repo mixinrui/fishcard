@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
+import com.boxfishedu.workorder.servicex.home.HomePageServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
@@ -57,6 +59,9 @@ StudentAppRelatedController {
     private RepeatedSubmissionChecker checker;
     @Autowired
     private OnlineAccountService onlineAccountService;
+
+    @Autowired
+    private HomePageServiceX homePageServiceX;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -204,30 +209,7 @@ StudentAppRelatedController {
 
     @RequestMapping(value = "/{student_id}/card_infos", method = RequestMethod.GET)
     public JsonResultModel userCardInfo(String order_type,@PathVariable("student_id") Long studentId) {
-        if(!onlineAccountService.isMember(studentId)){
-            logger.debug("@userCardInfo#{}不是在线购买用户,直接返回",studentId);
-            return JsonResultModel.newJsonResultModel(AccountCardInfo.buildEmpty());
-        }
-        AccountCardInfo accountCardInfo=accountCardInfoService.queryByStudentId(studentId);
-        if(null!=order_type) {
-            switch (order_type) {
-                case "chinese":
-                    accountCardInfo.setComment(null);
-                    accountCardInfo.setForeign(null);
-                    break;
-                case "foreign":
-                    accountCardInfo.setComment(null);
-                    accountCardInfo.setChinese(null);
-                    break;
-                case "comment":
-                    accountCardInfo.setForeign(null);
-                    accountCardInfo.setChinese(null);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return JsonResultModel.newJsonResultModel(accountCardInfo);
+        return homePageServiceX.getHomePage(order_type, studentId);
     }
 
 
