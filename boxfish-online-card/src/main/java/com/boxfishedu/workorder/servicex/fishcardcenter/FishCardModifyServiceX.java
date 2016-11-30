@@ -120,7 +120,7 @@ public class FishCardModifyServiceX {
         courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
 
         //通知师生运营更换老师
-        teacherStudentRequester.notifyChangeTeacher(workOrder);
+        teacherStudentRequester.notifyChangeTeacher(workOrder,teacherChangeParam);
 
         //更新新的教师到workorder和courseschedule,此处做事务控制
         workOrderService.updateWorkOrderAndSchedule(workOrder, courseSchedule);
