@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -29,6 +30,9 @@ public class FishCardQueryController {
 
     @Autowired
     private WorkOrderLogService workOrderLogService;
+
+    @Autowired
+    private WorkOrderService workOrderService;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -143,5 +147,16 @@ public class FishCardQueryController {
     @RequestMapping(value = "/rechargeType/list", method = RequestMethod.GET)
     public JsonResultModel rechargeType() throws Exception {
         return JsonResultModel.newJsonResultModel(FishCardChargebackStatusEnum.varMapout);
+    }
+
+
+    /**
+     * 获取某个学生的所有的鱼卡信息
+     * @param studentId
+     * @return
+     */
+    @RequestMapping(value = "query/studentlist",method = RequestMethod.GET)
+    public JsonResultModel getFishCardListByStudentId(@PathVariable Long studentId){
+        return JsonResultModel.newJsonResultModel(workOrderService.findByStudentId(studentId));
     }
 }
