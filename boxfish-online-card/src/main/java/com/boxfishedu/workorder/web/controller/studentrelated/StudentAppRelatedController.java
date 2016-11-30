@@ -98,8 +98,7 @@ StudentAppRelatedController {
 
     @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
-                                     @PageableDefault(value = 15, sort = {"classDate", "timeSlotId"},
-                                             direction = Sort.Direction.DESC) Pageable pageable,
+                                     @PageableDefault(value = 15) Pageable pageable,
                                      Locale locale) {
         commonServeServiceX.checkToken(studentId, userId);
         return timePickerServiceX.getCourseSchedulePage(studentId, pageable, locale);
