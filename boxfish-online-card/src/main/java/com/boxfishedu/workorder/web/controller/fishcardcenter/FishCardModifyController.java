@@ -34,10 +34,17 @@ public class FishCardModifyController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     * 换老师
+     * @param teacherChangeParam
+     * @return
+     */
     @RequestMapping(value = "/teacher", method = RequestMethod.PUT)
     public JsonResultModel changeTeacher(@RequestBody TeacherChangeParam teacherChangeParam) {
         return fishCardModifyServiceX.changeTeacher(teacherChangeParam);
     }
+
+    
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public JsonResultModel deleteFishCard(@RequestBody FishCardDeleteParam fishCardDeleteParam) {

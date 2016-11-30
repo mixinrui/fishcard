@@ -366,7 +366,7 @@ public class MakeWorkOrderServiceX {
     public void pushTeacherList(Map<Long, List<WorkOrder>> map) {
         List list = Lists.newArrayList();
         for (Long key : map.keySet()) {
-            String pushTitle = WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE;
+            String pushTitle = WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
             Map map1 = Maps.newHashMap();
             map1.put("user_id", key);
 
@@ -377,10 +377,6 @@ public class MakeWorkOrderServiceX {
             WorkOrder workOrder = map.get(key).get(0);
             if (null == workOrder) {
                 continue;
-            }
-
-            if (CourseTypeEnum.TALK.toString().equals(workOrder.getCourseType())) {
-                pushTitle = WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
             }
 
 

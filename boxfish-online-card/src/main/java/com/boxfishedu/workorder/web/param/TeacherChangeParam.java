@@ -10,4 +10,5 @@ public class TeacherChangeParam {
     private Long workOrderId;
     private Long teacherId;
     private String teacherName;
+    private String changeReason; /**  如果老师请假  takeforleave  change **/
 }
