@@ -104,7 +104,6 @@ public class BaseTimeSlotService {
             }else {
                 rediscache.put(key, Lists.newArrayList(baseTimeSlots));
             }
-            //redisMapService.setMap ( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d),timeSlotsList);
         }
 
 
