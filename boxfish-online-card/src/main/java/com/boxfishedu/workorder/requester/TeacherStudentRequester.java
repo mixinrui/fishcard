@@ -341,13 +341,13 @@ public class TeacherStudentRequester {
      * @param orderCode
      */
     public void closeOrderByOrderCode(String orderCode){
-        String url = new StringBuffer(urlConf.getOrder_service()).append("/order/closed/").append(orderCode).toString();
-        logger.info("@closeOrderByOrderCode#{}",orderCode);
+        String url = new StringBuffer(urlConf.getOrder_service()).append("/closed/").append(orderCode).toString();
+        logger.info("@closeOrderByOrderCode#{},url={}",orderCode,url);
         JsonResultModel jsonResultModel = null;
         try {
             jsonResultModel = restTemplate.postForObject(url,null,JsonResultModel.class);
         }catch (Exception e){
-            logger.error("@closeOrderByOrderCoded#{}#returnException 关闭订单:[{}]", orderCode,jsonResultModel.getReturnMsg());
+            logger.error("@closeOrderByOrderCoded#{}#returnException 关闭订单:[{}]", orderCode,jsonResultModel==null?"null":jsonResultModel.getReturnMsg());
             throw new BusinessException("关闭订单失败:" + jsonResultModel.getReturnMsg());
         }
 
