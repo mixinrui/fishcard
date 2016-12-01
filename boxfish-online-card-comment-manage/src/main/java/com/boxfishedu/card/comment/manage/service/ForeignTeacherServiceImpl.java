@@ -45,9 +45,6 @@ public class ForeignTeacherServiceImpl implements ForeignTeacherService{
     CommentCardJpaRepository commentCardJpaRepository;
 
     @Autowired
-    private CommentCardService commentCardService;
-
-    @Autowired
     private DTOBinder dtoBinder;
 
     private final static Logger logger = LoggerFactory.getLogger(ForeignTeacherServiceImpl.class);

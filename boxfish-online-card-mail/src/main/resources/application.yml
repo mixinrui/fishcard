@@ -31,13 +31,13 @@ spring.profiles.active: product
 mail:
   notAnswerOver12HoursRecipients:
     recipients: luolibing@boxfish.cn, liruixue@boxfish.cn,3324941283@qq.com
-    sender: nobody@send.boxfish.cn
+    sender: online@send.boxfish.cn
     subject: 12小时未回复点评列表
 
   noCourseIdOver24HoursRecipients:
     recipients: luolibing@boxfish.cn, huchunlin@boxfish.cn, liuzheng@boxfish.cn, jiaozijun@boxfish.cn, liyinghao@boxfish.cn, wuxi@boxfish.cn
 #    recipients: luolibing@boxfish.cn
-    sender: nobody@send.boxfish.cn
+    sender: online@send.boxfish.cn
     subject: 48小时以内未成功推荐课程的鱼卡id列表
 
 
@@ -54,8 +54,8 @@ spring:
   mail:
     host: smtpdm.aliyun.com
     port: 25
-    username: nobody@send.boxfish.cn
-    password: Boxfish123
+    username: online@send.boxfish.cn
+    password: 7AkAiuUKPAfW2yXfsgCG
     properties:
       mail:
         smtp:
@@ -83,8 +83,8 @@ spring:
   mail:
     host: smtpdm.aliyun.com
     port: 25
-    username: nobody@send.boxfish.cn
-    password: Boxfish123
+    username: online@send.boxfish.cn
+    password: 7AkAiuUKPAfW2yXfsgCG
     properties:
       mail:
         smtp:
