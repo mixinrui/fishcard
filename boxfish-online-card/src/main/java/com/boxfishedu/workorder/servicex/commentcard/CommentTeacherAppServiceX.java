@@ -115,11 +115,11 @@ public class CommentTeacherAppServiceX {
             notifyOrderUpdateStatus(service.getOrderId(), ConstantUtil.WORKORDER_COMPLETED);
         }
         //填充主页内容
-//        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId());
-//        if (Objects.equals(homeCommentCard.getId(),commentCard.getId())){
-//            logger.info("@submitComment 更新首页中外教点评项...");
-//            commentHomePage(commentCard);
-//        }
+        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId());
+        if (Objects.equals(homeCommentCard.getId(),commentCard.getId())){
+            logger.info("@submitComment 更新首页中外C教点评项...");
+            setCommentHomePage(commentCard);
+        }
         logger.info("@submitComment 更新首页中外教点评项...");
         findHomeComment(commentCard.getStudentId());
     }
