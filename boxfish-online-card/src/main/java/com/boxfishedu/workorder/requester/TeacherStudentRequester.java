@@ -342,7 +342,7 @@ public class TeacherStudentRequester {
      */
     public void closeOrderByOrderCode(String orderCode){
         String url = new StringBuffer(urlConf.getOrder_service()).append("/closed/").append(orderCode).toString();
-        logger.info("@closeOrderByOrderCode#{}",orderCode);
+        logger.info("@closeOrderByOrderCode#{},url={}",orderCode,url);
         JsonResultModel jsonResultModel = null;
         try {
             jsonResultModel = restTemplate.postForObject(url,null,JsonResultModel.class);
