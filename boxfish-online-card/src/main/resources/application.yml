@@ -163,7 +163,7 @@ interface:
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://123.56.13.168:8080
-    order_service: http://123.56.13.168:8082
+    order_service: http://123.56.13.168:8082/order
     course_online_service: http://123.56.13.168:9090
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
@@ -221,7 +221,7 @@ interface:
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://127.0.0.1:8080
-    order_service: http://101.201.237.252:8082
+    order_service: http://101.201.237.252:8082/order
     course_online_service: http://101.201.239.116:9090
 #    course_online_service: http://online-api.boxfish.cn/teaching-service
     auth_user: http://114.55.58.184:8099
@@ -278,7 +278,7 @@ interface:
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://101.201.237.252:8080
-    order_service: http://101.201.237.252:8082
+    order_service: http://101.201.237.252:8082/order
     course_online_service: http://101.201.237.252:9090
 #    course_online_service: http://online-api.boxfish.cn/teaching-service
     auth_user: http://114.55.58.184:8099
@@ -344,7 +344,7 @@ interface:
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://123.56.13.168:8080
-    order_service: http://123.56.13.168:8082
+    order_service: http://123.56.13.168:8082/order
     course_online_service: http://123.56.13.168:9090
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
@@ -408,7 +408,7 @@ interface:
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://127.0.0.1:8080
-    order_service: http://127.0.0.1:8082
+    order_service: http://127.0.0.1:8082/order
     course_online_service: http://127.0.0.1:9090
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
@@ -468,7 +468,7 @@ interface:
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://localhost:8080
-    order_service: http://localhost:8082
+    order_service: http://localhost:8082/order
     course_online_service: http://localhost:9090
     auth_user: http://114.55.58.184:8099
     data_analysis_service: http://114.55.65.28:9301
@@ -532,7 +532,7 @@ interface:
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
     fishcard_service: http://localhost:8080
-    order_service: http://localhost:8082
+    order_service: http://localhost:8082/order
     course_online_service: http://localhost:9090
     auth_user: http://base.boxfish.cn/passbook
     data_analysis_service: http://114.55.65.28:9301
@@ -597,7 +597,7 @@ interface:
     course_wudaokou_recommend_service: http://base.boxfish.cn/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://base.boxfish.cn/boxfish-wudaokou-course/course/info
     fishcard_service: http://online-api.boxfish.cn/fishcard
-    order_service: http://online-api.boxfish.cn/order
+    order_service: http://online-api.inside.boxfish.cn/order
     course_online_service: http://online-api.boxfish.cn/teaching-service
     auth_user: http://base.boxfish.cn/passbook
 #鱼卡管理后台的页面地址

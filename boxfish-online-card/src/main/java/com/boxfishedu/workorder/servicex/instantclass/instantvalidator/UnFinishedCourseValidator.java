@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -42,6 +43,10 @@ public class UnFinishedCourseValidator implements InstantClassValidator {
         Optional<WorkOrder> passedCardOptional=workOrderJpaRepository
                 .findTop1ByStudentIdAndStartTimeLessThanOrderByStartTimeDesc(instantRequestParam.getStudentId(),new Date());
         if(!passedCardOptional.isPresent()){
+            return InstantClassRequestStatus.UNKNOWN.getCode();
+        }
+        //如果是立即上课类型的鱼卡直接放过
+        if(!Objects.isNull(passedCardOptional.get().getClassType())){
             return InstantClassRequestStatus.UNKNOWN.getCode();
         }
         Date begin=passedCardOptional.get().getStartTime();

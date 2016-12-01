@@ -15,6 +15,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
+import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
@@ -165,7 +166,7 @@ public class TeacherStudentRequester {
     }
 
     //TODO:此处的url换为师生运营的url
-    public void notifyChangeTeacher(WorkOrder workOrder) {
+    public void notifyChangeTeacher(WorkOrder workOrder,TeacherChangeParam teacherChangeParam) {
         StringBuilder builder = new StringBuilder(urlConf.getTeacher_service_admin());// jiaozijun 配合  haijiang  更改师生运营接口
         builder.append("/course/schedule/teacher/change");
         String url = builder.toString();
@@ -175,6 +176,7 @@ public class TeacherStudentRequester {
         map.put("timeSlotId", workOrder.getSlotId());
         map.put("teacherId", workOrder.getTeacherId());
         map.put("studentId", workOrder.getStudentId());
+        map.put("changeReason",teacherChangeParam.getChangeReason());  /**  如果老师请假  takeforleave  change  **/
         logger.debug("参数{}", JacksonUtil.toJSon(map));
         JsonResultModel jsonResultModel = null;
         try {
@@ -339,13 +341,13 @@ public class TeacherStudentRequester {
      * @param orderCode
      */
     public void closeOrderByOrderCode(String orderCode){
-        String url = new StringBuffer(urlConf.getOrder_service()).append("/order/closed/").append(orderCode).toString();
-        logger.info("@closeOrderByOrderCode#{}",orderCode);
+        String url = new StringBuffer(urlConf.getOrder_service()).append("/closed/").append(orderCode).toString();
+        logger.info("@closeOrderByOrderCode#{},url={}",orderCode,url);
         JsonResultModel jsonResultModel = null;
         try {
             jsonResultModel = restTemplate.postForObject(url,null,JsonResultModel.class);
         }catch (Exception e){
-            logger.error("@closeOrderByOrderCoded#{}#returnException 关闭订单:[{}]", orderCode,jsonResultModel.getReturnMsg());
+            logger.error("@closeOrderByOrderCoded#{}#returnException 关闭订单:[{}]", orderCode,jsonResultModel==null?"null":jsonResultModel.getReturnMsg());
             throw new BusinessException("关闭订单失败:" + jsonResultModel.getReturnMsg());
         }
 
