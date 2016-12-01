@@ -66,7 +66,7 @@ public class CommentCardSDK {
     }
 
     public Map commentTypeAndDifficulty(String courseId){
-        return restTemplate.getForObject(getCourseTypeAndDifficulty(courseId),Map.class);
+        return templateForCommentCard.getForObject(getCourseTypeAndDifficulty(courseId),Map.class);
     }
 
     public Map initiateTypeAndDifficulty(String courseId){

@@ -287,14 +287,14 @@ public class CommentCardServiceImpl implements CommentCardService {
         // 点评创建开始时间
         if(Objects.nonNull(commentCardForm.getFrom())) {
             predicateList.add(criteriaBuilder.greaterThanOrEqualTo(
-                    root.get("createTime"), commentCardForm.getFrom()
+                    root.get("studentAskTime"), commentCardForm.getFrom()
             ));
         }
 
         // 点评创建结束时间
         if(Objects.nonNull(commentCardForm.getTo())) {
             predicateList.add(criteriaBuilder.lessThanOrEqualTo(
-                    root.get("createTime"), commentCardForm.getTo()
+                    root.get("studentAskTime"), commentCardForm.getTo()
             ));
         }
 

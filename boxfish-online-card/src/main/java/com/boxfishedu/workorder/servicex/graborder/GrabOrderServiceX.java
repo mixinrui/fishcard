@@ -189,7 +189,7 @@ public class GrabOrderServiceX {
                     // 纪录日志
 
 
-                    workOrderLogService.saveWorkOrderLog(workOrder, "抢单数据");
+                    workOrderLogService.saveWorkOrderLog(workOrder, "老师抢单,匹配老师");
                     jsonObject.put("msg", WorkOrderConstant.GRABORDER_SUCCESS);
                     jsonObject.put("code", "0");
 

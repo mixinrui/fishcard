@@ -49,6 +49,17 @@ public class FishCardQueryController {
     }
 
     /**
+     * 供小马调用  勿动
+     * @param fishCardFilterParam
+     * @param pageable
+     * @return
+     */
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondfirst(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
+    }
+
+    /**
      * 用户id不做限制的查询  鱼卡管理
      */
     @RequestMapping(value = "/listitem", method = RequestMethod.GET)
