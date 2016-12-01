@@ -347,7 +347,7 @@ public class TeacherStudentRequester {
         try {
             jsonResultModel = restTemplate.postForObject(url,null,JsonResultModel.class);
         }catch (Exception e){
-            logger.error("@closeOrderByOrderCoded#{}#returnException 关闭订单:[{}]", orderCode,jsonResultModel==null?"":jsonResultModel.getReturnMsg());
+            logger.error("@closeOrderByOrderCoded#{}#returnException 关闭订单:[{}]", orderCode,jsonResultModel==null?"null":jsonResultModel.getReturnMsg());
             throw new BusinessException("关闭订单失败:" + jsonResultModel.getReturnMsg());
         }
 
