@@ -397,7 +397,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardStatistics.setOperationType(CommentCardStatus.AMOUNT_ADD.getCode());
                 commentCardStatisticsJpaRepository.save(commentCardStatistics);
                 logger.info("@foreignTeacherCommentUnAnswer25 修改首页中外教点评次数");
-//                commentTeacherAppServiceX.commentHomePage(commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId()));
+                commentTeacherAppServiceX.setCommentHomePage(commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId()));
                 commentTeacherAppServiceX.findHomeComment(commentCard.getStudentId());
                 logger.info("@foreignTeacherCommentUnAnswer26 次数修改,通知客服系统....");
                 syncCommentCard2SystemService.syncCommentCard2System(serviceTemp.getId(),commentCard.getStatus(),commentCard.getTeacherAnswerTime());
