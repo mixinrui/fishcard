@@ -34,10 +34,10 @@ public class CommentCardForm {
      */
 //    private DateRange studentAskTimeRange;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date from;
+    private Date studentAskTimeRangeFrom;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date to;
+    private Date studentAskTimeRangeTo;
 
     /**
      * 订单类型
