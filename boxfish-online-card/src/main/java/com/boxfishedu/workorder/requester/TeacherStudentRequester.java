@@ -341,7 +341,7 @@ public class TeacherStudentRequester {
      * @param orderCode
      */
     public void closeOrderByOrderCode(String orderCode){
-        String url = new StringBuffer(urlConf.getOrder_service()).append("/order/closed/").append(orderCode).toString();
+        String url = new StringBuffer(urlConf.getOrder_service()).append("/closed/").append(orderCode).toString();
         logger.info("@closeOrderByOrderCode#{}",orderCode);
         JsonResultModel jsonResultModel = null;
         try {
