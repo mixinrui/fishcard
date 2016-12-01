@@ -1,8 +1,6 @@
 package com.boxfishedu.card.comment.manage.service;
 
-import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
-import com.boxfishedu.card.comment.manage.entity.dto.CommentCardLogDto;
-import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
+import com.boxfishedu.card.comment.manage.entity.dto.*;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.NotAnswerTime;
@@ -12,6 +10,7 @@ import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
 import com.boxfishedu.card.comment.manage.exception.BoxfishAsserts;
+import com.boxfishedu.card.comment.manage.exception.BusinessException;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import com.boxfishedu.card.comment.manage.util.DateUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -28,6 +27,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -312,6 +312,17 @@ public class CommentCardServiceImpl implements CommentCardService {
                 || Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.NOTANSWER.value()))
                 && Objects.nonNull(commentCardForm.getNotAnswerTime())
                 && Objects.nonNull(NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()));
+    }
+
+    /**
+     * 导出excel
+     */
+    public CommentCardExcelDto exportExcel(CommentCardForm commentCardForm, Pageable pageable){
+        Page<CommentCardDto> page = findCommentCardByOptions(commentCardForm,pageable);
+        if (page.getSize() == 0){
+            throw new BusinessException();
+        }
+        return new CommentCardExcelDto(page.getContent());
     }
 
 }
