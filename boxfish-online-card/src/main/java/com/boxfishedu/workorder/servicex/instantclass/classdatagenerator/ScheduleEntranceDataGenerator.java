@@ -88,6 +88,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
             workOrders.get(i).setSlotId(oldCard.getSlotId());
             //TODO:更换时间以后,可能需要更换教师;需要师生运营提供接口判断是否可以上那个时间点的课程;可以异步操作
             workOrders.get(i).setTeacherId(oldCard.getTeacherId());
+            workOrders.get(i).setTeacherName(oldCard.getTeacherName());
 
             if(!oldCard.getCourseType().equals(workOrders.get(i).getClassType())){
                 typeChangedList.add(workOrders.get(i));
