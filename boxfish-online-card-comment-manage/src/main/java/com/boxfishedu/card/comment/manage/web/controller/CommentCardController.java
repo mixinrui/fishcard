@@ -1,9 +1,11 @@
 package com.boxfishedu.card.comment.manage.web.controller;
 
 import com.boxfishedu.beans.view.JsonResultModel;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCardExcelDto;
 import com.boxfishedu.card.comment.manage.entity.form.CommentCardForm;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.service.CommentCardService;
+import com.boxfishedu.card.comment.manage.util.FormatterUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 /**
@@ -32,6 +36,13 @@ public class CommentCardController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Object commentCard(@PathVariable Long id) {
         return JsonResultModel.newJsonResultModel(commentCardService.findCommentCardById(id));
+    }
+
+    @RequestMapping(value = "/export",method = RequestMethod.GET)
+    public void exportCommentCardExcel(CommentCardForm commentCardForm,Pageable pageable, HttpServletResponse httpServletResponse){
+
+        CommentCardExcelDto commentCardExcelDto = commentCardService.exportExcel(commentCardForm,pageable);
+        commentCardExcelDto.downLoad(httpServletResponse, FormatterUtils.DATE_TIME_FORMATTER_0.format(LocalDateTime.now()));
     }
 
     /**
