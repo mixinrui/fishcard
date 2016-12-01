@@ -75,7 +75,7 @@ public class DataCollectorService {
     public Integer getChineseUnselectedServices(Long studentId) {
         List<Service> overAllServices = serveService.getUnselectedService(studentId, ComboTypeEnum.OVERALL, 0);
         List<Service> otherChineseServices = serveService.getUnselectedService(studentId,
-                Lists.newArrayList(ComboTypeEnum.EXCHANGE,ComboTypeEnum.INTELLIGENT,ComboTypeEnum.EXPERIENCE), TutorTypeEnum.CN, 0);
+                Lists.newArrayList(ComboTypeEnum.EXCHANGE,ComboTypeEnum.INTELLIGENT,ComboTypeEnum.EXPERIENCE,ComboTypeEnum.REWARD), TutorTypeEnum.CN, 0);
 
         return (CollectionUtils.isEmpty(overAllServices) ? 0 : this.getAmountFromServices(overAllServices))
                 + (CollectionUtils.isEmpty(otherChineseServices) ? 0 : this.getAmountFromServices(otherChineseServices));
@@ -84,7 +84,7 @@ public class DataCollectorService {
     public Integer getForeignUnselectedServices(Long studentId) {
         List<Service> communctionServices = serveService.getUnselectedService(studentId, Lists.newArrayList(ComboTypeEnum.FOREIGN,ComboTypeEnum.CHINESE), 0);
         List<Service> otherFrnServices = serveService.getUnselectedService(studentId,
-                Lists.newArrayList(ComboTypeEnum.EXCHANGE,ComboTypeEnum.INTELLIGENT,ComboTypeEnum.EXPERIENCE), TutorTypeEnum.FRN, 0);
+                Lists.newArrayList(ComboTypeEnum.EXCHANGE,ComboTypeEnum.INTELLIGENT,ComboTypeEnum.EXPERIENCE,ComboTypeEnum.REWARD), TutorTypeEnum.FRN, 0);
         return (CollectionUtils.isEmpty(communctionServices) ? 0 : this.getAmountFromServices(communctionServices))
                 + (CollectionUtils.isEmpty(otherFrnServices) ? 0 : this.getAmountFromServices(otherFrnServices));
     }
@@ -93,10 +93,10 @@ public class DataCollectorService {
         switch (teachingType){
             case ZHONGJIAO:
                 return workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.INTELLIGENT,
-                        ComboTypeEnum.EXCHANGE,ComboTypeEnum.EXPERIENCE), com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
+                        ComboTypeEnum.EXCHANGE,ComboTypeEnum.EXPERIENCE,ComboTypeEnum.REWARD), com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
             case WAIJIAO:
                 return workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.INTELLIGENT,
-                        ComboTypeEnum.EXCHANGE,ComboTypeEnum.EXPERIENCE), com.boxfishedu.card.bean.TeachingType.WAIJIAO);
+                        ComboTypeEnum.EXCHANGE,ComboTypeEnum.EXPERIENCE,ComboTypeEnum.REWARD), com.boxfishedu.card.bean.TeachingType.WAIJIAO);
             default: return null;
         }
     }

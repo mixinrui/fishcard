@@ -115,11 +115,11 @@ public class CommentTeacherAppServiceX {
             notifyOrderUpdateStatus(service.getOrderId(), ConstantUtil.WORKORDER_COMPLETED);
         }
         //填充主页内容
-//        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId());
-//        if (Objects.equals(homeCommentCard.getId(),commentCard.getId())){
-//            logger.info("@submitComment 更新首页中外教点评项...");
-//            commentHomePage(commentCard);
-//        }
+        CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(commentCard.getStudentId());
+        if (Objects.equals(homeCommentCard.getId(),commentCard.getId())){
+            logger.info("@submitComment 更新首页中外C教点评项...");
+            setCommentHomePage(commentCard);
+        }
         logger.info("@submitComment 更新首页中外教点评项...");
         findHomeComment(commentCard.getStudentId());
     }
@@ -162,16 +162,15 @@ public class CommentTeacherAppServiceX {
         cardCourseInfo.setCourseId(commentCard.getCourseId());
         cardCourseInfo.setCourseName(commentCard.getCourseName());
         if (Objects.nonNull(commentCard.getCourseId())){
-            //外教点评不需要显示课程难度和类型
-//            Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
-//            if (Objects.nonNull(typeAndDifficultyMap)){
-//                if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
-//                    cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
-//                }
-//                if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
-//                    cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()));
-//                }
-//            }
+            Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
+            if (Objects.nonNull(typeAndDifficultyMap)){
+                if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
+                    cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
+                }
+                if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
+                    cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()).toString());
+                }
+            }
         }
         cardCourseInfo.setThumbnail(urlConf.getThumbnail_server()+commentCard.getCover());
         cardCourseInfo.setStudentReadFlag(commentCard.getStudentReadFlag());

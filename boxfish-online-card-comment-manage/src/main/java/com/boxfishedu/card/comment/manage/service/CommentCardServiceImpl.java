@@ -1,6 +1,9 @@
 package com.boxfishedu.card.comment.manage.service;
 
-import com.boxfishedu.card.comment.manage.entity.dto.*;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCardExcelDto;
+import com.boxfishedu.card.comment.manage.entity.dto.CommentCardLogDto;
+import com.boxfishedu.card.comment.manage.entity.dto.TeacherInfo;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardFormStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.NotAnswerTime;
@@ -27,7 +30,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,10 +67,6 @@ public class CommentCardServiceImpl implements CommentCardService {
                 return createPredicates(root, criteriaBuilder, commentCardForm);
             }
         };
-        // 排序方式
-        if(Objects.nonNull(pageable.getSort())) {
-            entityQuery.orderBy(pageable.getSort().iterator());
-        }
         Page page = entityQuery.page();
         List<CommentCardDto> resultList = dtoBinder.bindFromBusinessObjectList(CommentCardDto.class, page.getContent());
         return new PageImpl<>(resultList, pageable, page.getTotalElements());
@@ -285,16 +283,16 @@ public class CommentCardServiceImpl implements CommentCardService {
         }
 
         // 点评创建开始时间
-        if(Objects.nonNull(commentCardForm.getFrom())) {
+        if(Objects.nonNull(commentCardForm.getStudentAskTimeRangeFrom())) {
             predicateList.add(criteriaBuilder.greaterThanOrEqualTo(
-                    root.get("createTime"), commentCardForm.getFrom()
+                    root.get("studentAskTime"), commentCardForm.getStudentAskTimeRangeFrom()
             ));
         }
 
         // 点评创建结束时间
-        if(Objects.nonNull(commentCardForm.getTo())) {
+        if(Objects.nonNull(commentCardForm.getStudentAskTimeRangeTo())) {
             predicateList.add(criteriaBuilder.lessThanOrEqualTo(
-                    root.get("createTime"), commentCardForm.getTo()
+                    root.get("studentAskTime"), commentCardForm.getStudentAskTimeRangeTo()
             ));
         }
 

@@ -1,6 +1,7 @@
 package com.boxfishedu.card.comment.manage.entity.form;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -32,10 +33,11 @@ public class CommentCardForm {
      * 学生提问时间区间
      */
 //    private DateRange studentAskTimeRange;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date studentAskTimeRangeFrom;
 
-    private Date from;
-
-    private Date to;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date studentAskTimeRangeTo;
 
     /**
      * 订单类型
