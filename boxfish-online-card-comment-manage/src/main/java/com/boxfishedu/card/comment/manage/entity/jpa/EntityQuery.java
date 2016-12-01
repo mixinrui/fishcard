@@ -8,12 +8,10 @@ import org.springframework.data.domain.Sort;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -82,15 +80,22 @@ public abstract class EntityQuery<T> {
     private void sort() {
         if(pageable.getSort() != null) {
             Sort sort = pageable.getSort();
+            List<Order> result = new ArrayList<>();
             for (Sort.Order order : sort) {
+
                 String property = order.getProperty();
                 if (order.isAscending()) {
-                    query.orderBy(criteriaBuilder.asc(root.get(property)));
+                    result.add(criteriaBuilder.asc(root.get(property)));
                 } else {
-                    query.orderBy(criteriaBuilder.desc(root.get(property)));
+                    result.add(criteriaBuilder.desc(root.get(property)));
                 }
             }
+            orderBy(result);
         }
+    }
+
+    public void orderBy(List<Order> orders) {
+        query.orderBy(orders);
     }
 
     private List<T> getPageList() {

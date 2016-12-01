@@ -67,10 +67,6 @@ public class CommentCardServiceImpl implements CommentCardService {
                 return createPredicates(root, criteriaBuilder, commentCardForm);
             }
         };
-        // 排序方式
-        if(Objects.nonNull(pageable.getSort())) {
-            entityQuery.orderBy(pageable.getSort().iterator());
-        }
         Page page = entityQuery.page();
         List<CommentCardDto> resultList = dtoBinder.bindFromBusinessObjectList(CommentCardDto.class, page.getContent());
         return new PageImpl<>(resultList, pageable, page.getTotalElements());
