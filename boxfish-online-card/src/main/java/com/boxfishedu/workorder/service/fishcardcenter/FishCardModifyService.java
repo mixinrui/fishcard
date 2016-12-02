@@ -197,6 +197,12 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
                 workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
                 courseSchedule.setStatus( FishCardStatusEnum.COURSE_ASSIGNED.getCode());
             }
+
+            // 如果设置提醒 ,删除提醒操作
+            if(null!=workOrder.getNeedChangeTime()){
+                workOrder.setNeedChangeTime(null);
+            }
+
             workOrder.setTeacherId(0L);
             workOrder.setTeacherName("");
             workOrder.setStartTime(startTimeParam.getBeginDateFormat() );
