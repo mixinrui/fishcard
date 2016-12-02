@@ -203,6 +203,10 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
                 workOrder.setNeedChangeTime(null);
             }
 
+            if(null!=courseSchedule.getNeedChangeTime()){
+                courseSchedule.setNeedChangeTime(null);
+            }
+
             workOrder.setTeacherId(0L);
             workOrder.setTeacherName("");
             workOrder.setStartTime(startTimeParam.getBeginDateFormat() );

@@ -41,6 +41,10 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStudentId(Long studentId);
 
+    public List<WorkOrder> findByNeedChangeTime(Integer needChangeTime);
+
+    public List<WorkOrder> findByNeedChangeTimeAndStudentId(Integer needChangeTime,Long studentId);
+
     //查找出学生所有状态的工单
     @Query("select wo from  WorkOrder wo where wo.service.id in (?1) and (wo.startTime between ?2 and ?3) order by wo.startTime desc ")
     public Page<WorkOrder> findByQueryCondAllStatus(Long[] ids, Date beginDate, Date endDate, Pageable pageable);

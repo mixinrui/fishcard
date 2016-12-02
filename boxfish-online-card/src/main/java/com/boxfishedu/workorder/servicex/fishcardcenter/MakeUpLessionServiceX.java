@@ -575,7 +575,8 @@ public class MakeUpLessionServiceX {
 //            teacherStudentRequester.notifyCancelTeacher(workOrder);
 //        }
 
-        workOrder.setNeedChangeTime(20); // 该鱼卡需要换时间
+        workOrder.setNeedChangeTime(10); // 该鱼卡需要换时间
+        courseSchedule.setNeedChangeTime(10);
 
 
         workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
