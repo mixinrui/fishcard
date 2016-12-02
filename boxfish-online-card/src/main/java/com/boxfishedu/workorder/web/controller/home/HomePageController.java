@@ -47,7 +47,7 @@ HomePageController {
     private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
 
-    @RequestMapping(value = "/cardInfos/{student_id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/student/{student_id}", method = RequestMethod.GET)
     public JsonResultModel userCardInfo(String order_type,@PathVariable("student_id") Long studentId) {
         return homePageServiceX.getHomePage(order_type, studentId);
     }
