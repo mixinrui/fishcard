@@ -41,11 +41,12 @@ public class ParameterValidator implements InstantClassValidator {
         if(Objects.isNull(instantRequestParam.getStudentId())){
             throw new BusinessException("用户参数为必填");
         }
-        if(!StringUtils.isEmpty(instantRequestParam.getTutorType())){
-            if(!instantRequestParam.getTutorType().equals(TutorTypeEnum.FRN.toString())){
-                return InstantClassRequestStatus.TUTOR_TYPE_NOT_SUPPORT.getCode();
-            }
-        }
+        //中教立即上课放开
+//        if(!StringUtils.isEmpty(instantRequestParam.getTutorType())){
+//            if(!instantRequestParam.getTutorType().equals(TutorTypeEnum.FRN.toString())){
+//                return InstantClassRequestStatus.TUTOR_TYPE_NOT_SUPPORT.getCode();
+//            }
+//        }
         return InstantClassRequestStatus.UNKNOWN.getCode();
     }
 }

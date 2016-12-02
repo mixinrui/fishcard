@@ -52,11 +52,17 @@ public class ScheduleCourseValidator implements InstantClassValidator {
     @Override
     public int preValidate() {
         InstantRequestParam instantRequestParam=ThreadLocalUtil.instantRequestParamThreadLocal.get();
+        //默认为外教
+        int teachingType=TeachingType.WAIJIAO.getCode();
+        if(StringUtils.equalsIgnoreCase(TutorTypeEnum.CN.toString(),instantRequestParam.getTutorType())){
+            teachingType=TeachingType.ZHONGJIAO.getCode();
+        }
         switch (InstantRequestParam.SelectModeEnum.getSelectMode(instantRequestParam.getSelectMode())){
+
             case COURSE_SCHEDULE_ENTERANCE:
                 Optional<WorkOrder> haveClass=workOrderJpaRepository
                         .findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterOrderByStartTimeAsc(instantRequestParam
-                                .getStudentId(),TeachingType.WAIJIAO.getCode(),new Integer(0),new Date());
+                                .getStudentId(),teachingType,new Integer(0),new Date());
                 if(!haveClass.isPresent()){
                     //判断当前是否有刚匹配上的课程,如果有,则跳过这个验证
                     Optional<InstantClassCard> latestMatchedDateOptional=instantClassJpaRepository
