@@ -31,6 +31,8 @@ public class OnlineAccountService {
 
     private final String ONLINE_ACCOUNT_KEY="account:online";
 
+    private final String SYNC_KEY="syncMongo2Redis";
+
     @Autowired
     private ThreadPoolManager threadPoolManager;
 
@@ -63,7 +65,11 @@ public class OnlineAccountService {
             }
             else{
                 //将mongo的数据同步到redis中去
-                threadPoolManager.execute(new Thread(()->{syncMongo2Redis();}));
+                if(redisTemplate.opsForValue().setIfAbsent(SYNC_KEY,Boolean.TRUE.toString())) {
+                    threadPoolManager.execute(new Thread(() -> {
+                        syncMongo2Redis();
+                    }));
+                }
                 return (onlineAccountSetMorphiaRepository.queryByStudentId(studentId)!=null);
             }
             return result;
@@ -83,5 +89,6 @@ public class OnlineAccountService {
             List<OnlineAccountSet> allAccounts = onlineAccountSetMorphiaRepository.getAll();
             allAccounts.forEach(onlineAccount -> redisTemplate.opsForSet().add(ONLINE_ACCOUNT_KEY,onlineAccount.getStudentId().toString()));
         }
+        redisTemplate.delete(SYNC_KEY);
     }
 }
