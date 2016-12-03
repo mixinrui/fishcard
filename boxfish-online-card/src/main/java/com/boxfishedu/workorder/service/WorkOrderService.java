@@ -26,9 +26,11 @@ import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.course.ServiceWorkOrderCombination;
 import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +43,11 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -496,6 +500,86 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         courseSchedule.setTeacherId(0l);
         saveWorkOrderAndSchedule(workOrder,courseSchedule);
         timePickerService.getRecommandTeachers(workOrder);
+    }
+
+    /**
+     * 获取需要提醒的学生数量
+     * @return
+     */
+    public Map<Long,List<WorkOrder>> getNotifyMessage(){
+        List<WorkOrder> needNotifyWorkOrders = jpa.findByNeedChangeTime(20);
+        if(CollectionUtils.isEmpty(needNotifyWorkOrders)){
+            return null;
+        }
+        Date now = new Date();
+
+        needNotifyWorkOrders = needNotifyWorkOrders.stream().filter( workOrder ->
+                (  1!=workOrder.getIsFreeze()
+                        &&
+                        now.after(  DateUtils.addMinutes( workOrder.getStartTime(),35 ))
+                )
+
+        ).collect(Collectors.toList());
+
+        Map<Long,List<WorkOrder>> notifyMaps = Maps.newHashMap();
+
+        for(WorkOrder workOrder:needNotifyWorkOrders){
+            List<WorkOrder> workOrders =  notifyMaps.get(workOrder.getStudentId());
+            if(CollectionUtils.isEmpty(workOrders)){
+                notifyMaps.put(workOrder.getStudentId(), Lists.newArrayList(workOrders));
+            }else {
+                workOrders.add(workOrder);
+                notifyMaps.put(workOrder.getStudentId(),workOrders);
+            }
+        }
+
+        for(Long key :notifyMaps.keySet()){
+            notifyMaps.put(key,getSortOrders(notifyMaps.get(key)));
+        }
+        logger.info("getNotifyMessage@notifyMapsSize=[{}]",notifyMaps.size());
+        return notifyMaps;
+    }
+
+    /**
+     * 获取某个学生的通知信息
+     * @param studentId
+     * @return
+     */
+    public List<WorkOrder> getNotifyMessageByStudentId(Long studentId){
+        if(null == studentId || studentId==0){
+            return null;
+        }
+        List<WorkOrder> needNotifyWorkOrders = jpa.findByNeedChangeTimeAndStudentId(20,studentId);
+
+        if(CollectionUtils.isEmpty(needNotifyWorkOrders)){
+            return null;
+        }
+        Date now = new Date();
+
+        needNotifyWorkOrders = needNotifyWorkOrders.stream().filter( workOrder ->
+                (  1!=workOrder.getIsFreeze()
+                        &&
+                        now.after(  DateUtils.addMinutes( workOrder.getStartTime(),35 ))
+                )
+
+        ).collect(Collectors.toList());
+        return getSortOrders(needNotifyWorkOrders);
+    }
+
+
+
+    private List<WorkOrder> getSortOrders(List<WorkOrder> workOrders){
+        workOrders.sort(new Comparator<WorkOrder>() {
+            @Override
+            public int compare(WorkOrder o1, WorkOrder o2) {
+                if(o1.getStartTime().after(o2.getStartTime())){
+                    return 0;
+                }
+                return -1;
+            }
+        });
+
+        return workOrders;
     }
 
 }

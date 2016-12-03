@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.*;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardMakeUpService;
 import com.boxfishedu.workorder.service.graborder.GrabOrderService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
@@ -27,6 +28,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.math.LongMath;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang.time.DateUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +37,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/6/14.
@@ -79,6 +83,9 @@ public class MakeUpLessionServiceX {
 
     @Autowired
     private ScheduleCourseInfoService scheduleCourseInfoService;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
 
 
     /**
@@ -264,6 +271,9 @@ public class MakeUpLessionServiceX {
         resultMap.put("0", "更新成功");
         return JsonResultModel.newJsonResultModel(resultMap);
     }
+
+
+
 
     // db操作 确认状态
     public void fishcardStatusRechargeChangeLast(List<WorkOrder> workOrders){
@@ -503,6 +513,79 @@ public class MakeUpLessionServiceX {
             return (title.substring(0, 50) + "...");
         }
         return title;
+    }
+
+
+
+    /**
+     * 提醒学生换时间 批量确认
+     * @param makeUpCourseParam
+     * @return
+     */
+    public JsonResultModel confirmNotifyChangeTime(MakeUpCourseParam makeUpCourseParam){
+        Map<String, String> resultMap = Maps.newHashMap();
+        if (null == makeUpCourseParam || null == makeUpCourseParam.getWorkOrderIds() || makeUpCourseParam.getWorkOrderIds().length < 1) {
+            resultMap.put("1", "参数有错误");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
+
+        if (CollectionUtils.isEmpty(workOrders)) {
+            resultMap.put("1", "鱼卡数据有问题,请及时纠正");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+        Date now = new Date();
+        workOrders = workOrders.stream().filter(workOrder ->
+                (  1!=workOrder.getIsFreeze()
+                   &&
+                        now.after(  DateUtils.addMinutes( workOrder.getStartTime(),35 ))
+                )
+
+        ).collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(workOrders)) {
+            resultMap.put("1", "没有符合要求的鱼卡或者冻结课程结束的鱼卡无需进行此操作");
+            return JsonResultModel.newJsonResultModel(resultMap);
+        }
+
+        for(WorkOrder workOrder: workOrders){
+            setNotify(workOrder.getId());
+        }
+
+        resultMap.put("0", "更新成功");
+        return JsonResultModel.newJsonResultModel(resultMap);
+    }
+
+    public JsonResultModel setNotify(Long fishcardId){
+        WorkOrder workOrder=workOrderService.findOne(fishcardId);
+        CourseSchedule courseSchedule= courseScheduleService.findByWorkOrderId(fishcardId);
+
+
+//        Long teacherId=workOrder.getTeacherId();
+//        String teacherName=workOrder.getTeacherName();
+
+//        if(teacherId!=0l){
+//            workOrder.setTeacherId(0l);
+//            workOrder.setTeacherName(null);
+//            courseSchedule.setTeacherId(0l);
+//            workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+//            courseSchedule.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+//
+//            teacherStudentRequester.notifyCancelTeacher(workOrder);
+//        }
+
+        workOrder.setNeedChangeTime(10); // 该鱼卡需要换时间
+        courseSchedule.setNeedChangeTime(10);
+
+
+        workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
+
+//        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
+
+        workOrderLogService.saveWorkOrderLog(workOrder,"通知学生更换时间操作(由于节假日)");
+
+        return JsonResultModel.newJsonResultModel("ok");
     }
 
 

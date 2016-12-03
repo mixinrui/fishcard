@@ -36,6 +36,9 @@ public class StudentCourseSchedule implements Serializable {
     //是否冻结标记,冻结为1,其他为不冻结
     private Integer isFreeze;
 
+    /** 由于假期原因,提示该鱼卡需要更换时间   10 需要更换时间  **/
+    private Integer needChangeTime;
+
     private Integer status;
 
     public String getCourseType() {

@@ -188,6 +188,7 @@ public class FishCardFreezeServiceX {
             this.freezeSec(workOrder.getId(),false);
         });
 
+
         if(!CollectionUtils.isEmpty(unfinishedClass) ){
             teacherStudentRequester.closeOrderByOrderCode(workOrders.get(0).getOrderCode());
         }

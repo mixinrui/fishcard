@@ -235,6 +235,7 @@ public class TimePickerServiceX {
         TimeSlots timeSlots = getTimeSlotById(courseSchedule.getTimeSlotId());
         StudentCourseSchedule studentCourseSchedule = new StudentCourseSchedule();
         studentCourseSchedule.setId(courseSchedule.getId());
+        studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());
         studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
         studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
         if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType())){
