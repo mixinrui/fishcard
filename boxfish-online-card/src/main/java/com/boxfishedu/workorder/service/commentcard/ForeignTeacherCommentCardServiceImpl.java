@@ -11,7 +11,6 @@ import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
-import com.boxfishedu.workorder.common.util.SimpleDateUtil;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.CommentCardStatisticsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
@@ -236,10 +235,15 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             commentCardJpaRepository.save(commentCard);
         }
         CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(userId);
-        com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
+        Optional<com.boxfishedu.workorder.entity.mysql.Service> optional =
+                serveService.findFirstAvailableForeignCommentService(userId);
+        int amount = 0;
+        if(optional.isPresent()) {
+            amount = optional.get().getAmount();
+        }
         if (Objects.nonNull(homeCommentCard)){
             if (Objects.equals(id,homeCommentCard.getId())){
-                if ((commentCardJpaRepository.getUncommentedCard(userId).size() == 0 ) && service.getAmount() == 0){
+                if ((commentCardJpaRepository.getUncommentedCard(userId).size() == 0 ) && amount == 0){
                     logger.info("@setHomePage1 次数用尽,重置外教点评首页...");
                     accountCardInfoService.saveOrUpdate(userId,new AccountCourseBean(), AccountCourseEnum.CRITIQUE);
                 } else {
