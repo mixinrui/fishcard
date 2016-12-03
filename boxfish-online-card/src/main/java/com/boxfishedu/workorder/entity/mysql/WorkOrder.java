@@ -211,9 +211,6 @@ public class WorkOrder implements Cloneable{
     @Column(name = "deduct_score_status" , nullable = true)
     private Integer deductScoreStatus;
 
-    /** 由于假期原因,提示该鱼卡需要更换时间   10 需要更换时间  **/
-    @Column(name = "need_change_time", nullable = true)
-    private Integer needChangeTime;
 
 
     @Override

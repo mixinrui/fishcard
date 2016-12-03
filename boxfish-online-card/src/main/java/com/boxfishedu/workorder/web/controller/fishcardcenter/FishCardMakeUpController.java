@@ -71,15 +71,6 @@ public class FishCardMakeUpController {
     }
 
 
-    /**
-     * 批量更改增加标示 ,目的提醒学生在假日期间更改时间,防止老师旷课发生.
-     * @param makeUpCourseParam
-     * @return
-     */
-    @RequestMapping(value = "/notify/student/changetime", method = RequestMethod.POST)
-    public JsonResultModel notifyStudentChangetime(@RequestBody MakeUpCourseParam makeUpCourseParam){
-        return makeUpLessionServiceX.confirmNotifyChangeTime(makeUpCourseParam);
-    }
 
 
     /**
