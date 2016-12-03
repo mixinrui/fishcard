@@ -208,6 +208,10 @@ public class RabbitMqReciver {
                 logger.info("==========>INSTANT_CLASS_MARK_UNMATCH ===>>> 一分钟未匹配教师,标记未匹配");
                 instantClassTimerServiceX.markUnmatchCard();
             }
+            else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS_BACK_COURSES.value()){
+                logger.info("==========>INSTANT_CLASS_BACK_COURSES ===>>> 未上的课程退回到课程推荐");
+                instantClassTimerServiceX.backUnmatchCoursesAsync();
+            }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);

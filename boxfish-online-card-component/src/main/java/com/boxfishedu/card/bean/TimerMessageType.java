@@ -51,7 +51,10 @@ public enum TimerMessageType {
     INSTANT_CLASS(145),
 
     //标记超过一分钟未匹配教师的课程
-    INSTANT_CLASS_MARK_UNMATCH(146);
+    INSTANT_CLASS_MARK_UNMATCH(146),
+
+    //标记超过一分钟未匹配教师的课程
+    INSTANT_CLASS_BACK_COURSES(147);
 
     private int code;
 

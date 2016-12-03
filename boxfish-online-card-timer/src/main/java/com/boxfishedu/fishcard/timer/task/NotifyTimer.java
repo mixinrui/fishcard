@@ -287,5 +287,15 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
+    /**
+     * 定时清理没有匹配上的课程,将相应的课退回到推荐课系统
+     */
+    @Scheduled(cron = "0 1/30 * * * ?")
+    public void pushBackCourses() {
+        logger.info("<<<<<<开始通知<<<退回没有成功的实时抢课的课程>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.INSTANT_CLASS_BACK_COURSES.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 
 }

@@ -64,4 +64,6 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
 
     @Query(value = "select max(icc) from InstantClassCard icc where studentId=? and status=?")
     Optional<InstantClassCard> findLatestMatchedInstantCard(Long studentId,Integer status);
+
+    List<InstantClassCard> findByCreateTimeLessThanAndWorkOrderId(Date deadLine, Long workOrderId);
 }
