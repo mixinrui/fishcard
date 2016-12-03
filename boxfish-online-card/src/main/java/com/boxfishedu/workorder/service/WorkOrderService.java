@@ -488,8 +488,8 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             return;
         }
         logger.debug("@changeTeacherForTypeChanged#{}#result#{}",workOrder.getId(),result.booleanValue());
-        Long oldTeacherId=workOrder.getTeacherId();
-        workOrderLogService.saveWorkOrderLog(workOrder,"课程类型变化,教师不能上此种类型课程,需要更换教师,旧教师:"+oldTeacherId);
+        WorkOrder oldWorkOrder=workOrder.clone();
+        workOrderLogService.saveWorkOrderLog(workOrder,"课程类型变化,教师不能上此种类型课程,需要更换教师,旧教师:"+oldWorkOrder.getTeacherId());
         workOrder.setTeacherId(0l);
         workOrder.setTeacherName(null);
         CourseSchedule courseSchedule=courseScheduleService.findByWorkOrderId(workOrder.getId());

@@ -16,9 +16,13 @@ import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +69,9 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
     @Autowired
     private ThreadPoolManager threadPoolManager;
 
+    @Autowired
+    private ServiceSDK serviceSDK;
+
     private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @Override
@@ -72,7 +79,8 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         WorkOrder workOrder=workOrderJpaRepository.findOne(instantClassCard.getWorkorderId());
         List<WorkOrder> workOrders=workOrderJpaRepository
                 .findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(workOrder.getService().getOrderId(),new Date());
-        List<WorkOrder> typeChangedList= new ArrayList<>();
+        List<WorkOrder> typeChangedList= Lists.newArrayList();
+        List<WorkOrder> typeUnChangedList= Lists.newArrayList();
 
         Map<WorkOrder,String> logMap= Maps.newHashMap();
 
@@ -90,8 +98,10 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
             workOrders.get(i).setTeacherId(oldCard.getTeacherId());
             workOrders.get(i).setTeacherName(oldCard.getTeacherName());
 
-            if(!oldCard.getCourseType().equals(workOrders.get(i).getClassType())){
+            if (!oldCard.getCourseType().equals(workOrders.get(i).getClassType())) {
                 typeChangedList.add(workOrders.get(i));
+            } else {
+                typeUnChangedList.add(workOrders.get(i));
             }
 
             logMap.put(workOrders.get(i),"实时上课数据移动,旧时间:["+DateUtil.Date2String(tmp.getStartTime())+"],教师:["+tmp.getTeacherId()+"]");
@@ -99,6 +109,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
             BeanUtils.copyProperties(tmp,oldCard);
         }
 
+        this.rebuildGroup(typeUnChangedList);
         workOrders.forEach(card->workOrderService.saveWorkOrderAndSchedule(card,initSchedule(card)));
         printLog(logMap);
 
@@ -152,6 +163,20 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
             courseSchedule.setInstantEndTtime(DateUtil.dateTrimYear(workOrder.getEndTime()));
         }
         return courseSchedule;
+    }
+
+    private void rebuildGroup(List<WorkOrder> typeUnchangedList){
+        if(CollectionUtils.isEmpty(typeUnchangedList)){
+            return;
+        }
+        threadPoolManager.execute(new Thread(()->{
+            typeUnchangedList.forEach(card->{
+                // 创建群组
+                serviceSDK.createGroup(card);
+                workOrderLogService.saveWorkOrderLog(card
+                        ,String.format("实时上课重建鱼卡群组关系,teacher[%s],student[%s]",card.getTeacherId(),card.getStudentId()));
+            });
+        }));
     }
 
 }

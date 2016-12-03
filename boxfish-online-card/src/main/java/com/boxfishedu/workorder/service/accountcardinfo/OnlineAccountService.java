@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/9/24.
@@ -87,8 +88,15 @@ public class OnlineAccountService {
         if(mongoCount.longValue()>redisCount.longValue()) {
             logger.info("@syncMongo2Redis###############mongo#notif#equal#redis,同步数据开始");
             List<OnlineAccountSet> allAccounts = onlineAccountSetMorphiaRepository.getAll();
-            allAccounts.forEach(onlineAccount -> redisTemplate.opsForSet().add(ONLINE_ACCOUNT_KEY,onlineAccount.getStudentId().toString()));
+            logger.debug("@syncMongo2Redis#需要同步的数据[{}]",allAccounts.size());
+            for(OnlineAccountSet onlineAccountSet:allAccounts){
+                if(!Objects.isNull(onlineAccountSet.getStudentId())) {
+                    logger.debug("=>{}", onlineAccountSet.getStudentId());
+                    redisTemplate.opsForSet().add(ONLINE_ACCOUNT_KEY, onlineAccountSet.getStudentId().toString());
+                }
+            }
         }
+        logger.debug(">>>>>>>同步完成");
         redisTemplate.delete(SYNC_KEY);
     }
 }

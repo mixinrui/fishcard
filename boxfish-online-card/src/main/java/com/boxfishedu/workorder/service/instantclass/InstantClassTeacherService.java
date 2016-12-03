@@ -73,11 +73,11 @@ public class InstantClassTeacherService {
             return;
         }
         if(!teacherIdsOptional.isPresent()||CollectionUtils.isEmpty(teacherIdsOptional.get())){
-            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 没有获取到可用的教师列表,cardId{},studentId{}"
+            logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 没有获取到可用的教师列表,cardId[{}],studentId[{}]"
                     ,instantClassCard.getId(),instantClassCard.getStudentId());
             return;
         }
-        logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 获取到教师列表[{}],card{},学生{}"
+        logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 获取到教师列表[{}],card[{}],学生[{}]"
                 ,teacherIdsOptional.get().toString(),instantClassCard.getId(),instantClassCard.getStudentId());
         //匹配上老师,则向教师推送抢单的消息
         courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());

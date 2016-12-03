@@ -18,6 +18,7 @@ import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
@@ -76,6 +77,9 @@ public class FishCardModifyServiceX {
 
     @Autowired
     private CourseOnlineRequester  courseOnlineRequester;
+
+    @Autowired
+    private AccountCardInfoService accountCardInfoService;
 
     @Autowired
     private TimePickerService timePickerService;
@@ -193,6 +197,7 @@ public class FishCardModifyServiceX {
             return;
         }
         fishCardModifyService.changeCourse(workOrder);
+        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
     }
 
     public void deleteFishCardsByStudentIds(FishCardDeleteParam fishCardDeleteParam) {
