@@ -2,19 +2,18 @@ package com.boxfishedu.workorder.servicex.instantclass.timer;
 
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqDelaySender;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
-import com.boxfishedu.workorder.web.result.InstantClassResult;
-import com.sun.media.jfxmedia.logging.Logger;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +30,12 @@ public class InstantClassTimerServiceX {
     private RabbitMqDelaySender rabbitMqDelaySender;
 
     private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
 
     public void putCardsToMatchTeachers() {
         //TODO:此处需要使用配置
@@ -58,5 +63,23 @@ public class InstantClassTimerServiceX {
         logger.warn("@markUnmatchCard超过一分钟未匹配教师,通过定时器强制设置为未匹配的抢单卡",instantClassCards);
         instantClassCards.forEach(instantClassCard -> instantClassJpaRepository.updateStatus(instantClassCard.getId(),InstantClassRequestStatus.NO_MATCH.getCode()));
 
+    }
+
+    public void backUnmatchCoursesAsync(){
+        threadPoolManager.execute(new Thread(()->{
+            this.backUnmatchCourses();
+        }));
+    }
+
+    public void backUnmatchCourses() {
+        Date deadLine=DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(35));
+        List<InstantClassCard> instantCards=instantClassJpaRepository.findByCreateTimeLessThanAndWorkOrderId(deadLine,null);
+        if(CollectionUtils.isEmpty(instantCards)){
+            return;
+        }
+        instantCards.forEach(instantCard->{
+            logger.debug("@backUnmatchCourses,向课程推荐发送取消课程,学生[{}],instantcard[{}]",instantCard.getStudentId(),instantCard.getId());
+            recommandCourseRequester.cancelUnmatchedInstantCourse(instantCard);
+        });
     }
 }

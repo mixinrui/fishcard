@@ -6,12 +6,14 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.RecommandedCourseService;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendCourseType;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseViews;
+import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -291,6 +293,26 @@ public class RecommandCourseRequester {
         logger.debug("@getCourseViewDetail->获取课程详细信息courseId:[{}],url:[{}]",courseId,url);
         RecommandCourseView recommandCourseView=restTemplate.getForObject(url, RecommandCourseView.class);
         return recommandCourseView;
+    }
+
+    /***
+     * 未匹配上教师的实时上课卡取消课程
+     * @param instantClassCard
+     */
+    public void cancelUnmatchedInstantCourse(InstantClassCard instantClassCard) {
+        this.cancelUnmatchedInstantCourse(instantClassCard.getStudentId(),instantClassCard.getCourseId());
+    }
+
+    public void cancelUnmatchedInstantCourse(Long studentId,String courseId) {
+        String url=String.format("%s/cancel/%s/%s",urlConf.getCourse_wudaokou_recommend_service(),studentId,courseId);
+        try {
+            logger.debug("@cancelUnmatchedInstantCourse#超时没有匹配上教师的实时上课卡课程取消,url[{}],学生[{}],课程[{}]",url,studentId,courseId);
+            restTemplate.delete(url);
+        }
+        catch (Exception ex){
+            logger.error("@cancelUnmatchedInstantCourse#未匹配教师的推荐课取消失败,url[{}],学生[{}],课程[{}]",url,studentId,courseId);
+        }
+
     }
 
 }
