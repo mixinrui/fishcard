@@ -49,7 +49,7 @@ public class FishCardQueryOuterController {
             return JsonResultModel.newJsonResultModel(myWorkOrdes);
         }else {
             List<Long>  hasEvFinsList =  Arrays.asList(fishCardinnerParam.getHasEvFishcardIds());
-             myWorkOrdes.stream().filter(workOrder -> hasEvFinsList.contains(workOrder.getId())).collect(Collectors.toList());
+            myWorkOrdes=myWorkOrdes.stream().filter(workOrder -> !hasEvFinsList.contains(workOrder.getId())).collect(Collectors.toList());
              return JsonResultModel.newJsonResultModel(myWorkOrdes);
         }
 
