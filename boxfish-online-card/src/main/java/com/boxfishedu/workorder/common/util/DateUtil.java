@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.common.util;
 
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import org.apache.commons.lang3.StringUtils;
 
@@ -85,7 +86,7 @@ public class DateUtil {
     public static String simpleDate2String(Date date) {
         String dateStr = null;
         try {
-            dateStr = new SimpleDateFormat("yyyy-MM-dd").format(date);
+            dateStr = ThreadLocalUtil.dateFormatThreadLocal.get().format(date);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }

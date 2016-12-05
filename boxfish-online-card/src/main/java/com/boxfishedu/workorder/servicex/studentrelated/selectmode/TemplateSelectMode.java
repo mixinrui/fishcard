@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import org.apache.commons.codec.binary.StringUtils;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -64,7 +65,7 @@ public class TemplateSelectMode implements SelectMode {
                 TimeSlots timeSlots = teacherStudentRequester.getTimeSlot(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
                 String startTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getStartTime();
                 String endTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getEndTime();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                DateFormat sdf = ThreadLocalUtil.dateTimeFormatThreadLocal.get();
                 try {
                     Date startTime = sdf.parse(startTimeString);
                     Date endTime = sdf.parse(endTimeString);

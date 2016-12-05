@@ -25,10 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -100,8 +97,11 @@ StudentAppRelatedController {
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
                                      @PageableDefault(value = 15) Pageable pageable,
                                      Locale locale) {
+        long start = System.currentTimeMillis();
         commonServeServiceX.checkToken(studentId, userId);
-        return timePickerServiceX.getCourseSchedulePage(studentId, pageable, locale);
+        Object result = timePickerServiceX.getCourseSchedulePage(studentId, pageable, locale);
+        logger.info("student:{} Schedule page select time: {}", userId, (System.currentTimeMillis() - start));
+        return result;
     }
 
     /**

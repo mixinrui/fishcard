@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.service.ServiceSDK;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -13,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.Serializable;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +45,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
             return -1;
         }
         try {
-            return new SimpleDateFormat("yyyy-MM-dd").parse(day).getTime();
+            return ThreadLocalUtil.dateFormatThreadLocal.get().parse(day).getTime();
         } catch (ParseException e) {
             e.printStackTrace();
             return -1;
