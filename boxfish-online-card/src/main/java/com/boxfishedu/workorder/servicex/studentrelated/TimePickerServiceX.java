@@ -236,6 +236,7 @@ public class TimePickerServiceX {
         StudentCourseSchedule studentCourseSchedule = new StudentCourseSchedule();
         studentCourseSchedule.setId(courseSchedule.getId());
         studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
+        studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());/** 显示需要修改时间的鱼卡信息 **/
         studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
         if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType())){
             studentCourseSchedule.setTime(courseSchedule.getInstantStartTtime());
