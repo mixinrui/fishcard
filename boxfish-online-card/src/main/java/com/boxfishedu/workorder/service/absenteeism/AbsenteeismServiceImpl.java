@@ -74,7 +74,7 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     @Override
     public int testQueryAbsentStudent() {
         LocalDateTime now = LocalDateTime.now();
-        List<WorkOrder> workOrderList =  workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(30)),DateUtil.localDate2Date(now.minusMinutes(0)), ComboTypeEnum.EXCHANGE.toString());
+        List<WorkOrder> workOrderList =  workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(30)),DateUtil.localDate2Date(now.minusMinutes(0)), "STANDARD");
         int sum = 0;
         for (WorkOrder workOrder: workOrderList) {
             logger.info("@testQueryAbsentStudent Deducting score " + workOrder.getId());
@@ -96,7 +96,7 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
     @Override
     public int productQueryAbsentStudent() {
         LocalDateTime now = LocalDateTime.now();
-        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.String2Date("2016-09-20 00:00:00"),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
+        List<WorkOrder> workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.String2Date("2016-12-05 00:00:00"),DateUtil.localDate2Date(now.minusDays(0)), "STANDARD");
         int sum = 0;
         for (WorkOrder workOrder: workOrderList) {
             logger.info("@handleQueryAbsentStudent Deducting score " + workOrder.getId());
