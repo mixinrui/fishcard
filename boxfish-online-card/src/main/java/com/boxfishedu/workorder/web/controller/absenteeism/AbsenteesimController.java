@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.web.controller.absenteeism;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.absenteeism.AbsenteeismService;
 import com.boxfishedu.workorder.service.absenteeism.sdk.AbsenteeismSDK;
 import org.springframework.beans.factory.annotation.Autowired;
