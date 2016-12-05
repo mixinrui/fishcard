@@ -267,7 +267,9 @@ public class FishCardUpdatorServiceX {
             return true;
         }
         for (WorkOrderLog workOrderLog : workOrderLogs) {
-            if (workOrderLog.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()) {
+            if (workOrderLog.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()
+                    ||workOrderLog.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
+                    ||workOrder.getStatus()==FishCardStatusEnum.ONCLASS.getCode()) {
                 return false;
             }
         }
