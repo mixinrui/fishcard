@@ -49,7 +49,7 @@ public class AbsenteeismServiceImpl implements AbsenteeismService{
             workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusMinutes(30)),DateUtil.localDate2Date(now.minusMinutes(0)), "STANDARD");
 
         }else{
-            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.String2Date("2016-09-20 00:00:00"),DateUtil.localDate2Date(now.minusDays(0)), "STANDARD");
+            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.String2Date("2016-12-05 00:00:00"),DateUtil.localDate2Date(now.minusDays(0)), "STANDARD");
         }
 //        else{
 //            workOrderList = workOrderJpaRepository.queryAbsentStudent(DateUtil.localDate2Date(now.minusDays(1)),DateUtil.localDate2Date(now.minusDays(0)), ComboTypeEnum.EXCHANGE.toString());
