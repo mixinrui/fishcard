@@ -1,16 +1,21 @@
 package com.boxfishedu.workorder.servicex.coursenotify;
 
 import com.alibaba.fastjson.JSONObject;
+import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.ShortMessageCodeConstant;
+import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
+import com.boxfishedu.workorder.web.param.StudentNotifyParam;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -47,11 +52,24 @@ public class CourseChangeTimeNotifySerceX {
     @Autowired
     private RabbitMqSender rabbitMqSender;
 
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
+
+    public void notifyStu(StudentNotifyParam studentNotifyParam){
+        if(null==studentNotifyParam  )
+            throw new BusinessException("参数有错误");
+        if(null ==studentNotifyParam.getStudentIds()){
+            notiFyStudentChangeTime(studentNotifyParam.getAppreceiveFlag());
+        }else{
+            notifyPersons(studentNotifyParam.getStudentIds(),studentNotifyParam.getAppreceiveFlag());
+        }
+    }
 
     /**
-     * 短信通知学生换时间
+     * 短信通知学生换时间+推送
+     * appReceiveFlag app 是否接受推送
      */
-    public void notiFyStudentChangeTime() {
+    public void notiFyStudentChangeTime(Boolean appReceiveFlag) {
 
         logger.info("notiFyStudentChangeTime--->开始检索老师今天有课的记录");
         Map<Long,List<WorkOrder>> studentNotifyMap  = workOrderService.getNotifyMessage();
@@ -75,6 +93,9 @@ public class CourseChangeTimeNotifySerceX {
 
         for(Long studentId:studentNotifyMap.keySet()){
             sendShortMessage(studentNotifyMap.get(studentId));
+            if(null!=appReceiveFlag && appReceiveFlag){
+                //sendAPPMessage(studentNotifyMap.get(studentId));
+            }
         }
         /**  end    发送短信 **/
 
@@ -88,7 +109,7 @@ public class CourseChangeTimeNotifySerceX {
      * 指定学生发通知
      * @param studentIds
      */
-    public void notifyPersons(Long[] studentIds){
+    public void notifyPersons(Long[] studentIds,Boolean appReceive){
         if(null==studentIds || studentIds.length<1)
             throw new BusinessException("参数有误");
 
@@ -97,8 +118,28 @@ public class CourseChangeTimeNotifySerceX {
             List<WorkOrder> workOrders = workOrderService.getNotifyMessageByStudentId(stuId);
             if(!CollectionUtils.isEmpty(workOrders)){
                 sendShortMessage(workOrders);
+                if(null!=appReceive && appReceive){
+                    //  sendAPPMessage(workOrders);
+                }
             }
         }
+    }
+
+    /**
+     * 课程列表获取提醒是否还有提醒修改时间信息
+     * @param studentId
+     * @return
+     */
+    public JsonResultModel getNotifyByStudentId(Long studentId){
+        List<WorkOrder> workOrders = workOrderService.getNotifyMessageByStudentId(studentId);
+        if(CollectionUtils.isEmpty(workOrders)){
+            return JsonResultModel.newJsonResultModel("ok");
+        }
+        String message = getAppNotices(workOrders);
+        JSONObject jo = new JSONObject();
+        jo.put("message",message);
+
+        return JsonResultModel.newJsonResultModel(jo);
     }
 
 
@@ -127,6 +168,36 @@ public class CourseChangeTimeNotifySerceX {
 
     }
 
+
+    /**
+     * app消息推送
+     * @param myClass
+     */
+    private void sendAPPMessage( List<WorkOrder> myClass) {
+        threadPoolManager.execute(new Thread(() -> {
+            // 发送短信 向短信队列发送q消息
+            this.pushStudentMessage(myClass);
+        }));
+
+    }
+
+
+    /**
+     * app 推送消息
+     * @param myClass
+     */
+    public void pushStudentMessage(List<WorkOrder> myClass) {
+
+            String pushTitle = "";// WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
+            Map map1 = Maps.newHashMap();
+            map1.put("user_id", myClass.get(0).getStudentId());
+            map1.put("push_title", pushTitle);
+
+            String jo = "";
+            map1.put("data", jo);
+        teacherStudentRequester.pushTeacherListOnlineMsg(map1);
+    }
+
     /**
      * 学生消息体
      *
@@ -147,6 +218,16 @@ public class CourseChangeTimeNotifySerceX {
         map.put("data", jo.toJSONString());
         return map;
 
+    }
+
+
+    /**
+     * app课表页面提示
+     * @param workOrders
+     * @return
+     */
+    private  String getAppNotices(List<WorkOrder> workOrders){
+        return "页面提示";
     }
 
 
