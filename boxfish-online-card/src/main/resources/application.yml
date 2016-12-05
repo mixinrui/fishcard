@@ -368,10 +368,16 @@ service:
   gateway:
     type: test
 
+#server.port: 8080
 
-
-
-server.port: 8080
+server:
+  port: 8080
+  servlet-path: /
+  tomcat:
+    accesslog:
+      directory: /share/fishcard-logs
+      enabled: true
+      pattern: -%h %l %u [%{yyyy-MM-dd HH:mm:ss}t] i -%r- %s %b %D %F
 
 #===============================================================pretest环境:123.56.13.168 机器密码:Boxfish2016===============================================================
 ---
@@ -583,8 +589,18 @@ spring:
     virtualHost: local
   profiles: product
 
-server.servlet-path: /fishcard
-server.port: 9999
+#server.servlet-path: /fishcard
+#server.port: 9999
+
+server:
+  port: 9999
+  servlet-path: /fishcard
+  tomcat:
+    accesslog:
+      directory: /var/logs/fishcard-logs
+      enabled: true
+      pattern: -%h %l %u [%{yyyy-MM-dd HH:mm:ss}t] i -%r- %s %b %D %F
+
 ##################接口调用地址
 interface:
   address:

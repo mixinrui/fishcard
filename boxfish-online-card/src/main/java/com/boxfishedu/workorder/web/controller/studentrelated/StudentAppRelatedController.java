@@ -97,11 +97,8 @@ StudentAppRelatedController {
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
                                      @PageableDefault(value = 15) Pageable pageable,
                                      Locale locale) {
-        long start = System.currentTimeMillis();
         commonServeServiceX.checkToken(studentId, userId);
-        Object result = timePickerServiceX.getCourseSchedulePage(studentId, pageable, locale);
-        logger.info("student:{} Schedule page select time: {}", userId, (System.currentTimeMillis() - start));
-        return result;
+        return timePickerServiceX.getCourseSchedulePage(studentId, pageable, locale);
     }
 
     /**

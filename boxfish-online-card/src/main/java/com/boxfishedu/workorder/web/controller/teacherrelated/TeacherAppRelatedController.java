@@ -3,12 +3,9 @@ package com.boxfishedu.workorder.web.controller.teacherrelated;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.TimeLimitPolicy;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
-import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.servicex.teacherrelated.TeacherAppRelatedServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +33,6 @@ public class TeacherAppRelatedController {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
     private final static DateTimeFormatter yearMonthFormatter = DateTimeFormatter.ofPattern("yyyyMM");
-    private final static Logger logger = LoggerFactory.getLogger(TeacherAppRelatedController.class);
 
     /**
      * 评论学生,应该还需要的参数还有评论的内容等,写成dto,方便后续扩展,以及操作者的id
@@ -61,16 +57,13 @@ public class TeacherAppRelatedController {
             Integer count, // 一次返回几个月的数据
             String yearMonth,
             Locale locale) {
-        long startTime = System.currentTimeMillis();
         commonServeServiceX.checkToken(teacherId, userId);
         YearMonth yearMonthParam = null;
         if(StringUtils.isNotBlank(yearMonth)) {
             yearMonthParam = YearMonth.from(yearMonthFormatter.parse(yearMonth));
         }
-        MonthTimeSlots result = teacherAppRelatedServiceX.getScheduleByIdAndDateRange(
+        return teacherAppRelatedServiceX.getScheduleByIdAndDateRange(
                 teacherId, yearMonthParam, count, locale);
-        logger.info("teacher:{} Schedule {} month select time: {}", teacherId, count, (System.currentTimeMillis() - startTime));
-        return result;
     }
 
     @RequestMapping(value = "{teacher_id}/schedule/day", method = RequestMethod.GET)
