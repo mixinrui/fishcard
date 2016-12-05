@@ -73,7 +73,7 @@ public class InstantClassTimerServiceX {
 
     public void backUnmatchCourses() {
         Date deadLine=DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(35));
-        List<InstantClassCard> instantCards=instantClassJpaRepository.findByCreateTimeLessThanAndWorkOrderId(deadLine,null);
+        List<InstantClassCard> instantCards=instantClassJpaRepository.findByCreateTimeLessThanAndWorkorderId(deadLine,null);
         if(CollectionUtils.isEmpty(instantCards)){
             return;
         }
