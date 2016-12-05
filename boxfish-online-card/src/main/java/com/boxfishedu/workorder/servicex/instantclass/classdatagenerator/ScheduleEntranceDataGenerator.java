@@ -165,7 +165,7 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         return courseSchedule;
     }
 
-    private void rebuildGroup(List<WorkOrder> typeUnchangedList){
+    public void rebuildGroup(List<WorkOrder> typeUnchangedList){
         if(CollectionUtils.isEmpty(typeUnchangedList)){
             return;
         }

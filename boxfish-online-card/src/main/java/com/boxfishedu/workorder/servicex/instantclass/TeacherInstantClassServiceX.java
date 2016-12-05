@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.requester.InstantTeacherRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassTeacherService;
+import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstantClassValidators;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstatntClassKeyGenerator;
@@ -20,6 +21,9 @@ import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +31,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -68,6 +73,9 @@ public class TeacherInstantClassServiceX {
 
     @Autowired
     private DataCollectorService dataCollectorService;
+
+    @Autowired
+    private ScheduleEntranceDataGenerator scheduleEntranceDataGenerator;
 
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
@@ -129,7 +137,11 @@ public class TeacherInstantClassServiceX {
         }
         threadPoolManager.execute(new Thread(()->{
             for(int i=0;i<workOrders.size();i++){
-                workOrderService.changeTeacherForTypeChanged(workOrders.get(i));
+                Boolean result=workOrderService.changeTeacherForTypeChanged(workOrders.get(i));
+                //如果能上此种类型的课程,重新生成关系
+                if(BooleanUtils.isFalse(result)){
+                    scheduleEntranceDataGenerator.rebuildGroup(Arrays.asList(workOrders.get(i)));
+                }
             }
         }));
     }
