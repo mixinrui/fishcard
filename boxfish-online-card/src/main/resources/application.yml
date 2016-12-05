@@ -599,7 +599,7 @@ server:
     accesslog:
       directory: /var/logs/fishcard-logs
       enabled: true
-      pattern: -%h %l %u [%{yyyy-MM-dd HH:mm:ss}t] i -%r- %s %b %D %F
+      pattern: -%h %l %u [%{yyyy-MM-dd HH:mm:ss}t]i -%r- %s %b %D %F
 
 ##################接口调用地址
 interface:
