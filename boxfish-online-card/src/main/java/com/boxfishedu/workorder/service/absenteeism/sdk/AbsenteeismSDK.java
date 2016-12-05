@@ -33,7 +33,7 @@ public class AbsenteeismSDK {
     public Map absenteeismDeductScore(WorkOrder workOrder){
         Map<String,String> paramsMap = new HashMap<>();
         paramsMap.put("lesson_id",workOrder.getCourseId());
-        paramsMap.put("message","{\"user_id\":"+workOrder.getStudentId()+",\"score\":30000}");
+        paramsMap.put("message","{\"user_id\":"+workOrder.getStudentId()+",\"score\":5000}");
         paramsMap.put("user_id",workOrder.getStudentId().toString());
         return restTemplate.postForObject(createDeductScoreURI(paramsMap),null,Map.class);
     }
