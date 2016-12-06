@@ -171,10 +171,10 @@ public class ScheduleEntranceDataGenerator implements IClassDataGenerator {
         }
         threadPoolManager.execute(new Thread(()->{
             typeUnchangedList.forEach(card->{
-                // 创建群组
-                serviceSDK.createGroup(card);
                 workOrderLogService.saveWorkOrderLog(card
                         ,String.format("实时上课重建鱼卡群组关系,teacher[%s],student[%s]",card.getTeacherId(),card.getStudentId()));
+                // 创建群组
+                serviceSDK.createGroup(card);
             });
         }));
     }

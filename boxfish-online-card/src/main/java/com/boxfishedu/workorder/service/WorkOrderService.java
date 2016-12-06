@@ -485,7 +485,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         workOrderLogService.saveWorkOrderLog(workOrder,"课程类型发生变化,向师生运营发起判断是否换课请求");
         Boolean result=teacherStudentRequester.changeTeacherForTypeChanged(workOrder);
         if(BooleanUtils.isFalse(result)){
-            logger.debug("@changeTeacherForTypeChanged#{}#result#{}",workOrder.getId(),result.booleanValue());
+            logger.debug("@changeTeacherForTypeChanged#[{}]#result#{}",workOrder.getId(),result.booleanValue());
             workOrderLogService.saveWorkOrderLog(workOrder,"课程类型变化,教师能上此种类型课程");
             return result;
         }
