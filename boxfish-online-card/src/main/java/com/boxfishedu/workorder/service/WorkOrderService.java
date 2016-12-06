@@ -526,7 +526,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         for(WorkOrder workOrder:needNotifyWorkOrders){
             List<WorkOrder> workOrders =  notifyMaps.get(workOrder.getStudentId());
             if(CollectionUtils.isEmpty(workOrders)){
-                notifyMaps.put(workOrder.getStudentId(), Lists.newArrayList(workOrders));
+                notifyMaps.put(workOrder.getStudentId(), Lists.newArrayList(workOrder));
             }else {
                 workOrders.add(workOrder);
                 notifyMaps.put(workOrder.getStudentId(),workOrders);

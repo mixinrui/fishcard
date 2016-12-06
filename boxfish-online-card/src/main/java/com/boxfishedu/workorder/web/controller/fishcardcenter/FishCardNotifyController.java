@@ -28,7 +28,8 @@ public class FishCardNotifyController {
      * @param studentNotifyParam
      * @return
      */
-    @RequestMapping(value = "/notifyStudentitem", method = RequestMethod.POST)
+
+    @RequestMapping(value = "/notify/Studentitem", method = RequestMethod.POST)
     public JsonResultModel changeTeacher(@RequestBody StudentNotifyParam studentNotifyParam) {
         courseChangeTimeNotifySerceX.notifyStu(studentNotifyParam);
         return JsonResultModel.newJsonResultModel("OK");
