@@ -522,6 +522,10 @@ public class MakeUpLessionServiceX {
      * @return
      */
     public JsonResultModel confirmNotifyChangeTime(MakeUpCourseParam makeUpCourseParam){
+        if("notmake".equals(makeUpCourseParam.getMakeOrnotmakeflag())){
+            cancelMakeTag(makeUpCourseParam.getWorkOrderIds());
+            return JsonResultModel.newJsonResultModel("OK");
+        }
         Map<String, String> resultMap = Maps.newHashMap();
         if (null == makeUpCourseParam || null == makeUpCourseParam.getWorkOrderIds() || makeUpCourseParam.getWorkOrderIds().length < 1) {
             resultMap.put("1", "参数有错误");
@@ -538,7 +542,7 @@ public class MakeUpLessionServiceX {
         workOrders = workOrders.stream().filter(workOrder ->
                 (  1!=workOrder.getIsFreeze()
                         &&
-                        now.after(  DateUtils.addMinutes( workOrder.getStartTime(),35 ))
+                        now.before(   workOrder.getStartTime())
                 )
 
         ).collect(Collectors.toList());
@@ -554,6 +558,23 @@ public class MakeUpLessionServiceX {
 
         resultMap.put("0", "更新成功");
         return JsonResultModel.newJsonResultModel(resultMap);
+    }
+
+    @Transactional
+    private void   cancelMakeTag(Long[] fishcards){
+        for(Long fishcardId:fishcards){
+            WorkOrder workOrder=workOrderService.findOne(fishcardId);
+            CourseSchedule courseSchedule= courseScheduleService.findByWorkOrderId(fishcardId);
+            workOrder.setNeedChangeTime(null); // 该鱼卡需要换时间
+            courseSchedule.setNeedChangeTime(null);
+
+            workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
+
+//        dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
+
+            workOrderLogService.saveWorkOrderLog(workOrder,"取消通知学生更换时间操作(由于节假日)");
+        }
+
     }
 
 

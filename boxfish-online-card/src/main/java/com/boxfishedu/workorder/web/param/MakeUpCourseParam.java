@@ -17,5 +17,6 @@ public class MakeUpCourseParam {
     private Long workOrderIds[];
     private String orderCode;
     private String successFlag;
+    private String makeOrnotmakeflag; //   make    notmake
 
 }

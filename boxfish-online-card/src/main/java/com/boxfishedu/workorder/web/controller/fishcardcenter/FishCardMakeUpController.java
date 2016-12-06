@@ -76,7 +76,7 @@ public class FishCardMakeUpController {
      * @param makeUpCourseParam
      * @return
      */
-    @RequestMapping(value = "/notify/student/changetime", method = RequestMethod.POST)
+    @RequestMapping(value = "/notify/student/changetimeitem", method = RequestMethod.POST)
     public JsonResultModel notifyStudentChangetime(@RequestBody MakeUpCourseParam makeUpCourseParam){
         return makeUpLessionServiceX.confirmNotifyChangeTime(makeUpCourseParam);
     }
