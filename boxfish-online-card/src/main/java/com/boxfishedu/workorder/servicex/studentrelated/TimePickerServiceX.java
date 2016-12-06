@@ -269,12 +269,14 @@ public class TimePickerServiceX {
         Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
         courseScheduleList.forEach(courseSchedule -> {
             String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
-            List<StudentCourseSchedule> studentCourseScheduleList = courseScheduleMap.get(date);
-            if (studentCourseScheduleList == null) {
-                studentCourseScheduleList = Lists.newArrayList();
-                courseScheduleMap.put(date, studentCourseScheduleList);
-            }
-            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule, locale));
+            courseScheduleMap.compute(date, (k, v) -> {
+                if(v == null) {
+                   v = Lists.newArrayList();
+                } else {
+                   v.add(createStudentCourseSchedule(courseSchedule, locale));
+                }
+                return v;
+            });
         });
 
         List<Map<String, Object>> result = Lists.newArrayList();

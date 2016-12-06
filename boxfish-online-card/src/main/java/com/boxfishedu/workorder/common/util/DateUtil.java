@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.common.util;
 
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
-import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,6 +12,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import static com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil.*;
+
 /**
  * Created by hucl on 16/3/24.
  */
@@ -20,21 +21,16 @@ public class DateUtil {
 
     public final static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public final static DateTimeFormatter dateFormatterChinese = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
-
     public final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public final static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     public static Date String2Date(String str) throws RuntimeException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = null;
         try {
-            date = sdf.parse(str);
+            return dateTimeFormat.get().parse(str);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }
-        return date;
     }
 
     public static LocalDateTime string2LocalDateTime(String dateStr){
@@ -65,13 +61,11 @@ public class DateUtil {
      * @throws RuntimeException
      */
     public static Date String2SimpleDate(String str) throws RuntimeException {
-        Date date = null;
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd").parse(str);
+            return dateFormat.get().parse(str);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }
-        return date;
     }
 
     public static Date date2SimpleDate(Date dateWithTime) {
@@ -84,13 +78,11 @@ public class DateUtil {
     }
 
     public static String simpleDate2String(Date date) {
-        String dateStr = null;
         try {
-            dateStr = ThreadLocalUtil.dateFormatThreadLocal.get().format(date);
+            return dateFormat.get().format(date);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }
-        return dateStr;
     }
 
     public static String date2ShortString(Date date) {
@@ -104,13 +96,11 @@ public class DateUtil {
     }
 
     public static String timeShortString(Date date) {
-        String dateStr;
         try {
-            dateStr = new SimpleDateFormat("HH:mm:ss").format(date);
+            return timeFormat.get().format(date);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }
-        return dateStr;
     }
 
     public static LocalDate convertLocalDate(Date date) {
@@ -158,22 +148,22 @@ public class DateUtil {
      * @return
      */
     public static String string(Date date) {
-        return new SimpleDateFormat("yyyy-MM-dd").format(date);
+        return dateFormat.get().format(date);
     }
 
     //TODO:将hh:mm:ss(12进制改为HH:mm:ss:24进制)
     public static String Date2String(Date date) throws RuntimeException {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+        return dateTimeFormat.get().format(date);
     }
 
 
     public static String Date2StringChinese(Date date) throws RuntimeException {
-        return new SimpleDateFormat("yyyy年MM月dd日").format(date);
+        return cnDateFormat.get().format(date);
     }
 
 
     public static String Date2String24(Date date) throws RuntimeException {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+        return dateTimeFormat.get().format(date);
     }
 
     public static String formatLocalDate(LocalDateTime localDateTime) {
@@ -204,7 +194,7 @@ public class DateUtil {
 
     public static Date parseTime(String time) {
         try {
-            return new SimpleDateFormat("HH:mm:ss").parse(time);
+            return timeFormat.get().parse(time);
         } catch (ParseException e) {
             throw new RuntimeException(time + "时间转换错误!!" + e.getMessage());
         }
@@ -372,13 +362,11 @@ public class DateUtil {
     }
 
     public static String formatMonthDay2String(Date date) {
-        String dateStr = null;
         try {
-            dateStr = new SimpleDateFormat("MM月dd日").format(date);
+            return cnYearMonthFormat.get().format(date);
         } catch (Exception ex) {
             throw new RuntimeException("日期格式不合法");
         }
-        return dateStr;
     }
 
     public static boolean getWeekDay(){

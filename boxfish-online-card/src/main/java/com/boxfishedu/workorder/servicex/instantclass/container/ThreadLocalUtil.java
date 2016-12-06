@@ -24,17 +24,39 @@ public class ThreadLocalUtil {
         return TeacherInstantParamThreadLocal.get();
     }
 
-    public final static ThreadLocal<DateFormat> dateFormatThreadLocal = new ThreadLocal<DateFormat>() {
+    public final static ThreadLocal<DateFormat> dateFormat = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd");
         }
     };
 
-    public final static ThreadLocal<DateFormat> dateTimeFormatThreadLocal = new ThreadLocal<DateFormat>() {
+    public final static ThreadLocal<DateFormat> dateTimeFormat = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+    };
+
+    public final static ThreadLocal<DateFormat> timeFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("HH:mm:ss");
+        }
+    };
+
+
+    public final static ThreadLocal<DateFormat> cnYearMonthFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("MM月dd日");
+        }
+    };
+
+    public final static ThreadLocal<DateFormat> cnDateFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy年MM月dd日");
         }
     };
 }

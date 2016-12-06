@@ -65,7 +65,7 @@ public class TemplateSelectMode implements SelectMode {
                 TimeSlots timeSlots = teacherStudentRequester.getTimeSlot(timeSlotParam.getSelectedTimes().get(j).getTimeSlotId());
                 String startTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getStartTime();
                 String endTimeString = selectedTimes.get(j).getSelectedDate() + " " + timeSlots.getEndTime();
-                DateFormat sdf = ThreadLocalUtil.dateTimeFormatThreadLocal.get();
+                DateFormat sdf = ThreadLocalUtil.dateTimeFormat.get();
                 try {
                     Date startTime = sdf.parse(startTimeString);
                     Date endTime = sdf.parse(endTimeString);
