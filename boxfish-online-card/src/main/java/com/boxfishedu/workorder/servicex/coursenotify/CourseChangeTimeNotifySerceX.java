@@ -137,6 +137,7 @@ public class CourseChangeTimeNotifySerceX {
         }
         String message = getAppNotices(workOrders);
         JSONObject jo = new JSONObject();
+        jo.put("title","课程调整");
         jo.put("message",message);
 
         return JsonResultModel.newJsonResultModel(jo);
@@ -227,7 +228,10 @@ public class CourseChangeTimeNotifySerceX {
      * @return
      */
     private  String getAppNotices(List<WorkOrder> workOrders){
-        return "页面提示";
+        String begin = "同学,你在 ";
+        String date = getDate(workOrders);
+        String end = " 共计 "+workOrders.size()+" 节课,由于恰逢节假日不能上课,请尽快修改上课时间吧~";
+        return begin+date+end;
     }
 
 

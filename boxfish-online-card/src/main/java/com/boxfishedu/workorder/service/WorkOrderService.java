@@ -559,7 +559,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         needNotifyWorkOrders = needNotifyWorkOrders.stream().filter( workOrder ->
                 (  1!=workOrder.getIsFreeze()
                         &&
-                        now.after(  DateUtils.addMinutes( workOrder.getStartTime(),35 ))
+                        now.before(workOrder.getStartTime())
                 )
 
         ).collect(Collectors.toList());
