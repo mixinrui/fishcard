@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.instantclass;
 
+import com.alibaba.fastjson.JSON;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
@@ -128,6 +129,14 @@ public class InstantClassController {
     public JsonResultModel instantDayClassTimes(@RequestBody DayRangeBean dateInfo) {
         instantClassServiceX.initTimeRange(dateInfo);
         return JsonResultModel.newJsonResultModel("ok");
+    }
+
+    /**
+     * 教师端显示时间片用
+     */
+    @RequestMapping(value = "/service/student/scheduletype/{student_id}", method = RequestMethod.GET)
+    public JsonResultModel getScheduleType(@PathVariable("student_id") Long studentId) {
+        return instantClassServiceX.getScheduleType(studentId);
     }
     
 }
