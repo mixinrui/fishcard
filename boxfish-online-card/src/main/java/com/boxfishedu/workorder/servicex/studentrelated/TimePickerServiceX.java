@@ -272,9 +272,8 @@ public class TimePickerServiceX {
             courseScheduleMap.compute(date, (k, v) -> {
                 if(v == null) {
                    v = Lists.newArrayList();
-                } else {
-                   v.add(createStudentCourseSchedule(courseSchedule, locale));
                 }
+                v.add(createStudentCourseSchedule(courseSchedule, locale));
                 return v;
             });
         });
