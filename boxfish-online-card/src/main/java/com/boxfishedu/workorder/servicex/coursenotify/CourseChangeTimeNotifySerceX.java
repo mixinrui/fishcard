@@ -94,7 +94,7 @@ public class CourseChangeTimeNotifySerceX {
         for(Long studentId:studentNotifyMap.keySet()){
             sendShortMessage(studentNotifyMap.get(studentId));
             if(null!=appReceiveFlag && appReceiveFlag){
-                //sendAPPMessage(studentNotifyMap.get(studentId));
+                sendAPPMessage(studentNotifyMap.get(studentId));
             }
         }
         /**  end    发送短信 **/
@@ -114,12 +114,13 @@ public class CourseChangeTimeNotifySerceX {
             throw new BusinessException("参数有误");
 
         studentIds = trimArray(studentIds);
+        logger.info("notiFyStudentChangeTime@notifyPersons->studentInfo:[{}]",studentIds);
         for(Long stuId:studentIds){
             List<WorkOrder> workOrders = workOrderService.getNotifyMessageByStudentId(stuId);
             if(!CollectionUtils.isEmpty(workOrders)){
                 sendShortMessage(workOrders);
                 if(null!=appReceive && appReceive){
-                    //  sendAPPMessage(workOrders);
+                     sendAPPMessage(workOrders);
                 }
             }
         }
@@ -238,7 +239,7 @@ public class CourseChangeTimeNotifySerceX {
 
     public String getDate(List<WorkOrder> list){
         Map<String,Long> map = list.stream().collect(Collectors.groupingBy( (workOrder) ->  DateUtil.formatMonthDay2String(workOrder.getStartTime()) ,Collectors.counting()));
-        Set<String> selectedSet = map.entrySet().stream().filter(entry -> entry.getValue() > 0).map(entry -> entry.getKey()).collect(Collectors.toSet());
+        Set<String> selectedSet = map.entrySet().stream().filter(entry -> entry.getValue() > 0).map(entry -> entry.getKey()).sorted().collect(Collectors.toSet());
 
         return  StringUtils.collectionToDelimitedString(selectedSet,",");
     }

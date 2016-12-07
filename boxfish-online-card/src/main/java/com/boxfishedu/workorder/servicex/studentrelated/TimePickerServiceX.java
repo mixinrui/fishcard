@@ -253,6 +253,33 @@ public class TimePickerServiceX {
         return studentCourseSchedule;
     }
 
+    private StudentCourseSchedule createStudentCourseSchedule(CourseSchedule courseSchedule, Locale locale,Date now) {
+        TimeSlots timeSlots = getTimeSlotById(courseSchedule.getTimeSlotId());
+        StudentCourseSchedule studentCourseSchedule = new StudentCourseSchedule();
+        studentCourseSchedule.setId(courseSchedule.getId());
+        studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
+
+        if(courseSchedule.getStartTime().after(now) && 1!=courseSchedule.getIsFreeze()){
+            studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());/** 显示需要修改时间的鱼卡信息 **/
+        }else {
+            studentCourseSchedule.setNeedChangeTime(null);
+        }
+        studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
+        if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType())){
+            studentCourseSchedule.setTime(courseSchedule.getInstantStartTtime());
+        }
+        else {
+            studentCourseSchedule.setTime(timeSlots.getStartTime());
+        }
+        studentCourseSchedule.setWorkOrderId(courseSchedule.getWorkorderId());
+        studentCourseSchedule.setStatus(courseSchedule.getStatus());
+        studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
+        if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
+            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
+        }
+        return studentCourseSchedule;
+    }
+
     public Object getCourseSchedulePage(Long studentId, Pageable pageable, Locale locale) {
         Page<CourseSchedule> page = courseScheduleService.findByStudentId(studentId, pageable);
         List<Map<String, Object>> result = adapterCourseScheduleList(page.getContent(), locale);
@@ -268,6 +295,7 @@ public class TimePickerServiceX {
 
     private List<Map<String, Object>> adapterCourseScheduleList(List<CourseSchedule> courseScheduleList, Locale locale) {
         Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
+        Date now = new Date();
         courseScheduleList.forEach(courseSchedule -> {
             String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
             List<StudentCourseSchedule> studentCourseScheduleList = courseScheduleMap.get(date);
@@ -275,7 +303,7 @@ public class TimePickerServiceX {
                 studentCourseScheduleList = Lists.newArrayList();
                 courseScheduleMap.put(date, studentCourseScheduleList);
             }
-            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule, locale));
+            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule, locale,now));
         });
 
         List<Map<String, Object>> result = Lists.newArrayList();
