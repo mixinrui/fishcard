@@ -240,10 +240,16 @@ public class CourseChangeTimeNotifySerceX {
 
 
     public String getDate(List<WorkOrder> list){
-        Map<String,Long> map = list.stream().collect(Collectors.groupingBy( (workOrder) ->  DateUtil.formatMonthDay2String(workOrder.getStartTime()) ,Collectors.counting()));
-        Set<String> selectedSet = map.entrySet().stream().filter(entry -> entry.getValue() > 0).map(entry -> entry.getKey()).sorted().collect(Collectors.toSet());
+        List<String> listdate = Lists.newArrayList();
+        for(WorkOrder workOrder:list){
+            if(!listdate.contains( DateUtil.formatMonthDay2String(workOrder.getStartTime()))){
+                listdate.add(DateUtil.formatMonthDay2String(workOrder.getStartTime()));
+            }
+        }
+//        Map<String,Long> map = list.stream().collect(Collectors.groupingBy( (workOrder) ->  DateUtil.formatMonthDay2String(workOrder.getStartTime()) ,Collectors.counting()));
+//        Set<String> selectedSet = map.entrySet().stream().filter(entry -> entry.getValue() > 0).map(entry -> entry.getKey()).sorted().collect(Collectors.toSet());
 
-        return  StringUtils.collectionToDelimitedString(selectedSet,",");
+        return  StringUtils.collectionToDelimitedString(listdate,",");
     }
 
     public static void main(String[] args) {
