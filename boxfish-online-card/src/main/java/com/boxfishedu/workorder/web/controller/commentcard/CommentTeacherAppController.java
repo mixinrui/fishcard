@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.commentcard;
 
+import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.bean.CommentCardTeacherAppTip;
 import com.boxfishedu.workorder.dao.jpa.CommentCardStarJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
@@ -75,6 +76,13 @@ public class CommentTeacherAppController {
         commonServeServiceX.checkToken(commentCardSubmitParam.getTeacherId(),userId);
         commentCardSubmitParam.setTeacherPicturePath(foreignTeacherCommentCardService.getUserPicture(access_token));
         //commentCardSubmitParam.setTeacherId(userId);//测试时使用,正式去掉
+        CommentCard commentCard = commentTeacherAppServiceX.checkCommentCard(commentCardSubmitParam.getCommentCardId(),userId);
+        if (commentCard == null || !Objects.equals(commentCard.getStatus(),CommentCardStatus.ASSIGNED_TEACHER.getCode())){
+            JsonResultModel jsonResultModel = new JsonResultModel();
+            jsonResultModel.setReturnMsg("Sorry! You do not have enough authorization.");
+            jsonResultModel.setData("Unauthorized");
+            jsonResultModel.setReturnCode(CommentCardTeacherAppTip.COMMENT_CARD_TIME_OUT.getCode());
+        }
         commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
         return JsonResultModel.newJsonResultModel(null);
     }

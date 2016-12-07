@@ -222,4 +222,9 @@ public class CommentTeacherAppServiceX {
         param.put("status",status.toString());
         rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
     }
+
+    public CommentCard checkCommentCard(Long cardId,Long teacherId){
+        logger.info("@checkCommentCard 第2次检查点评是否过期");
+        return commentCardJpaRepository.findByIdAndTeacherId(cardId,teacherId);
+    }
 }
