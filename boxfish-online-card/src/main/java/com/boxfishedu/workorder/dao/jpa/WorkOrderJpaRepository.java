@@ -41,6 +41,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStudentId(Long studentId);
 
+    public List<WorkOrder> findByIsFreezeAndStartTimeBetweenAndParentIdNotNull( Integer isFreeze, Date startDate, Date endDate);
+
+
 
     //查找出学生所有状态的工单
     @Query("select wo from  WorkOrder wo where wo.service.id in (?1) and (wo.startTime between ?2 and ?3) order by wo.startTime desc ")

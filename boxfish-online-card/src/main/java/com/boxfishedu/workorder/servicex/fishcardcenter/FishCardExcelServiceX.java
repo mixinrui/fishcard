@@ -2,8 +2,12 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.service.BackOrderService;
+import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.WorkOrderViewExcel;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
+import com.boxfishedu.workorder.web.view.base.StudentInfo;
 import com.google.common.collect.Lists;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +37,15 @@ public class FishCardExcelServiceX {
     @Autowired
     private FishCardQueryServiceX fishCardQueryServiceX;
 
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
+    private BackOrderService backOrderService;
+
+    @Autowired
+    private MakeWorkOrderService makeWorkOrderService;
     /**
      * 导出Excel
      * @param fishCardFilterParam
@@ -202,5 +216,122 @@ public class FishCardExcelServiceX {
         });
 
         return listexcel;
+    }
+
+
+
+
+
+    private List<WorkOrder> getSortOrders(List<WorkOrder> workOrders){
+        workOrders.sort(new Comparator<WorkOrder>() {
+            @Override
+            public int compare(WorkOrder o1, WorkOrder o2) {
+                if(o1.getStartTime().after(o2.getStartTime())){
+                    return -1;
+                }
+                return 0;
+            }
+        });
+
+        return workOrders;
+    }
+
+
+
+
+
+
+    public void exportExcelbuke(HttpServletResponse response) {
+        List<WorkOrder> listWorkOrder = makeWorkOrderService.findWorkOrdersTodyTomoAndNeed();
+        if (null == listWorkOrder || listWorkOrder.isEmpty()) {
+            return;
+        }
+
+        List<WorkOrder> listWorkOrderlast = Lists.newArrayList();
+        for(WorkOrder workOrder :listWorkOrder){
+            List<WorkOrder>  myorders = getSortOrders(  backOrderService .findByOrderId(workOrder.getOrderId()));
+            if(myorders.get(0).getId() == workOrder.getId()){
+                listWorkOrderlast.add(workOrder);
+            }
+
+        }
+
+        List<StudentInfo> studentInfos = Lists.newArrayList();
+        listWorkOrderlast.stream().forEach(workOrder -> {
+            StudentInfo stu =null;// teacherStudentRequester.getStudentInfo(workOrder.getStudentId());
+            stu.setStartTime(DateUtil.Date2String(workOrder.getStartTime())  );
+            stu.setFishcardId(workOrder.getId());
+            stu.setStudentId(workOrder.getStudentId());
+            studentInfos.add(stu);
+        });
+
+
+
+        final String fileName = "fishCard_" + DateUtil.Date2String(new Date()) ;
+        HSSFWorkbook hssfWorkbook = new HSSFWorkbook();
+        HSSFSheet hssfSheet = hssfWorkbook.createSheet();
+        HSSFRow hssfRow = hssfSheet.createRow(0);
+
+        HSSFCell hssfCell = hssfRow.createCell(0);
+        hssfCell.setCellValue("鱼卡号");
+
+        hssfCell = hssfRow.createCell(1);
+        hssfCell.setCellValue("学生id");
+
+        hssfCell = hssfRow.createCell(2);
+        hssfCell.setCellValue("开始上课时间");
+
+        hssfCell = hssfRow.createCell(3);
+        hssfCell.setCellValue("学生电话");
+
+        hssfCell = hssfRow.createCell(4);
+        hssfCell.setCellValue("学生姓名");
+
+        hssfCell = hssfRow.createCell(5);
+        hssfCell.setCellValue("学校");
+
+
+
+
+
+
+
+
+        for(int i = 0;i < studentInfos.size();i++){
+            hssfRow = hssfSheet.createRow(i + 1);
+
+            hssfCell = hssfRow.createCell(0);
+            hssfCell.setCellValue( studentInfos.get(i).getFishcardId() );
+
+            hssfCell = hssfRow.createCell(1);
+            hssfCell.setCellValue( studentInfos.get(i).getStudentId() );
+
+            hssfCell = hssfRow.createCell(2);
+            hssfCell.setCellValue( studentInfos.get(i).getStartTime() );
+
+
+            hssfCell = hssfRow.createCell(3);
+            hssfCell.setCellValue( studentInfos.get(i).getMobile() );
+
+            hssfCell = hssfRow.createCell(4);
+            hssfCell.setCellValue( studentInfos.get(i).getUsername() );
+
+
+            hssfCell = hssfRow.createCell(5);
+            hssfCell.setCellValue( studentInfos.get(i).getSchoolName());
+
+        }
+
+        response.setHeader("Content-disposition", "attachment; filename=" + fileName + ".xls");
+        response.setContentType("application/msexcel");
+        try(OutputStream out = response.getOutputStream()) {
+            hssfWorkbook.write(out);
+            logger.info("导出鱼卡列表成功!");
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("导出鱼卡列表异常!");
+        }
+
+
     }
 }
