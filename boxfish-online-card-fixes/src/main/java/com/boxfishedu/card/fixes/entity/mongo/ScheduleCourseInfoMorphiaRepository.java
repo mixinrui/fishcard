@@ -28,6 +28,9 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
     @Value("${recommend.url.courseInfo}")
     private String url;
 
+    @Value("${recommend.url.cover}")
+    private String coverUrl;
+
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
 
@@ -101,6 +104,9 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
                 sci.setDifficulty((String) courseMap.get("difficulty"));
                 sci.setLastModified((long) courseMap.get("lastModified"));
                 sci.setPublicDate(courseMap.get("publicDate").toString());
+                if(courseMap.get("cover") != null) {
+                    sci.setThumbnail(String.format(coverUrl, (String) courseMap.get("cover")));
+                }
                 datastore.save(sci);
                 System.out.println("after  update= [{" + sci + "}]");
             } catch (Exception e) {

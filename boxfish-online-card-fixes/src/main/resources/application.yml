@@ -19,6 +19,7 @@ spring.profiles.active: product
 #spring.profiles.active: pretest
 
 recommend.url.courseInfo: http://base.boxfish.cn/boxfish-wudaokou-course/course/info/%s
+recommend.url.cover: http://api.boxfish.cn/student/publication/data/data/%s
 recommend.token: bCA0X0Z1bmN0aW9uMi8wMDAu5aaC5L2V6K
 
 server:
