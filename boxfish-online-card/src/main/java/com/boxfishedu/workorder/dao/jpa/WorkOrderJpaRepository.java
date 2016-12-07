@@ -174,4 +174,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     Optional<Date> findLatestClassDateByStudentId(Long studentId,Integer isFreeze,Date date);
 
     Optional<WorkOrder> findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterOrderByStartTimeAsc(Long studentId,Integer skuId,Integer isFreeze,Date date);
+
+    @Query(value = "select distinct wo.skuId from WorkOrder wo where studentId=? and startTime>?")
+    List<Integer> findDistinctSkuIds(Long studentId,Date startTime);
 }

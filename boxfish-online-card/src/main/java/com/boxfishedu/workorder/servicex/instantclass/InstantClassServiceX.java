@@ -4,11 +4,13 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.core.joran.conditional.ElseAction;
 import com.alibaba.fastjson.JSON;
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
@@ -35,10 +37,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +63,9 @@ public class InstantClassServiceX {
     private
     @Qualifier("stringLongRedisTemplate")
     RedisTemplate<String, Long> stringLongRedisTemplate;
+
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
 
     @Autowired
     private
@@ -95,22 +97,22 @@ public class InstantClassServiceX {
             switch (instantStatus) {
                 case NOT_IN_RANGE:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus, "实时上课会在[ " + this.timeRange()+" ]内开启,请到时间再重试~"));
+                            .newInstantClassResult(instantStatus, "实时上课会在[ " + this.timeRange() + " ]内开启,请到时间再重试~"));
                 case HAVE_CLASS_IN_HALF_HOURS:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(instantStatus
-                                    , "您预约了[ " + DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()) +" ]的课程,马上就开始了,此时不能实时上课~"));
+                                    , "您预约了[ " + DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()) + " ]的课程,马上就开始了,此时不能实时上课~"));
                 case MATCHED_LESS_THAN_30MINUTES: {
                     JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
                             .newInstantClassResult(ThreadLocalUtil.instantCardMatched30Minutes.get(), InstantClassRequestStatus.MATCHED));
-                    if(ThreadLocalUtil.instantCardMatched30Minutes.get().getMatchResultReadFlag()!=1){
-                        instantClassJpaRepository.updateMatchedReadFlag(ThreadLocalUtil.instantCardMatched30Minutes.get().getId(),1);
+                    if (ThreadLocalUtil.instantCardMatched30Minutes.get().getMatchResultReadFlag() != 1) {
+                        instantClassJpaRepository.updateMatchedReadFlag(ThreadLocalUtil.instantCardMatched30Minutes.get().getId(), 1);
                     }
                     return jsonResultModel;
                 }
-                case UNFINISHED_COURSE:{
+                case UNFINISHED_COURSE: {
                     return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus,ThreadLocalUtil.unFinishedCourses30MinutesTips.get()));
+                            .newInstantClassResult(instantStatus, ThreadLocalUtil.unFinishedCourses30MinutesTips.get()));
                 }
                 default:
                     return JsonResultModel.newJsonResultModel(InstantClassResult
@@ -162,13 +164,13 @@ public class InstantClassServiceX {
 
     public void initTimeRange(DayRangeBean dateInfo) {
         Date date = DateUtil.String2Date(String.join(" ", dateInfo.getDate(), "00:00:00"));
-        if(CollectionUtils.isEmpty(dateInfo.getRange())){
+        if (CollectionUtils.isEmpty(dateInfo.getRange())) {
             throw new BusinessException("参数不合法");
         }
-        Optional<List<InstantClassTimeRules>> listOldOptional=instantClassTimeRulesMorphiaRepository.getByDay(dateInfo.getDate());
+        Optional<List<InstantClassTimeRules>> listOldOptional = instantClassTimeRulesMorphiaRepository.getByDay(dateInfo.getDate());
 
         //新增新规则
-        dateInfo.getRange().forEach(range->{
+        dateInfo.getRange().forEach(range -> {
             LocalDateTime dateLocal = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
             InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
             instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(dateLocal));
@@ -179,7 +181,7 @@ public class InstantClassServiceX {
         });
 
         //删除旧的规则
-        listOldOptional.get().forEach(oldRange->{
+        listOldOptional.get().forEach(oldRange -> {
             instantClassTimeRulesMorphiaRepository.delete(oldRange);
         });
 
@@ -190,10 +192,34 @@ public class InstantClassServiceX {
     public JsonResultModel getTeacherRangeByDay() {
         Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = instantClassTimeRulesMorphiaRepository
                 .getByDay(DateUtil.date2SimpleString(new Date()));
-        if(!instantClassTimeRulesList.isPresent()){
+        if (!instantClassTimeRulesList.isPresent()) {
             return JsonResultModel.newJsonResultModel(TeacherInstantRangeBean.defaultRange());
         }
         List<InstantClassTimeRules> instantClassTimeRules = this.getSortedTimeRulesList(instantClassTimeRulesList.get());
         return JsonResultModel.newJsonResultModel(TeacherInstantRangeBean.getInstantRange(instantClassTimeRules));
+    }
+
+    public JsonResultModel getScheduleType(Long studentId){
+        List<Integer> skuIds=workOrderJpaRepository.findDistinctSkuIds(studentId,new Date());
+        java.util.Map<String,Object> map=new HashMap<>();
+        map.put("status",0);
+        map.put("statusDesc","既无中教也无外教");
+        if(!CollectionUtils.isEmpty(skuIds)){
+           if(1==skuIds.size()){
+               if(skuIds.get(0)== TeachingType.ZHONGJIAO.getCode()){
+                   map.put("status",TeachingType.ZHONGJIAO.getCode());
+                   map.put("statusDesc","只有中教");
+               }
+               if(skuIds.get(0)== TeachingType.WAIJIAO.getCode()){
+                   map.put("status",TeachingType.WAIJIAO.getCode());
+                   map.put("statusDesc","只有外教");
+               }
+           }
+            else{
+               map.put("status",3);
+               map.put("statusDesc","既有中教也有外教");
+           }
+        }
+        return  JsonResultModel.newJsonResultModel(map);
     }
 }
