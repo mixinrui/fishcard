@@ -17,6 +17,7 @@ import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.base.StudentInfo;
 import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -372,6 +373,20 @@ public class TeacherStudentRequester {
             tokenCheckObject = null;
         }
         return tokenCheckObject;
+    }
+
+    public StudentInfo getStudentInfo(Long studentId){
+        String url = "http://114.55.110.227:10011/info?user_id="+studentId;
+        StudentInfo studentInfo;
+        try {
+            studentInfo = restTemplate.getForObject(url, StudentInfo.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            studentInfo = null;
+        }
+        return studentInfo;
+
+
     }
 
     public TokenReturnBean checkTokenPrivilege(String token,String path) {

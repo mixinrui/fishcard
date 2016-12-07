@@ -258,7 +258,7 @@ public class FishCardExcelServiceX {
 
         List<StudentInfo> studentInfos = Lists.newArrayList();
         listWorkOrderlast.stream().forEach(workOrder -> {
-            StudentInfo stu =null;// teacherStudentRequester.getStudentInfo(workOrder.getStudentId());
+            StudentInfo stu =teacherStudentRequester.getStudentInfo(workOrder.getStudentId());
             stu.setStartTime(DateUtil.Date2String(workOrder.getStartTime())  );
             stu.setFishcardId(workOrder.getId());
             stu.setStudentId(workOrder.getStudentId());
