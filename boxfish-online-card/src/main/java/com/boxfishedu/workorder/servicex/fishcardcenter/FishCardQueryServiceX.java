@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardQueryService;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,35 @@ public class FishCardQueryServiceX {
         Page<WorkOrder> page = new PageImpl(workOrderList, pageable, count);
         return JsonResultModel.newJsonResultModel(page);
     }
+
+
+    /**
+     * 拼装房间号
+     * @param page
+     */
+    private void trimPage(Page<WorkOrder> page){
+        if(page==null || null == page.getContent())
+            return;
+        List<WorkOrder> list = ((List<WorkOrder>)page.getContent());
+        List<Long> fishcards = Lists.newArrayList();
+        list.stream().forEach(workOrder -> fishcards.add(workOrder.getId()));
+
+        List attributeList = Lists.newArrayList();// 从小码获取数据
+
+        list.stream().forEach(workOrder -> {
+            attributeList.stream().forEach(o -> {
+                if(o.equals(workOrder.getId())){
+//                    workOrder.setCourseType("");
+//                    workOrder.setCourseType("");
+                }
+            });
+        });
+
+
+
+    }
+
+
 
 
     /**
