@@ -28,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -85,11 +86,18 @@ public class CommentTeacherAppServiceX {
         commentCardTeacherAppService.save(commentCard);
     }
 
+    @Transactional
     public void submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam){
         CommentCard commentCard=commentCardTeacherAppService.findById(commentCardSubmitParam.getCommentCardId());
         if(null==commentCard){
             throw new BusinessException("不存在对应的点评卡");
         }
+
+        // 提交时验证点评状态
+        if(!Objects.equals(commentCard.getStatus(),CommentCardStatus.ASSIGNED_TEACHER.getCode())) {
+            throw new BusinessException("Sorry! You do not have enough authorization.");
+        }
+
         commentCard.setStudentReadFlag(0);
         commentCard.setStatus(CommentCardStatus.ANSWERED.getCode());
         commentCard.setUpdateTime(new Date());
