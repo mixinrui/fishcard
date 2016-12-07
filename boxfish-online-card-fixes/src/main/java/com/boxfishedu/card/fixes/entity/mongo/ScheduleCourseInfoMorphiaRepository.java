@@ -2,6 +2,7 @@ package com.boxfishedu.card.fixes.entity.mongo;
 
 import com.boxfishedu.card.fixes.entity.jpa.WorkOrder;
 import com.boxfishedu.card.fixes.entity.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.card.fixes.service.WorkOrderService;
 import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +31,12 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
 
+    @Autowired
+    private WorkOrderService workOrderService;
+
     private LongAdder longAdder = new LongAdder();
+
+    private final static String WORKORDER_ID_PATH = "/root/projects/fixes/updateCourseInfoByWorkOrderId.txt";
 
     public void updateCourseInfos() {
 
@@ -32,6 +44,27 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         List<ScheduleCourseInfo> list = query.asList();
         System.out.println(list.size());
         list.parallelStream().forEach(this::updateCourseInfo);
+    }
+
+    public void updateCourseInfoByFile() {
+        Path path = Paths.get(WORKORDER_ID_PATH);
+        if(Files.exists(path)) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(WORKORDER_ID_PATH));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    try {
+                        System.out.println("workOrderId = " + line);
+                        WorkOrder workOrder = workOrderJpaRepository.findOne(Long.valueOf(line));
+                        workOrderService.handleDifferent(workOrder);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

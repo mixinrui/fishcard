@@ -13,8 +13,8 @@ logging:
 #spring.profiles.active: product
 #spring.profiles.active: local
 #spring.profiles.active: development
-#spring.profiles.active: product
-spring.profiles.active: test
+spring.profiles.active: product
+#spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
 
@@ -23,7 +23,7 @@ recommend.token: bCA0X0Z1bmN0aW9uMi8wMDAu5aaC5L2V6K
 
 server:
   servlet-path: /fixes
-  port: 7777
+  port: 0
 
 ---
 spring:

@@ -4,6 +4,7 @@ import com.boxfishedu.card.fixes.entity.mongo.ScheduleCourseInfoMorphiaRepositor
 import com.boxfishedu.card.fixes.service.BaseTimeSlotService;
 import com.boxfishedu.card.fixes.service.WorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import java.util.Date;
 @RestController
 @EnableScheduling
 @SpringBootApplication
-public class Application {
+public class Application implements CommandLineRunner {
 
 
     public static void main(String[] args) {
@@ -72,5 +73,10 @@ public class Application {
 
     private static Date convertToDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        repository.updateCourseInfoByFile();
     }
 }
