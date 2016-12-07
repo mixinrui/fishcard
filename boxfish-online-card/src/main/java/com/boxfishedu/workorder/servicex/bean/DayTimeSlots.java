@@ -45,7 +45,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
             return -1;
         }
         try {
-            return ThreadLocalUtil.dateFormatThreadLocal.get().parse(day).getTime();
+            return ThreadLocalUtil.dateFormat.get().parse(day).getTime();
         } catch (ParseException e) {
             e.printStackTrace();
             return -1;
@@ -115,7 +115,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
 
 
     /**
-     *
+     * 课程信息
      * @param courseSchedules
      * @param serviceSDK
      */
@@ -143,6 +143,7 @@ public class DayTimeSlots implements Cloneable, Serializable {
             }
         }
     }
+
 
     public void transferTimestampToDate() {
         if(StringUtils.isNotEmpty(day)) {

@@ -84,10 +84,17 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
         Map<String, Map<String, CourseSchedule>> dailyScheduleMap = Maps.newHashMap();
         courseSchedules.forEach(courseSchedule -> {
             String day = DateUtil.simpleDate2String(courseSchedule.getClassDate());
-            if (!dailyScheduleMap.containsKey(day)) {
-                dailyScheduleMap.put(day, Maps.newHashMap());
-            }
-            dailyScheduleMap.get(day).put(courseSchedule.getTimeSlotId().toString(), courseSchedule);
+            dailyScheduleMap.compute(day, (k, v) -> {
+                if(v == null) {
+                    v = Maps.newHashMap();
+                }
+                v.put(courseSchedule.getTimeSlotId().toString(), courseSchedule);
+                return v;
+            });
+//            if (!dailyScheduleMap.containsKey(day)) {
+//                dailyScheduleMap.put(day, Maps.newHashMap());
+//            }
+//            dailyScheduleMap.get(day).put(courseSchedule.getTimeSlotId().toString(), courseSchedule);
         });
         return dailyScheduleMap;
     }

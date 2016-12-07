@@ -21,4 +21,6 @@ public class CacheKeyConstant {
     public static final String WORKORDERS_INSTANT_CLASS = "INSTANT_CLASS";
 
     public static final String BASE_TIME_SLOTS = "BASE_TIME_SLOTS";
+
+    public static final String SCHEDULE_HAS_MORE_HISTORY = "SCHEDULE_HAS_MORE_HISTORY";
 }

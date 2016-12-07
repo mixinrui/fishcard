@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.teacherrelated;
 import com.boxfishedu.workorder.common.bean.FishCardAuthEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,9 +52,10 @@ public class TeacherAppRelatedServiceX {
     private String WORKORDER_VALID_TIME_PEROID;
     @Autowired
     private TimeLimitPolicy timeLimitPolicy;
-
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+    @Autowired
+    private CacheManager cacheManager;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -162,9 +165,7 @@ public class TeacherAppRelatedServiceX {
         MonthTimeSlots resultMonthTimeSlots = serviceSDK.getMonthTimeSlotsByDateBetween(teacherId, dateRangeForm);
         // 设置是否包含更多的历史记录
         resultMonthTimeSlots.setHasMoreHistory(hasMoreHistory(teacherId, dateRangeForm));
-        // 调用世超的接口查看老师选择的时间片的最早记录
         if (CollectionUtils.isEmpty(resultMonthTimeSlots.getData())) {
-//            return JsonResultModel.newJsonResultModel(resultMonthTimeSlots.getData());
             return resultMonthTimeSlots;
         }
         // 2 获取排课表信息
@@ -223,7 +224,7 @@ public class TeacherAppRelatedServiceX {
     private Map<String, Map<String, CourseSchedule>> courseSchedule(Long teacherId, DateRangeForm dateRangeForm) {
         List<CourseSchedule> courseSchedules = courseScheduleService.findByTeacherIdAndClassDateBetween(teacherId, dateRangeForm);
         if (CollectionUtils.isEmpty(courseSchedules)) {
-            return new HashMap<>();
+            return Collections.EMPTY_MAP;
         }
         // 分组处理
         return courseScheduleService.groupCourseScheduleByDate(courseSchedules);
@@ -390,10 +391,17 @@ public class TeacherAppRelatedServiceX {
     }
 
     private boolean hasMoreHistory(Long teacherId, DateRangeForm dateRangeForm) {
-        Long firstDayTimeStamp = null;
-        Optional<Date> firstDay = courseScheduleService.findMinClassDateByTeacherId(teacherId);
-        if (firstDay.isPresent()) {
-            firstDayTimeStamp = firstDay.get().getTime();
+        // 先查询缓存
+        Long firstDayTimeStamp = cacheManager.getCache(
+                CacheKeyConstant.SCHEDULE_HAS_MORE_HISTORY).get(teacherId, Long.class);
+        // 如果缓存为空,再查数据库
+        if(firstDayTimeStamp == null) {
+            Optional<Date> firstDay = courseScheduleService.findMinClassDateByTeacherId(teacherId);
+            if (firstDay.isPresent()) {
+                firstDayTimeStamp = firstDay.get().getTime();
+                // 将数据保存进缓存
+                cacheManager.getCache(CacheKeyConstant.SCHEDULE_HAS_MORE_HISTORY).put(teacherId, firstDayTimeStamp);
+            }
         }
         return (firstDayTimeStamp != null) && (dateRangeForm.getFrom().getTime() > firstDayTimeStamp);
     }
