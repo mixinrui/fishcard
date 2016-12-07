@@ -83,9 +83,10 @@ public class CommentTeacherAppController {
             jsonResultModel.setData("Unauthorized");
             jsonResultModel.setReturnCode(CommentCardTeacherAppTip.COMMENT_CARD_TIME_OUT.getCode());
             return jsonResultModel;
+        }else{
+            commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
+            return JsonResultModel.newJsonResultModel(null);
         }
-        commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
-        return JsonResultModel.newJsonResultModel(null);
     }
 
     @RequestMapping(value = "/teacher/read_message", method = RequestMethod.PUT)
