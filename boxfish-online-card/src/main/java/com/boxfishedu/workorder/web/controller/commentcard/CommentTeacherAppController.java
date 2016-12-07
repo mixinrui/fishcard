@@ -82,6 +82,7 @@ public class CommentTeacherAppController {
             jsonResultModel.setReturnMsg("Sorry! You do not have enough authorization.");
             jsonResultModel.setData("Unauthorized");
             jsonResultModel.setReturnCode(CommentCardTeacherAppTip.COMMENT_CARD_TIME_OUT.getCode());
+            return jsonResultModel;
         }
         commentTeacherAppServiceX.submitComment(commentCardSubmitParam);
         return JsonResultModel.newJsonResultModel(null);
