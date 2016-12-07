@@ -159,11 +159,12 @@ public class CourseChangeTimeNotifySerceX {
      * @param myClass  提醒学生换时间
      */
     private void sendShortMessage( List<WorkOrder> myClass) {
+        long studentId =myClass.get(0).getStudentId();
 
-        Object messageStuct = getMessageStu(myClass.get(0).getStudentId(),  myClass);
-
+        Object messageStuct = getMessageStu(studentId,  myClass);
 
             threadPoolManager.execute(new Thread(() -> {
+                logger.info("notiFyStudentChangeTime@sendShortMessage,studentId=[{}]",studentId);
                 // 发送短信 向短信队列发送q消息
                     rabbitMqSender.send(messageStuct, QueueTypeEnum.SHORT_MESSAGE);
             }));
@@ -189,14 +190,15 @@ public class CourseChangeTimeNotifySerceX {
      * @param myClass
      */
     public void pushStudentMessage(List<WorkOrder> myClass) {
+        long studentId =myClass.get(0).getStudentId();
+        logger.info("notiFyStudentChangeTime@pushStudentMessage,studentId=[{}]",studentId);
+        String pushTitle = "";// WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
+        Map map1 = Maps.newHashMap();
+        map1.put("user_id", studentId);
+        map1.put("push_title", pushTitle);
 
-            String pushTitle = "";// WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
-            Map map1 = Maps.newHashMap();
-            map1.put("user_id", myClass.get(0).getStudentId());
-            map1.put("push_title", pushTitle);
-
-            String jo = "";
-            map1.put("data", jo);
+        String jo = getAppNotices(myClass);
+        map1.put("data", jo);
         teacherStudentRequester.pushTeacherListOnlineMsg(map1);
     }
 
