@@ -216,6 +216,11 @@ public class WorkOrder implements Cloneable{
     private Integer needChangeTime;
 
 
+    @Transient
+    private String groupId; // 房间号
+
+    @Transient
+    private boolean normal = false; //是否正常
 
     @Override
     public String toString() {

@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.SkuTypeEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
@@ -11,6 +12,7 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardQueryService;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -21,7 +23,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import sun.misc.BASE64Encoder;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,55 +46,98 @@ public class FishCardQueryServiceX {
     @Autowired
     private ServeService serveService;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
-    public JsonResultModel listFishCardsByUnlimitedUserCond(FishCardFilterParam fishCardFilterParam,Pageable pageable){
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    public JsonResultModel listFishCardsByUnlimitedUserCond(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         workOrderService.processDateParam(fishCardFilterParam);
-        List<WorkOrder> workOrderList=fishCardQueryService.filterFishCards(fishCardFilterParam,pageable);
-        Long count=fishCardQueryService.filterFishCardsCount(fishCardFilterParam);
+        List<WorkOrder> workOrderList = fishCardQueryService.filterFishCards(fishCardFilterParam, pageable);
+        Long count = fishCardQueryService.filterFishCardsCount(fishCardFilterParam);
         Page<WorkOrder> page = new PageImpl(workOrderList, pageable, count);
+        trimPage(page);
         return JsonResultModel.newJsonResultModel(page);
     }
 
 
     /**
      * 拼装房间号
+     *
      * @param page
      */
-    private void trimPage(Page<WorkOrder> page){
-        if(page==null || null == page.getContent())
+    private void trimPage(Page<WorkOrder> page) {
+        if (page == null || null == page.getContent())
             return;
-        List<WorkOrder> list = ((List<WorkOrder>)page.getContent());
+        List<WorkOrder> list = ((List<WorkOrder>) page.getContent());
         List<Long> fishcards = Lists.newArrayList();
         list.stream().forEach(workOrder -> fishcards.add(workOrder.getId()));
 
+        FishCardGroupsInfo[] fishCardGroupsInfos = teacherStudentRequester.getFishcardMessage(fishcards);
+
+
         List attributeList = Lists.newArrayList();// 从小码获取数据
 
-        list.stream().forEach(workOrder -> {
-            attributeList.stream().forEach(o -> {
-                if(o.equals(workOrder.getId())){
-//                    workOrder.setCourseType("");
-//                    workOrder.setCourseType("");
-                }
-            });
-        });
+        ((List<WorkOrder>) page.getContent()).stream().forEach(workOrder -> {
+            for (FishCardGroupsInfo fishCardGroupsInfo : fishCardGroupsInfos) {
+                if (fishCardGroupsInfo.getWorkOrderId().equals(workOrder.getId())) {
+                    workOrder.setGroupId(fishCardGroupsInfo.getGroupId());
+                    if (null == fishCardGroupsInfo.getMemberAccount() || fishCardGroupsInfo.getMemberAccount().length != 2) {
+                        workOrder.setNormal(false);
+                    } else {
+                        if (fishCardGroupsInfo.getMemberAccount()[0].equals(EncoderByMd5(workOrder.getStudentId().toString()))){
+                            if(fishCardGroupsInfo.getMemberAccount()[1].equals(EncoderByMd5(workOrder.getTeacherId()  .toString()))){
+                                workOrder.setNormal(true);
+                            }else {
+                                workOrder.setNormal(false);
+                            }
+                        }else if(fishCardGroupsInfo.getMemberAccount()[1].equals(EncoderByMd5(workOrder.getStudentId().toString()))){
+                            if(fishCardGroupsInfo.getMemberAccount()[0].equals(EncoderByMd5(workOrder.getTeacherId()  .toString()))){
+                                workOrder.setNormal(true);
+                            }else {
+                                workOrder.setNormal(false);
+                            }
+                        }else {
+                            workOrder.setNormal(false);
+                        }
+                    }
 
+                    break;
+                }
+            }
+
+        });
 
 
     }
 
 
+    public String EncoderByMd5(String str) {
+        String newstr = "";
+        try {
+            //确定计算方法
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            BASE64Encoder base64en = new BASE64Encoder();
+            //加密后的字符串
+            newstr = base64en.encode(md5.digest(str.getBytes()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return newstr;
+    }
 
 
     /**
      * Excel导出
+     *
      * @param fishCardFilterParam
      * @param pageable
      * @return
      */
-    public List<WorkOrder>  listFishCardsByUnlimitedUserCondForExcel(FishCardFilterParam fishCardFilterParam,Pageable pageable){
+    public List<WorkOrder> listFishCardsByUnlimitedUserCondForExcel(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         workOrderService.processDateParam(fishCardFilterParam);
-        return fishCardQueryService.filterFishCards(fishCardFilterParam,pageable);
+        return fishCardQueryService.filterFishCards(fishCardFilterParam, pageable);
     }
 
     //带用户的访问.这个接口在规划管理的页面做出来后会使用
@@ -101,10 +151,9 @@ public class FishCardQueryServiceX {
         Page<WorkOrder> page = listFishCardsByDifferentCond(fishCardFilterParam, services, pageable);
         for (WorkOrder workOrder : page.getContent()) {
             workOrder.setStatusDesc(FishCardStatusEnum.getDesc((workOrder.getStatus())));
-            if(ConstantUtil.SKU_EXTRA_VALUE==workOrder.getSkuIdExtra()){
+            if (ConstantUtil.SKU_EXTRA_VALUE == workOrder.getSkuIdExtra()) {
                 workOrder.setTeachingType(TeachingType.WAIJIAO.getCode());
-            }
-            else{
+            } else {
                 workOrder.setTeachingType(TeachingType.ZHONGJIAO.getCode());
             }
         }
@@ -113,7 +162,7 @@ public class FishCardQueryServiceX {
     }
 
     private List<Service> ListServicesByCond(FishCardFilterParam fishCardFilterParam) {
-        if(null==fishCardFilterParam.getStudentId()){
+        if (null == fishCardFilterParam.getStudentId()) {
 
         }
         if (null != fishCardFilterParam.getOrderCode()) {
@@ -138,10 +187,10 @@ public class FishCardQueryServiceX {
         }
     }
 
-    public JsonResultModel listAllStatus(){
-        Map<Integer,String> statusMap= Maps.newHashMap();
-        for(FishCardStatusEnum fishCardStatusEnum:FishCardStatusEnum.values()){
-            statusMap.put(fishCardStatusEnum.getCode(),fishCardStatusEnum.getDesc());
+    public JsonResultModel listAllStatus() {
+        Map<Integer, String> statusMap = Maps.newHashMap();
+        for (FishCardStatusEnum fishCardStatusEnum : FishCardStatusEnum.values()) {
+            statusMap.put(fishCardStatusEnum.getCode(), fishCardStatusEnum.getDesc());
         }
         return JsonResultModel.newJsonResultModel(statusMap);
     }
