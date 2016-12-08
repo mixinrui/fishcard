@@ -43,29 +43,26 @@ public class InstantTeacherRequester {
     private RestTemplate restTemplate;
 
 
-    private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //学生发起请求以后,获取可用的教师列表
-    public Optional<List<Long>> getInstantTeacherIds(InstantClassCard instantClassCard){
-        InstantFetchTeacherParam instantFetchTeacherParam=new InstantFetchTeacherParam();
+    public Optional<List<Long>> getInstantTeacherIds(InstantClassCard instantClassCard) {
+        InstantFetchTeacherParam instantFetchTeacherParam = new InstantFetchTeacherParam();
         instantFetchTeacherParam.setDay(instantClassCard.getClassDate().getTime());
         instantFetchTeacherParam.setCourseType(instantClassCard.getCourseType());
         //TODO:这里暂时假数据,到时候会替换
-        InstantRecommandAlthom instantRecommandAlthom=new InstantRecommandAlthom(instantClassCard.getRequestTeacherTimes());
+        InstantRecommandAlthom instantRecommandAlthom = new InstantRecommandAlthom(instantClassCard.getRequestTeacherTimes());
         instantFetchTeacherParam.setCountStart(instantRecommandAlthom.getCountStart());
         instantFetchTeacherParam.setCountEnd(instantRecommandAlthom.getCountEnd());
-
-//        instantFetchTeacherParam.setCountStart(0);
-//        instantFetchTeacherParam.setCountEnd(50);
         instantFetchTeacherParam.setRoleId(instantClassCard.getRoleId());
         instantFetchTeacherParam.setSlotId(instantClassCard.getSlotId());
-        return this.parseFetchTeachers(this.getInstantTeachers(instantFetchTeacherParam));
+        return this.parseFetchTeachers(this.getInstantTeachers(instantFetchTeacherParam, instantClassCard));
     }
 
 
     //向师生运营发起获取教师请求
-    public InstantAssignTeacher assignGrabteacher(InstantClassCard instantClassCard, TeacherInstantRequestParam teacherInstantRequestParam){
-        InstantAssignTeacherParam instantAssignTeacherParam=new InstantAssignTeacherParam();
+    public InstantAssignTeacher assignGrabteacher(InstantClassCard instantClassCard, TeacherInstantRequestParam teacherInstantRequestParam) {
+        InstantAssignTeacherParam instantAssignTeacherParam = new InstantAssignTeacherParam();
         instantAssignTeacherParam.setDay(instantClassCard.getClassDate().getTime());
         instantAssignTeacherParam.setSlotId(instantClassCard.getSlotId());
         instantAssignTeacherParam.setStudentId(instantClassCard.getStudentId());
@@ -73,47 +70,48 @@ public class InstantTeacherRequester {
         return this.assignGrabteacher(instantAssignTeacherParam);
     }
 
-    private InstantAssignTeacher assignGrabteacher(InstantAssignTeacherParam instantAssignTeacherParam){
+    private InstantAssignTeacher assignGrabteacher(InstantAssignTeacherParam instantAssignTeacherParam) {
         String url = String.format("%s/immediately/course/schedule/online/grab", urlConf.getTeacher_service());
-        logger.debug(">>>>>>>>>>>@assignGrabteacher===>>>>教师抢课以后开始前往师生运营校验#url:{}#param:{}"
-                ,url, JacksonUtil.toJSon(instantAssignTeacherParam));
-        JsonResultModel jsonResultModel=null;
-        try{
+        logger.debug(">>>>>>>>>>>@assignGrabteacher===> IIIIIIIIIIIIIII 教师抢课以后开始前往师生运营校验#url:{}#param:{}"
+                , url, JacksonUtil.toJSon(instantAssignTeacherParam));
+        JsonResultModel jsonResultModel = null;
+        try {
             jsonResultModel = restTemplate.postForObject(url, instantAssignTeacherParam, JsonResultModel.class);
-            if(jsonResultModel.getReturnCode()!= HttpStatus.OK.value()){
-                throw new BusinessException("向师生运营发起请求获取失败"+jsonResultModel.getReturnMsg());
+            if (jsonResultModel.getReturnCode() != HttpStatus.OK.value()) {
+                throw new BusinessException("向师生运营发起请求获取失败,参数[{}]" + jsonResultModel.getReturnMsg());
             }
-        }
-        catch (Exception ex){
-            logger.error("!!!!!!!@IassignGrabteacher#前往师生运营校验失败失败,url{},参数[{}]",url,JacksonUtil.toJSon(instantAssignTeacherParam),ex);
+        } catch (Exception ex) {
+            logger.error("!!!!!!!@IassignGrabteacher# IIIIIIIIIIIIIII 前往师生运营校验失败失败,url{},参数[{}]", url, JacksonUtil.toJSon(instantAssignTeacherParam), ex);
             throw new BusinessException("教师校验失败");
         }
-        logger.debug("<<<<<<<<<<<<@assignGrabteacher===>>>>校验成功,返回值[{}]",jsonResultModel);
+        logger.debug("<<<<<<<<<<<<@assignGrabteacher===>>>>校验成功,参数[{}],返回值[{}]", JacksonUtil.toJSon(instantAssignTeacherParam),jsonResultModel);
         return jsonResultModel.getData(InstantAssignTeacher.class);
     }
 
-    private JsonResultModel getInstantTeachers(InstantFetchTeacherParam fetchTeacherParam) {
+    public JsonResultModel getInstantTeachers(InstantFetchTeacherParam fetchTeacherParam, InstantClassCard instantClassCard) {
         String url = String.format("%s/immediately/course/schedule/online/getRecommendImmediatelyTeachers", urlConf.getTeacher_service());
-        logger.debug(">>>>>>>>>>>@InstantTeacherRequester# IIIIIIIIIIIIIII 获取教师列表 getInstantTeachers#url:{}#param:{}"
-                ,url, JacksonUtil.toJSon(fetchTeacherParam));
-        JsonResultModel jsonResultModel=null;
-        try{
-            jsonResultModel = restTemplate.postForObject(url, fetchTeacherParam, JsonResultModel.class);
-        }
-        catch (Exception ex){
-            logger.error("!!!!!!!@InstantTeacherRequester#getInstantTeachers失败,url{},参数[{}]",url,JacksonUtil.toJSon(fetchTeacherParam),ex);
+        try {
+            logger.debug(">>>>>>>>>>>@InstantTeacherRequester# IIIIIIIIIIIIIII 获取教师列表 getInstantTeachers#url:{}#param:{},学生[{}],instantcard[{}]"
+                    , url, JacksonUtil.toJSon(fetchTeacherParam), instantClassCard.getStudentId(), instantClassCard.getId());
+            return this.getInstantTeachers(fetchTeacherParam, url);
+        } catch (Exception ex) {
+            logger.error("!!!!!!!@InstantTeacherRequester# IIIIIIIIIIIIIII getInstantTeachers失败,url{},参数[{}],学生[{}],instantcard[{}]"
+                    , url, JacksonUtil.toJSon(fetchTeacherParam), instantClassCard.getStudentId(), instantClassCard.getId(), ex);
             throw new BusinessException("获取实时推荐教师失败");
         }
-        return jsonResultModel;
     }
 
-    private Optional<List<Long>> parseFetchTeachers(JsonResultModel jsonResultModel){
-        List<Long> teachers= jsonResultModel.getListData(Long.class);
+    private JsonResultModel getInstantTeachers(InstantFetchTeacherParam fetchTeacherParam, String url) {
+        return restTemplate.postForObject(url, fetchTeacherParam, JsonResultModel.class);
+    }
+
+    private Optional<List<Long>> parseFetchTeachers(JsonResultModel jsonResultModel) {
+        List<Long> teachers = jsonResultModel.getListData(Long.class);
         return Optional.ofNullable(teachers);
     }
 
     @Data
-    class InstantFetchTeacherParam{
+    class InstantFetchTeacherParam {
         private Long day;
         private String courseType;
         private Long slotId;
@@ -123,7 +121,7 @@ public class InstantTeacherRequester {
     }
 
     @Data
-    class InstantAssignTeacherParam{
+    class InstantAssignTeacherParam {
         private Long day;
         private Long slotId;
         private Long teacherId;
@@ -131,7 +129,7 @@ public class InstantTeacherRequester {
     }
 
     @Data
-    public static class InstantAssignTeacher{
+    public static class InstantAssignTeacher {
         private Long teacherId;
         private String teacherName;
         private Boolean select;

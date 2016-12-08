@@ -120,6 +120,12 @@ spring:
     password: boxfish
     virtualHost: local
   profiles: local
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 10
+    nodeThree: 20
+    nodeFour: 6000
 
 server.servlet-path: /
 server.port: 8080
@@ -185,6 +191,12 @@ service:
     innerTeacherUrl: http://123.56.13.168:8099
   gateway:
     type: test
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 10
+    nodeThree: 20
+    nodeFour: 6000
 
 #===============================================================development环境:101.201.239.116 密码:Box12345678 ===============================================================
 ---
@@ -241,6 +253,12 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://101.201.239.116:9090
     innerTeacherUrl: http://101.201.237.252:8099
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 10
+    nodeThree: 20
+    nodeFour: 6000
 server.port: 8080
 
 #=============================================================development_new环境:60.205.178.235 密码:Boxfish123456 ===============================================================
@@ -301,6 +319,12 @@ service:
     innerTeacherUrl: http://101.201.237.252:8099
   gateway:
       type: development_new
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 10
+    nodeThree: 20
+    nodeFour: 6000
 server.port: 8080
 
 #===============================================================test环境:123.56.13.168 机器密码:Boxfish2016===============================================================
@@ -367,6 +391,12 @@ service:
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
     type: test
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 10
+    nodeThree: 20
+    nodeFour: 6000
 
 #server.port: 8080
 
@@ -435,6 +465,12 @@ service:
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: pretest
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 10
+    nodeThree: 20
+    nodeFour: 6000
 
 server.port: 8080
 #===============================================================demo环境=====101.201.66.32===============================================================
@@ -498,6 +534,12 @@ service:
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: demo
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 10
+    nodeThree: 20
+    nodeFour: 6000
 #===============================================================预生产环境===============================================================
 ---
 spring:
@@ -560,6 +602,12 @@ service:
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: preproduct
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 1440
+    nodeThree: 2880
+    nodeFour: 43200
 
 #===============================================================生产环境===============================================================
 #=============192.168.1.30===============192.168.1.29======================192.168.1.25===============================================#
@@ -629,6 +677,12 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.boxfish.cn//online/figure
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 1440
+    nodeThree: 2880
+    nodeFour: 43200
 #外教点评接口调用地址
 service:
   sdk:
@@ -708,3 +762,9 @@ service:
     scoreUrl: api.boxfish.cn
   gateway:
     type: product
+time:
+  task:
+    nodeOne: 0
+    nodeTwo: 1440
+    nodeThree: 2880
+    nodeFour: 43200
