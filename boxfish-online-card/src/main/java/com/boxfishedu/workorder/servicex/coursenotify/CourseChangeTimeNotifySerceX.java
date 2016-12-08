@@ -192,13 +192,14 @@ public class CourseChangeTimeNotifySerceX {
     public void pushStudentMessage(List<WorkOrder> myClass) {
         long studentId =myClass.get(0).getStudentId();
         logger.info("notiFyStudentChangeTime@pushStudentMessage,studentId=[{}]",studentId);
+        String jo = getAppNotices(myClass);
         String pushTitle = "";// WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
         Map map1 = Maps.newHashMap();
         map1.put("user_id", studentId);
-        map1.put("push_title", pushTitle);
+        map1.put("push_title", jo);
 
-        String jo = getAppNotices(myClass);
-        map1.put("data", jo);
+
+        //map1.put("data", jo);
         teacherStudentRequester.pushTeacherListOnlineMsg(map1);
     }
 
