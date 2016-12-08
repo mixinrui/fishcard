@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,10 +46,7 @@ public class WorkOrderService {
         List<WorkOrder> workOrders = workOrderJpaRepository.findNotFinishWorkOrder();
         workOrders.parallelStream()
                 .filter(workOrder -> !StringUtils.isEmpty(workOrder.getCourseId()))
-                .forEach(workOrder -> {
-                    handleWorkOrderAndCourseSchedule(workOrder);
-                    handleWorkOrderAndScheduleCourse(workOrder);
-                });
+                .forEach(this::handleDifferent);
     }
 
     public void handleScheduleCourseInfo() {
@@ -68,6 +67,16 @@ public class WorkOrderService {
     public void synchronousCourseInfoById(String courseId) {
         List<ScheduleCourseInfo> list = scheduleCourseInfoMorphiaRepository.findByCourseId(courseId);
         list.parallelStream().forEach( sc -> scheduleCourseInfoMorphiaRepository.updateCourseInfo(sc));
+    }
+
+    public void handleDifferent(WorkOrder workOrder) {
+        Map courseMap = new RestTemplate().getForObject(
+                String.format(url, workOrder.getCourseId()), Map.class);
+        workOrder.setCourseName((String) courseMap.get("courseName"));
+        workOrder.setCourseType((String) courseMap.get("type"));
+        workOrderJpaRepository.save(workOrder);
+        handleWorkOrderAndCourseSchedule(workOrder);
+        handleWorkOrderAndScheduleCourse(workOrder);
     }
 
     /**

@@ -173,6 +173,8 @@ public class CommentCard implements Serializable {
         newCommentCard.setAssignTeacherTime(now);
         newCommentCard.setTeacherId(teacherInfo.getTeacherId());
         newCommentCard.setTeacherName(teacherInfo.getTeacherName());
+        newCommentCard.setTeacherFirstName(teacherInfo.getFirstName());
+        newCommentCard.setTeacherLastName(teacherInfo.getLastName());
         newCommentCard.setUpdateTime(now);
         if(Objects.nonNull(this.previous_id)) {
             newCommentCard.setPrevious_id(this.previous_id);

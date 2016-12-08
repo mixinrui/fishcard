@@ -28,4 +28,11 @@ public class DataExportController {
         fishCardExcelServiceX.exportExcel(fishCardFilterParam,response,pageable);
         return JsonResultModel.newJsonResultModel();
     }
+
+    @RequestMapping(value = "/export/buke", method = RequestMethod.GET)
+    public JsonResultModel listFishBuke(HttpServletResponse response) {
+        fishCardExcelServiceX.exportExcelbuke(response);
+        return JsonResultModel.newJsonResultModel();
+    }
 }
+

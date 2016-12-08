@@ -53,7 +53,7 @@ public class OnlineAccountService {
 
     //如果redis出问题,直接查mongo
     public boolean isMember(Long studentId){
-        boolean result=false;
+        boolean result;
         //分流;mongo效率更低
         if(studentId%3==0){
             logger.debug("<<<@OnlineAccountService#isMember#user:[{}]########<<mongo>>>>",studentId);

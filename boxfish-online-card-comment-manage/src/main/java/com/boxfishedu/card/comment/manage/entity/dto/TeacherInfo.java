@@ -30,6 +30,10 @@ public class TeacherInfo {
 
     private String teacherName;
 
+    private String firstName;
+
+    private String lastName;
+
     private Boolean freezeStatus;
 
     public static class UnknowTeacherInfo extends TeacherInfo {

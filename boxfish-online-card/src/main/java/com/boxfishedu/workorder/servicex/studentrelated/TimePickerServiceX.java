@@ -278,6 +278,16 @@ public class TimePickerServiceX {
             });
         });
 
+//        courseScheduleList.forEach(courseSchedule -> {
+//            String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
+//            List<StudentCourseSchedule> studentCourseScheduleList = courseScheduleMap.get(date);
+//            if (studentCourseScheduleList == null) {
+//                studentCourseScheduleList = Lists.newArrayList();
+//                courseScheduleMap.put(date, studentCourseScheduleList);
+//            }
+//            studentCourseScheduleList.add(createStudentCourseSchedule(courseSchedule, locale));
+//        });
+
         List<Map<String, Object>> result = Lists.newArrayList();
         courseScheduleMap.forEach((key, val) -> {
             Map<String, Object> beanMap = Maps.newHashMap();

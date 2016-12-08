@@ -132,5 +132,11 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
                 "1",begin,end);
     }
 
+    public List<WorkOrder> findWorkOrdersTodyTomoAndNeed(){
+        Date begin = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),0),0);
+        Date end = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-1),1);
+        logger.info("::::::findWorkOrdersTodyTomoAndNeed::conditionDateFrom{[]}:::::To{[]}",DateUtil.Date2String(begin),DateUtil.Date2String(end));
+        return workOrderJpaRepository.findByIsFreezeAndStartTimeBetweenAndParentIdNotNull(0,begin,end);
+    }
 
 }
