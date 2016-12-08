@@ -89,7 +89,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
 
         boolean afterTomo =  afterTomoDate(workOrder);
         if(!afterTomo){
-            throw  new BusinessException("请提前48小时修改上课时间");
+            throw  new BusinessException("请提前48小时修改上课时间，有任何问题请电话联系客服～");
         }
 
         //首次鱼卡时间
