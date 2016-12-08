@@ -1,11 +1,10 @@
 package com.boxfishedu.workorder.service;
 
-import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.dao.mongo.TrialCourseMorphiaRepository;
-import com.boxfishedu.workorder.entity.mongo.OnlineAccountSet;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mongo.TrialCourse;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -15,11 +14,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateOperations;
-import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,7 +49,7 @@ public class ScheduleCourseInfoService {
 
     public void save(Iterable<ScheduleCourseInfo> scheduleCourseInfos) {
         logger.info("往mongo存入课程信息{}", JacksonUtil.toJSon(scheduleCourseInfos));
-        scheduleCourseInfoMorphiaRepository.save(scheduleCourseInfos);
+        scheduleCourseInfoMorphiaRepository.saveWithFsyncSafe(scheduleCourseInfos);
     }
 
     public Optional<ScheduleCourseInfo> getById(Long id) {
