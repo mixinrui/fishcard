@@ -101,7 +101,7 @@ public class InstantClassService {
         //处理学生跨时间片的请求,如果当前请求在29:55这时候下一个请求在30:01;则返回上一个请求卡的匹配情况
         Optional<InstantClassCard> latestInstantCardOptional = instantClassJpaRepository
                 .findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(getInstantRequestParam().getStudentId()
-                        , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(60)));
+                        , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusSeconds(70)));
         if (latestInstantCardOptional.isPresent()) {
             return matchResultWrapper(latestInstantCardOptional.get());
         }
