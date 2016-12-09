@@ -76,14 +76,17 @@ public class CommentTeacherAppServiceX {
         return commentCardTeacherAppService.findById(cardId);
     }
 
+    @Transactional
     public void markTeacherRead(TeacherReadMsgParam teacherReadMsgParam){
         CommentCard commentCard=this.findById(teacherReadMsgParam.getCommentCardId());
         if(null==commentCard){
             logger.error("不存在对应的点评卡,点评卡id[{}]",teacherReadMsgParam.getCommentCardId());
             throw new BusinessException("不存在对应的点评卡");
         }
-        commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
-        commentCardTeacherAppService.save(commentCard);
+//        commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
+//        commentCardTeacherAppService.save(commentCard);
+        logger.info("###markTeacherRead### 老师端标记点评卡已读");
+        commentCardJpaRepository.markTeacherRead(teacherReadMsgParam.getCommentCardId());
     }
 
     @Transactional
