@@ -21,7 +21,7 @@ public class BaseMorphiaRepository<T> {
     }
 
     public void saveWithFsyncSafe(Iterable<T> ts) {
-        datastore.save(ts, WriteConcern.JOURNALED);
+        datastore.save(ts, WriteConcern.FSYNC_SAFE);
     }
 
     public <T> WriteResult delete(T entity){
