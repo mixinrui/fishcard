@@ -236,6 +236,34 @@ public class TimePickerServiceX {
         StudentCourseSchedule studentCourseSchedule = new StudentCourseSchedule();
         studentCourseSchedule.setId(courseSchedule.getId());
         studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
+        studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());/** 显示需要修改时间的鱼卡信息 **/
+        studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
+        if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType())){
+            studentCourseSchedule.setTime(courseSchedule.getInstantStartTtime());
+        }
+        else {
+            studentCourseSchedule.setTime(timeSlots.getStartTime());
+        }
+        studentCourseSchedule.setWorkOrderId(courseSchedule.getWorkorderId());
+        studentCourseSchedule.setStatus(courseSchedule.getStatus());
+        studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
+        if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
+            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
+        }
+        return studentCourseSchedule;
+    }
+
+    private StudentCourseSchedule createStudentCourseSchedule(CourseSchedule courseSchedule, Locale locale,Date now) {
+        TimeSlots timeSlots = getTimeSlotById(courseSchedule.getTimeSlotId());
+        StudentCourseSchedule studentCourseSchedule = new StudentCourseSchedule();
+        studentCourseSchedule.setId(courseSchedule.getId());
+        studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
+
+        if(courseSchedule.getStartTime().after(now) && 1!=courseSchedule.getIsFreeze()){
+            studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());/** 显示需要修改时间的鱼卡信息 **/
+        }else {
+            studentCourseSchedule.setNeedChangeTime(null);
+        }
         studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
         if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType())){
             studentCourseSchedule.setTime(courseSchedule.getInstantStartTtime());
@@ -267,13 +295,14 @@ public class TimePickerServiceX {
 
     private List<Map<String, Object>> adapterCourseScheduleList(List<CourseSchedule> courseScheduleList, Locale locale) {
         Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
+        Date now = new Date();
         courseScheduleList.forEach(courseSchedule -> {
             String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
             courseScheduleMap.compute(date, (k, v) -> {
                 if(v == null) {
-                   v = Lists.newArrayList();
+                    v = Lists.newArrayList();
                 }
-                v.add(createStudentCourseSchedule(courseSchedule, locale));
+                v.add(createStudentCourseSchedule(courseSchedule, locale,now));
                 return v;
             });
         });
