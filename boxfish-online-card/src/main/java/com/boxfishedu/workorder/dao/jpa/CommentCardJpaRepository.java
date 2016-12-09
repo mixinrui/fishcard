@@ -137,4 +137,12 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Query("SELECT c FROM CommentCard c  where c.courseType is null or c.courseDifficulty is null")
     public List<CommentCard> initiateCourseTypeAndDifficulty();
 
+    /**
+     * 标记老师已读
+     * @param id
+     */
+    @Modifying
+    @Query("update CommentCard c set c.teacherReadFlag = 1  where c.id = ?1 ")
+    public void markTeacherRead(Long id);
+
 }
