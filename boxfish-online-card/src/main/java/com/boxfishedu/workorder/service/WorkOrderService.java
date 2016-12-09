@@ -500,4 +500,86 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         timePickerService.getRecommandTeachers(workOrder);
         return result;
     }
+
+
+    /**
+     * 获取需要提醒的学生数量
+     * @return
+     */
+    public Map<Long,List<WorkOrder>> getNotifyMessage(){
+        List<WorkOrder> needNotifyWorkOrders = jpa.findByNeedChangeTime(20);
+        if(CollectionUtils.isEmpty(needNotifyWorkOrders)){
+            return null;
+        }
+        Date now = new Date();
+
+        needNotifyWorkOrders = needNotifyWorkOrders.stream().filter( workOrder ->
+                (  1!=workOrder.getIsFreeze()
+                        &&
+                        now.before(workOrder.getStartTime())
+                )
+
+        ).collect(Collectors.toList());
+
+        Map<Long,List<WorkOrder>> notifyMaps = Maps.newHashMap();
+
+        for(WorkOrder workOrder:needNotifyWorkOrders){
+            List<WorkOrder> workOrders =  notifyMaps.get(workOrder.getStudentId());
+            if(CollectionUtils.isEmpty(workOrders)){
+                notifyMaps.put(workOrder.getStudentId(), Lists.newArrayList(workOrder));
+            }else {
+                workOrders.add(workOrder);
+                notifyMaps.put(workOrder.getStudentId(),workOrders);
+            }
+        }
+
+        for(Long key :notifyMaps.keySet()){
+            notifyMaps.put(key,getSortOrders(notifyMaps.get(key)));
+        }
+        logger.info("getNotifyMessage@notifyMapsSize=[{}]",notifyMaps.size());
+        return notifyMaps;
+    }
+
+    /**
+     * 获取某个学生的通知信息
+     * @param studentId
+     * @return
+     */
+    public List<WorkOrder> getNotifyMessageByStudentId(Long studentId){
+        if(null == studentId || studentId==0){
+            return null;
+        }
+        List<WorkOrder> needNotifyWorkOrders = jpa.findByNeedChangeTimeAndStudentId(20,studentId);
+
+        if(CollectionUtils.isEmpty(needNotifyWorkOrders)){
+            return null;
+        }
+        Date now = new Date();
+
+        needNotifyWorkOrders = needNotifyWorkOrders.stream().filter( workOrder ->
+                (  1!=workOrder.getIsFreeze()
+                        &&
+                        now.before(workOrder.getStartTime())
+                )
+
+        ).collect(Collectors.toList());
+        return getSortOrders(needNotifyWorkOrders);
+    }
+
+
+
+    private List<WorkOrder> getSortOrders(List<WorkOrder> workOrders){
+        workOrders.sort(new Comparator<WorkOrder>() {
+            @Override
+            public int compare(WorkOrder o1, WorkOrder o2) {
+                if(o1.getStartTime().after(o2.getStartTime())){
+                    return 0;
+                }
+                return -1;
+            }
+        });
+
+        return workOrders;
+    }
+
 }

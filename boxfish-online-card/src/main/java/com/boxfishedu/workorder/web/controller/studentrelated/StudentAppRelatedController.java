@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
+import com.boxfishedu.workorder.servicex.coursenotify.CourseChangeTimeNotifySerceX;
 import com.boxfishedu.workorder.servicex.home.HomePageServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
@@ -59,6 +60,9 @@ StudentAppRelatedController {
 
     @Autowired
     private HomePageServiceX homePageServiceX;
+
+    @Autowired
+    private CourseChangeTimeNotifySerceX courseChangeTimeNotifySerceX;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -212,6 +216,19 @@ StudentAppRelatedController {
         if(!(e instanceof RepeatedSubmissionException)) {
             checker.evictRepeatedSubmission(orderId);
         }
+    }
+
+
+    /**
+     * app课程列表 获取提醒内容(1 提示学生修改时间)
+     * @param studentId
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "{student_Id}/schedule/page/notice", method = RequestMethod.GET)
+    public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId) {
+        commonServeServiceX.checkToken(studentId, userId);
+        return courseChangeTimeNotifySerceX.getNotifyByStudentId(studentId);
     }
 
 }

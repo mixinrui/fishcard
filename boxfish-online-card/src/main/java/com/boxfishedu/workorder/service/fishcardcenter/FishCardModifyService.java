@@ -158,7 +158,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         if(checkTimeflag) {
             boolean afterTomo = afterTomoDate(workOrder);
             if (!afterTomo) {
-                throw new BusinessException("请提前48小时修改上课时间");
+                throw new BusinessException("请提前48小时修改上课时间，有任何问题请电话联系客服～");
             }
         }
 
@@ -198,6 +198,14 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
                 courseSchedule.setStatus( FishCardStatusEnum.COURSE_ASSIGNED.getCode());
             }
 
+            // 如果设置提醒 ,删除提醒操作
+            if(null!=workOrder.getNeedChangeTime()){
+                workOrder.setNeedChangeTime(null);
+            }
+
+            if(null!=courseSchedule.getNeedChangeTime()){
+                courseSchedule.setNeedChangeTime(null);
+            }
 
             workOrder.setTeacherId(0L);
             workOrder.setTeacherName("");
