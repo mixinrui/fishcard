@@ -72,13 +72,15 @@ public class FishCardQueryServiceX {
 
         FishCardGroupsInfo[] fishCardGroupsInfos = teacherStudentRequester.getFishcardMessage(fishcards);
 
+        if(null ==fishCardGroupsInfos|| fishCardGroupsInfos.length<1)
+            return;
 
-        List attributeList = Lists.newArrayList();// 从小码获取数据
 
         ((List<WorkOrder>) page.getContent()).stream().forEach(workOrder -> {
             for (FishCardGroupsInfo fishCardGroupsInfo : fishCardGroupsInfos) {
                 if (fishCardGroupsInfo.getWorkOrderId().equals(workOrder.getId())) {
                     workOrder.setGroupId(fishCardGroupsInfo.getGroupId());
+                    workOrder.setChatRoomId(fishCardGroupsInfo.getChatRoomId());
                     if (null == fishCardGroupsInfo.getMemberAccount() || fishCardGroupsInfo.getMemberAccount().length != 2) {
                         workOrder.setNormal(false);
                     } else {

@@ -8,9 +8,11 @@ import lombok.Data;
 @Data
 public class FishCardGroupsInfo {
 
-    private String groupId;  //房间号
+    private String groupId;  //群主Id
 
     private Long workOrderId;// 鱼卡id
+
+    private Integer chatRoomId;//房间号
 
     private String [] memberAccount;//学生id 老师id
 
