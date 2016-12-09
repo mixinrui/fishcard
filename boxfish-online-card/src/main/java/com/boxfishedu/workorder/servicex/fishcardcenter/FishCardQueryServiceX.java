@@ -54,7 +54,12 @@ public class FishCardQueryServiceX {
         List<WorkOrder> workOrderList = fishCardQueryService.filterFishCards(fishCardFilterParam, pageable);
         Long count = fishCardQueryService.filterFishCardsCount(fishCardFilterParam);
         Page<WorkOrder> page = new PageImpl(workOrderList, pageable, count);
-        trimPage(page);
+        try {
+            trimPage(page);
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("listFishCardsByUnlimitedUserCond");
+        }
         return JsonResultModel.newJsonResultModel(page);
     }
 
