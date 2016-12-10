@@ -67,6 +67,7 @@ public class FishCardQueryController {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam,pageable);
     }
 
+
     /**
      * 用户id不做限制的查询 鱼卡管理(中教)
      */
@@ -169,5 +170,16 @@ public class FishCardQueryController {
     @RequestMapping(value = "/{studentId}/studentlist",method = RequestMethod.GET)
     public JsonResultModel getFishCardListByStudentId(@PathVariable("studentId") Long studentId){
         return JsonResultModel.newJsonResultModel(workOrderService.findByStudentId(studentId));
+    }
+
+    /**
+     * 获取群组关系
+     * @param fishCardFilterParam
+     * @param pageable
+     * @return
+     */
+    @RequestMapping(value = "/getGroupInfo", method = RequestMethod.GET)
+    public JsonResultModel getGroupInfo(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return JsonResultModel.newJsonResultModel(fishCardQueryServiceX.getGroupInfo(fishCardFilterParam.getId()));
     }
 }
