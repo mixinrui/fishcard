@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.web.view.base.GroupInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.SkuTypeEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
@@ -54,12 +55,16 @@ public class FishCardQueryServiceX {
         List<WorkOrder> workOrderList = fishCardQueryService.filterFishCards(fishCardFilterParam, pageable);
         Long count = fishCardQueryService.filterFishCardsCount(fishCardFilterParam);
         Page<WorkOrder> page = new PageImpl(workOrderList, pageable, count);
-        try {
-            trimPage(page);
-        }catch (Exception e){
-            e.printStackTrace();
-            logger.info("listFishCardsByUnlimitedUserCond");
+
+        if(null==fishCardFilterParam.getShowGroup() || !fishCardFilterParam.getShowGroup()){
+            try {
+                trimPage(page);
+            }catch (Exception e){
+                e.printStackTrace();
+                logger.info("listFishCardsByUnlimitedUserCond");
+            }
         }
+
         return JsonResultModel.newJsonResultModel(page);
     }
 
@@ -83,34 +88,7 @@ public class FishCardQueryServiceX {
 
 
         ((List<WorkOrder>) page.getContent()).stream().forEach(workOrder -> {
-            for (FishCardGroupsInfo fishCardGroupsInfo : fishCardGroupsInfos) {
-                if (fishCardGroupsInfo.getWorkOrderId().equals(workOrder.getId())) {
-                    workOrder.setGroupId(fishCardGroupsInfo.getGroupId());
-                    workOrder.setChatRoomId(fishCardGroupsInfo.getChatRoomId());
-                    if (null == fishCardGroupsInfo.getMemberAccount() || fishCardGroupsInfo.getMemberAccount().length != 2) {
-                        workOrder.setNormal(false);
-                    } else {
-                        if (fishCardGroupsInfo.getMemberAccount()[0].equals(EncoderByMd5(workOrder.getStudentId().toString()))){
-                            if(fishCardGroupsInfo.getMemberAccount()[1].equals(EncoderByMd5(workOrder.getTeacherId()  .toString()))){
-                                workOrder.setNormal(true);
-                            }else {
-                                workOrder.setNormal(false);
-                            }
-                        }else if(fishCardGroupsInfo.getMemberAccount()[1].equals(EncoderByMd5(workOrder.getStudentId().toString()))){
-                            if(fishCardGroupsInfo.getMemberAccount()[0].equals(EncoderByMd5(workOrder.getTeacherId()  .toString()))){
-                                workOrder.setNormal(true);
-                            }else {
-                                workOrder.setNormal(false);
-                            }
-                        }else {
-                            workOrder.setNormal(false);
-                        }
-                    }
-
-                    break;
-                }
-            }
-
+            getGroupStatus(fishCardGroupsInfos,workOrder);
         });
 
 
@@ -124,6 +102,64 @@ public class FishCardQueryServiceX {
             e.printStackTrace();
         }
         return "";
+    }
+
+
+    /**
+     * 根据鱼卡获取群组信息
+     * @param workOrderId
+     * @return
+     */
+    public GroupInfo  getGroupInfo(Long workOrderId){
+        WorkOrder workOrder = workOrderService.findOne(workOrderId);
+        FishCardGroupsInfo[] fishCardGroupsInfos = teacherStudentRequester.getFishcardMessage(Lists.newArrayList(workOrderId));
+        GroupInfo groupInfo = new GroupInfo();
+        groupInfo.setWorkOrderId(workOrderId);
+
+        String [] infoMissIn = {  EncoderByMd5(workOrder.getStudentId().toString()) ,  EncoderByMd5( workOrder.getTeacherId().toString())   };
+
+        groupInfo.setInfoMissIn(infoMissIn);
+        if(null!=fishCardGroupsInfos && fishCardGroupsInfos.length==1){
+             groupInfo.setInfoMissOut(fishCardGroupsInfos[0].getMemberAccount());
+             groupInfo.setGroupId( fishCardGroupsInfos[0].getGroupId() );
+             groupInfo.setChatRoomId(fishCardGroupsInfos[0].getChatRoomId());
+             getGroupStatus(fishCardGroupsInfos,workOrder);
+        }
+
+        return groupInfo;
+    }
+
+
+
+    private void getGroupStatus( FishCardGroupsInfo   [] fishCardGroupsInfos , WorkOrder workOrder){
+        for (FishCardGroupsInfo fishCardGroupsInfo : fishCardGroupsInfos) {
+            if (fishCardGroupsInfo.getWorkOrderId().equals(workOrder.getId())) {
+                workOrder.setGroupId(fishCardGroupsInfo.getGroupId());
+                workOrder.setChatRoomId(fishCardGroupsInfo.getChatRoomId());
+                if (null == fishCardGroupsInfo.getMemberAccount() || fishCardGroupsInfo.getMemberAccount().length != 2) {
+                    workOrder.setNormal(false);
+                } else {
+                    if (fishCardGroupsInfo.getMemberAccount()[0].equals(EncoderByMd5(workOrder.getStudentId().toString()))){
+                        if(fishCardGroupsInfo.getMemberAccount()[1].equals(EncoderByMd5(workOrder.getTeacherId()  .toString()))){
+                            workOrder.setNormal(true);
+                        }else {
+                            workOrder.setNormal(false);
+                        }
+                    }else if(fishCardGroupsInfo.getMemberAccount()[1].equals(EncoderByMd5(workOrder.getStudentId().toString()))){
+                        if(fishCardGroupsInfo.getMemberAccount()[0].equals(EncoderByMd5(workOrder.getTeacherId()  .toString()))){
+                            workOrder.setNormal(true);
+                        }else {
+                            workOrder.setNormal(false);
+                        }
+                    }else {
+                        workOrder.setNormal(false);
+                    }
+                }
+
+                break;
+            }
+        }
+
     }
 
 
