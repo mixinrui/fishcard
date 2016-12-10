@@ -145,6 +145,7 @@ public class MakeUpLessionServiceX {
         newWorkOrder.setActualStartTime(null);
         newWorkOrder.setActualEndTime(null);
         newWorkOrder.setIsCourseOver((short) 0);
+        newWorkOrder.setClassType(null);
         //已经安排补课
         newWorkOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         if (null == oldWorkOrder.getMakeUpSeq() || 0 == oldWorkOrder.getMakeUpSeq()) {
@@ -170,6 +171,9 @@ public class MakeUpLessionServiceX {
         newCourseSchedule.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         newCourseSchedule.setCreateTime(new Date());
         newCourseSchedule.setUpdateTime(null);
+        newCourseSchedule.setClassType(null);
+        newCourseSchedule.setInstantStartTtime(null);
+        newCourseSchedule.setInstantEndTtime(null);
         return newCourseSchedule;
     }
 
