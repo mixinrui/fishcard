@@ -56,6 +56,8 @@ public class ImmutableDbValidator implements IGrabInstantClassValidator {
         if (instantClassCard.getEntrance() == InstantRequestParam.SelectModeEnum.OTHER_ENTERANCE.getCode()) {
             List<Service> services = serveService.findByOrderId(instantClassCard.getOrderId());
             if (CollectionUtils.isEmpty(services) || services.get(0).getCoursesSelected() == 1) {
+                logger.error("课程已经选过课,不能再重复消费,学生[{}],card[{}],教师[{}]"
+                        , instantClassCard.getStudentId(), instantClassCard.getId(), instantClassCard.getTeacherId());
                 return TeacherInstantClassStatus.FAIL_TO_MATCH;
             }
         }
