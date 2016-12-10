@@ -132,6 +132,11 @@ public class FishCardQueryServiceX {
 
 
     private void getGroupStatus( FishCardGroupsInfo   [] fishCardGroupsInfos , WorkOrder workOrder){
+
+        if(workOrder.getStudentId()==0 || workOrder.getTeacherId() ==0 || workOrder.getStudentId()==null || workOrder.getTeacherId() ==null ){
+            workOrder.setNormal(false);
+            return;
+        }
         for (FishCardGroupsInfo fishCardGroupsInfo : fishCardGroupsInfos) {
             if (fishCardGroupsInfo.getWorkOrderId().equals(workOrder.getId())) {
                 workOrder.setGroupId(fishCardGroupsInfo.getGroupId());
@@ -140,7 +145,7 @@ public class FishCardQueryServiceX {
                     workOrder.setNormal(false);
                 } else {
                     if (fishCardGroupsInfo.getMemberAccount()[0].equals(EncoderByMd5(workOrder.getStudentId().toString()))){
-                        if(fishCardGroupsInfo.getMemberAccount()[1].equals(EncoderByMd5(workOrder.getTeacherId()  .toString()))){
+                        if(fishCardGroupsInfo.getMemberAccount()[1].equals(EncoderByMd5(workOrder.getTeacherId().toString()))){
                             workOrder.setNormal(true);
                         }else {
                             workOrder.setNormal(false);
