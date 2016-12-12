@@ -53,8 +53,8 @@ public class InstantTeacherRequester {
         //TODO:这里暂时假数据,到时候会替换
         InstantRecommandAlthom instantRecommandAlthom = new InstantRecommandAlthom(instantClassCard.getRequestTeacherTimes());
 
-        logger.debug(">>>>>>>>>>>@InstantTeacherRequester===> IIIIIIIIIIIIIII 向师生运营发起请求的序号:[{}],card[{}],学生[{}]"
-                ,instantClassCard.getRequestTeacherTimes(),instantClassCard.getId(),instantClassCard.getStudentId());
+        logger.debug(">>>>>>>>>>>@InstantTeacherRequester===> IIIIIIIIIIIIIII 向师生运营发起请求的序号:[{}],card[{}],学生[{}],结果:[{}]"
+                ,instantClassCard.getRequestTeacherTimes(),instantClassCard.getId(),instantClassCard.getStudentId(),JacksonUtil.toJSon(instantRecommandAlthom));
 
         instantFetchTeacherParam.setCountStart(instantRecommandAlthom.getCountStart());
         instantFetchTeacherParam.setCountEnd(instantRecommandAlthom.getCountEnd());
