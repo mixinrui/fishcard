@@ -79,7 +79,10 @@ public class InstantClassService {
                 && instantClassCardOptional.get().getStatus() == InstantClassRequestStatus.NO_MATCH.getCode()) {
             instantClassJpaRepository.updateReadFlagAnsStatus(instantClassCardOptional.get().getId()
                     , 0, InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
-            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCardOptional.get());
+
+            instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCardOptional.get().getId(), new Date());
+            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCardOptional.get(),true);
+
             return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH, teacherPhotoRequester);
         } else {
             //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
@@ -108,7 +111,6 @@ public class InstantClassService {
                     return matchResultWrapper(latestInstantCardOptional30Minutes.get());
                 }
             }
-
         }
         return dealFirstRequest(timeSlotsOptional);
     }
@@ -126,7 +128,11 @@ public class InstantClassService {
         logger.debug("@InstantClassService#user{}时间片{}在instant_class_card表中无数据"
                 , getInstantRequestParam().getStudentId(), timeSlotsOptional.get().getSlotId());
         InstantClassCard instantClassCard = persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
-        instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard);
+
+        instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId(),new Date());
+
+        instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard,true);
+
         //TODO:发起教师请求，同时将匹配的结果返回给App
         return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH, teacherPhotoRequester);
     }

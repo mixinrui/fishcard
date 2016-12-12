@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +57,14 @@ public class InstantClassTeacherService {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    @Transactional
-    public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
-        instantClassCard = instantClassJpaRepository.findForUpdate(instantClassCard.getId());
-        instantClassCard.setRequestTeacherTimes(instantClassCard.getRequestTeacherTimes()+1);
-        instantClassJpaRepository.save(instantClassCard);
-        this.fetchedTeachersAsync(instantClassCard);
+    public void dealFetchedTeachersAsync(InstantClassCard instantClassCard,boolean queryFlag){
+        if(BooleanUtils.isTrue(queryFlag)){
+            instantClassCard=instantClassJpaRepository.findOne(instantClassCard.getId());
+        }
+        this.dealFetchedTeachersAsync(instantClassCard);
     }
 
-    public void fetchedTeachersAsync(InstantClassCard instantClassCard){
+    public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
         threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassCard);}));
     }
 

@@ -51,6 +51,10 @@ public class InstantClassTimerDealer {
             logger.debug("@timerGetInstantTeachers#matched# IIIIIIIIIIIIIII 已被标记为匹配,card#[{}],返回", JacksonUtil.toJSon(instantClassCard));
             return;
         }
-        instantClassTeacherService.dealFetchedTeachersAsync(dbInstantCard);
+
+        dbInstantCard.setRequestTeacherTimes(dbInstantCard.getRequestTeacherTimes()+1);
+        instantClassJpaRepository.save(dbInstantCard);
+
+        instantClassTeacherService.dealFetchedTeachersAsync(dbInstantCard,false);
     }
 }
