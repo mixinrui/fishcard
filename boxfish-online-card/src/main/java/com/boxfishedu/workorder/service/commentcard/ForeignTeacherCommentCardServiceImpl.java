@@ -70,6 +70,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Autowired
     SyncCommentCard2SystemService syncCommentCard2SystemService;
 
+    @Autowired
+    CommentCardTimeConf commentCardTimeConf;
+
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
     @Override
@@ -281,7 +284,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 //                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
 //        }
         //2016-12-08 修改为从配置文件获取过滤时间
-        CommentCardTimeConf commentCardTimeConf = new CommentCardTimeConf();
+        System.out.println("nodeOne:" + commentCardTimeConf.getNodeOne());
+        System.out.println("nodeTwo:" + commentCardTimeConf.getNodeTwo());
+        System.out.println("nodeThree:" + commentCardTimeConf.getNodeThree());
+        System.out.println("nodeFour:" + commentCardTimeConf.getNodeFour());
         List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus(
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeThree()))),
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeTwo()))),
@@ -377,7 +383,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 //                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
 //        }
         //2016-12-08 修改为从配置文件获取过滤时间
-        CommentCardTimeConf commentCardTimeConf = new CommentCardTimeConf();
+        System.out.println("nodeOne2:" + commentCardTimeConf.getNodeOne());
+        System.out.println("nodeTwo2:" + commentCardTimeConf.getNodeTwo());
+        System.out.println("nodeThree2:" + commentCardTimeConf.getNodeThree());
+        System.out.println("nodeFour2:" + commentCardTimeConf.getNodeFour());
         List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus2(
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeFour()))),
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeThree()))),
