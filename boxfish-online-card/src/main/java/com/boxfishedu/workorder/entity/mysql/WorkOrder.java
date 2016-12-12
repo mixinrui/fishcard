@@ -226,6 +226,9 @@ public class WorkOrder implements Cloneable{
 
     private Integer chatRoomId;//房间号
 
+    @Transient
+    private boolean haveTeacherRequested = true; //是否有教师操作
+
     @Override
     public String toString() {
         return "WorkOrder{" +
