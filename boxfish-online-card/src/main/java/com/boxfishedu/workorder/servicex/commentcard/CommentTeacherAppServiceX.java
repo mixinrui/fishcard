@@ -168,6 +168,7 @@ public class CommentTeacherAppServiceX {
     }
 
     public void setCommentHomePage(CommentCard commentCard) {
+        logger.info("@setCommentHomePage1 设置外教点评首页" + commentCard);
         AccountCourseBean accountCourseBean = new AccountCourseBean();
         AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
         cardCourseInfo.setCourseId(commentCard.getCourseId());
@@ -188,7 +189,7 @@ public class CommentTeacherAppServiceX {
         cardCourseInfo.setStatus(commentCard.getStatus());
         accountCourseBean.setLeftAmount(serveService.getForeignCommentServiceCount(commentCard.getStudentId()).get("amount"));
         accountCourseBean.setCourseInfo(cardCourseInfo);
-        logger.info("@setCommentHomePage 设置外教点评首页信息...");
+        logger.info("@setCommentHomePage2 设置外教点评首页");
         accountCardInfoService.saveOrUpdate(commentCard.getStudentId(),accountCourseBean, AccountCourseEnum.CRITIQUE);
     }
 
