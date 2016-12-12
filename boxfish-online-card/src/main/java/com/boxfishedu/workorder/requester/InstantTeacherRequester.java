@@ -52,6 +52,10 @@ public class InstantTeacherRequester {
         instantFetchTeacherParam.setCourseType(instantClassCard.getCourseType());
         //TODO:这里暂时假数据,到时候会替换
         InstantRecommandAlthom instantRecommandAlthom = new InstantRecommandAlthom(instantClassCard.getRequestTeacherTimes());
+
+        logger.debug(">>>>>>>>>>>@InstantTeacherRequester===> IIIIIIIIIIIIIII 向师生运营发起请求的序号:[{}],card[{}],学生[{}]"
+                ,instantClassCard.getRequestTeacherTimes(),instantClassCard.getId(),instantClassCard.getStudentId());
+
         instantFetchTeacherParam.setCountStart(instantRecommandAlthom.getCountStart());
         instantFetchTeacherParam.setCountEnd(instantRecommandAlthom.getCountEnd());
         instantFetchTeacherParam.setRoleId(instantClassCard.getRoleId());

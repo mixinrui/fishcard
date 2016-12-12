@@ -43,12 +43,6 @@ public class InstantClassService {
     private TeacherStudentRequester teacherStudentRequester;
 
     @Autowired
-    private WorkOrderJpaRepository workOrderJpaRepository;
-
-    @Autowired
-    private DataCollectorService dataCollectorService;
-
-    @Autowired
     private InstantClassJpaRepository instantClassJpaRepository;
 
     @Autowired
@@ -59,9 +53,6 @@ public class InstantClassService {
 
     @Autowired
     private TeacherPhotoRequester teacherPhotoRequester;
-
-    @Autowired
-    private LogPoolManager logPoolManager;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -113,8 +104,7 @@ public class InstantClassService {
             if (latestInstantCardOptional30Minutes.get().getStatus() == InstantClassRequestStatus.MATCHED.getCode()) {
                 if (getInstantRequestParam().getSelectMode() != latestInstantCardOptional30Minutes.get().getEntrance()) {
                     throw new BusinessException("您当前还有未完成的课程，请稍后再试");
-                }
-                else {
+                } else {
                     return matchResultWrapper(latestInstantCardOptional30Minutes.get());
                 }
             }

@@ -1,8 +1,11 @@
 package com.boxfishedu.workorder.service.instantclass;
 
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.google.common.collect.Maps;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by hucl on 16/11/8.
@@ -15,6 +18,8 @@ public class InstantRecommandAlthom {
     private static Integer CYCLE_COUNT=0;
 
     public static java.util.Map<Integer,Integer> indexMap= Maps.newHashMap();
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     static{
         indexMap.put(1,2);
