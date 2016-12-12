@@ -461,7 +461,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 //                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
 //        }
         //2016-12-08 修改为从配置文件获取过滤时间
-        CommentCardTimeConf commentCardTimeConf = new CommentCardTimeConf();
+        System.out.println("nodeOne3:" + commentCardTimeConf.getNodeOne());
+        System.out.println("nodeTwo3:" + commentCardTimeConf.getNodeTwo());
+        System.out.println("nodeThree3:" + commentCardTimeConf.getNodeThree());
+        System.out.println("nodeFour3:" + commentCardTimeConf.getNodeFour());
         List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus2(
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeFour()))),
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeOne()))),
