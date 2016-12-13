@@ -102,11 +102,11 @@ public class CommentCard {
     @Column(name = "question_name", nullable = true, length = 1024)
     private String questionName;
 
-    @Column(name = "question_code", nullable = true, length = 45)
-    private String questionCode;
-
-    @Column(name = "question_type", nullable = true, columnDefinition = "1")
-    private Integer questionType;
+//    @Column(name = "question_code", nullable = true, length = 45)
+//    private String questionCode;
+//
+//    @Column(name = "question_type", nullable = true, columnDefinition = "1")
+//    private Integer questionType;
 
     @Column(name = "cover", nullable = true, length = 50)
     private String cover;
@@ -152,8 +152,8 @@ public class CommentCard {
     public static CommentCard getCommentCard(CommentCardForm commentCardForm){
         CommentCard commentCard = new CommentCard();
         commentCard.setQuestionName(commentCardForm.getQuestionName());
-        commentCard.setQuestionCode(commentCardForm.getQuestionCode());
-        commentCard.setQuestionType(commentCardForm.getQuestionType());
+//        commentCard.setQuestionCode(commentCardForm.getQuestionCode());
+//        commentCard.setQuestionType(commentCardForm.getQuestionType());
         commentCard.setCourseId(commentCardForm.getCourseId());
         commentCard.setCourseName(commentCardForm.getCourseName());
         commentCard.setCover(commentCardForm.getCover());
@@ -198,8 +198,8 @@ public class CommentCard {
         temp.setCourseType(this.courseType);
         temp.setCourseDifficulty(this.courseDifficulty);
         temp.setQuestionName(questionName);
-        temp.setQuestionCode(questionCode);
-        temp.setQuestionType(questionType);
+//        temp.setQuestionCode(questionCode);
+//        temp.setQuestionType(questionType);
         temp.setCover(cover);
         temp.setService(service);
         temp.setOrderId(orderId);

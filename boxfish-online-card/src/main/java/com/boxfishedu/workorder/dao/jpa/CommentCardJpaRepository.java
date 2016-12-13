@@ -153,4 +153,16 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Query("update CommentCard c set c.studentReadFlag = 1  where c.id = ?1 ")
     public void markStudentRead(Long id);
 
+    /**
+     * 获取所有课程id
+     */
+    @Query("select distinct(c.courseId) from CommentCard c where c.status != 500")
+    public List<String> getComCourseIdList();
+
+    /**
+     * 修改课程难度和类型
+     */
+    @Modifying
+    @Query("update CommentCard c set c.courseType = ?1, c.courseDifficulty = ?2  where c.courseId = ?3 ")
+    public void updateCourseTypeAndDifficulty(String type, String difficulty,String courseId);
 }
