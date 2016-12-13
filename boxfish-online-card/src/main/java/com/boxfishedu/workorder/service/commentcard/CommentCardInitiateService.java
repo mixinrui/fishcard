@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -47,5 +48,29 @@ public class CommentCardInitiateService {
         }
         logger.info("###initiateCourseTypeAndDifficutlty3### 初始化外教点评中的课程难度和类型,本次初始化个数为:"+ commentCardList.size() + ", 其中" + count + "个没有课程信息。");
         return commentCardList.size();
+    }
+
+    /**
+     * 定时更新课程难度和类型
+     */
+    @Transactional
+    public void timeToUpdateTypeAndDifficulty(){
+        List<String> courseId = commentCardJpaRepository.getComCourseIdList();
+        Map courseMap;
+        int count = 0;
+        for (String courseIdStr:courseId){
+            logger.info("###timeToUpdateTypeAndDifficulty## 修改课程id为{}的相关信息",courseIdStr);
+            try {
+                courseMap = commentCardSDK.initiateTypeAndDifficulty(courseIdStr);
+                if (Objects.nonNull(courseMap)){
+                    commentCardJpaRepository.updateCourseTypeAndDifficulty(courseMap.get("type") == null?"":courseMap.get("type").toString(),
+                            courseMap.get("difficulty") == null?"":courseMap.get("difficulty").toString(),courseIdStr);
+                }
+            }catch (NotFoundException notFound){
+                logger.info("###timeToUpdateTypeAndDifficulty2### 找不到对应课程信息 课程id为{}",courseIdStr);
+                count += 1;
+            }
+        }
+        logger.info("###timeToUpdateTypeAndDifficulty3### 更新课程难度和类型,本次更新个数为:"+ courseId.size() + ", 其中" + count + "个没有课程信息。");
     }
 }
