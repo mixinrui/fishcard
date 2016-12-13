@@ -124,6 +124,7 @@ public class FishCardQueryServiceX {
              groupInfo.setGroupId( fishCardGroupsInfos[0].getGroupId() );
              groupInfo.setChatRoomId(fishCardGroupsInfos[0].getChatRoomId());
              getGroupStatus(fishCardGroupsInfos,workOrder);
+             groupInfo.setInfoMissIn(infoMissIn);
              groupInfo.setNormal(workOrder.isNormal());
         }
         return groupInfo;
