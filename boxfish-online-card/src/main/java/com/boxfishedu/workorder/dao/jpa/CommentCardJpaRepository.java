@@ -145,4 +145,12 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Query("update CommentCard c set c.teacherReadFlag = 1  where c.id = ?1 ")
     public void markTeacherRead(Long id);
 
+    /**
+     * 标记学生已读
+     * @param id
+     */
+    @Modifying
+    @Query("update CommentCard c set c.studentReadFlag = 1  where c.id = ?1 ")
+    public void markStudentRead(Long id);
+
 }
