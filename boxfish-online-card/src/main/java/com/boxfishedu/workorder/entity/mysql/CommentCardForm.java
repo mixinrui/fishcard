@@ -10,6 +10,8 @@ public class CommentCardForm {
     private Long id;
     private Long studentId;
     private String questionName;
+    private String questionCode;
+    private Integer questionType;
     private String courseId;
     private String courseName;
     private String courseType;

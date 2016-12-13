@@ -236,7 +236,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }
         if(commentCard.getStudentReadFlag() == CommentCardStatus.STUDENT_UNREAD.getCode()){
             commentCard.setStudentReadFlag(CommentCardStatus.STUDENT_READ.getCode());
-            commentCardJpaRepository.save(commentCard);
+//            commentCardJpaRepository.save(commentCard);
+            commentCardJpaRepository.markStudentRead(commentCard.getId());
         }
         CommentCard homeCommentCard = commentCardJpaRepository.getHomePageCommentCard(userId);
         Optional<com.boxfishedu.workorder.entity.mysql.Service> optional =
