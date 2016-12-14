@@ -59,7 +59,7 @@ public class InstantClassTeacherService {
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard,boolean queryFlag){
         if(BooleanUtils.isTrue(queryFlag)){
-            instantClassCard=instantClassJpaRepository.findOne(instantClassCard.getId());
+            instantClassCard=instantClassJpaRepository.findById(instantClassCard.getId());
         }
         this.dealFetchedTeachersAsync(instantClassCard);
     }

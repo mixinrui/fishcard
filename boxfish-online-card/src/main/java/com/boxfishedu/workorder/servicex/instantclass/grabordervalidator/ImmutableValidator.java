@@ -44,17 +44,17 @@ public class ImmutableValidator implements IGrabInstantClassValidator {
         TeacherInstantRequestParam teacherInstantRequestParam = ThreadLocalUtil.getTeacherInstantParam();
         String matchedResult = opsValue.get(GrabInstatntClassKeyGenerator.matchedKey(teacherInstantRequestParam.getCardId()));
         if (!StringUtils.isEmpty(matchedResult)) {
-            logger.debug("teacherInstantClass#fail#参数[{}]进行抢课[{}],但是已经被教师[{}]抢走;退出抢单......"
+            logger.debug("/(ㄒoㄒ)/~~teacherInstantClass#fail#参数[{}]进行抢课[{}],但是已经被教师[{}]抢走;退出抢单......"
                     , JacksonUtil.toJSon(teacherInstantRequestParam), matchedResult);
             return TeacherInstantClassStatus.FAIL_TO_MATCH;
         }
         //如果失败了
         if (!opsValue.setIfAbsent(key, teacherInstantRequestParam.getTeacherId().toString())) {
-            logger.debug("teacherInstantClass#fail#参数[{}],已经有教师[{}]正在抢单,退出抢单...."
+            logger.debug("/(ㄒoㄒ)/~~teacherInstantClass#fail#参数[{}],已经有教师[{}]正在抢单,退出抢单...."
                     , JacksonUtil.toJSon(teacherInstantRequestParam), opsValue.get(key));
             return TeacherInstantClassStatus.FAIL_TO_MATCH;
         } else {
-            logger.debug("teacherInstantClass#enter#参数[{}]正在进入抢单>>>>"
+            logger.debug(":-D:-D:-D teacherInstantClass#enter#参数[{}]正在进入抢单>>>>"
                     , JacksonUtil.toJSon(teacherInstantRequestParam));
             redisTemplate.expire(key, 1, TimeUnit.HOURS);
             return TeacherInstantClassStatus.UNKNOWN;

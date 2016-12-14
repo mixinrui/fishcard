@@ -84,7 +84,7 @@ public class TeacherInstantClassServiceX {
         putParameterIntoThreadLocal(teacherInstantRequestParam);
         //校验是否需要走抢单的流程
         TeacherInstantClassStatus validateResult = grabInstantClassValidators.preValidate();
-        if (!validateResult.toString().equals(TeacherInstantClassStatus.UNKNOWN.toString())) {
+        if (validateResult.getCode()!=TeacherInstantClassStatus.UNKNOWN.getCode()) {
             JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(validateResult));
             logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII grabresult ,校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
