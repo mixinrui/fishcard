@@ -45,7 +45,7 @@ public class StudentAssignTeacherController {
 
     //2 获取指定老师带的课程列表  studentId 学生id   assignteacherId 分配老师ID
     @RequestMapping(value = "/assign/teacher/page")
-    public JsonResultModel getFinishCourseSchedulePage(
+    public JsonResultModel getFinishCourseSchedulePage(Long oldWorkOrderId,
             Long studentId, Long teacherId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
             direction = Sort.Direction.DESC) Pageable pageable) {
         return assignTeacherService.getAssginTeacherCourseList(studentId,teacherId,pageable);
