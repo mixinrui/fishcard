@@ -25,7 +25,7 @@ public class StStudentApplyRecords {
     private Date applyTime  ; //申请时间
     private Long   workOrderId ;//鱼卡id
     private Long  courseScheleId ;// 课程id
-    private Integer applyStatus   ;// '申请状态  0  待接受  1 已接受
+    private Integer applyStatus   ;// '申请状态  0 不匹配  1 匹配  2 无时间片待匹配
     private Date  createTime  ;
     private Date  updateTime ;
     private Integer applySchema ; // '0:自由;1:指定',

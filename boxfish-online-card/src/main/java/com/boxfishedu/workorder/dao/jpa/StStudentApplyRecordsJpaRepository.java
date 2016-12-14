@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Created by jiaozijun on 16/12/13.
  */
 public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStudentApplyRecords, Long> {
+
+    public StStudentApplyRecords findByworkOrderIdAndApplyStatus(Long workOrderId, Integer applyStatus);
 }

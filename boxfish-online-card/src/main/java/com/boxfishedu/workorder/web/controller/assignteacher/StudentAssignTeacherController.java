@@ -37,9 +37,10 @@ public class StudentAssignTeacherController {
     private AssignTeacherService assignTeacherService;
 
     //1 判断指定这位老师上课 按钮是否出现
+    // 新增老鱼卡ID oldWorkOrderId
     @RequestMapping(value = "{student_Id}/show/assign", method = RequestMethod.GET)
-    public JsonResultModel showAssign(@PathVariable("student_Id") Long studentId) {
-        return JsonResultModel.newJsonResultModel(true);
+    public JsonResultModel showAssign(@PathVariable("student_Id") Long studentId,Long oldWorkOrderId) {
+        return assignTeacherService.checkAssignTeacherFlag(oldWorkOrderId);
     }
 
 
