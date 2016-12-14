@@ -2,10 +2,8 @@ package com.boxfishedu.workorder.entity.mysql;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.Date;
 
 /**
@@ -27,9 +25,28 @@ public class StStudentApplyRecords {
     private Date applyTime  ; //申请时间
     private Long   workOrderId ;//鱼卡id
     private Long  courseScheleId ;// 课程id
-    private Integer applyStatus   ;// '申请状态   10 申请成功  20 申请失败  ',
+    private Integer applyStatus   ;// '申请状态  0  待接受  1 已接受
     private Date  createTime  ;
     private Date  updateTime ;
     private Integer applySchema ; // '0:自由;1:指定',
     private Long  teacherId ;     //  指定教师ID
+
+
+    @Transient
+    private Integer courseNum;
+
+    @Transient
+    private Integer timeSlotId;
+
+
+    @Transient
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startTime;
+
+    @Transient
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endTime;
+
+
+
 }
