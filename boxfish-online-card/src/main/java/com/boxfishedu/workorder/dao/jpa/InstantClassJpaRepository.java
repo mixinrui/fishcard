@@ -28,11 +28,6 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
 
     @Transactional
     @Modifying
-    @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1,icc.requestMatchTeacherTime=?2,icc.updateTime=?2 where icc.id= ?1")
-    void incrementrequestTeacherTimes(Long id, Date date);
-
-    @Transactional
-    @Modifying
     @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1,status=?2 where icc.id= ?1")
     void updateRequestTeacherTimesAndStatus(Long id, Integer status);
 

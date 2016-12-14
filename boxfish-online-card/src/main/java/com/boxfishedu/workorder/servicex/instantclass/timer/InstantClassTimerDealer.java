@@ -34,7 +34,8 @@ public class InstantClassTimerDealer {
     public void timerGetInstantTeachers(InstantClassCard instantClassCard) {
         InstantClassCard dbInstantCard = instantClassJpaRepository.findForUpdate(instantClassCard.getId());
         if (dbInstantCard.getRequestTeacherTimes() != instantClassCard.getRequestTeacherTimes()) {
-            logger.debug("@timerGetInstantTeachers#repeat# IIIIIIIIIIIIIII 已经请求过一次教师,放弃该消息#[{}]", JacksonUtil.toJSon(instantClassCard));
+            logger.debug("@timerGetInstantTeachers#repeat# IIIIIIIIIIIIIII 已经请求过一次教师,放弃该消息#mq次数[{}]#db[{}]"
+                    , instantClassCard.getRequestTeacherTimes(),JacksonUtil.toJSon(dbInstantCard));
             return;
         }
         if (dbInstantCard.getStatus() == InstantClassRequestStatus.WAIT_TO_MATCH.getCode()) {
@@ -56,7 +57,9 @@ public class InstantClassTimerDealer {
             return;
         }
 
-        dbInstantCard=instantClassUpdatorService.incrementrequestTeacherTimes(dbInstantCard.getId());
+        dbInstantCard.setRequestMatchTeacherTime(new Date());
+        dbInstantCard.setRequestTeacherTimes(instantClassCard.getRequestTeacherTimes()+1);
+        instantClassJpaRepository.save(dbInstantCard);
 
         instantClassTeacherService.dealFetchedTeachersAsync(dbInstantCard,false);
     }

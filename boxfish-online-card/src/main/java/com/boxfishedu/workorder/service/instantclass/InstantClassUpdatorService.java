@@ -48,8 +48,19 @@ public class InstantClassUpdatorService {
         InstantClassCard instantClassCard=instantClassJpaRepository.findForUpdate(id);
         instantClassCard.setRequestMatchTeacherTime(new Date());
         instantClassCard.setRequestTeacherTimes(instantClassCard.getRequestTeacherTimes()+1);
-        instantClassJpaRepository.save(instantClassCard);
-        return  instantClassCard;
+        return  instantClassJpaRepository.save(instantClassCard);
     }
+
+    @Transactional
+    public InstantClassCard resetInstantCard(Long id,Integer resultReadFlag,InstantClassRequestStatus instantClassRequestStatus){
+        InstantClassCard instantClassCard=instantClassJpaRepository.findForUpdate(id);
+        instantClassCard.setRequestMatchTeacherTime(new Date());
+        instantClassCard.setRequestTeacherTimes(instantClassCard.getRequestTeacherTimes()+1);
+        instantClassCard.setResultReadFlag(resultReadFlag);
+        instantClassCard.setStatus(instantClassRequestStatus.getCode());
+        return  instantClassJpaRepository.save(instantClassCard);
+    }
+
+;
 
 }
