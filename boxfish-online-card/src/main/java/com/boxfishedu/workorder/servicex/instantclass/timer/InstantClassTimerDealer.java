@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.service.instantclass.InstantClassTeacherService;
+import com.boxfishedu.workorder.service.instantclass.InstantClassUpdatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class InstantClassTimerDealer {
 
     @Autowired
     private InstantClassTeacherService instantClassTeacherService;
+
+    @Autowired
+    private InstantClassUpdatorService instantClassUpdatorService;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -52,8 +56,7 @@ public class InstantClassTimerDealer {
             return;
         }
 
-        dbInstantCard.setRequestTeacherTimes(dbInstantCard.getRequestTeacherTimes()+1);
-        instantClassJpaRepository.save(dbInstantCard);
+        dbInstantCard=instantClassUpdatorService.incrementrequestTeacherTimes(dbInstantCard.getId());
 
         instantClassTeacherService.dealFetchedTeachersAsync(dbInstantCard,false);
     }

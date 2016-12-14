@@ -54,6 +54,9 @@ public class InstantClassService {
     @Autowired
     private TeacherPhotoRequester teacherPhotoRequester;
 
+    @Autowired
+    private InstantClassUpdatorService instantClassUpdatorService;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public InstantClassResult getMatchResult() {
@@ -83,8 +86,8 @@ public class InstantClassService {
             instantClassJpaRepository.updateReadFlagAnsStatus(instantClassCardOptional.get().getId()
                     , 0, InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
 
-            instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCardOptional.get().getId(), new Date());
-            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCardOptional.get(), true);
+            InstantClassCard instantClassCard=instantClassUpdatorService.incrementrequestTeacherTimes(instantClassCardOptional.get().getId());
+            instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard, false);
 
             return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH, teacherPhotoRequester);
         } else {
@@ -135,8 +138,7 @@ public class InstantClassService {
                 , getInstantRequestParam().getStudentId(), timeSlotsOptional.get().getSlotId());
         InstantClassCard instantClassCard = persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
 
-        instantClassCard.setRequestTeacherTimes(instantClassCard.getRequestTeacherTimes()+1);
-        instantClassJpaRepository.save(instantClassCard);
+        instantClassCard=instantClassUpdatorService.incrementrequestTeacherTimes(instantClassCard.getId());
 
         instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard, false);
 
