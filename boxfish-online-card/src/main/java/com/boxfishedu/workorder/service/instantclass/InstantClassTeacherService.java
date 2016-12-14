@@ -58,9 +58,6 @@ public class InstantClassTeacherService {
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard,boolean queryFlag){
-        if(BooleanUtils.isTrue(queryFlag)){
-            instantClassCard=instantClassJpaRepository.findById(instantClassCard.getId());
-        }
         this.dealFetchedTeachersAsync(instantClassCard);
     }
 

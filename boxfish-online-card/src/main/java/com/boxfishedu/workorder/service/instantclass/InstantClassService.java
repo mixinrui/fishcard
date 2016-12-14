@@ -135,9 +135,10 @@ public class InstantClassService {
                 , getInstantRequestParam().getStudentId(), timeSlotsOptional.get().getSlotId());
         InstantClassCard instantClassCard = persistInstantCard(initClassCardWithCourse(timeSlotsOptional.get()));
 
-        instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId(), new Date());
+        instantClassCard.setRequestTeacherTimes(instantClassCard.getRequestTeacherTimes()+1);
+        instantClassJpaRepository.save(instantClassCard);
 
-        instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard, true);
+        instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard, false);
 
         //TODO:发起教师请求，同时将匹配的结果返回给App
         return this.matchResultWrapper(InstantClassRequestStatus.WAIT_TO_MATCH, teacherPhotoRequester);
