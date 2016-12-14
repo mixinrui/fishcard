@@ -70,7 +70,7 @@ public class ServiceSDK {
         MonthTimeSlots monthTimeSlots = restTemplate.postForObject(
                 timeSlotsUrl(), timeSlotsParam(teacherId, dateRangeForm), MonthTimeSlots.class);
         // 将时间戳转换为日期字符串
-        monthTimeSlots.transferTimestampToDate();
+//        monthTimeSlots.transferTimestampToDate();
         return monthTimeSlots;
     }
 

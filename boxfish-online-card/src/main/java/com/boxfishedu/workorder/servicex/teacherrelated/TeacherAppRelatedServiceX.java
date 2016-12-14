@@ -200,6 +200,7 @@ public class TeacherAppRelatedServiceX {
                     ));
         }
         DayTimeSlots dayTimeSlots = dayTimeSlotsList.get(0);
+        dayTimeSlots.setDay(DateUtil.simpleDate2String(date));
 
         // 2 获取老师遮天选的课
         List<CourseSchedule> courseScheduleList = courseScheduleService

@@ -74,7 +74,7 @@ public class MonthTimeSlots extends ResponseBaseView implements Serializable {
         while (it.hasNext()){
             DayTimeSlots dayTimeSlots = it.next();
             // 世超传过来的是一个long型,这边是用一个long型的字符串接收.....
-            // dayTimeSlots.setDay(DateUtil.simpleDateLong2String(Long.valueOf(dayTimeSlots.getDay())));
+            dayTimeSlots.setDay(DateUtil.simpleDateLong2String(Long.valueOf(dayTimeSlots.getDay())));
             dayTimeSlots.override(courseSchedules, serviceSDK, locale);
             if(CollectionUtils.isEmpty(dayTimeSlots.getDailyScheduleTime())) {
                 it.remove();
