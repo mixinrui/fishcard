@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.dao.mongo.WorkOrderLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -73,6 +74,9 @@ public class FishCardUpdatorServiceX {
     @Autowired
     private FetchHeartBeatServiceX fetchHeartBeatServiceX;
 
+    @Autowired
+    private WorkOrderLogMorphiaRepository workOrderLogMorphiaRepository;
+
 
     /**
      * 教师旷课逻辑处理
@@ -128,7 +132,7 @@ public class FishCardUpdatorServiceX {
 
         for (WorkOrderLog workOrderLog : workOrderLogs) {
             if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_ENTER_ROOM.getCode()) {
-                logger.info("@studentAbsentUpdator#newversion#status_changed鱼卡[{}]的学生已经点击过进入房间",workOrderLog.getWorkOrderId());
+                logger.info("@studentAbsentUpdator#newversion#status_changed鱼卡[{}]的学生已经点击过进入房间", workOrderLog.getWorkOrderId());
                 return;
             }
             if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_ACCEPTED.getCode()) {
@@ -216,6 +220,7 @@ public class FishCardUpdatorServiceX {
                 return;
             }
         }
+
         //处于正在上课,标记为服务器强制完成
         if (fishCardDelayMessage.getStatus() == FishCardStatusEnum.ONCLASS.getCode()) {
             logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
@@ -230,12 +235,33 @@ public class FishCardUpdatorServiceX {
         }
         //处于学生接受请求或者ready状态,标记为系统异常
         else {
-            logger.info("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
-                    FishCardStatusEnum.getDesc(FishCardStatusEnum.EXCEPTION.getCode()));
-//            courseOnlineService.handleException(workOrder, courseSchedule, FishCardStatusEnum.EXCEPTION.getCode());
-            courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.EXCEPTION.getCode());
+            if (!this.pickLeaveEarlyFromException(fishCardDelayMessage, workOrder)) {
+                logger.debug("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
+                        FishCardStatusEnum.getDesc(FishCardStatusEnum.EXCEPTION.getCode()));
+                courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.EXCEPTION.getCode());
+            }
         }
         workOrderLogService.saveWorkOrderLog(workOrder);
+    }
+
+
+    /**
+     * 将学生早退的情况从之前被判断为系统异常的情况中挑选出来
+     *
+     * @param fishCardDelayMessage
+     * @param workOrder
+     * @return true:鱼卡为学生早退 , false:留下用来标记为系统异常
+     */
+    public boolean pickLeaveEarlyFromException(FishCardDelayMessage fishCardDelayMessage, WorkOrder workOrder) {
+        logger.debug("@pickLeaveEarlyFromException->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
+                FishCardStatusEnum.getDesc(FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()));
+
+        List<WorkOrderLog> workOrderLogs = workOrderLogMorphiaRepository.queryByWorkId(workOrder.getId(), false);
+        if(CollectionUtils.isEmpty(workOrderLogs)){
+            
+        }
+
+        return true;
     }
 
     /**
@@ -268,8 +294,8 @@ public class FishCardUpdatorServiceX {
         }
         for (WorkOrderLog workOrderLog : workOrderLogs) {
             if (workOrderLog.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()
-                    ||workOrderLog.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
-                    ||workOrder.getStatus()==FishCardStatusEnum.ONCLASS.getCode()) {
+                    || workOrderLog.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
+                    || workOrder.getStatus() == FishCardStatusEnum.ONCLASS.getCode()) {
                 return false;
             }
         }

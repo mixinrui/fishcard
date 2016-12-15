@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Component
 public class WorkOrderLogMorphiaRepository extends BaseMorphiaRepository<WorkOrderLog>{
@@ -19,12 +20,17 @@ public class WorkOrderLogMorphiaRepository extends BaseMorphiaRepository<WorkOrd
         return Optional.ofNullable(query.get());
     }
 
-    public List<WorkOrderLog> queryByWorkId(Long workId) {
+    public List<WorkOrderLog> queryByWorkId(Long workId, boolean ascFlag) {
         Query<WorkOrderLog> query = datastore.createQuery(WorkOrderLog.class);
         query.and(query.criteria("workOrderId").equal(workId));
-        //倒序
-//        query.order("-createTime");
-        query.order("createTime");
+
+        if(ascFlag){
+            query.order("createTime");
+        }
+        else{
+            query.order("-createTime");
+        }
+
         List<WorkOrderLog> workOrderLogs= query.asList();
         int limit=0;
         for (WorkOrderLog workOrderLog:workOrderLogs){
@@ -33,4 +39,5 @@ public class WorkOrderLogMorphiaRepository extends BaseMorphiaRepository<WorkOrd
         }
         return workOrderLogs;
     }
+
 }

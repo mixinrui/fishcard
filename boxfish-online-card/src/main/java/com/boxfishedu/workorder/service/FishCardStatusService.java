@@ -42,142 +42,154 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
     @Value("${parameter.notify_teacher_prepare_class_limit}")
     private Integer notifyTeacherPrepareLimit;
 
-    private final long minutesOfDay=24*60;
-    private final long minutesOfHour=60;
+    private final long minutesOfDay = 24 * 60;
+    private final long minutesOfHour = 60;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     //找出所有上课时间大于当前时间,并且已经延迟3分钟的;这样的单教师旷课可能性更大
-    public List<WorkOrder> getCardsToStart(){
-        Date date=new Date();
-        LocalDateTime endLocalDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).minusSeconds(60*passCardStartPeroid-1);
+    public List<WorkOrder> getCardsToStart() {
+        Date date = new Date();
+        LocalDateTime endLocalDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).minusSeconds(60 * passCardStartPeroid - 1);
+
         //所有之前的数据都放入,做冗余处理;不会影响太多性能
         LocalDateTime startLocalDate = endLocalDate.minusMinutes(minutesOfDay);
-        Date startDate= DateUtil.localDate2Date(startLocalDate);
-        Date endDate=DateUtil.localDate2Date(endLocalDate);
-        Integer[] statuses=new Integer[]{FishCardStatusEnum.TEACHER_ASSIGNED.getCode(),
-                FishCardStatusEnum.STUDENT_ENTER_ROOM.getCode(),FishCardStatusEnum.READY.getCode()};
-        logger.debug("@query db开始从数据库查询[[[教师旷课数据]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
-                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate)
-                ,FishCardStatusEnum.TEACHER_ASSIGNED.getCode()+";"+FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
-//        Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode()};
-//        List<WorkOrder> result= jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
-        List<WorkOrder> result= jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
+        Date startDate = DateUtil.localDate2Date(startLocalDate);
+        Date endDate = DateUtil.localDate2Date(endLocalDate);
+        Integer[] statuses = new Integer[]{FishCardStatusEnum.TEACHER_ASSIGNED.getCode()
+                , FishCardStatusEnum.STUDENT_ENTER_ROOM.getCode(), FishCardStatusEnum.READY.getCode()};
+
+        logger.debug("@query db开始从数据库查询[[[教师旷课数据]]],参数[startDate:{} ; endDate:{} 要求的鱼卡status;[{}]]"
+                , DateUtil.Date2String(startDate), DateUtil.Date2String(endDate)
+                , FishCardStatusEnum.TEACHER_ASSIGNED.getCode() + ";" + FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+
+        List<WorkOrder> result = jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
         return result;
     }
 
 
     //找出所有上课时间大于当前时间,并且状态处于等待学生应答状态超过3分钟的鱼卡,这样的鱼卡;学生旷课的可能性更大
-    public List<WorkOrder> getCardsWaitStudentAccepted(){
-        Date date=new Date();
-        LocalDateTime endLocalDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).minusSeconds(60*passCardWaitPeroid-1);
+    public List<WorkOrder> getCardsWaitStudentAccepted() {
+        Date date = new Date();
+        LocalDateTime endLocalDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).minusSeconds(60 * passCardWaitPeroid - 1);
         LocalDateTime startLocalDate = endLocalDate.minusMinutes(minutesOfDay);
-        Date startDate= DateUtil.localDate2Date(startLocalDate);
-        Date endDate=DateUtil.localDate2Date(endLocalDate);
-        logger.debug("@query db开始从数据库查询[[[学生可能旷课]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
-                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.WAITFORSTUDENT.getCode());
+        Date startDate = DateUtil.localDate2Date(startLocalDate);
+        Date endDate = DateUtil.localDate2Date(endLocalDate);
+
+        logger.debug("@query db开始从数据库查询[[[学生可能旷课]]],参数[startDate:{} ; endDate:{} 要求的鱼卡status;[{}]]"
+                , DateUtil.Date2String(startDate), DateUtil.Date2String(endDate), FishCardStatusEnum.WAITFORSTUDENT.getCode());
 
         //没加学生主动进入房间之前
-        Integer[] statuses=new Integer[]{FishCardStatusEnum.WAITFORSTUDENT.getCode(),
-                FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode(),FishCardStatusEnum.CONNECTED.getCode(),FishCardStatusEnum.TEACHER_ASSIGNED.getCode()};
+        Integer[] statuses = new Integer[]{FishCardStatusEnum.WAITFORSTUDENT.getCode()
+                , FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode(), FishCardStatusEnum.CONNECTED.getCode()
+                , FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), FishCardStatusEnum.STUDENT_INVITED_SCREEN.getCode()};
 
-        List<WorkOrder> result= jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
+        List<WorkOrder> result = jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
         return result;
     }
 
     //找出结束时间大于应该结束时间3分钟,但是没有状态回应的鱼卡,这样的鱼卡出现服务器强制下课的可能性更大
-    public List<WorkOrder> getCardsBeyondEndTime(){
-        Date date=new Date();
+    public List<WorkOrder> getCardsBeyondEndTime() {
+        Date date = new Date();
         LocalDateTime endLocalDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).minusMinutes(passCardEndTime);
         LocalDateTime startLocalDate = endLocalDate.minusMinutes(minutesOfDay);
-        Date startDate= DateUtil.localDate2Date(startLocalDate);
-        Date endDate=DateUtil.localDate2Date(endLocalDate);
+        Date startDate = DateUtil.localDate2Date(startLocalDate);
+        Date endDate = DateUtil.localDate2Date(endLocalDate);
+
         logger.debug("@query db开始从数据库查询[[[需要强制下课]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
-                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.ONCLASS.getCode());
-        Integer[] statuses=new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(),FishCardStatusEnum.READY.getCode(),FishCardStatusEnum.STUDENT_ENTER_ROOM.getCode()
-                ,FishCardStatusEnum.ONCLASS.getCode(),FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode(),FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()
-                ,FishCardStatusEnum.CONNECTED.getCode(),FishCardStatusEnum.WAITFORSTUDENT.getCode()
-                ,FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode(),FishCardStatusEnum.EXCEPTION.getCode(),FishCardStatusEnum.STUDENT_ABSENT.getCode()
-                ,FishCardStatusEnum.EXCEPTION_RESOURCE_DOWNLOAD_FAIL.getCode()};
-        List<WorkOrder> result= jpa.findByIsCourseOverAndStatusInAndOrderIdLessThanAndEndTimeBetween((short)0,statuses,Long.MAX_VALUE, startDate, endDate);
+                , DateUtil.Date2String(startDate), DateUtil.Date2String(endDate), FishCardStatusEnum.ONCLASS.getCode());
+
+        Integer[] statuses = new Integer[]{FishCardStatusEnum.STUDENT_ACCEPTED.getCode(), FishCardStatusEnum.READY.getCode()
+                , FishCardStatusEnum.STUDENT_ENTER_ROOM.getCode(), FishCardStatusEnum.ONCLASS.getCode(), FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()
+                , FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode(), FishCardStatusEnum.CONNECTED.getCode(), FishCardStatusEnum.STUDENT_INVITED_SCREEN.getCode()
+                , FishCardStatusEnum.WAITFORSTUDENT.getCode(), FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode(), FishCardStatusEnum.EXCEPTION.getCode()
+                , FishCardStatusEnum.STUDENT_ABSENT.getCode(), FishCardStatusEnum.EXCEPTION_RESOURCE_DOWNLOAD_FAIL.getCode()};
+
+        List<WorkOrder> result = jpa.findByIsCourseOverAndStatusInAndOrderIdLessThanAndEndTimeBetween((short) 0, statuses, Long.MAX_VALUE, startDate, endDate);
         return result;
     }
 
-    public List<WorkOrder> getCardsTeacherPrepareClass(){
-        Date date=new Date();
-        LocalDateTime startLocalDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).plusSeconds(60*notifyTeacherPrepareLimit-1);
+    public List<WorkOrder> getCardsTeacherPrepareClass() {
+        Date date = new Date();
+        LocalDateTime startLocalDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).plusSeconds(60 * notifyTeacherPrepareLimit - 1);
         //多放入一分钟的，以免漏过通知；为了防止重复通知，把最近两分钟通知过的数据放入redis；设置超时时间为两分钟
-        LocalDateTime endLocalDate = startLocalDate.plusSeconds(60*notifyTeacherPrepareLimit+1);
-        Date startDate= DateUtil.localDate2Date(startLocalDate);
-        Date endDate=DateUtil.localDate2Date(endLocalDate);
+        LocalDateTime endLocalDate = startLocalDate.plusSeconds(60 * notifyTeacherPrepareLimit + 1);
+        Date startDate = DateUtil.localDate2Date(startLocalDate);
+        Date endDate = DateUtil.localDate2Date(endLocalDate);
+
         logger.debug("@query db开始从数据库查询[[[需要课前通知上课的老师]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
-                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
-        List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
+                , DateUtil.Date2String(startDate), DateUtil.Date2String(endDate), FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+
+        List<WorkOrder> result = jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
         return result;
     }
 
 
     /**
      * 通知未来一天通知 学生有课
+     *
      * @return
      */
-    public List<WorkOrder> getCardsStudentNotifyClass(){
-        Date date=new Date();
+    public List<WorkOrder> getCardsStudentNotifyClass() {
+        Date date = new Date();
 
-        Date startDate= DateUtil.parseTime(   DateUtil.getBeforeDays(date,-1),0);
-        Date endDate=DateUtil.parseTime( DateUtil.getBeforeDays(date,-1) ,1);
+        Date startDate = DateUtil.parseTime(DateUtil.getBeforeDays(date, -1), 0);
+        Date endDate = DateUtil.parseTime(DateUtil.getBeforeDays(date, -1), 1);
         logger.debug("@query db开始从数据库查询[[[需要课前通知上课的学生]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
-                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
-        List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
+                , DateUtil.Date2String(startDate), DateUtil.Date2String(endDate), FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        List<WorkOrder> result = jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
         return result;
     }
 
     /**
      * 通知今天老师有课
+     *
      * @return
      */
-    public List<WorkOrder> getCardsTeacherNotifyClass(){
-        Date date=new Date();
-        Date startDate= DateUtil.parseTime(date,0);
-        Date endDate=DateUtil.parseTime( date ,1);
-        logger.debug("@query db开始从数据库查询[[[今天有课的记录]]],参数[startDate:{}    ;    endDate:{}    要求的鱼卡status;[{}]]"
-                ,DateUtil.Date2String(startDate),DateUtil.Date2String(endDate),FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
-        List<WorkOrder> result= jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
+    public List<WorkOrder> getCardsTeacherNotifyClass() {
+        Date date = new Date();
+        Date startDate = DateUtil.parseTime(date, 0);
+        Date endDate = DateUtil.parseTime(date, 1);
+
+        logger.debug("@query db开始从数据库查询[[[今天有课的记录]]],参数[startDate:{} ; endDate:{}    要求的鱼卡status;[{}]]"
+                , DateUtil.Date2String(startDate), DateUtil.Date2String(endDate), FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+
+        List<WorkOrder> result = jpa.findByStatusAndStartTimeBetween(FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), startDate, endDate);
         return result;
     }
 
 
-
-    public MessageProperties getMsgProperties(Date date, FishCardDelayMsgType fishCardDelayMsgType){
+    public MessageProperties getMsgProperties(Date date, FishCardDelayMsgType fishCardDelayMsgType) {
         MessageProperties messageProperties = new MessageProperties();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        switch (fishCardDelayMsgType){
+        switch (fishCardDelayMsgType) {
             case TEACHER_ABSENT: {
-                calendar.add(Calendar.SECOND,60*teacherAbsentTimeLimit);
+                calendar.add(Calendar.SECOND, 60 * teacherAbsentTimeLimit);
                 break;
             }
             case STUDENT_ABSENT: {
-                calendar.add(Calendar.SECOND,60*studentAbsentTimeLimit+passBeyondNormal);
+                calendar.add(Calendar.SECOND, 60 * studentAbsentTimeLimit + passBeyondNormal);
                 break;
             }
             case FORCE_COMPLETE_SERVER: {
-                calendar.add(Calendar.SECOND,60*forceCompleteTimeLimit+12*passBeyondNormal);
+                calendar.add(Calendar.SECOND, 60 * forceCompleteTimeLimit + 12 * passBeyondNormal);
                 break;
             }
-            case NOTIFY_TEACHER_PREPARE_CLASS:{
-                calendar.add(Calendar.SECOND,0-60*notifyTeacherPrepareLimit+passBeyondNormal);
+            case NOTIFY_TEACHER_PREPARE_CLASS: {
+                calendar.add(Calendar.SECOND, 0 - 60 * notifyTeacherPrepareLimit + passBeyondNormal);
                 break;
             }
             default:
                 break;
         }
-        Date deadDate =calendar.getTime();
-        Date now=new Date();
-        Long diff=deadDate.getTime()-now.getTime();
-        if(diff<0l){
-            diff=0l;
+        Date deadDate = calendar.getTime();
+        Date now = new Date();
+        Long diff = deadDate.getTime() - now.getTime();
+        if (diff < 0l) {
+            diff = 0l;
         }
-        messageProperties.setExpiration(diff+"");
+        messageProperties.setExpiration(diff + "");
         messageProperties.setTimestamp(new Date());
         return messageProperties;
     }

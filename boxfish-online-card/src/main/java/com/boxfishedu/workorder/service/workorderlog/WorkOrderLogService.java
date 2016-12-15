@@ -50,7 +50,7 @@ public class WorkOrderLogService {
     private org.slf4j.Logger logger= org.slf4j.LoggerFactory.getLogger(this.getClass());
 
     public List<WorkOrderLog> queryByWorkId(Long workId) {
-        List<WorkOrderLog> workOrderLogs=workOrderLogMorphiaRepository.queryByWorkId(workId);
+        List<WorkOrderLog> workOrderLogs=workOrderLogMorphiaRepository.queryByWorkId(workId,true);
         return workOrderLogs;
     }
 
