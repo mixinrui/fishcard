@@ -18,13 +18,17 @@ import java.util.Date;
 @Data
 public class StStudentSchema {
 
+    public enum StSchema{
+        un_assgin,
+        assgin
+    }
     @Id
     @GeneratedValue
     private Long id;
 
     private Long  studentId;
     private Long  teacherId ;     //  指定教师ID
-    private Integer stSchema;//  '0自由模式1指定模式'
+    private StSchema stSchema;//  '0自由模式1指定模式'
     private Date createTime  ;
     private Date  updateTime ;
 }

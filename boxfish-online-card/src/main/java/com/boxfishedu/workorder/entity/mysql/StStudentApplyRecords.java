@@ -15,35 +15,35 @@ import java.util.Date;
 @Entity
 @Data
 public class StStudentApplyRecords {
+    public enum ApplyStatus{
+        pending,
+        agree
+    }
+    public enum ReadStatus{
+        yes,
+        no
+    }
     @Id
     @GeneratedValue
     private Long id;
-
-
     private Long  studentId;
     @Transient
     private String studentImg ; //学生头像url
     private Date applyTime  ; //申请时间
     private Long   workOrderId ;//鱼卡id
-    private Long  courseScheleId ;// 课程id
-    private Integer applyStatus   ;// '申请状态  0 不匹配  1 匹配  2 无时间片待匹配
-    private Date  createTime  ;
-    private Date  updateTime ;
-    //private Integer applySchema ; // '0:自由;1:指定',
-    private Long  teacherId ;     //  指定教师ID
-
-
+    private Long  courseScheleId;// 课程id
+    private ApplyStatus applyStatus;// '申请状态 0 待接受  1 已接受
+    private Date  createTime ;
+    private Date  updateTime;
+    private Long  teacherId;     //  指定教师ID
+    private ReadStatus isRead;
     @Transient
     private Integer courseNum;
-
     @Transient
     private Integer timeSlotId;
-
-
     @Transient
     @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
-
     @Transient
     @Temporal(TemporalType.TIMESTAMP)
     private Date endTime;

@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStudentApplyRecords, Long> {
 
     public StStudentApplyRecords findByworkOrderIdAndApplyStatus(Long workOrderId, Integer applyStatus);
+//    StStudentApplyRecords findBy
 }
