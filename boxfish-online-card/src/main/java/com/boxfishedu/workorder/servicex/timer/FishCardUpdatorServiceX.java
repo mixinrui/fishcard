@@ -258,10 +258,10 @@ public class FishCardUpdatorServiceX {
 
         List<WorkOrderLog> workOrderLogs = workOrderLogMorphiaRepository.queryByWorkId(workOrder.getId(), false);
         if(CollectionUtils.isEmpty(workOrderLogs)){
-            
+
         }
 
-        return true;
+        return false;
     }
 
     /**
