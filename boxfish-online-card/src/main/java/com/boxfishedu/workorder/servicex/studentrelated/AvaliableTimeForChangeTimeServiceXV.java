@@ -89,7 +89,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
 
         boolean afterTomo =  afterTomoDate(workOrder);
         if(!afterTomo){
-            throw  new BusinessException("请提前48小时修改上课时间");
+            throw  new BusinessException("请提前48小时修改上课时间，有任何问题请电话联系客服～");
         }
 
         //首次鱼卡时间
@@ -105,7 +105,7 @@ public class AvaliableTimeForChangeTimeServiceXV {
         Integer comboCycle = workOrder.getService().getComboCycle();
 
         if(null==comboCycle  || comboCycle<1 ){
-            throw new BusinessException("该鱼卡不允许更改时间");
+            throw new BusinessException("该课不允许更改时间，有任何问题请电话联系客服～");
         }
 
         List<MyCourseView>  myCourseViews =   courseScheduleService.findMyClasses(workOrder.getStudentId());// 该学生以后的课程
@@ -254,8 +254,8 @@ public class AvaliableTimeForChangeTimeServiceXV {
     private DateRange getEnableDateRange(Date endDate) {
         Date date  = new Date();// DateUtil.date2SimpleDate(new Date());
         int days = DateUtil.getBetweenDays(date,endDate);
-        if(days<2){
-            throw new BusinessException("该鱼卡更改时间超出修改范围");
+        if(days<1){  // 时间片允许显示到后天
+            throw new BusinessException("该课不允许更改时间，有任何问题请电话联系客服～ ");
         }
         int afterDays = consumerStartDay;
         LocalDateTime startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());

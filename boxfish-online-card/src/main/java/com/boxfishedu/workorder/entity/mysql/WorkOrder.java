@@ -211,7 +211,23 @@ public class WorkOrder implements Cloneable{
     @Column(name = "deduct_score_status" , nullable = true)
     private Integer deductScoreStatus;
 
+    /** 由于假期原因,提示该鱼卡需要更换时间   10 需要更换时间  **/
+    @Column(name = "need_change_time", nullable = true)
+    private Integer needChangeTime;
 
+
+    @Transient
+    private String groupId; // 群组id
+
+    @Transient
+    private boolean normal = false; //是否正常
+
+    @Transient
+
+    private Integer chatRoomId;//房间号
+
+    @Transient
+    private boolean haveTeacherRequested = true; //是否有教师操作
 
     @Override
     public String toString() {

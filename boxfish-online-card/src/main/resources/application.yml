@@ -342,6 +342,7 @@ spring:
     password: Boxfish2016
   redis:
     hostName: 8619f2f4a93c4a70.m.cnbja.kvstore.aliyuncs.com
+#    hostName: 127.0.0.1
     password: Box12345678
     port: 6379
     timeout: 10000
@@ -408,6 +409,9 @@ server:
       directory: /share/fishcard-logs
       enabled: true
       pattern: -%h %l %u [%{yyyy-MM-dd HH:mm:ss}t] i -%r- %s %b %D %F
+  compression:
+    enabled: true
+    mime-types: "text/html,text/xml,text/plain,text/html,text/css,application/json"
 
 #===============================================================pretest环境:123.56.13.168 机器密码:Boxfish2016===============================================================
 ---

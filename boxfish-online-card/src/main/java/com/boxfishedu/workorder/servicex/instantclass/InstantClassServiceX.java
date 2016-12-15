@@ -199,27 +199,26 @@ public class InstantClassServiceX {
         return JsonResultModel.newJsonResultModel(TeacherInstantRangeBean.getInstantRange(instantClassTimeRules));
     }
 
-    public JsonResultModel getScheduleType(Long studentId){
-        List<Integer> skuIds=workOrderJpaRepository.findDistinctSkuIds(studentId,new Date());
-        java.util.Map<String,Object> map=new HashMap<>();
-        map.put("status",0);
-        map.put("statusDesc","既无中教也无外教");
-        if(!CollectionUtils.isEmpty(skuIds)){
-           if(1==skuIds.size()){
-               if(skuIds.get(0)== TeachingType.ZHONGJIAO.getCode()){
-                   map.put("status",TeachingType.ZHONGJIAO.getCode());
-                   map.put("statusDesc","只有中教");
-               }
-               if(skuIds.get(0)== TeachingType.WAIJIAO.getCode()){
-                   map.put("status",TeachingType.WAIJIAO.getCode());
-                   map.put("statusDesc","只有外教");
-               }
-           }
-            else{
-               map.put("status",3);
-               map.put("statusDesc","既有中教也有外教");
-           }
+    public JsonResultModel getScheduleType(Long studentId) {
+        List<Integer> skuIds = workOrderJpaRepository.findDistinctSkuIds(studentId, new Date());
+        java.util.Map<String, Object> map = new HashMap<>();
+        map.put("status", 0);
+        map.put("statusDesc", "既无中教也无外教");
+        if (!CollectionUtils.isEmpty(skuIds)) {
+            if (1 == skuIds.size()) {
+                if (skuIds.get(0) == TeachingType.ZHONGJIAO.getCode()) {
+                    map.put("status", TeachingType.ZHONGJIAO.getCode());
+                    map.put("statusDesc", "只有中教");
+                }
+                if (skuIds.get(0) == TeachingType.WAIJIAO.getCode()) {
+                    map.put("status", TeachingType.WAIJIAO.getCode());
+                    map.put("statusDesc", "只有外教");
+                }
+            } else {
+                map.put("status", 3);
+                map.put("statusDesc", "既有中教也有外教");
+            }
         }
-        return  JsonResultModel.newJsonResultModel(map);
+        return JsonResultModel.newJsonResultModel(map);
     }
 }

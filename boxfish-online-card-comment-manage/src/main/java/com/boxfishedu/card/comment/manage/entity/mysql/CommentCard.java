@@ -154,6 +154,12 @@ public class CommentCard implements Serializable {
     @Column(name = "service_id")
     private Long serviceId;
 
+    @Column(name = "question_code", nullable = true, length = 45)
+    private String questionCode;
+
+    @Column(name = "question_type", nullable = true, columnDefinition = "1")
+    private Integer questionType;
+
     // 换老师逻辑
     public CommentCard changeTeacher(TeacherInfo teacherInfo) {
 //        Duration duration = Duration.between(studentAskTime.toInstant(), Instant.now());

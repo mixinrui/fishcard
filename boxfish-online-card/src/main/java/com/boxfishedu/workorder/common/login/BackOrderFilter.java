@@ -75,7 +75,7 @@ public class BackOrderFilter extends OncePerRequestFilter {
                 errorTokenHandle(response, String.format("token无效,token:[%s]", token),HttpStatus.SC_UNAUTHORIZED);
                 return;
             }else if(URI!=null && URI.endsWith("item") &&!loginService.checkURI(token,URI)){
-                logger.info("URI无效,token:{[]}",token);
+                logger.info("URI无效,token:[{}]",token);
                 errorTokenHandle(response,String.format("您没有权限访问"),HttpStatus.SC_BAD_REQUEST);
                 return;
             }
@@ -96,6 +96,7 @@ public class BackOrderFilter extends OncePerRequestFilter {
          * 跨域问题
          */
         response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Headers","Content-Type");
         JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(null);
         jsonResultModel.setReturnCode(code);
         jsonResultModel.setReturnMsg(message);

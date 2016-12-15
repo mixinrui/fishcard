@@ -15,10 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -136,7 +133,10 @@ public class DayTimeSlots implements Cloneable, Serializable {
                 CourseSchedule courseSchedule = courseScheduleMap.get(timeSlots.getSlotId().toString());
                 if (checkCourseSchedule(courseSchedule)) {
                     timeSlots.initTimeSlots(courseSchedule);
-                    if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
+                    // 判断时间片是与当前日期的间隔, 时间间隔为4天
+                    long durationDays = DateUtil.durationOfDay(DateUtil.String2SimpleDate(day), new Date());
+                    if (StringUtils.isNotEmpty(courseSchedule.getCourseId())
+                            && (durationDays >= 0 && durationDays <= 4)) {
                         timeSlots.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
                     }
                 }

@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,9 +57,12 @@ public class InstantClassTeacherService {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
+    public void dealFetchedTeachersAsync(InstantClassCard instantClassCard,boolean queryFlag){
+        this.dealFetchedTeachersAsync(instantClassCard);
+    }
+
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard){
-        instantClassJpaRepository.incrementrequestTeacherTimes(instantClassCard.getId(),new Date());
-        threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassJpaRepository.findOne(instantClassCard.getId()));}));
+        threadPoolManager.execute(new Thread(() -> {dealInstantFetchedTeachers(instantClassCard);}));
     }
 
     public void dealInstantFetchedTeachers(InstantClassCard instantClassCard){
@@ -68,17 +72,17 @@ public class InstantClassTeacherService {
         }
         catch (Exception ex){
             logger.error("@dealInstantFetchedTeachers#user:[{}] card[{}] IIIIIIIIIIIIIII    获取实时推荐教师失败,将匹配状态设置为未匹配上"
-                    ,instantClassCard.getStudentId(),instantClassCard.getId());
+                    ,instantClassCard.getStudentId(),JacksonUtil.toJSon(instantClassCard));
             this.updateNomatchStatus(instantClassCard);
             return;
         }
         if(!teacherIdsOptional.isPresent()||CollectionUtils.isEmpty(teacherIdsOptional.get())){
             logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 没有获取到可用的教师列表,cardId[{}],studentId[{}]"
-                    ,instantClassCard.getId(),instantClassCard.getStudentId());
+                    ,JacksonUtil.toJSon(instantClassCard),instantClassCard.getStudentId());
             return;
         }
         logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 获取到教师列表[{}],card[{}],学生[{}]"
-                ,teacherIdsOptional.get().toString(),instantClassCard.getId(),instantClassCard.getStudentId());
+                ,teacherIdsOptional.get().toString(),JacksonUtil.toJSon(instantClassCard),instantClassCard.getStudentId());
         //匹配上老师,则向教师推送抢单的消息
         courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
     }

@@ -19,6 +19,7 @@ import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.base.StudentInfo;
 import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.PlannerAssignView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Maps;
@@ -230,11 +231,26 @@ public class TeacherStudentRequester {
     public void pushTeacherListOnlineMsg(List teachingOnlineListMsg) {
         String url = String.format("%s/teaching/callback/push", urlConf.getCourse_online_service());
         // String url="http://192.168.77.37:9090/teaching/callback/push";
-        logger.debug("::::::::::::::::::::::::::::::::@[pushWrappedMsg]向在线教育发起获取教师列表url[{}]::::::::::::::::::::::::::::::::", url);
+        logger.debug("::::::::::::::::::::::::::::::::@[pushWrappedMsg]向在线教育推送url[{}]::::::::::::::::::::::::::::::::", url);
 
         logger.info("::::::::::::::::::::::::::::::::sendDate:begion::[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(teachingOnlineListMsg));
         threadPoolManager.execute(new Thread(() -> {
             restTemplate.postForObject(url, teachingOnlineListMsg, Object.class);
+        }));
+        logger.info("::::::::::::::::::::::::::::::::sendData:over::::::::::::::");
+        //restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);
+        //JsonResultModel jsonResultModel = restTemplate.postForObject(url, teachingOnlineListMsg,JsonResultModel.class);
+    }
+
+
+    public void pushTeacherListOnlineMsg(Object message) {
+        String url = String.format("%s/teaching/callback/push", urlConf.getCourse_online_service());
+        // String url="http://192.168.77.37:9090/teaching/callback/push";
+        logger.debug("::::::::::::::::::::::::::::::::@[pushWrappedMsg]向在线教育推送url[{}]::::::::::::::::::::::::::::::::", url);
+
+        logger.info("::::::::::::::::::::::::::::::::sendDate:begion::[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(message));
+        threadPoolManager.execute(new Thread(() -> {
+            restTemplate.postForObject(url, message, Object.class);
         }));
         logger.info("::::::::::::::::::::::::::::::::sendData:over::::::::::::::");
         //restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);
@@ -404,6 +420,27 @@ public class TeacherStudentRequester {
         }
 
         return tokenReturnBean;
+    }
+
+
+    /**
+     * 查询向在线教学获取鱼卡的房间号信息
+     * @param listFishCards
+     */
+    public FishCardGroupsInfo [] getFishcardMessage(List listFishCards) {
+        String url = String.format("%s/teaching/group/member", urlConf.getCourse_online_service());
+        logger.debug("::::::::::::::::::::::::::::::::@[getFishcardMessage]向在线教学请求房间号url[{}]::::::::::::::::::::::::::::::::", url);
+        FishCardGroupsInfo [] fishCardGroupsInfo = null;
+        logger.info("::::::::::::::::::::::::::::::::sendDate:begion::[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(listFishCards));
+        try{
+            fishCardGroupsInfo =  restTemplate.postForObject(url, listFishCards, FishCardGroupsInfo[].class);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            fishCardGroupsInfo = null;
+        }
+
+        logger.info("::::::::::::::::::::::::::::::::sendData:over::::::::::::::");
+        return fishCardGroupsInfo;
     }
 
 

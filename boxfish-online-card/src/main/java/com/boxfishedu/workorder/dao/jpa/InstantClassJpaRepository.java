@@ -28,28 +28,23 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
 
     @Transactional
     @Modifying
-    @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1,icc.requestMatchTeacherTime=?2,icc.updateTime=?2 where icc.id= ?1")
-    void incrementrequestTeacherTimes(Long id, Date date);
-
-    @Transactional
-    @Modifying
     @Query("update InstantClassCard icc set icc.requestTeacherTimes =icc.requestTeacherTimes+1,status=?2 where icc.id= ?1")
     void updateRequestTeacherTimesAndStatus(Long id, Integer status);
 
     @Transactional
     @Modifying
     @Query("update InstantClassCard icc set icc.resultReadFlag = ?2 where icc.id= ?1")
-    void updateReadFlag(Long id, Integer resultReadFlag );
+    void updateReadFlag(Long id, Integer resultReadFlag);
 
     @Transactional
     @Modifying
     @Query("update InstantClassCard icc set icc.matchResultReadFlag = ?2 where icc.id= ?1")
-    void updateMatchedReadFlag(Long id, Integer resultReadFlag );
+    void updateMatchedReadFlag(Long id, Integer resultReadFlag);
 
     @Transactional
     @Modifying
     @Query("update InstantClassCard icc set icc.resultReadFlag = ?2 ,icc.status=?3  where icc.id= ?1")
-    void updateReadFlagAnsStatus(Long id, Integer resultReadFlag ,Integer status);
+    void updateReadFlagAnsStatus(Long id, Integer resultReadFlag, Integer status);
 
     @Transactional
     @Modifying
@@ -58,12 +53,15 @@ public interface InstantClassJpaRepository extends JpaRepository<InstantClassCar
 
     List<InstantClassCard> findByRequestMatchTeacherTimeBetweenAndStatusIn(Date startDate, Date endDate, Integer[] statuses);
 
-    Optional<InstantClassCard> findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(Long studentId,Date date);
+    Optional<InstantClassCard> findTop1ByStudentIdAndCreateTimeAfterOrderByCreateTimeDesc(Long studentId, Date date);
 
-    Optional<InstantClassCard> findTop1ByStudentIdAndRequestMatchTeacherTimeAfterOrderByCreateTimeDesc(Long studentId,Date date);
+    Optional<InstantClassCard> findTop1ByStudentIdAndRequestMatchTeacherTimeAfterOrderByCreateTimeDesc(Long studentId, Date date);
 
     @Query(value = "select max(icc) from InstantClassCard icc where studentId=? and status=?")
-    Optional<InstantClassCard> findLatestMatchedInstantCard(Long studentId,Integer status);
+    Optional<InstantClassCard> findLatestMatchedInstantCard(Long studentId, Integer status);
+
+    @Query(value = "select icc from InstantClassCard icc where id=?")
+    InstantClassCard findById(Long id);
 
     List<InstantClassCard> findByCreateTimeLessThanAndWorkorderId(Date deadLine, Long workOrderId);
 }

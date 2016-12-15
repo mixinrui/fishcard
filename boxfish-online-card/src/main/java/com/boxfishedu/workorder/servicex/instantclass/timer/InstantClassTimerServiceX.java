@@ -43,10 +43,9 @@ public class InstantClassTimerServiceX {
 
         List<InstantClassCard> instantClassCards = instantClassJpaRepository.findByRequestMatchTeacherTimeBetweenAndStatusIn(
                 DateUtil.localDate2Date(beginLocal), new Date(), new Integer[]{InstantClassRequestStatus.WAIT_TO_MATCH.getCode()});
-        logger.debug("====排序前===>>>>>:begin:{}",DateUtil.localDate2Date(beginLocal));
+        logger.debug("@putCardsToMatchTeachers#轮询需要处理的立即上课卡");
         instantClassCards.forEach(instantClassCard1 -> logger.debug(instantClassCard1.toString()));
         instantClassCards.sort(Comparator.comparing(instantClassCard->instantClassCard.getRequestMatchTeacherTime().getTime()));
-        logger.debug("====排序后===<<<<<");
         instantClassCards.forEach(instantClassCard1 -> logger.debug(instantClassCard1.toString()));
 
         instantClassCards.forEach(instantClassCard -> rabbitMqDelaySender

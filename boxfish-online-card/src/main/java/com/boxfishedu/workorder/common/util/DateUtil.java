@@ -399,7 +399,15 @@ public class DateUtil {
         return  (i-1)==0?date : addMinutes(date,60*24*(i-1)*7);
     }
 
+    private final static long DAY_OF_SECONDS = 24 * 60 * 60 * 1000;
 
+    public static long durationOfDay(Date from, Date to) {
+        return (to.getTime() - from.getTime()) / DAY_OF_SECONDS;
+    }
 
-
+//    public static void main(String[] args) throws ParseException {
+//        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//        Date from = format.parse("2016-12-10");
+//        System.out.println(durationOfDay(from, new Date()));
+//    }
 }

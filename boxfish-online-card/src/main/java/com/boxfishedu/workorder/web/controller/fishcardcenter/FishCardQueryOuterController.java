@@ -42,6 +42,10 @@ public class FishCardQueryOuterController {
 
         myWorkOrdes.stream().filter(workOrder1 -> (1==workOrder1.getIsFreeze() || workOrder1.getStatus() <40)).collect(Collectors.toList());
 
+        if(null!=fishCardinnerParam.getSkuId()){
+            myWorkOrdes.stream().filter(workOrder1 -> (fishCardinnerParam.getSkuId().equals( workOrder1.getSkuId() ) )).collect(Collectors.toList());
+        }
+
         if(CollectionUtils.isEmpty(myWorkOrdes)){
             return JsonResultModel.newJsonResultModel(myWorkOrdes);
         }
@@ -49,8 +53,8 @@ public class FishCardQueryOuterController {
             return JsonResultModel.newJsonResultModel(myWorkOrdes);
         }else {
             List<Long>  hasEvFinsList =  Arrays.asList(fishCardinnerParam.getHasEvFishcardIds());
-            myWorkOrdes.stream().filter(workOrder -> !hasEvFinsList.contains(workOrder.getId())).collect(Collectors.toList());
-            return JsonResultModel.newJsonResultModel(myWorkOrdes);
+            myWorkOrdes=myWorkOrdes.stream().filter(workOrder -> !hasEvFinsList.contains(workOrder.getId())).collect(Collectors.toList());
+             return JsonResultModel.newJsonResultModel(myWorkOrdes);
         }
 
     }

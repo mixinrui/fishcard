@@ -10,4 +10,5 @@ public class FishCardinnerParam {
 
     private  Long studentId;
     private  Long[] hasEvFishcardIds;  // 鱼卡数组
+    private Integer skuId;
 }
