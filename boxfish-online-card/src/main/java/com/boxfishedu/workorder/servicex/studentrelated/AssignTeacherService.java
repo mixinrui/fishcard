@@ -58,7 +58,7 @@ public class AssignTeacherService {
             WorkOrder workOrder = workOrderService.findOne(workOrderId);
             if(workOrder==null)
                 throw new BusinessException("课程信息有误");
-            List<WorkOrder>  listWorkOrders =  workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder.getStartTime(),workOrder.getSkuId());
+            List<WorkOrder>  listWorkOrders =  workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
             if(CollectionUtils.isEmpty(listWorkOrders)){
                 return JsonResultModel.newJsonResultModel(false);
             }else {

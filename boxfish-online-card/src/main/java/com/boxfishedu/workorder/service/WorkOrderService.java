@@ -583,8 +583,8 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
 
-    public List<WorkOrder> findByStartTimeMoreThanAndSkuIdAndIsFreeze(Date startTime,Integer skuId){
-        return jpa.findByStartTimeGreaterThanAndSkuIdAndIsFreeze(startTime,skuId,0);
+    public List<WorkOrder> findByStartTimeMoreThanAndSkuIdAndIsFreeze(WorkOrder workOrder){
+        return jpa.findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(workOrder.getStudentId() ,workOrder.getStartTime(),workOrder.getSkuId(),0);
     }
 
 }
