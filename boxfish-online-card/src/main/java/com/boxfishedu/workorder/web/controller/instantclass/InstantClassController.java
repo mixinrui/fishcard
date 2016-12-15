@@ -60,7 +60,8 @@ public class InstantClassController {
 
 
     @Autowired
-    private @Qualifier("teachingServiceRedisTemplate")
+    private
+    @Qualifier("teachingServiceRedisTemplate")
 
 
     StringRedisTemplate redisTemplate;
@@ -70,16 +71,16 @@ public class InstantClassController {
     @RequestMapping(value = "/service/student/instantclass", method = RequestMethod.POST)
     public JsonResultModel instantClass(@RequestBody InstantRequestParam instantRequestParam, Long userId) {
         logger.debug("→_→→_→→_→→_→→_→→_>>>>>>>> IIIIIIIIIIIIIII grabstudent[{}] 学生立即上课请求,参数{}"
-                ,instantRequestParam.getStudentId(),JacksonUtil.toJSon(instantRequestParam));
-        JsonResultModel jsonResultModel= instantClassServiceX.instantClass(instantRequestParam);
+                , instantRequestParam.getStudentId(), JacksonUtil.toJSon(instantRequestParam));
+        JsonResultModel jsonResultModel = instantClassServiceX.instantClass(instantRequestParam);
         logger.debug("→_→→_→→_→→_→→_→→_<<<<<<<< IIIIIIIIIIIIIII grabstudent[{}] 学生立即上课返回,参数{},结果{}"
-                ,instantRequestParam.getStudentId(),JacksonUtil.toJSon(instantRequestParam),JacksonUtil.toJSon(jsonResultModel));
+                , instantRequestParam.getStudentId(), JacksonUtil.toJSon(instantRequestParam), JacksonUtil.toJSon(jsonResultModel));
         return jsonResultModel;
     }
 
     @RequestMapping(value = "/service/teacher/instantclass", method = RequestMethod.POST)
     public JsonResultModel teacherInstantClass(@RequestBody TeacherInstantRequestParam teacherInstantRequestParam, Long userId) {
-        logger.info("x__xx__xx__xx__x>>>> IIIIIIIIIIIIIII 教师立即上课抢单,参数{}",JacksonUtil.toJSon(teacherInstantRequestParam));
+        logger.info("x__xx__xx__xx__x>>>> IIIIIIIIIIIIIII 教师立即上课抢单,参数{}", JacksonUtil.toJSon(teacherInstantRequestParam));
         try {
             JsonResultModel jsonResultModel = teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
             return jsonResultModel;
@@ -87,12 +88,22 @@ public class InstantClassController {
             JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
             logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII  grabresult ,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
-                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel),ex);
+                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel), ex);
             return jsonResultModel;
         } finally {
             String key = GrabInstatntClassKeyGenerator.generateKey(teacherInstantRequestParam);
-            //无论是否成功都删除当前用户的资源
-            redisTemplate.delete(key);
+            //无论是否成功都删除当前用户的资源,需要增加判断
+            String lockedUserId = redisTemplate.opsForValue().get(key);
+            if (lockedUserId != null) {
+                if (lockedUserId.equals(teacherInstantRequestParam.getTeacherId())) {
+                    logger.debug("@teacherInstantClass IIIIIIIIIIIIIII 参数为[{}]的抢单教师[{}]完成抢单,删除redis数据,正在退出..."
+                            , JacksonUtil.toJSon(teacherInstantRequestParam), lockedUserId);
+                    redisTemplate.delete(key);
+                } else {
+                    logger.debug("@teacherInstantClass IIIIIIIIIIIIIII 参数为[{}]的抢单教师[{}]完成抢单,与正在抢单的教师[{}]不是同一个教师,正在退出..."
+                            , JacksonUtil.toJSon(teacherInstantRequestParam), teacherInstantRequestParam.getTeacherId(), lockedUserId);
+                }
+            }
         }
     }
 
@@ -139,5 +150,5 @@ public class InstantClassController {
     public JsonResultModel getScheduleType(@PathVariable("student_id") Long studentId) {
         return instantClassServiceX.getScheduleType(studentId);
     }
-    
+
 }

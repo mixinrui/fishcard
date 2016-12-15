@@ -1,6 +1,9 @@
 package com.boxfishedu.workorder.servicex.timer;
 
-import com.boxfishedu.workorder.common.bean.*;
+import com.boxfishedu.workorder.common.bean.AppPointRecordEventEnum;
+import com.boxfishedu.workorder.common.bean.FishCardDelayMessage;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.TeachingNotificationEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -17,7 +20,6 @@ import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.dataanalysis.FetchHeartBeatServiceX;
 import com.boxfishedu.workorder.web.param.requester.DataAnalysisLogParam;
-import org.apache.catalina.LifecycleState;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -257,11 +258,57 @@ public class FishCardUpdatorServiceX {
                 FishCardStatusEnum.getDesc(FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()));
 
         List<WorkOrderLog> workOrderLogs = workOrderLogMorphiaRepository.queryByWorkId(workOrder.getId(), false);
-        if(CollectionUtils.isEmpty(workOrderLogs)){
-
+        if (CollectionUtils.isEmpty(workOrderLogs)) {
+            return false;
         }
 
+        if (!this.containStudentLeaveEarly(workOrderLogs)) {
+            return false;
+        }
+
+        if (!this.isTeacherAction(workOrderLogs.get(0).getStatus())) {
+            return false;
+        }
+
+
         return false;
+    }
+
+    /**
+     * 是否包含学生早退的动作
+     *
+     * @param workOrderLogs
+     * @return
+     */
+    private boolean containStudentLeaveEarly(List<WorkOrderLog> workOrderLogs) {
+        for (WorkOrderLog workOrderLog : workOrderLogs) {
+            if (workOrderLog.getStatus() == FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断当前最后一次动作是否为教师所为
+     *
+     * @param status 鱼卡流水日志的状态码
+     * @return 如果有老师的操作动作, 返回true, 否则false
+     */
+    private boolean isTeacherAction(Integer status) {
+        switch (FishCardStatusEnum.get(status)) {
+            case WAITFORSTUDENT:
+            case TEACHER_CANCEL_PUSH:
+            case CONNECTED:
+            case STUDENT_INVITED_SCREEN:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean isStudentLeaveEarly(int status) {
+        return status == FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode();
     }
 
     /**
