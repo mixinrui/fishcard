@@ -254,7 +254,7 @@ public class FishCardUpdatorServiceX {
      * @return true:鱼卡为学生早退 , false:留下用来标记为系统异常
      */
     public boolean pickLeaveEarlyFromException(FishCardDelayMessage fishCardDelayMessage, WorkOrder workOrder) {
-        logger.debug("@pickLeaveEarlyFromException->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
+        logger.debug("@pickLeaveEarlyFromException 将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
                 FishCardStatusEnum.getDesc(FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()));
 
         List<WorkOrderLog> workOrderLogs = workOrderLogMorphiaRepository.queryByWorkId(workOrder.getId(), false);
@@ -318,12 +318,16 @@ public class FishCardUpdatorServiceX {
         logger.debug("@teacherPrepareClassUpdator,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
         //将已经推送过的数据放入cache,防止二次推送
         String flag = cacheManager.getCache(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY).get(fishCardDelayMessage.getId(), String.class);
+        
         if (StringUtils.isEmpty(flag)) {
+
             logger.info("@teacherPrepareClassUpdator->在redis中无对应的通知教师上课记录,开始通知师生运营组提醒教师上课");
+
             cacheManager.getCache(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY).put(fishCardDelayMessage.getId(), "sent");
             courseOnlineRequester.notifyTeachingOnlinePushMessage(fishCardDelayMessage.getId(), TeachingNotificationEnum.PREPARE_START_CLASS);
             return;
         }
+
         logger.info("@teacherPrepareClassUpdator->在redis中存在通知教师上课记录,不需要再次通知");
     }
 
