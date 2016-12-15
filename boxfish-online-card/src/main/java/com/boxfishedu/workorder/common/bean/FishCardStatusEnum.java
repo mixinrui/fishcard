@@ -13,6 +13,8 @@ public enum FishCardStatusEnum {
     STUDENT_ENTER_ROOM(36,"学生进入房间",""),
     //师生连通关系介于等待与接受之间
     CONNECTED(35,"师生已连通",""),
+    //学生弹出受邀请界面,在师生已联通之后出现
+    STUDENT_INVITED_SCREEN(37,"学生端弹出受邀界面",""),
     STUDENT_ACCEPTED(32,"学生接受上课请求",""),
     //学生资源准备完成
     READY(33, "就绪",""),
