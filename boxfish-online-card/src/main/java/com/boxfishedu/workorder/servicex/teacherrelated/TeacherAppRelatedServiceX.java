@@ -192,7 +192,6 @@ public class TeacherAppRelatedServiceX {
         List<DayTimeSlots> dayTimeSlotsList = resultMonthTimeSlots.getData();
         if (CollectionUtils.isEmpty(dayTimeSlotsList)) {
             DayTimeSlots dayTimeSlotsTemplate = teacherStudentRequester.dayTimeSlotsTemplate(teacherId, date);
-            dayTimeSlotsTemplate.setDay(DateUtil.simpleDate2String(date));
             return JsonResultModel.newJsonResultModel(
                     timeLimitPolicy.limit(dayTimeSlotsTemplate).filter(
                             d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
@@ -200,7 +199,6 @@ public class TeacherAppRelatedServiceX {
                     ));
         }
         DayTimeSlots dayTimeSlots = dayTimeSlotsList.get(0);
-        dayTimeSlots.setDay(DateUtil.simpleDate2String(date));
 
         // 2 获取老师遮天选的课
         List<CourseSchedule> courseScheduleList = courseScheduleService
