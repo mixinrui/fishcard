@@ -582,4 +582,12 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return workOrders;
     }
 
+    public List<WorkOrder> findByStartTimeMoreThanAndSkuIdAndIsFreeze(WorkOrder workOrder){
+        return jpa.findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(workOrder.getStudentId() ,workOrder.getStartTime(),workOrder.getSkuId(),0);
+    }
+
+    public List<WorkOrder> getMatchWorkOrders(Long teacherId,List startTimes){
+        return jpa.findByTeacherIdAndIsFreezeAndStartTimeIn(teacherId,0,startTimes);
+    }
+
 }
