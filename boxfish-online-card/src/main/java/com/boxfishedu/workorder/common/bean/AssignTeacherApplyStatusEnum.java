@@ -45,6 +45,7 @@ public enum AssignTeacherApplyStatusEnum {
         if (varMap.containsKey(code)) {
             return varMap.get(code);
         }
+        return null;
     }
 
     public static String getDesc(int code) {
