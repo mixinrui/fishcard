@@ -2,16 +2,15 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.entity.mysql.CourseInfo;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -163,4 +163,38 @@ public class AssignTeacherService {
     }
 
 
+    //4 查看我的邀请数量(学生的数量 未读)
+    public Integer getMyInvited(Long teacherId){
+        Date date = DateUtil.addMinutes(new Date(),-60*24*2);
+        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId,date);
+    }
+
+    // 5 老师端上课邀请列表
+    public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId,Pageable pageable){
+        Date now = new Date();
+        Date date = DateUtil.addMinutes(now,-60*24*2);
+        Page<StStudentApplyRecordsResult>  results =  stStudentApplyRecordsService.getmyInviteList(teacherId,date,pageable);
+
+        if (results == null || null == results.getContent())
+           return results;
+
+        ((List<StStudentApplyRecordsResult>) results.getContent()).stream().forEach(rs -> {
+            Map<String ,String> teacherInfoMap =teacherPhotoRequester.getTeacherInfo(rs.getStudentId());
+            if(!CollectionUtils.isEmpty(teacherInfoMap)){
+                rs.setStudentImg( teacherInfoMap.get("figure_url"));
+                rs.setStudentName(teacherInfoMap.get("nickname"));
+                rs.setSystemTime(now);
+            }
+        });
+
+        return results;
+    }
+
+    // 5 老师端上课邀请列表
+    public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId, Pageable pageable){
+        Date now = new Date();
+        Date date = DateUtil.addMinutes(now,-60*24*2);
+        Page<StStudentApplyRecords> results =  stStudentApplyRecordsService.getMyClassesByStudentId(teacherId,studentId,date,pageable);
+        return results;
+    }
 }

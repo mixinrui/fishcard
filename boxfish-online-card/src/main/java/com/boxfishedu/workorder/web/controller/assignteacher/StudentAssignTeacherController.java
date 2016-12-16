@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -64,7 +65,7 @@ public class StudentAssignTeacherController {
     @RequestMapping(value = "/{teacher_Id}/invitenum/assign", method = RequestMethod.GET)
     public JsonResultModel getInvitedNum(@PathVariable("teacher_Id")Long teahcerId){
         JSONObject jo = new JSONObject();
-        jo.put("unreadnum",3);
+        jo.put("unreadnum",assignTeacherService.getMyInvited(teahcerId));
         return JsonResultModel.newJsonResultModel(jo);
     }
 
@@ -73,61 +74,15 @@ public class StudentAssignTeacherController {
     @RequestMapping(value = "/{teacher_Id}/invitelist/assign", method = RequestMethod.GET)
     public JsonResultModel getInvitedList(@PathVariable("teacher_Id") Long teacherId,@PageableDefault(value = 10, sort = {"applyTime"},
             direction = Sort.Direction.DESC) Pageable pageable){
-
-        List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
-
-        StStudentApplyRecords st = new StStudentApplyRecords();
-        st.setStudentId(new Long(3232l));
-        st.setTeacherId(new Long(31123l));
-        st.setStudentImg("wwww.baidu.com");
-        st.setApplyTime(DateUtil.addMinutes(new Date(),190)   );
-        st.setCourseNum(3);
-        stStudentApplyRecordsList.add(st);
-
-        StStudentApplyRecords st1 = new StStudentApplyRecords();
-        st1.setStudentId(new Long(111111l));
-        st1.setTeacherId(new Long(323211l));
-        st1.setStudentImg("wwww.baidu.com");
-        st1.setApplyTime(DateUtil.addMinutes(new Date(),10) );
-        st1.setCourseNum(3);
-        stStudentApplyRecordsList.add(st1);
-
-        return JsonResultModel.newJsonResultModel(stStudentApplyRecordsList);
+        return JsonResultModel.newJsonResultModel( assignTeacherService.getmyInviteList(teacherId,pageable));
     }
 
     // 6学生的上课邀请列表详情
     @RequestMapping(value = "/{teacher_id}/invitelist/assign/{student_id}", method = RequestMethod.GET)
-    public JsonResultModel getInvitedDetailList(@PathVariable("teacher_id") Long teacherId,@PageableDefault(value = 10, sort = {"applyTime"},
+    public JsonResultModel getInvitedDetailList(@PathVariable("teacher_id") Long teacherId ,@PathVariable("student_id") Long studentId,@PageableDefault(value = 10, sort = {"applyTime"},
             direction = Sort.Direction.DESC) Pageable pageable){
 
-        List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
-
-        StStudentApplyRecords st = new StStudentApplyRecords();
-
-        st.setWorkOrderId(323L);
-        st.setCourseScheleId(32311l);
-        st.setStartTime(DateUtil.String2Date("2016-10-10 11:00:00"));
-        st.setTimeSlotId(32);
-        st.setEndTime(DateUtil.String2Date("2016-10-10 11:25:00"));
-        st.setStudentId(new Long(3232l));
-        st.setTeacherId(new Long(31123l));
-        st.setStudentImg("wwww.baidu.com");
-        st.setApplyTime(DateUtil.addMinutes(new Date(),190)   );
-        st.setCourseNum(3);
-        stStudentApplyRecordsList.add(st);
-
-        StStudentApplyRecords st1 = new StStudentApplyRecords();
-        st1.setWorkOrderId(323L);
-        st1.setCourseScheleId(32311l);
-        st1.setStartTime(DateUtil.String2Date("2016-12-19 11:00:00"));
-        st1.setTimeSlotId(32);
-        st.setEndTime(DateUtil.String2Date("2016-12-19 11:25:00"));
-        st1.setStudentId(new Long(111111l));
-        st1.setTeacherId(new Long(323211l));
-        st1.setStudentImg("wwww.baidu.com");
-        st1.setApplyTime(DateUtil.addMinutes(new Date(),10) );
-        st1.setCourseNum(3);
-        stStudentApplyRecordsList.add(st1);
+        Page<StStudentApplyRecords> stStudentApplyRecordsList = assignTeacherService.getMyClassesByStudentId(teacherId,studentId,pageable);
         return JsonResultModel.newJsonResultModel(stStudentApplyRecordsList);
     }
 
