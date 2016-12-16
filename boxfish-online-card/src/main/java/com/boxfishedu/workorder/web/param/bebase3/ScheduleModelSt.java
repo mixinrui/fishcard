@@ -12,10 +12,15 @@ import java.util.Date;
 @Data
 public class ScheduleModelSt {
 
-    private Long Id;
-
+    public enum MatchStatus{
+        un_matched,
+        matched,
+        wait2apply
+    }
+    private Long id;
+    private Long workOrderId;
     @NotNull(message = "日期不能为空")
-    private Long day;
+    private Date day;
 
     private String courseType;
 
@@ -24,7 +29,7 @@ public class ScheduleModelSt {
 
     private Integer roleId;
 
-    private Integer matchStatus   ;// '申请状态  0 不匹配  1 匹配  2 无时间片待匹配
+    private MatchStatus matchStatus   ;// '申请状态  0 不匹配  1 匹配  2 无时间片待匹配
     private Long oldTeacherId;//原老师id 需要指定老师的课的原来老师id  B老师
 
 
@@ -33,7 +38,7 @@ public class ScheduleModelSt {
     private Long grabedId;//课程表id
 
     @NotNull(message = "日期不能为空")
-    private Long grabedday;
+    private Long grabedDay;
 
     private String grabedcourseType;
 
@@ -42,13 +47,15 @@ public class ScheduleModelSt {
 
     private Integer grabedRoleId;
 
+    private Long grabedWorkOrderId;
+
     public ScheduleModelSt(CourseSchedule courseSchedule) {
-        this.day = courseSchedule.getClassDate().getTime();
+        this.day = courseSchedule.getClassDate();
         this.slotId = courseSchedule.getTimeSlotId();
         this.courseType = courseSchedule.getCourseType();
         this.roleId = courseSchedule.getRoleId();
         this.oldTeacherId = courseSchedule.getTeacherId();
-
-//        this.id = courseSchedule.getId();
+        this.id = courseSchedule.getId();
+        this.workOrderId = courseSchedule.getWorkorderId();
     }
 }

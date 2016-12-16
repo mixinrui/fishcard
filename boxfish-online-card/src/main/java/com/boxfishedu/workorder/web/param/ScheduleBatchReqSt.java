@@ -17,6 +17,8 @@ public class ScheduleBatchReqSt {
 
     private Long assginTeacherId;
 
+    private String assginTeacherName;
+
     private String operateType;//auto 自动 manual手动
     @Size(min = 1,message = "课程规划数据不能为空")
     private List<com.boxfishedu.workorder.web.param.bebase3.ScheduleModelSt> scheduleModelList;
