@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
+import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,8 @@ public class TestController {
 
     @Autowired
     private BaseTimeSlotService baseTimeSlotService;
+    @Autowired
+    private AssignTeacherServiceX assignTeacherServiceX;
 
     @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
     public void changeFishCardTime(@RequestBody Map<String,String> param){
@@ -186,5 +189,12 @@ public class TestController {
     public Object initBaseTimeSlots(@PathVariable Integer days) {
         baseTimeSlotService.initBaseTimeSlots(days);
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/assign")
+    public void testAssign(){
+        Long studentId = 1300041L;
+        Long teacherId = 100000000612L;
+        assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
     }
 }

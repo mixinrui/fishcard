@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -31,6 +32,7 @@ import java.util.List;
 /**
  * Created by olly on 2016/12/15.
  */
+@Service
 public class AssignTeacherServiceX {
     @Autowired
     WorkOrderJpaRepository workOrderJpaRepository;
@@ -78,10 +80,10 @@ public class AssignTeacherServiceX {
         }
         stStudentSchemaJpaRepository.save(stStudentSchema);
         Date startTime = DateTime.now().plusHours(48).toDate();
-        List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByStudentIdAndStartTimeAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
+        List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
         List<Integer> timeslotsList = Collections3.extractToList(aggressorCourseSchedules,"timeSlotId");
         List<Date> classDateList = Collections3.extractToList(aggressorCourseSchedules,"classDate");
-        List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze(teacherId,timeslotsList,classDateList,0);//TODO 当前指定老师的其他学生的课表
+        List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreeze(teacherId,timeslotsList,classDateList,0);//TODO 当前指定老师的其他学生的课表
         if(Collections3.isNotEmpty(victimCourseSchedules)){
             CourseSchedule courseSchedule = null;
             StStudentSchema stStudentSchemaTmp = null;
