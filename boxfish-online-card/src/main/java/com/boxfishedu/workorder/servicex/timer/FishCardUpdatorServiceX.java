@@ -288,6 +288,7 @@ public class FishCardUpdatorServiceX {
 
             return false;
         }
+        
         return false;
     }
 
