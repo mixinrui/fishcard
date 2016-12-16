@@ -54,11 +54,6 @@ public class OnlineAccountService {
     //如果redis出问题,直接查mongo
     public boolean isMember(Long studentId){
         boolean result;
-        //分流;mongo效率更低
-        if(studentId%3==0){
-            logger.debug("<<<@OnlineAccountService#isMember#user:[{}]########<<mongo>>>>",studentId);
-            return (onlineAccountSetMorphiaRepository.queryByStudentId(studentId)!=null);
-        }
         try {
             logger.debug("<<<@OnlineAccountService#isMember#user:[{}]########<<redis>>>>",studentId);
             if(redisTemplate.hasKey(ONLINE_ACCOUNT_KEY)) {
