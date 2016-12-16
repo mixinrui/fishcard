@@ -190,11 +190,17 @@ public class AssignTeacherService {
         return results;
     }
 
-    // 5 老师端上课邀请列表
+    // 6 学生的邀请
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId, Pageable pageable){
         Date now = new Date();
         Date date = DateUtil.addMinutes(now,-60*24*2);
         Page<StStudentApplyRecords> results =  stStudentApplyRecordsService.getMyClassesByStudentId(teacherId,studentId,date,pageable);
         return results;
     }
+
+    public StStudentApplyRecords getMyLastAssignTeacher(Long studentId){
+       return null;// stStudentApplyRecordsService.findMyLastAssignTeacher
+    }
+
+
 }

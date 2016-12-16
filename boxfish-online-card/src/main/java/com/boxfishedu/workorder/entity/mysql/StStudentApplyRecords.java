@@ -37,6 +37,7 @@ public class StStudentApplyRecords {
     private Date  updateTime;
     private Long  teacherId;     //  指定教师ID
     private ReadStatus isRead;
+    private Integer skuId;
     @Transient
     private Integer courseNum;
     @Transient

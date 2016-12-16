@@ -16,9 +16,6 @@ import java.util.List;
  */
 public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStudentApplyRecords, Long> {
 
-    public StStudentApplyRecords findByworkOrderIdAndApplyStatus(Long workOrderId, Integer applyStatus);
-//    StStudentApplyRecords findBy
-
     public StStudentApplyRecords findTop1ByWorkOrderIdAndApplyStatus(Long workOrderId,StStudentApplyRecords.ApplyStatus applyStatus);
 
     @Query(value = "select count(s.studentId) from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3 group by s.studentId")
@@ -30,4 +27,6 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
 
     public Page<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentId(Date date ,Long teacherId,Long studentId, Pageable pageable);
+
+    public StStudentApplyRecords findTop1ByStudentIdAndApplyStatusAndTeacherIdNotNullOrderByApplyTimeDesc(Long studentId,StStudentApplyRecords.ApplyStatus applyStatus);
 }
