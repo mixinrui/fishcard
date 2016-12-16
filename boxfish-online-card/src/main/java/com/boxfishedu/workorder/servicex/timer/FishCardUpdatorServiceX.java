@@ -237,7 +237,7 @@ public class FishCardUpdatorServiceX {
         }
         //处于学生接受请求或者ready状态,标记为系统异常
         else {
-            if (!this.pickLeaveEarlyFromException(fishCardDelayMessage, workOrder)) {
+            if (!this.pickLeaveEarlyFromException(fishCardDelayMessage, workOrder, courseSchedule)) {
                 logger.debug("@forceCompleteUpdator->将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
                         FishCardStatusEnum.getDesc(FishCardStatusEnum.EXCEPTION.getCode()));
                 courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.EXCEPTION.getCode());
@@ -254,7 +254,7 @@ public class FishCardUpdatorServiceX {
      * @param workOrder
      * @return true:鱼卡为学生早退 , false:留下用来标记为系统异常
      */
-    public boolean pickLeaveEarlyFromException(FishCardDelayMessage fishCardDelayMessage, WorkOrder workOrder) {
+    public boolean pickLeaveEarlyFromException(FishCardDelayMessage fishCardDelayMessage, WorkOrder workOrder, CourseSchedule courseSchedule) {
         logger.debug("@pickLeaveEarlyFromException 将鱼卡[{}]标记为[{}]", fishCardDelayMessage.getId(),
                 FishCardStatusEnum.getDesc(FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()));
 
@@ -271,17 +271,18 @@ public class FishCardUpdatorServiceX {
             return false;
         }
 
-        return this.pickLeaveEarlyFromException(workOrderLogs);
+        return this.pickLeaveEarlyFromException(workOrderLogs, workOrder, courseSchedule);
     }
 
-    private boolean pickLeaveEarlyFromException(List<WorkOrderLog> workOrderLogs) {
+    private boolean pickLeaveEarlyFromException(List<WorkOrderLog> workOrderLogs, WorkOrder workOrder, CourseSchedule courseSchedule) {
         for (WorkOrderLog workOrderLog : workOrderLogs) {
             if (this.isTeacherAction(workOrderLog)) {
                 continue;
             }
 
             if (this.isStudentLeaveEarly(workOrderLog)) {
-
+                logger.debug("@pickLeaveEarlyFromException,鱼卡[{}],标记为学生早退", workOrder.getId());
+                this.dealStudentLeaveEarly(workOrder, courseSchedule);
                 return true;
             }
 
@@ -290,8 +291,9 @@ public class FishCardUpdatorServiceX {
         return false;
     }
 
-    private void dealStudentAbsent(WorkOrder workOrder) {
-
+    private void dealStudentLeaveEarly(WorkOrder workOrder, CourseSchedule courseSchedule) {
+        courseOnlineServiceX.completeCourse(workOrder, courseSchedule
+                , FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode());
     }
 
     /**
