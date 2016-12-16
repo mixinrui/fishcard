@@ -2,16 +2,15 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.entity.mysql.CourseInfo;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -93,7 +93,7 @@ public class AssignTeacherService {
 
 
     public List<WorkOrder> getAssignTeacherList(Long workOrderId){
-        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, AssignTeacherApplyStatusEnum.YES.getCode());
+        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
         if(null==stStudentApplyRecords){
             WorkOrder workOrder = workOrderService.findOne(workOrderId);
             if(workOrder==null)
@@ -120,15 +120,18 @@ public class AssignTeacherService {
 
         CourseInfo courseInfo = new CourseInfo();
         //2 获取是否本课为指定老师
-        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, AssignTeacherApplyStatusEnum.YES.getCode());
+        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId,StStudentApplyRecords.ApplyStatus.agree);
         if(null!=stStudentApplyRecords){
             courseInfo.setAssignFlag(true);// 指定老师
         }else {
             courseInfo.setAssignFlag(false);// 非指定老师
         }
 
+
+
         //3 获取教师信息 老师头像 老师姓名
         if(workOrder.getTeacherId()!=null && workOrder.getTeacherId()>0){
+            courseInfo.setTeacherId(workOrder.getTeacherId());   // 设置教师ID
             Map<String ,String> teacherInfoMap =   teacherPhotoRequester.getTeacherInfo(workOrder.getTeacherId());
             courseInfo.setTeacherId(workOrder.getTeacherId());
             if(!CollectionUtils.isEmpty(teacherInfoMap)){
@@ -141,12 +144,16 @@ public class AssignTeacherService {
 
         //4 获取课程信息 词义数 阅读量 听力时长
         if(!StringUtils.isEmpty(workOrder.getCourseId() )){
-            Map<String ,Integer> teacherInfoMap =   teacherPhotoRequester.getTeacherInfo(workOrder.getTeacherId());
-            if(!CollectionUtils.isEmpty(teacherInfoMap)){
-//                private Integer wordNum; //单词量
+            courseInfo.setCourseId(workOrder.getCourseId());
+            Map<String ,Integer> courseMap =   teacherPhotoRequester.getCourseInfo(workOrder.getCourseId());
+            if(!CollectionUtils.isEmpty(courseMap)){
+//                private Integer wordNum; //词义数
 //                private Integer readNum; //阅读量
 //                private Integer listenNum;//积分
-                //courseInfo.setListenNum(teacherInfoMap.get("multiwordCount"));
+                courseInfo.setWordNum(courseMap.get("multiwordCount")); //词义数
+                courseInfo.setReadNum(courseMap.get("readWordCount"));//阅读量
+                courseInfo.setListenNum(courseMap.get("score"));//积分
+
             }
         }
 
@@ -156,4 +163,38 @@ public class AssignTeacherService {
     }
 
 
+    //4 查看我的邀请数量(学生的数量 未读)
+    public Integer getMyInvited(Long teacherId){
+        Date date = DateUtil.addMinutes(new Date(),-60*24*2);
+        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId,date);
+    }
+
+    // 5 老师端上课邀请列表
+    public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId,Pageable pageable){
+        Date now = new Date();
+        Date date = DateUtil.addMinutes(now,-60*24*2);
+        Page<StStudentApplyRecordsResult>  results =  stStudentApplyRecordsService.getmyInviteList(teacherId,date,pageable);
+
+        if (results == null || null == results.getContent())
+           return results;
+
+        ((List<StStudentApplyRecordsResult>) results.getContent()).stream().forEach(rs -> {
+            Map<String ,String> teacherInfoMap =teacherPhotoRequester.getTeacherInfo(rs.getStudentId());
+            if(!CollectionUtils.isEmpty(teacherInfoMap)){
+                rs.setStudentImg( teacherInfoMap.get("figure_url"));
+                rs.setStudentName(teacherInfoMap.get("nickname"));
+                rs.setSystemTime(now);
+            }
+        });
+
+        return results;
+    }
+
+    // 5 老师端上课邀请列表
+    public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId, Pageable pageable){
+        Date now = new Date();
+        Date date = DateUtil.addMinutes(now,-60*24*2);
+        Page<StStudentApplyRecords> results =  stStudentApplyRecordsService.getMyClassesByStudentId(teacherId,studentId,date,pageable);
+        return results;
+    }
 }

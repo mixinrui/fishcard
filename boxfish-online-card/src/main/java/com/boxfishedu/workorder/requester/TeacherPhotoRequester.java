@@ -71,11 +71,11 @@ public class TeacherPhotoRequester {
      * @param teacherId
      * @return  figure_url
      */
-    public Map<String, Integer> getTeacherInfo(Long teacherId) {
+    public Map<String, String> getTeacherInfo(Long teacherId) {
         String url = String.format("%s/%s", urlConf.getTeacher_photo(), teacherId);
         try {
             logger.info("获取教师xinxi ,url:[{}]", url);
-            Map<String, Integer> map = restTemplate.getForObject(url, Map.class);
+            Map<String, String> map = restTemplate.getForObject(url, Map.class);
             return map;
         } catch (Exception ex) {
             logger.error("获取教师失败,url[{}]",url, ex);

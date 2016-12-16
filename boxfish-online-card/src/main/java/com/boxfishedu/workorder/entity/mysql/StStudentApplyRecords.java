@@ -37,16 +37,19 @@ public class StStudentApplyRecords {
     private Date  updateTime;
     private Long  teacherId;     //  指定教师ID
     private ReadStatus isRead;
-//    @Transient
-//    private Integer courseNum;
-//    @Transient
-//    private Integer timeSlotId;
-//    @Transient
-//    @Temporal(TemporalType.TIMESTAMP)
-//    private Date startTime;
-//    @Transient
-//    @Temporal(TemporalType.TIMESTAMP)
-//    private Date endTime;
+    @Transient
+    private Integer courseNum;
+    @Transient
+    private Integer timeSlotId;
+    @Transient
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startTime;
+    @Transient
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endTime;
+    @Transient
+    private String studentImg;
+
 
 
 
