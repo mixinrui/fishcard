@@ -37,18 +37,25 @@ public class InstantRecommandAlthom {
         Integer remainder =accessIndex%CYCLE;
         switch (remainder){
             case 1:
-                this.countStart=CYCLE_COUNT*multiple;
+//                this.countStart=CYCLE_COUNT*multiple;
+                this.countStart=0;
+                this.countEnd=indexMap.get(1);
+//                this.countEnd=this.countStart+indexMap.get(remainder);
                 break;
             case 2:
-                this.countStart=CYCLE_COUNT*multiple+indexMap.get(1);
+//                this.countStart=CYCLE_COUNT*multiple+indexMap.get(1);
+                this.countStart=2;
+                this.countEnd=indexMap.get(2);
                 break;
             case 0:
-                this.countStart=CYCLE_COUNT*(multiple-1)+indexMap.get(1)+indexMap.get(2);
+//                this.countStart=CYCLE_COUNT*(multiple-1)+indexMap.get(1)+indexMap.get(2);
+                this.countStart=0;
+                this.countEnd=indexMap.get(0)+indexMap.get(1)+indexMap.get(2);
                 break;
             default:
                 throw new BusinessException("不合理的倍数");
         }
-        this.countEnd=this.countStart+indexMap.get(remainder);
+
     }
 
     public InstantRecommandAlthom(){
