@@ -55,14 +55,7 @@ public class StudentAssignTeacherController {
     //3 开始上课界面接口
     @RequestMapping(value = "/{workorder_Id}/beginclass/assign", method = RequestMethod.GET)
     public JsonResultModel showBeginClass(@PathVariable("workorder_Id") Long workOrderId){
-        CourseInfo c  = new CourseInfo();
-        c.setAssignFlag(true);
-        c.setWordNum(new Integer(180));
-        c.setReadNum(new Integer(264));
-        c.setListenNum(new Integer(168));
-        c.setTeacherImg("www.baidu.com");
-        c.setTeacherName("AssinName");
-        return JsonResultModel.newJsonResultModel(c);
+        return JsonResultModel.newJsonResultModel(  assignTeacherService.getCourseInfo(workOrderId));
 
     }
 

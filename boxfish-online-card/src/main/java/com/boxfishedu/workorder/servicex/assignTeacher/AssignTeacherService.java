@@ -65,14 +65,14 @@ public class AssignTeacherService {
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByStudentIdAndStartTimeAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
         List<Integer> timeslotsList = Collections3.extractToList(aggressorCourseSchedules,"timeSlotId");
         List<Date> classDateList = Collections3.extractToList(aggressorCourseSchedules,"classDate");
-        List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze(teacherId,timeslotsList,classDateList,0);//TODO 当前指定老师的其他学生的课表
+        List<CourseSchedule> victimCourseSchedules = null;//courseScheduleRepository.findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze(teacherId,timeslotsList,classDateList,0);//TODO 当前指定老师的其他学生的课表
         if(Collections3.isNotEmpty(victimCourseSchedules)){
             CourseSchedule courseSchedule;
             for (Iterator<CourseSchedule> iter = victimCourseSchedules.iterator(); iter.hasNext();) {
                 courseSchedule = iter.next();
-                if(courseSchedule.isAssgin()){
-                    iter.remove();//把是这个指定老师的排除掉
-                }
+//                if(courseSchedule.isAssgin()){
+//                    iter.remove();//把是这个指定老师的排除掉
+//                }
             }
         }
 
@@ -103,12 +103,13 @@ public class AssignTeacherService {
         ScheduleModelSt scheduleModelSt = null;
         for(CourseSchedule courseSchedule : aggressorCourseSchedules){
             scheduleModelSt = new ScheduleModelSt(courseSchedule);
-            scheduleModelSt.setCourseType();
+            scheduleModelSt.setCourseType(courseSchedule.getCourseType());
             for (CourseSchedule  victimCourseSchedule :victimCourseSchedules){
                 if(courseSchedule.getClassDate().compareTo(victimCourseSchedule.getClassDate()) == 0 && courseSchedule.getTimeSlotId() == victimCourseSchedule.getTimeSlotId() ){
 
                 }
             }
         }
+        return null;
     }
 }

@@ -127,8 +127,11 @@ public class AssignTeacherService {
             courseInfo.setAssignFlag(false);// 非指定老师
         }
 
+
+
         //3 获取教师信息 老师头像 老师姓名
         if(workOrder.getTeacherId()!=null && workOrder.getTeacherId()>0){
+            courseInfo.setTeacherId(workOrder.getTeacherId());   // 设置教师ID
             Map<String ,String> teacherInfoMap =   teacherPhotoRequester.getTeacherInfo(workOrder.getTeacherId());
             courseInfo.setTeacherId(workOrder.getTeacherId());
             if(!CollectionUtils.isEmpty(teacherInfoMap)){
@@ -141,12 +144,15 @@ public class AssignTeacherService {
 
         //4 获取课程信息 词义数 阅读量 听力时长
         if(!StringUtils.isEmpty(workOrder.getCourseId() )){
-            Map<String ,Integer> teacherInfoMap =   teacherPhotoRequester.getTeacherInfo(workOrder.getTeacherId());
-            if(!CollectionUtils.isEmpty(teacherInfoMap)){
-//                private Integer wordNum; //单词量
+            Map<String ,Integer> courseMap =   teacherPhotoRequester.getCourseInfo(workOrder.getCourseId());
+            if(!CollectionUtils.isEmpty(courseMap)){
+//                private Integer wordNum; //词义数
 //                private Integer readNum; //阅读量
 //                private Integer listenNum;//积分
-                //courseInfo.setListenNum(teacherInfoMap.get("multiwordCount"));
+                courseInfo.setWordNum(courseMap.get("multiwordCount")); //词义数
+                courseInfo.setReadNum(courseMap.get("readWordCount"));//阅读量
+                courseInfo.setListenNum(courseMap.get("score"));//积分
+
             }
         }
 
