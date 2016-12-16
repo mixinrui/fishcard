@@ -179,6 +179,7 @@ public class FishCardUpdatorServiceX {
 
         boolean isOnline = fetchHeartBeatServiceX.isOnline(new DataAnalysisLogParam(workOrder.getStudentId(),
                 startDate.getTime(), endDate.getTime(), AppPointRecordEventEnum.STUDENT_ONLINE_STATUS.value()));
+
         //没有联通但是在线,则表示为系统异常
         if (!containConnectedFlag && isOnline) {
             logger.info("studentForceAbsentUpdator判断鱼卡[{}]是否由于终端异常导致,判断结果[{}]", workOrder.getId(), isOnline);
@@ -270,8 +271,27 @@ public class FishCardUpdatorServiceX {
             return false;
         }
 
+        return this.pickLeaveEarlyFromException(workOrderLogs);
+    }
 
+    private boolean pickLeaveEarlyFromException(List<WorkOrderLog> workOrderLogs) {
+        for (WorkOrderLog workOrderLog : workOrderLogs) {
+            if (this.isTeacherAction(workOrderLog)) {
+                continue;
+            }
+
+            if (this.isStudentLeaveEarly(workOrderLog)) {
+
+                return true;
+            }
+
+            return false;
+        }
         return false;
+    }
+
+    private void dealStudentAbsent(WorkOrder workOrder) {
+
     }
 
     /**
@@ -287,6 +307,11 @@ public class FishCardUpdatorServiceX {
             }
         }
         return false;
+    }
+
+
+    private boolean isTeacherAction(WorkOrderLog workOrderLog) {
+        return this.isTeacherAction(workOrderLog.getStatus());
     }
 
     /**
@@ -307,6 +332,10 @@ public class FishCardUpdatorServiceX {
         }
     }
 
+    private boolean isStudentLeaveEarly(WorkOrderLog workOrderLog) {
+        return this.isStudentLeaveEarly(workOrderLog.getStatus());
+    }
+
     private boolean isStudentLeaveEarly(int status) {
         return status == FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode();
     }
@@ -318,7 +347,7 @@ public class FishCardUpdatorServiceX {
         logger.debug("@teacherPrepareClassUpdator,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
         //将已经推送过的数据放入cache,防止二次推送
         String flag = cacheManager.getCache(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY).get(fishCardDelayMessage.getId(), String.class);
-        
+
         if (StringUtils.isEmpty(flag)) {
 
             logger.info("@teacherPrepareClassUpdator->在redis中无对应的通知教师上课记录,开始通知师生运营组提醒教师上课");
