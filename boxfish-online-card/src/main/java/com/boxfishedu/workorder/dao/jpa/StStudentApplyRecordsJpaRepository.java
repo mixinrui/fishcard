@@ -10,4 +10,6 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
     public StStudentApplyRecords findByworkOrderIdAndApplyStatus(Long workOrderId, Integer applyStatus);
 //    StStudentApplyRecords findBy
+
+    public StStudentApplyRecords findTop1ByWorkOrderIdAndApplyStatus(Long workOrderId,Integer applyStatus);
 }

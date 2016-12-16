@@ -53,8 +53,9 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
 
     // 获取已经指定过老师的记录 AssignTeacherApplyStatusEnum
     public StStudentApplyRecords  getStStudentApplyRecordsBy(Long workOrderId,Integer applyStatus ){
-        return jpa.findByworkOrderIdAndApplyStatus(workOrderId,applyStatus);
+        return jpa.findTop1ByWorkOrderIdAndApplyStatus(workOrderId,applyStatus);
     }
+
 
 
 }

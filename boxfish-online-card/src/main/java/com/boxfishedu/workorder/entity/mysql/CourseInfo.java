@@ -14,9 +14,9 @@ public class CourseInfo {
     private String teacherImg;
     private boolean assignFlag ;//是否为指定的老师
 
-    private Integer wordNum;
-    private Integer readNum;
-    private Integer listenNum;
+    private Integer wordNum; //单词量
+    private Integer readNum; //阅读量
+    private Integer listenNum;//积分
 
 
 }

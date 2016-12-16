@@ -183,6 +183,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099
@@ -246,6 +247,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
 
 service:
   sdk:
@@ -311,6 +313,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
 service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099
@@ -383,6 +386,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099
@@ -458,6 +462,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
     course_type_and_difficulty: http://123.56.13.168:8001
 service:
@@ -528,7 +533,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
-
+    resource_url: http://api.online.test.boxfish.cn/online
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
@@ -594,6 +599,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    resource_url:http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
     course_type_and_difficulty: http://base.boxfish.cn
 
@@ -681,6 +687,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.boxfish.cn//online/figure
+    resource_url: http://api.boxfish.cn//online
 time:
   task:
     nodeOne: 0
@@ -756,6 +763,7 @@ interface:
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.boxfish.cn/online/figure
+    resource_url: http://api.boxfish.cn/online
 #外教点评接口调用地址
 service:
   sdk:

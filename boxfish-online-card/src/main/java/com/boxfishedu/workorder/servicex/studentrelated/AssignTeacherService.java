@@ -2,9 +2,11 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.entity.mysql.CourseInfo;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
 import com.boxfishedu.workorder.service.WorkOrderService;
@@ -16,9 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jiaozijun on 16/12/14.
@@ -35,6 +39,9 @@ public class AssignTeacherService {
 
     @Autowired
     private StStudentApplyRecordsService stStudentApplyRecordsService;
+
+    @Autowired
+    private TeacherPhotoRequester teacherPhotoRequester;
 
     //2 获取指定老师带的课程列表
     public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId ,Long studentId, Long teacherId, Pageable pageable) {
@@ -100,6 +107,52 @@ public class AssignTeacherService {
         }else {
             return null;
         }
+    }
+
+
+    //3 开始上课界面接口
+    public CourseInfo  getCourseInfo(Long workOrderId){
+        //1 获取鱼卡信息
+        WorkOrder  workOrder = workOrderService.findOne(workOrderId);
+        if(null==workOrder){
+            throw new BusinessException("课程信息有误");
+        }
+
+        CourseInfo courseInfo = new CourseInfo();
+        //2 获取是否本课为指定老师
+        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, AssignTeacherApplyStatusEnum.YES.getCode());
+        if(null!=stStudentApplyRecords){
+            courseInfo.setAssignFlag(true);// 指定老师
+        }else {
+            courseInfo.setAssignFlag(false);// 非指定老师
+        }
+
+        //3 获取教师信息 老师头像 老师姓名
+        if(workOrder.getTeacherId()!=null && workOrder.getTeacherId()>0){
+            Map<String ,String> teacherInfoMap =   teacherPhotoRequester.getTeacherInfo(workOrder.getTeacherId());
+            courseInfo.setTeacherId(workOrder.getTeacherId());
+            if(!CollectionUtils.isEmpty(teacherInfoMap)){
+                courseInfo.setTeacherImg(teacherInfoMap.get("figure_url"));// 教师头像url
+                courseInfo.setTeacherName(teacherInfoMap.get("nickname")); // 教师姓名
+            }
+
+        }
+
+
+        //4 获取课程信息 词义数 阅读量 听力时长
+        if(!StringUtils.isEmpty(workOrder.getCourseId() )){
+            Map<String ,Integer> teacherInfoMap =   teacherPhotoRequester.getTeacherInfo(workOrder.getTeacherId());
+            if(!CollectionUtils.isEmpty(teacherInfoMap)){
+//                private Integer wordNum; //单词量
+//                private Integer readNum; //阅读量
+//                private Integer listenNum;//积分
+                //courseInfo.setListenNum(teacherInfoMap.get("multiwordCount"));
+            }
+        }
+
+
+        return courseInfo;
+
     }
 
 
