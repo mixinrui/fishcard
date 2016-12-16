@@ -52,7 +52,7 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // 获取已经指定过老师的记录 AssignTeacherApplyStatusEnum
-    public StStudentApplyRecords  getStStudentApplyRecordsBy(Long workOrderId,Integer applyStatus ){
+    public StStudentApplyRecords  getStStudentApplyRecordsBy(Long workOrderId,StStudentApplyRecords.ApplyStatus applyStatus){
         return jpa.findTop1ByWorkOrderIdAndApplyStatus(workOrderId,applyStatus);
     }
 

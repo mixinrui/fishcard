@@ -93,7 +93,7 @@ public class AssignTeacherService {
 
 
     public List<WorkOrder> getAssignTeacherList(Long workOrderId){
-        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, AssignTeacherApplyStatusEnum.YES.getCode());
+        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
         if(null==stStudentApplyRecords){
             WorkOrder workOrder = workOrderService.findOne(workOrderId);
             if(workOrder==null)
@@ -120,7 +120,7 @@ public class AssignTeacherService {
 
         CourseInfo courseInfo = new CourseInfo();
         //2 获取是否本课为指定老师
-        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, AssignTeacherApplyStatusEnum.YES.getCode());
+        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId,StStudentApplyRecords.ApplyStatus.agree);
         if(null!=stStudentApplyRecords){
             courseInfo.setAssignFlag(true);// 指定老师
         }else {
@@ -144,6 +144,7 @@ public class AssignTeacherService {
 
         //4 获取课程信息 词义数 阅读量 听力时长
         if(!StringUtils.isEmpty(workOrder.getCourseId() )){
+            courseInfo.setCourseId(workOrder.getCourseId());
             Map<String ,Integer> courseMap =   teacherPhotoRequester.getCourseInfo(workOrder.getCourseId());
             if(!CollectionUtils.isEmpty(courseMap)){
 //                private Integer wordNum; //词义数
