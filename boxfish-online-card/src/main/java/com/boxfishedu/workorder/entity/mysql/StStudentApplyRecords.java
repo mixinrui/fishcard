@@ -27,8 +27,8 @@ public class StStudentApplyRecords {
     @GeneratedValue
     private Long id;
     private Long  studentId;
-    @Transient
-    private String studentImg ; //学生头像url
+//    @Transient
+//    private String studentImg ; //学生头像url
     private Date applyTime  ; //申请时间
     private Long   workOrderId ;//鱼卡id
     private Long  courseScheleId;// 课程id
@@ -37,16 +37,16 @@ public class StStudentApplyRecords {
     private Date  updateTime;
     private Long  teacherId;     //  指定教师ID
     private ReadStatus isRead;
-    @Transient
-    private Integer courseNum;
-    @Transient
-    private Integer timeSlotId;
-    @Transient
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date startTime;
-    @Transient
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endTime;
+//    @Transient
+//    private Integer courseNum;
+//    @Transient
+//    private Integer timeSlotId;
+//    @Transient
+//    @Temporal(TemporalType.TIMESTAMP)
+//    private Date startTime;
+//    @Transient
+//    @Temporal(TemporalType.TIMESTAMP)
+//    private Date endTime;
 
 
 

@@ -94,4 +94,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     // 查找48小时以内,没有课程推荐的课表
     @Query("select c from CourseSchedule c,WorkOrder w where c.workorderId=w.id and w.startTime<=?1 and w.courseId is null")
     List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
+
+    List<CourseSchedule> findByStudentIdAndStartTimeAndIsFreezeAndTeacherIdNot(Long studentId,Date startTime,Integer isFreeze,Long teacherId);
+    List<CourseSchedule> findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze(Long teacherId,List<Integer> TimeslotsList,List<Date> classDateList,Integer isFreeze);
 }

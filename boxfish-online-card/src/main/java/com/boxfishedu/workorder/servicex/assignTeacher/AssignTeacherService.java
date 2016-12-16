@@ -1,17 +1,22 @@
 package com.boxfishedu.workorder.servicex.assignTeacher;
 
+import com.boxfishedu.workorder.common.util.Collections3;
+import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.boxfishedu.workorder.entity.mysql.StStudentSchema;
+import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
+import com.boxfishedu.workorder.web.param.bebase3.ScheduleModelSt;
 import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -20,7 +25,8 @@ import java.util.List;
 public class AssignTeacherService {
     @Autowired
     WorkOrderJpaRepository workOrderJpaRepository;
-
+    @Autowired
+    CourseScheduleRepository courseScheduleRepository;
     @Autowired
     StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
     @Autowired
@@ -55,14 +61,28 @@ public class AssignTeacherService {
         }
         stStudentSchemaJpaRepository.save(stStudentSchema);
         Date startTime = DateTime.now().plusHours(48).toDate();
-        List<CourseSchedule> aggressorCourseSchedules = Lists.newArrayList();//TODO 发起指定老师的学生的48小时候的课表
-        List<CourseSchedule> victimCourseSchedules = Lists.newArrayList();//TODO 当前指定老师的其他学生的课表
+
+        List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByStudentIdAndStartTimeAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
+        List<Integer> timeslotsList = Collections3.extractToList(aggressorCourseSchedules,"timeSlotId");
+        List<Date> classDateList = Collections3.extractToList(aggressorCourseSchedules,"classDate");
+        List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze(teacherId,timeslotsList,classDateList,0);//TODO 当前指定老师的其他学生的课表
+        if(Collections3.isNotEmpty(victimCourseSchedules)){
+            CourseSchedule courseSchedule;
+            for (Iterator<CourseSchedule> iter = victimCourseSchedules.iterator(); iter.hasNext();) {
+                courseSchedule = iter.next();
+                if(courseSchedule.isAssgin()){
+                    iter.remove();//把是这个指定老师的排除掉
+                }
+            }
+        }
 
 
+
+//        List<CourseSchedule> victimCourseSchedules =
         //TODO 此处请求师生运营进行教师重新匹配
         //TODO 分为3中状态 匹配成功直接更新鱼卡和课表 不匹配不更新 无时间片 请求记录入库
 
-        List<>
+//        List<>
 
         //无时间片 请求记录入库
         StStudentApplyRecords stStudentApplyRecords = new StStudentApplyRecords();
@@ -75,5 +95,20 @@ public class AssignTeacherService {
         stStudentApplyRecords.setWorkOrderId(1l);
         stStudentApplyRecords.setCourseScheleId(1l);
         stStudentApplyRecordsJpaRepository.save(stStudentApplyRecords);
+    }
+
+    private List match(List<CourseSchedule> aggressorCourseSchedules,List<CourseSchedule> victimCourseSchedules){
+        ScheduleBatchReqSt scheduleBatchReqSt = new ScheduleBatchReqSt();
+        List<ScheduleModelSt> scheduleModelSts = Lists.newArrayList();
+        ScheduleModelSt scheduleModelSt = null;
+        for(CourseSchedule courseSchedule : aggressorCourseSchedules){
+            scheduleModelSt = new ScheduleModelSt(courseSchedule);
+            scheduleModelSt.setCourseType();
+            for (CourseSchedule  victimCourseSchedule :victimCourseSchedules){
+                if(courseSchedule.getClassDate().compareTo(victimCourseSchedule.getClassDate()) == 0 && courseSchedule.getTimeSlotId() == victimCourseSchedule.getTimeSlotId() ){
+
+                }
+            }
+        }
     }
 }
