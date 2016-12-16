@@ -1,6 +1,9 @@
 package com.boxfishedu.workorder.entity.mysql;
 
 import lombok.Data;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.Where;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -88,9 +91,16 @@ public class CourseSchedule {
 
     @Transient
     private Integer matchStatus;  // 用于指定老师列表判断
-    
 
-
+    @NotFound(action= NotFoundAction.IGNORE)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    @Where(clause="st_schema = 1")
+    private StStudentSchema stStudentSchema;
+    @Transient
+    public boolean isAssgin(){
+        return null != stStudentSchema;
+    }
 //    @Column(name="schedule_type")
 //    private Integer scheduleType;
 }
