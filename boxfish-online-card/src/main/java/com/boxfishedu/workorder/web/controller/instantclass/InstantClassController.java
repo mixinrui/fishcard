@@ -95,12 +95,12 @@ public class InstantClassController {
             //无论是否成功都删除当前用户的资源,需要增加判断
             String lockedUserId = redisTemplate.opsForValue().get(key);
             if (lockedUserId != null) {
-                if (lockedUserId.equals(teacherInstantRequestParam.getTeacherId())) {
-                    logger.debug("@teacherInstantClass IIIIIIIIIIIIIII 参数为[{}]的抢单教师[{}]完成抢单,删除redis数据,正在退出..."
+                if (lockedUserId.equals(teacherInstantRequestParam.getTeacherId().toString())) {
+                    logger.debug("@teacherInstantClass IIIIIIIIIIIIIII 参数为[{}]的抢单教师[{}]结束抢单,删除redis数据,正在退出..."
                             , JacksonUtil.toJSon(teacherInstantRequestParam), lockedUserId);
                     redisTemplate.delete(key);
                 } else {
-                    logger.debug("@teacherInstantClass IIIIIIIIIIIIIII 参数为[{}]的抢单教师[{}]完成抢单,与正在抢单的教师[{}]不是同一个教师,正在退出..."
+                    logger.debug("@teacherInstantClass IIIIIIIIIIIIIII (ㄒoㄒ)/~~/(ㄒoㄒ) 参数为[{}]的抢单教师[{}]完成抢单,与正在抢单的教师[{}]不是同一个教师,正在退出..."
                             , JacksonUtil.toJSon(teacherInstantRequestParam), teacherInstantRequestParam.getTeacherId(), lockedUserId);
                 }
             }
