@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.config.CommentCardTimeConf;
 import com.boxfishedu.workorder.common.config.ServiceGateWayType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.NotFoundException;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -80,10 +81,14 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public CommentCard foreignTeacherCommentCardAdd(CommentCardForm commentCardForm, Long userId, String access_token) {
         commentCardForm.setCourseType(null);
         commentCardForm.setCourseDifficulty(null);
-        Map courseMap = commentCardSDK.commentTypeAndDifficulty(commentCardForm.getCourseId());
-        if (Objects.nonNull(courseMap)){
-            commentCardForm.setCourseType(courseMap.get("type") == null?"":courseMap.get("type").toString());
-            commentCardForm.setCourseDifficulty(courseMap.get("difficulty") == null?"":courseMap.get("difficulty").toString());
+        try {
+            Map courseMap = commentCardSDK.commentTypeAndDifficulty(commentCardForm.getCourseId());
+            if (Objects.nonNull(courseMap)) {
+                commentCardForm.setCourseType(courseMap.get("type") == null ? "" : courseMap.get("type").toString());
+                commentCardForm.setCourseDifficulty(courseMap.get("difficulty") == null ? "" : courseMap.get("difficulty").toString());
+            }
+        } catch (NotFoundException e) {
+            e.printStackTrace();
         }
         CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
         if(!serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
