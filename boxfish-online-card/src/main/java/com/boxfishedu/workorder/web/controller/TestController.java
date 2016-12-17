@@ -195,6 +195,7 @@ public class TestController {
     public void testAssign(){
         Long studentId = 7045l;
         Long teacherId = 100000000612L;
+//        assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
         //assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
     }
 }
