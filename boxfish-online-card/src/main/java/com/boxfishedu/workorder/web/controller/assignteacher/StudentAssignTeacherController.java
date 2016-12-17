@@ -78,8 +78,8 @@ public class StudentAssignTeacherController {
     }
 
     // 6学生的上课邀请列表详情
-    @RequestMapping(value = "/{teacher_id}/invitelist/assign/{student_id}", method = RequestMethod.GET)
-    public JsonResultModel getInvitedDetailList(@PathVariable("teacher_id") Long teacherId ,@PathVariable("student_id") Long studentId,@PageableDefault(value = 10, sort = {"applyTime"},
+    @RequestMapping(value = "/{student_id}/invitelist/assign/{teacher_id}", method = RequestMethod.GET)
+    public JsonResultModel getInvitedDetailList(@PathVariable("student_id") Long studentId,@PathVariable("teacher_id") Long teacherId ,@PageableDefault(value = 10, sort = {"applyTime"},
             direction = Sort.Direction.DESC) Pageable pageable){
 
         Page<StStudentApplyRecords> stStudentApplyRecordsList = assignTeacherService.getMyClassesByStudentId(teacherId,studentId,pageable);
@@ -95,12 +95,10 @@ public class StudentAssignTeacherController {
     }
 
     //8 下单 是否弹出 是否继续指定该老师上课
-    @RequestMapping(value = "/{student_Id}/show/assign/first", method = RequestMethod.GET)
-    public JsonResultModel showAssignFirst(@PathVariable("student_Id") Long studentId) {
-        JSONObject jo = new JSONObject();
-        jo.put("teacherId",32323l);
-        jo.put("teacherImg","www.baidu.com");
-        return JsonResultModel.newJsonResultModel(jo);
+    @RequestMapping(value = "/{student_Id}/show/assign/first/{sku_id}", method = RequestMethod.GET)
+    public JsonResultModel showAssignFirst(@PathVariable("student_Id") Long studentId,@PathVariable("sku_id") Integer sku_id) {
+
+        return JsonResultModel.newJsonResultModel(assignTeacherService.getMyLastAssignTeacher(studentId,sku_id));
     }
 
 }

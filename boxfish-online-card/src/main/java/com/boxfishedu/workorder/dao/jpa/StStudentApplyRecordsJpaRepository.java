@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
@@ -28,5 +29,13 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
     public Page<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentId(Date date ,Long teacherId,Long studentId, Pageable pageable);
 
-    public StStudentApplyRecords findTop1ByStudentIdAndApplyStatusAndTeacherIdNotNullOrderByApplyTimeDesc(Long studentId,StStudentApplyRecords.ApplyStatus applyStatus);
+    public StStudentApplyRecords findTop1ByStudentIdAndApplyStatusAndSkuIdAndTeacherIdNotNullOrderByApplyTimeDesc(Long studentId,StStudentApplyRecords.ApplyStatus applyStatus,Integer skuId);
+
+    @Modifying
+    @Query("update StStudentApplyRecords o set o.isRead= ?1    where o.teacherId= ?2 and o.studentId= ?3")
+    int setFixedIsReadFor(StStudentApplyRecords.ReadStatus readStatus,Long teacherId, Long studentId);
+
+    @Modifying
+    @Query("update StStudentApplyRecords o set  o.isRead= ?1, o.applyStatus=?2  where  o.id in (?3) ")
+    int setFixedIsReadAndApplyStatusFor(StStudentApplyRecords.ReadStatus readStatus, StStudentApplyRecords.ApplyStatus applyStatus ,Long [] ids);
 }

@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -12,10 +13,13 @@ import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -29,7 +33,7 @@ import java.util.Map;
  */
 @Component
 public class AssignTeacherService {
-
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private CourseScheduleService courseScheduleService;
@@ -44,27 +48,26 @@ public class AssignTeacherService {
     private TeacherPhotoRequester teacherPhotoRequester;
 
     //2 获取指定老师带的课程列表
-    public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId ,Long studentId, Long teacherId, Pageable pageable) {
+    public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId, Long studentId, Long teacherId, Pageable pageable) {
         Page<CourseSchedule> courseSchedulePage = courseScheduleService.findFinishCourseSchedulePage(studentId, pageable);
         trimPage(courseSchedulePage);
         return JsonResultModel.newJsonResultModel(courseSchedulePage);
     }
 
 
-
     // 2.1 组装向师生运营发送的消息内容   teacherId 指定的老师id
-    public ScheduleBatchReqSt makeScheduleBatchReqSt(Long oldWorkOrderId,Long teacherId){
+    public ScheduleBatchReqSt makeScheduleBatchReqSt(Long oldWorkOrderId, Long teacherId) {
         ScheduleBatchReqSt scheduleBatchReqSt = new ScheduleBatchReqSt();
-        List<WorkOrder> workOrders =   this.getAssignTeacherList(oldWorkOrderId);
-        if(CollectionUtils.isEmpty(workOrders))
+        List<WorkOrder> workOrders = this.getAssignTeacherList(oldWorkOrderId);
+        if (CollectionUtils.isEmpty(workOrders))
             return null;
 
         // 获取和该 workOrders 未冻结 开始时间相同 并且为指定老师的鱼卡信息
         List startTimelist = Lists.newArrayList();
-        workOrders.forEach(w->{
+        workOrders.forEach(w -> {
             startTimelist.add(w.getStartTime());
         });
-        List<WorkOrder> workOrdersB = workOrderService.getMatchWorkOrders(teacherId,startTimelist);
+        List<WorkOrder> workOrdersB = workOrderService.getMatchWorkOrders(teacherId, startTimelist);
 
         return scheduleBatchReqSt;
     }
@@ -80,61 +83,59 @@ public class AssignTeacherService {
     }
 
 
-    public JsonResultModel checkAssignTeacherFlag(Long workOrderId){
-        List<WorkOrder> workOrders =   this.getAssignTeacherList(workOrderId);
-        if(CollectionUtils.isEmpty(workOrders)){
+    public JsonResultModel checkAssignTeacherFlag(Long workOrderId) {
+        List<WorkOrder> workOrders = this.getAssignTeacherList(workOrderId);
+        if (CollectionUtils.isEmpty(workOrders)) {
             return JsonResultModel.newJsonResultModel(false);
-        }else {
+        } else {
             return JsonResultModel.newJsonResultModel(true);
         }
 
     }
 
 
-
-    public List<WorkOrder> getAssignTeacherList(Long workOrderId){
-        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
-        if(null==stStudentApplyRecords){
+    public List<WorkOrder> getAssignTeacherList(Long workOrderId) {
+        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
+        if (null == stStudentApplyRecords) {
             WorkOrder workOrder = workOrderService.findOne(workOrderId);
-            if(workOrder==null)
+            if (workOrder == null)
                 throw new BusinessException("课程信息有误");
-            List<WorkOrder>  listWorkOrders =  workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
-            if(CollectionUtils.isEmpty(listWorkOrders)){
+            List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
+            if (CollectionUtils.isEmpty(listWorkOrders)) {
                 return null;
-            }else {
+            } else {
                 return listWorkOrders;
             }
-        }else {
+        } else {
             return null;
         }
     }
 
 
     //3 开始上课界面接口
-    public CourseInfo  getCourseInfo(Long workOrderId){
+    public CourseInfo getCourseInfo(Long workOrderId) {
         //1 获取鱼卡信息
-        WorkOrder  workOrder = workOrderService.findOne(workOrderId);
-        if(null==workOrder){
+        WorkOrder workOrder = workOrderService.findOne(workOrderId);
+        if (null == workOrder) {
             throw new BusinessException("课程信息有误");
         }
 
         CourseInfo courseInfo = new CourseInfo();
         //2 获取是否本课为指定老师
-        StStudentApplyRecords stStudentApplyRecords =   stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId,StStudentApplyRecords.ApplyStatus.agree);
-        if(null!=stStudentApplyRecords){
+        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
+        if (null != stStudentApplyRecords) {
             courseInfo.setAssignFlag(true);// 指定老师
-        }else {
+        } else {
             courseInfo.setAssignFlag(false);// 非指定老师
         }
 
 
-
         //3 获取教师信息 老师头像 老师姓名
-        if(workOrder.getTeacherId()!=null && workOrder.getTeacherId()>0){
+        if (workOrder.getTeacherId() != null && workOrder.getTeacherId() > 0) {
             courseInfo.setTeacherId(workOrder.getTeacherId());   // 设置教师ID
-            Map<String ,String> teacherInfoMap =   teacherPhotoRequester.getTeacherInfo(workOrder.getTeacherId());
+            Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(workOrder.getTeacherId());
             courseInfo.setTeacherId(workOrder.getTeacherId());
-            if(!CollectionUtils.isEmpty(teacherInfoMap)){
+            if (!CollectionUtils.isEmpty(teacherInfoMap)) {
                 courseInfo.setTeacherImg(teacherInfoMap.get("figure_url"));// 教师头像url
                 courseInfo.setTeacherName(teacherInfoMap.get("nickname")); // 教师姓名
             }
@@ -143,10 +144,10 @@ public class AssignTeacherService {
 
 
         //4 获取课程信息 词义数 阅读量 听力时长
-        if(!StringUtils.isEmpty(workOrder.getCourseId() )){
+        if (!StringUtils.isEmpty(workOrder.getCourseId())) {
             courseInfo.setCourseId(workOrder.getCourseId());
-            Map<String ,Integer> courseMap =   teacherPhotoRequester.getCourseInfo(workOrder.getCourseId());
-            if(!CollectionUtils.isEmpty(courseMap)){
+            Map<String, Integer> courseMap = teacherPhotoRequester.getCourseInfo(workOrder.getCourseId());
+            if (!CollectionUtils.isEmpty(courseMap)) {
 //                private Integer wordNum; //词义数
 //                private Integer readNum; //阅读量
 //                private Integer listenNum;//积分
@@ -164,24 +165,24 @@ public class AssignTeacherService {
 
 
     //4 查看我的邀请数量(学生的数量 未读)
-    public Integer getMyInvited(Long teacherId){
-        Date date = DateUtil.addMinutes(new Date(),-60*24*2);
-        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId,date);
+    public Integer getMyInvited(Long teacherId) {
+        Date date = DateUtil.addMinutes(new Date(), -60 * 24 * 2);
+        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId, date);
     }
 
     // 5 老师端上课邀请列表
-    public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId,Pageable pageable){
+    public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Pageable pageable) {
         Date now = new Date();
-        Date date = DateUtil.addMinutes(now,-60*24*2);
-        Page<StStudentApplyRecordsResult>  results =  stStudentApplyRecordsService.getmyInviteList(teacherId,date,pageable);
+        Date date = DateUtil.addMinutes(now, -60 * 24 * 2);
+        Page<StStudentApplyRecordsResult> results = stStudentApplyRecordsService.getmyInviteList(teacherId, date, pageable);
 
         if (results == null || null == results.getContent())
-           return results;
+            return results;
 
         ((List<StStudentApplyRecordsResult>) results.getContent()).stream().forEach(rs -> {
-            Map<String ,String> teacherInfoMap =teacherPhotoRequester.getTeacherInfo(rs.getStudentId());
-            if(!CollectionUtils.isEmpty(teacherInfoMap)){
-                rs.setStudentImg( teacherInfoMap.get("figure_url"));
+            Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(rs.getStudentId());
+            if (!CollectionUtils.isEmpty(teacherInfoMap)) {
+                rs.setStudentImg(teacherInfoMap.get("figure_url"));
                 rs.setStudentName(teacherInfoMap.get("nickname"));
                 rs.setSystemTime(now);
             }
@@ -191,15 +192,42 @@ public class AssignTeacherService {
     }
 
     // 6 学生的邀请
-    public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId, Pageable pageable){
+    @Transactional
+    public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId, Long studentId, Pageable pageable) {
         Date now = new Date();
-        Date date = DateUtil.addMinutes(now,-60*24*2);
-        Page<StStudentApplyRecords> results =  stStudentApplyRecordsService.getMyClassesByStudentId(teacherId,studentId,date,pageable);
+        Date date = DateUtil.addMinutes(now, -60 * 24 * 2);
+        Page<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, date, pageable);
+        // 更新已读状态
+
+        int readNum = stStudentApplyRecordsService.upateReadStatusByStudentId(teacherId, studentId);
+        logger.info("getMyClassesByStudentId:num:[{}],teacherId:[{}],studentId:[{}]",readNum,teacherId,studentId);
         return results;
     }
 
-    public StStudentApplyRecords getMyLastAssignTeacher(Long studentId){
-       return null;// stStudentApplyRecordsService.findMyLastAssignTeacher
+    public JSONObject getMyLastAssignTeacher(Long studentId, Integer skuId) {
+        if (studentId == null || null == skuId) {
+            throw new BusinessException("课程信息有误");
+        }
+        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(studentId, skuId);
+
+        JSONObject jo = new JSONObject();
+        if (stStudentApplyRecords == null) {
+            jo.put("hasAssignTeacher", false);
+            return jo;
+        }
+
+        jo.put("hasAssignTeacher", true);
+
+        Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(stStudentApplyRecords.getTeacherId());
+        if (!CollectionUtils.isEmpty(teacherInfoMap)) {
+            jo.put("teacherImg", teacherInfoMap.get("figure_url"));
+            jo.put("teacherName", teacherInfoMap.get("nickname"));
+            jo.put("teacherId", stStudentApplyRecords.getTeacherId());
+            jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
+
+        }
+        return jo;
+
     }
 
 
