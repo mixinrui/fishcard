@@ -36,7 +36,7 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
 
 
     public Integer getUnreadInvitedNum(Long teacherId, Date date){
-       Optional<Integer> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no);
+       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no);
         return unread.isPresent()?unread.get().intValue():0;
     }
 

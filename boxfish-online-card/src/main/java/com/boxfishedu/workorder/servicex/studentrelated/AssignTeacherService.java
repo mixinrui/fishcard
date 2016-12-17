@@ -198,7 +198,27 @@ public class AssignTeacherService {
         Date date = DateUtil.addMinutes(now, -60 * 24 * 2);
         Page<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, date, pageable);
         // 更新已读状态
+        List fishcardids = Lists.newArrayList();
+        if(results!=null && null!=results.getContent()){
+            ((List<StStudentApplyRecords>)results.getContent()).stream().forEach(st->{
+                 fishcardids.add(st.getWorkOrderId());
+            });
+        }
 
+        if(!CollectionUtils.isEmpty(fishcardids)){
+            List<WorkOrder> workOrders = workOrderService.findByIdIn(fishcardids);
+            ((List<StStudentApplyRecords>)results.getContent()).stream().forEach(st->{
+                workOrders.stream().forEach(workOrder -> {
+                    if(workOrder.getId().equals(st.getWorkOrderId())){
+                        st.setStartTime(workOrder.getStartTime());
+                        st.setEndTime(workOrder.getEndTime());
+                        st.setTimeSlotId(workOrder.getSlotId());
+                    }
+                });
+
+            });
+
+        }
         int readNum = stStudentApplyRecordsService.upateReadStatusByStudentId(teacherId, studentId);
         logger.info("getMyClassesByStudentId:num:[{}],teacherId:[{}],studentId:[{}]",readNum,teacherId,studentId);
         return results;

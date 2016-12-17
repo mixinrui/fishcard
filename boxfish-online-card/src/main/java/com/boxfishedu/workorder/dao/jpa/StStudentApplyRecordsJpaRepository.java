@@ -19,8 +19,8 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
     public StStudentApplyRecords findTop1ByWorkOrderIdAndApplyStatus(Long workOrderId,StStudentApplyRecords.ApplyStatus applyStatus);
 
-    @Query(value = "select count(s.studentId) from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3 group by s.studentId")
-    Optional<Integer> getUnreadInvitedNum(Long teacherId,Date date,StStudentApplyRecords.ReadStatus status);
+    @Query(value = "select count(distinct s.studentId) from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3")
+    Optional<Long> getUnreadInvitedNum(Long teacherId,Date date,StStudentApplyRecords.ReadStatus status);
 
 
     @Query(value = "select new com.boxfishedu.workorder.entity.mysql.StStudentApplyRecordsResult(s.studentId,s.applyTime,s.teacherId,s.isRead,count(s.workOrderId)) from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2  group by s.studentId")

@@ -74,7 +74,10 @@ public class StudentAssignTeacherController {
     @RequestMapping(value = "/{teacher_Id}/invitelist/assign", method = RequestMethod.GET)
     public JsonResultModel getInvitedList(@PathVariable("teacher_Id") Long teacherId,@PageableDefault(value = 10, sort = {"applyTime"},
             direction = Sort.Direction.DESC) Pageable pageable){
-        return JsonResultModel.newJsonResultModel( assignTeacherService.getmyInviteList(teacherId,pageable));
+        JSONObject jo = new JSONObject();
+        jo.put("baseHours",48);
+        jo.put("results",assignTeacherService.getmyInviteList(teacherId,pageable));
+        return JsonResultModel.newJsonResultModel(jo);
     }
 
     // 6学生的上课邀请列表详情
