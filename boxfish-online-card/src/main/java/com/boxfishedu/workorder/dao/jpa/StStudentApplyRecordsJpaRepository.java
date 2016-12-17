@@ -17,23 +17,23 @@ import java.util.List;
  */
 public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStudentApplyRecords, Long> {
 
-    public StStudentApplyRecords findTop1ByWorkOrderIdAndApplyStatus(Long workOrderId,StStudentApplyRecords.ApplyStatus applyStatus);
+    public StStudentApplyRecords findTop1ByWorkOrderIdAndApplyStatusAndValid(Long workOrderId,StStudentApplyRecords.ApplyStatus applyStatus ,StStudentApplyRecords.VALID valid);
 
-    @Query(value = "select count(distinct s.studentId) from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3")
-    Optional<Long> getUnreadInvitedNum(Long teacherId,Date date,StStudentApplyRecords.ReadStatus status);
-
-
-    @Query(value = "select new com.boxfishedu.workorder.entity.mysql.StStudentApplyRecordsResult(s.studentId,s.applyTime,s.teacherId,s.isRead,count(s.workOrderId)) from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2  group by s.studentId")
-    Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date, Pageable pageable);
+    @Query(value = "select count(distinct s.studentId) from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3 and s.valid=?4")
+    Optional<Long> getUnreadInvitedNum(Long teacherId,Date date,StStudentApplyRecords.ReadStatus status,StStudentApplyRecords.VALID valid);
 
 
-    public Page<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentId(Date date ,Long teacherId,Long studentId, Pageable pageable);
+    @Query(value = "select new com.boxfishedu.workorder.entity.mysql.StStudentApplyRecordsResult(s.studentId,s.applyTime,s.teacherId,s.isRead,count(s.workOrderId)) from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2 and s.valid=?3  group by s.studentId")
+    Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date,StStudentApplyRecords.VALID valid, Pageable pageable);
 
-    public StStudentApplyRecords findTop1ByStudentIdAndApplyStatusAndSkuIdAndTeacherIdNotNullOrderByApplyTimeDesc(Long studentId,StStudentApplyRecords.ApplyStatus applyStatus,Integer skuId);
+
+    public Page<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(Date date ,Long teacherId,Long studentId,StStudentApplyRecords.VALID valid, Pageable pageable);
+
+    public StStudentApplyRecords findTop1ByStudentIdAndApplyStatusAndSkuIdAndValidAndTeacherIdNotNullOrderByApplyTimeDesc(Long studentId,StStudentApplyRecords.ApplyStatus applyStatus,Integer skuId,StStudentApplyRecords.VALID valid);
 
     @Modifying
-    @Query("update StStudentApplyRecords o set o.isRead= ?1    where o.teacherId= ?2 and o.studentId= ?3")
-    int setFixedIsReadFor(StStudentApplyRecords.ReadStatus readStatus,Long teacherId, Long studentId);
+    @Query("update StStudentApplyRecords o set o.isRead= ?1    where o.teacherId= ?2 and o.studentId= ?3 and o.valid= ?4")
+    int setFixedIsReadFor(StStudentApplyRecords.ReadStatus readStatus,Long teacherId, Long studentId,StStudentApplyRecords.VALID valid);
 
     @Modifying
     @Query("update StStudentApplyRecords o set  o.isRead= ?1, o.applyStatus=?2  where  o.id in (?3) ")
