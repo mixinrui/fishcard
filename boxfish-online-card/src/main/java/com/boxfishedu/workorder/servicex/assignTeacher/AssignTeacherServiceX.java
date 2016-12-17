@@ -142,8 +142,9 @@ public class AssignTeacherServiceX {
                 stStudentApplyRecordsList.add(stStudentApplyRecords);
             }
         }
-        //无时间片 请求记录入库
+        //无时间片 请求记录入库 入库之前,先把之前的申请记录全部作废掉
         if(Collections3.isNotEmpty(stStudentApplyRecordsList)){
+
             stStudentApplyRecordsJpaRepository.save(stStudentApplyRecordsList);
         }
 
