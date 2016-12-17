@@ -22,6 +22,11 @@ public class StStudentSchema {
         un_assgin,
         assgin
     }
+    public enum CourseType{
+        unknown,
+        chinese,
+        foreign
+    }
     @Id
     @GeneratedValue
     private Long id;
@@ -29,6 +34,7 @@ public class StStudentSchema {
     private Long  studentId;
     private Long  teacherId ;     //  指定教师ID
     private StSchema stSchema;//  '0自由模式1指定模式'
+    private CourseType skuId;
     private Date createTime  ;
     private Date  updateTime ;
 }
