@@ -268,14 +268,17 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                 break;
             }
             List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
+
+            workOrder.setHaveTeacherRequested(Boolean.FALSE);
+            
             for (WorkOrderLog workOrderLog : workOrderLogs) {
                 if (workOrderLog.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
-                        || workOrderLog.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()) {
+                        || workOrderLog.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()
+                        || workOrderLog.getStatus() == FishCardStatusEnum.ONCLASS.getCode()) {
                     workOrder.setHaveTeacherRequested(Boolean.TRUE);
                     break;
                 }
             }
-            workOrder.setHaveTeacherRequested(Boolean.FALSE);
         }
     }
 
