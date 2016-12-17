@@ -20,8 +20,8 @@ public class StStudentApplyRecords {
         agree
     }
     public enum ReadStatus{
-        yes,
-        no
+        no,
+        yes
     }
     //是否有效
     public enum VALID{
