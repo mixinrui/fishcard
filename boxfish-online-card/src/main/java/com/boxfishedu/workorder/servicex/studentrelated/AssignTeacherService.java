@@ -47,6 +47,36 @@ public class AssignTeacherService {
     @Autowired
     private TeacherPhotoRequester teacherPhotoRequester;
 
+
+    //1 判断按钮是否出现
+    public JsonResultModel checkAssignTeacherFlag(Long workOrderId) {
+        List<WorkOrder> workOrders = this.getAssignTeacherList(workOrderId);
+        if (CollectionUtils.isEmpty(workOrders)) {
+            return JsonResultModel.newJsonResultModel(false);
+        } else {
+            return JsonResultModel.newJsonResultModel(true);
+        }
+
+    }
+
+
+    public List<WorkOrder> getAssignTeacherList(Long workOrderId) {
+        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
+        if (null == stStudentApplyRecords) {
+            WorkOrder workOrder = workOrderService.findOne(workOrderId);
+            if (workOrder == null)
+                throw new BusinessException("课程信息有误");
+            List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
+            if (CollectionUtils.isEmpty(listWorkOrders)) {
+                return null;
+            } else {
+                return listWorkOrders;
+            }
+        } else {
+            return null;
+        }
+    }
+
     //2 获取指定老师带的课程列表
     public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId, Long studentId, Long teacherId, Pageable pageable) {
         Page<CourseSchedule> courseSchedulePage = courseScheduleService.findFinishCourseSchedulePage(studentId, pageable);
@@ -83,33 +113,6 @@ public class AssignTeacherService {
     }
 
 
-    public JsonResultModel checkAssignTeacherFlag(Long workOrderId) {
-        List<WorkOrder> workOrders = this.getAssignTeacherList(workOrderId);
-        if (CollectionUtils.isEmpty(workOrders)) {
-            return JsonResultModel.newJsonResultModel(false);
-        } else {
-            return JsonResultModel.newJsonResultModel(true);
-        }
-
-    }
-
-
-    public List<WorkOrder> getAssignTeacherList(Long workOrderId) {
-        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
-        if (null == stStudentApplyRecords) {
-            WorkOrder workOrder = workOrderService.findOne(workOrderId);
-            if (workOrder == null)
-                throw new BusinessException("课程信息有误");
-            List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
-            if (CollectionUtils.isEmpty(listWorkOrders)) {
-                return null;
-            } else {
-                return listWorkOrders;
-            }
-        } else {
-            return null;
-        }
-    }
 
 
     //3 开始上课界面接口

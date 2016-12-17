@@ -23,6 +23,11 @@ public class StStudentApplyRecords {
         yes,
         no
     }
+    //是否有效
+    public enum VALID{
+        yes,
+        no
+    }
     @Id
     @GeneratedValue
     private Long id;
@@ -38,6 +43,7 @@ public class StStudentApplyRecords {
     private Long  teacherId;     //  指定教师ID
     private ReadStatus isRead;
     private Integer skuId;
+    private VALID valid; // 用于逻辑删除数据
     @Transient
     private Integer courseNum;
     @Transient
