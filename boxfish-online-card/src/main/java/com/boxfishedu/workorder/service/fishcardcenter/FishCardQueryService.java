@@ -270,7 +270,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
 
             workOrder.setHaveTeacherRequested(Boolean.FALSE);
-            
+
             for (WorkOrderLog workOrderLog : workOrderLogs) {
                 if (workOrderLog.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
                         || workOrderLog.getStatus() == FishCardStatusEnum.WAITFORSTUDENT.getCode()
