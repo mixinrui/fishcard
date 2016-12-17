@@ -153,7 +153,7 @@ public class AssignTeacherService {
 //                private Integer listenNum;//积分
                 courseInfo.setWordNum(courseMap.get("multiwordCount")); //词义数
                 courseInfo.setReadNum(courseMap.get("readWordCount"));//阅读量
-                courseInfo.setListenNum(courseMap.get("score"));//积分
+                courseInfo.setScoreNum(courseMap.get("score"));//积分
 
             }
         }

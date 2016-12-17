@@ -16,7 +16,7 @@ public class CourseInfo {
 
     private Integer wordNum; //单词量
     private Integer readNum; //阅读量
-    private Integer listenNum;//积分
+    private Integer scoreNum;//积分
 
 
 }
