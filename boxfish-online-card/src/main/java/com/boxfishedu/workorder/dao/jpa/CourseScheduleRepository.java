@@ -42,7 +42,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     public CourseSchedule findByWorkorderId(Long workorderId);
 
     public List<CourseSchedule> findByWorkorderIdIn(Long[] workOrderIds);
-
+    List<CourseSchedule> findByWorkorderIdIn(List<Long> workOrderIds);
     public CourseSchedule findByTeacherIdAndTimeSlotIdAndClassDate(Long teacherId, Long timeSlotId, Date classDate);
 
     public CourseSchedule findTop1ByWorkorderId(Long workOrderId);

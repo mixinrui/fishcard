@@ -121,7 +121,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     @Query("select wo from WorkOrder wo where wo.id in (?1) ")
     public List<WorkOrder> findWorkOrderAll(Long[] ids);
-
+    @Query("select wo from WorkOrder wo where wo.id in (?1) ")
+    public List<WorkOrder> findWorkOrderAll(List<Long> ids);
 
     public List<WorkOrder> findByCourseType(String courseType);
 

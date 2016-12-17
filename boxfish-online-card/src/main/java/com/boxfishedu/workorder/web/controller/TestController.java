@@ -193,7 +193,7 @@ public class TestController {
 
     @RequestMapping(value = "/assign")
     public void testAssign(){
-        Long studentId = 1300041L;
+        Long studentId = 7045l;
         Long teacherId = 100000000612L;
         assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
     }

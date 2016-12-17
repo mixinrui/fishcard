@@ -59,11 +59,22 @@ public class AssignTeacherServiceX {
      * stp4 请求师生运营进行教师匹配
      * stp5 根据匹配结果如果匹配成功 更新鱼卡 如果匹配失败不更新 如果无时间片申请表入库
      *
+     *
+     *
+     *
+     * 不成功的也会入记录表
      * @param teacherId 指定老师ID
      * @param studentId 当前学生ID
      */
+
+    public JsonResultModel maualAssgin(Long teacherId, Long studentId){
+        Date startTime = DateTime.now().plusHours(48).toDate();
+        List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
+        return doAssignTeacher(teacherId,studentId,aggressorCourseSchedules);
+    }
+
     @Transactional
-    public JsonResultModel doAssignTeacher(Long teacherId, Long studentId){
+    private JsonResultModel doAssignTeacher(Long teacherId, Long studentId,List<CourseSchedule> aggressorCourseSchedules){
 
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findByStudentId(studentId);
         if(null == stStudentSchema){
@@ -79,8 +90,8 @@ public class AssignTeacherServiceX {
             stStudentSchema.setUpdateTime(new Date());
         }
         stStudentSchemaJpaRepository.save(stStudentSchema);
-        Date startTime = DateTime.now().plusHours(48).toDate();
-        List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
+
+
         List<Integer> timeslotsList = Collections3.extractToList(aggressorCourseSchedules,"timeSlotId");
         List<Date> classDateList = Collections3.extractToList(aggressorCourseSchedules,"classDate");
         List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreeze(teacherId,timeslotsList,classDateList,0);//TODO 当前指定老师的其他学生的课表
@@ -99,12 +110,21 @@ public class AssignTeacherServiceX {
         //TODO 此处去请求师生运营
 
         ScheduleBatchReqSt responseScheduleBatchReqSt = scheduleBatchReqSt;
+
         //TODO 此处请求师生运营进行教师重新匹配
         //TODO 分为3中状态 匹配成功直接更新鱼卡和课表 不匹配不更新 无时间片 请求记录入库
         List<ScheduleModelSt> scheduleModelStList = responseScheduleBatchReqSt.getScheduleModelList();
+
+        /** ---------------假数据测试开始-------------------*/
+        responseScheduleBatchReqSt.setAssginTeacherName("测试的小王子");
+        for(ScheduleModelSt scheduleModelSt :scheduleModelStList){
+            scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.wait2apply);
+        }
+        /** ----------------假数据测试结束------------------*/
         List<Long> macthedWorkOrderIdList = Lists.newArrayList();
         List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
         StStudentApplyRecords stStudentApplyRecords = null;
+        Date now = new Date();
         for(ScheduleModelSt scheduleModelSt : scheduleModelStList){
             if(scheduleModelSt.getMatchStatus() == ScheduleModelSt.MatchStatus.matched){
                 macthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
@@ -112,8 +132,9 @@ public class AssignTeacherServiceX {
                 stStudentApplyRecords = new StStudentApplyRecords();
                 stStudentApplyRecords.setTeacherId(teacherId);
                 stStudentApplyRecords.setStudentId(studentId);
-                stStudentApplyRecords.setCreateTime(new Date());
-                stStudentApplyRecords.setUpdateTime(new Date());
+                stStudentApplyRecords.setApplyTime(now);
+                stStudentApplyRecords.setCreateTime(now);
+                stStudentApplyRecords.setUpdateTime(now);
                 stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.pending);
                 stStudentApplyRecords.setIsRead(StStudentApplyRecords.ReadStatus.no);
                 stStudentApplyRecords.setWorkOrderId(scheduleModelSt.getWorkOrderId());
@@ -127,8 +148,8 @@ public class AssignTeacherServiceX {
         }
 
         if(Collections3.isNotEmpty(macthedWorkOrderIdList)){
-            List<WorkOrder> workOrders = workOrderJpaRepository.findWorkOrderAll((Long[]) macthedWorkOrderIdList.toArray());
-            List<CourseSchedule> courseSchedules  = courseScheduleRepository.findByWorkorderIdIn((Long[]) macthedWorkOrderIdList.toArray());
+            List<WorkOrder> workOrders = workOrderJpaRepository.findWorkOrderAll(macthedWorkOrderIdList);
+            List<CourseSchedule> courseSchedules  = courseScheduleRepository.findByWorkorderIdIn(macthedWorkOrderIdList);
             for(WorkOrder workOrder : workOrders){
                 workOrder.setTeacherId(teacherId);
                 workOrder.setTeacherName(responseScheduleBatchReqSt.getAssginTeacherName());
@@ -191,7 +212,7 @@ public class AssignTeacherServiceX {
             workOrderLog.setContent("指定更换教师:" + FishCardStatusEnum.getDesc(workOrder.getStatus()));
             workOrderLogs.add(workOrderLog);
         }
-        workOrderLogMorphiaRepository.save(workOrderLog);
+        workOrderLogMorphiaRepository.save(workOrderLogs);
     }
 
     @Async
