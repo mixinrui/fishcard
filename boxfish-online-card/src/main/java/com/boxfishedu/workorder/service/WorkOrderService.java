@@ -590,4 +590,8 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByTeacherIdAndIsFreezeAndStartTimeIn(teacherId,0,startTimes);
     }
 
+    public List<WorkOrder> findByIdIn(List workOrderIds){
+        return jpa.findByIdIn(workOrderIds);
+    }
+
 }
