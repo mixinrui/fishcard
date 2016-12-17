@@ -49,6 +49,13 @@ public class CourseOnlineRequester {
         workOrderLogService.saveWorkOrderLog(workOrder,"解散群组关系");
     }
 
+    public void instantReleaseGroup(WorkOrder workOrder){
+        String url=String.format("%s/teaching/destroy_group?work_order_id=%s&instance=true",urlConf.getCourse_online_service(),workOrder.getId());
+        logger.debug("<<<<<<<<<<<<<@[releaseGroup]向在线教育发起[[[[释放师生关系]]]],url[{}]",url);
+        restTemplate.getForObject(url,Object.class);;
+        workOrderLogService.saveWorkOrderLog(workOrder,"立即解散群组关系");
+    }
+
     /**
      *向运营组发起通知请求
      */

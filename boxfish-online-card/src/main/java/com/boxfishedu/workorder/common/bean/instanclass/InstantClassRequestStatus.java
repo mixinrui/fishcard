@@ -4,7 +4,7 @@ import org.joda.time.Minutes;
 
 public enum InstantClassRequestStatus {
     UNKNOWN(0,"默认状态"),
-    WAIT_TO_MATCH(10,"正在呼叫外教..."),
+    WAIT_TO_MATCH(10,"正在呼叫老师..."),
     ASK_TOO_BUSY(20,"您访问过于频繁"),
     HAVE_CLASS_IN_HALF_HOURS(30,"半小时内有即将上的课程,不能立即上课"),
     NOT_IN_RANGE(31,"该时间段不允许即时上课"),

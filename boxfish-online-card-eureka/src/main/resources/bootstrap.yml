@@ -1,0 +1,51 @@
+spring.application.name: boxfish-fishcard-eureka
+
+server.port: 18761
+
+logging:
+  file: ${user.home}/logs/${spring.application.name}.log
+  level:
+    org.springframework: INFO
+
+
+spring.profiles.active: standalone
+
+
+---
+spring.profiles: standalone
+
+
+eureka:
+  environment: ${spring.profiles.active}
+  instance:
+    hostname: localhost
+
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+---
+spring.profiles: production-node-29
+
+
+eureka:
+  environment: ${spring.profiles.active}
+  instance:
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://120.27.236.110:18761/eureka/
+
+---
+spring.profiles: production-node-30
+
+
+eureka:
+  environment: ${spring.profiles.active}
+  instance:
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://121.43.166.93:18761/eureka/

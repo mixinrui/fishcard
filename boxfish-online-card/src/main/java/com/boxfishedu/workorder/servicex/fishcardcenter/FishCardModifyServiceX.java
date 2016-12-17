@@ -131,6 +131,9 @@ public class FishCardModifyServiceX {
 
         dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
+        //立即解散群组
+        courseOnlineRequester.instantReleaseGroup(workOrder);
+
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
 
