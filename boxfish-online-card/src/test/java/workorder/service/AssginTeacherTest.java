@@ -21,6 +21,6 @@ public class AssginTeacherTest {
     public void doAssign(){
         Long studentId = 1300041L;
         Long teacherId = 100000000612L;
-        assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
+        //assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
     }
 }

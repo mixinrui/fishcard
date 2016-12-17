@@ -31,30 +31,30 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
 
     // 获取已经指定过老师的记录 AssignTeacherApplyStatusEnum
     public StStudentApplyRecords  getStStudentApplyRecordsBy(Long workOrderId,StStudentApplyRecords.ApplyStatus applyStatus){
-        return jpa.findTop1ByWorkOrderIdAndApplyStatus(workOrderId,applyStatus);
+        return jpa.findTop1ByWorkOrderIdAndApplyStatusAndValid(workOrderId,applyStatus,StStudentApplyRecords.VALID.yes);
     }
 
 
     public Integer getUnreadInvitedNum(Long teacherId, Date date){
-       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no);
+       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no,StStudentApplyRecords.VALID.yes);
         return unread.isPresent()?unread.get().intValue():0;
     }
 
 
     public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date, Pageable pageable){
-        return  jpa.getmyInviteList(teacherId,date, pageable);
+        return  jpa.getmyInviteList(teacherId,date,StStudentApplyRecords.VALID.yes, pageable);
     }
 
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Pageable pageable){
-        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentId(date,teacherId,studentId,pageable);
+        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes,pageable);
     }
 
     public StStudentApplyRecords findMyLastAssignTeacher(Long studentId,Integer skuId){
-        return jpa.findTop1ByStudentIdAndApplyStatusAndSkuIdAndTeacherIdNotNullOrderByApplyTimeDesc(studentId,StStudentApplyRecords.ApplyStatus.agree,skuId);
+        return jpa.findTop1ByStudentIdAndApplyStatusAndSkuIdAndValidAndTeacherIdNotNullOrderByApplyTimeDesc(studentId,StStudentApplyRecords.ApplyStatus.agree,skuId,StStudentApplyRecords.VALID.yes);
     }
 
     public int upateReadStatusByStudentId(Long teacherId, Long studentId){
-        return  jpa.setFixedIsReadFor(StStudentApplyRecords.ReadStatus.yes,teacherId,studentId);
+        return  jpa.setFixedIsReadFor(StStudentApplyRecords.ReadStatus.yes,teacherId,studentId,StStudentApplyRecords.VALID.yes);
     }
 
 }
