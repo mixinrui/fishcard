@@ -25,8 +25,9 @@ public class StStudentApplyRecords {
     }
     //是否有效
     public enum VALID{
-        yes,
-        no
+        no,
+        yes
+
     }
     @Id
     @GeneratedValue
