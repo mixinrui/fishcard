@@ -403,7 +403,7 @@ time:
 
 server:
   port: 8080
-  servlet-path: /
+  servlet-path: /fishcard
   tomcat:
     accesslog:
       directory: /share/fishcard-logs
@@ -504,6 +504,7 @@ spring:
   profiles: demo
 
 server.port: 8080
+server.servlet-path: /fishcard
 
 ##################接口调用地址
 interface:
