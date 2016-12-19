@@ -471,7 +471,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         System.out.println("nodeTwo3:" + commentCardTimeConf.getNodeTwo());
         System.out.println("nodeThree3:" + commentCardTimeConf.getNodeThree());
         System.out.println("nodeFour3:" + commentCardTimeConf.getNodeFour());
-        List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus2(
+        List<CommentCard> list = commentCardJpaRepository.findUndistributedTeacher(
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeFour()))),
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeOne()))),
                 CommentCardStatus.ASSIGNED_TEACHER.getCode());
