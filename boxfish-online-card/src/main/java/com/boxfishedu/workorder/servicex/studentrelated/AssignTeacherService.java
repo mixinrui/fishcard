@@ -2,8 +2,10 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
@@ -47,6 +49,9 @@ public class AssignTeacherService {
     @Autowired
     private TeacherPhotoRequester teacherPhotoRequester;
 
+    @Autowired
+    StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
+
 
     //1 判断按钮是否出现
     public JsonResultModel checkAssignTeacherFlag(Long workOrderId) {
@@ -61,11 +66,24 @@ public class AssignTeacherService {
 
 
     public List<WorkOrder> getAssignTeacherList(Long workOrderId) {
-        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
-        if (null == stStudentApplyRecords) {
-            WorkOrder workOrder = workOrderService.findOne(workOrderId);
-            if (workOrder == null)
-                throw new BusinessException("课程信息有误");
+        WorkOrder workOrder =  workOrderService.findOne(workOrderId);//刚刚上过的课的鱼卡
+        if (workOrder == null) {
+            throw new BusinessException("课程信息有误");
+        }
+
+        // 查询schema  学生id  st_schema  sku_id
+        StStudentSchema.CourseType courseType;
+        if( TeachingType.ZHONGJIAO.getCode()==workOrder.getSkuId()){ //中教
+            courseType = StStudentSchema.CourseType.chinese;
+        }else if(TeachingType.WAIJIAO.getCode()==workOrder.getSkuId()){
+            courseType = StStudentSchema.CourseType.foreign;
+        }else {
+            throw new BusinessException("课程类型未知");
+        }
+
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, courseType);
+
+        if (null == stStudentSchema) {
             List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
             if (CollectionUtils.isEmpty(listWorkOrders)) {
                 return null;
