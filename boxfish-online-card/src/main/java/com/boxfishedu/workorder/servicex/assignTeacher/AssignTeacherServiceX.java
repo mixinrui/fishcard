@@ -166,7 +166,7 @@ public class AssignTeacherServiceX {
             if(curren<=num*3 && curren>num*2){
                 scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.wait2apply);
             }
-
+            curren++;
 //
         }
         /** ----------------假数据测试结束------------------*/
