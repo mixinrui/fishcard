@@ -6,6 +6,8 @@ import com.boxfishedu.workorder.entity.mysql.CourseInfo;
 import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherService;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
+import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionChecker;
+import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
 import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -37,6 +39,9 @@ public class StudentAssignTeacherController {
     @Autowired
     private AssignTeacherService assignTeacherService;
 
+    @Autowired
+    private RepeatedSubmissionChecker checker;
+
     //1 判断指定这位老师上课 按钮是否出现
     // 新增老鱼卡ID oldWorkOrderId
     @RequestMapping(value = "{workorder_Id}/show/assign", method = RequestMethod.GET)
@@ -45,9 +50,24 @@ public class StudentAssignTeacherController {
     }
 
 
+    //2.1 指定老师上课按钮
+    @RequestMapping(value = "/assign/teacher/act", method = RequestMethod.GET)
+    public JsonResultModel assignTeacherAct (Long oldWorkOrderId,
+                                                Long studentId, Long teacherId) {
+//        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
+//            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
+//        }
+        // 验证重复提交问题
+        assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId, studentId,teacherId);
+        //
+//        checker.evictRepeatedSubmission(oldWorkOrderId);
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
+
     //2 获取指定老师带的课程列表  studentId 学生id   assignteacherId 分配老师ID
     @RequestMapping(value = "/assign/teacher/page")
-    public JsonResultModel getFinishCourseSchedulePage(Long oldWorkOrderId,
+    public JsonResultModel getAssignTeacherCourseSchedulePage(Long oldWorkOrderId,
             Long studentId, Long teacherId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
             direction = Sort.Direction.DESC) Pageable pageable) {
         return assignTeacherService.getAssginTeacherCourseList(oldWorkOrderId,studentId,teacherId,pageable);
@@ -94,7 +114,7 @@ public class StudentAssignTeacherController {
     // 7 接受上课邀请接口
     @RequestMapping(value = "/acceptInvite", method = RequestMethod.POST)
     public JsonResultModel acceptInvite(@RequestBody StTeacherInviteParam stTeacherInviteParam){
-        return JsonResultModel.newJsonResultModel("OK");
+        return assignTeacherService.acceptInvitedCourseByStudentId(stTeacherInviteParam);
     }
 
     //8 下单 是否弹出 是否继续指定该老师上课

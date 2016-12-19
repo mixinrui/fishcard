@@ -98,4 +98,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     List<CourseSchedule> findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(Long studentId,Date startTime,Integer isFreeze,Long teacherId);
     List<CourseSchedule> findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreezeAndRoleId(Long teacherId,List<Integer> TimeslotsList,List<Date> classDateList,Integer isFreeze,Integer roleId);
 //    findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze
+
+    @Query(value = "select s from CourseSchedule s where s.studentId=?1 and s.status <=30 and s.startTime>?2  and s.isFreeze=?3")
+    Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long studentId,Date startTime, Integer isFreeze, Pageable pageable);
 }

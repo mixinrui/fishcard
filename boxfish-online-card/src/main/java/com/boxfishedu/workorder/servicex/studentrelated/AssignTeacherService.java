@@ -4,17 +4,22 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
+import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +55,13 @@ public class AssignTeacherService {
     private TeacherPhotoRequester teacherPhotoRequester;
 
     @Autowired
-    StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
+    private StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
+
+    @Autowired
+    private AssignTeacherServiceX assignTeacherServiceX;
+
+    @Autowired
+    private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
 
 
     //1 判断按钮是否出现
@@ -95,9 +106,17 @@ public class AssignTeacherService {
         }
     }
 
+
+    //2.1  指定这位老师上课
+    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Long studentId, Long teacherId){
+        WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
+        return assignTeacherServiceX.maualAssgin(teacherId,studentId,workOrder.getSkuId());
+    }
     //2 获取指定老师带的课程列表
-    public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId, Long studentId, Long teacherId, Pageable pageable) {
-        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findFinishCourseSchedulePage(studentId, pageable);
+    public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId,Long studentId,Long teacherId, Pageable pageable) {
+
+        Date startTime = DateTime.now().plusHours(48).toDate();
+        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(studentId,startTime, pageable);
         trimPage(courseSchedulePage);
         return JsonResultModel.newJsonResultModel(courseSchedulePage);
     }
@@ -269,6 +288,16 @@ public class AssignTeacherService {
         }
         return jo;
 
+    }
+
+
+    public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam){
+        List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findAll(stTeacherInviteParam.getIds());
+        Long teacherId = stStudentApplyRecordsList.get(0).getTeacherId();
+        Long studentId = stStudentApplyRecordsList.get(0).getStudentId();
+        List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
+        List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList,"workOrderId");
+        return   assignTeacherServiceX.teacherAccept(teacherId,studentId, courseScheleIds, workOrderIds);
     }
 
 

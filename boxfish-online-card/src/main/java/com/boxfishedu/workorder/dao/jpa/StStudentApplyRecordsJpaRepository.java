@@ -39,5 +39,5 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
     @Query("update StStudentApplyRecords o set  o.isRead= ?1, o.applyStatus=?2  where  o.id in (?3) ")
     int setFixedIsReadAndApplyStatusFor(StStudentApplyRecords.ReadStatus readStatus, StStudentApplyRecords.ApplyStatus applyStatus ,Long [] ids);
 
-    List<StStudentApplyRecords> findByStudentIdAndValid(Long studentId, StStudentApplyRecords.VALID valid);
+    List<StStudentApplyRecords> findByStudentIdAndTeacherIdAndValid(Long studentId,Long teacherId, StStudentApplyRecords.VALID valid);
 }
