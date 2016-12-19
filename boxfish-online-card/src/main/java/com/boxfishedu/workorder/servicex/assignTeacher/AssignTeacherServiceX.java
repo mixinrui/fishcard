@@ -186,7 +186,7 @@ public class AssignTeacherServiceX {
         if(channel.equals(STUDENT_CHANNLE)){
             makeApplyRecords(teacherId,studentId,wait2applyWorkOrderIdList,skuId);
         }else if(channel.equals(TEACHER_CHANNLE)){
-            changeApplyRecords(studentId,macthedWorkOrderIdList);
+            changeApplyRecords(studentId,teacherId,macthedWorkOrderIdList);
         }else if(channel.equals(TIMER_CHANNLE)){
             makeApplyRecords(teacherId,studentId,wait2applyWorkOrderIdList,skuId);
         }
@@ -279,7 +279,7 @@ public class AssignTeacherServiceX {
         }
         //TODO 无时间片 请求记录入库 入库之前,先把之前的申请记录全部作废掉
         if(Collections3.isNotEmpty(stStudentApplyRecordsList)){
-            List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndValid(studentId, StStudentApplyRecords.VALID.yes);
+            List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndTeacherIdAndValid(studentId,teacherId, StStudentApplyRecords.VALID.yes);
             if(Collections3.isNotEmpty(invalidRecordsList)){
                 for(StStudentApplyRecords studentApplyRecords :invalidRecordsList){
                     studentApplyRecords.setValid(StStudentApplyRecords.VALID.no);
@@ -296,8 +296,8 @@ public class AssignTeacherServiceX {
      * @param studentId
      * @param macthedWorkOrderIdList
      */
-    private void changeApplyRecords(Long studentId,List<Long> macthedWorkOrderIdList){
-        List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndValid(studentId, StStudentApplyRecords.VALID.yes);
+    private void changeApplyRecords(Long studentId,Long teacherId,List<Long> macthedWorkOrderIdList){
+        List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndTeacherIdAndValid(studentId,teacherId, StStudentApplyRecords.VALID.yes);
         if(Collections3.isNotEmpty(invalidRecordsList)){
             for (StStudentApplyRecords stStudentApplyRecords : invalidRecordsList){
                 for(Long workId :macthedWorkOrderIdList){
