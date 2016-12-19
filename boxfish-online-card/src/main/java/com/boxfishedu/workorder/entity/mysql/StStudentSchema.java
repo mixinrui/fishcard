@@ -20,12 +20,28 @@ public class StStudentSchema {
 
     public enum StSchema{
         un_assgin,
-        assgin
+        assgin;
+        public static StSchema getEnum(int value) {
+            for (StSchema stSchema : StSchema.values()) {
+                if (stSchema.ordinal() == value) {
+                    return stSchema;
+                }
+            }
+            return null;
+        }
     }
     public enum CourseType{
         unknown,
         chinese,
-        foreign
+        foreign;
+        public static CourseType getEnum(int value) {
+            for (CourseType courseType : CourseType.values()) {
+                if (courseType.ordinal() == value) {
+                    return courseType;
+                }
+            }
+            return null;
+        }
     }
     @Id
     @GeneratedValue

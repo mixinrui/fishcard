@@ -34,6 +34,11 @@ import java.util.List;
  */
 @Service
 public class AssignTeacherServiceX {
+    private final static String STUDENT_CHANNLE = "ss_manual";
+    private final static String TEACHER_CHANNLE = "st_manual";
+    private final static String TIMER_CHANNLE = "auto";
+    private final static String MANUAL_OPERATOR ="manual";//OperateType
+    private final static String TIMER_OPERATOR ="auto";//OperateType
     @Autowired
     WorkOrderJpaRepository workOrderJpaRepository;
     @Autowired
@@ -67,16 +72,46 @@ public class AssignTeacherServiceX {
      * @param studentId 当前学生ID
      */
 
-    public JsonResultModel maualAssgin(Long teacherId, Long studentId){
+    /**
+     * APP端调用
+     * @param teacherId
+     * @param studentId
+     * @param skuId
+     * @return
+     */
+    public JsonResultModel maualAssgin(Long teacherId, Long studentId,Integer skuId){
         Date startTime = DateTime.now().plusHours(48).toDate();
+//        Integer skuId = workOrderJpaRepository.findOne(workOrderId).getSkuId();
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
-        return doAssignTeacher(teacherId,studentId,aggressorCourseSchedules);
+        return doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,STUDENT_CHANNLE,skuId);
     }
 
+    /**
+     * 定时任务调用
+     * @param teacherId
+     * @param studentId
+     * @param courseScheleIds
+     * @param workOrderIds
+     * @return
+     */
+    public JsonResultModel teacherAccept(Long teacherId,Long studentId,List<Long> courseScheleIds,List<Long> workOrderIds){
+        Integer skuId = stStudentSchemaJpaRepository.findByStudentIdAndTeacherId(studentId,teacherId).getSkuId().ordinal();
+        List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(workOrderIds);
+//        Integer skuId = workOrderJpaRepository.findOne(workOrderIds.get(0)).getSkuId();
+        return doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,TEACHER_CHANNLE,skuId);
+    }
+    /**
+     *
+     * @param teacherId
+     * @param studentId
+     * @param aggressorCourseSchedules
+     * @param channel ss_manual APP端学生手工点击指定老师 auto 系统定时任务出发 st_manual 教师点击接受触发
+     * @param skuId 鱼卡ID
+     * @return
+     */
     @Transactional
-    private JsonResultModel doAssignTeacher(Long teacherId, Long studentId,List<CourseSchedule> aggressorCourseSchedules){
-
-        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findByStudentId(studentId);
+    private JsonResultModel doAssignTeacher(Long teacherId, Long studentId,List<CourseSchedule> aggressorCourseSchedules,String channel,Integer skuId){
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuId(studentId,teacherId, StStudentSchema.CourseType.getEnum(skuId));
         if(null == stStudentSchema){
             stStudentSchema = new StStudentSchema();
             stStudentSchema.setCreateTime(new Date());
@@ -84,29 +119,31 @@ public class AssignTeacherServiceX {
             stStudentSchema.setStSchema(StStudentSchema.StSchema.assgin);
             stStudentSchema.setStudentId(studentId);
             stStudentSchema.setTeacherId(teacherId);
+            stStudentSchema.setSkuId(StStudentSchema.CourseType.getEnum(skuId));
         }else{
             stStudentSchema.setStSchema(StStudentSchema.StSchema.assgin);
             stStudentSchema.setTeacherId(teacherId);
             stStudentSchema.setUpdateTime(new Date());
+            stStudentSchema.setSkuId(StStudentSchema.CourseType.getEnum(skuId));
         }
         stStudentSchemaJpaRepository.save(stStudentSchema);
 
-
         List<Integer> timeslotsList = Collections3.extractToList(aggressorCourseSchedules,"timeSlotId");
         List<Date> classDateList = Collections3.extractToList(aggressorCourseSchedules,"classDate");
-        List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreeze(teacherId,timeslotsList,classDateList,0);//TODO 当前指定老师的其他学生的课表
+        //TODO 查询出不同的类型的课表
+        List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreezeAndRoleId(teacherId,timeslotsList,classDateList,0,skuId);//TODO 当前指定老师的其他学生的课表
         if(Collections3.isNotEmpty(victimCourseSchedules)){
             CourseSchedule courseSchedule = null;
             StStudentSchema stStudentSchemaTmp = null;
             for (Iterator<CourseSchedule> iter = victimCourseSchedules.iterator(); iter.hasNext();) {
                 courseSchedule = iter.next();
-                stStudentSchemaTmp = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndStSchema(courseSchedule.getStudentId(),courseSchedule.getTeacherId(), StStudentSchema.StSchema.assgin);
+                stStudentSchemaTmp = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuIdAndStSchema(courseSchedule.getStudentId(),courseSchedule.getTeacherId(),StStudentSchema.CourseType.getEnum(skuId), StStudentSchema.StSchema.assgin);
                 if(null != stStudentSchemaTmp){
                     iter.remove();//把是这个指定老师的排除掉
                 }
             }
         }
-        ScheduleBatchReqSt scheduleBatchReqSt = match(studentId,teacherId,aggressorCourseSchedules,victimCourseSchedules);
+        ScheduleBatchReqSt scheduleBatchReqSt = match(studentId,teacherId,aggressorCourseSchedules,victimCourseSchedules,channel);
         //TODO 此处去请求师生运营
 
         ScheduleBatchReqSt responseScheduleBatchReqSt = scheduleBatchReqSt;
@@ -117,35 +154,41 @@ public class AssignTeacherServiceX {
 
         /** ---------------假数据测试开始-------------------*/
         responseScheduleBatchReqSt.setAssginTeacherName("测试的小王子");
+        int num = scheduleModelStList.size()/3;
+        int curren = 0;
         for(ScheduleModelSt scheduleModelSt :scheduleModelStList){
-            scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.wait2apply);
+            if(curren<num){
+                scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.matched);
+            }
+            if(curren<num*2){
+                scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.un_matched);
+            }
+            if(curren<num){
+                scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.wait2apply);
+            }
+
+//
         }
         /** ----------------假数据测试结束------------------*/
         List<Long> macthedWorkOrderIdList = Lists.newArrayList();
-        List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
-        StStudentApplyRecords stStudentApplyRecords = null;
-        Date now = new Date();
+        List<ScheduleModelSt> wait2applyWorkOrderIdList = Lists.newArrayList();
         for(ScheduleModelSt scheduleModelSt : scheduleModelStList){
             if(scheduleModelSt.getMatchStatus() == ScheduleModelSt.MatchStatus.matched){
                 macthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
-            }else if(scheduleModelSt.getMatchStatus() == ScheduleModelSt.MatchStatus.wait2apply){
-                stStudentApplyRecords = new StStudentApplyRecords();
-                stStudentApplyRecords.setTeacherId(teacherId);
-                stStudentApplyRecords.setStudentId(studentId);
-                stStudentApplyRecords.setApplyTime(now);
-                stStudentApplyRecords.setCreateTime(now);
-                stStudentApplyRecords.setUpdateTime(now);
-                stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.pending);
-                stStudentApplyRecords.setIsRead(StStudentApplyRecords.ReadStatus.no);
-                stStudentApplyRecords.setWorkOrderId(scheduleModelSt.getWorkOrderId());
-                stStudentApplyRecords.setCourseScheleId(scheduleModelSt.getId());
-                stStudentApplyRecordsList.add(stStudentApplyRecords);
+            }else{
+                wait2applyWorkOrderIdList.add(scheduleModelSt);
             }
-        }
-        //无时间片 请求记录入库 入库之前,先把之前的申请记录全部作废掉
-        if(Collections3.isNotEmpty(stStudentApplyRecordsList)){
 
-            stStudentApplyRecordsJpaRepository.save(stStudentApplyRecordsList);
+//            else if (scheduleModelSt.getMatchStatus() == ScheduleModelSt.MatchStatus.wait2apply){
+//                wait2applyWorkOrderIdList.add(scheduleModelSt);
+//            }
+        }
+        if(channel.equals(STUDENT_CHANNLE)){
+            makeApplyRecords(teacherId,studentId,wait2applyWorkOrderIdList,skuId);
+        }else if(channel.equals(TEACHER_CHANNLE)){
+            changeApplyRecords(studentId,macthedWorkOrderIdList);
+        }else if(channel.equals(TIMER_CHANNLE)){
+            makeApplyRecords(teacherId,studentId,wait2applyWorkOrderIdList,skuId);
         }
 
         if(Collections3.isNotEmpty(macthedWorkOrderIdList)){
@@ -161,8 +204,8 @@ public class AssignTeacherServiceX {
                 courseSchedule.setTeacherId(teacherId);
                 courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
             }
-            notifyOthers(workOrders);
-            changeTeacherLog(workOrders);
+//            notifyOthers(workOrders);
+//            changeTeacherLog(workOrders);
         }
         return JsonResultModel.newJsonResultModel(null);
     }
@@ -175,7 +218,7 @@ public class AssignTeacherServiceX {
      * @param victimCourseSchedules
      * @return
      */
-    private ScheduleBatchReqSt match(Long studentId,Long teacherId,List<CourseSchedule> aggressorCourseSchedules,List<CourseSchedule> victimCourseSchedules){
+    private ScheduleBatchReqSt match(Long studentId,Long teacherId,List<CourseSchedule> aggressorCourseSchedules,List<CourseSchedule> victimCourseSchedules,String channel){
         ScheduleBatchReqSt scheduleBatchReqSt = new ScheduleBatchReqSt();
         List<ScheduleModelSt> scheduleModelSts = Lists.newArrayList();
         ScheduleModelSt scheduleModelSt = null;
@@ -190,17 +233,89 @@ public class AssignTeacherServiceX {
                     scheduleModelSt.setGrabedSlotId(victimCourseSchedule.getTimeSlotId());
                     scheduleModelSt.setGrabedRoleId(victimCourseSchedule.getRoleId());
                     scheduleModelSt.setGrabedWorkOrderId(victimCourseSchedule.getWorkorderId());
+                    break;
                 }
             }
             scheduleModelSts.add(scheduleModelSt);
         }
         scheduleBatchReqSt.setUserId(studentId);
         scheduleBatchReqSt.setAssginTeacherId(teacherId);
-        scheduleBatchReqSt.setOperateType("auto");
+
+        if(channel.equals(STUDENT_CHANNLE)){
+            scheduleBatchReqSt.setOperateType(MANUAL_OPERATOR);
+        }else if(channel.equals(TEACHER_CHANNLE)){
+            scheduleBatchReqSt.setOperateType(MANUAL_OPERATOR);
+        }else if(channel.equals(TIMER_CHANNLE)){
+            scheduleBatchReqSt.setOperateType(TIMER_OPERATOR);
+        }
         scheduleBatchReqSt.setScheduleModelList(scheduleModelSts);
         return scheduleBatchReqSt;
     }
 
+    /**
+     *
+     * @param teacherId
+     * @param studentId
+     * @param wait2applyWorkOrderIdList
+     */
+    private void makeApplyRecords(Long teacherId,Long studentId,List<ScheduleModelSt> wait2applyWorkOrderIdList,Integer skuId){
+        StStudentApplyRecords stStudentApplyRecords = null;
+        List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
+        Date now = new Date();
+        for(ScheduleModelSt scheduleModelSt : wait2applyWorkOrderIdList){
+            stStudentApplyRecords = new StStudentApplyRecords();
+            stStudentApplyRecords.setTeacherId(teacherId);
+            stStudentApplyRecords.setStudentId(studentId);
+            stStudentApplyRecords.setApplyTime(now);
+            stStudentApplyRecords.setCreateTime(now);
+            stStudentApplyRecords.setUpdateTime(now);
+            stStudentApplyRecords.setSkuId(skuId);
+            stStudentApplyRecords.setValid(StStudentApplyRecords.VALID.yes);
+            stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.pending);
+            stStudentApplyRecords.setIsRead(StStudentApplyRecords.ReadStatus.no);
+            stStudentApplyRecords.setWorkOrderId(scheduleModelSt.getWorkOrderId());
+            stStudentApplyRecords.setCourseScheleId(scheduleModelSt.getId());
+            stStudentApplyRecordsList.add(stStudentApplyRecords);
+        }
+        //TODO 无时间片 请求记录入库 入库之前,先把之前的申请记录全部作废掉
+        if(Collections3.isNotEmpty(stStudentApplyRecordsList)){
+            List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndValid(studentId, StStudentApplyRecords.VALID.yes);
+            if(Collections3.isNotEmpty(invalidRecordsList)){
+                for(StStudentApplyRecords studentApplyRecords :invalidRecordsList){
+                    studentApplyRecords.setValid(StStudentApplyRecords.VALID.no);
+                    studentApplyRecords.setUpdateTime(now);
+                }
+                stStudentApplyRecordsJpaRepository.save(invalidRecordsList);
+            }
+            stStudentApplyRecordsJpaRepository.save(stStudentApplyRecordsList);
+        }
+    }
+
+    /**
+     * 更新申请记录
+     * @param studentId
+     * @param macthedWorkOrderIdList
+     */
+    private void changeApplyRecords(Long studentId,List<Long> macthedWorkOrderIdList){
+        List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndValid(studentId, StStudentApplyRecords.VALID.yes);
+        if(Collections3.isNotEmpty(invalidRecordsList)){
+            for (StStudentApplyRecords stStudentApplyRecords : invalidRecordsList){
+                for(Long workId :macthedWorkOrderIdList){
+                    if(workId.equals(stStudentApplyRecords.getWorkOrderId())){
+                        stStudentApplyRecords.setUpdateTime(new Date());
+                        stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.agree);
+                        break;
+                    }
+                }
+            }
+            stStudentApplyRecordsJpaRepository.save(invalidRecordsList);
+        }
+    }
+
+    /**
+     * 异步 记录日志
+     * @param workOrders
+     */
     @Async
     private void changeTeacherLog(List<WorkOrder> workOrders){
         List<WorkOrderLog> workOrderLogs = Lists.newArrayList();
@@ -216,6 +331,10 @@ public class AssignTeacherServiceX {
         workOrderLogMorphiaRepository.save(workOrderLogs);
     }
 
+    /**
+     *
+     * @param workOrders
+     */
     @Async
     private void notifyOthers(List<WorkOrder> workOrders){
         for(WorkOrder workOrder :workOrders){

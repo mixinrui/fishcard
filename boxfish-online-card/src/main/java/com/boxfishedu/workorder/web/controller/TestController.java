@@ -2,10 +2,13 @@ package com.boxfishedu.workorder.web.controller;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
+import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
@@ -63,6 +66,9 @@ public class TestController {
     private BaseTimeSlotService baseTimeSlotService;
     @Autowired
     private AssignTeacherServiceX assignTeacherServiceX;
+
+    @Autowired
+    private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
 
     @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
     public void changeFishCardTime(@RequestBody Map<String,String> param){
@@ -193,9 +199,20 @@ public class TestController {
 
     @RequestMapping(value = "/assign")
     public void testAssign(){
-        Long studentId = 7045l;
+        Long studentId = 996734L;
         Long teacherId = 100000000612L;
-//        assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
+        Integer skuid =2;
+        assignTeacherServiceX.maualAssgin( teacherId,  studentId, skuid);
         //assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
+    }
+    @RequestMapping(value = "/teacherAccept")
+    public void teacherAccept(){
+        Long studentId = 996734L;
+        Long teacherId = 100000000612L;
+//        Long workOrderId =61224l;
+        List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndValid(studentId, StStudentApplyRecords.VALID.yes);
+        List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
+        List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList,"workOrderId");
+        assignTeacherServiceX.teacherAccept(teacherId,studentId, courseScheleIds, workOrderIds);
     }
 }
