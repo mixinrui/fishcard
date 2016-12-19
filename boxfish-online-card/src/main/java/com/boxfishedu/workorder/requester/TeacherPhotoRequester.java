@@ -66,4 +66,45 @@ public class TeacherPhotoRequester {
         }
     }
 
+    /**
+     * 获取老师信息
+     * @param teacherId
+     * @return  figure_url
+     */
+    public Map<String, String> getTeacherInfo(Long teacherId) {
+        String url = String.format("%s/%s", urlConf.getTeacher_photo(), teacherId);
+        try {
+            logger.info("获取教师xinxi ,url:[{}]", url);
+            Map<String, String> map = restTemplate.getForObject(url, Map.class);
+            return map;
+        } catch (Exception ex) {
+            logger.error("获取教师失败,url[{}]",url, ex);
+            return null;
+        }
+    }
+
+    /**
+     * 获取课程信息
+
+     "score": 2770,
+     "readWordCount": 154,
+     "multiwordCount": 46
+
+     * @param courseId
+     * @return
+     */
+    public Map<String,Integer> getCourseInfo(String courseId){
+
+        String url = String.format("%s/%s/%s", urlConf.getResource_url(),"course/info", courseId);
+        try {
+            logger.info("获取课程信息,url:[{}]", url);
+            Map<String, Integer> map = restTemplate.getForObject(url, Map.class);
+            return map;
+        } catch (Exception ex) {
+            logger.error("获取课程信息,url[{}]",url, ex);
+            return null;
+        }
+    }
+
+
 }

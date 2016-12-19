@@ -121,7 +121,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     @Query("select wo from WorkOrder wo where wo.id in (?1) ")
     public List<WorkOrder> findWorkOrderAll(Long[] ids);
-
+    @Query("select wo from WorkOrder wo where wo.id in (?1) ")
+    public List<WorkOrder> findWorkOrderAll(List<Long> ids);
 
     public List<WorkOrder> findByCourseType(String courseType);
 
@@ -183,4 +184,15 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     @Query(value = "select distinct wo.skuId from WorkOrder wo where studentId=? and startTime>?")
     List<Integer> findDistinctSkuIds(Long studentId,Date startTime);
+
+    List<WorkOrder>  findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId,Date startTime,Integer skuId,Integer isFreeze);
+
+    List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeIn(Long teacherId,Integer isFreeze,List startTimes);
+
+    @Query("select wo from  WorkOrder wo where wo.teacherId=?1 and (wo.endTime between ?2 and ?3) and status=?4 order by wo.endTime ")
+    public List<WorkOrder> findByStartTime(Long teacherId, Date beginDate, Date endDate, Integer status);
+
+    public List<WorkOrder> findByIdIn(List workOrderIds);
+
+
 }

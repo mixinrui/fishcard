@@ -42,7 +42,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     public CourseSchedule findByWorkorderId(Long workorderId);
 
     public List<CourseSchedule> findByWorkorderIdIn(Long[] workOrderIds);
-
+    List<CourseSchedule> findByWorkorderIdIn(List<Long> workOrderIds);
     public CourseSchedule findByTeacherIdAndTimeSlotIdAndClassDate(Long teacherId, Long timeSlotId, Date classDate);
 
     public CourseSchedule findTop1ByWorkorderId(Long workOrderId);
@@ -94,4 +94,8 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     // 查找48小时以内,没有课程推荐的课表
     @Query("select c from CourseSchedule c,WorkOrder w where c.workorderId=w.id and w.startTime<=?1 and w.courseId is null")
     List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
+
+    List<CourseSchedule> findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(Long studentId,Date startTime,Integer isFreeze,Long teacherId);
+    List<CourseSchedule> findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreezeAndRoleId(Long teacherId,List<Integer> TimeslotsList,List<Date> classDateList,Integer isFreeze,Integer roleId);
+//    findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze
 }

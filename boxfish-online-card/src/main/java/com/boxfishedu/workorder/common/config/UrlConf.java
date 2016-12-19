@@ -63,4 +63,8 @@ public class UrlConf {
     @Value("${interface.address.teacher_photo}")
     private String teacher_photo;//登录验证URL
 
+    //种老师那边系统域名
+    @Value("${interface.address.resource_url}")
+    private String resource_url;//登录验证URL
+
 }
