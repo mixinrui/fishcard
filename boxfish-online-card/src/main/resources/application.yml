@@ -179,7 +179,7 @@ interface:
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
 #  获取课程类型和难度
-    course_type_and_difficulty: https://123.56.13.168:8001
+    course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
@@ -243,7 +243,7 @@ interface:
 #  学生旷课扣积分
     absenteeism_deduct_score: https://api.online.test.boxfish.cn
 #  获取课程类型和难度
-    course_type_and_difficulty: https://123.56.13.168:8001
+    course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
@@ -307,7 +307,7 @@ interface:
 #  学生旷课扣积分
     absenteeism_deduct_score: https://api.online.test.boxfish.cn
 #  获取课程类型和难度
-    course_type_and_difficulty: https://123.56.13.168:8001
+    course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #支付系统
     pay_service: http://101.201.237.252:8888/pay-inside
 #   login_token
@@ -382,7 +382,7 @@ interface:
 #支付系统
     pay_service: http://123.56.6.91:8888/pay-inside
 #  获取课程类型和难度
-    course_type_and_difficulty: https://123.56.13.168:8001
+    course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
@@ -464,7 +464,7 @@ interface:
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
-    course_type_and_difficulty: https://123.56.13.168:8001
+    course_type_and_difficulty: https://online-api.test.boxfish.cn/
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
@@ -530,7 +530,7 @@ interface:
 #支付系统
     pay_service: http://101.201.66.32:8888/pay-inside
 #  获取课程类型和难度
-    course_type_and_difficulty: https://123.56.13.168:8001
+    course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
