@@ -157,13 +157,13 @@ public class AssignTeacherServiceX {
         int num = scheduleModelStList.size()/3;
         int curren = 0;
         for(ScheduleModelSt scheduleModelSt :scheduleModelStList){
-            if(curren<num){
+            if(curren<=num){
                 scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.matched);
             }
-            if(curren<num*2){
+            if(curren<=num*2 && curren>num){
                 scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.un_matched);
             }
-            if(curren<num){
+            if(curren<=num*3 && curren>num*2){
                 scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.wait2apply);
             }
 
