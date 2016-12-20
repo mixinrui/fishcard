@@ -204,8 +204,8 @@ public class AssignTeacherServiceX {
                 courseSchedule.setTeacherId(teacherId);
                 courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
             }
-//            notifyOthers(workOrders);
-//            changeTeacherLog(workOrders);
+            notifyOthers(workOrders);
+            changeTeacherLog(workOrders);
         }
         return JsonResultModel.newJsonResultModel(null);
     }
