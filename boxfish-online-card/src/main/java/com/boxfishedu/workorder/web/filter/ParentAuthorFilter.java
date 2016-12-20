@@ -30,6 +30,7 @@ import java.util.Set;
  */
 @SuppressWarnings("ALL")
 @WebFilter(urlPatterns ={
+        "/fishcard/service/parent/*",
         "/service/parent/*"})
 public class ParentAuthorFilter extends OncePerRequestFilter {
 

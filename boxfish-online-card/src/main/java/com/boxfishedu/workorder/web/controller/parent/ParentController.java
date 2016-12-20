@@ -3,6 +3,8 @@ package com.boxfishedu.workorder.web.controller.parent;
 import com.boxfishedu.workorder.servicex.home.HomePageServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -26,6 +28,8 @@ public class ParentController {
 
     @Autowired
     private TimePickerServiceX timePickerServiceX;
+
+    private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "/card_infos", method = RequestMethod.GET)
     public JsonResultModel userCardInfo(String order_type, Long studentId,Long parentId) {
