@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmis
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
 import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
+import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,5 +124,14 @@ public class StudentAssignTeacherController {
 
         return JsonResultModel.newJsonResultModel(assignTeacherService.getMyLastAssignTeacher(studentId,sku_id));
     }
+
+    //9 换个老师接口
+    @RequestMapping(value = "/neworder/changeTeacher", method = RequestMethod.POST)
+    public JsonResultModel showAssignFirst(@RequestBody StudentTeacherParam studentTeacherParam) {
+        return  assignTeacherService.changeATeacher(studentTeacherParam);
+    }
+
+
+
 
 }

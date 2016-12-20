@@ -10,12 +10,14 @@ import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
+import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
@@ -62,6 +64,9 @@ public class AssignTeacherService {
 
     @Autowired
     private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
 
     //1 判断按钮是否出现
@@ -301,6 +306,16 @@ public class AssignTeacherService {
         List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
         List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList,"workOrderId");
         return   assignTeacherServiceX.teacherAccept(teacherId,studentId, courseScheleIds, workOrderIds);
+    }
+
+
+    // 9 app换个老师
+    public JsonResultModel changeATeacher(StudentTeacherParam studentTeacherParam){
+        if(null == studentTeacherParam.getTeacherId() || null==studentTeacherParam.getStudentId() || 0==studentTeacherParam.getTeacherId() && 0==studentTeacherParam.getStudentId()){
+            throw  new BusinessException("数据参数不全");
+        }
+        teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
+        return  JsonResultModel.newJsonResultModel("OK");
     }
 
 
