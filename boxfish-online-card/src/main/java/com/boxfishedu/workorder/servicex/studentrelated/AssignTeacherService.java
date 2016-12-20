@@ -293,6 +293,9 @@ public class AssignTeacherService {
 
     public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam){
         List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findAll(stTeacherInviteParam.getIds());
+        if(CollectionUtils.isEmpty(stStudentApplyRecordsList)){
+            throw new BusinessException("没有查询到匹配的课程");
+        }
         Long teacherId = stStudentApplyRecordsList.get(0).getTeacherId();
         Long studentId = stStudentApplyRecordsList.get(0).getStudentId();
         List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");

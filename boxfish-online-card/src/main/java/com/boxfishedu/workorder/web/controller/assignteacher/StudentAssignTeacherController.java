@@ -58,7 +58,7 @@ public class StudentAssignTeacherController {
 //            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
 //        }
         // 验证重复提交问题
-        assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId, studentId,teacherId);
+        JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId, studentId,teacherId);
         //
 //        checker.evictRepeatedSubmission(oldWorkOrderId);
         return JsonResultModel.newJsonResultModel("OK");
