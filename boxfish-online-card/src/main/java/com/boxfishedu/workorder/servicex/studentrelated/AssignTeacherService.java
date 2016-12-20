@@ -9,12 +9,16 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
+import com.boxfishedu.workorder.web.filter.ParentRelationGetter;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
 import com.boxfishedu.workorder.web.param.StudentTeacherParam;
@@ -27,7 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -67,6 +72,14 @@ public class AssignTeacherService {
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
+    private TimePickerService timePickerService;
+
+    @Autowired
+    private ServeService serveService;
+
+
 
 
     //1 判断按钮是否出现
@@ -269,6 +282,16 @@ public class AssignTeacherService {
         return results;
     }
 
+
+    // 11 检查是否还有申请记录
+    @Transactional
+    public List<StStudentApplyRecords> checkMyClassesByStudentId(Long teacherId, Long studentId) {
+        Date now = new Date();
+        Date date = DateUtil.addMinutes(now, -60 * 24 * 2);
+        List<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, date);
+        return results;
+    }
+
     public JSONObject getMyLastAssignTeacher(Long studentId, Integer skuId) {
         if (studentId == null || null == skuId) {
             throw new BusinessException("课程信息有误");
@@ -314,7 +337,23 @@ public class AssignTeacherService {
         if(null == studentTeacherParam.getTeacherId() || null==studentTeacherParam.getStudentId() || 0==studentTeacherParam.getTeacherId() && 0==studentTeacherParam.getStudentId()){
             throw  new BusinessException("数据参数不全");
         }
-        teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
+
+        JsonResultModel  jsonResultModel = teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
+
+        if(null!=jsonResultModel && HttpStatus.OK.value() == jsonResultModel.getReturnCode()){
+
+            Service service =  serveService.findOne(studentTeacherParam.getOrderId());
+            // 获取订单数据
+            List<WorkOrder>  workOrders =  workOrderService.getAllWorkOrdersByOrderId(studentTeacherParam.getOrderId());
+            Long [] workOrderIds = (Long [])Collections3.extractToList(workOrders,"id").toArray();
+
+            // 获取课程数据
+            List<CourseSchedule> courseSchedules =  courseScheduleService.findByWorkorderIdIn(workOrderIds);
+
+            // 分配老师
+            timePickerService.getRecommandTeachers(service,courseSchedules);
+        }
+
         return  JsonResultModel.newJsonResultModel("OK");
     }
 

@@ -29,6 +29,8 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
     public Page<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(Date date ,Long teacherId,Long studentId,StStudentApplyRecords.VALID valid, Pageable pageable);
 
+    public List<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(Date date ,Long teacherId,Long studentId,StStudentApplyRecords.VALID valid);
+
     public StStudentApplyRecords findTop1ByStudentIdAndApplyStatusAndSkuIdAndValidAndTeacherIdNotNullOrderByApplyTimeDesc(Long studentId,StStudentApplyRecords.ApplyStatus applyStatus,Integer skuId,StStudentApplyRecords.VALID valid);
 
     @Modifying

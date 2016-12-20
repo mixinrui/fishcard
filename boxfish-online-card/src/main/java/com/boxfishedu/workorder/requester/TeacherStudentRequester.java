@@ -446,9 +446,9 @@ public class TeacherStudentRequester {
 
 
     //指定老师 换个老师
-    public void notifyAssignTeacher(StudentTeacherParam studentTeacherParam) {
-//        String url = String.format("/%s/%s", urlConf.getTeacher_service(),"/course/schedule/applyDesignatedTeacher");
-        String url = String.format("/%s/%s", "http://192.168.77.241:8099","/course/schedule/applyDesignatedTeacher");
+    public JsonResultModel notifyAssignTeacher(StudentTeacherParam studentTeacherParam) {
+        String url = String.format("/%s/%s", urlConf.getTeacher_service(),"course/schedule/applyDesignatedTeacher");
+//        String url = String.format("%s/%s", "http://192.168.88.147:8099","course/schedule/changeDesignatedTeacher");
 
 
         logger.info("notifyAssignTeacher :studentID[{}],teacherId[{}]", studentTeacherParam.getStudentId(),studentTeacherParam.getTeacherId());
@@ -464,6 +464,7 @@ public class TeacherStudentRequester {
             logger.error("向师生运营发送指定老师换个老师失败:[{}]", jsonResultModel.getReturnMsg());
             throw new BusinessException("向师生运营发送指定老师换个老师失败:" + jsonResultModel.getReturnMsg());
         }
+        return jsonResultModel;
     }
 
 

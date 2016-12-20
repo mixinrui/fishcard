@@ -87,6 +87,30 @@ StudentAppRelatedController {
         }
     }
 
+    /**
+     * 学生端批量选择课程的接口(指定老师)
+     * 1.获取课程的接口为假数据 2.获取教师的时候需要根据coursetype把外教区分出来,并且体现到workorder和course_schedule的冗余表里
+     * @param timeSlotParam
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/v11/workorders", method = RequestMethod.POST)
+    public JsonResultModel ensureCourseTimesV11(@RequestBody TimeSlotParam timeSlotParam, Long userId) {
+        timeSlotParam.setStudentId(userId);
+
+        try {
+            if(checker.checkRepeatedSubmission(timeSlotParam.getOrderId())) {
+                throw new RepeatedSubmissionException("正在提交当中,请稍候...");
+            }
+            JsonResultModel jsonResultModel = timePickerServiceXV1.ensureCourseTimesv2(timeSlotParam);
+            checker.evictRepeatedSubmission(timeSlotParam.getOrderId());
+            return jsonResultModel;
+        } catch (Exception e) {
+            evictRepeatedSubmission(e, timeSlotParam.getOrderId());
+            throw e;
+        }
+    }
+
 
     @RequestMapping(value = "{student_Id}/schedule/month", method = RequestMethod.GET)
     public JsonResultModel courseScheduleList(

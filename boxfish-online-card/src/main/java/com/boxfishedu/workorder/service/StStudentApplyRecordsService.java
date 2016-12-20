@@ -49,6 +49,10 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
         return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes,pageable);
     }
 
+    public List<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date){
+        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes);
+    }
+
     public StStudentApplyRecords findMyLastAssignTeacher(Long studentId,Integer skuId){
         return jpa.findTop1ByStudentIdAndApplyStatusAndSkuIdAndValidAndTeacherIdNotNullOrderByApplyTimeDesc(studentId,StStudentApplyRecords.ApplyStatus.agree,skuId,StStudentApplyRecords.VALID.yes);
     }

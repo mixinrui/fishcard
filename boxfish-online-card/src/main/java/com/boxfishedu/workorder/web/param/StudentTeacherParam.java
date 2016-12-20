@@ -10,4 +10,5 @@ import lombok.Data;
 public class StudentTeacherParam {
     private Long studentId;
     private Long teacherId;
+    private Long orderId;
 }
