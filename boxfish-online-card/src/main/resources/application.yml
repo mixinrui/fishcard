@@ -388,7 +388,6 @@ interface:
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  师生运营匹配老师
-    match_teacher_url: http://192.168.55.240:8099/course/schedule/applyDesignatedTeacher
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099

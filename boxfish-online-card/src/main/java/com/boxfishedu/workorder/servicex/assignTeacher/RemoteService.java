@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.assignTeacher;
 
+import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,10 +14,10 @@ import org.springframework.web.client.RestTemplate;
 public class RemoteService {
     @Autowired
     RestTemplate restTemplate;
-    @Value("${interface.address.match_teacher_url}")
-    private String matchTeacherUrl;
+    @Autowired
+    UrlConf urlConf;
     public ScheduleBatchReqSt matchTeacher(ScheduleBatchReqSt reqSt){
-        return restTemplate.postForObject(matchTeacherUrl,reqSt,ScheduleBatchReqSt.class);
+        return restTemplate.postForObject(urlConf.getTeacher_service().trim()+"/course/schedule/applyDesignatedTeacher",reqSt,ScheduleBatchReqSt.class);
     }
 
 }
