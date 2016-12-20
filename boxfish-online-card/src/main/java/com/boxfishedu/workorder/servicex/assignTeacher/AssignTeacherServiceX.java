@@ -22,6 +22,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,11 +51,14 @@ public class AssignTeacherServiceX {
     @Autowired
     StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
     @Autowired
-    private WorkOrderLogMorphiaRepository workOrderLogMorphiaRepository;
+    WorkOrderLogMorphiaRepository workOrderLogMorphiaRepository;
     @Autowired
-    private ServiceSDK serviceSDK;
+    ServiceSDK serviceSDK;
     @Autowired
-    private DataCollectorService dataCollectorService;
+    DataCollectorService dataCollectorService;
+    @Autowired
+    RemoteService remoteService;
+
 
     /**
      * 是查询鱼卡还是查询课表? 鱼卡和课表的开始时间不一样的是怎么回事?
@@ -155,13 +159,13 @@ public class AssignTeacherServiceX {
 
         //TODO 此处去请求师生运营
 
-        ScheduleBatchReqSt responseScheduleBatchReqSt = scheduleBatchReqSt;
+        ScheduleBatchReqSt responseScheduleBatchReqSt = remoteService.matchTeacher(scheduleBatchReqSt);
 
         //TODO 此处请求师生运营进行教师重新匹配
         //TODO 分为3中状态 匹配成功直接更新鱼卡和课表 不匹配不更新 无时间片 请求记录入库
         List<ScheduleModelSt> scheduleModelStList = responseScheduleBatchReqSt.getScheduleModelList();
 
-        /** ---------------假数据测试开始-------------------*/
+        /** ---------------假数据测试开始------------------
         responseScheduleBatchReqSt.setAssginTeacherName("测试的小王子");
         int num = scheduleModelStList.size()/3;
         int curren = 0;
@@ -178,6 +182,7 @@ public class AssignTeacherServiceX {
             curren++;
 //
         }
+         -*/
         /** ----------------假数据测试结束------------------*/
         List<Long> macthedWorkOrderIdList = Lists.newArrayList();
         List<ScheduleModelSt> wait2applyWorkOrderIdList = Lists.newArrayList();
