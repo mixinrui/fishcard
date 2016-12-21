@@ -133,7 +133,7 @@ public class AssignTeacherService {
     //2.1  指定这位老师上课
     public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Long studentId, Long teacherId){
         WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
-        return assignTeacherServiceX.maualAssgin(teacherId,studentId,workOrder.getSkuId());
+        return assignTeacherServiceX.maualAssign(teacherId,studentId,workOrder.getSkuId());
     }
     //2 获取指定老师带的课程列表
     public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId,Long studentId,Long teacherId, Pageable pageable) {
