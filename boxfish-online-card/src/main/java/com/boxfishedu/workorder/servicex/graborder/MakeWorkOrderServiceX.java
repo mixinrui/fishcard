@@ -368,7 +368,9 @@ public class MakeWorkOrderServiceX {
         for (Long key : map.keySet()) {
             String pushTitle = WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
             Map map1 = Maps.newHashMap();
-            map1.put("user_id", key);
+            JSONArray  jsonArray = new JSONArray();
+            jsonArray.add(key);
+            map1.put("user_id", jsonArray);
 
             if (null == map.get(key)) {
                 continue;

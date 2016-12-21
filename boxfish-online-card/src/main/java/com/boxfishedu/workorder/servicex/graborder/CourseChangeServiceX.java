@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.graborder;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.LongArraySerializer;
 import com.boxfishedu.card.bean.CourseTypeEnum;
@@ -121,7 +122,10 @@ public class CourseChangeServiceX {
             String pushTitle_bein = WorkOrderConstant.SEND_CHANGE_COURSE_MESSAGE_BEGIN;
             String pushTitle_end = WorkOrderConstant.SEND_CHANGE_COURSE_MESSAGE_END;
             Map map1 = Maps.newHashMap();
-            map1.put("user_id", key);
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.add(key);
+            map1.put("user_id", jsonArray);
+
 
             if (null == map.get(key)) {
                 continue;

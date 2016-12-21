@@ -484,7 +484,11 @@ public class MakeUpLessionServiceX {
                 WorkOrderConstant.SEND_STU_CLASS_REFUND_FOUR;
         logger.info("sendMessageRefund title [{}] ,reason [{}]", pushTitle, reason);
         Map map1 = Maps.newHashMap();
-        map1.put("user_id", wo.getStudentId());
+
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.add(wo.getStudentId());
+        map1.put("user_id", jsonArray);
+
         map1.put("push_title", pushTitle);
         JSONObject jo = new JSONObject();
         jo.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_REFUND_TYPE.toString());

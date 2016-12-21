@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service.fishcardcenter;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
@@ -286,7 +287,10 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         String pushTitle = WorkOrderConstant.SEND_TEACHER_CHANGETIME_BEGIN+startTime+WorkOrderConstant.SEND_TEACHER_CHANGETIME_END;
         Integer count = 1;
         Map map1 = Maps.newHashMap();
-        map1.put("user_id", teahcerId);
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.add(teahcerId);
+        map1.put("user_id", jsonArray);
+
         map1.put("push_title", pushTitle);
 
         JSONObject jo = new JSONObject();

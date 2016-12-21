@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.coursenotify;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
@@ -118,7 +119,10 @@ public class CourseNotifyOneDayServiceX {
             String pushTitle = WorkOrderConstant.SEND_STU_CLASS_TOMO_MESSAGE_BEGIN;
             Integer count = (null == map.get(key) ? 0 : map.get(key).size());
             Map map1 = Maps.newHashMap();
-            map1.put("user_id", key);
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.add(key);
+
+            map1.put("user_id", jsonArray);
 
             if (null == map.get(key)) {
                 continue;

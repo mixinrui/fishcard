@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.coursenotify;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
@@ -196,7 +197,9 @@ public class CourseChangeTimeNotifySerceX {
         String title = getAppNotices(myClass);
         String pushTitle = "";// WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
         Map map1 = Maps.newHashMap();
-        map1.put("user_id", studentId);
+        JSONArray  jsonArray = new JSONArray();
+        jsonArray.add(studentId);
+        map1.put("user_id", jsonArray);
         map1.put("push_title", title);
 
         JSONObject jo = new JSONObject();
