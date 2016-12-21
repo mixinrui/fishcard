@@ -15,5 +15,6 @@ public interface StStudentSchemaJpaRepository extends JpaRepository<StStudentSch
     StStudentSchema findByStudentIdAndTeacherId(Long studentId,Long teacherId);
     StStudentSchema findByStudentIdAndTeacherIdAndStSchema(Long studentId,Long teacherId, StStudentSchema.StSchema stSchema);
     // 查询schema  学生id  st_schema  sku_id
-    public StStudentSchema findTop1ByStudentIdAndStSchemaAndSkuId(Long studentId,StStudentSchema.StSchema stSchema,StStudentSchema.CourseType courseType);
+    StStudentSchema findTop1ByStudentIdAndStSchemaAndSkuId(Long studentId,StStudentSchema.StSchema stSchema,StStudentSchema.CourseType courseType);
+    List<StStudentSchema> findByStSchema(StStudentSchema.StSchema stSchema);
 }
