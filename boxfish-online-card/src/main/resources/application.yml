@@ -714,8 +714,8 @@ service:
 spring:
   datasource:
     url: jdbc:mysql://boxfish-online-2016-inside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&&zeroDateTimeBehavior=convertToNull
-    username: service
-    password: nEaJiP7hwoXEUkPDnDjaBK3hEJanHTec
+    username: service2016
+    password: kENpyAGFPgNKzVbDeR42MGfsZmQRzwVg
   mongo:
     serverAddress: dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717,dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717
     dbName: fishcard
