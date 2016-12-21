@@ -332,6 +332,13 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentId(studentId);
     }
 
+    public List<WorkOrder> findByStudentIdAfterNow(Long studentId){
+        if(null==studentId)
+            throw new BusinessException("参数不正确");
+        return jpa.findByStudentIdAfterNow(studentId);
+    }
+
+
     public WorkOrder getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(Long studentId, Integer productType, String tutorType) {
         String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.service.productType=? and wo.service.tutorType=? order by wo.endTime desc";
         Query query = entityManager.createQuery(sql)
