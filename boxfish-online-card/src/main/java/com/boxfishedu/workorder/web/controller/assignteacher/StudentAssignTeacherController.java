@@ -57,13 +57,13 @@ public class StudentAssignTeacherController {
     public JsonResultModel assignTeacherAct (Long oldWorkOrderId,
                                                 Long studentId, Long teacherId, Long userId) {
         studentId = userId;
-//        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
-//            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
-//        }
+        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
+            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
+        }
         // 验证重复提交问题
         JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId, studentId,teacherId);
         //
-//        checker.evictRepeatedSubmission(oldWorkOrderId);
+        checker.evictRepeatedSubmission(oldWorkOrderId);
         return JsonResultModel.newJsonResultModel("OK");
     }
 
