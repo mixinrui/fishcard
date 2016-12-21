@@ -22,7 +22,6 @@ public class ScheduleStrategyContext {
 
     public List<WorkOrder> prepareInstantSchedule(InstantClassCard instantClassCard, String strategyType) {
         if (StringUtils.isEmpty(strategyType)) {
-            logger.error("@prepareInstantSchedule未获取到策略的类型,使用默认策略");
             return scheduleStrategyMap.get(ScheduleStrategyEnum.SCHEDULE_LAST).prepareInstantSchedule(instantClassCard);
         } else {
             return scheduleStrategyMap.get(strategyType).prepareInstantSchedule(instantClassCard);

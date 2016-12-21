@@ -94,40 +94,9 @@ public class InstantClassServiceX {
         int validateResult = instantClassValidators.preValidate();
         if (validateResult > InstantClassRequestStatus.UNKNOWN.getCode()) {
             InstantClassRequestStatus instantStatus = InstantClassRequestStatus.getEnumByCode(validateResult);
-            switch (instantStatus) {
-                case NOT_IN_RANGE:
-                    return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus, "实时上课会在[ " + this.timeRange() + " ]内开启,请到时间再重试~"));
-                case HAVE_CLASS_IN_HALF_HOURS:
-                    return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus
-                                    , "您预约了[ " + DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()) + " ]的课程,马上就开始了,此时不能实时上课~"));
-                case MATCHED_LESS_THAN_30MINUTES: {
-                    JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(ThreadLocalUtil.instantCardMatched30Minutes.get(), InstantClassRequestStatus.MATCHED));
-                    if (ThreadLocalUtil.instantCardMatched30Minutes.get().getMatchResultReadFlag() != 1) {
-                        instantClassJpaRepository.updateMatchedReadFlag(ThreadLocalUtil.instantCardMatched30Minutes.get().getId(), 1);
-                    }
-                    return jsonResultModel;
-                }
-                case UNFINISHED_COURSE: {
-                    return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus, ThreadLocalUtil.unFinishedCourses30MinutesTips.get()));
-                }
-                default:
-                    return JsonResultModel.newJsonResultModel(InstantClassResult
-                            .newInstantClassResult(instantStatus));
-            }
+            return this.invalidReturn(instantStatus);
         }
         return JsonResultModel.newJsonResultModel(instantClassService.getMatchResult());
-    }
-
-
-    private void putParameterIntoThreadLocal(InstantRequestParam instantRequestParam) {
-        if (StringUtils.isEmpty(instantRequestParam.getTutorType())) {
-            instantRequestParam.setTutorType(TutorType.FRN.toString());
-        }
-        ThreadLocalUtil.instantRequestParamThreadLocal.set(instantRequestParam);
     }
 
     public String timeRange() {
@@ -140,10 +109,14 @@ public class InstantClassServiceX {
         } catch (Exception ex) {
             logger.error("从redis获取当天可上课时间片失败，从mongo获取");
         }
-        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = instantClassTimeRulesMorphiaRepository.getByDay(DateUtil.date2SimpleString(new Date()));
+
+        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList
+                = instantClassTimeRulesMorphiaRepository.getByDay(DateUtil.date2SimpleString(new Date()));
+
         if (!instantClassTimeRulesList.isPresent()) {
             return StringUtils.EMPTY;
         }
+
         timeDesc = this.timeDesc(this.getSortedTimeRulesList(instantClassTimeRulesList.get()));
         redisTemplate.opsForValue().setIfAbsent(this.timeRangeKey(), timeDesc);
         return timeDesc;
@@ -220,5 +193,46 @@ public class InstantClassServiceX {
             }
         }
         return JsonResultModel.newJsonResultModel(map);
+    }
+
+    private JsonResultModel invalidReturn(InstantClassRequestStatus instantStatus) {
+        switch (instantStatus) {
+            case NOT_IN_RANGE:
+                return JsonResultModel.newJsonResultModel(InstantClassResult
+                        .newInstantClassResult(instantStatus, String.format("实时上课会在[%s]内开启,请到时间再重试~",this.timeRange())));
+
+            case HAVE_CLASS_IN_HALF_HOURS:
+                String msg = String.format("您预约了[%s]的课程,马上就开始了,此时不能实时上课~"
+                        , DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()));
+
+                return JsonResultModel.newJsonResultModel(InstantClassResult
+                        .newInstantClassResult(instantStatus, msg));
+
+            case MATCHED_LESS_THAN_30MINUTES: {
+                JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
+                        .newInstantClassResult(ThreadLocalUtil.instantCardMatched30Minutes.get(), InstantClassRequestStatus.MATCHED));
+                if (ThreadLocalUtil.instantCardMatched30Minutes.get().getMatchResultReadFlag() != 1) {
+                    instantClassJpaRepository.updateMatchedReadFlag(ThreadLocalUtil.instantCardMatched30Minutes.get().getId(), 1);
+                }
+                return jsonResultModel;
+            }
+
+            case UNFINISHED_COURSE: {
+                return JsonResultModel.newJsonResultModel(InstantClassResult
+                        .newInstantClassResult(instantStatus, ThreadLocalUtil.unFinishedCourses30MinutesTips.get()));
+            }
+
+            default:
+                return JsonResultModel.newJsonResultModel(InstantClassResult
+                        .newInstantClassResult(instantStatus));
+        }
+    }
+
+
+    private void putParameterIntoThreadLocal(InstantRequestParam instantRequestParam) {
+        if (StringUtils.isEmpty(instantRequestParam.getTutorType())) {
+            instantRequestParam.setTutorType(TutorType.FRN.toString());
+        }
+        ThreadLocalUtil.instantRequestParamThreadLocal.set(instantRequestParam);
     }
 }
