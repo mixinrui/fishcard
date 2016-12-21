@@ -30,11 +30,6 @@ import java.util.List;
 @Service
 public class AssignTeacherServiceX {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-//    private final static String STUDENT_CHANNLE = "ss_manual";
-//    private final static String TEACHER_CHANNLE = "st_manual";
-//    private final static String TIMER_CHANNLE = "auto";
-//    private final static String MANUAL_OPERATOR ="manual";//OperateType
-//    private final static String TIMER_OPERATOR ="auto";//OperateType
     @Autowired
     WorkOrderJpaRepository workOrderJpaRepository;
     @Autowired
