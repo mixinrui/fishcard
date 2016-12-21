@@ -46,11 +46,11 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
     }
 
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Pageable pageable){
-        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes,pageable);
+        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes, StStudentApplyRecords.ApplyStatus.agree,  pageable);
     }
 
     public List<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date){
-        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes);
+        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree);
     }
 
     public StStudentApplyRecords findMyLastAssignTeacher(Long studentId,Integer skuId){
