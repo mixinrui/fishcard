@@ -199,9 +199,6 @@ public class TestController {
 
     @RequestMapping(value = "/assign")
     public void testAssign(Long studentId,Long teacherId ,Integer skuid){
-//        Long studentId = 7045L;
-//        Long teacherId = 100000000612L;
-//        Integer skuid =2;
         assignTeacherServiceX.maualAssign( teacherId,  studentId, skuid);
         //assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
     }
