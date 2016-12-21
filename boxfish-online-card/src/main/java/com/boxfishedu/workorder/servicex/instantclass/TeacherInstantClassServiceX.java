@@ -100,8 +100,11 @@ public class TeacherInstantClassServiceX {
         } catch (Exception ex) {
             JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
                     .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
-            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII  grabresult fail,前往师生运营校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
-                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel), ex);
+
+            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII  grabresult fail,前往师生运营校验不通过,instantcard:[{}]" +
+                    ",teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}", teacherInstantRequestParam.getCardId()
+                    , teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel), ex);
+
             return jsonResultModel;
         }
 
@@ -141,7 +144,7 @@ public class TeacherInstantClassServiceX {
                 Boolean result = workOrderService.changeTeacherForTypeChanged(workOrders.get(i));
                 //如果能上此种类型的课程,重新生成关系
                 if (BooleanUtils.isFalse(result)) {
-                    scheduleEntranceDataGenerator.rebuildGroup(Arrays.asList(workOrders.get(i)));
+                    courseOnlineRequester.rebuildGroup(Arrays.asList(workOrders.get(i)));
                 }
             }
         }));

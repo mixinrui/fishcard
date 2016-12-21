@@ -11,10 +11,12 @@ import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,8 @@ public class CourseOnlineRequester {
     private WorkOrderLogService workOrderLogService;
     @Autowired
     private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
+    @Autowired
+    private ServiceSDK serviceSDK;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
     public void releaseGroup(WorkOrder workOrder){
@@ -54,6 +58,21 @@ public class CourseOnlineRequester {
         logger.debug("<<<<<<<<<<<<<@[releaseGroup]向在线教育发起[[[[释放师生关系]]]],url[{}]",url);
         restTemplate.getForObject(url,Object.class);;
         workOrderLogService.saveWorkOrderLog(workOrder,"立即解散群组关系");
+    }
+
+    public void rebuildGroup(List<WorkOrder> typeUnchangedList){
+        if(CollectionUtils.isEmpty(typeUnchangedList)){
+            return;
+        }
+        threadPoolManager.execute(new Thread(()->{
+            typeUnchangedList.forEach(card->{
+                workOrderLogService.saveWorkOrderLog(card
+                        ,String.format("实时上课重建鱼卡群组关系,teacher[%s],student[%s]"
+                                ,card.getTeacherId(),card.getStudentId()));
+                // 创建群组
+                serviceSDK.createGroup(card);
+            });
+        }));
     }
 
     /**
