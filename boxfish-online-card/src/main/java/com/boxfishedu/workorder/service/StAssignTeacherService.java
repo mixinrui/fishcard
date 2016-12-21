@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
@@ -16,7 +17,6 @@ import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.servicex.assignTeacher.RemoteService;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import com.boxfishedu.workorder.web.param.bebase3.ScheduleModelSt;
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,9 @@ public class StAssignTeacherService {
         //TODO 此处请求师生运营进行教师重新匹配
         //TODO 分为3中状态 匹配成功直接更新鱼卡和课表 不匹配不更新 无时间片 请求记录入库
         List<ScheduleModelSt> scheduleModelStList = responseScheduleBatchReqSt.getScheduleModelList();
-
+        if(Collections3.isEmpty(scheduleModelStList)){
+            throw new BusinessException("请求师生运营系统匹配老师返回数据空");
+        }
         /** ---------------假数据测试开始------------------
          responseScheduleBatchReqSt.setAssginTeacherName("测试的小王子");
          int num = scheduleModelStList.size()/3;
@@ -127,7 +129,7 @@ public class StAssignTeacherService {
         }
         logger.info("指定老师stp-2::::匹配鱼卡完成:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>匹配上的鱼卡共{}条",studentId,teacherId,skuId,macthedWorkOrderIdList.size());
         if(Collections3.isNotEmpty(macthedWorkOrderIdList)){
-            logger.info("指定老师stp-2:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>匹配上的鱼卡IDS{}",studentId,teacherId,skuId,Collections3.extractToList(macthedWorkOrderIdList,""));
+            logger.info("指定老师stp-2:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>匹配上的鱼卡IDS{}",studentId,teacherId,skuId,wait2applyWorkOrderIdList.toArray());
             List<WorkOrder> workOrders = workOrderJpaRepository.findWorkOrderAll(macthedWorkOrderIdList);
             List<CourseSchedule> courseSchedules  = courseScheduleRepository.findByWorkorderIdIn(macthedWorkOrderIdList);
             for(WorkOrder workOrder : workOrders){
@@ -140,9 +142,9 @@ public class StAssignTeacherService {
                 courseSchedule.setTeacherId(teacherId);
                 courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
             }
-            logger.info("指定老师stp-2::::通知更新群组:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",studentId,teacherId,skuId,Collections3.extractToList(macthedWorkOrderIdList,""));
+            logger.info("指定老师stp-2::::通知更新群组:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",studentId,teacherId,skuId,macthedWorkOrderIdList.toArray());
 //            notifyOthers(workOrders);
-            logger.info("指定老师stp-2::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",studentId,teacherId,skuId,Collections3.extractToList(macthedWorkOrderIdList,""));
+            logger.info("指定老师stp-2::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",studentId,teacherId,skuId,macthedWorkOrderIdList.toArray());
 //            changeTeacherLog(workOrders);
         }
 

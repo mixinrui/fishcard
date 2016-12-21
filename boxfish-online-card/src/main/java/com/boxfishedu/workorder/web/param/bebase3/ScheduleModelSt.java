@@ -4,13 +4,14 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by wangshichao on 16/4/12.
  */
 @Data
-public class ScheduleModelSt {
+public class ScheduleModelSt implements Serializable{
 
     public enum MatchStatus{
         un_matched,
@@ -48,7 +49,7 @@ public class ScheduleModelSt {
     private Integer grabedRoleId;
 
     private Long grabedWorkOrderId;
-
+    public ScheduleModelSt(){}
     public ScheduleModelSt(CourseSchedule courseSchedule) {
         this.day = courseSchedule.getClassDate();
         this.slotId = courseSchedule.getTimeSlotId();
@@ -58,4 +59,5 @@ public class ScheduleModelSt {
         this.id = courseSchedule.getId();
         this.workOrderId = courseSchedule.getWorkorderId();
     }
+
 }
