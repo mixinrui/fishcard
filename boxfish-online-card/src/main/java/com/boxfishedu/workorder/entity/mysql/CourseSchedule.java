@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -45,6 +46,7 @@ public class CourseSchedule {
     private Long workorderId;
 
     @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+08:00")
     private Date classDate;
 
     @Temporal(TemporalType.TIMESTAMP)

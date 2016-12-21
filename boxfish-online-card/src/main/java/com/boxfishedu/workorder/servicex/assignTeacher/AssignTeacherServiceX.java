@@ -102,7 +102,7 @@ public class AssignTeacherServiceX {
     public JsonResultModel teacherAccept(Long teacherId,Long studentId,List<Long> courseScheleIds,List<Long> workOrderIds){
         Integer skuId = stStudentSchemaJpaRepository.findByStudentIdAndTeacherId(studentId,teacherId).getSkuId().ordinal();
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(workOrderIds);
-        stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,ConstantUtil.STUDENT_CHANNLE,skuId);
+        stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,ConstantUtil.TEACHER_CHANNLE,skuId);
         return JsonResultModel.newJsonResultModel(null);
 
     }

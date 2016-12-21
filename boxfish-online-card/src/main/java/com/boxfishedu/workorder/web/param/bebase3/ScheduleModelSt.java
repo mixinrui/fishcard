@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.param.bebase3;
 
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ public class ScheduleModelSt implements Serializable{
     private Long id;
     private Long workOrderId;
     @NotNull(message = "日期不能为空")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+08:00")
     private Date day;
 
     private String courseType;
