@@ -38,9 +38,7 @@ public class FishCardQueryOuterController {
         Long studentId = fishCardinnerParam.getStudentId();
         if(null==studentId || 0==studentId)
             throw new BusinessException("参数有问题");
-        List<WorkOrder> myWorkOrdes = workOrderService.findByStudentId(studentId);
-
-        myWorkOrdes.stream().filter(workOrder1 -> (1==workOrder1.getIsFreeze() || workOrder1.getStatus() <40)).collect(Collectors.toList());
+        List<WorkOrder> myWorkOrdes = workOrderService.findByStudentIdAfterNow(studentId);
 
         if(null!=fishCardinnerParam.getSkuId()){
             myWorkOrdes.stream().filter(workOrder1 -> (fishCardinnerParam.getSkuId().equals( workOrder1.getSkuId() ) )).collect(Collectors.toList());

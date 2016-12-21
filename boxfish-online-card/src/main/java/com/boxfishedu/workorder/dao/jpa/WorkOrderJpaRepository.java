@@ -41,6 +41,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public List<WorkOrder> findByStudentId(Long studentId);
 
+    @Query("select wo from  WorkOrder wo where wo.studentId =?1 and wo.startTime <current_timestamp  and wo.isFreeze!=1  order by wo.startTime desc ")
+    public List<WorkOrder> findByStudentIdAfterNow(Long studentId);
+
     public List<WorkOrder> findByIsFreezeAndStartTimeBetweenAndParentIdNotNull( Integer isFreeze, Date startDate, Date endDate);
 
     public List<WorkOrder> findByNeedChangeTime(Integer needChangeTime);
