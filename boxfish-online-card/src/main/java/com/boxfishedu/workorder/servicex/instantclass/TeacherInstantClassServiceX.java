@@ -62,9 +62,6 @@ public class TeacherInstantClassServiceX {
     private InstantClassTeacherService instantClassTeacherService;
 
     @Autowired
-    private WorkOrderJpaRepository workOrderJpaRepository;
-
-    @Autowired
     private CourseOnlineRequester courseOnlineRequester;
 
     @Autowired
@@ -75,9 +72,6 @@ public class TeacherInstantClassServiceX {
 
     @Autowired
     private DataCollectorService dataCollectorService;
-
-    @Autowired
-    private ScheduleEntranceDataGenerator scheduleEntranceDataGenerator;
 
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
