@@ -100,6 +100,11 @@ public class AssignTeacherService {
             throw new BusinessException("课程信息有误");
         }
 
+        //判断旧鱼卡是否已经上完课
+        if(workOrder.getStartTime().after(new Date())){
+            throw new BusinessException("该课程尚未结束");
+        }
+
         // 查询schema  学生id  st_schema  sku_id
         StStudentSchema.CourseType courseType;
         if( TeachingType.ZHONGJIAO.getCode()==workOrder.getSkuId()){ //中教
@@ -107,7 +112,7 @@ public class AssignTeacherService {
         }else if(TeachingType.WAIJIAO.getCode()==workOrder.getSkuId()){
             courseType = StStudentSchema.CourseType.foreign;
         }else {
-            throw new BusinessException("课程类型未知");
+            throw new BusinessException("课程类型有误");
         }
 
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, courseType);
