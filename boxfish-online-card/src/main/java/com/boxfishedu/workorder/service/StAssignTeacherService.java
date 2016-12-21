@@ -56,26 +56,32 @@ public class StAssignTeacherService {
     @Transactional
     public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,
                                 String channel, Integer skuId) {
-        StStudentSchema stStudentSchema = checkSchema(studentId, teacherId, skuId);
-        List<Integer> timeslotsList = Collections3.extractToList(aggressorCourseSchedules, "timeSlotId");
-        List<Date> classDateList = Collections3.extractToList(aggressorCourseSchedules, "classDate");
+        checkSchema(studentId, teacherId, skuId);
+
+
         //TODO 查询出不同的类型的课表
-        List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreezeAndRoleId(teacherId, timeslotsList, classDateList, 0, skuId);//TODO 当前指定老师的其他学生的课表
-        logger.info("指定老师stp-2::排除相同指定老师课表开始::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>老师其他学生的鱼卡IDS:{}===>>>总共{}条", studentId, teacherId, skuId,  Collections3.extractToList(victimCourseSchedules, "workorderId").toArray(), victimCourseSchedules.size());
+        List<CourseSchedule> victimCourseSchedules = courseScheduleRepository.findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleId(teacherId, studentId, 0, skuId);//TODO 当前指定老师的其他学生的课表
+        List<CourseSchedule> victimCourseSchedulesFinal = Lists.newArrayList();
         if (Collections3.isNotEmpty(victimCourseSchedules)) {
             CourseSchedule courseSchedule = null;
             StStudentSchema stStudentSchemaTmp = null;
             for (Iterator<CourseSchedule> iter = victimCourseSchedules.iterator(); iter.hasNext(); ) {
                 courseSchedule = iter.next();
-                stStudentSchemaTmp = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuIdAndStSchema(courseSchedule.getStudentId(), courseSchedule.getTeacherId(), StStudentSchema.CourseType.getEnum(skuId), StStudentSchema.StSchema.assgin);
-                if (null != stStudentSchemaTmp) {
-                    iter.remove();//把是这个指定老师的排除掉
+                for(CourseSchedule cs : aggressorCourseSchedules){
+                    if(courseSchedule.getClassDate().compareTo(cs.getClassDate())==0 && courseSchedule.getTimeSlotId().intValue()==cs.getTimeSlotId().intValue()){
+                        stStudentSchemaTmp = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuIdAndStSchema(courseSchedule.getStudentId(), courseSchedule.getTeacherId(), StStudentSchema.CourseType.getEnum(skuId), StStudentSchema.StSchema.assgin);
+                        if (null == stStudentSchemaTmp) {
+                            victimCourseSchedulesFinal.add(courseSchedule);
+                        }
+                        break;
+                    }
                 }
+
             }
-            logger.info("指定老师stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条", studentId, teacherId, skuId, Collections3.extractToList(victimCourseSchedules, "workorderId").toArray(), victimCourseSchedules.size());
+            logger.info("指定老师stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条", studentId, teacherId, skuId, Collections3.extractToList(victimCourseSchedulesFinal, "workorderId").toArray(), victimCourseSchedulesFinal.size());
         }
 
-        ScheduleBatchReqSt scheduleBatchReqSt = match(studentId, teacherId, aggressorCourseSchedules, victimCourseSchedules, channel);
+        ScheduleBatchReqSt scheduleBatchReqSt = match(studentId, teacherId, aggressorCourseSchedules, victimCourseSchedulesFinal, channel);
         logger.info("指定老师stp-2:::生成要匹配的鱼卡数据去请求师生运营匹配:::======>>>APP端学生ID:{}====>>请求师生运营去匹配的数据{}", studentId, scheduleBatchReqSt.toString());
 
         //TODO 此处去请求师生运营
@@ -172,18 +178,21 @@ public class StAssignTeacherService {
             if (channel.equals(ConstantUtil.TEACHER_CHANNLE)) {
                 scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.wait2apply);
             }
-            for (CourseSchedule victimCourseSchedule : victimCourseSchedules) {
-                if (courseSchedule.getClassDate().compareTo(victimCourseSchedule.getClassDate()) == 0 && courseSchedule.getTimeSlotId().longValue() == victimCourseSchedule.getTimeSlotId().longValue()) {
-                    scheduleModelSt.setGrabedStudentId(victimCourseSchedule.getStudentId());
-                    scheduleModelSt.setGrabedId(victimCourseSchedule.getId());
-                    scheduleModelSt.setGrabedDay(victimCourseSchedule.getClassDate().getTime());
-                    scheduleModelSt.setGrabedcourseType(victimCourseSchedule.getCourseType());
-                    scheduleModelSt.setGrabedSlotId(victimCourseSchedule.getTimeSlotId());
-                    scheduleModelSt.setGrabedRoleId(victimCourseSchedule.getRoleId());
-                    scheduleModelSt.setGrabedWorkOrderId(victimCourseSchedule.getWorkorderId());
-                    break;
+            if(Collections3.isNotEmpty(victimCourseSchedules)){
+                for (CourseSchedule victimCourseSchedule : victimCourseSchedules) {
+                    if (courseSchedule.getClassDate().compareTo(victimCourseSchedule.getClassDate()) == 0 && courseSchedule.getTimeSlotId().intValue() == victimCourseSchedule.getTimeSlotId().intValue()) {
+                        scheduleModelSt.setGrabedStudentId(victimCourseSchedule.getStudentId());
+                        scheduleModelSt.setGrabedId(victimCourseSchedule.getId());
+                        scheduleModelSt.setGrabedDay(victimCourseSchedule.getClassDate().getTime());
+                        scheduleModelSt.setGrabedcourseType(victimCourseSchedule.getCourseType());
+                        scheduleModelSt.setGrabedSlotId(victimCourseSchedule.getTimeSlotId());
+                        scheduleModelSt.setGrabedRoleId(victimCourseSchedule.getRoleId());
+                        scheduleModelSt.setGrabedWorkOrderId(victimCourseSchedule.getWorkorderId());
+                        break;
+                    }
                 }
             }
+
             scheduleModelSts.add(scheduleModelSt);
         }
         scheduleBatchReqSt.setUserId(studentId);
