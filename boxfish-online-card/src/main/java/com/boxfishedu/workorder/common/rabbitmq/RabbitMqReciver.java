@@ -211,6 +211,9 @@ public class RabbitMqReciver {
             else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS_BACK_COURSES.value()){
                 logger.info("==========>INSTANT_CLASS_BACK_COURSES ===>>> 未上的课程退回到课程推荐");
                 instantClassTimerServiceX.backUnmatchCoursesAsync();
+            } else if(serviceTimerMessage.getType() == TimerMessageType.EXPIRE_COMMENT_CARD.value()) {
+                logger.info("==========>EXPIRE_COMMENT_CARD ===>>> 会员外教点评过期提醒");
+                foreignTeacherCommentCardService.notifyExpireCommentCards();
             }
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);

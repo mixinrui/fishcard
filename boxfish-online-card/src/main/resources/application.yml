@@ -77,6 +77,8 @@ spring.datasource:
 
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
+server.compression.enabled: true
+server.compression.mime-types: "text/html,text/xml,text/plain,text/html,text/css,application/json"
 
 #spring.profiles.active: local_hucl
 #spring.profiles.active: product

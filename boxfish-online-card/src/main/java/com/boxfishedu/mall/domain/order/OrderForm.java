@@ -51,6 +51,8 @@ public class OrderForm extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Flag flagDropped;
 
+    private Integer validDays;
+
 //    @Transient
 //    private List<OrderDetail> orderDetails;
 

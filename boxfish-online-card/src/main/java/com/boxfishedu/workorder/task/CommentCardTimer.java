@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,5 +31,10 @@ public class CommentCardTimer {
         foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
         foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
         foreignTeacherCommentCardService.foreignUndistributedTeacherCommentCards();
+    }
+
+//    @Scheduled(cron = "0 0/1 * * * ?")
+    public void notifyCommentCard() {
+        foreignTeacherCommentCardService.notifyExpireCommentCards();
     }
 }

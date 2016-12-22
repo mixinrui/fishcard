@@ -135,6 +135,12 @@ public class Service {
     @Column(name = "teaching_type", nullable = true)
     private Integer teachingType;
 
+    /**
+     * 会员类型: 默认是普通用户
+     */
+    @Column(name = "user_type", nullable = true)
+    private Integer userType;
+
     public void authentication(Long userId) {
         if(!Objects.equals(studentId, userId)) {
             throw new BusinessException("非法用户,拒绝访问!");

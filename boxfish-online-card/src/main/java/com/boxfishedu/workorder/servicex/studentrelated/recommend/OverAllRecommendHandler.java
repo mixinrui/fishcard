@@ -7,7 +7,6 @@ import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,19 +26,7 @@ public class OverAllRecommendHandler extends DefaultRecommendHandler {
     public Map<Integer, RecommandCourseView> recommendCourseViews(List<WorkOrder> workOrders, TimeSlotParam timeSlotParam) {
 
         // 如果不支持批量,直接使用默认的推荐方式
-        if(!isSupportBatchExecute(workOrders)) {
-            return super.recommendCourseViews(workOrders, timeSlotParam);
-        }
-
-        Map<Integer, RecommandCourseView> resultMap = new HashMap<>();
-        for(int i = 0, size = workOrders.size() / 8; i < size; i++) {
-            List<RecommandCourseView> recommendCourseViews = recommandCourseRequester.getBatchRecommandCourse(
-                    timeSlotParam.getStudentId());
-            for(RecommandCourseView recommandCourseView : recommendCourseViews) {
-                resultMap.put(i, recommandCourseView);
-            }
-        }
-        return resultMap;
+        return super.recommendCourseViews(workOrders, timeSlotParam);
     }
 
 
