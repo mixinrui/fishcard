@@ -485,7 +485,6 @@ public class TeacherStudentRequester {
             teacherMap = (Map)jsonResultModel.getData();
         } catch (Exception ex) {
             logger.error("向师生运营发送获取老师姓名", ex);
-            throw new BusinessException("向师生运营发送获取老师姓名失败");
         }
         if (null!=teacherMap) {
             if((Integer)teacherMap.get("teachingType")  ==TeachingType.WAIJIAO.getCode())  {
