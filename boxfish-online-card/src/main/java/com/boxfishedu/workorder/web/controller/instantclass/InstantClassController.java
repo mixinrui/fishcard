@@ -142,7 +142,6 @@ public class InstantClassController {
     }
 
     //初始化数据
-    //@RequestMapping(value = "/instanttimes/date", method = RequestMethod.POST)
     @RequestMapping(value = "/instanttimes/initdata/date", method = RequestMethod.POST)
     public JsonResultModel instantDayClassTimes(@RequestBody DayRangeBean dateInfo) {
         instantClassServiceX.initTimeRange(dateInfo);
