@@ -308,7 +308,7 @@ public class StAssignTeacherService {
         if (Collections3.isNotEmpty(invalidRecordsList)) {
             for (StStudentApplyRecords stStudentApplyRecords : invalidRecordsList) {
                 for (Long workId : macthedWorkOrderIdList) {
-                    if (workId.equals(stStudentApplyRecords.getWorkOrderId())) {
+                    if (workId.longValue() == stStudentApplyRecords.getWorkOrderId().longValue()) {
                         stStudentApplyRecords.setUpdateTime(new Date());
                         stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.agree);
                         break;
