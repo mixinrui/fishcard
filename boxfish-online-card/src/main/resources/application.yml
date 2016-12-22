@@ -54,6 +54,9 @@ parameter:
   #距离上课时间提醒教师,单位：minutes
   notify_teacher_prepare_class_limit: 5
 
+  #允许立即上课的类型:   0:All  1:中教    2:外教
+  instant_allow_teacher_type: 0
+
   #封面服务器的地址
   thumbnail_server: http://api.boxfish.cn/student/publication/data/data/
 

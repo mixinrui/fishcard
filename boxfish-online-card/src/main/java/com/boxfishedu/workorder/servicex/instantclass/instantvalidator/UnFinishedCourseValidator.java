@@ -26,13 +26,8 @@ import java.util.Optional;
 @Order(5)
 @Component
 public class UnFinishedCourseValidator implements InstantClassValidator {
-    @Autowired
-    private OnlineAccountService onlineAccountService;
 
-    @Autowired
-    private InstantClassJpaRepository instantClassJpaRepository;
-
-    private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
@@ -40,33 +35,32 @@ public class UnFinishedCourseValidator implements InstantClassValidator {
     @Override
     public int preValidate() {
         InstantRequestParam instantRequestParam = ThreadLocalUtil.instantRequestParamThreadLocal.get();
-        Optional<WorkOrder> passedCardOptional=workOrderJpaRepository
-                .findTop1ByStudentIdAndStartTimeLessThanOrderByStartTimeDesc(instantRequestParam.getStudentId(),new Date());
-        if(!passedCardOptional.isPresent()){
+        Optional<WorkOrder> passedCardOptional = workOrderJpaRepository
+                .findTop1ByStudentIdAndStartTimeLessThanOrderByStartTimeDesc(instantRequestParam.getStudentId(), new Date());
+        if (!passedCardOptional.isPresent()) {
             return InstantClassRequestStatus.UNKNOWN.getCode();
         }
         //如果是立即上课类型的鱼卡直接放过
-        if(!Objects.isNull(passedCardOptional.get().getClassType())){
+        if (!Objects.isNull(passedCardOptional.get().getClassType())) {
             return InstantClassRequestStatus.UNKNOWN.getCode();
         }
-        Date begin=passedCardOptional.get().getStartTime();
-        Date end=passedCardOptional.get().getEndTime();
-        Date deadLine=DateUtil.addMinutes(begin,30);
+        Date begin = passedCardOptional.get().getStartTime();
+        Date end = passedCardOptional.get().getEndTime();
+        Date deadLine = DateUtil.addMinutes(begin, 30);
 
-        if(deadLine.before(new Date())){
+        if (deadLine.before(new Date())) {
             return InstantClassRequestStatus.UNKNOWN.getCode();
         }
 
-        long minute=(deadLine.getTime()-new Date().getTime())/(1000*60);
-        String beginStr=DateUtil.dateTrimYear(begin).substring(0,5);
-        String endStr=DateUtil.dateTrimYear(end).substring(0,5);
-        StringBuilder builder=new StringBuilder().append("已安排")
-                .append(String.join("-",beginStr,endStr)).append("的课程;请等待外教发起邀请,或");
-        if(minute!=0){
+        long minute = (deadLine.getTime() - new Date().getTime()) / (1000 * 60);
+        String beginStr = DateUtil.dateTrimYear(begin).substring(0, 5);
+        String endStr = DateUtil.dateTrimYear(end).substring(0, 5);
+        StringBuilder builder = new StringBuilder().append("已安排")
+                .append(String.join("-", beginStr, endStr)).append("的课程;请等待外教发起邀请,或");
+        if (minute != 0) {
             builder.append(minute).append("分钟后再试");
-        }
-        else{
-            long second= (deadLine.getTime()-new Date().getTime())/(1000);
+        } else {
+            long second = (deadLine.getTime() - new Date().getTime()) / (1000);
             builder.append(second).append("秒钟后再试");
         }
         ThreadLocalUtil.unFinishedCourses30MinutesTips.set(builder.toString());

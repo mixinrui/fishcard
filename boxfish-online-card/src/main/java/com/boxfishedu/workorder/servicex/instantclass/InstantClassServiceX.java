@@ -121,34 +121,6 @@ public class InstantClassServiceX {
         )).collect(Collectors.toList());
     }
 
-    public void initTimeRange(DayRangeBean dateInfo) {
-        Date date = DateUtil.String2Date(String.join(" ", dateInfo.getDate(), "00:00:00"));
-        if (CollectionUtils.isEmpty(dateInfo.getRange())) {
-            throw new BusinessException("参数不合法");
-        }
-        Optional<List<InstantClassTimeRules>> listOldOptional
-                = instantClassTimeRulesMorphiaRepository.getByDay(dateInfo.getDate(), dateInfo.getTutorType());
-
-        //新增新规则
-        dateInfo.getRange().forEach(range -> {
-            LocalDateTime dateLocal = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-            InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
-            instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(dateLocal));
-            instantClassTimeRules.setTutorType(dateInfo.getTutorType());
-            instantClassTimeRules.setDay(dateLocal.getDayOfWeek().toString());
-            instantClassTimeRules.setBegin(range.getBegin());
-            instantClassTimeRules.setEnd(range.getEnd());
-            instantClassTimeRulesMorphiaRepository.save(instantClassTimeRules);
-        });
-
-        //删除旧的规则
-        listOldOptional.get().forEach(oldRange -> instantClassTimeRulesMorphiaRepository.delete(oldRange));
-
-        //清空缓存
-        TutorTypeEnum tutorTypeEnum = TutorTypeEnum.getByValue(dateInfo.getTutorType());
-        redisTemplate.delete(studentRangeContext.timeRangeKey(tutorTypeEnum));
-    }
-
     public JsonResultModel getTeacherRangeByDay(Long userId) {
         return JsonResultModel.newJsonResultModel(teacherRangeContext
                 .teacherTimeRange(teacherStudentRequester, instantClassTimeRulesMorphiaRepository, userId));
@@ -192,11 +164,38 @@ public class InstantClassServiceX {
         }
     }
 
-
     private void putParameterIntoThreadLocal(InstantRequestParam instantRequestParam) {
         if (StringUtils.isEmpty(instantRequestParam.getTutorType())) {
             instantRequestParam.setTutorType(TutorType.FRN.toString());
         }
         ThreadLocalUtil.instantRequestParamThreadLocal.set(instantRequestParam);
+    }
+
+    public void initTimeRange(DayRangeBean dateInfo) {
+        Date date = DateUtil.String2Date(String.join(" ", dateInfo.getDate(), "00:00:00"));
+        if (CollectionUtils.isEmpty(dateInfo.getRange())) {
+            throw new BusinessException("参数不合法");
+        }
+        Optional<List<InstantClassTimeRules>> listOldOptional
+                = instantClassTimeRulesMorphiaRepository.getByDay(dateInfo.getDate(), dateInfo.getTutorType());
+
+        //新增新规则
+        dateInfo.getRange().forEach(range -> {
+            LocalDateTime dateLocal = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+            InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
+            instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(dateLocal));
+            instantClassTimeRules.setTutorType(dateInfo.getTutorType());
+            instantClassTimeRules.setDay(dateLocal.getDayOfWeek().toString());
+            instantClassTimeRules.setBegin(range.getBegin());
+            instantClassTimeRules.setEnd(range.getEnd());
+            instantClassTimeRulesMorphiaRepository.save(instantClassTimeRules);
+        });
+
+        //删除旧的规则
+        listOldOptional.get().forEach(oldRange -> instantClassTimeRulesMorphiaRepository.delete(oldRange));
+
+        //清空缓存
+        TutorTypeEnum tutorTypeEnum = TutorTypeEnum.getByValue(dateInfo.getTutorType());
+        redisTemplate.delete(studentRangeContext.timeRangeKey(tutorTypeEnum));
     }
 }
