@@ -17,6 +17,7 @@ public class RemoteService {
     RestTemplate restTemplate;
     @Autowired
     UrlConf urlConf;
+    
     public ScheduleBatchReqSt matchTeacher(ScheduleBatchReqSt reqSt){
         //urlConf.getTeacher_service().trim()
         JsonResultModel jsonResultModel = restTemplate.postForObject(urlConf.getTeacher_service()+"/course/schedule/applyDesignatedTeacher",reqSt,JsonResultModel.class);
