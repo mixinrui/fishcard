@@ -113,4 +113,7 @@ public class RabbitMqConstant {
     public static final String SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME = "com.boxfishedu.sync_commentcard_template_name";
     public static final String SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE="com.boxfishedu.sync_commentcard_queue";
 
+
+    /**指定上课系统 自动匹配老师**/
+    public static final String ST_AUTO_ASSIGN_TEACHER_QUEUE="com.boxfishedu.auto.assign_teacher";
 }

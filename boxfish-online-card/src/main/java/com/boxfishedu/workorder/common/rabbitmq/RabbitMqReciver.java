@@ -15,6 +15,7 @@ import com.boxfishedu.workorder.service.absenteeism.AbsenteeismService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.AutuConfirmFishCardServiceX;
@@ -96,6 +97,9 @@ public class RabbitMqReciver {
 
     @Autowired
     private InstantClassTimerServiceX instantClassTimerServiceX;
+
+    @Autowired
+    private AssignTeacherServiceX assignTeacherServiceX;
 
     /**
      * 订单中心转换请求
@@ -291,6 +295,18 @@ public class RabbitMqReciver {
         }
     }
 
+    /**
+     *
+     */
+    @RabbitListener(queues = RabbitMqConstant.ST_AUTO_ASSIGN_TEACHER_QUEUE)
+    public void autoAssignTeacher(){
+        logger.debug("@autoAssignTeacher接收来自定时任务 指定老师请求");
+        try {
+            assignTeacherServiceX.autoAssign();
+        } catch (Exception ex) {
+            logger.error("@autoAssignTeacher接收来自定时任务,处理失败");
+        }
+    }
 //    /**
 //     * 抢单监听
 //     * 1 初始化数据 生成能够抢单的工单

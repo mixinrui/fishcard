@@ -18,9 +18,9 @@ public class AbsenteesimController {
     @Autowired
     NotifyTimer notifyTimer;
 
-    @RequestMapping(value = "/deduct/score", method = RequestMethod.GET)
-    public Object handleDeductScore(){
-        notifyTimer.deductScore();
-        return JsonResultModel.newJsonResultModel("ok");
-    }
+//    @RequestMapping(value = "/deduct/score", method = RequestMethod.GET)
+//    public Object handleDeductScore(){
+//        notifyTimer.deductScore();
+//        return JsonResultModel.newJsonResultModel("ok");
+//    }
 }
