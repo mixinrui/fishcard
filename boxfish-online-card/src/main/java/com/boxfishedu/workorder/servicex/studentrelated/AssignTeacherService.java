@@ -81,8 +81,6 @@ public class AssignTeacherService {
     private ServeService serveService;
 
 
-
-
     //1 判断按钮是否出现
     public JsonResultModel checkAssignTeacherFlag(Long workOrderId) {
         List<WorkOrder> workOrders = this.getAssignTeacherList(workOrderId);
@@ -96,23 +94,23 @@ public class AssignTeacherService {
 
 
     public List<WorkOrder> getAssignTeacherList(Long workOrderId) {
-        WorkOrder workOrder =  workOrderService.findOne(workOrderId);//刚刚上过的课的鱼卡
+        WorkOrder workOrder = workOrderService.findOne(workOrderId);//刚刚上过的课的鱼卡
         if (workOrder == null) {
             throw new BusinessException("课程信息有误");
         }
 
         //判断旧鱼卡是否已经上完课
-        if(workOrder.getStartTime().after(new Date())){
+        if (workOrder.getStartTime().after(new Date())) {
             throw new BusinessException("该课程尚未结束");
         }
 
         // 查询schema  学生id  st_schema  sku_id
         StStudentSchema.CourseType courseType;
-        if( TeachingType.ZHONGJIAO.getCode()==workOrder.getSkuId()){ //中教
+        if (TeachingType.ZHONGJIAO.getCode() == workOrder.getSkuId()) { //中教
             courseType = StStudentSchema.CourseType.chinese;
-        }else if(TeachingType.WAIJIAO.getCode()==workOrder.getSkuId()){
+        } else if (TeachingType.WAIJIAO.getCode() == workOrder.getSkuId()) {
             courseType = StStudentSchema.CourseType.foreign;
-        }else {
+        } else {
             throw new BusinessException("课程类型有误");
         }
 
@@ -132,15 +130,16 @@ public class AssignTeacherService {
 
 
     //2.1  指定这位老师上课
-    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Long studentId, Long teacherId){
+    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Long studentId, Long teacherId) {
         WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
-        return assignTeacherServiceX.maualAssign(teacherId,studentId,workOrder.getSkuId());
+        return assignTeacherServiceX.maualAssign(teacherId, studentId, workOrder.getSkuId());
     }
+
     //2 获取指定老师带的课程列表
-    public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId,Long studentId,Long teacherId, Pageable pageable) {
+    public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId, Long studentId, Long teacherId, Pageable pageable) {
 
         Date startTime = DateTime.now().plusHours(48).toDate();
-        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(studentId,startTime, pageable);
+        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(studentId, startTime, pageable);
         trimPage(courseSchedulePage);
         return JsonResultModel.newJsonResultModel(courseSchedulePage);
     }
@@ -172,8 +171,6 @@ public class AssignTeacherService {
             }
         });
     }
-
-
 
 
     //3 开始上课界面接口
@@ -264,17 +261,17 @@ public class AssignTeacherService {
         Page<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, date, pageable);
         // 更新已读状态
         List fishcardids = Lists.newArrayList();
-        if(results!=null && null!=results.getContent()){
-            ((List<StStudentApplyRecords>)results.getContent()).stream().forEach(st->{
-                 fishcardids.add(st.getWorkOrderId());
+        if (results != null && null != results.getContent()) {
+            ((List<StStudentApplyRecords>) results.getContent()).stream().forEach(st -> {
+                fishcardids.add(st.getWorkOrderId());
             });
         }
 
-        if(!CollectionUtils.isEmpty(fishcardids)){
+        if (!CollectionUtils.isEmpty(fishcardids)) {
             List<WorkOrder> workOrders = workOrderService.findByIdIn(fishcardids);
-            ((List<StStudentApplyRecords>)results.getContent()).stream().forEach(st->{
+            ((List<StStudentApplyRecords>) results.getContent()).stream().forEach(st -> {
                 workOrders.stream().forEach(workOrder -> {
-                    if(workOrder.getId().equals(st.getWorkOrderId())){
+                    if (workOrder.getId().equals(st.getWorkOrderId())) {
                         st.setStartTime(workOrder.getStartTime());
                         st.setEndTime(workOrder.getEndTime());
                         st.setTimeSlotId(workOrder.getSlotId());
@@ -285,7 +282,7 @@ public class AssignTeacherService {
 
         }
         int readNum = stStudentApplyRecordsService.upateReadStatusByStudentId(teacherId, studentId);
-        logger.info("getMyClassesByStudentId:num:[{}],teacherId:[{}],studentId:[{}]",readNum,teacherId,studentId);
+        logger.info("getMyClassesByStudentId:num:[{}],teacherId:[{}],studentId:[{}]", readNum, teacherId, studentId);
         return results;
     }
 
@@ -326,50 +323,50 @@ public class AssignTeacherService {
     }
 
 
-    public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam){
+    public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam) {
         List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findAll(stTeacherInviteParam.getIds());
-        if(CollectionUtils.isEmpty(stStudentApplyRecordsList)){
+        if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
             throw new BusinessException("没有查询到匹配的课程");
         }
         // 未匹配上的进行匹配
-        stStudentApplyRecordsList.stream().filter(sts -> sts.getMatchStatus() .equals(  StStudentApplyRecords.MatchStatus.wait2apply)  ).collect(Collectors.toList());
+        stStudentApplyRecordsList.stream().filter(sts -> sts.getMatchStatus().equals(StStudentApplyRecords.MatchStatus.wait2apply)).collect(Collectors.toList());
 
         Long teacherId = stStudentApplyRecordsList.get(0).getTeacherId();
         Long studentId = stStudentApplyRecordsList.get(0).getStudentId();
-        List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
-        List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList,"workOrderId");
-        return   assignTeacherServiceX.teacherAccept(teacherId,studentId, workOrderIds);
+        List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList, "courseScheleId");
+        List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList, "workOrderId");
+        return assignTeacherServiceX.teacherAccept(teacherId, studentId, workOrderIds);
     }
 
 
     // 9 app换个老师
-    public JsonResultModel changeATeacher(StudentTeacherParam studentTeacherParam){
-        if(null == studentTeacherParam.getTeacherId() || null==studentTeacherParam.getStudentId() || 0==studentTeacherParam.getTeacherId() && 0==studentTeacherParam.getStudentId()){
-            throw  new BusinessException("数据参数不全");
+    public JsonResultModel changeATeacher(StudentTeacherParam studentTeacherParam) {
+        if (null == studentTeacherParam.getTeacherId() || null == studentTeacherParam.getStudentId() || 0 == studentTeacherParam.getTeacherId() && 0 == studentTeacherParam.getStudentId()) {
+            throw new BusinessException("数据参数不全");
         }
 
-        JsonResultModel  jsonResultModel = teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
+        JsonResultModel jsonResultModel = teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
 
-        if(null!=jsonResultModel && HttpStatus.OK.value() == jsonResultModel.getReturnCode()){
+        if (null != jsonResultModel && HttpStatus.OK.value() == jsonResultModel.getReturnCode()) {
 
-            Service service =  serveService.findOne(studentTeacherParam.getOrderId());
+            Service service = serveService.findOne(studentTeacherParam.getOrderId());
             // 获取订单数据
-            List<WorkOrder>  workOrders =  workOrderService.getAllWorkOrdersByOrderId(studentTeacherParam.getOrderId());
-            Long [] workOrderIds = (Long [])Collections3.extractToList(workOrders,"id").toArray();
+            List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(studentTeacherParam.getOrderId());
+            Long[] workOrderIds = (Long[]) Collections3.extractToList(workOrders, "id").toArray();
 
             // 获取课程数据
-            List<CourseSchedule> courseSchedules =  courseScheduleService.findByWorkorderIdIn(workOrderIds);
+            List<CourseSchedule> courseSchedules = courseScheduleService.findByWorkorderIdIn(workOrderIds);
 
             // 分配老师
-            timePickerService.getRecommandTeachers(service,courseSchedules);
+            timePickerService.getRecommandTeachers(service, courseSchedules);
         }
 
-        return  JsonResultModel.newJsonResultModel("OK");
+        return JsonResultModel.newJsonResultModel("OK");
     }
 
 
-    public String getTeacherName(Long teacherId){
-        if(null==teacherId)
+    public String getTeacherName(Long teacherId) {
+        if (null == teacherId)
             return "";
         return teacherStudentRequester.getTeacherName(teacherId);
     }
