@@ -32,7 +32,7 @@ public class JsonResultModel implements Serializable {
 
     private int returnCode = 200;
 
-    private String returnMsg = "‰";
+    private String returnMsg = "success";
 
     private JsonResultModel(Object data) {
         this.data = data;
