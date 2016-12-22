@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Data
 public class TeachingOnlineGroupMsg {
-    private List<String> alias=new ArrayList<>();
+    private List<Long> user_id=new ArrayList<>();
     private String push_title;
     private TeachingOnlineMsgAttach data;
 

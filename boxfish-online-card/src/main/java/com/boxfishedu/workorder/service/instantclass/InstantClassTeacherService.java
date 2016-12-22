@@ -84,7 +84,7 @@ public class InstantClassTeacherService {
         logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 获取到教师列表[{}],card[{}],学生[{}]"
                 ,teacherIdsOptional.get().toString(),JacksonUtil.toJSon(instantClassCard),instantClassCard.getStudentId());
         //匹配上老师,则向教师推送抢单的消息
-        courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
+        courseOnlineRequester.notifyInstantGroupClassMsg(instantClassCard,teacherIdsOptional.get());
     }
 
     private void updateNomatchStatus(InstantClassCard instantClassCard){
