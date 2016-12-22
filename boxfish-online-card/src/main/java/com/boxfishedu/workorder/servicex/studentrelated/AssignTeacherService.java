@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by jiaozijun on 16/12/14.
@@ -200,8 +201,9 @@ public class AssignTeacherService {
             courseInfo.setTeacherId(workOrder.getTeacherId());
             if (!CollectionUtils.isEmpty(teacherInfoMap)) {
                 courseInfo.setTeacherImg(teacherInfoMap.get("figure_url"));// 教师头像url
-                courseInfo.setTeacherName(teacherInfoMap.get("nickname")); // 教师姓名
             }
+
+            courseInfo.setTeacherName(getTeacherName(workOrder.getTeacherId())); // 教师姓名
 
         }
 
@@ -314,11 +316,11 @@ public class AssignTeacherService {
         Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(stStudentApplyRecords.getTeacherId());
         if (!CollectionUtils.isEmpty(teacherInfoMap)) {
             jo.put("teacherImg", teacherInfoMap.get("figure_url"));
-            jo.put("teacherName", teacherInfoMap.get("nickname"));
             jo.put("teacherId", stStudentApplyRecords.getTeacherId());
             jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
 
         }
+        jo.put("teacherName", getTeacherName(stStudentApplyRecords.getTeacherId()));
         return jo;
 
     }
@@ -329,6 +331,9 @@ public class AssignTeacherService {
         if(CollectionUtils.isEmpty(stStudentApplyRecordsList)){
             throw new BusinessException("没有查询到匹配的课程");
         }
+        // 未匹配上的进行匹配
+        stStudentApplyRecordsList.stream().filter(sts -> sts.getMatchStatus() .equals(  StStudentApplyRecords.MatchStatus.wait2apply)  ).collect(Collectors.toList());
+
         Long teacherId = stStudentApplyRecordsList.get(0).getTeacherId();
         Long studentId = stStudentApplyRecordsList.get(0).getStudentId();
         List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
@@ -360,6 +365,13 @@ public class AssignTeacherService {
         }
 
         return  JsonResultModel.newJsonResultModel("OK");
+    }
+
+
+    public String getTeacherName(Long teacherId){
+        if(null==teacherId)
+            return "";
+        return teacherStudentRequester.getTeacherName(teacherId);
     }
 
 
