@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
+import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -472,23 +473,26 @@ public class TeacherStudentRequester {
     //TODO:此处的url换为师生运营的url
     public String  getTeacherName(Long teacherId) {
 
-        String url = String.format("/%s/%s/%s",urlConf.getTeacher_service(),"teacher",teacherId);
+        String url = String.format("%s/%s/%s",urlConf.getTeacher_service(),"teacher",teacherId);
 
         logger.info("getTeacherName 鱼卡向师生运营获取老师url[{}] ,老师Id[{}]",  url,teacherId);
         String teacherName = "";
         TeacherParam teacherParam = null;
+        JsonResultModel jsonResultModel;
+        Map teacherMap = Maps.newHashMap();
         try {
-            teacherParam = restTemplate.getForObject(url, TeacherParam.class);
+            jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
+            teacherMap = (Map)jsonResultModel.getData();
         } catch (Exception ex) {
             logger.error("向师生运营发送获取老师姓名", ex);
             throw new BusinessException("向师生运营发送获取老师姓名失败");
         }
-        if (null == teacherParam) {
-            if(teacherParam.getTeachingType()  ==TeachingType.WAIJIAO.getCode())  {
-                teacherName = teacherParam.getFirstName()+" "+teacherParam.getLastName();
+        if (null!=teacherMap) {
+            if((Integer)teacherMap.get("teachingType")  ==TeachingType.WAIJIAO.getCode())  {
+                teacherName = (String)teacherMap.get("firstName")+" "+(String)teacherMap.get("lastName");
             }
-            if(teacherParam.getTeachingType() == TeachingType.ZHONGJIAO.getCode()){
-                teacherName = teacherParam.getName();
+            if((Integer)teacherMap.get("teachingType") == TeachingType.ZHONGJIAO.getCode()){
+                teacherName = (String)teacherMap.get("name");
             }
         }
 
