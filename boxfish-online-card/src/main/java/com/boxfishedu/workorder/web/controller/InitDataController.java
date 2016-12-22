@@ -234,6 +234,7 @@ public class InitDataController {
                     instantClassTimeRules.setDay(localDateTime.getDayOfWeek().toString());
                     instantClassTimeRules.setBegin("19:00:00");
                     instantClassTimeRules.setEnd("23:00:00");
+                    instantClassTimeRules.setTutorType(tutorType);
                     instantClassTimeRulesMorphiaRepository.save(instantClassTimeRules);
                     break;
             }
