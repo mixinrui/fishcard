@@ -13,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * 配置相关移到configuration包下
  */
 @EnableScheduling
-//@SpringBootApplication(scanBasePackages = {"com.boxfishedu"})
 @SpringBootApplication
 @ServletComponentScan
 public class ServiceApplication extends SpringBootServletInitializer {

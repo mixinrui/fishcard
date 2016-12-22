@@ -29,6 +29,11 @@ public class StStudentApplyRecords {
         yes
 
     }
+    public enum MatchStatus{
+        un_matched,
+        matched,
+        wait2apply
+    }
     @Id
     @GeneratedValue
     private Long id;
@@ -45,6 +50,7 @@ public class StStudentApplyRecords {
     private ReadStatus isRead;
     private Integer skuId;
     private VALID valid; // 用于逻辑删除数据
+    private MatchStatus matchStatus;
     @Transient
     private Integer courseNum;
     @Transient

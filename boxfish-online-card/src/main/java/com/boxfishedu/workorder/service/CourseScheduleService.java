@@ -162,6 +162,13 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
         return courseScheduleRepository.findFinishCourseScheduleByStudentId(userId, pageable);
     }
 
+    // 查询指定老师之后 学生未上 未冻结 的课程列表
+    public Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long userId,Date startTime, Pageable pageable) {
+        return courseScheduleRepository.findAssignCourseScheduleByStudentId(userId,startTime,0, pageable);
+    }
+
+
+
     public Page<CourseSchedule> findUnfinishCourseSchedulePage(Long userId, Pageable pageable) {
         return courseScheduleRepository.findByStudentIdAndStatusBefore(
                 userId, FishCardStatusEnum.COMPLETED.getCode(), pageable);
