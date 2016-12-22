@@ -57,7 +57,7 @@ public enum TimerMessageType {
     INSTANT_CLASS_BACK_COURSES(147),
 
     // 外教点评会员过期提醒
-    EXPIRE_COMMENT_CARD(148);
+    EXPIRE_COMMENT_CARD(149);
 
     private int code;
 
