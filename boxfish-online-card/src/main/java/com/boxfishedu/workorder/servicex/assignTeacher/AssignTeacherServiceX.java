@@ -91,11 +91,10 @@ public class AssignTeacherServiceX {
      * 老师点接受
      * @param teacherId
      * @param studentId
-     * @param courseScheleIds
      * @param workOrderIds
      * @return
      */
-    public JsonResultModel teacherAccept(Long teacherId,Long studentId,List<Long> courseScheleIds,List<Long> workOrderIds){
+    public JsonResultModel teacherAccept(Long teacherId,Long studentId,List<Long> workOrderIds){
         Integer skuId = stStudentSchemaJpaRepository.findByStudentIdAndTeacherId(studentId,teacherId).getSkuId().ordinal();
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(workOrderIds);
         stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,ConstantUtil.TEACHER_CHANNLE,skuId);

@@ -210,6 +210,6 @@ public class TestController {
         List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndTeacherIdAndValid(studentId,teacherId, StStudentApplyRecords.VALID.yes);
         List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
         List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList,"workOrderId");
-        assignTeacherServiceX.teacherAccept(teacherId,studentId, courseScheleIds, workOrderIds);
+        assignTeacherServiceX.teacherAccept(teacherId,studentId, workOrderIds);
     }
 }

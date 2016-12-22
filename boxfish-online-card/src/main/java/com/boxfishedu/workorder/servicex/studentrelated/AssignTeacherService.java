@@ -333,7 +333,7 @@ public class AssignTeacherService {
         Long studentId = stStudentApplyRecordsList.get(0).getStudentId();
         List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
         List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList,"workOrderId");
-        return   assignTeacherServiceX.teacherAccept(teacherId,studentId, courseScheleIds, workOrderIds);
+        return   assignTeacherServiceX.teacherAccept(teacherId,studentId, workOrderIds);
     }
 
 

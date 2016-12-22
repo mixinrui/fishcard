@@ -57,16 +57,14 @@ public class StAssignTeacherService {
     public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,
                                 String channel, Integer skuId) {
         checkSchema(studentId, teacherId, skuId);
-        //TODO 查询出不同的类型的课表
+        //TODO 当前指定老师的其他学生的课表
         List<CourseSchedule> victimCourseSchedules =
                 courseScheduleRepository.
-                        findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleId(teacherId, studentId, 0, skuId);//TODO 当前指定老师的其他学生的课表
+                        findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleId(teacherId, studentId, 0, skuId);
         List<CourseSchedule> victimCourseSchedulesFinal = Lists.newArrayList();
         if (Collections3.isNotEmpty(victimCourseSchedules)) {
-            CourseSchedule courseSchedule = null;
             StStudentSchema stStudentSchemaTmp = null;
-            for (Iterator<CourseSchedule> iter = victimCourseSchedules.iterator(); iter.hasNext(); ) {
-                courseSchedule = iter.next();
+            for (CourseSchedule courseSchedule : victimCourseSchedules ) {
                 for(CourseSchedule cs : aggressorCourseSchedules){
                     if(courseSchedule.getClassDate().compareTo(cs.getClassDate())==0
                             && courseSchedule.getTimeSlotId().intValue()==cs.getTimeSlotId().intValue()){
