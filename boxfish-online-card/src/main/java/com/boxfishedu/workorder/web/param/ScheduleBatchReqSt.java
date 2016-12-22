@@ -4,13 +4,14 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by wangshichao on 16/4/12.
  */
 @Data
-public class ScheduleBatchReqSt {
+public class ScheduleBatchReqSt implements Serializable{
 
     @NotNull(message = "用户id不能为空")
     private Long userId;
