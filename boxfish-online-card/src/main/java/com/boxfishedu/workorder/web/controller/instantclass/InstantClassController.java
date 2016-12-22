@@ -115,6 +115,7 @@ public class InstantClassController {
      */
     @RequestMapping(value = "/service/student/instant/timerange", method = RequestMethod.GET)
     public JsonResultModel timeRange(Long userId) {
+        logger.debug("timeRange用户id:[{}]",userId);
         String timeDesc = instantClassServiceX.timeRange(userId);
         if (StringUtils.isEmpty(timeDesc)) {
             return JsonResultModel.newJsonResultModel(null);
