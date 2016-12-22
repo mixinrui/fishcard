@@ -611,12 +611,6 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return beginDate;
     }
 
-
-    private void getUserType() {
-
-    }
-
-
     /**
      * 返回首次时间
      * @param workOrders
