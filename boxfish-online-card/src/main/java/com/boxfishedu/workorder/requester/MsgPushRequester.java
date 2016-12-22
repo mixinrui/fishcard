@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 /**
  * Created by hucl on 16/12/22.
  */
+@Component
 public class MsgPushRequester {
     @Autowired
     private UrlConf urlConf;
