@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.param.bebase3;
 
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -14,11 +15,7 @@ import java.util.Date;
 @Data
 public class ScheduleModelSt implements Serializable{
 
-    public enum MatchStatus{
-        un_matched,
-        matched,
-        wait2apply
-    }
+
     private Long id;
     private Long workOrderId;
     @NotNull(message = "日期不能为空")
@@ -32,7 +29,7 @@ public class ScheduleModelSt implements Serializable{
 
     private Integer roleId;
 
-    private MatchStatus matchStatus   ;// '申请状态  0 不匹配  1 匹配  2 无时间片待匹配
+    private StStudentApplyRecords.MatchStatus matchStatus   ;// '申请状态  0 不匹配  1 匹配  2 无时间片待匹配
     private Long oldTeacherId;//原老师id 需要指定老师的课的原来老师id  B老师
 
 

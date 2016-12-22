@@ -10,10 +10,7 @@ import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.WorkOrderLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
-import com.boxfishedu.workorder.entity.mysql.StStudentSchema;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.servicex.assignTeacher.RemoteService;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
@@ -122,15 +119,14 @@ public class StAssignTeacherService {
         List<Long> macthedWorkOrderIdList = Lists.newArrayList();
         List<ScheduleModelSt> wait2applyWorkOrderIdList = Lists.newArrayList();
         for (ScheduleModelSt scheduleModelSt : scheduleModelStList) {
-            if (scheduleModelSt.getMatchStatus() == ScheduleModelSt.MatchStatus.matched) {
+            if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.matched) {
                 macthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
-            } else {
+            }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.un_matched
+                    ||scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
                 wait2applyWorkOrderIdList.add(scheduleModelSt);
             }
 
-//            else if (scheduleModelSt.getMatchStatus() == ScheduleModelSt.MatchStatus.wait2apply){
-//                wait2applyWorkOrderIdList.add(scheduleModelSt);
-//            }
+
         }
         logger.info("指定老师stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中匹配上IDS:{}",
                 studentId,  macthedWorkOrderIdList.toArray());
@@ -139,7 +135,7 @@ public class StAssignTeacherService {
 
 
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
-            makeApplyRecords(teacherId, studentId, wait2applyWorkOrderIdList, skuId);
+            makeApplyRecords(teacherId, studentId, wait2applyWorkOrderIdList,skuId);
         } else if (channel.equals(ConstantUtil.TEACHER_CHANNLE)) {
             changeApplyRecords(studentId, teacherId, macthedWorkOrderIdList);
         } else if (channel.equals(ConstantUtil.TIMER_CHANNLE)) {
@@ -190,7 +186,7 @@ public class StAssignTeacherService {
         for (CourseSchedule courseSchedule : aggressorCourseSchedules) {
             scheduleModelSt = new ScheduleModelSt(courseSchedule);
             if (channel.equals(ConstantUtil.TEACHER_CHANNLE)) {
-                scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.wait2apply);
+                scheduleModelSt.setMatchStatus(StStudentApplyRecords.MatchStatus.wait2apply);
             }
             if(Collections3.isNotEmpty(victimCourseSchedules)){
                 for (CourseSchedule victimCourseSchedule : victimCourseSchedules) {
@@ -278,8 +274,10 @@ public class StAssignTeacherService {
             stStudentApplyRecords.setIsRead(StStudentApplyRecords.ReadStatus.no);
             stStudentApplyRecords.setWorkOrderId(scheduleModelSt.getWorkOrderId());
             stStudentApplyRecords.setCourseScheleId(scheduleModelSt.getId());
+            stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus());
             stStudentApplyRecordsList.add(stStudentApplyRecords);
         }
+
         //TODO 无时间片 请求记录入库 入库之前,先把之前的申请记录全部作废掉
         if (Collections3.isNotEmpty(stStudentApplyRecordsList)) {
             List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.
