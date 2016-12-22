@@ -28,7 +28,6 @@ public class StStudentApplyRecordsResult {
     private String studentName;// 学生姓名
     private Long  teacherId;     //  指定教师ID
     private Long courseNum;
-
     private String studentImg ; //学生头像url
     private StStudentApplyRecords.ReadStatus isRead;
 
