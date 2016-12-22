@@ -15,6 +15,7 @@ public class ServiceOnlineBoxfishExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public Object processAllException(Exception e) {
+        e.printStackTrace();
         logger.error("controller层:", e);
         final JsonResultModel jsonResultModel = new JsonResultModel();
         jsonResultModel.setReturnCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -71,6 +72,7 @@ public class ServiceOnlineBoxfishExceptionHandler {
     }
 
     private Object boxfishExceptionReturn(BoxfishException e) {
+        e.printStackTrace();
         logger.error("controller层:BoxFishException:{}", e.getReturnMsg(), e);
         JsonResultModel jsonResultModel = new JsonResultModel();
         jsonResultModel.setReturnCode(e.getReturnCode());
