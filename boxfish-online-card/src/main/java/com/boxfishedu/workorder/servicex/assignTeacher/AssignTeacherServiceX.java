@@ -115,7 +115,7 @@ public class AssignTeacherServiceX {
                     findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(stStudentSchema.getStudentId(),
                             startTime,0,stStudentSchema.getTeacherId());//TODO 发起指定老师的学生的48小时候的课表
             if(Collections3.isNotEmpty(aggressorCourseSchedules)){
-                logger.info("<定时任务>指定老师stp-1::::::======>>>学生ID{}===>>>>指定老师{}===>>skuId{}",
+                logger.info("指定老师 <定时任务> stp-1::::::======>>>学生ID{}===>>>>指定老师{}===>>skuId{}",
                         stStudentSchema.getStudentId(),stStudentSchema.getTeacherId(),stStudentSchema.getSkuId().ordinal());
                 stAssignTeacherService.doAssignTeacher(stStudentSchema.getTeacherId(),stStudentSchema.getStudentId(),
                         aggressorCourseSchedules,ConstantUtil.TIMER_CHANNLE,stStudentSchema.getSkuId().ordinal());
