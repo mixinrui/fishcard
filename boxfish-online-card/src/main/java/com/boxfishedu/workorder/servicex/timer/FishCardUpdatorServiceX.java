@@ -182,6 +182,7 @@ public class FishCardUpdatorServiceX {
 
         //没有联通但是在线,则表示为系统异常
         if (!containConnectedFlag && isOnline) {
+            workOrderLogService.saveWorkOrderLog(workOrder,"学生课前在线,但是没有师生连通,将改为系统异常");
             logger.info("studentForceAbsentUpdator判断鱼卡[{}]是否由于终端异常导致,判断结果[{}]", workOrder.getId(), isOnline);
             return true;
         }
