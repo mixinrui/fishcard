@@ -25,18 +25,14 @@ public class DreamRecommendHandler extends DefaultRecommendHandler {
 
     @Override
     public Map<Integer, RecommandCourseView> recommendCourseViews(List<WorkOrder> workOrders, TimeSlotParam timeSlotParam) {
-        if(isSupportBatchExecute(workOrders)) {
-            return batchRecommendCourses(workOrders, timeSlotParam);
-        } else {
-            Map<Integer, RecommandCourseView> courseViewMap = Maps.newHashMap();
-            for (WorkOrder workOrder : workOrders) {
-                logger.debug("鱼卡序号{}",workOrder.getSeqNum());
-                // 不同类型的套餐对应不同类型的课程推荐
-                RecommandCourseView recommandCourseView = recommendCourse(workOrder);
-                courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
-            }
-            return courseViewMap;
+        Map<Integer, RecommandCourseView> courseViewMap = Maps.newHashMap();
+        for (WorkOrder workOrder : workOrders) {
+            logger.debug("鱼卡序号{}",workOrder.getSeqNum());
+            // 不同类型的套餐对应不同类型的课程推荐
+            RecommandCourseView recommandCourseView = recommendCourse(workOrder);
+            courseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
         }
+        return courseViewMap;
     }
 
 
@@ -50,17 +46,4 @@ public class DreamRecommendHandler extends DefaultRecommendHandler {
         return recommandCourseRequester.getUltimateRecommend(workOrder);
     }
 
-
-    private Map<Integer, RecommandCourseView> batchRecommendCourses(List<WorkOrder> workOrders, TimeSlotParam timeSlotParam) {
-        int recommendIndex = 0;
-        Map<Integer, RecommandCourseView> resultMap = Maps.newHashMap();
-        for(int i = 0, size = workOrders.size() / 8; i < size; i++) {
-            List<RecommandCourseView> recommendCourseViews = recommandCourseRequester.getBatch8DreamRecommandCourse(
-                    timeSlotParam.getStudentId());
-            for(RecommandCourseView recommandCourseView : recommendCourseViews) {
-                resultMap.put(++recommendIndex, recommandCourseView);
-            }
-        }
-        return resultMap;
-    }
 }

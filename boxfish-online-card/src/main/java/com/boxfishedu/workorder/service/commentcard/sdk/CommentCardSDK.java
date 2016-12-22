@@ -3,24 +3,17 @@ package com.boxfishedu.workorder.service.commentcard.sdk;
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.config.CommentCardUrlConf;
 import com.boxfishedu.workorder.common.config.UrlConf;
-import com.boxfishedu.workorder.common.util.RestTemplateForCommentCard;
 import com.boxfishedu.workorder.entity.mysql.PushToStudentAndTeacher;
-import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by ansel on 16/7/26.
@@ -81,6 +74,14 @@ public class CommentCardSDK {
         return restTemplate.postForObject(getAddScoreURI(studentId,accessToken,point),null,Object.class);
     }
 
+    public Object notifyCommentCardExpire(Set<Long> ids, String message, String type) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("user_id", ids);
+        requestBody.put("push_title", message);
+        requestBody.put("data", Collections.singletonMap("type", type));
+        return restTemplate.postForObject(createBoxfishPushURI(), requestBody, JsonResultModel.class);
+    }
+
     private URI createTeacherAbsenceURI(){
         logger.info("Accessing createTeacherAbsenceURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getTeacherAbsenceUrl())
@@ -104,6 +105,13 @@ public class CommentCardSDK {
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getPushInfoIrl())
                 .path("/teaching/callback/push")
                 .queryParam("")
+                .build()
+                .toUri();
+    }
+
+    private URI createBoxfishPushURI() {
+        logger.info("Accessing createPushURI in CommentCardSDK......");
+        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getBoxfishPushUrl())
                 .build()
                 .toUri();
     }

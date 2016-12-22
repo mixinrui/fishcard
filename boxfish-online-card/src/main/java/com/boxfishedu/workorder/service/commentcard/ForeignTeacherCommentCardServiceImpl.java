@@ -1,14 +1,11 @@
 package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.workorder.common.bean.AccountCourseBean;
-import com.boxfishedu.workorder.common.bean.AccountCourseEnum;
-import com.boxfishedu.workorder.common.bean.CommentCardStatus;
-import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.mall.enums.ProductType;
+import com.boxfishedu.workorder.common.bean.*;
 import com.boxfishedu.workorder.common.config.CommentCardTimeConf;
 import com.boxfishedu.workorder.common.config.ServiceGateWayType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.exception.NotFoundException;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -30,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -607,6 +605,24 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
             commentCardJpaRepository.save(newCommentCard);
         }
+    }
+
+    /**
+     * 外教点评过期通知
+     */
+    @Override
+    public void notifyExpireCommentCards() {
+        // 会员有效期倒数第三天时,如果用户还有会员外教点评未使用,下午17:00点推送提醒: 会员要到期啦,外教点评还没用完呢,赶快去行使会员特权~
+        LocalDate now = LocalDate.now();
+        Set<Long> studentIds = serviceJpaRepository.getAvailableForeignCommentService(
+                ProductType.COMMENT.value(), DateUtil.convertToDate(now.plusDays(3)), UserTypeEnum.GENERAL_MEMBER.type());
+        pushExpireMessage(studentIds);
+    }
+
+    // 推送
+    private void pushExpireMessage(Set<Long> ids) {
+        logger.info("push expire commentCards to {}", ids);
+        commentCardSDK.notifyCommentCardExpire(ids, commentCardTimeConf.getExpireMessage(), "FOREIGNCOMMENT");
     }
 
     private String getTeacherName(String teacherFirstName,String teacherLastName){

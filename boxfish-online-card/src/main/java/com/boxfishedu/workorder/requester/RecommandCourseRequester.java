@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.mall.enums.TutorType;
-import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -12,8 +11,6 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.RecommandedCourseService;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendCourseType;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
-import com.boxfishedu.workorder.web.view.course.RecommandCourseViews;
-import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -111,22 +107,6 @@ public class RecommandCourseRequester {
         return String.format("%s%s", urlConf.getThumbnail_server(), courseView.getCover());
     }
 
-    public List<RecommandCourseView> getBatchRecommandCourse(Long studentId) {
-        try {
-            RecommandCourseViews overAllRecommandViews = restTemplate.getForObject(
-                    createOverAllRecommend(studentId), RecommandCourseViews.class);
-            return overAllRecommandViews.getSingle();
-        } catch (Exception e) {
-            throw new BusinessException("调用课程推荐失败");
-        }
-    }
-
-    public List<RecommandCourseView> getBatch8DreamRecommandCourse(Long studentId) {
-        RecommandCourseViews recommandCourseViews = restTemplate.getForObject(
-                create8BatchDreamRecommend(studentId), RecommandCourseViews.class);
-        return recommandCourseViews.getSingle();
-    }
-
 
     //课程完成后,通知推荐课程服务
     public void notifyCompleteCourse(WorkOrder workOrder) {
@@ -212,26 +192,6 @@ public class RecommandCourseRequester {
                 createUltimateRecommend(studentId, index),
                 RecommandCourseView.class);
     }
-
-
-    private URI createOverAllRecommend(Long studentId) {
-        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
-                .path("/online/" + studentId)
-                .build()
-                .toUri();
-        logger.info("recommendURL: [{}]", uri);
-        return uri;
-    }
-
-    private URI create8BatchDreamRecommend(Long studentId) {
-        URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_recommended_service())
-                .path(String.format("/ultimate/%s", studentId.toString()))
-                .build()
-                .toUri();
-        logger.info("recommendURL: [{}]", uri);
-        return uri;
-    }
-
 
     // 核心素养 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/promote/18826/9
     private URI createPromoteRecommend(Long studentId, int index) {

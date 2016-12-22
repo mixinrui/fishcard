@@ -18,4 +18,6 @@ public class CommentCardTimeConf {
     private String nodeThree;
 
     private String nodeFour;
+
+    private String expireMessage;
 }

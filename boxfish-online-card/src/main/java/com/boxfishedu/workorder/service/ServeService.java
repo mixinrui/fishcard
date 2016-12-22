@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -46,6 +47,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -321,7 +323,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             Service service = serviceHashMap.get(key);
             if(service != null) {
                 //增加有效期,数量
-                setServiceExistedSpecs(service, productComboDetail);
+                setServiceExistedSpecs(service, productComboDetail, orderView);
             } else {
                 service = getServiceByOrderView(orderView, productComboDetail, productCombo, isOverAll);
                 services.add(service);
@@ -384,60 +386,26 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     }
 
     private void addValidTimeForServices(List<Service> services) {
+        LocalDate now = LocalDate.now();
         for (Service service : services) {
-            service.setStartTime(Calendar.getInstance().getTime());
-            Calendar calendar = Calendar.getInstance();
-            //service的validate day来自sku的validate day
-            // 暂时没有validatyDay这个字段了
-            calendar.add(Calendar.DAY_OF_YEAR, service.getValidityDay());
-            service.setEndTime(calendar.getTime());
+            service.setStartTime(DateUtil.convertToDate(now));
+            // 从购买当天0点算起, 到过期的第一天0点为止
+            service.setEndTime(DateUtil.convertToDate(now.plusDays(service.getValidityDay() + 1)));
             logger.info("订单[{}]生成服务类型[{}]成功]", service.getOrderId(), service.getSkuName());
         }
     }
 
-//    private void setServiceExistedSpecs(Service service, OrderDetailView orderDetailView
-//            , ProductSKUView productSKUView) {
-//        ServiceSKU serviceSKU = productSKUView.getServiceSKU();
-//        service.setOriginalAmount(service.getOriginalAmount() + orderDetailView.getAmount());
-//        service.setAmount(service.getOriginalAmount());
-//        service.setValidityDay(service.getValidityDay() + serviceSKU.getValidDay());
-//    }
 
-    private void setServiceExistedSpecs(Service service, ProductComboDetail productComboDetail) {
+    private void setServiceExistedSpecs(Service service, ProductComboDetail productComboDetail, OrderForm orderForm) {
         service.setOriginalAmount(service.getOriginalAmount() + productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
         // TODO 长期有效service.getValidityDay() + serviceSKU.getValidDay()
-        service.setValidityDay(365);
+        if(Objects.isNull(orderForm)) {
+            service.setValidityDay(365 * 2);
+        } else {
+            service.setValidityDay(orderForm.getValidDays());
+        }
     }
-
-
-//    private Service getServiceByOrderView(OrderForm orderView, OrderDetailView orderDetailView,
-//                                          ProductSKUView productSKUView) throws BoxfishException {
-//        ServiceSKU serviceSKU = productSKUView.getServiceSKU();
-//        Service service = new Service();
-//        service.setStudentId(orderView.getUserId());
-//        // TODO 没有username
-////        service.setStudentName(orderView.getUserName());
-//        service.setOrderId(orderView.getId());
-//        if (productSKUView.getSkuCycle() == -1) {
-//            service.setOriginalAmount(productSKUView.getSkuAmount());
-//        } else {
-//            service.setOriginalAmount(orderDetailView.getAmount() * productSKUView.getSkuAmount() * productSKUView.getSkuCycle());
-//        }
-//        service.setAmount(service.getOriginalAmount());
-//        service.setAmount(service.getOriginalAmount());
-//        service.setValidityDay(serviceSKU.getValidDay());
-//        service.setSkuId(Long.parseLong(serviceSKU.getServiceType()));
-//        service.setRoleId(Integer.parseInt(serviceSKU.getServiceType()));
-//        service.setSkuName(serviceSKU.getSkuName());
-//        service.setComboCycle(productSKUView.getSkuCycle());
-//        service.setCountInMonth(productSKUView.getSkuAmount());
-//        service.setCreateTime(new Date());
-//        service.setOrderCode(orderView.getOrderCode());
-//        service.setCoursesSelected(0);
-//        return service;
-//    }
-
 
     private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail,
                                           ProductCombo productCombo, boolean isOverAll) throws BoxfishException {
@@ -447,6 +415,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOriginalAmount(productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
         service.setSkuId(productCombo.getId());
+        // 设置用户会员类型
+        service.setUserType(UserTypeEnum.getUserTypeByComboCode(productCombo.getComboCode()).type());
         // 课程类型
         if(isOverAll) {
             service.setTutorType(TutorType.MIXED.name());
@@ -463,6 +433,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setCoursesSelected(0);
         service.setValidityDay(365);
         service.setOrderChannel(orderView.getOrderChannel().name());
+
+        productCombo.getComboCode();
 
         List<ComboDurations> durations = productCombo.getComboDurations();
         if(CollectionUtils.isNotEmpty(durations)) {
@@ -638,6 +610,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]",workOrder.getId(),   workOrder.getStartTime());
         return beginDate;
     }
+
+
+    private void getUserType() {
+
+    }
+
 
     /**
      * 返回首次时间

@@ -44,4 +44,7 @@ public interface ForeignTeacherCommentCardService {
     public void updateCommentCardsPictures(UpdatePicturesForm updatePicturesForm);
 
     public void forceToChangeTeacher(Long fromTeacherId,Long toTeacherId);
+
+    void notifyExpireCommentCards();
+
 }
