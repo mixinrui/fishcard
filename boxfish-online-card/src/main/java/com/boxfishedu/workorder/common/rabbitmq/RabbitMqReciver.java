@@ -219,6 +219,11 @@ public class RabbitMqReciver {
                 logger.info("==========>EXPIRE_COMMENT_CARD ===>>> 会员外教点评过期提醒");
                 foreignTeacherCommentCardService.notifyExpireCommentCards();
             }
+            else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_ASSGIN_TEACHER.value()) {
+                logger.info("==========>ASSIGN TEACHER===>>> 指定老师定时任务");
+                assignTeacherServiceX.autoAssign();
+            }
+            //
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);
@@ -295,18 +300,7 @@ public class RabbitMqReciver {
         }
     }
 
-    /**
-     *
-     */
-//    @RabbitListener(queues = RabbitMqConstant.ST_AUTO_ASSIGN_TEACHER_QUEUE)
-//    public void autoAssignTeacher(){
-//        logger.debug("@autoAssignTeacher接收来自定时任务 指定老师请求");
-//        try {
-//            assignTeacherServiceX.autoAssign();
-//        } catch (Exception ex) {
-//            logger.error("@autoAssignTeacher接收来自定时任务,处理失败");
-//        }
-//    }
+
 //    /**
 //     * 抢单监听
 //     * 1 初始化数据 生成能够抢单的工单
