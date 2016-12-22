@@ -367,7 +367,7 @@ spring:
 interface:
   address:
     teacher_service: http://123.56.13.168:8099/teacher
-    teacher_service_admin: http://123.56.13.168:8098
+    teacher_service_admin: http://123.56.13.168:8098/teacheradmin
     course_recommended_service: http://123.56.13.168:8001/recommend
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
