@@ -26,13 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by hucl on 16/11/3.
@@ -56,6 +55,9 @@ public class InstantClassService {
 
     @Autowired
     private InstantClassUpdatorService instantClassUpdatorService;
+
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -153,7 +155,8 @@ public class InstantClassService {
         LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30);
         return dayTimeSlots.getDailyScheduleTime().stream()
                 .filter(timeSlot -> nextSlotTime
-                        .isAfter(DateUtil.string2LocalDateTime(String.join(" ", DateUtil.date2SimpleString(new Date()), timeSlot.getStartTime()))))
+                        .isAfter(DateUtil.string2LocalDateTime(String.join(" ", DateUtil.date2SimpleString(new Date())
+                                , timeSlot.getStartTime()))))
                 .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
     }
 
@@ -247,6 +250,29 @@ public class InstantClassService {
 
     private WorkOrder getAvaliableWorkOrder() {
         return ThreadLocalUtil.latestWorkOrderThreadLocal.get();
+    }
+
+    public Map<String, Object> getScheduleTypeMap(Long studentId) {
+        List<Integer> skuIds = workOrderJpaRepository.findDistinctSkuIds(studentId, new Date());
+        java.util.Map<String, Object> map = new HashMap<>();
+        map.put("status", 0);
+        map.put("statusDesc", "既无中教也无外教");
+        if (!CollectionUtils.isEmpty(skuIds)) {
+            if (1 == skuIds.size()) {
+                if (skuIds.get(0) == TeachingType.ZHONGJIAO.getCode()) {
+                    map.put("status", TeachingType.ZHONGJIAO.getCode());
+                    map.put("statusDesc", "只有中教");
+                }
+                if (skuIds.get(0) == TeachingType.WAIJIAO.getCode()) {
+                    map.put("status", TeachingType.WAIJIAO.getCode());
+                    map.put("statusDesc", "只有外教");
+                }
+            } else {
+                map.put("status", 3);
+                map.put("statusDesc", "既有中教也有外教");
+            }
+        }
+        return map;
     }
 
 }

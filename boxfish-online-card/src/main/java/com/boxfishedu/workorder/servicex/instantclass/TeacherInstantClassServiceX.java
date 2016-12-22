@@ -17,6 +17,7 @@ import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.Schedul
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstantClassValidators;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstatntClassKeyGenerator;
+import com.boxfishedu.workorder.servicex.instantclass.tutorrange.TeacherRangeContext;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
@@ -72,6 +73,9 @@ public class TeacherInstantClassServiceX {
 
     @Autowired
     private DataCollectorService dataCollectorService;
+
+    @Autowired
+    private TeacherRangeContext teacherRangeContext;
 
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {

@@ -5,6 +5,7 @@ import ch.qos.logback.core.joran.conditional.ElseAction;
 import com.alibaba.fastjson.JSON;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -14,11 +15,14 @@ import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.entity.mongo.TimeLimitRules;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
 import com.boxfishedu.workorder.servicex.instantclass.bean.TeacherInstantRangeBean;
 import com.boxfishedu.workorder.servicex.instantclass.config.DayRangeBean;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.instantvalidator.InstantClassValidators;
+import com.boxfishedu.workorder.servicex.instantclass.tutorrange.StudentRangeContext;
+import com.boxfishedu.workorder.servicex.instantclass.tutorrange.TeacherRangeContext;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
@@ -65,12 +69,18 @@ public class InstantClassServiceX {
     RedisTemplate<String, Long> stringLongRedisTemplate;
 
     @Autowired
-    private WorkOrderJpaRepository workOrderJpaRepository;
+    private TeacherRangeContext teacherRangeContext;
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
     @Autowired
     private
     @Qualifier("teachingServiceRedisTemplate")
     StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private StudentRangeContext studentRangeContext;
 
     private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
@@ -78,9 +88,6 @@ public class InstantClassServiceX {
         return "InstantClass:user:" + studentId;
     }
 
-    private String timeRangeKey() {
-        return "range:" + DateUtil.date2SimpleString(new Date());
-    }
 
     @PostConstruct
     public void initOpsForValue() {
@@ -94,32 +101,18 @@ public class InstantClassServiceX {
         int validateResult = instantClassValidators.preValidate();
         if (validateResult > InstantClassRequestStatus.UNKNOWN.getCode()) {
             InstantClassRequestStatus instantStatus = InstantClassRequestStatus.getEnumByCode(validateResult);
-            return this.invalidReturn(instantStatus);
+            return this.invalidReturn(instantStatus, instantRequestParam);
         }
         return JsonResultModel.newJsonResultModel(instantClassService.getMatchResult());
     }
 
-    public String timeRange() {
-        String timeDesc;
-        try {
-            timeDesc = redisTemplate.opsForValue().get(timeRangeKey());
-            if (StringUtils.isNotEmpty(timeDesc)) {
-                return timeDesc;
-            }
-        } catch (Exception ex) {
-            logger.error("从redis获取当天可上课时间片失败，从mongo获取");
-        }
+    //给用户界面展示使用
+    public String timeRange(Long studentId) {
+        return studentRangeContext.studentTimeRange(studentId);
+    }
 
-        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList
-                = instantClassTimeRulesMorphiaRepository.getByDay(DateUtil.date2SimpleString(new Date()));
-
-        if (!instantClassTimeRulesList.isPresent()) {
-            return StringUtils.EMPTY;
-        }
-
-        timeDesc = this.timeDesc(this.getSortedTimeRulesList(instantClassTimeRulesList.get()));
-        redisTemplate.opsForValue().setIfAbsent(this.timeRangeKey(), timeDesc);
-        return timeDesc;
+    public String timeRange(TutorTypeEnum tutorTypeEnum) {
+        return studentRangeContext.studentTimeRange(tutorTypeEnum);
     }
 
     public List<InstantClassTimeRules> getSortedTimeRulesList(List<InstantClassTimeRules> rawTimeRules) {
@@ -128,25 +121,20 @@ public class InstantClassServiceX {
         )).collect(Collectors.toList());
     }
 
-    public String timeDesc(List<InstantClassTimeRules> rawTimeRules) {
-        List<String> timeStringRules = rawTimeRules.stream()
-                .map(timeLimitRule -> String.join("-", timeLimitRule.getBegin().substring(0, 5), timeLimitRule.getEnd().substring(0, 5)))
-                .collect(Collectors.toList());
-        return StringUtils.join(timeStringRules, " & ");
-    }
-
     public void initTimeRange(DayRangeBean dateInfo) {
         Date date = DateUtil.String2Date(String.join(" ", dateInfo.getDate(), "00:00:00"));
         if (CollectionUtils.isEmpty(dateInfo.getRange())) {
             throw new BusinessException("参数不合法");
         }
-        Optional<List<InstantClassTimeRules>> listOldOptional = instantClassTimeRulesMorphiaRepository.getByDay(dateInfo.getDate());
+        Optional<List<InstantClassTimeRules>> listOldOptional
+                = instantClassTimeRulesMorphiaRepository.getByDay(dateInfo.getDate(), dateInfo.getTutorType());
 
         //新增新规则
         dateInfo.getRange().forEach(range -> {
             LocalDateTime dateLocal = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
             InstantClassTimeRules instantClassTimeRules = new InstantClassTimeRules();
             instantClassTimeRules.setDate(DateUtil.localDate2SimpleString(dateLocal));
+            instantClassTimeRules.setTutorType(dateInfo.getTutorType());
             instantClassTimeRules.setDay(dateLocal.getDayOfWeek().toString());
             instantClassTimeRules.setBegin(range.getBegin());
             instantClassTimeRules.setEnd(range.getEnd());
@@ -154,52 +142,28 @@ public class InstantClassServiceX {
         });
 
         //删除旧的规则
-        listOldOptional.get().forEach(oldRange -> {
-            instantClassTimeRulesMorphiaRepository.delete(oldRange);
-        });
+        listOldOptional.get().forEach(oldRange -> instantClassTimeRulesMorphiaRepository.delete(oldRange));
 
         //清空缓存
-        redisTemplate.delete(timeRangeKey());
+        TutorTypeEnum tutorTypeEnum = TutorTypeEnum.getByValue(dateInfo.getTutorType());
+        redisTemplate.delete(studentRangeContext.timeRangeKey(tutorTypeEnum));
     }
 
-    public JsonResultModel getTeacherRangeByDay() {
-        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = instantClassTimeRulesMorphiaRepository
-                .getByDay(DateUtil.date2SimpleString(new Date()));
-        if (!instantClassTimeRulesList.isPresent()) {
-            return JsonResultModel.newJsonResultModel(TeacherInstantRangeBean.defaultRange());
-        }
-        List<InstantClassTimeRules> instantClassTimeRules = this.getSortedTimeRulesList(instantClassTimeRulesList.get());
-        return JsonResultModel.newJsonResultModel(TeacherInstantRangeBean.getInstantRange(instantClassTimeRules));
+    public JsonResultModel getTeacherRangeByDay(Long userId) {
+        return JsonResultModel.newJsonResultModel(teacherRangeContext
+                .teacherTimeRange(teacherStudentRequester, instantClassTimeRulesMorphiaRepository, userId));
     }
 
     public JsonResultModel getScheduleType(Long studentId) {
-        List<Integer> skuIds = workOrderJpaRepository.findDistinctSkuIds(studentId, new Date());
-        java.util.Map<String, Object> map = new HashMap<>();
-        map.put("status", 0);
-        map.put("statusDesc", "既无中教也无外教");
-        if (!CollectionUtils.isEmpty(skuIds)) {
-            if (1 == skuIds.size()) {
-                if (skuIds.get(0) == TeachingType.ZHONGJIAO.getCode()) {
-                    map.put("status", TeachingType.ZHONGJIAO.getCode());
-                    map.put("statusDesc", "只有中教");
-                }
-                if (skuIds.get(0) == TeachingType.WAIJIAO.getCode()) {
-                    map.put("status", TeachingType.WAIJIAO.getCode());
-                    map.put("statusDesc", "只有外教");
-                }
-            } else {
-                map.put("status", 3);
-                map.put("statusDesc", "既有中教也有外教");
-            }
-        }
-        return JsonResultModel.newJsonResultModel(map);
+        return JsonResultModel.newJsonResultModel(instantClassService.getScheduleTypeMap(studentId));
     }
 
-    private JsonResultModel invalidReturn(InstantClassRequestStatus instantStatus) {
+    private JsonResultModel invalidReturn(InstantClassRequestStatus instantStatus, InstantRequestParam instantRequestParam) {
         switch (instantStatus) {
             case NOT_IN_RANGE:
                 return JsonResultModel.newJsonResultModel(InstantClassResult
-                        .newInstantClassResult(instantStatus, String.format("实时上课会在[%s]内开启,请到时间再重试~",this.timeRange())));
+                        .newInstantClassResult(instantStatus, String.format("实时上课会在[%s]内开启,请到时间再重试~"
+                                , this.timeRange(TutorTypeEnum.getByValue(instantRequestParam.getTutorType())))));
 
             case HAVE_CLASS_IN_HALF_HOURS:
                 String msg = String.format("您预约了[%s]的课程,马上就开始了,此时不能实时上课~"

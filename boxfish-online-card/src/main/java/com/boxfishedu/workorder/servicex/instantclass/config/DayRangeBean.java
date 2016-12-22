@@ -10,6 +10,8 @@ import java.util.List;
 @Data
 public class DayRangeBean {
     private String date;
+    //CN,FRN
+    private String tutorType;
     private List<RangeBean> range;
 
     @Data

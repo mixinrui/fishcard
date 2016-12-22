@@ -28,4 +28,8 @@ public class InstantClassTimeRules {
 
     //结束时间
     private String end;
+
+    //CN,FRN
+    private String tutorType;
+
 }
