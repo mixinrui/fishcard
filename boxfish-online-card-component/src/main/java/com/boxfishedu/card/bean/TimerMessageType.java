@@ -55,15 +55,12 @@ public enum TimerMessageType {
 
     //超过35分钟没有匹配上学生的立即上课卡片,课程退回
     INSTANT_CLASS_BACK_COURSES(147),
-<<<<<<< HEAD
-
-    // 外教点评会员过期提醒
-    EXPIRE_COMMENT_CARD(148);
-
-=======
     //指定老师
-    INSTANT_ASSGIN_TEACHER(148);
->>>>>>> 3d0ba6f1c420e1e60a13255ef400751e7f73c223
+    INSTANT_ASSGIN_TEACHER(148),
+    // 外教点评会员过期提醒
+    EXPIRE_COMMENT_CARD(149);
+
+
     private int code;
 
     private TimerMessageType(int code) {

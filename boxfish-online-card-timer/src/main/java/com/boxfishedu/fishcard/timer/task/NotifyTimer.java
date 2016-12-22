@@ -298,7 +298,7 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
-<<<<<<< HEAD
+
     /**
      * 外教点评会员过期提前三天提示
      */
@@ -309,8 +309,6 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
-
-=======
     @Scheduled(cron = "0 1/30 * * * ?")
     public void assginTeacher(){
         logger.info("<<<<<<开始通知<<<指定老师>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
@@ -318,5 +316,4 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
->>>>>>> 3d0ba6f1c420e1e60a13255ef400751e7f73c223
 }

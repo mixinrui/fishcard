@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
+import com.boxfishedu.workorder.requester.MsgPushRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.OtherEntranceDataGenerator;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
@@ -55,6 +56,9 @@ public class InstantClassTeacherService {
     @Autowired
     private WorkOrderService workOrderService;
 
+    @Autowired
+    private MsgPushRequester msgPushRequester;
+
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard,boolean queryFlag){
@@ -84,7 +88,7 @@ public class InstantClassTeacherService {
         logger.debug("@dealInstantFetchedTeachers IIIIIIIIIIIIIII 获取到教师列表[{}],card[{}],学生[{}]"
                 ,teacherIdsOptional.get().toString(),JacksonUtil.toJSon(instantClassCard),instantClassCard.getStudentId());
         //匹配上老师,则向教师推送抢单的消息
-        courseOnlineRequester.notifyInstantClassMsg(instantClassCard,teacherIdsOptional.get());
+        msgPushRequester.notifyInstantGroupClassMsg(instantClassCard,teacherIdsOptional.get());
     }
 
     private void updateNomatchStatus(InstantClassCard instantClassCard){
