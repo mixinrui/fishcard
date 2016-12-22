@@ -198,17 +198,17 @@ public class TestController {
     }
 
     @RequestMapping(value = "/assign")
-    public void testAssign(){
-        Long studentId = 996734L;
-        Long teacherId = 100000000612L;
-        Integer skuid =2;
+    public void testAssign(Long studentId,Long teacherId,Integer skuid){
+//        Long studentId = 996734L;
+//        Long teacherId = 100000000612L;
+//        Integer skuid =2;
         assignTeacherServiceX.maualAssgin( teacherId,  studentId, skuid);
         //assignTeacherServiceX.doAssignTeacher(teacherId,studentId);
     }
     @RequestMapping(value = "/teacherAccept")
-    public void teacherAccept(){
-        Long studentId = 996734L;
-        Long teacherId = 100000000612L;
+    public void teacherAccept(Long studentId,Long teacherId){
+//        Long studentId = 996734L;
+//        Long teacherId = 100000000612L;
 //        Long workOrderId =61224l;
         List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndValid(studentId, StStudentApplyRecords.VALID.yes);
         List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
