@@ -115,5 +115,5 @@ public class RabbitMqConstant {
 
 
     /**指定上课系统 自动匹配老师**/
-    public static final String ST_AUTO_ASSIGN_TEACHER_QUEUE="com.boxfishedu.auto.assign_teacher";
+//    public static final String ST_AUTO_ASSIGN_TEACHER_QUEUE="com.boxfishedu.auto.assign_teacher";
 }

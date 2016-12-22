@@ -298,15 +298,15 @@ public class RabbitMqReciver {
     /**
      *
      */
-    @RabbitListener(queues = RabbitMqConstant.ST_AUTO_ASSIGN_TEACHER_QUEUE)
-    public void autoAssignTeacher(){
-        logger.debug("@autoAssignTeacher接收来自定时任务 指定老师请求");
-        try {
-            assignTeacherServiceX.autoAssign();
-        } catch (Exception ex) {
-            logger.error("@autoAssignTeacher接收来自定时任务,处理失败");
-        }
-    }
+//    @RabbitListener(queues = RabbitMqConstant.ST_AUTO_ASSIGN_TEACHER_QUEUE)
+//    public void autoAssignTeacher(){
+//        logger.debug("@autoAssignTeacher接收来自定时任务 指定老师请求");
+//        try {
+//            assignTeacherServiceX.autoAssign();
+//        } catch (Exception ex) {
+//            logger.error("@autoAssignTeacher接收来自定时任务,处理失败");
+//        }
+//    }
 //    /**
 //     * 抢单监听
 //     * 1 初始化数据 生成能够抢单的工单
