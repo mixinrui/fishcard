@@ -56,7 +56,7 @@ public class FishCardQueryServiceX {
         Long count = fishCardQueryService.filterFishCardsCount(fishCardFilterParam);
         Page<WorkOrder> page = new PageImpl(workOrderList, pageable, count);
 
-        if(null==fishCardFilterParam.getShowGroup() || !fishCardFilterParam.getShowGroup()){
+        if(null==fishCardFilterParam.getShowGroup() ||  !fishCardFilterParam.getShowGroup()){
             try {
                 trimPage(page);
             }catch (Exception e){
