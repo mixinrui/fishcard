@@ -259,10 +259,14 @@ public class TimePickerServiceX {
         studentCourseSchedule.setId(courseSchedule.getId());
         studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
 
-        if(courseSchedule.getStartTime().after(now) && 1!=courseSchedule.getIsFreeze()){
-            studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());/** 显示需要修改时间的鱼卡信息 **/
-        }else {
-            studentCourseSchedule.setNeedChangeTime(null);
+        try {
+            if (courseSchedule.getStartTime().after(now) && Objects.equals(1, courseSchedule.getIsFreeze())) {
+                studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());/** 显示需要修改时间的鱼卡信息 **/
+            } else {
+                studentCourseSchedule.setNeedChangeTime(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
         if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType())){
