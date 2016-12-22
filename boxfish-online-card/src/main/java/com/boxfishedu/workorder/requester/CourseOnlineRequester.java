@@ -85,30 +85,6 @@ public class CourseOnlineRequester {
         threadPoolManager.execute(new Thread(()->{restTemplate.getForObject(url,Object.class);}));
     }
 
-
-    public void notifyInstantGroupClassMsg(InstantClassCard instantClassCard,List<Long> teacherIds){
-        String url=String.format("%s/teaching/callback/push/group",
-                urlConf.getCourse_online_service());
-        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
-        TeachingOnlineGroupMsg teachingOnlineGroupMsg=new TeachingOnlineGroupMsg();
-        teachingOnlineGroupMsg.setPush_title("Many a student calls in for online LIVE teaching. Click and get prepared.");
-
-        TeachingOnlineGroupMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach=new  TeachingOnlineGroupMsg.TeachingOnlineMsgAttach();
-        teachingOnlineMsgAttach.setType(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
-        teachingOnlineMsgAttach.setCardId(instantClassCard.getId());
-        teachingOnlineMsgAttach.setDay(DateUtil.simpleDate2String(instantClassCard.getClassDate()));
-        teachingOnlineMsgAttach.setSlotId(instantClassCard.getSlotId());
-        teachingOnlineMsgAttach.setCount(teacherIds.size());
-        teachingOnlineMsgAttach.setStudentId(instantClassCard.getStudentId());
-        teachingOnlineGroupMsg.setData(teachingOnlineMsgAttach);
-
-        teacherIds.forEach(teacherId-> teachingOnlineGroupMsg.getAlias().add(teacherId.toString()));
-
-        logger.debug(">>>>>>@notifyInstantClassMsg, IIIIIIIIIIIIIII 向教师发起推送实时上课请求,courseInfo[{}],教师信息[{}]"
-                ,JacksonUtil.toJSon(teachingOnlineGroupMsg),teacherIds);
-        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineGroupMsg,Object.class);}));
-    }
-
     public void notifyInstantClassMsg(InstantClassCard instantClassCard,List<Long> teacherIds){
         String url=String.format("%s/teaching/callback/push",
                 urlConf.getCourse_online_service());

@@ -12,9 +12,11 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.param.TeacherParam;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
+import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.base.StudentInfo;
@@ -441,6 +443,56 @@ public class TeacherStudentRequester {
 
         logger.info("::::::::::::::::::::::::::::::::sendData:over::::::::::::::");
         return fishCardGroupsInfo;
+    }
+
+
+    //指定老师 换个老师
+    public JsonResultModel notifyAssignTeacher(StudentTeacherParam studentTeacherParam) {
+        String url = String.format("/%s/%s", urlConf.getTeacher_service(),"course/schedule/applyDesignatedTeacher");
+//        String url = String.format("%s/%s", "http://192.168.88.147:8099","course/schedule/changeDesignatedTeacher");
+
+
+        logger.info("notifyAssignTeacher :studentID[{}],teacherId[{}]", studentTeacherParam.getStudentId(),studentTeacherParam.getTeacherId());
+
+        JsonResultModel jsonResultModel = null;
+        try {
+            jsonResultModel = restTemplate.postForObject(url, studentTeacherParam, JsonResultModel.class);
+        } catch (Exception ex) {
+            logger.error("向师生运营发送指定老师换个老师失败", ex);
+            throw new BusinessException("向师生运营发送指定老师换个老师失败");
+        }
+        if (HttpStatus.OK.value() != jsonResultModel.getReturnCode()) {
+            logger.error("向师生运营发送指定老师换个老师失败:[{}]", jsonResultModel.getReturnMsg());
+            throw new BusinessException("向师生运营发送指定老师换个老师失败:" + jsonResultModel.getReturnMsg());
+        }
+        return jsonResultModel;
+    }
+
+
+    //TODO:此处的url换为师生运营的url
+    public String  getTeacherName(Long teacherId) {
+
+        String url = String.format("/%s/%s/%s",urlConf.getTeacher_service(),"teacher",teacherId);
+
+        logger.info("getTeacherName 鱼卡向师生运营获取老师url[{}] ,老师Id[{}]",  url,teacherId);
+        String teacherName = "";
+        TeacherParam teacherParam = null;
+        try {
+            teacherParam = restTemplate.getForObject(url, TeacherParam.class);
+        } catch (Exception ex) {
+            logger.error("向师生运营发送获取老师姓名", ex);
+            throw new BusinessException("向师生运营发送获取老师姓名失败");
+        }
+        if (null == teacherParam) {
+            if(teacherParam.getTeachingType()  ==TeachingType.WAIJIAO.getCode())  {
+                teacherName = teacherParam.getFirstName()+" "+teacherParam.getLastName();
+            }
+            if(teacherParam.getTeachingType() == TeachingType.ZHONGJIAO.getCode()){
+                teacherName = teacherParam.getName();
+            }
+        }
+
+        return teacherName;
     }
 
 
