@@ -17,10 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by ansel on 16/7/26.
@@ -57,7 +54,9 @@ public class CommentCardSDK {
 
     public JsonResultModel pushToStudentAndTeacher(Long userId, String title, String type){
         PushToStudentAndTeacher pushToStudentAndTeacher = new PushToStudentAndTeacher();
-        pushToStudentAndTeacher.setUser_id(userId);
+        List list = new ArrayList();
+        list.add(userId);
+        pushToStudentAndTeacher.setUser_id(list);
         pushToStudentAndTeacher.setPush_title(title);
         Map<String,String> map = new HashMap<>();
         map.put("type",type);
@@ -102,7 +101,7 @@ public class CommentCardSDK {
     private URI createPushURI(){
         logger.info("Accessing createPushURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getPushInfoIrl())
-                .path("/teaching/callback/push")
+                .path("/notification/push")
                 .queryParam("")
                 .build()
                 .toUri();
