@@ -56,8 +56,8 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     public Service findById(Long id);
 
     // 外教点评带会员过期时间
-    @Query("select s.studentId from Service s where s.productType=?1 and s.amount>0 and s.endTime=?2 and s.userType=?3")
-    Set<Long> getAvailableForeignCommentService(Integer productType, Date expireDate, Integer userType);
+    @Query("select s.studentId from Service s where s.productType=?1 and s.amount>0 and s.endTime between ?2 and ?3 and s.userType=?4")
+    Set<Long> getAvailableForeignCommentService(Integer productType, Date from, Date to, Integer userType);
 
     /*********兼容老版本*************/
     Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
