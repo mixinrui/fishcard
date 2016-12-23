@@ -21,6 +21,10 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public Page<WorkOrder> findByServiceIdOrderByStartTime(Long serviceId, Pageable pageable);
 
+
+    //按照订单id查找鱼卡
+    public Page<WorkOrder> findByOrderIdAndIsFreeze(Long orderId,Integer isFreeze,Pageable pageable);
+
     public WorkOrder findByOrderIdAndServiceId(Long orderId, Long serviceId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
