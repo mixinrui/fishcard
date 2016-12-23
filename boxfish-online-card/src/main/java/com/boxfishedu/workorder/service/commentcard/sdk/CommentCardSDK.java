@@ -111,7 +111,7 @@ public class CommentCardSDK {
 
     private URI createBoxfishPushURI() {
         logger.info("Accessing createPushURI in CommentCardSDK......");
-        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getBoxfishPushUrl())
+        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getPushInfoIrl())
                 .build()
                 .toUri();
     }
