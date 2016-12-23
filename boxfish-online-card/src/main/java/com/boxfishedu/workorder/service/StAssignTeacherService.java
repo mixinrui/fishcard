@@ -197,7 +197,6 @@ public class StAssignTeacherService {
                     }
                 }
             }
-
             scheduleModelSts.add(scheduleModelSt);
         }
         scheduleBatchReqSt.setUserId(studentId);
