@@ -113,4 +113,5 @@ public class RabbitMqConstant {
     public static final String SYNC_COMMENTCARD_2_CUSTOMERSERVICE_TEMPLATE_NAME = "com.boxfishedu.sync_commentcard_template_name";
     public static final String SYNC_COMMENTCARD_2_CUSTOMERSERVICE_QUEUE="com.boxfishedu.sync_commentcard_queue";
 
+
 }

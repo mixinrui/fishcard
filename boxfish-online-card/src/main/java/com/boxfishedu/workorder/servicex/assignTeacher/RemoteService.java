@@ -17,9 +17,10 @@ public class RemoteService {
     RestTemplate restTemplate;
     @Autowired
     UrlConf urlConf;
+    
     public ScheduleBatchReqSt matchTeacher(ScheduleBatchReqSt reqSt){
         //urlConf.getTeacher_service().trim()
-        JsonResultModel jsonResultModel = restTemplate.postForObject(urlConf.getTeacher_service()+"/teacher/course/schedule/applyDesignatedTeacher",reqSt,JsonResultModel.class);
+        JsonResultModel jsonResultModel = restTemplate.postForObject(urlConf.getTeacher_service()+"/course/schedule/applyDesignatedTeacher",reqSt,JsonResultModel.class);
 //        JsonResultModel jsonResultModel = restTemplate.postForObject("http://192.168.55.240:8099/teacher/course/schedule/applyDesignatedTeacher",reqSt,JsonResultModel.class);
         if(null == jsonResultModel){
             throw new BusinessException("请求师生运营系统匹配老师异常");

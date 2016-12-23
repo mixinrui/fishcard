@@ -15,6 +15,7 @@ import com.boxfishedu.workorder.service.absenteeism.AbsenteeismService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.AutuConfirmFishCardServiceX;
@@ -96,6 +97,9 @@ public class RabbitMqReciver {
 
     @Autowired
     private InstantClassTimerServiceX instantClassTimerServiceX;
+
+    @Autowired
+    private AssignTeacherServiceX assignTeacherServiceX;
 
     /**
      * 订单中心转换请求
@@ -215,6 +219,11 @@ public class RabbitMqReciver {
                 logger.info("==========>EXPIRE_COMMENT_CARD ===>>> 会员外教点评过期提醒");
                 foreignTeacherCommentCardService.notifyExpireCommentCards();
             }
+            else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_ASSGIN_TEACHER.value()) {
+                logger.info("==========>ASSIGN TEACHER===>>> 指定老师定时任务");
+                assignTeacherServiceX.autoAssign();
+            }
+            //
         } catch (Exception ex) {
             logger.error("检查教师失败", ex);
 //            throw new AmqpRejectAndDontRequeueException("失败", ex);
@@ -290,6 +299,7 @@ public class RabbitMqReciver {
             logger.error("@updateWorkOrderStatus,消息[{}]处理失败",JacksonUtil.toJSon(map));
         }
     }
+
 
 //    /**
 //     * 抢单监听

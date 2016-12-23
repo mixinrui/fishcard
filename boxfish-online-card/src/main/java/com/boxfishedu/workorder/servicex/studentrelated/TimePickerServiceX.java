@@ -259,9 +259,9 @@ public class TimePickerServiceX {
         studentCourseSchedule.setId(courseSchedule.getId());
         studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
 
-        if(courseSchedule.getStartTime().after(now) && 1!=courseSchedule.getIsFreeze()){
+        if (courseSchedule.getStartTime().after(now) && Objects.equals(1, courseSchedule.getIsFreeze())) {
             studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());/** 显示需要修改时间的鱼卡信息 **/
-        }else {
+        } else {
             studentCourseSchedule.setNeedChangeTime(null);
         }
         studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
