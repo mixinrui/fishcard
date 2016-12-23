@@ -57,25 +57,25 @@ public class LastClassStrategy implements ScheduleStrategy {
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
 
-    private final Logger logger= LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
     public List<WorkOrder> prepareInstantSchedule(InstantClassCard instantClassCard) {
 
-        WorkOrder workOrder=workOrderJpaRepository.findOne(instantClassCard.getWorkorderId());
-        List<WorkOrder> workOrders=workOrderJpaRepository
-                .findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(workOrder.getService().getOrderId(),new Date());
-        List<WorkOrder> typeChangedList= Lists.newArrayList();
-        List<WorkOrder> typeUnChangedList= Lists.newArrayList();
+        WorkOrder workOrder = workOrderJpaRepository.findOne(instantClassCard.getWorkorderId());
+        List<WorkOrder> workOrders = workOrderJpaRepository
+                .findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(workOrder.getService().getOrderId(), new Date());
+        List<WorkOrder> typeChangedList = Lists.newArrayList();
+        List<WorkOrder> typeUnChangedList = Lists.newArrayList();
 
-        Map<WorkOrder,String> logMap= Maps.newHashMap();
+        Map<WorkOrder, String> logMap = Maps.newHashMap();
 
-        WorkOrder oldCard=workOrders.get(0).clone();
+        WorkOrder oldCard = workOrders.get(0).clone();
 
-        dealFirstWorkOrder(instantClassCard,workOrders.get(0),logMap);
+        dealFirstWorkOrder(instantClassCard, workOrders.get(0), logMap);
 
-        for(int i=1;i<workOrders.size();i++){
-            WorkOrder tmp= workOrders.get(i).clone();
+        for (int i = 1; i < workOrders.size(); i++) {
+            WorkOrder tmp = workOrders.get(i).clone();
 
             workOrders.get(i).setStartTime(oldCard.getStartTime());
             workOrders.get(i).setEndTime(oldCard.getEndTime());
@@ -90,14 +90,14 @@ public class LastClassStrategy implements ScheduleStrategy {
                 typeUnChangedList.add(workOrders.get(i));
             }
 
-            logMap.put(workOrders.get(i),"实时上课数据移动,旧时间:["+ DateUtil.Date2String(tmp.getStartTime())+"],教师:["+tmp.getTeacherId()+"]");
+            logMap.put(workOrders.get(i), "实时上课数据移动,旧时间:[" + DateUtil.Date2String(tmp.getStartTime()) + "],教师:[" + tmp.getTeacherId() + "]");
 
-            BeanUtils.copyProperties(tmp,oldCard);
+            BeanUtils.copyProperties(tmp, oldCard);
         }
 
         courseOnlineRequester.rebuildGroup(typeUnChangedList);
 
-        workOrders.forEach(card->workOrderService.saveWorkOrderAndSchedule(card,initSchedule(card)));
+        workOrders.forEach(card -> workOrderService.saveWorkOrderAndSchedule(card, initSchedule(card)));
         printLog(logMap);
 
         return typeChangedList;
@@ -110,15 +110,15 @@ public class LastClassStrategy implements ScheduleStrategy {
                         .getStudentId(), teachingType, new Integer(0), new Date());
     }
 
-    private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder,Map<WorkOrder,String> logMap) {
-        if(instantClassCard.getWorkorderId()!=firstWorkOrder.getId()){
-            logger.error("@initCardAndSchedule#exception数据存在问题,放弃匹配教师,鱼卡:{}",firstWorkOrder);
+    private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder, Map<WorkOrder, String> logMap) {
+        if (instantClassCard.getWorkorderId() != firstWorkOrder.getId()) {
+            logger.error("@initCardAndSchedule#exception数据存在问题,放弃匹配教师,鱼卡:{}", firstWorkOrder);
             throw new BusinessException("内部数据错误");
         }
-        String oldTime=DateUtil.Date2String(firstWorkOrder.getStartTime());
-        Long oldTeacher=firstWorkOrder.getTeacherId();
+        String oldTime = DateUtil.Date2String(firstWorkOrder.getStartTime());
+        Long oldTeacher = firstWorkOrder.getTeacherId();
 
-        LocalDateTime localDateTime=LocalDateTime.now(ZoneId.systemDefault());
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
         firstWorkOrder.setStartTime(DateUtil.localDate2Date(localDateTime));
         firstWorkOrder.setEndTime(DateUtil.localDate2Date(localDateTime.plusMinutes(25)));
         firstWorkOrder.setTeacherId(instantClassCard.getTeacherId());
@@ -126,28 +126,29 @@ public class LastClassStrategy implements ScheduleStrategy {
         firstWorkOrder.setSlotId(instantClassCard.getSlotId().intValue());
         firstWorkOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
         firstWorkOrder.setClassType(ClassTypeEnum.INSTNAT.toString());
-        logMap.put(firstWorkOrder,"生成实时上课鱼卡,旧时间["+oldTime+"],旧教师:["+oldTeacher+"]");
+        logMap.put(firstWorkOrder, "生成实时上课鱼卡,旧时间[" + oldTime + "],旧教师:[" + oldTeacher + "]");
         return firstWorkOrder;
     }
 
-    private void printLog(Map<WorkOrder,String> logMap){
-        logMap.forEach((workorder,desc)->{
+    private void printLog(Map<WorkOrder, String> logMap) {
+        logMap.forEach((workorder, desc) -> {
             logPoolManager.execute(new Thread(() -> {
-                workOrderLogService.saveWorkOrderLog(workorder,desc);
+                workOrderLogService.saveWorkOrderLog(workorder, desc);
             }));
         });
     }
 
     //TODO:需要优化为一次从db中把schedule全取出
-    private CourseSchedule initSchedule(WorkOrder workOrder){
-        CourseSchedule courseSchedule=courseScheduleRepository.findByWorkorderId(workOrder.getId());
+    private CourseSchedule initSchedule(WorkOrder workOrder) {
+        CourseSchedule courseSchedule = courseScheduleRepository.findByWorkorderId(workOrder.getId());
         courseSchedule.setClassDate(workOrder.getStartTime());
         courseSchedule.setStartTime(workOrder.getStartTime());
         courseSchedule.setTimeSlotId(workOrder.getSlotId());
         courseSchedule.setTeacherId(workOrder.getTeacherId());
         courseSchedule.setUpdateTime(workOrder.getUpdateTime());
         courseSchedule.setClassType(workOrder.getClassType());
-        if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),workOrder.getClassType())){
+        courseSchedule.setStatus(workOrder.getStatus());
+        if (StringUtils.equals(ClassTypeEnum.INSTNAT.toString(), workOrder.getClassType())) {
             courseSchedule.setInstantStartTtime(DateUtil.dateTrimYear(workOrder.getStartTime()));
             courseSchedule.setInstantEndTtime(DateUtil.dateTrimYear(workOrder.getEndTime()));
         }
