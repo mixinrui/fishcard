@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.web.result;
+package com.boxfishedu.workorder.requester.resultbean;
 
 import lombok.Data;
 
@@ -24,5 +24,9 @@ public class NetSourceBean {
         private String event;
         private Long appTime;
         private Long sysTime;
+
+        private Long size;
+        private Long number;
+        private Long numberOfElements;
     }
 }
