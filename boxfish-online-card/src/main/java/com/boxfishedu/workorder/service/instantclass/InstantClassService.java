@@ -253,7 +253,9 @@ public class InstantClassService {
     }
 
     public Map<String, Object> getScheduleTypeMap(Long studentId) {
-        List<Integer> skuIds = workOrderJpaRepository.findDistinctSkuIds(studentId, new Date());
+        LocalDateTime localDateTime=LocalDateTime.now(ZoneId.systemDefault());
+        List<Integer> skuIds = workOrderJpaRepository.findDistinctSkuIds(studentId
+                , DateUtil.localDate2Date(localDateTime.minusMinutes(30)));
         java.util.Map<String, Object> map = new HashMap<>();
         map.put("status", 0);
         map.put("statusDesc", "既无中教也无外教");
