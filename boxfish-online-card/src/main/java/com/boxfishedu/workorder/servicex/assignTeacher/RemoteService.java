@@ -24,15 +24,15 @@ public class RemoteService {
             JsonResultModel jsonResultModel = restTemplate.postForObject(urlConf.getTeacher_service()+"/course/schedule/applyDesignatedTeacher",reqSt,JsonResultModel.class);
 //        JsonResultModel jsonResultModel = restTemplate.postForObject("http://192.168.55.240:8099/teacher/course/schedule/applyDesignatedTeacher",reqSt,JsonResultModel.class);
             if(null == jsonResultModel){
-                throw new BusinessException("指定老师:::::::::请求师生运营系统匹配老师异常,返回数据 NULL");
+                throw new BusinessException("@@@@assign-teacher 指定老师:::::::::请求师生运营系统匹配老师异常,返回数据 NULL");
             }
             if(jsonResultModel.getReturnCode() != 200){
-                throw new BusinessException("指定老师:::::::::请求师生运营系统匹配老师异常,返回数据 不成功 statusCode :"+jsonResultModel.getReturnCode()+" :returnMsg ===:"+jsonResultModel.getReturnMsg());
+                throw new BusinessException("@@@@assign-teacher 指定老师:::::::::请求师生运营系统匹配老师异常,返回数据 不成功 statusCode :"+jsonResultModel.getReturnCode()+" :returnMsg ===:"+jsonResultModel.getReturnMsg());
             }
             ScheduleBatchReqSt scheduleBatchReqSt = jsonResultModel.getData(ScheduleBatchReqSt.class);
             return scheduleBatchReqSt;
         }catch (Exception e){
-            throw new BusinessException("指定老师:::::::::请求师生运营系统匹配老师异常");
+            throw new BusinessException("@@@@assign-teacher 指定老师:::::::::请求师生运营系统匹配老师异常");
         }
 
     }
