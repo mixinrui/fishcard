@@ -3,7 +3,10 @@ package com.boxfishedu.workorder.common.util;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.joda.time.DateTime;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -410,4 +413,28 @@ public class DateUtil {
 //        Date from = format.parse("2016-12-10");
 //        System.out.println(durationOfDay(from, new Date()));
 //    }
+
+    public static Date  getNextWeekSunday(Date date) {
+
+        int mondayPlus = getMondayPlus();
+        GregorianCalendar currentDate = new GregorianCalendar();
+        currentDate.add(GregorianCalendar.DATE, mondayPlus + 7+6);
+        Date monday = currentDate.getTime();
+        DateFormat df = DateFormat.getDateInstance();
+        String preMonday = df.format(monday);
+        return parseTime(monday,1)  ;
+    }
+
+
+    private static int getMondayPlus() {
+        Calendar cd = Calendar.getInstance();
+        // 获得今天是一周的第几天，星期日是第一天，星期二是第二天......
+        int dayOfWeek = cd.get(Calendar.DAY_OF_WEEK)-1;         //因为按中国礼拜一作为第一天所以这里减1
+        if (dayOfWeek == 1) {
+            return 0;
+        } else {
+            return 1 - dayOfWeek;
+        }
+    }
+
 }

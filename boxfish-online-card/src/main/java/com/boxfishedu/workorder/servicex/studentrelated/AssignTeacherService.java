@@ -228,8 +228,11 @@ public class AssignTeacherService {
 
     //4 查看我的邀请数量(学生的数量 未读)
     public Integer getMyInvited(Long teacherId) {
-        Date date = DateUtil.addMinutes(new Date(), -60 * 24 * 2);
-        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId, date);
+        Date beginDate = DateTime.now().plus(48).toDate();
+        Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
+
+        // 获取指定
+        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId, beginDate);
     }
 
     // 5 老师端上课邀请列表
@@ -328,6 +331,11 @@ public class AssignTeacherService {
         if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
             throw new BusinessException("没有查询到匹配的课程");
         }
+
+
+        // 对接受的课程进行 设置 老师已经同意
+        int updateNum =  stStudentApplyRecordsJpaRepository.setFixedApplyStatusFor(StStudentApplyRecords.ApplyStatus.agree,stTeacherInviteParam.getIds());
+        logger.info("acceptInvitedCourseByStudentId: updateNum [{}] ,ids:[{}]",updateNum,stTeacherInviteParam.getIds());
         // 未匹配上的进行匹配
         stStudentApplyRecordsList.stream().filter(sts -> sts.getMatchStatus().equals(StStudentApplyRecords.MatchStatus.wait2apply)).collect(Collectors.toList());
 
