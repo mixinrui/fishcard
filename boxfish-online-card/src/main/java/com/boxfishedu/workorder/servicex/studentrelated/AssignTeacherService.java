@@ -69,8 +69,6 @@ public class AssignTeacherService {
     @Autowired
     private AssignTeacherServiceX assignTeacherServiceX;
 
-    @Autowired
-    private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
@@ -82,7 +80,9 @@ public class AssignTeacherService {
     private ServeService serveService;
 
     @Autowired
-    private WorkOrderJpaRepository workOrderJpaRepository;
+    private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
+
+
 
 
     //1 判断按钮是否出现
@@ -104,9 +104,9 @@ public class AssignTeacherService {
         }
 
         //判断旧鱼卡是否已经上完课
-        if (workOrder.getStartTime().after(new Date())) {
-            throw new BusinessException("该课程尚未结束");
-        }
+//        if (workOrder.getStartTime().after(new Date())) {
+//            throw new BusinessException("该课程尚未结束");
+//        }
 
         // 查询schema  学生id  st_schema  sku_id
         StStudentSchema.CourseType courseType;
@@ -149,6 +149,14 @@ public class AssignTeacherService {
     }
 
 
+    //2.2 获取指定老师带的课程列表
+    public JsonResultModel getAssginTeacherCourseListnew(Long oldWorkOrderId, Long studentId, Long teacherId,Long orderId, Pageable pageable) {
+        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(orderId, pageable);
+        trimPage(courseSchedulePage);
+        return JsonResultModel.newJsonResultModel(courseSchedulePage);
+    }
+
+
     // 2.1 组装向师生运营发送的消息内容   teacherId 指定的老师id
     public ScheduleBatchReqSt makeScheduleBatchReqSt(Long oldWorkOrderId, Long teacherId) {
         ScheduleBatchReqSt scheduleBatchReqSt = new ScheduleBatchReqSt();
@@ -167,12 +175,31 @@ public class AssignTeacherService {
     }
 
     private void trimPage(Page<CourseSchedule> page) {
+        List<CourseSchedule>   courseSchedules =  (List<CourseSchedule>) page.getContent();
+        List<Long> workOrderIds = Collections3.extractToList(courseSchedules,"workorderId");
+        List<StStudentApplyRecords>  stStudentApplyRecordses =  stStudentApplyRecordsJpaRepository.findByWorkOrderIdIn(workOrderIds);
+
         ((List<CourseSchedule>) page.getContent()).forEach(courseSchedule -> {
-            if (courseSchedule.getId() % 2 == 0) {
-                courseSchedule.setMatchStatus(1);
-            } else {
-                courseSchedule.setMatchStatus(2);
+
+            if(CollectionUtils.isEmpty(stStudentApplyRecordses)){
+                courseSchedule.setMatchStatus(0); //等待确认
+            }else {
+                for(StStudentApplyRecords stStudentApplyRecords:stStudentApplyRecordses){
+                    if(stStudentApplyRecords.getWorkOrderId() == courseSchedule.getWorkorderId()){
+                       if(  stStudentApplyRecords.getMatchStatus() .equals(StStudentApplyRecords.MatchStatus.matched) ){
+                           courseSchedule.setMatchStatus(1); //匹配成功
+                       }else {
+                           courseSchedule.setMatchStatus(0); //等待确认
+                       }
+                       break;
+                    }
+                }
+                if(null==courseSchedule.getMatchStatus()){
+                    courseSchedule.setMatchStatus(0); //等待确认
+                }
             }
+
+
         });
     }
 
@@ -232,20 +259,23 @@ public class AssignTeacherService {
 
     //4 查看我的邀请数量(学生的数量 未读)
     public Integer getMyInvited(Long teacherId) {
-        Date beginDate = DateTime.now().plus(48).toDate();
+        if(null==teacherId){
+            throw new BusinessException("您非法登陆,或者已经掉线");
+        }
+        Date baseDate = DateTime.now().minusHours(48).toDate();
+        Date beginDate =DateTime.now().toDate();
         Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
-
-        // 获取该学生 该时间段内的的订单
-       // List<WorkOrder> workOrders = workOrderJpaRepository.findByMyClasses()
-
-        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId, beginDate);
+        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId,baseDate,beginDate,endDate);
     }
 
     // 5 老师端上课邀请列表
     public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Pageable pageable) {
-        Date now = new Date();
-        Date date = DateUtil.addMinutes(now, -60 * 24 * 2);
-        Page<StStudentApplyRecordsResult> results = stStudentApplyRecordsService.getmyInviteList(teacherId, date, pageable);
+
+        Date baseDate = DateTime.now().minusHours(48).toDate();
+        Date beginDate =DateTime.now().toDate();
+        Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
+
+        Page<StStudentApplyRecordsResult> results = stStudentApplyRecordsService.getmyInviteList(teacherId, baseDate,beginDate,endDate, pageable);
 
         if (results == null || null == results.getContent())
             return results;
@@ -255,7 +285,7 @@ public class AssignTeacherService {
             if (!CollectionUtils.isEmpty(teacherInfoMap)) {
                 rs.setStudentImg(teacherInfoMap.get("figure_url"));
                 rs.setStudentName(teacherInfoMap.get("nickname"));
-                rs.setSystemTime(now);
+                rs.setSystemTime(DateTime.now().toDate());
             }
         });
 
@@ -265,9 +295,11 @@ public class AssignTeacherService {
     // 6 学生的邀请
     @Transactional
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId, Long studentId, Pageable pageable) {
-        Date now = new Date();
-        Date date = DateUtil.addMinutes(now, -60 * 24 * 2);
-        Page<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, date, pageable);
+        Date baseDate = DateTime.now().minusHours(48).toDate();
+        Date beginDate =DateTime.now().toDate();
+        Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
+
+        Page<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, baseDate,beginDate,endDate, pageable);
         // 更新已读状态
         List fishcardids = Lists.newArrayList();
         if (results != null && null != results.getContent()) {
@@ -299,9 +331,10 @@ public class AssignTeacherService {
     // 11 检查是否还有申请记录
     @Transactional
     public List<StStudentApplyRecords> checkMyClassesByStudentId(Long teacherId, Long studentId) {
-        Date now = new Date();
-        Date date = DateUtil.addMinutes(now, -60 * 24 * 2);
-        List<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, date);
+        Date baseDate = DateTime.now().minusHours(48).toDate();
+        Date beginDate =DateTime.now().toDate();
+        Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
+        List<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, baseDate,beginDate,endDate);
         return results;
     }
 

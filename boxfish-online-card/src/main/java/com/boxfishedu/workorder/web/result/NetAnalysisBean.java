@@ -1,12 +1,16 @@
 package com.boxfishedu.workorder.web.result;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Date;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/12/22.
@@ -14,9 +18,22 @@ import java.util.*;
 @Data
 public class NetAnalysisBean {
 
+    @JsonIgnore
     private final String studentRole = "student";
 
+    @JsonIgnore
     private final String teacherRole = "teacher";
+
+    private final static String MAX = "MAX";
+
+    private final static String MIN = "MIN";
+
+    private final static String AVERAGE = "AVERAGE";
+
+    private final static String SERVICE_PING = "service_ping";
+
+    private final static String INTERNET_PING = "internet_ping";
+
 
     //"student,teacher"
     private String role;
@@ -46,5 +63,11 @@ public class NetAnalysisBean {
             netAnalysisBean.getDetails().add(map);
         });
         return netAnalysisBean;
+    }
+
+    public static Double max(NetAnalysisBean netAnalysisBean, String pingType) {
+        return new Double(0);
+//        netAnalysisBean.getDetails().stream()
+//                .sorted((o1, o2) -> Double.parseDouble(o1.get(pingType).toString()) > Double.parseDouble(o2.get(pingType).toString())).collect(Collectors.toList());
     }
 }

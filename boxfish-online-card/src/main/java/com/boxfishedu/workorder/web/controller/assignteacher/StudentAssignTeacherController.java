@@ -77,6 +77,15 @@ public class StudentAssignTeacherController {
         return assignTeacherService.getAssginTeacherCourseList(oldWorkOrderId,studentId,teacherId,pageable);
     }
 
+    //2.2 获取指定老师带的课程列表  studentId 学生id   assignteacherId 分配老师ID
+    @RequestMapping(value = "/assign/teacher/newpage")
+    public JsonResultModel getAssignTeacherCourseSchedulePageNew(Long oldWorkOrderId,
+                                                              Long studentId, Long teacherId,Long orderId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
+            direction = Sort.Direction.DESC) Pageable pageable,Long userId) {
+        studentId = userId;
+        return assignTeacherService.getAssginTeacherCourseListnew(oldWorkOrderId,studentId,teacherId,orderId,pageable);
+    }
+
     //3 开始上课界面接口
     @RequestMapping(value = "/{workorder_Id}/beginclass/assign", method = RequestMethod.GET)
     public JsonResultModel showBeginClass(@PathVariable("workorder_Id") Long workOrderId){

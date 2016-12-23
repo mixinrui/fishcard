@@ -167,6 +167,10 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
         return courseScheduleRepository.findAssignCourseScheduleByStudentId(userId,startTime,0, pageable);
     }
 
+    // 新下单指定老师查看课表
+    public Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long orderId, Pageable pageable) {
+        return courseScheduleRepository.findAssignCourseScheduleByStudentId(orderId, pageable);
+    }
 
 
     public Page<CourseSchedule> findUnfinishCourseSchedulePage(Long userId, Pageable pageable) {
