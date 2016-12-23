@@ -22,19 +22,11 @@ public class TeacherRangeContext {
     @Autowired
     private Map<String, ITutorRangeStrategy> tutorRangeStrategyMap;
 
-    @Autowired
-    private
-    @Qualifier("teachingServiceRedisTemplate")
-    StringRedisTemplate redisTemplate;
-
-    @Autowired
-    private InstantClassService instantClassService;
-
     //目前中外教一样,使用外教
     public TeacherInstantRangeBean teacherTimeRange(TeacherStudentRequester teacherStudentRequester
-            , InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository, Long teacherId){
-        return tutorRangeStrategyMap.get(InstantRangeEnum.FRN_RANGE).teacherTimeRange(teacherStudentRequester
-                ,instantClassTimeRulesMorphiaRepository,teacherId);
+            , InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository, Long teacherId) {
+        return tutorRangeStrategyMap.get(InstantRangeEnum.FRN_RANGE)
+                .teacherTimeRange(teacherStudentRequester, instantClassTimeRulesMorphiaRepository, teacherId);
 
     }
 }

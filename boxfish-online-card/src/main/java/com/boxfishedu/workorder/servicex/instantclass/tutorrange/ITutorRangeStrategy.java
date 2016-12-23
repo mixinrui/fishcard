@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -90,9 +91,10 @@ public interface ITutorRangeStrategy {
             , InstantClassTimeRulesMorphiaRepository instantClassTimeRulesMorphiaRepository, Long teacherId) {
         TutorTypeEnum tutorTypeEnum = this.getTeacherTutorType(teacherStudentRequester, teacherId);
 
-        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = this.getTeacherInstantTimeList(instantClassTimeRulesMorphiaRepository, tutorTypeEnum);
+        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList
+                = this.getTeacherInstantTimeList(instantClassTimeRulesMorphiaRepository, tutorTypeEnum);
 
-        if (!instantClassTimeRulesList.isPresent()) {
+        if (!instantClassTimeRulesList.isPresent()|| CollectionUtils.isEmpty(instantClassTimeRulesList.get())) {
             return TeacherInstantRangeBean.defaultRange();
         }
 

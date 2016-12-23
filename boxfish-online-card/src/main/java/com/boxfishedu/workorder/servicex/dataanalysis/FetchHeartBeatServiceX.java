@@ -41,6 +41,5 @@ public class FetchHeartBeatServiceX {
             logger.error("@isOnline分析数据有问题,影响结果");
             return false;
         }
-
     }
 }
