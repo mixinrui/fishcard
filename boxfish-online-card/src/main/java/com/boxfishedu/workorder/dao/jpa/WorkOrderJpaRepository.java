@@ -198,8 +198,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByIdIn(List workOrderIds);
 
 
-//    @Query("select wo from  WorkOrder wo where wo.teacherId=?1 and (wo.endTime between ?2 and ?3) and status=?4 order by wo.endTime ")
-//    public List<WorkOrder> findByMyClasses(Long teacherId, Date beginDate, Date endDate, Integer status);
+    @Query("select wo from  WorkOrder wo where wo.studentId=?1 and (wo.startTime between ?2 and ?3) and isFreeze=0 order by wo.startTime ")
+    public List<WorkOrder> findByMyClasses(Long studentId, Date beginDate, Date endDate);
 
 
 }

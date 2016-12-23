@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
@@ -79,6 +80,9 @@ public class AssignTeacherService {
 
     @Autowired
     private ServeService serveService;
+
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
 
 
     //1 判断按钮是否出现
@@ -231,7 +235,9 @@ public class AssignTeacherService {
         Date beginDate = DateTime.now().plus(48).toDate();
         Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
 
-        // 获取指定
+        // 获取该学生 该时间段内的的订单
+       // List<WorkOrder> workOrders = workOrderJpaRepository.findByMyClasses()
+
         return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId, beginDate);
     }
 
