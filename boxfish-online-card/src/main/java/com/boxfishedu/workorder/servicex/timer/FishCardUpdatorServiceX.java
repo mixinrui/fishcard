@@ -123,7 +123,7 @@ public class FishCardUpdatorServiceX {
         }
 
         if ((workOrder.getStatus() != FishCardStatusEnum.WAITFORSTUDENT.getCode()) && (workOrder.getStatus() != FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode())
-                && (workOrder.getStatus() != FishCardStatusEnum.CONNECTED.getCode())&& (workOrder.getStatus() != FishCardStatusEnum.STUDENT_INVITED_SCREEN.getCode())) {
+                && (workOrder.getStatus() != FishCardStatusEnum.CONNECTED.getCode()) && (workOrder.getStatus() != FishCardStatusEnum.STUDENT_INVITED_SCREEN.getCode())) {
             logger.info("@studentAbsentUpdator#status_changed#学生当前的鱼卡[{}]状态[{}]已经不是旷课需要处理的状态,暂不做处理",
                     workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             return;
@@ -163,7 +163,9 @@ public class FishCardUpdatorServiceX {
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
 
         boolean containConnectedFlag = false;
-        LocalDateTime startLocalDate = LocalDateTime.ofInstant(workOrder.getStartTime().toInstant(), ZoneId.systemDefault()).minusMinutes(3);
+        LocalDateTime startLocalDate = LocalDateTime.ofInstant(
+                workOrder.getStartTime().toInstant(), ZoneId.systemDefault()).minusMinutes(3);
+
         LocalDateTime endLocalDate = startLocalDate.plusMinutes(studentAbsentTimeLimit);
         Date startDate = DateUtil.localDate2Date(startLocalDate);
         Date endDate = DateUtil.localDate2Date(endLocalDate);
@@ -182,11 +184,13 @@ public class FishCardUpdatorServiceX {
 
         //没有联通但是在线,则表示为系统异常
         if (!containConnectedFlag && isOnline) {
-            workOrderLogService.saveWorkOrderLog(workOrder,"学生课前在线,但是没有师生连通,将改为系统异常");
+            workOrderLogService.saveWorkOrderLog(workOrder, "学生课前在线,但是没有师生连通,将改为系统异常");
             logger.info("studentForceAbsentUpdator判断鱼卡[{}]是否由于终端异常导致,判断结果[{}]", workOrder.getId(), isOnline);
             return true;
         }
+
         logger.warn("[studentForceAbsentUpdator]鱼卡:[{}]的状态为学生旷课,开始处理", workOrder.getId());
+
         courseOnlineServiceX.completeCourse(workOrder, courseSchedule, FishCardStatusEnum.STUDENT_ABSENT.getCode());
         workOrderLogService.saveWorkOrderLog(workOrder);
         //返回false
@@ -364,10 +368,6 @@ public class FishCardUpdatorServiceX {
         logger.info("@teacherPrepareClassUpdator->在redis中存在通知教师上课记录,不需要再次通知");
     }
 
-    private void handleStudentAbsent(FishCardDelayMessage fishCardDelayMessage, WorkOrder workOrder, CourseSchedule courseSchedule) {
-        logger.info("@handleStudentAbsent->鱼卡[{}]处理TEACHER_CANCEL_PUSH", fishCardDelayMessage.getId());
-
-    }
 
     //如果确定教师旷课返回true,否则返回false
     private boolean isTeacherAbsent(WorkOrder workOrder) {
