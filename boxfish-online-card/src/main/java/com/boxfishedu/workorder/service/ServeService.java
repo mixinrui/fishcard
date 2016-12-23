@@ -332,7 +332,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         });
 
         // service的开始日期,结束日期设置
-        addValidTimeForServices(services);
+        addValidTimeForServices(services, orderView);
         save(services);
 
         for (Service service:services){
@@ -385,12 +385,16 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return JSONObject.parseObject(orderDetailView.getProductInfo(), ProductSKUView.class);
     }
 
-    private void addValidTimeForServices(List<Service> services) {
+    private void addValidTimeForServices(List<Service> services, OrderForm orderForm) {
         LocalDate now = LocalDate.now();
         for (Service service : services) {
             service.setStartTime(DateUtil.convertToDate(now));
-            // 从购买当天0点算起, 到过期的第一天0点为止
-            service.setEndTime(DateUtil.convertToDate(now.plusDays(service.getValidityDay() + 1)));
+            if(orderForm.getExpiredDate() != null) {
+                service.setEndTime(orderForm.getExpiredDate());
+            } else {
+                // 从购买当天0点算起, 到过期的第一天0点为止
+                service.setEndTime(DateUtil.convertToDate(now.plusDays(service.getValidityDay() + 1)));
+            }
             logger.info("订单[{}]生成服务类型[{}]成功]", service.getOrderId(), service.getSkuName());
         }
     }
@@ -400,7 +404,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOriginalAmount(service.getOriginalAmount() + productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
         // TODO 长期有效service.getValidityDay() + serviceSKU.getValidDay()
-        if(Objects.isNull(orderForm)) {
+        if(Objects.isNull(orderForm.getValidDays())) {
             service.setValidityDay(365 * 2);
         } else {
             service.setValidityDay(orderForm.getValidDays());
@@ -431,7 +435,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);
-        service.setValidityDay(365);
+        service.setValidityDay(365 * 2);
         service.setOrderChannel(orderView.getOrderChannel().name());
 
         productCombo.getComboCode();

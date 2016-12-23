@@ -78,6 +78,8 @@ spring.datasource:
   autoReconnect: true
   jdbc-interceptors: SlowQueryReport(threshold=1000)
 
+time.task.expireMessage: "会员要到期啦,外教点评还没用完呢,赶快去行使会员特权~"
+
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
 server.compression.enabled: true
@@ -404,7 +406,7 @@ service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://123.56.13.168:9090/teaching-service
+    pushInfoIrl: http://123.56.13.168:9091/notification/push
     innerTeacherUrl: http://123.56.13.168:8099
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:

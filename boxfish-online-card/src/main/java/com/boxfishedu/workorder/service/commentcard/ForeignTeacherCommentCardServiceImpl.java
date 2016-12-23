@@ -616,14 +616,17 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         // 会员有效期倒数第三天时,如果用户还有会员外教点评未使用,下午17:00点推送提醒: 会员要到期啦,外教点评还没用完呢,赶快去行使会员特权~
         LocalDate now = LocalDate.now();
         Set<Long> studentIds = serviceJpaRepository.getAvailableForeignCommentService(
-                ProductType.COMMENT.value(), DateUtil.convertToDate(now.plusDays(3)), UserTypeEnum.GENERAL_MEMBER.type());
+                ProductType.COMMENT.value(),
+                DateUtil.convertToDate(now.plusDays(3)),
+                DateUtil.convertToDate(now.plusDays(4)),
+                UserTypeEnum.GENERAL_MEMBER.type());
         pushExpireMessage(studentIds);
     }
 
     // 推送
     private void pushExpireMessage(Set<Long> ids) {
         logger.info("push expire commentCards to {}", ids);
-        commentCardSDK.notifyCommentCardExpire(ids, commentCardTimeConf.getExpireMessage(), "FOREIGNCOMMENT");
+        commentCardSDK.notifyCommentCardExpire(ids, commentCardTimeConf.getExpireMessage(), "MEMBER_FOREIGN_COMMENT");
     }
 
     private String getTeacherName(String teacherFirstName,String teacherLastName){

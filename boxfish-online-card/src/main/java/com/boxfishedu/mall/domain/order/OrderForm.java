@@ -5,12 +5,14 @@ import com.boxfishedu.mall.enums.Flag;
 import com.boxfishedu.mall.enums.OrderChannel;
 import com.boxfishedu.mall.enums.OrderSource;
 import com.boxfishedu.mall.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.Date;
 
 @Data(staticConstructor = "getInstance")
 @EqualsAndHashCode(callSuper = true)
@@ -52,6 +54,9 @@ public class OrderForm extends BaseEntity {
     private Flag flagDropped;
 
     private Integer validDays;
+
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+    private Date expiredDate;
 
 //    @Transient
 //    private List<OrderDetail> orderDetails;
