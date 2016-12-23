@@ -50,6 +50,14 @@ public class StAssignTeacherService {
     @Autowired
     RemoteService remoteService;
 
+    /**
+     *
+     * @param teacherId
+     * @param studentId
+     * @param aggressorCourseSchedules
+     * @param channel
+     * @param skuId
+     */
     @Transactional
     public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,
                                 String channel, Integer skuId) {
@@ -84,18 +92,16 @@ public class StAssignTeacherService {
 
             }
             logger.info("指定老师stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
-                    "===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条",
+                            "===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条",
                     studentId, teacherId, skuId, Collections3.extractToList(victimCourseSchedulesFinal, "workorderId").toArray(),
                     victimCourseSchedulesFinal.size());
         }
-
         ScheduleBatchReqSt scheduleBatchReqSt = match(studentId, teacherId, aggressorCourseSchedules,
                 victimCourseSchedulesFinal, channel);
         logger.info("指定老师stp-2:::生成要匹配的鱼卡数据去请求师生运营匹配:::======>>>APP端学生ID:{}====>>请求师生运营去匹配的数据{}",
                 studentId, scheduleBatchReqSt.toString());
 
         //TODO 此处去请求师生运营
-
         ScheduleBatchReqSt responseScheduleBatchReqSt = remoteService.matchTeacher(scheduleBatchReqSt);
         //TODO 此处请求师生运营进行教师重新匹配
         //TODO 分为3中状态 匹配成功直接更新鱼卡和课表 不匹配不更新 无时间片 请求记录入库
@@ -103,33 +109,16 @@ public class StAssignTeacherService {
         if (Collections3.isEmpty(scheduleModelStList)) {
             throw new BusinessException("请求师生运营系统匹配老师返回数据空");
         }
-        /** ---------------假数据测试开始------------------
-         responseScheduleBatchReqSt.setAssginTeacherName("测试的小王子");
-         int num = scheduleModelStList.size()/3;
-         int curren = 0;
-         for(ScheduleModelSt scheduleModelSt :scheduleModelStList){
-         if(curren<=num){
-         scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.matched);
-         }
-         if(curren<=num*2 && curren>num){
-         scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.un_matched);
-         }
-         if(curren<=num*3 && curren>num*2){
-         scheduleModelSt.setMatchStatus(ScheduleModelSt.MatchStatus.wait2apply);
-         }
-         curren++;
-         //
-         }
-         -*/
-        /** ----------------假数据测试结束------------------*/
         List<Long> macthedWorkOrderIdList = Lists.newArrayList();
-        List<ScheduleModelSt> wait2applyWorkOrderIdList = Lists.newArrayList();
+        List<ScheduleModelSt> macthedList = Lists.newArrayList();
+        List<ScheduleModelSt> wait2applyList = Lists.newArrayList();
         for (ScheduleModelSt scheduleModelSt : scheduleModelStList) {
             if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.matched) {
+                macthedList.add(scheduleModelSt);
                 macthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.un_matched
                     ||scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
-                wait2applyWorkOrderIdList.add(scheduleModelSt);
+                wait2applyList.add(scheduleModelSt);
             }
 
 
@@ -137,21 +126,20 @@ public class StAssignTeacherService {
         logger.info("指定老师stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中匹配上IDS:{}",
                 studentId,  macthedWorkOrderIdList.toArray());
         logger.info("指定老师stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中未匹配上IDS:{}",
-                studentId, Collections3.extractToList(wait2applyWorkOrderIdList, "workOrderId"));
-
+                studentId, Collections3.extractToList(wait2applyList, "workOrderId"));
 
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
-            makeApplyRecords(teacherId, studentId, wait2applyWorkOrderIdList,skuId);
+            makeApplyRecords(teacherId, studentId, wait2applyList,skuId);
         } else if (channel.equals(ConstantUtil.TEACHER_CHANNLE)) {
-            changeApplyRecords(studentId, teacherId, macthedWorkOrderIdList);
+            changeApplyRecords(studentId, teacherId, macthedList);
         } else if (channel.equals(ConstantUtil.TIMER_CHANNLE)) {
-            makeApplyRecords(teacherId, studentId, wait2applyWorkOrderIdList, skuId);
+            makeApplyRecords(teacherId, studentId, wait2applyList, skuId);
         }
         logger.info("指定老师stp-2::::匹配鱼卡完成:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>匹配上的鱼卡共{}条",
                 studentId, teacherId, skuId, macthedWorkOrderIdList.size());
         if (Collections3.isNotEmpty(macthedWorkOrderIdList)) {
             logger.info("指定老师stp-2:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>匹配上的鱼卡IDS{}",
-                    studentId, teacherId, skuId, wait2applyWorkOrderIdList.toArray());
+                    studentId, teacherId, skuId, wait2applyList.toArray());
             List<WorkOrder> workOrders = workOrderJpaRepository.findWorkOrderAll(macthedWorkOrderIdList);
             List<CourseSchedule> courseSchedules = courseScheduleRepository.findByWorkorderIdIn(macthedWorkOrderIdList);
             for (WorkOrder workOrder : workOrders) {
@@ -260,14 +248,14 @@ public class StAssignTeacherService {
     /**
      * @param teacherId
      * @param studentId
-     * @param wait2applyWorkOrderIdList
+     * @param wait2applyList
      */
     @Transactional
-    public void makeApplyRecords(Long teacherId, Long studentId,List<ScheduleModelSt> wait2applyWorkOrderIdList,Integer skuId) {
+    public void makeApplyRecords(Long teacherId, Long studentId,List<ScheduleModelSt> wait2applyList,Integer skuId) {
         StStudentApplyRecords stStudentApplyRecords = null;
         List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
         Date now = new Date();
-        for (ScheduleModelSt scheduleModelSt : wait2applyWorkOrderIdList) {
+        for (ScheduleModelSt scheduleModelSt : wait2applyList) {
             stStudentApplyRecords = new StStudentApplyRecords();
             stStudentApplyRecords.setTeacherId(teacherId);
             stStudentApplyRecords.setStudentId(studentId);
@@ -303,18 +291,18 @@ public class StAssignTeacherService {
      * 更新申请记录
      *
      * @param studentId
-     * @param macthedWorkOrderIdList
+     * @param macthedList
      */
     @Transactional
-    public void changeApplyRecords(Long studentId, Long teacherId, List<Long> macthedWorkOrderIdList) {
+    public void changeApplyRecords(Long studentId, Long teacherId, List<ScheduleModelSt> macthedList) {
         List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.
                 findByStudentIdAndTeacherIdAndValid(studentId, teacherId, StStudentApplyRecords.VALID.yes);
         if (Collections3.isNotEmpty(invalidRecordsList)) {
             for (StStudentApplyRecords stStudentApplyRecords : invalidRecordsList) {
-                for (Long workId : macthedWorkOrderIdList) {
-                    if (workId.longValue() == stStudentApplyRecords.getWorkOrderId().longValue()) {
+                for (ScheduleModelSt scheduleModelSt : macthedList) {
+                    if (scheduleModelSt.getWorkOrderId().longValue() == stStudentApplyRecords.getWorkOrderId().longValue()) {
                         stStudentApplyRecords.setUpdateTime(new Date());
-                        stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.agree);
+                        stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus());
                         break;
                     }
                 }
