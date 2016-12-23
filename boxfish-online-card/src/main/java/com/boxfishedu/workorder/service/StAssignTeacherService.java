@@ -98,11 +98,16 @@ public class StAssignTeacherService {
         }
         ScheduleBatchReqSt scheduleBatchReqSt = match(studentId, teacherId, aggressorCourseSchedules,
                 victimCourseSchedulesFinal, channel);
-        logger.info("指定老师stp-2:::生成要匹配的鱼卡数据去请求师生运营匹配:::======>>>APP端学生ID:{}====>>请求师生运营去匹配的数据{}",
-                studentId, scheduleBatchReqSt.toString());
+//        logger.info("指定老师stp-2:::生成要匹配的鱼卡数据去请求师生运营匹配:::======>>>APP端学生ID:{}====>>请求师生运营去匹配的数据{}",
+//                studentId, scheduleBatchReqSt.toString());
 
         //TODO 此处去请求师生运营
-        ScheduleBatchReqSt responseScheduleBatchReqSt = remoteService.matchTeacher(scheduleBatchReqSt);
+        ScheduleBatchReqSt responseScheduleBatchReqSt = null;
+        try {
+            responseScheduleBatchReqSt = remoteService.matchTeacher(scheduleBatchReqSt);
+        }catch (BusinessException e){
+            throw e;
+        }
         //TODO 此处请求师生运营进行教师重新匹配
         //TODO 分为3中状态 匹配成功直接更新鱼卡和课表 不匹配不更新 无时间片 请求记录入库
         List<ScheduleModelSt> scheduleModelStList = responseScheduleBatchReqSt.getScheduleModelList();
