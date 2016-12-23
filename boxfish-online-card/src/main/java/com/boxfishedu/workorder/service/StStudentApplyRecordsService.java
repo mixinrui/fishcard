@@ -35,22 +35,27 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
     }
 
 
-    public Integer getUnreadInvitedNum(Long teacherId, Date date){
-       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no,StStudentApplyRecords.VALID.yes);
+   public Integer getUnreadInvitedNum(Long teacherId, Date date,Date beginDate,Date endDate){
+       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no,StStudentApplyRecords.VALID.yes,beginDate,endDate);
         return unread.isPresent()?unread.get().intValue():0;
     }
-
-
-    public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date, Pageable pageable){
-        return  jpa.getmyInviteList(teacherId,date,StStudentApplyRecords.VALID.yes, pageable);
+    public List<StStudentApplyRecords> getUnreadStStudentRecords(Long teacherId, Date date){
+        return jpa.getUnreadStStudentRecords(teacherId,date, StStudentApplyRecords.ReadStatus.no,StStudentApplyRecords.VALID.yes);
     }
 
-    public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Pageable pageable){
-        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes, StStudentApplyRecords.ApplyStatus.agree,  pageable);
+
+
+
+    public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date,Date startTime,Date endTime, Pageable pageable){
+        return  jpa.getmyInviteList(teacherId,date,StStudentApplyRecords.VALID.yes,startTime,endTime, pageable);
     }
 
-    public List<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date){
-        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree);
+    public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Date startTime,Date endTime,Pageable pageable){
+        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes, StStudentApplyRecords.ApplyStatus.agree, startTime,endTime, pageable);
+    }
+
+    public List<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Date startTime,Date endTime){
+        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree, startTime,endTime);
     }
 
     public StStudentApplyRecords findMyLastAssignTeacher(Long studentId,Integer skuId){
