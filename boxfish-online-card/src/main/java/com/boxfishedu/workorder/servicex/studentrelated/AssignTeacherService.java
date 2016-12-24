@@ -365,6 +365,7 @@ public class AssignTeacherService {
     }
 
 
+    @Transactional
     public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam) {
         List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findAll(stTeacherInviteParam.getIds());
         if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
