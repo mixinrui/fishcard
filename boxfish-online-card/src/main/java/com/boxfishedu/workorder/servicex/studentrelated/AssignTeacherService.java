@@ -395,11 +395,10 @@ public class AssignTeacherService {
         JsonResultModel jsonResultModel = teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
 
         if (null != jsonResultModel && HttpStatus.OK.value() == jsonResultModel.getReturnCode()) {
-
-            Service service = serveService.findOne(studentTeacherParam.getOrderId());
+            Service service = serveService.findTop1ByOrderId(studentTeacherParam.getOrderId());
             // 获取订单数据
             List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(studentTeacherParam.getOrderId());
-            Long[] workOrderIds = (Long[]) Collections3.extractToList(workOrders, "id").toArray();
+            List<Long> workOrderIds = Collections3.extractToList(workOrders, "id");
 
             // 获取课程数据
             List<CourseSchedule> courseSchedules = courseScheduleService.findByWorkorderIdIn(workOrderIds);
