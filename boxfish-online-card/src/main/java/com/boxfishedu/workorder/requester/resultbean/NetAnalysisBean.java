@@ -15,41 +15,37 @@ import java.util.*;
 public class NetAnalysisBean {
 
     @JsonIgnore
-    private final String studentRole = "student";
-
-    @JsonIgnore
-    private final String teacherRole = "teacher";
-
     private final static String MAX = "MAX";
-
+    @JsonIgnore
     private final static String MIN = "MIN";
-
+    @JsonIgnore
     private final static String AVERAGE = "AVERAGE";
-
+    @JsonIgnore
     private final static String SERVICE_PING = "service_ping";
-
+    @JsonIgnore
     private final static String INTERNET_PING = "internet_ping";
 
-
+    @JsonIgnore
     //"student,teacher"
     private String role;
-
+    @JsonIgnore
     private double maxServicePing;
+    @JsonIgnore
     private double maxInternetPing;
-
+    @JsonIgnore
     private double averageServicePing;
+    @JsonIgnore
     private double averageSInternetPing;
-
+    @JsonIgnore
     private double minServicePing;
+    @JsonIgnore
     private double minInternetPing;
 
     private List<java.util.Map<String, Object>> details = Lists.newArrayList();
 
-    public NetAnalysisBean netAdapter(NetSourceBean netSourceBean, String role) {
-        NetAnalysisBean netAnalysisBean = new NetAnalysisBean();
-        netAnalysisBean.setRole(role);
+    public NetAnalysisBean netAdapter(NetSourceBean netSourceBean) {
         if (Objects.isNull(netSourceBean) || CollectionUtils.isEmpty(netSourceBean.getContent())) {
-            return netAnalysisBean;
+            return this;
         }
 
         netSourceBean.getContent().forEach(contentBean -> {
@@ -57,12 +53,12 @@ public class NetAnalysisBean {
             map.putAll(contentBean.getProperties());
             map.put("appTime", new Date(contentBean.getAppTime()));
             map.put("sysTime", new Date(contentBean.getSysTime()));
-            netAnalysisBean.getDetails().add(map);
+            this.getDetails().add(map);
         });
 
         this.wrapAnalysis();
 
-        return netAnalysisBean;
+        return this;
     }
 
     private void wrapAnalysis() {

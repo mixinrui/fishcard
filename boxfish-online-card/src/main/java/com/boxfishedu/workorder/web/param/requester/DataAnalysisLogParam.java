@@ -11,6 +11,7 @@ public class DataAnalysisLogParam {
     private Long startTime;
     private Long endTime;
     private String event;
+    private String role;
 
     public DataAnalysisLogParam(){
 

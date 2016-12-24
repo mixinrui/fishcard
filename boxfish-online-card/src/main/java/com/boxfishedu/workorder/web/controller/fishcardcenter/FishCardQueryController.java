@@ -182,4 +182,15 @@ public class FishCardQueryController {
     public JsonResultModel getGroupInfo(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return JsonResultModel.newJsonResultModel(fishCardQueryServiceX.getGroupInfo(fishCardFilterParam.getId()));
     }
+
+    /**
+     *
+     * @param cardId
+     * @return
+     */
+    @RequestMapping(value = "/getNetPing", method = RequestMethod.GET)
+    public JsonResultModel getNetPing(Long cardId, Pageable pageable) {
+        return null;
+//        return JsonResultModel.newJsonResultModel(fishCardQueryServiceX.getGroupInfo(fishCardFilterParam.getId()));
+    }
 }

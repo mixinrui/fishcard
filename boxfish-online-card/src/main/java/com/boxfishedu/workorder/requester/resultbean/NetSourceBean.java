@@ -28,5 +28,6 @@ public class NetSourceBean {
         private Long size;
         private Long number;
         private Long numberOfElements;
+        private Long totalPages;
     }
 }

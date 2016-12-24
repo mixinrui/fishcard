@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.requester.resultbean.NetSourceBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -49,7 +50,7 @@ public class DataAnalysisRequester {
         return eventResultBean;
     }
 
-    public NetSourceBean getNetSourceBean(DataAnalysisLogParam dataAnalysisLogParam) {
+    public NetSourceBean getNetSourceBean(DataAnalysisLogParam dataAnalysisLogParam, Pageable pageable) {
 
         String url = String.format("%s/api/log/query/condition?userId=%s&startTime=%s&endTime=%s&event=%&size=%s",
                 urlConf.getData_analysis_service(), dataAnalysisLogParam.getUserId()

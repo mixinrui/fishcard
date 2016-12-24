@@ -1,8 +1,13 @@
 package com.boxfishedu.workorder.servicex.fishcardcenter;
 
+import com.boxfishedu.workorder.common.bean.AppPointRecordEventEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.requester.DataAnalysisRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.requester.resultbean.NetAnalysisBean;
+import com.boxfishedu.workorder.requester.resultbean.NetSourceBean;
+import com.boxfishedu.workorder.web.param.requester.DataAnalysisLogParam;
 import com.boxfishedu.workorder.web.view.base.GroupInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.common.bean.SkuTypeEnum;
@@ -47,6 +52,9 @@ public class FishCardQueryServiceX {
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
+    private DataAnalysisRequester dataAnalysisRequester;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -234,5 +242,22 @@ public class FishCardQueryServiceX {
             statusMap.put(fishCardStatusEnum.getCode(), fishCardStatusEnum.getDesc());
         }
         return JsonResultModel.newJsonResultModel(statusMap);
+    }
+
+    //直接获取详细信息
+    public JsonResultModel getNetPingDetail(Long cardId,String role,Pageable pageable){
+        WorkOrder workOrder=workOrderService.findOne(cardId);
+        DataAnalysisLogParam dataAnalysisLogParam=new DataAnalysisLogParam();
+        dataAnalysisLogParam.setStartTime(workOrder.getStartTime().getTime());
+        dataAnalysisLogParam.setEndTime(workOrder.getEndTime().getTime());
+        dataAnalysisLogParam.setEvent(AppPointRecordEventEnum.ONLINE_COURSE_HEARTBEAT.value());
+        if(role.equals("student")) {
+            dataAnalysisLogParam.setUserId(workOrder.getStudentId());
+        }
+        else{
+            dataAnalysisLogParam.setUserId(workOrder.getTeacherId());
+        }
+        return JsonResultModel.newJsonResultModel(
+                dataAnalysisRequester.getNetSourceBean(dataAnalysisLogParam,pageable));
     }
 }
