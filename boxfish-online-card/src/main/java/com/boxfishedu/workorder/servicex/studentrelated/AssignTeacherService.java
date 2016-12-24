@@ -292,7 +292,7 @@ public class AssignTeacherService {
         return results;
     }
 
-    // 6 学生的邀请
+    // 6 5的详情  学生的邀请
     @Transactional
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId, Long studentId, Pageable pageable) {
         Date baseDate = DateTime.now().minusHours(48).toDate();

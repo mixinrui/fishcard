@@ -36,7 +36,7 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
 
 
    public Integer getUnreadInvitedNum(Long teacherId, Date date,Date beginDate,Date endDate){
-       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no,StStudentApplyRecords.VALID.yes,beginDate,endDate);
+       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree,   beginDate,endDate);
         return unread.isPresent()?unread.get().intValue():0;
     }
     public List<StStudentApplyRecords> getUnreadStStudentRecords(Long teacherId, Date date){
@@ -47,7 +47,7 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
 
 
     public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date,Date startTime,Date endTime, Pageable pageable){
-        return  jpa.getmyInviteList(teacherId,date,StStudentApplyRecords.VALID.yes,startTime,endTime, pageable);
+        return  jpa.getmyInviteList(teacherId,date,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree,startTime,endTime, pageable);
     }
 
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Date startTime,Date endTime,Pageable pageable){
