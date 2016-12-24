@@ -449,11 +449,11 @@ public class TeacherStudentRequester {
 
     //指定老师 换个老师
     public JsonResultModel notifyAssignTeacher(StudentTeacherParam studentTeacherParam) {
-        String url = String.format("/%s/%s", urlConf.getTeacher_service(),"course/schedule/applyDesignatedTeacher");
+        String url = String.format("%s/%s", urlConf.getTeacher_service(),"course/schedule/changeDesignatedTeacher");
 //        String url = String.format("%s/%s", "http://192.168.88.147:8099","course/schedule/changeDesignatedTeacher");
 
 
-        logger.info("notifyAssignTeacher :studentID[{}],teacherId[{}]", studentTeacherParam.getStudentId(),studentTeacherParam.getTeacherId());
+        logger.info("notifyAssignTeacher:url [{}],studentID[{}],teacherId[{}]", url,studentTeacherParam.getStudentId(),studentTeacherParam.getTeacherId());
 
         JsonResultModel jsonResultModel = null;
         try {
