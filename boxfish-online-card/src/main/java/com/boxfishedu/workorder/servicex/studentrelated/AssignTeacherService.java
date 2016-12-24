@@ -292,7 +292,7 @@ public class AssignTeacherService {
         return results;
     }
 
-    // 6 学生的邀请
+    // 6 5的详情  学生的邀请
     @Transactional
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId, Long studentId, Pageable pageable) {
         Date baseDate = DateTime.now().minusHours(48).toDate();
@@ -365,6 +365,7 @@ public class AssignTeacherService {
     }
 
 
+    @Transactional
     public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam) {
         List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findAll(stTeacherInviteParam.getIds());
         if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
@@ -395,11 +396,10 @@ public class AssignTeacherService {
         JsonResultModel jsonResultModel = teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
 
         if (null != jsonResultModel && HttpStatus.OK.value() == jsonResultModel.getReturnCode()) {
-
-            Service service = serveService.findOne(studentTeacherParam.getOrderId());
+            Service service = serveService.findTop1ByOrderId(studentTeacherParam.getOrderId());
             // 获取订单数据
             List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(studentTeacherParam.getOrderId());
-            Long[] workOrderIds = (Long[]) Collections3.extractToList(workOrders, "id").toArray();
+            List<Long> workOrderIds = Collections3.extractToList(workOrders, "id");
 
             // 获取课程数据
             List<CourseSchedule> courseSchedules = courseScheduleService.findByWorkorderIdIn(workOrderIds);
