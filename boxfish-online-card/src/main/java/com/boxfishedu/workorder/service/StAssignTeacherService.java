@@ -67,15 +67,19 @@ public class StAssignTeacherService {
         checkSchema(studentId, teacherId, skuId);
         if(Collections3.isEmpty(aggressorCourseSchedules)){
             logger.info("@@@@assign-teacher 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
-                            "===>>skuId:{}====>>没有数据!!!!!!!!!!",
-                    studentId, teacherId, skuId);
+                            "===>>skuId:{}=====>>channel:{}====>>没有数据!!!!!!!!!!",
+                    studentId, teacherId, skuId,channel);
             return;
         }
+        logger.info("@@@@assign-teacher 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+                        "===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条",
+                studentId, teacherId, skuId, Collections3.extractToList(aggressorCourseSchedules,"workorderId").toArray(),
+                aggressorCourseSchedules.size());
         //TODO 当前指定老师的其他学生的课表
         List<CourseSchedule> victimCourseSchedules =
                 courseScheduleRepository.
                         findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleId(teacherId, studentId, 0, skuId);
-//        List<CourseSchedule> victimCourseSchedulesFinal = Lists.newArrayList();
+
         Map<String,CourseSchedule> victimCourseSchedulesFinalMap = Maps.newHashMap();
         if (Collections3.isNotEmpty(victimCourseSchedules)) {
             StStudentSchema stStudentSchemaTmp = null;
@@ -89,8 +93,6 @@ public class StAssignTeacherService {
                                         courseSchedule.getTeacherId(), StStudentSchema.CourseType.getEnum(skuId),
                                         StStudentSchema.StSchema.assgin);
                         if (null == stStudentSchemaTmp) {
-//                            victimCourseSchedulesFinal.add(courseSchedule);
-
                             key = new DateTime(courseSchedule.getClassDate()).toString("yyyy-MM-dd") + "-"+ courseSchedule.getTimeSlotId();
                             if(victimCourseSchedulesFinalMap.get(key) == null){
                                 victimCourseSchedulesFinalMap.put(key,courseSchedule);
@@ -102,17 +104,11 @@ public class StAssignTeacherService {
                         break;
                     }
                 }
-
             }
-            logger.info("@@@@assign-teacher 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
-                            "===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条",
-                    studentId, teacherId, skuId, victimCourseSchedulesFinalMap.keySet().toArray(),
-                    victimCourseSchedulesFinalMap.size());
+
         }
         ScheduleBatchReqSt scheduleBatchReqSt = match(studentId, teacherId, aggressorCourseSchedules,
                 victimCourseSchedulesFinalMap, channel);
-//        logger.info("指定老师stp-2:::生成要匹配的鱼卡数据去请求师生运营匹配:::======>>>APP端学生ID:{}====>>请求师生运营去匹配的数据{}",
-//                studentId, scheduleBatchReqSt.toString());
 
         //TODO 此处去请求师生运营
         ScheduleBatchReqSt responseScheduleBatchReqSt = null;
@@ -128,23 +124,24 @@ public class StAssignTeacherService {
             throw new BusinessException("请求师生运营系统匹配老师返回数据空");
         }
         List<Long> macthedWorkOrderIdList = Lists.newArrayList();
+        List<Long> wait2applyWorkOrderIdList = Lists.newArrayList();
         List<ScheduleModelSt> macthedList = Lists.newArrayList();
         List<ScheduleModelSt> wait2applyList = Lists.newArrayList();
         for (ScheduleModelSt scheduleModelSt : scheduleModelStList) {
             if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.matched) {
                 macthedList.add(scheduleModelSt);
                 macthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
-            }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.un_matched
-                    ||scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
+            }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.un_matched){
                 wait2applyList.add(scheduleModelSt);
+            }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
+                wait2applyList.add(scheduleModelSt);
+                wait2applyWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }
-
-
         }
         logger.info("@@@@assign-teacher 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中匹配上IDS:{}",
                 studentId,  macthedWorkOrderIdList.toArray());
-        logger.info("@@@@assign-teacher 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中未匹配上IDS:{}",
-                studentId, Collections3.extractToList(wait2applyList, "workOrderId"));
+        logger.info("@@@@assign-teacher 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中WAIT2APPLY ==IDS:{}",
+                studentId, wait2applyWorkOrderIdList.toArray());
 
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
             makeApplyRecords(teacherId, studentId, wait2applyList,skuId);
@@ -165,7 +162,6 @@ public class StAssignTeacherService {
                 workOrder.setAssignTeacherTime(new Date());
             }
 
-//            Map<String,Long> needFireWorkOrderIdsMap = Maps.newHashMap();
             List<Long> needFireWorkOrderIds= Lists.newArrayList();
             String matchKey = null;
             CourseSchedule needFireCourseSchedule = null;
@@ -238,21 +234,6 @@ public class StAssignTeacherService {
                 scheduleModelSt.setGrabedRoleId(victimCourseSchedule.getRoleId());
                 scheduleModelSt.setGrabedWorkOrderId(victimCourseSchedule.getWorkorderId());
             }
-//            if(Collections3.isNotEmpty(victimCourseSchedules)){
-//                for (CourseSchedule victimCourseSchedule : victimCourseSchedules) {
-//                    if (courseSchedule.getClassDate().compareTo(victimCourseSchedule.getClassDate()) == 0
-//                            && courseSchedule.getTimeSlotId().intValue() == victimCourseSchedule.getTimeSlotId().intValue()) {
-//                        scheduleModelSt.setGrabedStudentId(victimCourseSchedule.getStudentId());
-//                        scheduleModelSt.setGrabedId(victimCourseSchedule.getId());
-//                        scheduleModelSt.setGrabedDay(victimCourseSchedule.getClassDate().getTime());
-//                        scheduleModelSt.setGrabedcourseType(victimCourseSchedule.getCourseType());
-//                        scheduleModelSt.setGrabedSlotId(victimCourseSchedule.getTimeSlotId());
-//                        scheduleModelSt.setGrabedRoleId(victimCourseSchedule.getRoleId());
-//                        scheduleModelSt.setGrabedWorkOrderId(victimCourseSchedule.getWorkorderId());
-//                        break;
-//                    }
-//                }
-//            }
             scheduleModelSts.add(scheduleModelSt);
         }
         scheduleBatchReqSt.setUserId(studentId);
