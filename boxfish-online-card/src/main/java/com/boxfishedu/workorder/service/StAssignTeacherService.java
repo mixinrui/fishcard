@@ -242,8 +242,8 @@ public class StAssignTeacherService {
             victimCourseSchedule = victimCourseSchedules.get(matchKey);
             excludeSchedule = assignedCourseSchedulesMap.get(matchKey);
             if(null != excludeSchedule){
-                logger.info("@@@@assign-teacher 指定老师 stp-match::::排除掉那些也指定改老师的同时间片的鱼卡:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}====>>>不能抢鱼卡ID信息{}",
-                        studentId, teacherId, courseSchedule.getWorkorderId());
+                logger.info("@@@@assign-teacher 指定老师 stp-match::::排除掉那些也指定改老师的同时间片的鱼卡:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}====>>>鱼卡ID{}====>>>不能抢鱼卡ID{}",
+                        studentId, teacherId, courseSchedule.getWorkorderId(),excludeSchedule.getWorkorderId());
                 iter.remove();
                 continue;
             }
