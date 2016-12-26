@@ -4,7 +4,9 @@ import com.boxfishedu.workorder.requester.resultbean.NetAnalysisBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -14,6 +16,9 @@ import org.springframework.beans.BeanUtils;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity(noClassnameStored = true)
 public class NetPingAnalysisInfo {
+    @JsonIgnore
+    @Id
+    private ObjectId id;
 
     private String role;
 
