@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.SelectedTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -109,4 +111,17 @@ public class InstantClassCard {
 
     @Column(name = "chat_room_id")
     private Long chatRoomId;
+
+    public void initDefault(TimeSlots timeSlots) {
+        this.setClassDate(DateUtil.date2SimpleDate(new Date()));
+        this.setSlotId(timeSlots.getSlotId());
+        this.setRequestTeacherTimes(0);
+        this.setStudentRequestTimes(0);
+        this.setResultReadFlag(0);
+        this.setMatchResultReadFlag(0);
+        this.setTeacherId(0l);
+        this.setChatRoomId(0l);
+        this.setCreateTime(new Date());
+        this.setRequestMatchTeacherTime(DateTime.now().toDate());
+    }
 }
