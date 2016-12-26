@@ -86,7 +86,7 @@ public class CourseOnlineRequester {
     public void notifyInstantClassMsg(InstantClassCard instantClassCard,List<Long> teacherIds){
         String url=String.format("%s/teaching/callback/push",
                 urlConf.getCourse_online_service());
-        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
+//        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
         List<TeachingOnlineMsg> teachingOnlineMsgList=Lists.newArrayList();
         teacherIds.forEach(teacherId->{
             TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();
