@@ -28,6 +28,7 @@ public class NetAnalysisBean {
     @JsonIgnore
     //"student,teacher"
     private String role;
+
     @JsonIgnore
     private double maxServicePing;
     @JsonIgnore

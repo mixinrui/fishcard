@@ -4,6 +4,9 @@ import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.entity.mongo.InstantCardLog;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.requester.InstantTeacherRequester;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +22,7 @@ public class InstantCardLogMorphiaRepository extends BaseMorphiaRepository<Insta
     @Autowired
     private LogPoolManager logPoolManager;
 
+
     public void saveInstantLog(InstantClassCard instantClassCard,List<Long> pullTeacherIds,String desc){
         logPoolManager.execute(new Thread(()->{
             InstantCardLog instantCardLog=new InstantCardLog();
@@ -30,6 +34,24 @@ public class InstantCardLogMorphiaRepository extends BaseMorphiaRepository<Insta
             if(!Objects.isNull(instantClassCard.getWorkorderId())) {
                 instantCardLog.setWorkOrderId(instantClassCard.getWorkorderId());
             }
+            datastore.save(instantCardLog);
+        }));
+    }
+
+    public void saveInstantLog(InstantClassCard instantClassCard, List<Long> pullTeacherIds,String desc
+            , String url, InstantTeacherRequester.InstantFetchTeacherParam instantFetchTeacherParam){
+        logPoolManager.execute(new Thread(()->{
+            InstantCardLog instantCardLog=new InstantCardLog();
+            instantCardLog.setStudentId(instantClassCard.getStudentId());
+            instantCardLog.setPullTeacherIds(pullTeacherIds);
+            instantCardLog.setInstantCardId(instantClassCard.getId());
+            instantCardLog.setDesc(desc);
+            instantCardLog.setCreateTime(new Date());
+            if(!Objects.isNull(instantClassCard.getWorkorderId())) {
+                instantCardLog.setWorkOrderId(instantClassCard.getWorkorderId());
+            }
+            instantCardLog.setInstantFetchTeacherParam(instantFetchTeacherParam);
+            instantCardLog.setUrl(url);
             datastore.save(instantCardLog);
         }));
     }

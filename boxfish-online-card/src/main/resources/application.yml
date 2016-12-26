@@ -57,6 +57,9 @@ parameter:
   #允许立即上课的类型:   0:All  1:中教    2:外教
   instant_allow_teacher_type: 0
 
+  network_bad: 600
+  network_general: 300
+
   #封面服务器的地址
   thumbnail_server: http://api.boxfish.cn/student/publication/data/data/
 
@@ -387,7 +390,7 @@ interface:
     order_service: http://123.56.13.168:8082/order
     course_online_service: http://123.56.13.168:9090/teaching-service
     auth_user: http://114.55.58.184:8099
-    data_analysis_service: http://114.55.65.28:9301
+    data_analysis_service: http://114.55.255.121:9301/log/mongo
     student_teacher_relation: http://api.test.boxfish.cn
 #  学生旷课扣积分
     absenteeism_deduct_score: https://api.online.test.boxfish.cn
@@ -470,7 +473,7 @@ interface:
     order_service: http://127.0.0.1:8082/order
     course_online_service: http://127.0.0.1:9090
     auth_user: http://114.55.58.184:8099
-    data_analysis_service: http://114.55.65.28:9301
+    data_analysis_service: http://114.55.255.121:9301
     student_teacher_relation: http://api.test.boxfish.cn
 #  学生旷课扣积分
     absenteeism_deduct_score: https://api.online.test.boxfish.cn

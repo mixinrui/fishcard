@@ -229,6 +229,18 @@ public class WorkOrder implements Cloneable{
     @Transient
     private boolean haveTeacherRequested = true; //是否有教师操作
 
+    @Transient
+    private Integer teacherNetStatus;
+
+    @Transient
+    private String teacherNetStatusDesc;
+
+    @Transient
+    private Integer studentNetStatus;
+
+    @Transient
+    private String studentNetStatusDesc;
+
     @Override
     public String toString() {
         return "WorkOrder{" +

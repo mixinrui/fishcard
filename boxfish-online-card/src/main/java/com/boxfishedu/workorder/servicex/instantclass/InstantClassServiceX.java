@@ -116,14 +116,15 @@ public class InstantClassServiceX {
     }
 
     public List<InstantClassTimeRules> getSortedTimeRulesList(List<InstantClassTimeRules> rawTimeRules) {
-        return rawTimeRules.stream().sorted(Comparator.comparing(instantClassTimeRules ->
-                DateUtil.String2Date(String.join(" ", DateUtil.date2SimpleString(new Date()), instantClassTimeRules.getBegin())).getTime()
-        )).collect(Collectors.toList());
+        return rawTimeRules.stream()
+                           .sorted(Comparator.comparing(instantClassTimeRules -> DateUtil.String2Date(
+                                   String.join(" ", DateUtil.date2SimpleString(new Date()), instantClassTimeRules.getBegin())).getTime()))
+                           .collect(Collectors.toList());
     }
 
     public JsonResultModel getTeacherRangeByDay(Long userId) {
-        return JsonResultModel.newJsonResultModel(teacherRangeContext
-                .teacherTimeRange(teacherStudentRequester, instantClassTimeRulesMorphiaRepository, userId));
+        return JsonResultModel.newJsonResultModel(
+                teacherRangeContext.teacherTimeRange(teacherStudentRequester, instantClassTimeRulesMorphiaRepository, userId));
     }
 
     public JsonResultModel getScheduleType(Long studentId) {
@@ -133,20 +134,21 @@ public class InstantClassServiceX {
     private JsonResultModel invalidReturn(InstantClassRequestStatus instantStatus, InstantRequestParam instantRequestParam) {
         switch (instantStatus) {
             case NOT_IN_RANGE:
-                return JsonResultModel.newJsonResultModel(InstantClassResult
-                        .newInstantClassResult(instantStatus, String.format("实时上课会在[%s]内开启,请到时间再重试~"
+                return JsonResultModel.newJsonResultModel(
+                        InstantClassResult.newInstantClassResult(instantStatus, String.format("实时上课会在[%s]内开启,请到时间再重试~"
                                 , this.timeRange(TutorTypeEnum.getByValue(instantRequestParam.getTutorType())))));
 
             case HAVE_CLASS_IN_HALF_HOURS:
                 String msg = String.format("您预约了[%s]的课程,马上就开始了,此时不能实时上课~"
                         , DateUtil.dateTrimYear(ThreadLocalUtil.classDateIn30Minutes.get()));
 
-                return JsonResultModel.newJsonResultModel(InstantClassResult
-                        .newInstantClassResult(instantStatus, msg));
+                return JsonResultModel.newJsonResultModel(
+                        InstantClassResult.newInstantClassResult(instantStatus, msg));
 
             case MATCHED_LESS_THAN_30MINUTES: {
-                JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
-                        .newInstantClassResult(ThreadLocalUtil.instantCardMatched30Minutes.get(), InstantClassRequestStatus.MATCHED));
+                JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(
+                        InstantClassResult.newInstantClassResult(
+                                ThreadLocalUtil.instantCardMatched30Minutes.get(), InstantClassRequestStatus.MATCHED));
                 if (ThreadLocalUtil.instantCardMatched30Minutes.get().getMatchResultReadFlag() != 1) {
                     instantClassJpaRepository.updateMatchedReadFlag(ThreadLocalUtil.instantCardMatched30Minutes.get().getId(), 1);
                 }
@@ -154,13 +156,13 @@ public class InstantClassServiceX {
             }
 
             case UNFINISHED_COURSE: {
-                return JsonResultModel.newJsonResultModel(InstantClassResult
-                        .newInstantClassResult(instantStatus, ThreadLocalUtil.unFinishedCourses30MinutesTips.get()));
+                return JsonResultModel.newJsonResultModel(
+                        InstantClassResult.newInstantClassResult(instantStatus, ThreadLocalUtil.unFinishedCourses30MinutesTips.get()));
             }
 
             default:
-                return JsonResultModel.newJsonResultModel(InstantClassResult
-                        .newInstantClassResult(instantStatus));
+                return JsonResultModel.newJsonResultModel(
+                        InstantClassResult.newInstantClassResult(instantStatus));
         }
     }
 

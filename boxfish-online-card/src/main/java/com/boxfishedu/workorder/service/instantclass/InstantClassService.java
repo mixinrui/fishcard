@@ -94,7 +94,7 @@ public class InstantClassService {
 
             InstantClassCard instantClassCard = instantClassUpdatorService
                     .resetInstantCard(instantClassCardOptional.get()
-                            .getId(), 0, InstantClassRequestStatus.WAIT_TO_MATCH);
+                                                              .getId(), 0, InstantClassRequestStatus.WAIT_TO_MATCH);
 
             instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard, false);
 
@@ -105,13 +105,15 @@ public class InstantClassService {
         }
     }
 
-    private void tutorTypeChanged(Optional<TimeSlots> timeSlotsOptional
+    private void tutorTypeChanged(
+            Optional<TimeSlots> timeSlotsOptional
             , Optional<InstantClassCard> instantClassCardOptional) {
 
         this.reInitInstantCard(timeSlotsOptional, instantClassCardOptional);
     }
 
-    private void reInitInstantCard(Optional<TimeSlots> timeSlotsOptional
+    private void reInitInstantCard(
+            Optional<TimeSlots> timeSlotsOptional
             , Optional<InstantClassCard> instantClassCardOptional) {
 
         dealDifferentEntrance(instantClassCardOptional);
@@ -124,7 +126,8 @@ public class InstantClassService {
                 , instantClassCardOptional.get().getTutorType());
     }
 
-    private void entranceChanged(Optional<TimeSlots> timeSlotsOptional
+    private void entranceChanged(
+            Optional<TimeSlots> timeSlotsOptional
             , Optional<InstantClassCard> instantClassCardOptional) {
 
         this.reInitInstantCard(timeSlotsOptional, instantClassCardOptional);
@@ -137,7 +140,7 @@ public class InstantClassService {
      */
     private Long getRoleId() {
         return new Long(CourseType2TeachingTypeService
-                .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType())));
+                                .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType())));
     }
 
     //当无对应的鱼卡数据时候,获取第一条数据
@@ -198,11 +201,11 @@ public class InstantClassService {
     private Optional<TimeSlots> getMostSimilarSlot(DayTimeSlots dayTimeSlots) {
         LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30);
         return dayTimeSlots.getDailyScheduleTime().stream()
-                .filter(timeSlot -> nextSlotTime.isAfter(
-                        DateUtil.string2LocalDateTime(String.join(
-                                " ", DateUtil.date2SimpleString(new Date())
-                                , timeSlot.getStartTime()))))
-                .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
+                           .filter(timeSlot -> nextSlotTime.isAfter(
+                                   DateUtil.string2LocalDateTime(String.join(
+                                           " ", DateUtil.date2SimpleString(new Date())
+                                           , timeSlot.getStartTime()))))
+                           .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
     }
 
     public Optional<InstantClassCard> getClassCardByStudentIdAndTimeParam(TimeSlots timeSlots) {
@@ -215,7 +218,8 @@ public class InstantClassService {
         return instantClassJpaRepository.save(instantClassCard);
     }
 
-    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus
+    private InstantClassResult matchResultWrapper(
+            InstantClassRequestStatus instantClassRequestStatus
             , TeacherPhotoRequester teacherPhotoRequester) {
         return InstantClassResult.newInstantClassResult(instantClassRequestStatus);
     }

@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mongo;
 
+import com.boxfishedu.workorder.requester.InstantTeacherRequester;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -36,10 +37,14 @@ public class InstantCardLog {
 
     private Date requestTeacherTime;
 
-    private List<Long>  pullTeacherIds;
+    private InstantTeacherRequester.InstantFetchTeacherParam instantFetchTeacherParam;
+
+    private String url;
+
+    private List<Long> pullTeacherIds;
 
     @Override
-    public String toString(){
-        return this.id + "#" + this.status + "#" + this.desc + "#" + this.createTime ;
+    public String toString() {
+        return this.id + "#" + this.status + "#" + this.desc + "#" + this.createTime;
     }
 }

@@ -52,10 +52,10 @@ public class DataAnalysisRequester {
 
     public NetSourceBean getNetSourceBean(DataAnalysisLogParam dataAnalysisLogParam, Pageable pageable) {
 
-        String url = String.format("%s/api/log/query/condition?userId=%s&startTime=%s&endTime=%s&event=%&size=%s",
+        String url = String.format("%s/api/log/query/condition?userId=%s&startTime=%s&endTime=%s&event=%s&size=%s",
                 urlConf.getData_analysis_service(), dataAnalysisLogParam.getUserId()
                 , dataAnalysisLogParam.getStartTime(), dataAnalysisLogParam.getEndTime()
-                , dataAnalysisLogParam.getEvent(), defaultSize);
+                , dataAnalysisLogParam.getEvent(), pageable.getPageSize());
 
         NetSourceBean netSourceBean = null;
         try {

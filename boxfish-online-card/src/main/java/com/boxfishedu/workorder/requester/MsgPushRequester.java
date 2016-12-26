@@ -33,16 +33,16 @@ public class MsgPushRequester {
     @Autowired
     private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
 
-    private final Logger logger= LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public void notifyInstantGroupClassMsg(InstantClassCard instantClassCard, List<Long> teacherIds){
-        String url=String.format("%s/notification/push",
-                urlConf.getMsg_push_url());
-        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
-        TeachingOnlineGroupMsg teachingOnlineGroupMsg=new TeachingOnlineGroupMsg();
+    public void notifyInstantGroupClassMsg(InstantClassCard instantClassCard, List<Long> teacherIds) {
+        String url = String.format("%s/notification/push",
+                                   urlConf.getMsg_push_url());
+//        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard, teacherIds, "向教师发起推送");
+        TeachingOnlineGroupMsg teachingOnlineGroupMsg = new TeachingOnlineGroupMsg();
         teachingOnlineGroupMsg.setPush_title("Many students are waiting for class. Now matching...");
 
-        TeachingOnlineGroupMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach=new  TeachingOnlineGroupMsg.TeachingOnlineMsgAttach();
+        TeachingOnlineGroupMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach = new TeachingOnlineGroupMsg.TeachingOnlineMsgAttach();
         teachingOnlineMsgAttach.setType(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
         teachingOnlineMsgAttach.setCardId(instantClassCard.getId());
         teachingOnlineMsgAttach.setDay(DateUtil.simpleDate2String(instantClassCard.getClassDate()));
@@ -51,10 +51,12 @@ public class MsgPushRequester {
         teachingOnlineMsgAttach.setStudentId(instantClassCard.getStudentId());
         teachingOnlineGroupMsg.setData(teachingOnlineMsgAttach);
 
-        teacherIds.forEach(teacherId-> teachingOnlineGroupMsg.getUser_id().add(teacherId));
+        teacherIds.forEach(teacherId -> teachingOnlineGroupMsg.getUser_id().add(teacherId));
 
         logger.debug(">>>>>>@notifyInstantClassMsg, IIIIIIIIIIIIIII 向教师发起推送实时上课请求,courseInfo[{}],教师信息[{}]"
-                , JacksonUtil.toJSon(teachingOnlineGroupMsg),teacherIds);
-        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineGroupMsg,Object.class);}));
+                , JacksonUtil.toJSon(teachingOnlineGroupMsg), teacherIds);
+        threadPoolManager.execute(new Thread(() -> {
+            restTemplate.postForObject(url, teachingOnlineGroupMsg, Object.class);
+        }));
     }
 }

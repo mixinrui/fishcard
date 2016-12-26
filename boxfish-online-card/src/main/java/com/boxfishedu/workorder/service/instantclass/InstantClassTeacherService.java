@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
+import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
@@ -58,6 +59,8 @@ public class InstantClassTeacherService {
 
     @Autowired
     private MsgPushRequester msgPushRequester;
+
+    private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 

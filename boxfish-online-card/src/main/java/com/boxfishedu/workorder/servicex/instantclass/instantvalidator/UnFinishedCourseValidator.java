@@ -56,7 +56,7 @@ public class UnFinishedCourseValidator implements InstantClassValidator {
         String beginStr = DateUtil.dateTrimYear(begin).substring(0, 5);
         String endStr = DateUtil.dateTrimYear(end).substring(0, 5);
         StringBuilder builder = new StringBuilder().append("已安排")
-                .append(String.join("-", beginStr, endStr)).append("的课程;请等待外教发起邀请,或");
+                                                   .append(String.join("-", beginStr, endStr)).append("的课程;请等待教师发起邀请,或");
         if (minute != 0) {
             builder.append(minute).append("分钟后再试");
         } else {

@@ -25,14 +25,15 @@ public class NetNanlysisInfoMorphiaRepository {
 
     private final org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
 
-//
-//    public NetPingAnalysisInfo queryByCardId(Long cardId,Long userId){
-//        Query<AccountCardInfo> query = datastore.createQuery(NetPingAnalysisInfo.class);
-//        query.and(query.criteria("studentId").equal(studentId));
-//        return query.get();
-//    }
 
-    public void save(AccountCardInfo accountCardInfo) {
-        datastore.save(accountCardInfo);
+    public NetPingAnalysisInfo queryByCardIdAndUserId(Long cardId,Long userId){
+        Query<NetPingAnalysisInfo> query = datastore.createQuery(NetPingAnalysisInfo.class);
+        query.and(query.criteria("userId").equal(userId));
+        query.and(query.criteria("cardId").equal(cardId));
+        return query.get();
+    }
+
+    public void save(NetPingAnalysisInfo netPingAnalysisInfo) {
+        datastore.save(netPingAnalysisInfo);
     }
 }

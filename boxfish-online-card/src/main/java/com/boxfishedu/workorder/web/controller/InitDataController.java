@@ -24,6 +24,7 @@ import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.dataanalysis.FetchHeartBeatServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -90,6 +91,9 @@ public class InitDataController {
 
     @Autowired
     private CourseScheduleService courseScheduleService;
+
+    @Autowired
+    private FetchHeartBeatServiceX fetchHeartBeatServiceX;
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -254,24 +258,24 @@ public class InitDataController {
         AtomicInteger failNum = new AtomicInteger();
         List<Long> failList = new Vector<>();
         cardIds.forEach(cardId ->
-                {
-                    threadPoolManager.execute(new Thread(() -> {
-                        try {
-                            WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
-                            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
-                            courseSchedule.setStartTime(workOrder.getStartTime());
-                            courseSchedule.setClassDate(workOrder.getStartTime());
-                            courseSchedule.setTimeSlotId(workOrder.getSlotId());
-                            courseScheduleService.save(courseSchedule);
-                            int dealNum = successNum.addAndGet(1);
-                            logger.debug("->" + cardId + ";已经处理{}条,剩余{}条", dealNum, (totalNum - dealNum));
-                        } catch (Exception ex) {
-                            failNum.addAndGet(1);
-                            failList.add(cardId);
-                            logger.error("失败[{}]", cardId, ex);
+                        {
+                            threadPoolManager.execute(new Thread(() -> {
+                                try {
+                                    WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
+                                    CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
+                                    courseSchedule.setStartTime(workOrder.getStartTime());
+                                    courseSchedule.setClassDate(workOrder.getStartTime());
+                                    courseSchedule.setTimeSlotId(workOrder.getSlotId());
+                                    courseScheduleService.save(courseSchedule);
+                                    int dealNum = successNum.addAndGet(1);
+                                    logger.debug("->" + cardId + ";已经处理{}条,剩余{}条", dealNum, (totalNum - dealNum));
+                                } catch (Exception ex) {
+                                    failNum.addAndGet(1);
+                                    failList.add(cardId);
+                                    logger.error("失败[{}]", cardId, ex);
+                                }
+                            }));
                         }
-                    }));
-                }
         );
         while (true) {
             if (failNum.get() + successNum.get() == totalNum) {
@@ -284,7 +288,19 @@ public class InitDataController {
             }
             Thread.sleep(100);
         }
+    }
 
+    @RequestMapping(value = "/net", method = RequestMethod.POST)
+    public JsonResultModel initNet() {
+        List<Long> cardIds = workOrderJpaRepository.findAllWorkOrderId();
+        cardIds.forEach(cardId -> {
+            try {
+                fetchHeartBeatServiceX.persistAnalysisAsync(workOrderJpaRepository.findOne(cardId));
+            } catch (Exception ex) {
+                logger.error(cardId.toString(), ex);
+            }
 
+        });
+        return JsonResultModel.newJsonResultModel("OK");
     }
 }

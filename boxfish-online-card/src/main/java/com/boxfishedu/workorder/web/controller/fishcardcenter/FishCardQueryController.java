@@ -5,6 +5,7 @@ import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.servicex.dataanalysis.FetchHeartBeatServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -34,6 +35,9 @@ public class FishCardQueryController {
 
     @Autowired
     private WorkOrderService workOrderService;
+
+    @Autowired
+    private FetchHeartBeatServiceX fetchHeartBeatServiceX;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -197,7 +201,13 @@ public class FishCardQueryController {
      */
     @RequestMapping(value = "/net/{card_id}", method = RequestMethod.GET)
     public JsonResultModel getNetPingDeatil(@PathVariable("card_id") Long cardId, String role, Pageable pageable) {
-        return null;
-//        return JsonResultModel.newJsonResultModel(fishCardQueryServiceX.getGroupInfo(fishCardFilterParam.getId()));
+        return fetchHeartBeatServiceX.getNetPingDetail(cardId, role, pageable);
     }
+
+    @RequestMapping(value = "/net/analysis/{card_id}", method = RequestMethod.GET)
+    public JsonResultModel getNetPingAnalysis(@PathVariable("card_id") Long cardId, String role) {
+        return JsonResultModel.newJsonResultModel(
+                fetchHeartBeatServiceX.getNetAnalysis(cardId, role));
+    }
+
 }

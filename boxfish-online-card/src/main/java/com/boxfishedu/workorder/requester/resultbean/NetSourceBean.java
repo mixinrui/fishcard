@@ -12,6 +12,18 @@ import java.util.Map;
 public class NetSourceBean {
     private List<ContentBean> content;
 
+
+    private Boolean last;
+    private Long totalPages;
+    private Long totalElements;
+
+    private Object sort;
+
+    private Boolean first;
+    private Long numberOfElements;
+    private Long size;
+    private Long number;
+
     @Data
     public static class ContentBean {
         private String id;
@@ -24,10 +36,5 @@ public class NetSourceBean {
         private String event;
         private Long appTime;
         private Long sysTime;
-
-        private Long size;
-        private Long number;
-        private Long numberOfElements;
-        private Long totalPages;
     }
 }

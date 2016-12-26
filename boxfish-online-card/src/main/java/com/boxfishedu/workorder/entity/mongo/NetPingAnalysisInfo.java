@@ -20,6 +20,10 @@ public class NetPingAnalysisInfo {
     @Id
     private ObjectId id;
 
+    private Long userId;
+
+    private Long cardId;
+
     private String role;
 
     private double maxServicePing;
@@ -36,5 +40,11 @@ public class NetPingAnalysisInfo {
 
     private void analysis(NetAnalysisBean netAnalysisBean){
         BeanUtils.copyProperties(netAnalysisBean,this);
+    }
+
+    public void wrapIntoBean(NetAnalysisBean netAnalysisBean,Long userId,Long cardId){
+        this.analysis(netAnalysisBean);
+        this.setUserId(userId);
+        this.setCardId(cardId);
     }
 }

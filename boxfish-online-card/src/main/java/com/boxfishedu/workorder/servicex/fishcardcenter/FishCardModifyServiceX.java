@@ -76,7 +76,7 @@ public class FishCardModifyServiceX {
 
 
     @Autowired
-    private CourseOnlineRequester  courseOnlineRequester;
+    private CourseOnlineRequester courseOnlineRequester;
 
     @Autowired
     private AccountCardInfoService accountCardInfoService;
@@ -93,7 +93,8 @@ public class FishCardModifyServiceX {
     @Autowired
     private DataCollectorService dataCollectorService;
 
-    @Autowired FishCardModifyService fishCardModifyService;
+    @Autowired
+    FishCardModifyService fishCardModifyService;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -106,7 +107,7 @@ public class FishCardModifyServiceX {
     public JsonResultModel changeTeacher(TeacherChangeParam teacherChangeParam) {
         //获取对应的workorder和courseschedule
         WorkOrder workOrder = workOrderService.findOne(teacherChangeParam.getWorkOrderId());
-        if(workOrder.getIsCourseOver()==1){
+        if (workOrder.getIsCourseOver() == 1) {
             throw new BusinessException("课程已经结束,不能更换教师");
         }
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(teacherChangeParam.getWorkOrderId());
@@ -114,6 +115,8 @@ public class FishCardModifyServiceX {
         if ((null == workOrder) || (null == courseSchedule)) {
             throw new BusinessException("无对应的记录,请检查所传参数是否合法");
         }
+
+        WorkOrder oldWorkOrder = workOrder.clone();
 
         //对workorder和courseschedule做控制
         workOrder.setTeacherId(teacherChangeParam.getTeacherId());
@@ -124,7 +127,7 @@ public class FishCardModifyServiceX {
         courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
 
         //通知师生运营更换老师
-        teacherStudentRequester.notifyChangeTeacher(workOrder,teacherChangeParam);
+        teacherStudentRequester.notifyChangeTeacher(workOrder, teacherChangeParam);
 
         //更新新的教师到workorder和courseschedule,此处做事务控制
         workOrderService.updateWorkOrderAndSchedule(workOrder, courseSchedule);
@@ -137,9 +140,19 @@ public class FishCardModifyServiceX {
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
 
-        changeTeacherLog(workOrder);
+        changeTeacherLog(workOrder,oldWorkOrder);
         //返回结果
         return JsonResultModel.newJsonResultModel(null);
+    }
+
+    private void changeTeacherLog(WorkOrder workOrder, WorkOrder oldWorkOrder) {
+        WorkOrderLog workOrderLog = new WorkOrderLog();
+        workOrderLog.setCreateTime(new Date());
+        workOrderLog.setWorkOrderId(workOrder.getId());
+        workOrderLog.setStatus(workOrder.getStatus());
+        workOrderLog.setContent(String.format("更换教师:%s,旧的教师id%s"
+                , FishCardStatusEnum.getDesc(workOrder.getStatus()), oldWorkOrder.getTeacherId()));
+        workOrderLogService.save(workOrderLog);
     }
 
     private void changeTeacherLog(WorkOrder workOrder) {
@@ -153,7 +166,7 @@ public class FishCardModifyServiceX {
 
     public void changeSpecialOrderCourses(Long studentId, Long orderId) {
         List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndOrderIdAndStatusLessThan(studentId, orderId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
-        if(CollectionUtils.isEmpty(workOrders)){
+        if (CollectionUtils.isEmpty(workOrders)) {
             return;
         }
         workOrders.forEach(workOrder -> {
@@ -163,31 +176,30 @@ public class FishCardModifyServiceX {
 
     public void changerderCourses(Long studentId) {
         List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndStatusLessThan(studentId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
-        if(CollectionUtils.isEmpty(workOrders)){
+        if (CollectionUtils.isEmpty(workOrders)) {
             throw new NotFoundException();
         }
         try {
             workOrders.forEach(workOrder -> {
                 Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
-                        DateUtil.convertLocalDateTime(workOrder.getStartTime()));
+                                                     DateUtil.convertLocalDateTime(workOrder.getStartTime()));
                 long hours = duration.toHours();
                 logger.info("workOrder startTime=[{}] and duration=[{}]", workOrder.getStartTime(), duration.toHours());
                 // 24小时以内如果有课,不再换课,无课则直接推荐
-                if(hours <= 24) {
-                    if(StringUtils.isEmpty(workOrder.getCourseId())) {
+                if (hours <= 24) {
+                    if (StringUtils.isEmpty(workOrder.getCourseId())) {
                         fishCardModifyService.changeCourse(workOrder);
                     }
                 }
                 // 24小时以上的课,有课再换
                 else {
-                    if(StringUtils.isNotEmpty(workOrder.getCourseId())) {
+                    if (StringUtils.isNotEmpty(workOrder.getCourseId())) {
                         fishCardModifyService.changeCourse(workOrder);
                     }
                 }
             });
-        }
-        catch (Exception ex){
-            logger.error("修改课程失败@changerderCourses",ex);
+        } catch (Exception ex) {
+            logger.error("修改课程失败@changerderCourses", ex);
 
         }
         dataCollectorService.updateBothChnAndFnItemAsync(studentId);
@@ -196,7 +208,7 @@ public class FishCardModifyServiceX {
 
     public void changCourse(Long workOrderId) {
         WorkOrder workOrder = workOrderService.findOne(workOrderId);
-        if(null==workOrder){
+        if (null == workOrder) {
             return;
         }
         fishCardModifyService.changeCourse(workOrder);
@@ -219,7 +231,7 @@ public class FishCardModifyServiceX {
                 workOrderIds.add(workOrder.getId());
                 logger.debug("待删除的鱼卡[{}]", workOrder.getId());
             }
-            Long[] workOrderLongIds=new Long[workOrderIds.size()];
+            Long[] workOrderLongIds = new Long[workOrderIds.size()];
             List<CourseSchedule> courseSchedules = courseScheduleService.findByWorkorderIdIn(workOrderIds.toArray(workOrderLongIds));
             Map<String, CourseSchedule> courseScheduleMap = Maps.newHashMap();
             courseSchedules.stream().forEach(courseSchedule -> {
@@ -240,7 +252,7 @@ public class FishCardModifyServiceX {
         for (Long id : workOrderIds) {
             WorkOrder workOrder = workOrderService.findOne(id);
             if (workOrder.getStatus() > FishCardStatusEnum.TEACHER_ASSIGNED.getCode()) {
-                logger.error("所选课程包含已经上过课的id,请确认后再删除[{}]",workOrder.getId());
+                logger.error("所选课程包含已经上过课的id,请确认后再删除[{}]", workOrder.getId());
                 continue;
             }
             teacherStudentRequester.notifyCancelTeacher(workOrder);
@@ -249,7 +261,7 @@ public class FishCardModifyServiceX {
             fishCardModifyService.delete(id);
             courseScheduleService.delete(courseSchedule);
         }
-        for(Long id:workOrderIds){
+        for (Long id : workOrderIds) {
             WorkOrder workOrder = workOrderService.findOne(id);
             teacherStudentRequester.notifyCancelTeacher(workOrder);
         }
@@ -258,50 +270,50 @@ public class FishCardModifyServiceX {
 
     /**
      * 更改时间
-     *
-     *
+     * <p>
+     * <p>
      * 1 更改 鱼卡信息 和 课程信息
      * 2 分配老师
-     *
+     * <p>
      * desc:    ********  解决问题,有可能分配老师 和 更改课程信息 导致 脏读 导致 课程鱼卡 classDate  和 StartTime 时间不一致问题
      *
      * @param startTimeParam
      * @param checkTimeflag
      * @return
      */
-    public JsonResultModel changeStartTime(StartTimeParam startTimeParam,boolean checkTimeflag){
+    public JsonResultModel changeStartTime(StartTimeParam startTimeParam, boolean checkTimeflag) {
 
-        Long workOrderId= fishCardModifyService.changeStartTimeFishCard(startTimeParam,checkTimeflag);
+        Long workOrderId = fishCardModifyService.changeStartTimeFishCard(startTimeParam, checkTimeflag);
         dataCollectorService.updateBothChnAndFnItemForCardId(workOrderId);
-        WorkOrder workOrder =workOrderService.findOne(workOrderId);
-        logger.info("changeStartTime 准备 分配老师 workOrderId {[]}",workOrder.getId());
-        if(workOrder.getTeacherId() == 0){
-            logger.info("changeStartTime 满足 分配老师 条件 workOrderId {[]}",workOrder.getId());
+        WorkOrder workOrder = workOrderService.findOne(workOrderId);
+        logger.info("changeStartTime 准备 分配老师 workOrderId {[]}", workOrder.getId());
+        if (workOrder.getTeacherId() == 0) {
+            logger.info("changeStartTime 满足 分配老师 条件 workOrderId {[]}", workOrder.getId());
             List<CourseSchedule> courseSchedules = Lists.newArrayList();
             CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
             courseSchedules.add(courseSchedule);
-            timePickerService.getRecommandTeachers(workOrder.getService(),courseSchedules);
+            timePickerService.getRecommandTeachers(workOrder.getService(), courseSchedules);
         }
-        return  JsonResultModel.newJsonResultModel("OK");
+        return JsonResultModel.newJsonResultModel("OK");
     }
-
 
 
     /**
      * 短信通知老师 课程取消
+     *
      * @param teahcerId
      * @param startTime
      * @param workOrder
      */
-    private void  sendShortMessage(Long teahcerId,String startTime,WorkOrder workOrder){
-        Map map =  Maps.newHashMap();
-        map.put("user_id",teahcerId);
+    private void sendShortMessage(Long teahcerId, String startTime, WorkOrder workOrder) {
+        Map map = Maps.newHashMap();
+        map.put("user_id", teahcerId);
         map.put("template_code", ShortMessageCodeConstant.SMS_TEA_NOTITY_CLASS_CANCEL_CODE);
-        JSONObject jo =new JSONObject();
-        jo.put("startTime",workOrder.getStartTime());
-        jo.put("courseName",workOrder.getCourseName());
-        jo.put("cancelReason",ShortMessageCodeConstant.CANCELREASON);
-        map.put("data",jo);
+        JSONObject jo = new JSONObject();
+        jo.put("startTime", workOrder.getStartTime());
+        jo.put("courseName", workOrder.getCourseName());
+        jo.put("cancelReason", ShortMessageCodeConstant.CANCELREASON);
+        map.put("data", jo);
 
         rabbitMqSender.send(map, QueueTypeEnum.SHORT_MESSAGE);
     }

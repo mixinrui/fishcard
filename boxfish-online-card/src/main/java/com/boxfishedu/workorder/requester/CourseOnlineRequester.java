@@ -2,7 +2,6 @@ package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingNotificationEnum;
-import com.boxfishedu.workorder.common.bean.TeachingOnlineGroupMsg;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -17,7 +16,6 @@ import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
