@@ -69,12 +69,12 @@ public class StAssignTeacherService {
                                 String channel, Integer skuId) {
         checkSchema(studentId, teacherId, skuId);
         if(Collections3.isEmpty(aggressorCourseSchedules)){
-            logger.info("@@@@assign-teacher 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+            logger.info("@@@@assign 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                             "===>>skuId:{}=====>>channel:{}====>>没有数据!!!!!!!!!!",
                     studentId, teacherId, skuId,channel);
             return;
         }
-        logger.info("@@@@assign-teacher 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+        logger.info("@@@@assign 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                         "===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条",
                 studentId, teacherId, skuId, Collections3.extractToList(aggressorCourseSchedules,"workorderId").toArray(),
                 aggressorCourseSchedules.size());
@@ -101,12 +101,12 @@ public class StAssignTeacherService {
                             if(victimCourseSchedulesFinalMap.get(key) == null){
                                 victimCourseSchedulesFinalMap.put(key,courseSchedule);
                             }else { //TODO 一般不会发生,如果一旦发生先记录日志
-                                logger.error("@@@@assign-teacher 指定老师 出现同一老师{}不同学生重复学生::时间片{}",teacherId,key);
+                                logger.error("@@@@assign 指定老师 出现同一老师{}不同学生重复学生::时间片{}",teacherId,key);
                             }
 
                         }else{
                             assignedCourseSchedulesMap.put(key,courseSchedule);
-                            logger.info("@@@@assign-teacher 指定老师 stp-2:::发现不能抢的鱼卡:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+                            logger.info("@@@@assign 指定老师 stp-2:::发现不能抢的鱼卡:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                                             "===>>skuId:{}====>>鱼卡ID:{}",
                                     studentId, teacherId, skuId,courseSchedule.getWorkorderId());
                         }
@@ -119,7 +119,7 @@ public class StAssignTeacherService {
         ScheduleBatchReqSt scheduleBatchReqSt = match(studentId, teacherId, aggressorCourseSchedules,
                 victimCourseSchedulesFinalMap,assignedCourseSchedulesMap, channel);
 
-        logger.info("@@@@assign-teacher 指定老师 stp-2:::请求师生运营:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+        logger.info("@@@@assign 指定老师 stp-2:::请求师生运营:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                         "===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条",
                 studentId, teacherId, skuId, Collections3.extractToList(scheduleBatchReqSt.getScheduleModelList(),"workOrderId").toArray(),
                 scheduleBatchReqSt.getScheduleModelList().size());
@@ -152,9 +152,9 @@ public class StAssignTeacherService {
                 wait2applyWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }
         }
-        logger.info("@@@@assign-teacher 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中匹配上信息:{}",
+        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中匹配上信息:{}",
                 studentId,  wait2applyWorkOrderIdList);
-        logger.info("@@@@assign-teacher 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中WAIT2APPLY 信息:{}",
+        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中WAIT2APPLY 信息:{}",
                 studentId, wait2applyWorkOrderIdList);
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
             makeApplyRecords(teacherId, studentId, wait2applyList,skuId);
@@ -184,14 +184,14 @@ public class StAssignTeacherService {
                 courseSchedule.setTeacherId(teacherId);
                 courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
             }
-            logger.info("@@@@assign-teacher 指定老师 stp-2::::通知更新群组:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",
+            logger.info("@@@@assign 指定老师 stp-2::::通知更新群组:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",
                     studentId, teacherId, skuId, workOrders.toArray());
             notifyOthers(workOrders);
-            logger.info("@@@@assign-teacher 指定老师 stp-2::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",
+            logger.info("@@@@assign 指定老师 stp-2::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",
                     studentId, teacherId, skuId, workOrders.toArray());
             changeTeacherLog(workOrders);
             if(Collections3.isNotEmpty(needFireWorkOrderIds)){
-                logger.info("@@@@assign-teacher 指定老师 stp-2:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>需要被释放的的鱼卡IDS{}",studentId, teacherId, skuId, needFireWorkOrderIds.toArray());
+                logger.info("@@@@assign 指定老师 stp-2:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>需要被释放的的鱼卡IDS{}",studentId, teacherId, skuId, needFireWorkOrderIds.toArray());
                 List<WorkOrder> needFireWorkOrders = workOrderJpaRepository.findWorkOrderAll(needFireWorkOrderIds);
                 List<CourseSchedule> needFireCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(needFireWorkOrderIds);
                 for(WorkOrder workOrder :needFireWorkOrders ){
@@ -242,7 +242,7 @@ public class StAssignTeacherService {
             victimCourseSchedule = victimCourseSchedules.get(matchKey);
             excludeSchedule = assignedCourseSchedulesMap.get(matchKey);
             if(null != excludeSchedule){
-                logger.info("@@@@assign-teacher 指定老师 stp-match::::排除掉那些也指定改老师的同时间片的鱼卡:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}====>>>鱼卡ID{}====>>>不能抢鱼卡ID{}",
+                logger.info("@@@@assign 指定老师 stp-match::::排除掉那些也指定改老师的同时间片的鱼卡:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}====>>>鱼卡ID{}====>>>不能抢鱼卡ID{}",
                         studentId, teacherId, courseSchedule.getWorkorderId(),excludeSchedule.getWorkorderId());
                 iter.remove();
                 continue;
@@ -255,7 +255,7 @@ public class StAssignTeacherService {
                 scheduleModelSt.setGrabedSlotId(victimCourseSchedule.getTimeSlotId());
                 scheduleModelSt.setGrabedRoleId(victimCourseSchedule.getRoleId());
                 scheduleModelSt.setGrabedWorkOrderId(victimCourseSchedule.getWorkorderId());
-                logger.info("@@@@assign-teacher 指定老师 stp-match::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}====>>>抢单信息{}",
+                logger.info("@@@@assign 指定老师 stp-match::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}====>>>抢单信息{}",
                         studentId, teacherId, scheduleModelSt.toString());
             }
 
@@ -267,7 +267,7 @@ public class StAssignTeacherService {
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
             scheduleBatchReqSt.setOperateType(ConstantUtil.MANUAL_OPERATOR);
         } else if (channel.equals(ConstantUtil.TEACHER_CHANNLE)) {
-            scheduleBatchReqSt.setOperateType(ConstantUtil.MANUAL_OPERATOR);
+            scheduleBatchReqSt.setOperateType(ConstantUtil.MANUAL_TECH_OPERATOR);
         } else if (channel.equals(ConstantUtil.TIMER_CHANNLE)) {
             scheduleBatchReqSt.setOperateType(ConstantUtil.TIMER_OPERATOR);
         }
@@ -285,7 +285,7 @@ public class StAssignTeacherService {
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuId(studentId,
                 teacherId, StStudentSchema.CourseType.getEnum(skuId));
         if (null == stStudentSchema) {
-            logger.info("@@@@assign-teacher 指定老师 stp-2:::检查该学生的上课模式:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>当前学生以前未指定过老师}",
+            logger.info("@@@@assign 指定老师 stp-2:::检查该学生的上课模式:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>当前学生以前未指定过老师}",
                     studentId, teacherId, skuId);
             stStudentSchema = new StStudentSchema();
             stStudentSchema.setCreateTime(new Date());
@@ -295,7 +295,7 @@ public class StAssignTeacherService {
             stStudentSchema.setTeacherId(teacherId);
             stStudentSchema.setSkuId(StStudentSchema.CourseType.getEnum(skuId));
         } else {
-            logger.info("@@@@assign-teacher 指定老师 stp-2:::检查该学生的上课模式:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>当前学生以前定过老师:{}",
+            logger.info("@@@@assign 指定老师 stp-2:::检查该学生的上课模式:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>当前学生以前定过老师:{}",
                     studentId, teacherId, skuId, stStudentSchema.getTeacherId());
             stStudentSchema.setStSchema(StStudentSchema.StSchema.assgin);
             stStudentSchema.setTeacherId(teacherId);
