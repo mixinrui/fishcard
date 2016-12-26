@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -59,4 +60,8 @@ public class ScheduleModelSt implements Serializable{
         this.workOrderId = courseSchedule.getWorkorderId();
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 }

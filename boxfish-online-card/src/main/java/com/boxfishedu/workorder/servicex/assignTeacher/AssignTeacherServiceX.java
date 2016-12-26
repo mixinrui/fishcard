@@ -79,11 +79,14 @@ public class AssignTeacherServiceX {
      * @return
      */
     public JsonResultModel maualAssign(Long teacherId, Long studentId,Integer skuId){
-        logger.info("指定老师stp-1::::::======>>>APP端学生ID{}===>>>>发起指定老师{}===>>skuId{}",studentId,teacherId,skuId);
+        logger.info("@@@@assign 指定老师stp-1::::::======>>>APP端学生ID{}===>>>>发起指定老师{}===>>skuId{}=====>>>channel::{}",studentId,teacherId,skuId,"手动");
         Date startTime = DateTime.now().plusHours(48).toDate();
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.
                 findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
-        stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules, ConstantUtil.STUDENT_CHANNLE,skuId);
+        if(Collections3.isNotEmpty(aggressorCourseSchedules)){
+            stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules, ConstantUtil.STUDENT_CHANNLE,skuId);
+        }
+
         return JsonResultModel.newJsonResultModel(null);
     }
 
@@ -95,9 +98,13 @@ public class AssignTeacherServiceX {
      * @return
      */
     public JsonResultModel teacherAccept(Long teacherId,Long studentId,List<Long> workOrderIds){
+
         Integer skuId = stStudentSchemaJpaRepository.findByStudentIdAndTeacherId(studentId,teacherId).getSkuId().ordinal();
+        logger.info("@@@@assign 指定老师stp-1::::::======>>>APP端学生ID{}===>>>>发起指定老师{}===>>skuId{}=====>>>channel::{}",studentId,teacherId,skuId,"老师接受");
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(workOrderIds);
-        stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,ConstantUtil.TEACHER_CHANNLE,skuId);
+        if(Collections3.isNotEmpty(aggressorCourseSchedules)){
+            stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules, ConstantUtil.TEACHER_CHANNLE,skuId);
+        }
         return JsonResultModel.newJsonResultModel(null);
 
     }
@@ -106,7 +113,7 @@ public class AssignTeacherServiceX {
      *
      */
     public void autoAssign(){
-        logger.info("<定时任务>指定老师stp-1::::::开始==================");
+        logger.info("@@@@assign <定时任务>指定老师stp-1::::::开始==================");
         List<StStudentSchema> list = stStudentSchemaJpaRepository.findByStSchema(StStudentSchema.StSchema.assgin);
         Date startTime = DateTime.now().plusHours(48).toDate();
         List<CourseSchedule> aggressorCourseSchedules = null;
@@ -115,7 +122,7 @@ public class AssignTeacherServiceX {
                     findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(stStudentSchema.getStudentId(),
                             startTime,0,stStudentSchema.getTeacherId());//TODO 发起指定老师的学生的48小时候的课表
             if(Collections3.isNotEmpty(aggressorCourseSchedules)){
-                logger.info("指定老师 <定时任务> stp-1::::::======>>>学生ID{}===>>>>指定老师{}===>>skuId{}",
+                logger.info("@@@@assign 指定老师 <定时任务> stp-1::::::======>>>学生ID{}===>>>>指定老师{}===>>skuId{}",
                         stStudentSchema.getStudentId(),stStudentSchema.getTeacherId(),stStudentSchema.getSkuId().ordinal());
                 stAssignTeacherService.doAssignTeacher(stStudentSchema.getTeacherId(),stStudentSchema.getStudentId(),
                         aggressorCourseSchedules,ConstantUtil.TIMER_CHANNLE,stStudentSchema.getSkuId().ordinal());
