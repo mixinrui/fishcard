@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.param;
 
 import lombok.Data;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -23,5 +24,8 @@ public class ScheduleBatchReqSt implements Serializable{
     private String operateType;//auto 自动 manual手动
     @Size(min = 1,message = "课程规划数据不能为空")
     private List<com.boxfishedu.workorder.web.param.bebase3.ScheduleModelSt> scheduleModelList;
-
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 }
