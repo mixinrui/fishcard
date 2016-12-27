@@ -138,7 +138,7 @@ public class TimePickerServiceXV1 {
 
 
     public JsonResultModel ensureCourseTimesv2(TimeSlotParam timeSlotParam) throws BoxfishException {
-        logger.info("客户端发起选课请求;参数:[{}]", JacksonUtil.toJSon(timeSlotParam));
+        logger.info("ensureCourseTimesv2客户端发起选课请求;参数:[{}]", JacksonUtil.toJSon(timeSlotParam));
 
         //根据订单id,type获取对应的服务
         List<Service> serviceList = ensureConvertOver(timeSlotParam);
