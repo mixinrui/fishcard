@@ -190,10 +190,10 @@ public class StAssignTeacherService {
                 courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
             }
             logger.info("@@@@assign 指定老师 stp-2::::通知更新群组:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",
-                    studentId, teacherId, skuId, workOrders.toArray());
+                    studentId, teacherId, skuId, Collections3.extractToList(workOrders,"id"));
             notifyOthers(workOrders);
             logger.info("@@@@assign 指定老师 stp-2::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",
-                    studentId, teacherId, skuId, workOrders.toArray());
+                    studentId, teacherId, skuId, Collections3.extractToList(workOrders,"id"));
             changeTeacherLog(workOrders);
             if(Collections3.isNotEmpty(needFireWorkOrderIds)){
                 logger.info("@@@@assign 指定老师 stp-2:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>需要被释放的的鱼卡IDS{}",studentId, teacherId, skuId, needFireWorkOrderIds.toArray());
