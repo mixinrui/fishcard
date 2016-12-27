@@ -137,7 +137,9 @@ public class StAssignTeacherService {
         if (Collections3.isEmpty(scheduleModelStList)) {
             throw new BusinessException("请求师生运营系统匹配老师返回数据空");
         }
+
         List<Long> macthedWorkOrderIdList = Lists.newArrayList();
+        List<Long> unmacthedWorkOrderIdList = Lists.newArrayList();
         List<Long> wait2applyWorkOrderIdList = Lists.newArrayList();
         List<ScheduleModelSt> macthedList = Lists.newArrayList();
         List<ScheduleModelSt> wait2applyList = Lists.newArrayList();
@@ -147,15 +149,18 @@ public class StAssignTeacherService {
                 macthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.un_matched){
                 wait2applyList.add(scheduleModelSt);
+                unmacthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
                 wait2applyList.add(scheduleModelSt);
                 wait2applyWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }
         }
-        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中匹配上信息:{}",
+        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中MATCHED上信息:{}",
                 studentId,  macthedWorkOrderIdList);
         logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中WAIT2APPLY 信息:{}",
                 studentId, wait2applyWorkOrderIdList);
+        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中UNMATCHED 信息:{}",
+                studentId, unmacthedWorkOrderIdList);
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
             makeApplyRecords(teacherId, studentId, wait2applyList,skuId);
         } else if (channel.equals(ConstantUtil.TEACHER_CHANNLE)) {
