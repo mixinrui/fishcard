@@ -1,14 +1,13 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.Service;
-import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
@@ -85,6 +84,10 @@ public class TimePickerServiceXV1 {
 
     @Autowired
     private DataCollectorService dataCollectorService;
+
+
+    @Autowired
+    private StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
 
     /**
      * 学生选择时间
@@ -166,10 +169,11 @@ public class TimePickerServiceXV1 {
 
 
         //判断是否指定过老师
-        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(timeSlotParam.getStudentId(),timeSlotParam.getSkuId() );
+        //StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(timeSlotParam.getStudentId(),timeSlotParam.getSkuId() );
 
-        logger.info("ensureCourseTimesv2:stStudentApplyRecords [{}],studentId [{}],orderId [{}]",stStudentApplyRecords,timeSlotParam.getStudentId(),timeSlotParam.getOrderId());
-        if(null == stStudentApplyRecords){
+        StStudentSchema stStudentSchema  =  stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(timeSlotParam.getStudentId(),StStudentSchema.StSchema.assgin,StStudentSchema.CourseType.getEnum(timeSlotParam.getSkuId()));
+        logger.info("ensureCourseTimesv2:stStudentSchema [{}],studentId [{}],orderId [{}]",stStudentSchema,timeSlotParam.getStudentId(),timeSlotParam.getOrderId());
+        if(null == stStudentSchema){
             // 分配老师
             timePickerService.getRecommandTeachers(serviceList.get(0), courseSchedules);
         }

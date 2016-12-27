@@ -342,24 +342,28 @@ public class AssignTeacherService {
         if (studentId == null || null == skuId) {
             throw new BusinessException("课程信息有误");
         }
-        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(studentId, skuId);
+
+        StStudentSchema stStudentSchema  =  stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(studentId,StStudentSchema.StSchema.assgin,StStudentSchema.CourseType.getEnum(skuId));
+
+//        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(studentId, skuId);
 
         JSONObject jo = new JSONObject();
-        if (stStudentApplyRecords == null) {
+        if (stStudentSchema == null) {
             jo.put("hasAssignTeacher", false);
             return jo;
         }
 
         jo.put("hasAssignTeacher", true);
 
-        Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(stStudentApplyRecords.getTeacherId());
+        Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(stStudentSchema.getTeacherId());
         if (!CollectionUtils.isEmpty(teacherInfoMap)) {
             jo.put("teacherImg", teacherInfoMap.get("figure_url"));
-            jo.put("teacherId", stStudentApplyRecords.getTeacherId());
-            jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
+            jo.put("teacherId", stStudentSchema.getTeacherId());
+            jo.put("sku_id",stStudentSchema.getSkuId());
+            //jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
 
         }
-        jo.put("teacherName", getTeacherName(stStudentApplyRecords.getTeacherId()));
+        jo.put("teacherName", getTeacherName(stStudentSchema.getTeacherId()));
         return jo;
 
     }
