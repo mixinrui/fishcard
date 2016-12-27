@@ -105,21 +105,11 @@ public class AssignTeacherService {
 //            throw new BusinessException("该课程尚未结束");
 //        }
 
-        // 查询schema  学生id  st_schema  sku_id
-        StStudentSchema.CourseType courseType;
-        if (TeachingType.ZHONGJIAO.getCode() == workOrder.getSkuId()) { //中教
-            courseType = StStudentSchema.CourseType.chinese;
-        } else if (TeachingType.WAIJIAO.getCode() == workOrder.getSkuId()) {
-            courseType = StStudentSchema.CourseType.foreign;
-        } else {
-            throw new BusinessException("课程类型有误");
-        }
 
-        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, courseType);
-
-        if (null == stStudentSchema) {
-            List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
-            if (CollectionUtils.isEmpty(listWorkOrders)) {
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(workOrder.getSkuId()));
+        List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
+        if (null == stStudentSchema || !stStudentSchema.getTeacherId().equals(workOrder.getTeacherId()) ) {
+            if (CollectionUtils.isEmpty(listWorkOrders) ) {
                 return null;
             } else {
                 return listWorkOrders;
@@ -327,27 +317,13 @@ public class AssignTeacherService {
         }
 
         // 排序
-        this.getSortOrders(  ((List<StStudentApplyRecords>) results.getContent()));
+       // this.getSortOrders(  ((List<StStudentApplyRecords>) results.getContent()));
         int readNum = stStudentApplyRecordsService.upateReadStatusByStudentId(teacherId, studentId);
         logger.info("getMyClassesByStudentId:num:[{}],teacherId:[{}],studentId:[{}]", readNum, teacherId, studentId);
         return results;
     }
 
 
-
-    private List<StStudentApplyRecords> getSortOrders(List<StStudentApplyRecords> stStudentApplyRecordses){
-        stStudentApplyRecordses.sort(new Comparator<StStudentApplyRecords>() {
-            @Override
-            public int compare(StStudentApplyRecords o1, StStudentApplyRecords o2) {
-                if(o1.getStartTime().after(o2.getStartTime())){
-                    return 0;
-                }
-                return -1;
-            }
-        });
-
-        return stStudentApplyRecordses;
-    }
 
 
     // 11 检查是否还有申请记录
