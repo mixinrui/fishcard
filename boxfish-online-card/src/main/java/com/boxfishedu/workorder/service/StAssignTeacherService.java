@@ -162,11 +162,11 @@ public class StAssignTeacherService {
         logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中UNMATCHED 信息:{}",
                 studentId, unmacthedWorkOrderIdList);
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
-            makeApplyRecords(teacherId, studentId, wait2applyList,skuId);
+            makeApplyRecords(teacherId, studentId, scheduleModelStList,skuId);
         } else if (channel.equals(ConstantUtil.TEACHER_CHANNLE)) {
             changeApplyRecords(studentId, teacherId, macthedList);
         } else if (channel.equals(ConstantUtil.TIMER_CHANNLE)) {
-            makeApplyRecords(teacherId, studentId, wait2applyList, skuId);
+            makeApplyRecords(teacherId, studentId, scheduleModelStList, skuId);
         }
         if (Collections3.isNotEmpty(macthedWorkOrderIdList)) {
             List<WorkOrder> workOrders = workOrderJpaRepository.findWorkOrderAll(macthedWorkOrderIdList);
