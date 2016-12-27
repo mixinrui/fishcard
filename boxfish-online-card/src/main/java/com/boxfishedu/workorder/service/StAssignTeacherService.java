@@ -26,6 +26,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -202,7 +203,7 @@ public class StAssignTeacherService {
             notifyOthers(workOrders);
             logger.info("@@@@assign 指定老师 stp-2::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",
                     studentId, teacherId, skuId, Collections3.extractToList(workOrders,"id"));
-            changeTeacherLog(workOrders);
+            changeTeacherLog(macthedList,teacherId);
             if(Collections3.isNotEmpty(needFireWorkOrderIds)){
                 logger.info("@@@@assign 指定老师 stp-2:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>需要被释放的的鱼卡IDS{}",studentId, teacherId, skuId, needFireWorkOrderIds.toArray());
                 List<WorkOrder> needFireWorkOrders = workOrderJpaRepository.findWorkOrderAll(needFireWorkOrderIds);
@@ -384,20 +385,24 @@ public class StAssignTeacherService {
             stStudentApplyRecordsJpaRepository.save(invalidRecordsList);
         }
     }
+
     /**
-     * 异步 记录日志
-     * @param workOrders
+     *
+     * @param macthedList
+     * @param teacherId
      */
     @Async
-    private void changeTeacherLog(List<WorkOrder> workOrders){
+    private void changeTeacherLog(List<ScheduleModelSt> macthedList,Long teacherId){
         List<WorkOrderLog> workOrderLogs = Lists.newArrayList();
         WorkOrderLog workOrderLog = null;
-        for(WorkOrder workOrder :workOrders){
+        WorkOrder workOrder = null;
+        for(ScheduleModelSt scheduleModelSt :macthedList){
+            workOrder = workOrderJpaRepository.findOne(scheduleModelSt.getWorkOrderId());
             workOrderLog = new WorkOrderLog();
             workOrderLog.setCreateTime(new Date());
-            workOrderLog.setWorkOrderId(workOrder.getId());
+            workOrderLog.setWorkOrderId(scheduleModelSt.getWorkOrderId());
             workOrderLog.setStatus(workOrder.getStatus());
-            workOrderLog.setContent("指定更换教师:" + FishCardStatusEnum.getDesc(workOrder.getStatus()));
+            workOrderLog.setContent(MessageFormat.format("指定更换教师:status={0},指定老师={1},之前信息{2}",FishCardStatusEnum.getDesc(workOrder.getStatus()),teacherId,scheduleModelSt.toString()));
             workOrderLogs.add(workOrderLog);
         }
         workOrderLogMorphiaRepository.save(workOrderLogs);
