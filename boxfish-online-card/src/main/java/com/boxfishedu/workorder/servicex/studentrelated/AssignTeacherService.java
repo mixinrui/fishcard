@@ -66,9 +66,6 @@ public class AssignTeacherService {
     @Autowired
     private StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
 
-    @Autowired
-    private AssignTeacherServiceX assignTeacherServiceX;
-
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
@@ -81,6 +78,9 @@ public class AssignTeacherService {
 
     @Autowired
     private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
+
+    @Autowired
+    private AssignTeacherServiceX assignTeacherServiceX;
 
 
 
@@ -134,9 +134,15 @@ public class AssignTeacherService {
 
 
     //2.1  指定这位老师上课
-    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Long studentId, Long teacherId) {
-        WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
-        return assignTeacherServiceX.maualAssign(teacherId, studentId, workOrder.getSkuId());
+    @Transactional
+    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId,Integer skuIdParameter, Long studentId, Long teacherId) {
+        Integer skuId  = skuIdParameter;
+        if(null!=oldWorkOrderId){
+            WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
+            skuId = workOrder.getSkuId();
+        }
+        assignTeacherServiceX.insertOrUpdateSchema(studentId,teacherId,skuId);
+        return assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
     }
 
     //2 获取指定老师带的课程列表

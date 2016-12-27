@@ -54,14 +54,14 @@ public class StudentAssignTeacherController {
 
     //2.1 指定老师上课按钮(上完课)
     @RequestMapping(value = "/assign/teacher/act", method = RequestMethod.GET)
-    public JsonResultModel assignTeacherAct (Long oldWorkOrderId,
+    public JsonResultModel assignTeacherAct (Long oldWorkOrderId,Integer skuId,
                                                 Long studentId, Long teacherId, Long userId) {
         studentId = userId;
 //        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
 //            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
 //        }
         // 验证重复提交问题
-        JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId, studentId,teacherId);
+        JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId,skuId, studentId,teacherId);
         //
 //        checker.evictRepeatedSubmission(oldWorkOrderId);
         return JsonResultModel.newJsonResultModel("OK");

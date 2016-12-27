@@ -142,4 +142,40 @@ public class AssignTeacherServiceX {
 
 
 
+
+
+
+
+    /**
+     * @param studentId
+     * @param teacherId
+     * @param skuId
+     * @return
+     */
+    public StStudentSchema insertOrUpdateSchema(Long studentId, Long teacherId, Integer skuId) {
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuId(studentId,
+                teacherId, StStudentSchema.CourseType.getEnum(skuId));
+        if (null == stStudentSchema) {
+            logger.info("@@@@assign 指定老师 stp-2:::检查该学生的上课模式:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>当前学生以前未指定过老师}",
+                    studentId, teacherId, skuId);
+            stStudentSchema = new StStudentSchema();
+            stStudentSchema.setCreateTime(new Date());
+            stStudentSchema.setUpdateTime(new Date());
+            stStudentSchema.setStSchema(StStudentSchema.StSchema.assgin);
+            stStudentSchema.setStudentId(studentId);
+            stStudentSchema.setTeacherId(teacherId);
+            stStudentSchema.setSkuId(StStudentSchema.CourseType.getEnum(skuId));
+        } else {
+            logger.info("@@@@assign 指定老师 stp-2:::检查该学生的上课模式:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>当前学生以前定过老师:{}",
+                    studentId, teacherId, skuId, stStudentSchema.getTeacherId());
+            stStudentSchema.setStSchema(StStudentSchema.StSchema.assgin);
+            stStudentSchema.setTeacherId(teacherId);
+            stStudentSchema.setUpdateTime(new Date());
+            stStudentSchema.setSkuId(StStudentSchema.CourseType.getEnum(skuId));
+        }
+        stStudentSchemaJpaRepository.save(stStudentSchema);
+        return stStudentSchema;
+    }
+
+
 }
