@@ -67,7 +67,7 @@ public class StAssignTeacherService {
     @Transactional
     public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,
                                 String channel, Integer skuId) {
-        checkSchema(studentId, teacherId, skuId);
+//        checkSchema(studentId, teacherId, skuId);
         if(Collections3.isEmpty(aggressorCourseSchedules)){
             logger.info("@@@@assign 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                             "===>>skuId:{}=====>>channel:{}====>>没有数据!!!!!!!!!!",
@@ -281,7 +281,7 @@ public class StAssignTeacherService {
      * @param skuId
      * @return
      */
-    public StStudentSchema checkSchema(Long studentId, Long teacherId, Integer skuId) {
+/*    private StStudentSchema checkSchema(Long studentId, Long teacherId, Integer skuId) {
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuId(studentId,
                 teacherId, StStudentSchema.CourseType.getEnum(skuId));
         if (null == stStudentSchema) {
@@ -304,7 +304,7 @@ public class StAssignTeacherService {
         }
         stStudentSchemaJpaRepository.save(stStudentSchema);
         return stStudentSchema;
-    }
+    }*/
 
     /**
      * @param teacherId
