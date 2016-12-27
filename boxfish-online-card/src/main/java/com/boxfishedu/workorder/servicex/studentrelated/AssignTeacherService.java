@@ -26,6 +26,7 @@ import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,27 +173,9 @@ public class AssignTeacherService {
         List<Long> workOrderIds = Collections3.extractToList(courseSchedules,"workorderId");
         List<StStudentApplyRecords>  stStudentApplyRecordses =  stStudentApplyRecordsJpaRepository.findByWorkOrderIdIn(workOrderIds);
 
+        Map<Long,StStudentApplyRecords.MatchStatus> map = Collections3.extractToMap(stStudentApplyRecordses,"workOrderId","matchStatus");
         ((List<CourseSchedule>) page.getContent()).forEach(courseSchedule -> {
-
-            if(CollectionUtils.isEmpty(stStudentApplyRecordses)){
-                courseSchedule.setMatchStatus(0); //等待确认
-            }else {
-                for(StStudentApplyRecords stStudentApplyRecords:stStudentApplyRecordses){
-                    if(stStudentApplyRecords.getWorkOrderId() .equals(  courseSchedule.getWorkorderId())){
-                       if(  stStudentApplyRecords.getMatchStatus() .equals(StStudentApplyRecords.MatchStatus.matched) ){
-                           courseSchedule.setMatchStatus(1); //匹配成功
-                       }else {
-                           courseSchedule.setMatchStatus(0); //等待确认
-                       }
-                       break;
-                    }
-                }
-                if(null==courseSchedule.getMatchStatus()){
-                    courseSchedule.setMatchStatus(0); //等待确认
-                }
-            }
-
-
+            courseSchedule.setMatchStatus(map.get(courseSchedule.getWorkorderId())==StStudentApplyRecords.MatchStatus.matched?1:0);
         });
     }
 
