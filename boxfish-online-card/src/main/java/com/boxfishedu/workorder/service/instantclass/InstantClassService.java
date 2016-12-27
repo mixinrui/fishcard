@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service.instantclass;
 
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -94,7 +95,7 @@ public class InstantClassService {
 
             InstantClassCard instantClassCard = instantClassUpdatorService
                     .resetInstantCard(instantClassCardOptional.get()
-                                                              .getId(), 0, InstantClassRequestStatus.WAIT_TO_MATCH);
+                            .getId(), 0, InstantClassRequestStatus.WAIT_TO_MATCH);
 
             instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard, false);
 
@@ -140,7 +141,7 @@ public class InstantClassService {
      */
     private Long getRoleId() {
         return new Long(CourseType2TeachingTypeService
-                                .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType())));
+                .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType())));
     }
 
     //当无对应的鱼卡数据时候,获取第一条数据
@@ -201,11 +202,11 @@ public class InstantClassService {
     private Optional<TimeSlots> getMostSimilarSlot(DayTimeSlots dayTimeSlots) {
         LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30);
         return dayTimeSlots.getDailyScheduleTime().stream()
-                           .filter(timeSlot -> nextSlotTime.isAfter(
-                                   DateUtil.string2LocalDateTime(String.join(
-                                           " ", DateUtil.date2SimpleString(new Date())
-                                           , timeSlot.getStartTime()))))
-                           .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
+                .filter(timeSlot -> nextSlotTime.isAfter(
+                        DateUtil.string2LocalDateTime(String.join(
+                                " ", DateUtil.date2SimpleString(new Date())
+                                , timeSlot.getStartTime()))))
+                .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
     }
 
     public Optional<InstantClassCard> getClassCardByStudentIdAndTimeParam(TimeSlots timeSlots) {
@@ -265,10 +266,16 @@ public class InstantClassService {
             instantClassCard.setOrderId(getInstantRequestParam().getOrderId());
             instantClassCard.setProductType(getInstantRequestParam().getProductType());
             instantClassCard.setComboType(getInstantRequestParam().getComboType());
-            instantClassCard.setRoleId(TeachingType.WAIJIAO.getCode());
+            instantClassCard.setRoleId(this.getTeachingCode());
         }
         instantClassCard.setStatus(InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
         return instantClassCard;
+    }
+
+    private int getTeachingCode() {
+        return TeachingType.tutorType2TeachingType(
+                TutorTypeEnum.getByValue(
+                        getInstantRequestParam().getTutorType())).getCode();
     }
 
     private RecommandCourseView getCourseInfo() {
