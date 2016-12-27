@@ -32,6 +32,7 @@ public class RemoteService {
             ScheduleBatchReqSt scheduleBatchReqSt = jsonResultModel.getData(ScheduleBatchReqSt.class);
             return scheduleBatchReqSt;
         }catch (Exception e){
+            e.printStackTrace();
             throw new BusinessException("@@@@assign-teacher 指定老师:::::::::请求师生运营系统匹配老师异常");
         }
 
