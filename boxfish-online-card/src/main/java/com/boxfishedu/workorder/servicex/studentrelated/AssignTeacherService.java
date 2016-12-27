@@ -178,7 +178,7 @@ public class AssignTeacherService {
                 courseSchedule.setMatchStatus(0); //等待确认
             }else {
                 for(StStudentApplyRecords stStudentApplyRecords:stStudentApplyRecordses){
-                    if(stStudentApplyRecords.getWorkOrderId() == courseSchedule.getWorkorderId()){
+                    if(stStudentApplyRecords.getWorkOrderId() .equals(  courseSchedule.getWorkorderId())){
                        if(  stStudentApplyRecords.getMatchStatus() .equals(StStudentApplyRecords.MatchStatus.matched) ){
                            courseSchedule.setMatchStatus(1); //匹配成功
                        }else {

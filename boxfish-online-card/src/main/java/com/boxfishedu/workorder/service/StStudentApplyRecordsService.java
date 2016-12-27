@@ -47,7 +47,7 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
 
 
     public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date,Date startTime,Date endTime, Pageable pageable){
-        return  jpa.getmyInviteList(teacherId,date,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree,startTime,endTime, pageable);
+        return  jpa.getmyInviteList(teacherId,date,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree,startTime,endTime,StStudentApplyRecords.MatchStatus.matched, pageable);
     }
 
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Date startTime,Date endTime,Pageable pageable){
