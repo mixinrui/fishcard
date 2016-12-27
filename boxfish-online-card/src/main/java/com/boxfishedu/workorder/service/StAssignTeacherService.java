@@ -153,7 +153,7 @@ public class StAssignTeacherService {
             }
         }
         logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中匹配上信息:{}",
-                studentId,  wait2applyWorkOrderIdList);
+                studentId,  macthedWorkOrderIdList);
         logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中WAIT2APPLY 信息:{}",
                 studentId, wait2applyWorkOrderIdList);
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
