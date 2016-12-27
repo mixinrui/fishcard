@@ -22,6 +22,7 @@ public class ScheduleBatchReqSt implements Serializable{
     private String assginTeacherName;
 
     private String operateType;//auto 自动 manual手动
+    private Integer roleId;
     @Size(min = 1,message = "课程规划数据不能为空")
     private List<com.boxfishedu.workorder.web.param.bebase3.ScheduleModelSt> scheduleModelList;
     @Override

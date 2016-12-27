@@ -117,7 +117,7 @@ public class StAssignTeacherService {
             }
 
         }
-        ScheduleBatchReqSt scheduleBatchReqSt = match(studentId, teacherId, aggressorCourseSchedules,
+        ScheduleBatchReqSt scheduleBatchReqSt = match(studentId, teacherId,skuId, aggressorCourseSchedules,
                 victimCourseSchedulesFinalMap,assignedCourseSchedulesMap, channel);
 
         logger.info("@@@@assign 指定老师 stp-2:::请求师生运营:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
@@ -237,7 +237,7 @@ public class StAssignTeacherService {
      * @param victimCourseSchedules
      * @return
      */
-    private ScheduleBatchReqSt match(Long studentId, Long teacherId, List<CourseSchedule> aggressorCourseSchedules,
+    private ScheduleBatchReqSt match(Long studentId, Long teacherId,Integer roleId, List<CourseSchedule> aggressorCourseSchedules,
                                      Map<String,CourseSchedule> victimCourseSchedules,Map<String,CourseSchedule> assignedCourseSchedulesMap,String channel) {
         ScheduleBatchReqSt scheduleBatchReqSt = new ScheduleBatchReqSt();
         List<ScheduleModelSt> scheduleModelSts = Lists.newArrayList();
@@ -275,6 +275,7 @@ public class StAssignTeacherService {
 
             scheduleModelSts.add(scheduleModelSt);
         }
+        scheduleBatchReqSt.setRoleId(roleId);
         scheduleBatchReqSt.setUserId(studentId);
         scheduleBatchReqSt.setAssginTeacherId(teacherId);
 
