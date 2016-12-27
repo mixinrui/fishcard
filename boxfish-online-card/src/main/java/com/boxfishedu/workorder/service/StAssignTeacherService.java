@@ -137,6 +137,9 @@ public class StAssignTeacherService {
         if (Collections3.isEmpty(scheduleModelStList)) {
             throw new BusinessException("请求师生运营系统匹配老师返回数据空");
         }
+        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中teacherId:{}===>>>匹配外层信息:{}",
+                studentId, responseScheduleBatchReqSt.getAssginTeacherId(), responseScheduleBatchReqSt.toString());
+
 
         List<Long> macthedWorkOrderIdList = Lists.newArrayList();
         List<Long> unmacthedWorkOrderIdList = Lists.newArrayList();
@@ -145,21 +148,26 @@ public class StAssignTeacherService {
         List<ScheduleModelSt> wait2applyList = Lists.newArrayList();
         for (ScheduleModelSt scheduleModelSt : scheduleModelStList) {
             if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.matched) {
+                logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中MATCHED上信息:{}",
+                        studentId, scheduleModelSt.toString());
                 macthedList.add(scheduleModelSt);
                 macthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.un_matched){
                 wait2applyList.add(scheduleModelSt);
                 unmacthedWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }else if (scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
+                logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中其中WAIT2APPLY上信息:{}",
+                        studentId, scheduleModelSt.toString());
                 wait2applyList.add(scheduleModelSt);
                 wait2applyWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
             }
         }
-        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中MATCHED上信息:{}",
+
+        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中MATCHED上--鱼卡IDS:{}",
                 studentId,  macthedWorkOrderIdList);
-        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中WAIT2APPLY 信息:{}",
+        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中WAIT2APPLY --鱼卡IDS:{}",
                 studentId, wait2applyWorkOrderIdList);
-        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中UNMATCHED 信息:{}",
+        logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中UNMATCHED --鱼卡IDS:{}",
                 studentId, unmacthedWorkOrderIdList);
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
             makeApplyRecords(teacherId, studentId, scheduleModelStList,skuId);
@@ -314,14 +322,14 @@ public class StAssignTeacherService {
     /**
      * @param teacherId
      * @param studentId
-     * @param wait2applyList
+     * @param list
      */
     @Transactional
-    public void makeApplyRecords(Long teacherId, Long studentId,List<ScheduleModelSt> wait2applyList,Integer skuId) {
+    public void makeApplyRecords(Long teacherId, Long studentId,List<ScheduleModelSt> list,Integer skuId) {
         StStudentApplyRecords stStudentApplyRecords = null;
         List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
         Date now = new Date();
-        for (ScheduleModelSt scheduleModelSt : wait2applyList) {
+        for (ScheduleModelSt scheduleModelSt : list) {
             stStudentApplyRecords = new StStudentApplyRecords();
             stStudentApplyRecords.setTeacherId(teacherId);
             stStudentApplyRecords.setStudentId(studentId);
