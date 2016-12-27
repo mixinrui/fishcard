@@ -38,10 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -328,9 +325,28 @@ public class AssignTeacherService {
             });
 
         }
+
+        // 排序
+        this.getSortOrders(  ((List<StStudentApplyRecords>) results.getContent()));
         int readNum = stStudentApplyRecordsService.upateReadStatusByStudentId(teacherId, studentId);
         logger.info("getMyClassesByStudentId:num:[{}],teacherId:[{}],studentId:[{}]", readNum, teacherId, studentId);
         return results;
+    }
+
+
+
+    private List<StStudentApplyRecords> getSortOrders(List<StStudentApplyRecords> stStudentApplyRecordses){
+        stStudentApplyRecordses.sort(new Comparator<StStudentApplyRecords>() {
+            @Override
+            public int compare(StStudentApplyRecords o1, StStudentApplyRecords o2) {
+                if(o1.getStartTime().after(o2.getStartTime())){
+                    return 0;
+                }
+                return -1;
+            }
+        });
+
+        return stStudentApplyRecordses;
     }
 
 
