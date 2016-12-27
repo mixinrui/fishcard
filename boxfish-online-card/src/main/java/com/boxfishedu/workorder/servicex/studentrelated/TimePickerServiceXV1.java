@@ -171,8 +171,9 @@ public class TimePickerServiceXV1 {
         //判断是否指定过老师
         //StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(timeSlotParam.getStudentId(),timeSlotParam.getSkuId() );
 
+        logger.info("ensureCourseTimesv2,studentId [{}],orderId [{}]",timeSlotParam.getStudentId(),timeSlotParam.getOrderId());
         StStudentSchema stStudentSchema  =  stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(timeSlotParam.getStudentId(),StStudentSchema.StSchema.assgin,StStudentSchema.CourseType.getEnum(timeSlotParam.getSkuId()));
-        logger.info("ensureCourseTimesv2:stStudentSchema [{}],studentId [{}],orderId [{}]",stStudentSchema,timeSlotParam.getStudentId(),timeSlotParam.getOrderId());
+
         if(null == stStudentSchema){
             // 分配老师
             timePickerService.getRecommandTeachers(serviceList.get(0), courseSchedules);
