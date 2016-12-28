@@ -79,4 +79,15 @@ public enum TeachingType {
         }
     }
 
+    public static TeachingType tutorType2TeachingType(TutorTypeEnum tutorTypeEnum){
+        switch(tutorTypeEnum){
+            case CN:
+                return TeachingType.ZHONGJIAO;
+            case FRN:
+                return TeachingType.WAIJIAO;
+            default:
+                return TeachingType.UNKNOWN;
+        }
+    }
+
 }

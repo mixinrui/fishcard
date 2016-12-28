@@ -55,7 +55,7 @@ public class OrderForm extends BaseEntity {
 
     private Integer validDays;
 
-    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd HH:mm:ss", timezone="GMT")
     private Date expiredDate;
 
 //    @Transient

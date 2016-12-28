@@ -26,6 +26,7 @@ import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -66,9 +64,6 @@ public class AssignTeacherService {
     @Autowired
     private StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
 
-    @Autowired
-    private AssignTeacherServiceX assignTeacherServiceX;
-
 
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
@@ -81,6 +76,9 @@ public class AssignTeacherService {
 
     @Autowired
     private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
+
+    @Autowired
+    private AssignTeacherServiceX assignTeacherServiceX;
 
 
 
@@ -108,21 +106,11 @@ public class AssignTeacherService {
 //            throw new BusinessException("该课程尚未结束");
 //        }
 
-        // 查询schema  学生id  st_schema  sku_id
-        StStudentSchema.CourseType courseType;
-        if (TeachingType.ZHONGJIAO.getCode() == workOrder.getSkuId()) { //中教
-            courseType = StStudentSchema.CourseType.chinese;
-        } else if (TeachingType.WAIJIAO.getCode() == workOrder.getSkuId()) {
-            courseType = StStudentSchema.CourseType.foreign;
-        } else {
-            throw new BusinessException("课程类型有误");
-        }
 
-        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, courseType);
-
-        if (null == stStudentSchema) {
-            List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
-            if (CollectionUtils.isEmpty(listWorkOrders)) {
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(workOrder.getSkuId()));
+        List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
+        if (null == stStudentSchema || !stStudentSchema.getTeacherId().equals(workOrder.getTeacherId()) ) {
+            if (CollectionUtils.isEmpty(listWorkOrders) ) {
                 return null;
             } else {
                 return listWorkOrders;
@@ -134,9 +122,15 @@ public class AssignTeacherService {
 
 
     //2.1  指定这位老师上课
-    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Long studentId, Long teacherId) {
-        WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
-        return assignTeacherServiceX.maualAssign(teacherId, studentId, workOrder.getSkuId());
+    @Transactional
+    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId,Integer skuIdParameter, Long studentId, Long teacherId) {
+        Integer skuId  = skuIdParameter;
+        if(null!=oldWorkOrderId){
+            WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
+            skuId = workOrder.getSkuId();
+        }
+        assignTeacherServiceX.insertOrUpdateSchema(studentId,teacherId,skuId);
+        return assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
     }
 
     //2 获取指定老师带的课程列表
@@ -179,27 +173,9 @@ public class AssignTeacherService {
         List<Long> workOrderIds = Collections3.extractToList(courseSchedules,"workorderId");
         List<StStudentApplyRecords>  stStudentApplyRecordses =  stStudentApplyRecordsJpaRepository.findByWorkOrderIdIn(workOrderIds);
 
+        Map<Long,StStudentApplyRecords.MatchStatus> map = Collections3.extractToMap(stStudentApplyRecordses,"workOrderId","matchStatus");
         ((List<CourseSchedule>) page.getContent()).forEach(courseSchedule -> {
-
-            if(CollectionUtils.isEmpty(stStudentApplyRecordses)){
-                courseSchedule.setMatchStatus(0); //等待确认
-            }else {
-                for(StStudentApplyRecords stStudentApplyRecords:stStudentApplyRecordses){
-                    if(stStudentApplyRecords.getWorkOrderId() == courseSchedule.getWorkorderId()){
-                       if(  stStudentApplyRecords.getMatchStatus() .equals(StStudentApplyRecords.MatchStatus.matched) ){
-                           courseSchedule.setMatchStatus(1); //匹配成功
-                       }else {
-                           courseSchedule.setMatchStatus(0); //等待确认
-                       }
-                       break;
-                    }
-                }
-                if(null==courseSchedule.getMatchStatus()){
-                    courseSchedule.setMatchStatus(0); //等待确认
-                }
-            }
-
-
+            courseSchedule.setMatchStatus(map.get(courseSchedule.getWorkorderId())==StStudentApplyRecords.MatchStatus.matched?1:0);
         });
     }
 
@@ -322,10 +298,15 @@ public class AssignTeacherService {
             });
 
         }
+
+        // 排序
+       // this.getSortOrders(  ((List<StStudentApplyRecords>) results.getContent()));
         int readNum = stStudentApplyRecordsService.upateReadStatusByStudentId(teacherId, studentId);
         logger.info("getMyClassesByStudentId:num:[{}],teacherId:[{}],studentId:[{}]", readNum, teacherId, studentId);
         return results;
     }
+
+
 
 
     // 11 检查是否还有申请记录
@@ -342,24 +323,28 @@ public class AssignTeacherService {
         if (studentId == null || null == skuId) {
             throw new BusinessException("课程信息有误");
         }
-        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(studentId, skuId);
+
+        StStudentSchema stStudentSchema  =  stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(studentId,StStudentSchema.StSchema.assgin,StStudentSchema.CourseType.getEnum(skuId));
+
+//        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(studentId, skuId);
 
         JSONObject jo = new JSONObject();
-        if (stStudentApplyRecords == null) {
+        if (stStudentSchema == null) {
             jo.put("hasAssignTeacher", false);
             return jo;
         }
 
         jo.put("hasAssignTeacher", true);
 
-        Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(stStudentApplyRecords.getTeacherId());
+        Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(stStudentSchema.getTeacherId());
         if (!CollectionUtils.isEmpty(teacherInfoMap)) {
             jo.put("teacherImg", teacherInfoMap.get("figure_url"));
-            jo.put("teacherId", stStudentApplyRecords.getTeacherId());
-            jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
+            jo.put("teacherId", stStudentSchema.getTeacherId());
+            jo.put("sku_id",stStudentSchema.getSkuId());
+            //jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
 
         }
-        jo.put("teacherName", getTeacherName(stStudentApplyRecords.getTeacherId()));
+        jo.put("teacherName", getTeacherName(stStudentSchema.getTeacherId()));
         return jo;
 
     }

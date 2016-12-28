@@ -1,14 +1,13 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.Service;
-import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
@@ -86,6 +85,10 @@ public class TimePickerServiceXV1 {
     @Autowired
     private DataCollectorService dataCollectorService;
 
+
+    @Autowired
+    private StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
+
     /**
      * 学生选择时间
      * @param timeSlotParam
@@ -135,7 +138,7 @@ public class TimePickerServiceXV1 {
 
 
     public JsonResultModel ensureCourseTimesv2(TimeSlotParam timeSlotParam) throws BoxfishException {
-        logger.info("客户端发起选课请求;参数:[{}]", JacksonUtil.toJSon(timeSlotParam));
+        logger.info("ensureCourseTimesv2客户端发起选课请求;参数:[{}]", JacksonUtil.toJSon(timeSlotParam));
 
         //根据订单id,type获取对应的服务
         List<Service> serviceList = ensureConvertOver(timeSlotParam);
@@ -166,10 +169,12 @@ public class TimePickerServiceXV1 {
 
 
         //判断是否指定过老师
-        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(timeSlotParam.getStudentId(),timeSlotParam.getSkuId() );
+        //StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(timeSlotParam.getStudentId(),timeSlotParam.getSkuId() );
 
-        logger.info("ensureCourseTimesv2:stStudentApplyRecords [{}],studentId [{}],orderId [{}]",stStudentApplyRecords,timeSlotParam.getStudentId(),timeSlotParam.getOrderId());
-        if(null == stStudentApplyRecords){
+        logger.info("ensureCourseTimesv2,studentId [{}],orderId [{}]",timeSlotParam.getStudentId(),timeSlotParam.getOrderId());
+        StStudentSchema stStudentSchema  =  stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(timeSlotParam.getStudentId(),StStudentSchema.StSchema.assgin,StStudentSchema.CourseType.getEnum(timeSlotParam.getSkuId()));
+
+        if(null == stStudentSchema){
             // 分配老师
             timePickerService.getRecommandTeachers(serviceList.get(0), courseSchedules);
         }

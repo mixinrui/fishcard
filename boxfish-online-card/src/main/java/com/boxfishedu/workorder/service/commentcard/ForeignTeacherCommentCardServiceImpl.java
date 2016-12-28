@@ -19,6 +19,7 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -620,7 +621,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 DateUtil.convertToDate(now.plusDays(3)),
                 DateUtil.convertToDate(now.plusDays(4)),
                 UserTypeEnum.GENERAL_MEMBER.type());
-        pushExpireMessage(studentIds);
+        if(CollectionUtils.isNotEmpty(studentIds)) {
+            pushExpireMessage(studentIds);
+        }
     }
 
     // 推送
