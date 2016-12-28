@@ -86,8 +86,8 @@ public class InstantClassController {
             JsonResultModel jsonResultModel = teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
             return jsonResultModel;
         } catch (Exception ex) {
-            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
-                    .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
+            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(
+                    InstantClassResult.newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
             logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII  grabresult ,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
                     , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel), ex);
             return jsonResultModel;
@@ -115,7 +115,7 @@ public class InstantClassController {
      */
     @RequestMapping(value = "/service/student/instant/timerange", method = RequestMethod.GET)
     public JsonResultModel timeRange(Long userId) {
-        logger.debug("timeRange用户id:[{}]",userId);
+        logger.debug("timeRange用户id:[{}]", userId);
         String timeDesc = instantClassServiceX.timeRange(userId);
         if (StringUtils.isEmpty(timeDesc)) {
             return JsonResultModel.newJsonResultModel(null);

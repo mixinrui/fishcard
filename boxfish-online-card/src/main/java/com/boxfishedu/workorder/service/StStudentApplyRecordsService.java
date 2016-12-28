@@ -36,7 +36,7 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
 
 
    public Integer getUnreadInvitedNum(Long teacherId, Date date,Date beginDate,Date endDate){
-       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree,   beginDate,endDate);
+       Optional<Long> unread = jpa.getUnreadInvitedNum(teacherId,date, StStudentApplyRecords.ReadStatus.no,StStudentApplyRecords.VALID.yes,StStudentApplyRecords.ApplyStatus.agree,   beginDate,endDate,StStudentApplyRecords.MatchStatus.matched);
         return unread.isPresent()?unread.get().intValue():0;
     }
     public List<StStudentApplyRecords> getUnreadStStudentRecords(Long teacherId, Date date){
@@ -51,7 +51,7 @@ public class StStudentApplyRecordsService extends BaseService<StStudentApplyReco
     }
 
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Date startTime,Date endTime,Pageable pageable){
-        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes, StStudentApplyRecords.ApplyStatus.agree, startTime,endTime, pageable);
+        return  jpa.findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(date,teacherId,studentId,StStudentApplyRecords.VALID.yes, StStudentApplyRecords.ApplyStatus.agree, startTime,endTime,StStudentApplyRecords.MatchStatus.matched, pageable);
     }
 
     public List<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId,Long studentId,Date date,Date startTime,Date endTime){
