@@ -82,7 +82,7 @@ public class AssignTeacherServiceX {
         logger.info("@@@@assign 指定老师stp-1::::::======>>>APP端学生ID{}===>>>>发起指定老师{}===>>skuId{}=====>>>channel::{}",studentId,teacherId,skuId,"手动");
         Date startTime = DateTime.now().plusHours(48).toDate();
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.
-                findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
+                findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,skuId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
         if(Collections3.isNotEmpty(aggressorCourseSchedules)){
             stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules, ConstantUtil.STUDENT_CHANNLE,skuId);
         }
@@ -119,8 +119,8 @@ public class AssignTeacherServiceX {
         List<CourseSchedule> aggressorCourseSchedules = null;
         for(StStudentSchema stStudentSchema : list){
             aggressorCourseSchedules = courseScheduleRepository.
-                    findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(stStudentSchema.getStudentId(),
-                            startTime,0,stStudentSchema.getTeacherId());//TODO 发起指定老师的学生的48小时候的课表
+                    findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(stStudentSchema.getStudentId(),
+                            stStudentSchema.getSkuId().ordinal(),startTime,0,stStudentSchema.getTeacherId());//TODO 发起指定老师的学生的48小时候的课表
             if(Collections3.isNotEmpty(aggressorCourseSchedules)){
                 logger.info("@@@@assign 指定老师 <定时任务> stp-1::::::======>>>学生ID{}===>>>>指定老师{}===>>skuId{}",
                         stStudentSchema.getStudentId(),stStudentSchema.getTeacherId(),stStudentSchema.getSkuId().ordinal());

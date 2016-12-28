@@ -95,7 +95,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     @Query("select c from CourseSchedule c,WorkOrder w where c.workorderId=w.id and w.startTime<=?1 and w.courseId is null")
     List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
 
-    List<CourseSchedule> findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(Long studentId,Date startTime,Integer isFreeze,Long teacherId);
+    List<CourseSchedule> findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(Long studentId,Integer roleId,Date startTime,Integer isFreeze,Long teacherId);
     List<CourseSchedule> findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreezeAndRoleId(Long teacherId,List<Integer> TimeslotsList,List<Date> classDateList,Integer isFreeze,Integer roleId);
     List<CourseSchedule> findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleId(Long teacherId,Long studentId,Integer isFreeze,Integer roleId);
 //    findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze
