@@ -243,7 +243,7 @@ public class TeacherStudentRequester {
     }
 
     public void pushTeacherListOnlineMsgnew(JSONObject teachingOnlineListMsg) {
-        String url = String.format("%s/teaching/callback/push", urlConf.getCourse_online_service());
+        String url = String.format("%s/notification/push", urlConf.getMsg_push_url());
         // String url="http://192.168.77.37:9090/teaching/callback/push";
         logger.debug("::::::::::::::::::::::::::::::::@[pushWrappedMsg]向在线教育推送url[{}]::::::::::::::::::::::::::::::::", url);
 

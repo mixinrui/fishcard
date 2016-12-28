@@ -116,15 +116,16 @@ public class CourseChangeServiceX {
      * @param map
      */
     private void pushTeacherList(Map<Long, List<WorkOrder>> map) {
-        List list = Lists.newArrayList();
         for (Long key : map.keySet()) {
+            JSONObject  jsonObject = new JSONObject();
+            JSONObject  jsonObjectData = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+
             String pushTitle = "";
             String pushTitle_bein = WorkOrderConstant.SEND_CHANGE_COURSE_MESSAGE_BEGIN;
             String pushTitle_end = WorkOrderConstant.SEND_CHANGE_COURSE_MESSAGE_END;
-            Map map1 = Maps.newHashMap();
-            JSONArray jsonArray = new JSONArray();
             jsonArray.add(key);
-            map1.put("user_id", jsonArray);
+            jsonObject.put("user_id", jsonArray);
 
 
             if (null == map.get(key)) {
@@ -142,16 +143,15 @@ public class CourseChangeServiceX {
             }
             pushTitle = pushTitle_bein + map.get(key).size() + pushTitle_end;
 
-            map1.put("push_title", pushTitle);//您有N节变更的课
+            jsonObject.put("push_title", pushTitle);//您有N节变更的课
 
-            JSONObject jo = new JSONObject();
-            jo.put("type", MessagePushTypeEnum.SEND_TEASTU_ASSESS_TYPE.toString());
-            jo.put("count", null == map.get(key) ? "0" : map.get(key).size());
+            jsonObjectData.put("type", MessagePushTypeEnum.SEND_TEASTU_ASSESS_TYPE.toString());
+            jsonObjectData.put("count", null == map.get(key) ? "0" : map.get(key).size());
             logger.info(":::::::sendToTecherContent::::pushTitle:[{}]:size[{}]", pushTitle, map.get(key).size());
-            map1.put("data", jo);
+            jsonObject.put("data", jsonObjectData);
 
-            list.add(map1);
+            teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
         }
-        teacherStudentRequester.pushTeacherListOnlineMsg(list);
+
     }
 }
