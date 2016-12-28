@@ -388,7 +388,7 @@ service:
     teacherAbsenceUrl: http://123.56.13.168:8099
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9090/teaching-service
-    innerTeacherUrl: http://123.56.13.168:8099
+    innerTeacherUrl: http://123.56.13.168:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
     type: test
@@ -465,7 +465,7 @@ service:
     teacherAbsenceUrl: http://127.0.0.1:8099
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090/teaching-service
-    innerTeacherUrl: http://127.0.0.1:8099
+    innerTeacherUrl: http://127.0.0.1:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: pretest
@@ -535,7 +535,7 @@ service:
     teacherAbsenceUrl: http://127.0.0.1:8099
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090/teaching-service
-    innerTeacherUrl: http://127.0.0.1:8099
+    innerTeacherUrl: http://127.0.0.1:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: demo
