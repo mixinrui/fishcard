@@ -307,6 +307,13 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         logger.info("notiFyTeahcerchangeStartTime::end");
     }
 
+    public static void main(String[] args) {
+        List list= Lists.newArrayList();
+        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObjectinner = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+    }
+
     /**
      * 开始时间从后天开始
      * @param workOrder
