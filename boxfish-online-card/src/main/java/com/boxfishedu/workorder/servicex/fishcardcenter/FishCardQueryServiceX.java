@@ -31,10 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hucl on 16/5/9.
@@ -91,37 +88,50 @@ public class FishCardQueryServiceX {
         for (WorkOrder workOrder : workOrderList) {
             //未开始
             if (workOrder.getStartTime().after(new Date())) {
-                workOrder.setStudentNetStatus(FishCardNetStatusEnum.UNSTART.getCode());
-                workOrder.setTeacherNetStatus(FishCardNetStatusEnum.UNSTART.getCode());
+                workOrder.addStudentStatus(FishCardNetStatusEnum.UNSTART);
+                workOrder.addTeacherStatus(FishCardNetStatusEnum.UNSTART);
                 continue;
             }
 
             //正在进行
             if (workOrder.getStatus() > FishCardStatusEnum.TEACHER_ASSIGNED.getCode()
                     && !java.util.Objects.equals(new Short((short) 1), workOrder.getIsCourseOver())) {
-                workOrder.setStudentNetStatus(FishCardNetStatusEnum.CLASSING.getCode());
-                workOrder.setTeacherNetStatus(FishCardNetStatusEnum.CLASSING.getCode());
+                workOrder.addStudentStatus(FishCardNetStatusEnum.CLASSING);
+                workOrder.addTeacherStatus(FishCardNetStatusEnum.CLASSING);
                 continue;
             }
 
             //教师网络
             NetPingAnalysisInfo teacherNetInfo = fetchHeartBeatServiceX
                     .getNetAnalysis(workOrder.getId(), workOrder.getStudentId());
+            if (Objects.isNull(teacherNetInfo)) {
+                workOrder.addTeacherStatus(FishCardNetStatusEnum.UNKNOWN);
+            } else {
+                try {
+                    FishCardNetStatusEnum teacherStatusEnum = FishCardNetStatusEnum.anaLysis(
+                            teacherNetInfo, NETWORK_BAD.doubleValue(), NETWORK_GENERAL.doubleValue());
+                    workOrder.addTeacherStatus(teacherStatusEnum);
+                } catch (Exception ex) {
+                    logger.error("教师网络分析失败", ex);
+                    workOrder.addTeacherStatus(FishCardNetStatusEnum.UNKNOWN);
+                }
+            }
 
             //学生网络
             NetPingAnalysisInfo studentNetInfo = fetchHeartBeatServiceX
                     .getNetAnalysis(workOrder.getId(), workOrder.getTeacherId());
-
-            FishCardNetStatusEnum teacherStatusEnum=FishCardNetStatusEnum.anaLysis(
-                    teacherNetInfo, NETWORK_BAD.doubleValue(), NETWORK_GENERAL.doubleValue());
-            workOrder.setTeacherNetStatus(teacherStatusEnum.getCode());
-            workOrder.setTeacherNetStatusDesc(teacherStatusEnum.getDesc());
-
-
-            FishCardNetStatusEnum studentStatusEnum=FishCardNetStatusEnum.anaLysis(
-                    studentNetInfo, NETWORK_BAD.doubleValue(), NETWORK_GENERAL.doubleValue());
-            workOrder.setStudentNetStatus(studentStatusEnum.getCode());
-            workOrder.setStudentNetStatusDesc(studentStatusEnum.getDesc());
+            if (Objects.isNull(studentNetInfo)) {
+                workOrder.addStudentStatus(FishCardNetStatusEnum.UNKNOWN);
+            } else {
+                try {
+                    FishCardNetStatusEnum studentStatusEnum = FishCardNetStatusEnum.anaLysis(
+                            studentNetInfo, NETWORK_BAD.doubleValue(), NETWORK_GENERAL.doubleValue());
+                    workOrder.addStudentStatus(studentStatusEnum);
+                } catch (Exception ex) {
+                    logger.error("教师网络分析失败", ex);
+                    workOrder.addStudentStatus(FishCardNetStatusEnum.UNKNOWN);
+                }
+            }
         }
     }
 

@@ -416,7 +416,7 @@ public class AssignTeacherService {
      * 给老师进行消息推送
      * @param teahcerId
      */
-    private  void pushTeacherList(Long teahcerId) {
+    public void pushTeacherList(Long teahcerId) {
         logger.info("pushTeacherList::begin");
 
         JSONObject  jsonObject = new JSONObject();

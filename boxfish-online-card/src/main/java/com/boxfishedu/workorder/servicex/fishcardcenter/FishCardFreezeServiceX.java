@@ -118,9 +118,9 @@ public class FishCardFreezeServiceX {
     }
 
     private void validateComboTepe(WorkOrder workOrder) {
-        if (!workOrder.getService().getComboType().equals(ComboTypeEnum.EXCHANGE.toString())) {
-            throw new BusinessException("改鱼卡不是金币换课鱼卡");
-        }
+//        if (!workOrder.getService().getComboType().equals(ComboTypeEnum.EXCHANGE.toString())) {
+//            throw new BusinessException("改鱼卡不是金币换课鱼卡");
+//        }
     }
 
     private void validateFreezeDate(WorkOrder workOrder){

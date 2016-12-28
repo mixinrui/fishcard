@@ -115,7 +115,7 @@ public class StudentAssignTeacherController {
     // 5 老师端上课邀请列表
     @RequestMapping(value = "/{teacher_Id}/invitelist/assign", method = RequestMethod.GET)
     public JsonResultModel getInvitedList(@PathVariable("teacher_Id") Long teacherId,@PageableDefault(value = 10, sort = {"applyTime"},
-            direction = Sort.Direction.ASC) Pageable pageable,Long userId){
+            direction = Sort.Direction.DESC) Pageable pageable,Long userId){
         teacherId = userId;
         JSONObject jo = new JSONObject();
         jo.put("baseHours",48);
