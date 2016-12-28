@@ -25,6 +25,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.commentcard.SyncCommentCard2SystemService;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.ResponseCourseView;
@@ -46,6 +47,7 @@ import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -385,15 +387,15 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return JSONObject.parseObject(orderDetailView.getProductInfo(), ProductSKUView.class);
     }
 
-    private void addValidTimeForServices(List<Service> services, OrderForm orderForm) {
+    private void addValidTimeForServices(List<Service> services, OrderForm orderForm) throws ParseException {
         LocalDate now = LocalDate.now();
         for (Service service : services) {
             service.setStartTime(DateUtil.convertToDate(now));
-            if(orderForm.getExpiredDate() != null) {
-                service.setEndTime(orderForm.getExpiredDate());
-            } else {
+            if(StringUtils.isEmpty(orderForm.getExpiredDate())) {
                 // 从购买当天0点算起, 到过期的第一天0点为止
                 service.setEndTime(DateUtil.convertToDate(now.plusDays(service.getValidityDay() + 1)));
+            } else {
+                service.setEndTime(ThreadLocalUtil.dateTimeFormat.get().parse(orderForm.getExpiredDate()));
             }
             logger.info("订单[{}]生成服务类型[{}]成功]", service.getOrderId(), service.getSkuName());
         }

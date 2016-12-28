@@ -29,6 +29,10 @@ public class UrlConf {
     @Value("${interface.address.course_online_service}")
     private String course_online_service;
 
+    @Value("${interface.address.msg_push_url}")
+    private String msg_push_url;
+
+
     @Value("${interface.address.order_service}")
     private String order_service;
 
@@ -67,7 +71,8 @@ public class UrlConf {
     @Value("${interface.address.resource_url}")
     private String resource_url;//登录验证URL
 
-    @Value("${interface.address.msg_push_url}")
-    private String msg_push_url;//登录验证URL
+
+
+
 
 }
