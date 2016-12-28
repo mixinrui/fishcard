@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.bean.FishCardNetStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
@@ -23,7 +24,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "work_order")
 @EqualsAndHashCode(exclude = "workOrderLogs")
-public class WorkOrder implements Cloneable{
+public class WorkOrder implements Cloneable {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -110,12 +111,16 @@ public class WorkOrder implements Cloneable{
     @Transient
     private String statusDesc;
 
-    /**  (TeachingType.WAIJIAO.getCode() ==wo.getSkuId()  **/
-    @Column(name="sku_id")
+    /**
+     * (TeachingType.WAIJIAO.getCode() ==wo.getSkuId()
+     **/
+    @Column(name = "sku_id")
     private Integer skuId;
 
-    /** 更改次数 **/
-    @Column(name="changtime_times")
+    /**
+     * 更改次数
+     **/
+    @Column(name = "changtime_times")
     private Integer changtimeTimes;
 
     //是否补过课
@@ -124,7 +129,7 @@ public class WorkOrder implements Cloneable{
 
 
     @Transient
-    private String  orderTypeDesc;
+    private String orderTypeDesc;
 
     @Transient
     private Integer teachingType;
@@ -141,48 +146,59 @@ public class WorkOrder implements Cloneable{
     private Long parentId;
 
     //被补课的根节点id.增加该字段,提高性能
-    @Column(name="parent_root_id")
+    @Column(name = "parent_root_id")
     private Long parentRootId;
 
     //补课的次序(方便统计,显示)
-    @Column(name="make_up_seq")
+    @Column(name = "make_up_seq")
     private Integer makeUpSeq;
 
     //是否已安排补课 (1 表示已经不过课)
-    @Column(name="make_up_flag")
+    @Column(name = "make_up_flag")
     private Short makeUpFlag;
 
-    @Column(name="is_course_over")
+    @Column(name = "is_course_over")
     private Short isCourseOver;
 
     //order_code字段
-    @Column(name="order_code", length = 128)
+    @Column(name = "order_code", length = 128)
     private String orderCode;
     //0 True 1 False  是否手动修改过
-    @Column(name="update_manul_flag", length = 1)
+    @Column(name = "update_manul_flag", length = 1)
     private String updateManulFlag;
-    /** 关于更改课程 是否发送过消息   1 未发送  0 表示已经发送 **/
+    /**
+     * 关于更改课程 是否发送过消息   1 未发送  0 表示已经发送
+     **/
     @Column(name = "sendflagcc", nullable = true)
     private String sendflagcc;
 
-    /** 更改课程时间  **/
+    /**
+     * 更改课程时间
+     **/
     @Column(name = "updatetime_changecourse", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatetimeChangecourse;
 
-    /** 关于更改课程 是否发送过消息   1 未确认  0 已经确认 **/
+    /**
+     * 关于更改课程 是否发送过消息   1 未确认  0 已经确认
+     **/
     @Column(name = "confirm_flag", nullable = true)
     private String confirmFlag;
 
-    /**  鱼卡退款状态  **/
+    /**
+     * 鱼卡退款状态
+     **/
     @Column(name = "status_recharge", nullable = true)
-    private Integer    statusRecharge;
+    private Integer statusRecharge;
 
-    /**  退款原因  **/
+    /**
+     * 退款原因
+     **/
     @Column(name = "reason_recharge", nullable = true)
     private String reasonRecharge;
 
-    /**  鱼卡退款状态变更时间  **/;
+    /**  鱼卡退款状态变更时间  **/
+    ;
     @Column(name = "updatetime_recharge", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatetimeRecharge;
@@ -199,19 +215,23 @@ public class WorkOrder implements Cloneable{
     private String classType;
 
     @Transient
-    private Boolean freezeBtnShowFlag=false;
+    private Boolean freezeBtnShowFlag = false;
 
     @Transient
     private String tutorType;
 
     //解冻按钮是否显示标记
     @Transient
-    private Boolean unfreezeBtnShowFlag=false;
-    /** 学生旷课扣积分标记**/
-    @Column(name = "deduct_score_status" , nullable = true)
+    private Boolean unfreezeBtnShowFlag = false;
+    /**
+     * 学生旷课扣积分标记
+     **/
+    @Column(name = "deduct_score_status", nullable = true)
     private Integer deductScoreStatus;
 
-    /** 由于假期原因,提示该鱼卡需要更换时间   10 需要更换时间  **/
+    /**
+     * 由于假期原因,提示该鱼卡需要更换时间   10 需要更换时间
+     **/
     @Column(name = "need_change_time", nullable = true)
     private Integer needChangeTime;
 
@@ -271,27 +291,26 @@ public class WorkOrder implements Cloneable{
         setCourseType(courseView.getCourseType());
 
         // 课程ID不为空,状态为分配老师,不予修改状态
-        if(StringUtils.isNotEmpty(courseView.getCourseId()) && (status == FishCardStatusEnum.CREATED.getCode())) {
+        if (StringUtils.isNotEmpty(courseView.getCourseId()) && (status == FishCardStatusEnum.CREATED.getCode())) {
             setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         }
     }
 
     @JsonIgnore
     public int getRecommendSequence() {
-        if(Objects.isNull(seqNum)) {
+        if (Objects.isNull(seqNum)) {
             throw new BusinessException("错误的序列号!!");
         }
 
-        if(seqNum%8==0){
+        if (seqNum % 8 == 0) {
             return 8;
-        }
-        else{
-            return seqNum%8;
+        } else {
+            return seqNum % 8;
         }
     }
 
     @Override
-    public WorkOrder clone(){
+    public WorkOrder clone() {
         WorkOrder prototypeClass = null;
         try {
             prototypeClass = (WorkOrder) super.clone();
@@ -299,5 +318,24 @@ public class WorkOrder implements Cloneable{
             System.out.println("克隆对象失败");
         }
         return prototypeClass;
+    }
+
+    public void addStudentStatus(FishCardNetStatusEnum fishCardNetStatusEnum){
+        this.addNetStatus(fishCardNetStatusEnum,"student");
+    }
+
+    public void addTeacherStatus(FishCardNetStatusEnum fishCardNetStatusEnum){
+        this.addNetStatus(fishCardNetStatusEnum,"teacher");
+    }
+
+    private void addNetStatus(FishCardNetStatusEnum fishCardNetStatusEnum, String role) {
+        if (StringUtils.equals("student", role)) {
+            this.setStudentNetStatus(fishCardNetStatusEnum.getCode());
+            this.setStudentNetStatusDesc(fishCardNetStatusEnum.getDesc());
+        }
+        if (StringUtils.equals("teacher", role)) {
+            this.setTeacherNetStatus(fishCardNetStatusEnum.getCode());
+            this.setTeacherNetStatusDesc(fishCardNetStatusEnum.getDesc());
+        }
     }
 }
