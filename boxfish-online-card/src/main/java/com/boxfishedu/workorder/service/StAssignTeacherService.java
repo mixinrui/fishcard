@@ -164,6 +164,10 @@ public class StAssignTeacherService {
                         studentId, scheduleModelSt.toString());
                 wait2applyList.add(scheduleModelSt);
                 wait2applyWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
+            }else{
+                logger.error("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中鱼卡ID====>>{}=====>>异常匹配信息:{}",
+                        studentId, scheduleModelSt.getWorkOrderId(), scheduleModelSt.toString());
+                scheduleModelSt.setMatchStatus(StStudentApplyRecords.MatchStatus.un_matched);
             }
         }
 
