@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.coursenotify;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
@@ -190,22 +191,22 @@ public class CourseChangeTimeNotifySerceX {
      * @param myClass
      */
     public void pushStudentMessage(List<WorkOrder> myClass) {
-        List list = Lists.newArrayList();
+        JSONObject  jsonObject = new JSONObject();
+        JSONObject  jsonObjectData = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
         long studentId =myClass.get(0).getStudentId();
         logger.info("notiFyStudentChangeTime@pushStudentMessage,studentId=[{}]",studentId);
         String title = getAppNotices(myClass);
         String pushTitle = "";// WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
-        Map map1 = Maps.newHashMap();
-        map1.put("user_id", studentId);
-        map1.put("push_title", title);
+        jsonArray.add(studentId);
+        jsonObject.put("user_id", jsonArray);
+        jsonObject.put("push_title", title);
 
-        JSONObject jo = new JSONObject();
-        jo.put("type", "NOTIFYSTUDENTMESSAGE");
-        map1.put("data",jo);
-        
-        list.add(map1);
-        //map1.put("data", jo);
-        teacherStudentRequester.pushTeacherListOnlineMsg(list);
+        jsonObjectData.put("type", "NOTIFYSTUDENTMESSAGE");
+        jsonObject.put("data",jsonObjectData);
+
+        teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
     }
 
     /**

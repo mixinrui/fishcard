@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service.fishcardcenter;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
@@ -280,27 +281,36 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
      */
     private  void pushTeacherList(Long teahcerId,String startTime) {
         logger.info("notiFyTeahcerchangeStartTime::begin");
-        List list = Lists.newArrayList();
+
+        JSONObject  jsonObject = new JSONObject();
+        JSONObject  jsonObjectData = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
         startTime = DateUtil.Date2ForForeignDate( DateUtil.String2Date( startTime) );
 
         String pushTitle = WorkOrderConstant.SEND_TEACHER_CHANGETIME_BEGIN+startTime+WorkOrderConstant.SEND_TEACHER_CHANGETIME_END;
         Integer count = 1;
-        Map map1 = Maps.newHashMap();
-        map1.put("user_id", teahcerId);
-        map1.put("push_title", pushTitle);
 
-        JSONObject jo = new JSONObject();
+        jsonArray.add(teahcerId);
+        jsonObject.put("user_id", jsonArray);
+
+        jsonObject.put("push_title", pushTitle);
+
         //jo.put("type", MessagePushTypeEnum.SEND_TEACHER_CHANGE_CLASSTIME_TYPE.toString());
-        jo.put("count", count);
-        jo.put("push_title", pushTitle);
+        jsonObjectData.put("count", count);
+        jsonObjectData.put("push_title", pushTitle);
 
-        map1.put("data", jo);
+        jsonObject.put("data", jsonObjectData);
 
-        list.add(map1);
-
-
-        teacherStudentRequester.pushTeacherListOnlineMsg(list);
+        teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
         logger.info("notiFyTeahcerchangeStartTime::end");
+    }
+
+    public static void main(String[] args) {
+        List list= Lists.newArrayList();
+        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObjectinner = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
     }
 
     /**

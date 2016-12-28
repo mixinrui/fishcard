@@ -95,14 +95,14 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     @Query("select c from CourseSchedule c,WorkOrder w where c.workorderId=w.id and w.startTime<=?1 and w.courseId is null")
     List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
 
-    List<CourseSchedule> findByStudentIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(Long studentId,Date startTime,Integer isFreeze,Long teacherId);
+    List<CourseSchedule> findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(Long studentId,Integer roleId,Date startTime,Integer isFreeze,Long teacherId);
     List<CourseSchedule> findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreezeAndRoleId(Long teacherId,List<Integer> TimeslotsList,List<Date> classDateList,Integer isFreeze,Integer roleId);
     List<CourseSchedule> findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleId(Long teacherId,Long studentId,Integer isFreeze,Integer roleId);
 //    findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze
 
-    @Query(value = "select s from CourseSchedule s where s.studentId=?1 and s.status <=30 and s.startTime>?2  and s.isFreeze=?3")
-    Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long studentId,Date startTime, Integer isFreeze, Pageable pageable);
+    @Query(value = "select s from CourseSchedule s,WorkOrder wo  where s.workorderId=wo.id and  s.studentId=?1 and s.status <=30 and s.startTime>?2  and s.isFreeze=?3 and wo.skuId=?4")
+    Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long studentId,Date startTime, Integer isFreeze,Integer skuId, Pageable pageable);
 
-    @Query(value = "select s from CourseSchedule s ,WorkOrder wo  where  s.workorderId=wo.id   and wo.orderId=?1")
+    @Query(value = "select s from CourseSchedule s ,WorkOrder wo  where  s.workorderId=wo.id   and wo.orderId=?1 ")
     Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long orderId, Pageable pageable);
 }

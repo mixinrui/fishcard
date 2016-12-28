@@ -473,7 +473,11 @@ public class MakeUpLessionServiceX {
         logger.info("sendMessageRefund 退款消息 id [{}]", wo.getId());
 
         logger.info("sendMessageRefund::begin");
-        List list = Lists.newArrayList();
+
+        JSONObject  jsonObject = new JSONObject();
+        JSONObject  jsonObjectData = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
         String reason = wo.getStatus() == FishCardStatusEnum.EXCEPTION.getCode() ? "不可抗力因素" : FishCardStatusEnum.get(wo.getStatus()).getDesc();// 描述原因
         String pushTitle = WorkOrderConstant.SEND_STU_CLASS_REFUND_ONE
                 + DateUtil.Date2StringChinese(wo.getStartTime()) +  // 开始时间
@@ -483,17 +487,17 @@ public class MakeUpLessionServiceX {
                 + reason +                                        // 原因
                 WorkOrderConstant.SEND_STU_CLASS_REFUND_FOUR;
         logger.info("sendMessageRefund title [{}] ,reason [{}]", pushTitle, reason);
-        Map map1 = Maps.newHashMap();
-        map1.put("user_id", wo.getStudentId());
-        map1.put("push_title", pushTitle);
-        JSONObject jo = new JSONObject();
-        jo.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_REFUND_TYPE.toString());
-        jo.put("push_title", pushTitle);
 
-        map1.put("data", jo);
-        list.add(map1);
+        jsonArray.add(wo.getStudentId());
+        jsonObject.put("user_id", jsonArray);
 
-        teacherStudentRequester.pushTeacherListOnlineMsg(list);
+        jsonObject.put("push_title", pushTitle);
+        jsonObjectData.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_REFUND_TYPE.toString());
+        jsonObjectData.put("push_title", pushTitle);
+
+        jsonObject.put("data", jsonObjectData);
+
+        teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
 
 
         logger.info("sendMessageRefund::end");
