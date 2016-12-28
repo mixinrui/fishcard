@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.entity.mysql;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Map;
  */
 @Data
 public class PushToStudentAndTeacher {
-    Long user_id;
+    List<Long> user_id;
     String push_title;
     Map<String,String> data;
 }
