@@ -621,6 +621,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 DateUtil.convertToDate(now.plusDays(3)),
                 DateUtil.convertToDate(now.plusDays(4)),
                 UserTypeEnum.GENERAL_MEMBER.type());
+        logger.info("push expire commentCards to {}", studentIds);
         if(CollectionUtils.isNotEmpty(studentIds)) {
             pushExpireMessage(studentIds);
         }
@@ -628,7 +629,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     // 推送
     private void pushExpireMessage(Set<Long> ids) {
-        logger.info("push expire commentCards to {}", ids);
         commentCardSDK.notifyCommentCardExpire(ids, commentCardTimeConf.getExpireMessage(), "MEMBER_FOREIGN_COMMENT");
     }
 
