@@ -176,6 +176,10 @@ public class AssignTeacherService {
         return scheduleBatchReqSt;
     }
 
+    /**
+     * 加工课程是否匹配情况
+     * @param page
+     */
     private void trimPage(Page<CourseSchedule> page) {
         List<CourseSchedule> courseSchedules = (List<CourseSchedule>) page.getContent();
         List<Long> workOrderIds = Collections3.extractToList(courseSchedules, "workorderId");
@@ -258,6 +262,8 @@ public class AssignTeacherService {
         Date baseDate = DateTime.now().minusHours(48).toDate();
         Date beginDate = DateTime.now().toDate();
         Date endDate = DateUtil.getNextWeekSunday(DateTime.now().toDate());
+        logger.info("getmyInviteList teacherId:[{}],baseDate:[{}],beginDate:[{}],endDate:[{}],", teacherId,
+                DateUtil.Date2String24(baseDate), DateUtil.Date2String24(beginDate), DateUtil.Date2String24(endDate));
 
         Page<StStudentApplyRecordsResult> results = stStudentApplyRecordsService.getmyInviteList(teacherId, baseDate, beginDate, endDate, pageable);
 
@@ -424,7 +430,8 @@ public class AssignTeacherService {
 
     // 9 app换个老师
     public JsonResultModel changeATeacher(StudentTeacherParam studentTeacherParam) {
-        if (null == studentTeacherParam.getTeacherId() || null == studentTeacherParam.getStudentId() || 0 == studentTeacherParam.getTeacherId() && 0 == studentTeacherParam.getStudentId()) {
+        if (null==studentTeacherParam.getOrderId() || null == studentTeacherParam.getTeacherId()
+                || null == studentTeacherParam.getStudentId()) {
             throw new BusinessException("数据参数不全");
         }
 

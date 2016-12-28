@@ -165,9 +165,8 @@ public class StudentAssignTeacherController {
 
     //10 在 StudentAppRelatedController ensureCourseTimesV11
 
-    //11
 
-    // 6老师端获取学生的上课邀请列表详情
+    //11老师端获取学生的上课邀请列表详情
     @RequestMapping(value = "/{student_id}/invitelist/assign/{teacher_id}/check", method = RequestMethod.GET)
     public JsonResultModel getInvitedDetaiCheck(@PathVariable("student_id") Long studentId,@PathVariable("teacher_id") Long teacherId ,Long userId){
         teacherId = userId;
