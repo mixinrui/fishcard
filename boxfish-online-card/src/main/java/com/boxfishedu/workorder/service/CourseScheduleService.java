@@ -167,8 +167,8 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     }
 
     // 查询指定老师之后 学生未上 未冻结 的课程列表
-    public Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long userId,Date startTime, Pageable pageable) {
-        return courseScheduleRepository.findAssignCourseScheduleByStudentId(userId,startTime,0, pageable);
+    public Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long userId,Date startTime,  Integer skuId,Pageable pageable) {
+        return courseScheduleRepository.findAssignCourseScheduleByStudentId(userId,startTime,0,skuId, pageable);
     }
 
     // 新下单指定老师查看课表

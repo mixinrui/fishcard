@@ -13,6 +13,8 @@ import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
 import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,10 +46,14 @@ public class StudentAssignTeacherController {
     @Autowired
     private RepeatedSubmissionChecker checker;
 
+    //本地异常日志记录对象
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     //1 判断指定这位老师上课 按钮是否出现
     // 新增老鱼卡ID oldWorkOrderId
     @RequestMapping(value = "{workorder_Id}/show/assign", method = RequestMethod.GET)
     public JsonResultModel showAssign(@PathVariable("workorder_Id") Long oldWorkOrderId) {
+        logger.info("show_assign :oldWorkOrderId [{}]",oldWorkOrderId);
         return assignTeacherService.checkAssignTeacherFlag(oldWorkOrderId);
     }
 
@@ -57,6 +63,7 @@ public class StudentAssignTeacherController {
     public JsonResultModel assignTeacherAct (Long oldWorkOrderId,Integer skuId,
                                                 Long studentId, Long teacherId, Long userId) {
         studentId = userId;
+        logger.info("assign_teacher_act :oldWorkOrderId [{}] skuId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,skuId,teacherId,userId);
 //        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
 //            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
 //        }
@@ -72,7 +79,7 @@ public class StudentAssignTeacherController {
     @RequestMapping(value = "/assign/teacher/page")
     public JsonResultModel getAssignTeacherCourseSchedulePage(Long oldWorkOrderId,
             Long studentId, Long teacherId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
-            direction = Sort.Direction.DESC) Pageable pageable,Long userId) {
+            direction = Sort.Direction.ASC) Pageable pageable,Long userId) {
         studentId = userId;
         return assignTeacherService.getAssginTeacherCourseList(oldWorkOrderId,studentId,teacherId,pageable);
     }
@@ -81,7 +88,8 @@ public class StudentAssignTeacherController {
     @RequestMapping(value = "/assign/teacher/newpage")
     public JsonResultModel getAssignTeacherCourseSchedulePageNew(Long oldWorkOrderId,
                                                               Long studentId, Long teacherId,Long orderId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
-            direction = Sort.Direction.DESC) Pageable pageable,Long userId) {
+            direction = Sort.Direction.ASC) Pageable pageable,Long userId) {
+        logger.info("assign_teacher_newpage :oldWorkOrderId [{}] studentId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,studentId,teacherId,userId);
         studentId = userId;
         return assignTeacherService.getAssginTeacherCourseListnew(oldWorkOrderId,studentId,teacherId,orderId,pageable);
     }
@@ -107,7 +115,7 @@ public class StudentAssignTeacherController {
     // 5 老师端上课邀请列表
     @RequestMapping(value = "/{teacher_Id}/invitelist/assign", method = RequestMethod.GET)
     public JsonResultModel getInvitedList(@PathVariable("teacher_Id") Long teacherId,@PageableDefault(value = 10, sort = {"applyTime"},
-            direction = Sort.Direction.DESC) Pageable pageable,Long userId){
+            direction = Sort.Direction.ASC) Pageable pageable,Long userId){
         teacherId = userId;
         JSONObject jo = new JSONObject();
         jo.put("baseHours",48);

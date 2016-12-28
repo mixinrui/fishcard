@@ -135,9 +135,12 @@ public class AssignTeacherService {
 
     //2 获取指定老师带的课程列表
     public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId, Long studentId, Long teacherId, Pageable pageable) {
-
+        WorkOrder workOrder = workOrderService.getOne(oldWorkOrderId);
+        if(null==workOrder  || null ==workOrder.getSkuId()){
+            throw new BusinessException("课程信息有误");
+        }
         Date startTime = DateTime.now().plusHours(48).toDate();
-        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(studentId, startTime, pageable);
+        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(studentId, startTime, workOrder.getSkuId(),  pageable);
         trimPage(courseSchedulePage);
         return JsonResultModel.newJsonResultModel(courseSchedulePage);
     }
