@@ -1,11 +1,13 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -130,7 +132,10 @@ public class AssignTeacherService {
             skuId = workOrder.getSkuId();
         }
         assignTeacherServiceX.insertOrUpdateSchema(studentId,teacherId,skuId);
-        return assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
+        assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
+
+        pushTeacherList(teacherId);
+        return JsonResultModel.newJsonResultModel(null);
     }
 
     //2 获取指定老师带的课程列表
@@ -406,5 +411,28 @@ public class AssignTeacherService {
         return teacherStudentRequester.getTeacherName(teacherId);
     }
 
+
+    /**
+     * 给老师进行消息推送
+     * @param teahcerId
+     */
+    private  void pushTeacherList(Long teahcerId) {
+        logger.info("notiFyTeahcerchangeStartTime::begin");
+
+        JSONObject  jsonObject = new JSONObject();
+        JSONObject  jsonObjectData = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
+        String pushTitle = WorkOrderConstant.SEND_ASSIGN_TEACHER;
+
+        jsonArray.add(teahcerId);
+        jsonObject.put("user_id", jsonArray);
+        jsonObject.put("push_title", pushTitle);
+        jsonObjectData.put("push_title", pushTitle);
+        jsonObject.put("data", jsonObjectData);
+
+        teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
+        logger.info("notiFyTeahcerchangeStartTime::end");
+    }
 
 }

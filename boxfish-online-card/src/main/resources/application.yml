@@ -402,9 +402,9 @@ interface:
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
-#消息推送地址
-    msg_push_url: http://123.56.13.168:9091
 #  师生运营匹配老师
+    #消息推送地址
+    msg_push_url: http://123.56.13.168:9091
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099
@@ -790,7 +790,7 @@ interface:
     login_filter_url: http://114.55.140.96:6901
     teacher_photo: http://api.boxfish.cn/online/figure
     resource_url: http://api.boxfish.cn/online
-#消息推送
+    #消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push
 #外教点评接口调用地址
 service:
