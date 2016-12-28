@@ -185,10 +185,10 @@ interface:
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
 service:
   sdk:
-    teacherAbsenceUrl: http://123.56.13.168:8099
+    teacherAbsenceUrl: http://123.56.13.168:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9090/teaching-service
-    innerTeacherUrl: http://123.56.13.168:8099
+    innerTeacherUrl: http://123.56.13.168:8099/teacher
   gateway:
     type: test
 time:
@@ -249,10 +249,10 @@ interface:
 
 service:
   sdk:
-    teacherAbsenceUrl: http://101.201.237.252:8099
+    teacherAbsenceUrl: http://101.201.237.252:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://101.201.239.116:9090/teaching-service
-    innerTeacherUrl: http://101.201.237.252:8099
+    innerTeacherUrl: http://101.201.237.252:8099/teacher
 time:
   task:
     nodeOne: 0
@@ -313,10 +313,10 @@ interface:
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
 service:
   sdk:
-    teacherAbsenceUrl: http://101.201.237.252:8099
+    teacherAbsenceUrl: http://101.201.237.252:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://101.201.237.252:9090/teaching-service
-    innerTeacherUrl: http://101.201.237.252:8099
+    innerTeacherUrl: http://101.201.237.252:8099/teacher
   gateway:
       type: development_new
 time:
@@ -385,7 +385,7 @@ interface:
     teacher_photo: http://api.online.test.boxfish.cn/online/figure
 service:
   sdk:
-    teacherAbsenceUrl: http://123.56.13.168:8099
+    teacherAbsenceUrl: http://123.56.13.168:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9090/teaching-service
     innerTeacherUrl: http://123.56.13.168:8099/teacher
@@ -462,7 +462,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 service:
   sdk:
-    teacherAbsenceUrl: http://127.0.0.1:8099
+    teacherAbsenceUrl: http://127.0.0.1:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090/teaching-service
     innerTeacherUrl: http://127.0.0.1:8099/teacher
@@ -532,7 +532,7 @@ interface:
 
 service:
   sdk:
-    teacherAbsenceUrl: http://127.0.0.1:8099
+    teacherAbsenceUrl: http://127.0.0.1:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://127.0.0.1:9090/teaching-service
     innerTeacherUrl: http://127.0.0.1:8099/teacher
