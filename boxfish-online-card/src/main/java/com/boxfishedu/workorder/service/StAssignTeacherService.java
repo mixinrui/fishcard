@@ -164,6 +164,10 @@ public class StAssignTeacherService {
                         studentId, scheduleModelSt.toString());
                 wait2applyList.add(scheduleModelSt);
                 wait2applyWorkOrderIdList.add(scheduleModelSt.getWorkOrderId());
+            }else{
+                logger.error("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中鱼卡ID====>>{}=====>>异常匹配信息:{}",
+                        studentId, scheduleModelSt.getWorkOrderId(), scheduleModelSt.toString());
+                scheduleModelSt.setMatchStatus(StStudentApplyRecords.MatchStatus.un_matched);
             }
         }
 
@@ -339,9 +343,6 @@ public class StAssignTeacherService {
         Date now = new Date();
         boolean canPush = false;
         for (ScheduleModelSt scheduleModelSt : list) {
-            if(scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
-                canPush = true;
-            }
             stStudentApplyRecords = new StStudentApplyRecords();
             stStudentApplyRecords.setTeacherId(teacherId);
             stStudentApplyRecords.setStudentId(studentId);
@@ -354,9 +355,11 @@ public class StAssignTeacherService {
             stStudentApplyRecords.setIsRead(StStudentApplyRecords.ReadStatus.no);
             stStudentApplyRecords.setWorkOrderId(scheduleModelSt.getWorkOrderId());
             stStudentApplyRecords.setCourseScheleId(scheduleModelSt.getId());
-            stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus());
-
+            stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus()==null? StStudentApplyRecords.MatchStatus.un_matched:scheduleModelSt.getMatchStatus());
             stStudentApplyRecordsList.add(stStudentApplyRecords);
+            if(stStudentApplyRecords.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
+                canPush = true;
+            }
         }
 
         //TODO 无时间片 请求记录入库 入库之前,先把之前的申请记录全部作废掉
@@ -392,8 +395,8 @@ public class StAssignTeacherService {
                 for (ScheduleModelSt scheduleModelSt : macthedList) {
                     if (scheduleModelSt.getWorkOrderId().longValue() == stStudentApplyRecords.getWorkOrderId().longValue()) {
                         stStudentApplyRecords.setUpdateTime(new Date());
-                        stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus());
-                        if(scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
+                        stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus()==null? StStudentApplyRecords.MatchStatus.un_matched:scheduleModelSt.getMatchStatus());
+                        if(stStudentApplyRecords.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
                             canPush = true;
                         }
                         break;

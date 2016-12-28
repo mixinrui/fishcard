@@ -50,9 +50,6 @@ public class FishCardQueryServiceX {
     private TeacherStudentRequester teacherStudentRequester;
 
     @Autowired
-    private DataAnalysisRequester dataAnalysisRequester;
-
-    @Autowired
     private FetchHeartBeatServiceX fetchHeartBeatServiceX;
 
     @Value("${parameter.network_bad}")
