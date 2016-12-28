@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.servicex.assignTeacher.RemoteService;
+import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherService;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import com.boxfishedu.workorder.web.param.bebase3.ScheduleModelSt;
 import com.google.common.collect.Lists;
@@ -56,6 +57,8 @@ public class StAssignTeacherService {
     RemoteService remoteService;
     @Autowired
     CourseOnlineRequester courseOnlineRequester;
+    @Autowired
+    AssignTeacherService assignTeacherService;
 
     /**
      *
@@ -328,10 +331,17 @@ public class StAssignTeacherService {
      */
     @Transactional
     public void makeApplyRecords(Long teacherId, Long studentId,List<ScheduleModelSt> list,Integer skuId) {
+        if(Collections3.isEmpty(list)){
+            return;
+        }
         StStudentApplyRecords stStudentApplyRecords = null;
         List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
         Date now = new Date();
+        boolean canPush = false;
         for (ScheduleModelSt scheduleModelSt : list) {
+            if(scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
+                canPush = true;
+            }
             stStudentApplyRecords = new StStudentApplyRecords();
             stStudentApplyRecords.setTeacherId(teacherId);
             stStudentApplyRecords.setStudentId(studentId);
@@ -345,22 +355,25 @@ public class StAssignTeacherService {
             stStudentApplyRecords.setWorkOrderId(scheduleModelSt.getWorkOrderId());
             stStudentApplyRecords.setCourseScheleId(scheduleModelSt.getId());
             stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus());
+
             stStudentApplyRecordsList.add(stStudentApplyRecords);
         }
 
         //TODO 无时间片 请求记录入库 入库之前,先把之前的申请记录全部作废掉
-        if (Collections3.isNotEmpty(stStudentApplyRecordsList)) {
-            List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.
-                    findByStudentIdAndTeacherIdAndValid(studentId, teacherId, StStudentApplyRecords.VALID.yes);
-            if (Collections3.isNotEmpty(invalidRecordsList)) {
-                for (StStudentApplyRecords studentApplyRecords : invalidRecordsList) {
-                    studentApplyRecords.setValid(StStudentApplyRecords.VALID.no);
-                    studentApplyRecords.setUpdateTime(now);
-                }
-                stStudentApplyRecordsJpaRepository.save(invalidRecordsList);
+        List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.
+                findByStudentIdAndTeacherIdAndValid(studentId, teacherId, StStudentApplyRecords.VALID.yes);
+        if (Collections3.isNotEmpty(invalidRecordsList)) {
+            for (StStudentApplyRecords studentApplyRecords : invalidRecordsList) {
+                studentApplyRecords.setValid(StStudentApplyRecords.VALID.no);
+                studentApplyRecords.setUpdateTime(now);
             }
-            stStudentApplyRecordsJpaRepository.save(stStudentApplyRecordsList);
+            stStudentApplyRecordsJpaRepository.save(invalidRecordsList);
         }
+        stStudentApplyRecordsJpaRepository.save(stStudentApplyRecordsList);
+        if(canPush){
+            assignTeacherService.pushTeacherList(teacherId);
+        }
+
     }
 
     /**
@@ -374,16 +387,23 @@ public class StAssignTeacherService {
         List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.
                 findByStudentIdAndTeacherIdAndValid(studentId, teacherId, StStudentApplyRecords.VALID.yes);
         if (Collections3.isNotEmpty(invalidRecordsList)) {
+            boolean canPush = false;
             for (StStudentApplyRecords stStudentApplyRecords : invalidRecordsList) {
                 for (ScheduleModelSt scheduleModelSt : macthedList) {
                     if (scheduleModelSt.getWorkOrderId().longValue() == stStudentApplyRecords.getWorkOrderId().longValue()) {
                         stStudentApplyRecords.setUpdateTime(new Date());
                         stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus());
+                        if(scheduleModelSt.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
+                            canPush = true;
+                        }
                         break;
                     }
                 }
             }
             stStudentApplyRecordsJpaRepository.save(invalidRecordsList);
+            if(canPush){
+                assignTeacherService.pushTeacherList(teacherId);
+            }
         }
     }
 
