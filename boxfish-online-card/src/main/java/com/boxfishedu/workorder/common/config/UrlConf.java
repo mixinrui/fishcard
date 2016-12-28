@@ -71,7 +71,8 @@ public class UrlConf {
     @Value("${interface.address.resource_url}")
     private String resource_url;//登录验证URL
 
-    @Value("${interface.address.msg_push_url}")
-    private String msg_push_url;//登录验证URL
+
+
+
 
 }

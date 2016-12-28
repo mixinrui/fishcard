@@ -417,7 +417,7 @@ public class AssignTeacherService {
      * @param teahcerId
      */
     private  void pushTeacherList(Long teahcerId) {
-        logger.info("notiFyTeahcerchangeStartTime::begin");
+        logger.info("pushTeacherList::begin");
 
         JSONObject  jsonObject = new JSONObject();
         JSONObject  jsonObjectData = new JSONObject();
@@ -432,7 +432,7 @@ public class AssignTeacherService {
         jsonObject.put("data", jsonObjectData);
 
         teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
-        logger.info("notiFyTeahcerchangeStartTime::end");
+        logger.info("pushTeacherList::end");
     }
 
 }
