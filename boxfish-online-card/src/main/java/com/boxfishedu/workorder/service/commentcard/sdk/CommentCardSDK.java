@@ -76,11 +76,14 @@ public class CommentCardSDK {
         return restTemplate.postForObject(getAddScoreURI(studentId,accessToken,point),null,Object.class);
     }
 
-    public Object notifyCommentCardExpire(Set<Long> ids, String message, String type) {
+    public Object notifyCommentCardExpire(Long id, String message, String type) {
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("user_id", ids);
+        requestBody.put("user_id", id);
         requestBody.put("push_title", message);
-        requestBody.put("data", Collections.singletonMap("type", type));
+        Map<String, Object> data = new HashMap<>();
+        data.put("type", type);
+        data.put("user_id", id);
+        requestBody.put("data", data);
         return restTemplate.postForObject(createBoxfishPushURI(), requestBody, JsonResultModel.class);
     }
 
