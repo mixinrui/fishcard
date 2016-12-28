@@ -5,12 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by ansel on 16/8/4.
  */
-@Component
+//@Component
+@RestController
 @EnableScheduling
 public class CommentCardTimer {
 
@@ -34,6 +36,7 @@ public class CommentCardTimer {
     }
 
 //    @Scheduled(cron = "0 0/1 * * * ?")
+    @RequestMapping(value = "/notify/member")
     public void notifyCommentCard() {
         foreignTeacherCommentCardService.notifyExpireCommentCards();
     }
