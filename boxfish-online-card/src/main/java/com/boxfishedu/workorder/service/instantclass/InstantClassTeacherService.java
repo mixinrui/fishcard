@@ -60,8 +60,6 @@ public class InstantClassTeacherService {
     @Autowired
     private MsgPushRequester msgPushRequester;
 
-    private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
-
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void dealFetchedTeachersAsync(InstantClassCard instantClassCard, boolean queryFlag) {

@@ -74,28 +74,21 @@ public class InstantClassService {
                 , getInstantRequestParam(), timeSlotsOptional.get().getSlotId());
 
         Optional<InstantClassCard> instantClassCardOptional
-                = getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
+                = this.getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
 
         if (!instantClassCardOptional.isPresent()) {
             return getFirstInstantClassResult(timeSlotsOptional);
         }
 
-        //入口变化
-        if (getInstantRequestParam().getSelectMode() != instantClassCardOptional.get().getEntrance()) {
-            this.entranceChanged(timeSlotsOptional, instantClassCardOptional);
-        }
-
-        //请求的教师类型发生变化
-        if (!this.isTutorTypeSame(instantClassCardOptional)) {
-            this.tutorTypeChanged(timeSlotsOptional, instantClassCardOptional);
-        }
+        //如果教师类型或者入口变化,重新生成立即上课卡
+        instantClassCardOptional = regenerateInstantCard(timeSlotsOptional, instantClassCardOptional);
 
         if (instantClassCardOptional.get().getResultReadFlag() == 1
                 && instantClassCardOptional.get().getStatus() == InstantClassRequestStatus.NO_MATCH.getCode()) {
 
             InstantClassCard instantClassCard = instantClassUpdatorService
                     .resetInstantCard(instantClassCardOptional.get()
-                            .getId(), 0, InstantClassRequestStatus.WAIT_TO_MATCH);
+                                                              .getId(), 0, InstantClassRequestStatus.WAIT_TO_MATCH);
 
             instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard, false);
 
@@ -104,6 +97,29 @@ public class InstantClassService {
             //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
             return matchResultWrapper(instantClassCardOptional.get());
         }
+    }
+
+    /**
+     * 如果教师类型或者入口变化,重新生成立即上课卡
+     *
+     * @param timeSlotsOptional
+     * @param instantClassCardOptional
+     * @return
+     */
+    private Optional<InstantClassCard> regenerateInstantCard(
+            Optional<TimeSlots> timeSlotsOptional, Optional<InstantClassCard> instantClassCardOptional) {
+        //入口变化
+        if (getInstantRequestParam().getSelectMode() != instantClassCardOptional.get().getEntrance()) {
+            this.entranceChanged(timeSlotsOptional, instantClassCardOptional);
+            instantClassCardOptional = this.getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
+        }
+
+        //请求的教师类型发生变化
+        if (!this.isTutorTypeSame(instantClassCardOptional)) {
+            this.tutorTypeChanged(timeSlotsOptional, instantClassCardOptional);
+            instantClassCardOptional = this.getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
+        }
+        return instantClassCardOptional;
     }
 
     private void tutorTypeChanged(
@@ -141,7 +157,8 @@ public class InstantClassService {
      */
     private Long getRoleId() {
         return new Long(CourseType2TeachingTypeService
-                .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType())));
+                                .instantCourseType2TeachingType(
+                                        TutorType.resolve(getInstantRequestParam().getTutorType())));
     }
 
     //当无对应的鱼卡数据时候,获取第一条数据
@@ -202,11 +219,11 @@ public class InstantClassService {
     private Optional<TimeSlots> getMostSimilarSlot(DayTimeSlots dayTimeSlots) {
         LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30);
         return dayTimeSlots.getDailyScheduleTime().stream()
-                .filter(timeSlot -> nextSlotTime.isAfter(
-                        DateUtil.string2LocalDateTime(String.join(
-                                " ", DateUtil.date2SimpleString(new Date())
-                                , timeSlot.getStartTime()))))
-                .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
+                           .filter(timeSlot -> nextSlotTime.isAfter(
+                                   DateUtil.string2LocalDateTime(String.join(
+                                           " ", DateUtil.date2SimpleString(new Date())
+                                           , timeSlot.getStartTime()))))
+                           .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
     }
 
     public Optional<InstantClassCard> getClassCardByStudentIdAndTimeParam(TimeSlots timeSlots) {
