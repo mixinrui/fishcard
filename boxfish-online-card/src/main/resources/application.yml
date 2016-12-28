@@ -409,7 +409,7 @@ service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://123.56.13.168:9091/notification/push
+    pushInfoIrl: http://123.56.13.168:9090/teaching-service
     innerTeacherUrl: http://123.56.13.168:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
