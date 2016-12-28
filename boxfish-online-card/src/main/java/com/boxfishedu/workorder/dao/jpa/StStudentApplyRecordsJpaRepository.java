@@ -31,7 +31,7 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
 
     @Query(value = "select s from  StStudentApplyRecords s " +
-            " , WorkOrder wo  where s.workOrderId=wo.id and s.applyTime>?1 and s.teacherId = ?2 and s.studentId =?3 and s.valid =?4 and s.applyStatus != ?5 and wo.startTime between ?6 and ?7")
+            " , WorkOrder wo  where s.workOrderId=wo.id and s.applyTime>?1 and s.teacherId = ?2 and s.studentId =?3 and s.valid =?4 and s.applyStatus != ?5 and wo.startTime between ?6 and ?7 order by wo.startTime asc")
     public Page<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(Date date ,Long teacherId,Long studentId,StStudentApplyRecords.VALID valid ,StStudentApplyRecords.ApplyStatus applyStatus ,Date startTime,Date endTime ,Pageable pageable);
 
     @Query(value = "select s from  StStudentApplyRecords s " +

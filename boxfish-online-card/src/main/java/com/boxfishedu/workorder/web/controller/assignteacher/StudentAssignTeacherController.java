@@ -125,8 +125,7 @@ public class StudentAssignTeacherController {
 
     // 6老师端获取学生的上课邀请列表详情
     @RequestMapping(value = "/{student_id}/invitelist/assign/{teacher_id}", method = RequestMethod.GET)
-    public JsonResultModel getInvitedDetailList(@PathVariable("student_id") Long studentId,@PathVariable("teacher_id") Long teacherId ,@PageableDefault(value = 10, sort = {"applyTime"},
-            direction = Sort.Direction.DESC) Pageable pageable,Long userId){
+    public JsonResultModel getInvitedDetailList(@PathVariable("student_id") Long studentId,@PathVariable("teacher_id") Long teacherId ,@PageableDefault(value = 10) Pageable pageable,Long userId){
         teacherId = userId;
         Page<StStudentApplyRecords> stStudentApplyRecordsList = assignTeacherService.getMyClassesByStudentId(teacherId,studentId,pageable);
         return JsonResultModel.newJsonResultModel(stStudentApplyRecordsList);
