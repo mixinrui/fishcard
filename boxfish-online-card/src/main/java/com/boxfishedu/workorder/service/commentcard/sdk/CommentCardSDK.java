@@ -78,7 +78,7 @@ public class CommentCardSDK {
 
     public Object notifyCommentCardExpire(Long id, String message, String type) {
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("user_id", id);
+        requestBody.put("user_id", new Long[] {id});
         requestBody.put("push_title", message);
         Map<String, Object> data = new HashMap<>();
         data.put("type", type);

@@ -17,7 +17,7 @@ import java.util.List;
  */
 public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStudentApplyRecords, Long> {
 
-    public StStudentApplyRecords findTop1ByWorkOrderIdAndApplyStatusAndValid(Long workOrderId,StStudentApplyRecords.ApplyStatus applyStatus ,StStudentApplyRecords.VALID valid);
+    public StStudentApplyRecords findTop1ByWorkOrderIdAndMatchStatusAndValid(Long workOrderId,StStudentApplyRecords.MatchStatus matchStatus ,StStudentApplyRecords.VALID valid);
 
     @Query(value = "select count(distinct s.studentId) from StStudentApplyRecords s , WorkOrder wo  where s.workOrderId=wo.id  and s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3 and s.valid=?4 and s.applyStatus!=?5 and wo.startTime between ?6 and ?7  and s.matchStatus!=?8")
     Optional<Long> getUnreadInvitedNum(Long teacherId,Date date,StStudentApplyRecords.ReadStatus status,StStudentApplyRecords.VALID valid ,StStudentApplyRecords.ApplyStatus applyStatus,Date beginDate,Date endDate,StStudentApplyRecords.MatchStatus matchStatus);

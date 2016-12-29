@@ -204,6 +204,7 @@ public class CourseChangeTimeNotifySerceX {
         jsonObject.put("push_title", title);
 
         jsonObjectData.put("type", "NOTIFYSTUDENTMESSAGE");
+        jsonObjectData.put("user_id", studentId);
         jsonObject.put("data",jsonObjectData);
 
         teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);

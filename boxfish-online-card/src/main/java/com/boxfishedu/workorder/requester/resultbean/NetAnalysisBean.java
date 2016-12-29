@@ -75,7 +75,7 @@ public class NetAnalysisBean {
     }
 
     private double getPing(Map<String, Object> detailMap, String pingType) {
-        return StringUtils.isEmpty(String.valueOf(detailMap.get(pingType)))
+        return Objects.isNull(detailMap.get(pingType)) || StringUtils.isEmpty(detailMap.get(pingType).toString())
                 ? 0 : Double.parseDouble(detailMap.get(pingType).toString());
     }
 

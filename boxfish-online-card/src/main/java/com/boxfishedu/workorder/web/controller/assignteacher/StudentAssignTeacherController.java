@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.assignteacher;
 
 import com.alibaba.fastjson.JSONObject;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseInfo;
 import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
@@ -65,17 +66,17 @@ public class StudentAssignTeacherController {
     }
 
 
-    //2.1 指定老师上课按钮(上完课)
+    //2.1 指定老师上课按钮(上完课) *****sku_id  *****
     @RequestMapping(value = "/assign/teacher/act", method = RequestMethod.GET)
-    public JsonResultModel assignTeacherAct (Long oldWorkOrderId,Integer skuId,
+    public JsonResultModel assignTeacherAct (Long oldWorkOrderId,Integer sku_id,
                                                 Long studentId, Long teacherId, Long userId) {
         studentId = userId;
-        logger.info("assign_teacher_act :oldWorkOrderId [{}] skuId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,skuId,teacherId,userId);
+        logger.info("assign_teacher_act :oldWorkOrderId [{}] skuId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,sku_id,teacherId,userId);
 //        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
 //            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
 //        }
         // 验证重复提交问题
-        JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId,skuId, studentId,teacherId);
+        JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId,sku_id, studentId,teacherId);
         //
 //        checker.evictRepeatedSubmission(oldWorkOrderId);
         return JsonResultModel.newJsonResultModel("OK");
@@ -142,8 +143,10 @@ public class StudentAssignTeacherController {
 
     // 7 接受上课邀请接口
     @RequestMapping(value = "/acceptInvite", method = RequestMethod.POST)
-    public JsonResultModel acceptInvite(@RequestBody StTeacherInviteParam stTeacherInviteParam){
-        return assignTeacherService.acceptInvitedCourseByStudentId(stTeacherInviteParam);
+    public JsonResultModel acceptInvite(@RequestBody StTeacherInviteParam stTeacherInviteParam,Long userId){
+        if(null==userId)
+            throw new BusinessException("非法反问被拒绝");
+        return assignTeacherService.acceptInvitedCourseByStudentId(stTeacherInviteParam,userId);
     }
 
     //8 下单 是否弹出 是否继续指定该老师上课
@@ -162,9 +165,8 @@ public class StudentAssignTeacherController {
 
     //10 在 StudentAppRelatedController ensureCourseTimesV11
 
-    //11
 
-    // 6老师端获取学生的上课邀请列表详情
+    //11老师端获取学生的上课邀请列表详情
     @RequestMapping(value = "/{student_id}/invitelist/assign/{teacher_id}/check", method = RequestMethod.GET)
     public JsonResultModel getInvitedDetaiCheck(@PathVariable("student_id") Long studentId,@PathVariable("teacher_id") Long teacherId ,Long userId){
         teacherId = userId;

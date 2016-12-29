@@ -494,6 +494,7 @@ public class MakeUpLessionServiceX {
         jsonObject.put("push_title", pushTitle);
         jsonObjectData.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_REFUND_TYPE.toString());
         jsonObjectData.put("push_title", pushTitle);
+        jsonObjectData.put("user_id", wo.getStudentId());
 
         jsonObject.put("data", jsonObjectData);
 
