@@ -390,6 +390,7 @@ public class MakeWorkOrderServiceX {
             JSONObject jo = new JSONObject();
             jsonObjectData.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE.toString());
             jsonObjectData.put("count", null == map.get(key) ? "0" : map.get(key).size());
+            jsonObjectData.put("user_id",key);
 
             try {
                 logger.info("makeSendWorkOrder:::sendToTecherContent::::pushTitle:[{}]:size[{}]", pushTitle, map.get(key).size());

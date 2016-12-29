@@ -66,17 +66,17 @@ public class StudentAssignTeacherController {
     }
 
 
-    //2.1 指定老师上课按钮(上完课)
+    //2.1 指定老师上课按钮(上完课) *****sku_id  *****
     @RequestMapping(value = "/assign/teacher/act", method = RequestMethod.GET)
-    public JsonResultModel assignTeacherAct (Long oldWorkOrderId,Integer skuId,
+    public JsonResultModel assignTeacherAct (Long oldWorkOrderId,Integer sku_id,
                                                 Long studentId, Long teacherId, Long userId) {
         studentId = userId;
-        logger.info("assign_teacher_act :oldWorkOrderId [{}] skuId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,skuId,teacherId,userId);
+        logger.info("assign_teacher_act :oldWorkOrderId [{}] skuId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,sku_id,teacherId,userId);
 //        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
 //            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
 //        }
         // 验证重复提交问题
-        JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId,skuId, studentId,teacherId);
+        JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId,sku_id, studentId,teacherId);
         //
 //        checker.evictRepeatedSubmission(oldWorkOrderId);
         return JsonResultModel.newJsonResultModel("OK");
