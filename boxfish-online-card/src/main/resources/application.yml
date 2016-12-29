@@ -435,6 +435,9 @@ server:
     enabled: true
     mime-types: "text/html,text/xml,text/plain,text/html,text/css,application/json"
 
+parameter:
+  thumbnail_server: https://api.boxfish.cn/student/publication/data/data/
+
 #===============================================================pretest环境:123.56.13.168 机器密码:Boxfish2016===============================================================
 ---
 spring:
