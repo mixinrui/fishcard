@@ -398,16 +398,23 @@ public class AssignTeacherService {
 
         Map<Long,Long>  teachers = Collections3.extractToMap(stStudentApplyRecordsList,"teacherId","teacherId");
 
-        if(null==teachers.get(teacherId) || teachers.size()>1){
-            logger.info("acceptInvitedCourseByStudentId teacherId:[{}], teachers :[{}]",teacherId, JSON.toJSONString(teachers));
+        Map<Long,Long>  students = Collections3.extractToMap(stStudentApplyRecordsList,"studentId","studentId");
+
+        if(null==teachers.get(teacherId) || teachers.size()>1 || null==students ||students.size()>1){
+            logger.info("acceptInvitedCourseByStudentId teacherId:[{}], teachers :[{}] ,students :[{}]",teacherId, JSON.toJSONString(teachers),JSON.toJSONString(students));
             throw new BusinessException("您的访问不安全,请联系客服");
         }
 
 
-        // 对接受的课程进行 设置 老师已经同意
-        int updateNum = stStudentApplyRecordsJpaRepository.setFixedApplyStatusFor(StStudentApplyRecords.ApplyStatus.agree, ids);
+        // 对接受的课程进行 设置 老师已经同意 ----------->>>> 该老师对应该学生的记录 都变成agreee  只能接受一次
+        int updateNum     = stStudentApplyRecordsJpaRepository.setFixedApplyStatusFor(StStudentApplyRecords.ApplyStatus.agree,
+                                                                                      stStudentApplyRecordsList.get(0).getTeacherId(),
+                                                                                      stStudentApplyRecordsList.get(0).getStudentId()
+        );
+
         logger.info("acceptInvitedCourseByStudentId: updateNum [{}] ,ids:[{}]", updateNum, stTeacherInviteParam.getIds());
         // 未匹配上的进行匹配
+
         stStudentApplyRecordsList.stream().filter(sts -> sts.getMatchStatus().equals(StStudentApplyRecords.MatchStatus.wait2apply)).collect(Collectors.toList());
 
         Long studentId = stStudentApplyRecordsList.get(0).getStudentId();
