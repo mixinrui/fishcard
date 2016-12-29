@@ -103,6 +103,12 @@ public class AssignTeacherService {
             throw new BusinessException("课程信息有误");
         }
 
+        Boolean  isActive = teacherStudentRequester.checkTeacherIsFreeze(workOrder.getTeacherId());
+        if(!isActive || isActive==null){
+            logger.info("getAssignTeacherList 老师被冻结或者调用 师生运营接口失败");
+            return null;
+        }
+
         //判断旧鱼卡是否已经上完课
 //        if (workOrder.getStartTime().after(new Date())) {
 //            throw new BusinessException("该课程尚未结束");
