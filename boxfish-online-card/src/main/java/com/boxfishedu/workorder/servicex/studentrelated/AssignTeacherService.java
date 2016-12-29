@@ -208,7 +208,7 @@ public class AssignTeacherService {
 
         CourseInfo courseInfo = new CourseInfo();
         //2 获取是否本课为指定老师
-        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
+        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.MatchStatus.matched);
         if (null != stStudentApplyRecords) {
             if(stStudentApplyRecords.getTeacherId() == workOrder.getTeacherId()){
                 courseInfo.setAssignFlag(true);// 指定老师

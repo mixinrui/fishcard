@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -36,7 +37,7 @@ public class NetAnalysisBean {
     @JsonIgnore
     private double averageServicePing;
     @JsonIgnore
-    private double averageSInternetPing;
+    private double averageInternetPing;
     @JsonIgnore
     private double minServicePing;
     @JsonIgnore
@@ -70,20 +71,20 @@ public class NetAnalysisBean {
         this.setMinInternetPing(this.min(INTERNET_PING));
 
         this.setAverageServicePing(this.average(SERVICE_PING));
-        this.setAverageSInternetPing(this.average(INTERNET_PING));
+        this.setAverageInternetPing(this.average(INTERNET_PING));
     }
 
     private double getPing(Map<String, Object> detailMap, String pingType) {
-        return Objects.isNull(detailMap.get(pingType))
+        return Objects.isNull(detailMap.get(pingType)) || StringUtils.isEmpty(detailMap.get(pingType).toString())
                 ? 0 : Double.parseDouble(detailMap.get(pingType).toString());
     }
 
     private double max(String pingType) {
         Object maxItem = this.getDetails().stream()
-                .filter(map -> getPing(map, pingType) > 0)
-                .max(Comparator.comparing(map -> getPing(map, pingType)))
-                .get()
-                .get(pingType);
+                             .filter(map -> getPing(map, pingType) > 0)
+                             .max(Comparator.comparing(map -> getPing(map, pingType)))
+                             .get()
+                             .get(pingType);
 
         if (Objects.isNull(maxItem)) {
             return 0;
@@ -94,10 +95,10 @@ public class NetAnalysisBean {
 
     private double min(String pingType) {
         Object maxItem = this.getDetails().stream()
-                .filter(map -> getPing(map, pingType) > 0)
-                .min(Comparator.comparing(map -> getPing(map, pingType)))
-                .get()
-                .get(pingType);
+                             .filter(map -> getPing(map, pingType) > 0)
+                             .min(Comparator.comparing(map -> getPing(map, pingType)))
+                             .get()
+                             .get(pingType);
 
         if (Objects.isNull(maxItem)) {
             return 0;
@@ -108,10 +109,10 @@ public class NetAnalysisBean {
 
     private double average(String pingType) {
         return this.getDetails().stream()
-                .filter(map -> getPing(map, pingType) > 0)
-                .mapToDouble(map -> getPing(map, pingType))
-                .average()
-                .getAsDouble();
+                   .filter(map -> getPing(map, pingType) > 0)
+                   .mapToDouble(map -> getPing(map, pingType))
+                   .average()
+                   .getAsDouble();
     }
 
 }

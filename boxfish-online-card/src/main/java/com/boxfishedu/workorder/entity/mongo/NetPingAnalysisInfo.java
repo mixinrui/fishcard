@@ -32,7 +32,7 @@ public class NetPingAnalysisInfo {
 
     private double averageServicePing;
 
-    private double averageSInternetPing;
+    private double averageInternetPing;
 
     private double minServicePing;
 
