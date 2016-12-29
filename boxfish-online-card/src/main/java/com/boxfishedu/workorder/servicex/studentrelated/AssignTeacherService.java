@@ -208,13 +208,9 @@ public class AssignTeacherService {
 
         CourseInfo courseInfo = new CourseInfo();
         //2 获取是否本课为指定老师
-        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.MatchStatus.matched);
-        if (null != stStudentApplyRecords) {
-            if(stStudentApplyRecords.getTeacherId() == workOrder.getTeacherId()){
-                courseInfo.setAssignFlag(true);// 指定老师
-            }else {
-                courseInfo.setAssignFlag(false);// 非指定老师
-            }
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuIdAndStSchema(workOrder.getStudentId(),workOrder.getTeacherId(),StStudentSchema.CourseType.getEnum(workOrder.getSkuId()),StStudentSchema.StSchema.assgin);
+        if (null != stStudentSchema) {
+            courseInfo.setAssignFlag(true);// 指定老师
         } else {
             courseInfo.setAssignFlag(false);// 非指定老师
         }
