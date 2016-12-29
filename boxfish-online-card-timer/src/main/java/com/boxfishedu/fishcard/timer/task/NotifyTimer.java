@@ -311,7 +311,7 @@ public class NotifyTimer {
     }
 
     /**
-     * 每周周6的凌晨4点开始跑定时任务
+     * 指定老师====每周周6的凌晨4点开始跑定时任务
      * @Scheduled(cron = "0 0 4 0 0 6 ")
      */
     public void assginTeacher(){
