@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
@@ -7,6 +8,7 @@ import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
@@ -83,8 +85,6 @@ public class AssignTeacherService {
     private AssignTeacherServiceX assignTeacherServiceX;
 
 
-
-
     //1 判断按钮是否出现
     public JsonResultModel checkAssignTeacherFlag(Long workOrderId) {
         List<WorkOrder> workOrders = this.getAssignTeacherList(workOrderId);
@@ -111,8 +111,8 @@ public class AssignTeacherService {
 
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(workOrder.getSkuId()));
         List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
-        if (null == stStudentSchema || !stStudentSchema.getTeacherId().equals(workOrder.getTeacherId()) ) {
-            if (CollectionUtils.isEmpty(listWorkOrders) ) {
+        if (null == stStudentSchema || !stStudentSchema.getTeacherId().equals(workOrder.getTeacherId())) {
+            if (CollectionUtils.isEmpty(listWorkOrders)) {
                 return null;
             } else {
                 return listWorkOrders;
@@ -125,13 +125,13 @@ public class AssignTeacherService {
 
     //2.1  指定这位老师上课
     @Transactional
-    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId,Integer skuIdParameter, Long studentId, Long teacherId) {
-        Integer skuId  = skuIdParameter;
-        if(null!=oldWorkOrderId){
+    public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Integer skuIdParameter, Long studentId, Long teacherId) {
+        Integer skuId = skuIdParameter;
+        if (null != oldWorkOrderId) {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
             skuId = workOrder.getSkuId();
         }
-        assignTeacherServiceX.insertOrUpdateSchema(studentId,teacherId,skuId);
+        assignTeacherServiceX.insertOrUpdateSchema(studentId, teacherId, skuId);
         assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
 
         pushTeacherList(teacherId);
@@ -141,18 +141,18 @@ public class AssignTeacherService {
     //2 获取指定老师带的课程列表
     public JsonResultModel getAssginTeacherCourseList(Long oldWorkOrderId, Long studentId, Long teacherId, Pageable pageable) {
         WorkOrder workOrder = workOrderService.getOne(oldWorkOrderId);
-        if(null==workOrder  || null ==workOrder.getSkuId()){
+        if (null == workOrder || null == workOrder.getSkuId()) {
             throw new BusinessException("课程信息有误");
         }
         Date startTime = DateTime.now().plusHours(48).toDate();
-        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(studentId, startTime, workOrder.getSkuId(),  pageable);
+        Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(studentId, startTime, workOrder.getSkuId(), pageable);
         trimPage(courseSchedulePage);
         return JsonResultModel.newJsonResultModel(courseSchedulePage);
     }
 
 
     //2.2 获取指定老师带的课程列表
-    public JsonResultModel getAssginTeacherCourseListnew(Long oldWorkOrderId, Long studentId, Long teacherId,Long orderId, Pageable pageable) {
+    public JsonResultModel getAssginTeacherCourseListnew(Long oldWorkOrderId, Long studentId, Long teacherId, Long orderId, Pageable pageable) {
         Page<CourseSchedule> courseSchedulePage = courseScheduleService.findAssignCourseScheduleByStudentId(orderId, pageable);
         trimPage(courseSchedulePage);
         return JsonResultModel.newJsonResultModel(courseSchedulePage);
@@ -176,14 +176,18 @@ public class AssignTeacherService {
         return scheduleBatchReqSt;
     }
 
+    /**
+     * 加工课程是否匹配情况
+     * @param page
+     */
     private void trimPage(Page<CourseSchedule> page) {
-        List<CourseSchedule>   courseSchedules =  (List<CourseSchedule>) page.getContent();
-        List<Long> workOrderIds = Collections3.extractToList(courseSchedules,"workorderId");
-        List<StStudentApplyRecords>  stStudentApplyRecordses =  stStudentApplyRecordsJpaRepository.findByWorkOrderIdIn(workOrderIds);
+        List<CourseSchedule> courseSchedules = (List<CourseSchedule>) page.getContent();
+        List<Long> workOrderIds = Collections3.extractToList(courseSchedules, "workorderId");
+        List<StStudentApplyRecords> stStudentApplyRecordses = stStudentApplyRecordsJpaRepository.findByWorkOrderIdIn(workOrderIds);
 
-        Map<Long,StStudentApplyRecords.MatchStatus> map = Collections3.extractToMap(stStudentApplyRecordses,"workOrderId","matchStatus");
+        Map<Long, StStudentApplyRecords.MatchStatus> map = Collections3.extractToMap(stStudentApplyRecordses, "workOrderId", "matchStatus");
         ((List<CourseSchedule>) page.getContent()).forEach(courseSchedule -> {
-            courseSchedule.setMatchStatus(map.get(courseSchedule.getWorkorderId())==StStudentApplyRecords.MatchStatus.matched?1:0);
+            courseSchedule.setMatchStatus(map.get(courseSchedule.getWorkorderId()) == StStudentApplyRecords.MatchStatus.matched ? 1 : 0);
         });
     }
 
@@ -200,7 +204,11 @@ public class AssignTeacherService {
         //2 获取是否本课为指定老师
         StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.getStStudentApplyRecordsBy(workOrderId, StStudentApplyRecords.ApplyStatus.agree);
         if (null != stStudentApplyRecords) {
-            courseInfo.setAssignFlag(true);// 指定老师
+            if(stStudentApplyRecords.getTeacherId() == workOrder.getTeacherId()){
+                courseInfo.setAssignFlag(true);// 指定老师
+            }else {
+                courseInfo.setAssignFlag(false);// 非指定老师
+            }
         } else {
             courseInfo.setAssignFlag(false);// 非指定老师
         }
@@ -243,23 +251,25 @@ public class AssignTeacherService {
 
     //4 查看我的邀请数量(学生的数量 未读)
     public Integer getMyInvited(Long teacherId) {
-        if(null==teacherId){
+        if (null == teacherId) {
             throw new BusinessException("您非法登陆,或者已经掉线");
         }
         Date baseDate = DateTime.now().minusHours(48).toDate();
-        Date beginDate =DateTime.now().toDate();
-        Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
-        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId,baseDate,beginDate,endDate);
+        Date beginDate = DateTime.now().toDate();
+        Date endDate = DateUtil.getNextWeekSunday(DateTime.now().toDate());
+        return stStudentApplyRecordsService.getUnreadInvitedNum(teacherId, baseDate, beginDate, endDate);
     }
 
     // 5 老师端上课邀请列表
     public Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Pageable pageable) {
 
         Date baseDate = DateTime.now().minusHours(48).toDate();
-        Date beginDate =DateTime.now().toDate();
-        Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
+        Date beginDate = DateTime.now().toDate();
+        Date endDate = DateUtil.getNextWeekSunday(DateTime.now().toDate());
+        logger.info("getmyInviteList teacherId:[{}],baseDate:[{}],beginDate:[{}],endDate:[{}],", teacherId,
+                DateUtil.Date2String24(baseDate), DateUtil.Date2String24(beginDate), DateUtil.Date2String24(endDate));
 
-        Page<StStudentApplyRecordsResult> results = stStudentApplyRecordsService.getmyInviteList(teacherId, baseDate,beginDate,endDate, pageable);
+        Page<StStudentApplyRecordsResult> results = stStudentApplyRecordsService.getmyInviteList(teacherId, baseDate, beginDate, endDate, pageable);
 
         if (results == null || null == results.getContent())
             return results;
@@ -280,10 +290,10 @@ public class AssignTeacherService {
     @Transactional
     public Page<StStudentApplyRecords> getMyClassesByStudentId(Long teacherId, Long studentId, Pageable pageable) {
         Date baseDate = DateTime.now().minusHours(48).toDate();
-        Date beginDate =DateTime.now().toDate();
-        Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
+        Date beginDate = DateTime.now().toDate();
+        Date endDate = DateUtil.getNextWeekSunday(DateTime.now().toDate());
 
-        Page<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, baseDate,beginDate,endDate, pageable);
+        Page<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, baseDate, beginDate, endDate, pageable);
         // 更新已读状态
         List fishcardids = Lists.newArrayList();
         if (results != null && null != results.getContent()) {
@@ -308,22 +318,20 @@ public class AssignTeacherService {
         }
 
         // 排序
-       // this.getSortOrders(  ((List<StStudentApplyRecords>) results.getContent()));
+        // this.getSortOrders(  ((List<StStudentApplyRecords>) results.getContent()));
         int readNum = stStudentApplyRecordsService.upateReadStatusByStudentId(teacherId, studentId);
         logger.info("getMyClassesByStudentId:num:[{}],teacherId:[{}],studentId:[{}]", readNum, teacherId, studentId);
         return results;
     }
 
 
-
-
     // 11 检查是否还有申请记录
     @Transactional
     public List<StStudentApplyRecords> checkMyClassesByStudentId(Long teacherId, Long studentId) {
         Date baseDate = DateTime.now().minusHours(48).toDate();
-        Date beginDate =DateTime.now().toDate();
-        Date endDate   =DateUtil.getNextWeekSunday(DateTime.now().toDate());
-        List<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, baseDate,beginDate,endDate);
+        Date beginDate = DateTime.now().toDate();
+        Date endDate = DateUtil.getNextWeekSunday(DateTime.now().toDate());
+        List<StStudentApplyRecords> results = stStudentApplyRecordsService.getMyClassesByStudentId(teacherId, studentId, baseDate, beginDate, endDate);
         return results;
     }
 
@@ -332,7 +340,7 @@ public class AssignTeacherService {
             throw new BusinessException("课程信息有误");
         }
 
-        StStudentSchema stStudentSchema  =  stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(studentId,StStudentSchema.StSchema.assgin,StStudentSchema.CourseType.getEnum(skuId));
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(studentId, StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(skuId));
 
 //        StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(studentId, skuId);
 
@@ -348,7 +356,7 @@ public class AssignTeacherService {
         if (!CollectionUtils.isEmpty(teacherInfoMap)) {
             jo.put("teacherImg", teacherInfoMap.get("figure_url"));
             jo.put("teacherId", stStudentSchema.getTeacherId());
-            jo.put("sku_id",stStudentSchema.getSkuId());
+            jo.put("sku_id", stStudentSchema.getSkuId());
             //jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
 
         }
@@ -358,31 +366,76 @@ public class AssignTeacherService {
     }
 
 
+    /**
+     * 老师端 接受上课邀请 只处理申请时间在48小时+1分钟(网络等其他延迟时间)
+     *
+     * @param stTeacherInviteParam
+     * @return
+     */
     @Transactional
-    public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam) {
+    public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam,Long teacherId) {
         List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findAll(stTeacherInviteParam.getIds());
         if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
             throw new BusinessException("没有查询到匹配的课程");
         }
 
+        Date now = new Date();
+        stStudentApplyRecordsList.stream().filter(stStu ->
+                checkTimeOutForInvitedClass(stStu,now)
+        ).collect(Collectors.toList());
+
+
+        List<Long> ids = Collections3.extractToList(stStudentApplyRecordsList,"id");
+        logger.info("acceptInvitedCourseByStudentId 能够接受的id [{}]",ids.toArray());
+        //已经全部超时
+        if(CollectionUtils.isEmpty(stStudentApplyRecordsList)){
+            throw new BusinessException("课程已经全部超时");
+          //return JsonResultModel.newJsonResultModel(null);
+        }
+
+        Map<Long,Long>  teachers = Collections3.extractToMap(stStudentApplyRecordsList,"teacherId","teacherId");
+
+        if(null==teachers.get(teacherId) || teachers.size()>1){
+            logger.info("acceptInvitedCourseByStudentId teacherId:[{}], teachers :[{}]",teacherId, JSON.toJSONString(teachers));
+            throw new BusinessException("您的访问不安全,请联系客服");
+        }
+
 
         // 对接受的课程进行 设置 老师已经同意
-        int updateNum =  stStudentApplyRecordsJpaRepository.setFixedApplyStatusFor(StStudentApplyRecords.ApplyStatus.agree,stTeacherInviteParam.getIds());
-        logger.info("acceptInvitedCourseByStudentId: updateNum [{}] ,ids:[{}]",updateNum,stTeacherInviteParam.getIds());
+        int updateNum = stStudentApplyRecordsJpaRepository.setFixedApplyStatusFor(StStudentApplyRecords.ApplyStatus.agree, ids);
+        logger.info("acceptInvitedCourseByStudentId: updateNum [{}] ,ids:[{}]", updateNum, stTeacherInviteParam.getIds());
         // 未匹配上的进行匹配
         stStudentApplyRecordsList.stream().filter(sts -> sts.getMatchStatus().equals(StStudentApplyRecords.MatchStatus.wait2apply)).collect(Collectors.toList());
 
-        Long teacherId = stStudentApplyRecordsList.get(0).getTeacherId();
         Long studentId = stStudentApplyRecordsList.get(0).getStudentId();
-        List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList, "courseScheleId");
+        //List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList, "courseScheleId");
         List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList, "workOrderId");
         return assignTeacherServiceX.teacherAccept(teacherId, studentId, workOrderIds);
     }
 
 
+    /**
+     * 判断是否在有效期内
+     * 48小时+1分钟
+     *
+     * @param applyRecords
+     * @return
+     */
+    private boolean checkTimeOutForInvitedClass(StStudentApplyRecords applyRecords,Date now) {
+        if (null == applyRecords || null == applyRecords.getApplyTime()) {
+            return false;
+        }
+        if(DateUtil.addMinutes(  applyRecords.getApplyTime(),60*24*2+1) .after(now)){
+            return true;
+        }
+        return false;
+    }
+
+
     // 9 app换个老师
     public JsonResultModel changeATeacher(StudentTeacherParam studentTeacherParam) {
-        if (null == studentTeacherParam.getTeacherId() || null == studentTeacherParam.getStudentId() || 0 == studentTeacherParam.getTeacherId() && 0 == studentTeacherParam.getStudentId()) {
+        if (null==studentTeacherParam.getOrderId() || null == studentTeacherParam.getTeacherId()
+                || null == studentTeacherParam.getStudentId()) {
             throw new BusinessException("数据参数不全");
         }
 
@@ -414,13 +467,14 @@ public class AssignTeacherService {
 
     /**
      * 给老师进行消息推送
+     *
      * @param teahcerId
      */
     public void pushTeacherList(Long teahcerId) {
         logger.info("pushTeacherList::begin");
 
-        JSONObject  jsonObject = new JSONObject();
-        JSONObject  jsonObjectData = new JSONObject();
+        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObjectData = new JSONObject();
         JSONArray jsonArray = new JSONArray();
 
         String pushTitle = WorkOrderConstant.SEND_ASSIGN_TEACHER;
