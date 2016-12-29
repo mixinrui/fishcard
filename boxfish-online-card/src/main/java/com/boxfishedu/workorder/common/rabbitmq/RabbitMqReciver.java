@@ -220,7 +220,7 @@ public class RabbitMqReciver {
                 foreignTeacherCommentCardService.notifyExpireCommentCards();
             }
             else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_ASSGIN_TEACHER.value()) {
-                logger.info("==========>ASSIGN TEACHER===>>> 指定老师定时任务");
+                logger.info("==========>@@@@assign-timer===>>> 指定老师定时任务接受到任务");
                 assignTeacherServiceX.autoAssign();
             }
             //
