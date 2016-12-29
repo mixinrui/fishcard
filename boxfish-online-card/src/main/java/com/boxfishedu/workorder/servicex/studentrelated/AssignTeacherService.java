@@ -355,6 +355,13 @@ public class AssignTeacherService {
 
         jo.put("hasAssignTeacher", true);
 
+        Boolean isActive = teacherStudentRequester.checkTeacherIsFreeze(stStudentSchema.getTeacherId());
+        if (!isActive || isActive == null) {
+            logger.info("getAssignTeacherList 老师被冻结或者调用 师生运营接口失败");
+            jo.put("hasAssignTeacher", false);
+        }
+
+
         Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(stStudentSchema.getTeacherId());
         if (!CollectionUtils.isEmpty(teacherInfoMap)) {
             jo.put("teacherImg", teacherInfoMap.get("figure_url"));
