@@ -313,6 +313,7 @@ public class NotifyTimer {
     /**
      * 每周周6的凌晨4点开始跑定时任务
      */
+    @Scheduled(cron = "0 0 4 0 0 6 ")
     public void assginTeacher(){
         logger.info("<<<<<<@@@@assign-timer 开始通知<<<指定老师>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.ASSGIN_TEACHER.value());
