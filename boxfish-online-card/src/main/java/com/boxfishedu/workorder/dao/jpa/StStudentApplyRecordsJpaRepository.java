@@ -19,20 +19,25 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
     public StStudentApplyRecords findTop1ByWorkOrderIdAndMatchStatusAndValid(Long workOrderId,StStudentApplyRecords.MatchStatus matchStatus ,StStudentApplyRecords.VALID valid);
 
-    @Query(value = "select count(distinct s.studentId) from StStudentApplyRecords s , WorkOrder wo  where s.workOrderId=wo.id  and s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3 and s.valid=?4 and s.applyStatus!=?5 and wo.startTime between ?6 and ?7  and s.matchStatus!=?8")
+    @Query(value = "select count(distinct s.studentId) from StStudentApplyRecords s , WorkOrder wo  where s.workOrderId=wo.id  and s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3 and s.valid=?4 and s.applyStatus!=?5 and wo.startTime between ?6 and ?7  and s.matchStatus=?8")
     Optional<Long> getUnreadInvitedNum(Long teacherId,Date date,StStudentApplyRecords.ReadStatus status,StStudentApplyRecords.VALID valid ,StStudentApplyRecords.ApplyStatus applyStatus,Date beginDate,Date endDate,StStudentApplyRecords.MatchStatus matchStatus);
 
     @Query(value = "select s from StStudentApplyRecords s where s.teacherId=?1 and s.applyTime>?2 and s.isRead=?3 and s.valid=?4")
     List<StStudentApplyRecords>  getUnreadStStudentRecords(Long teacherId,Date date,StStudentApplyRecords.ReadStatus status,StStudentApplyRecords.VALID valid);
 
     @Query(value = "select new com.boxfishedu.workorder.entity.mysql.StStudentApplyRecordsResult(s.studentId,s.applyTime,s.teacherId,s.isRead,count(s.workOrderId)) " +
-            "from StStudentApplyRecords s  , WorkOrder wo  where s.workOrderId=wo.id and  s.teacherId=?1 and s.applyTime>?2 and s.valid=?3  and   s.applyStatus!=?4    and wo.startTime between ?5 and ?6  and s.matchStatus!=?7 group by s.studentId")
+            "from StStudentApplyRecords s  , WorkOrder wo  where s.workOrderId=wo.id and  s.teacherId=?1 and s.applyTime>?2 and s.valid=?3  and   s.applyStatus!=?4    and wo.startTime between ?5 and ?6  and s.matchStatus=?7 group by s.studentId")
     Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date,StStudentApplyRecords.VALID valid,StStudentApplyRecords.ApplyStatus applyStatus , Date startTime,Date endTime,StStudentApplyRecords.MatchStatus matchStatus, Pageable pageable);
 
 
     @Query(value = "select s from  StStudentApplyRecords s " +
-            " , WorkOrder wo  where s.workOrderId=wo.id and s.applyTime>?1 and s.teacherId = ?2 and s.studentId =?3 and s.valid =?4 and s.applyStatus != ?5 and wo.startTime between ?6 and ?7  and s.matchStatus!=?8 order by wo.startTime asc")
+            " , WorkOrder wo  where s.workOrderId=wo.id and s.applyTime>?1 and s.teacherId = ?2 and s.studentId =?3 and s.valid =?4 and s.applyStatus != ?5 and wo.startTime between ?6 and ?7  and s.matchStatus=?8 order by wo.startTime asc")
     public Page<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(Date date ,Long teacherId,Long studentId,StStudentApplyRecords.VALID valid ,StStudentApplyRecords.ApplyStatus applyStatus ,Date startTime,Date endTime ,StStudentApplyRecords.MatchStatus matchStatus,Pageable pageable);
+
+    @Query(value = "select s from  StStudentApplyRecords s " +
+            " , WorkOrder wo  where s.workOrderId=wo.id and s.applyTime>?1 and s.teacherId = ?2 and s.studentId =?3 and s.valid =?4 and s.applyStatus != ?5 and wo.startTime between ?6 and ?7  and s.matchStatus!=?8 order by wo.startTime asc")
+    public List<StStudentApplyRecords> findByApplyTimeGreaterThanAndTeacherIdAndStudentIdAndValid(Date date ,Long teacherId,Long studentId,StStudentApplyRecords.VALID valid ,StStudentApplyRecords.ApplyStatus applyStatus ,Date startTime,Date endTime ,StStudentApplyRecords.MatchStatus matchStatus);
+
 
     @Query(value = "select s from  StStudentApplyRecords s " +
             "  , WorkOrder wo  where s.workOrderId=wo.id and  s.applyTime>?1 and s.teacherId = ?2 and s.studentId =?3 and s.valid =?4 and s.applyStatus != ?5 and wo.startTime between ?6 and ?7")
@@ -46,7 +51,7 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
     @Modifying
     @Query("update StStudentApplyRecords o set o.applyStatus =?1 where o.id in (?2)")
-    int setFixedApplyStatusFor(StStudentApplyRecords.ApplyStatus  applyStatus,  List<Long> ids);
+    int setFixedApplyStatusFor(StStudentApplyRecords.ApplyStatus  applyStatus, List<Long> ids);
 
     @Modifying
     @Query("update StStudentApplyRecords o set  o.isRead= ?1, o.applyStatus=?2  where  o.id in (?3) ")
