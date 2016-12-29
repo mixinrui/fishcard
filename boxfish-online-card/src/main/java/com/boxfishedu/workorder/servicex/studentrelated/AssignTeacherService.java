@@ -490,6 +490,7 @@ public class AssignTeacherService {
         jsonObject.put("push_title", pushTitle);
         jsonObjectData.put("push_title", pushTitle);
         jsonObjectData.put("type", "ASSIGNTEACHER");
+        jsonObjectData.put("user_id", teahcerId);
         jsonObject.put("data", jsonObjectData);
 
         teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);

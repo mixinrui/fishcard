@@ -147,6 +147,7 @@ public class CourseChangeServiceX {
 
             jsonObjectData.put("type", MessagePushTypeEnum.SEND_TEASTU_ASSESS_TYPE.toString());
             jsonObjectData.put("count", null == map.get(key) ? "0" : map.get(key).size());
+            jsonObjectData.put("user_id", key);
             logger.info(":::::::sendToTecherContent::::pushTitle:[{}]:size[{}]", pushTitle, map.get(key).size());
             jsonObject.put("data", jsonObjectData);
 

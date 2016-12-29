@@ -136,6 +136,7 @@ public class CourseNotifyOneDayServiceX {
             jsonObjectData.put("type", MessagePushTypeEnum.SEND_STUDENT_CLASS_TOMO_TYPE.toString());
             jsonObjectData.put("count", count);
             jsonObjectData.put("push_title", pushTitle);
+            jsonObjectData.put("user_id", key);
 
             jsonObject.put("data", jsonObjectData);
             teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
