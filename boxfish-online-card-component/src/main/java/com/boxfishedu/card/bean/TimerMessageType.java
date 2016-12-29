@@ -60,7 +60,6 @@ public enum TimerMessageType {
     // 外教点评会员过期提醒
     EXPIRE_COMMENT_CARD(149);
 
-
     private int code;
 
     private TimerMessageType(int code) {
