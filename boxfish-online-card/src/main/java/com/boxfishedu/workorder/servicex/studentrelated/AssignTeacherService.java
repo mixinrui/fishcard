@@ -110,9 +110,9 @@ public class AssignTeacherService {
         }
 
         //判断旧鱼卡是否已经上完课
-//        if (workOrder.getStartTime().after(new Date())) {
-//            throw new BusinessException("该课程尚未结束");
-//        }
+        if (workOrder.getStartTime().after(new Date())) {
+            throw new BusinessException("该课程尚未结束");
+        }
 
 
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(workOrder.getSkuId()));
@@ -362,7 +362,7 @@ public class AssignTeacherService {
         if (!CollectionUtils.isEmpty(teacherInfoMap)) {
             jo.put("teacherImg", teacherInfoMap.get("figure_url"));
             jo.put("teacherId", stStudentSchema.getTeacherId());
-            jo.put("sku_id", stStudentSchema.getSkuId());
+            jo.put("sku_id", stStudentSchema.getSkuId().ordinal());
             //jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
 
         }
@@ -370,6 +370,7 @@ public class AssignTeacherService {
         return jo;
 
     }
+
 
 
     /**
