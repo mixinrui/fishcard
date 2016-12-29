@@ -629,8 +629,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     // 推送
     private void pushExpireMessage(Set<Long> ids) {
-        ids.forEach(id -> commentCardSDK.notifyCommentCardExpire(
-                id, commentCardTimeConf.getExpireMessage(), "MEMBER_FOREIGN_COMMENT"));
+        commentCardSDK.notifyCommentCardExpire(ids, commentCardTimeConf.getExpireMessage(), "MEMBER_FOREIGN_COMMENT");
     }
 
     private String getTeacherName(String teacherFirstName,String teacherLastName){
