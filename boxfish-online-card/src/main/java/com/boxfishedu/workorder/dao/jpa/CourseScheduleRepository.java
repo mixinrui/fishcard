@@ -96,7 +96,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
 
     List<CourseSchedule> findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(Long studentId,Integer roleId,Date startTime,Integer isFreeze,Long teacherId);
-    List<CourseSchedule> findByTeacherIdAndTimeSlotIdInAndClassDateInAndIsFreezeAndRoleId(Long teacherId,List<Integer> TimeslotsList,List<Date> classDateList,Integer isFreeze,Integer roleId);
+    List<CourseSchedule> findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherId(Long studentId,Integer roleId,Date startTime,Integer isFreeze,Long teacherId);
     List<CourseSchedule> findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleId(Long teacherId,Long studentId,Integer isFreeze,Integer roleId);
 //    findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze
 

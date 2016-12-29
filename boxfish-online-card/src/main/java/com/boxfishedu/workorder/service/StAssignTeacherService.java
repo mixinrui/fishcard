@@ -69,19 +69,28 @@ public class StAssignTeacherService {
      * @param skuId
      */
     @Transactional
-    public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,
+    public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,List<CourseSchedule> alreadyCourseSchedules,
                                 String channel, Integer skuId) {
-//        checkSchema(studentId, teacherId, skuId);
-        if(Collections3.isEmpty(aggressorCourseSchedules)){
-            logger.info("@@@@assign 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
-                            "===>>skuId:{}=====>>channel:{}====>>没有数据!!!!!!!!!!",
-                    studentId, teacherId, skuId,channel);
-            return;
-        }
-        logger.info("@@@@assign 指定老师 stp-2:::排除相同指定老师课表结束:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
-                        "===>>skuId:{}====>>(排除那些也指定过这个老师的之后)老师其他学生的鱼卡IDS:{}===>>>总共{}条",
+        logger.info("@@@@assign 指定老师 stp-2:::初始化:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+                        "===>>skuId:{}====>>鱼卡IDS:{}===>>>总共{}条",
                 studentId, teacherId, skuId, Collections3.extractToList(aggressorCourseSchedules,"workorderId").toArray(),
                 aggressorCourseSchedules.size());
+
+        logger.info("@@@@assign 指定老师 stp-2:::alreadyCourseSchedules:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+                        "===>>skuId:{}====>>鱼卡IDS:{}===>>>总共{}条",
+                studentId, teacherId, skuId, Collections3.extractToList(alreadyCourseSchedules,"workorderId").toArray(),
+                aggressorCourseSchedules.size());
+
+        if(Collections3.isEmpty(aggressorCourseSchedules)){
+            logger.info("@@@@assign 指定老师 stp-2:::排除相同指定老师:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+                            "===>>skuId:{}=====>>channel:{}====>>没有数据!!!!!!!!!!",
+                    studentId, teacherId, skuId,channel);
+            if(Collections3.isNotEmpty(alreadyCourseSchedules)){
+                makeApplyRecords( teacherId,  studentId, null, alreadyCourseSchedules, skuId);
+            }
+            return;
+        }
+
         //TODO 当前指定老师的其他学生的课表
         List<CourseSchedule> victimCourseSchedules =
                 courseScheduleRepository.
@@ -178,11 +187,11 @@ public class StAssignTeacherService {
         logger.info("@@@@assign 指定老师 stp-2:::师生运营完成匹配:::======>>>APP端学生ID:{}====>>师生运营完成匹配,其中UNMATCHED --鱼卡IDS:{}",
                 studentId, unmacthedWorkOrderIdList);
         if (channel.equals(ConstantUtil.STUDENT_CHANNLE)) {
-            makeApplyRecords(teacherId, studentId, scheduleModelStList,skuId);
+            makeApplyRecords(teacherId, studentId, scheduleModelStList,alreadyCourseSchedules,skuId);
         } else if (channel.equals(ConstantUtil.TEACHER_CHANNLE)) {
             changeApplyRecords(studentId, teacherId, macthedList);
         } else if (channel.equals(ConstantUtil.TIMER_CHANNLE)) {
-            makeApplyRecords(teacherId, studentId, scheduleModelStList, skuId);
+            makeApplyRecords(teacherId, studentId, scheduleModelStList,alreadyCourseSchedules, skuId);
         }
         if (Collections3.isNotEmpty(macthedWorkOrderIdList)) {
             List<WorkOrder> workOrders = workOrderJpaRepository.findWorkOrderAll(macthedWorkOrderIdList);
@@ -331,37 +340,53 @@ public class StAssignTeacherService {
     /**
      * @param teacherId
      * @param studentId
-     * @param list
+     * @param matchlist
      */
     @Transactional
-    public void makeApplyRecords(Long teacherId, Long studentId,List<ScheduleModelSt> list,Integer skuId) {
-        if(Collections3.isEmpty(list)){
-            return;
-        }
-        StStudentApplyRecords stStudentApplyRecords = null;
+    public void makeApplyRecords(Long teacherId, Long studentId,List<ScheduleModelSt> matchlist,List<CourseSchedule> alreadyList,Integer skuId) {
         List<StStudentApplyRecords> stStudentApplyRecordsList = Lists.newArrayList();
+        StStudentApplyRecords stStudentApplyRecords = null;
         Date now = new Date();
         boolean canPush = false;
-        for (ScheduleModelSt scheduleModelSt : list) {
-            stStudentApplyRecords = new StStudentApplyRecords();
-            stStudentApplyRecords.setTeacherId(teacherId);
-            stStudentApplyRecords.setStudentId(studentId);
-            stStudentApplyRecords.setApplyTime(now);
-            stStudentApplyRecords.setCreateTime(now);
-            stStudentApplyRecords.setUpdateTime(now);
-            stStudentApplyRecords.setSkuId(skuId);
-            stStudentApplyRecords.setValid(StStudentApplyRecords.VALID.yes);
-            stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.pending);
-            stStudentApplyRecords.setIsRead(StStudentApplyRecords.ReadStatus.no);
-            stStudentApplyRecords.setWorkOrderId(scheduleModelSt.getWorkOrderId());
-            stStudentApplyRecords.setCourseScheleId(scheduleModelSt.getId());
-            stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus()==null? StStudentApplyRecords.MatchStatus.un_matched:scheduleModelSt.getMatchStatus());
-            stStudentApplyRecordsList.add(stStudentApplyRecords);
-            if(stStudentApplyRecords.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
-                canPush = true;
+        if(Collections3.isNotEmpty(matchlist)){
+            for (ScheduleModelSt scheduleModelSt : matchlist) {
+                stStudentApplyRecords = new StStudentApplyRecords();
+                stStudentApplyRecords.setTeacherId(teacherId);
+                stStudentApplyRecords.setStudentId(studentId);
+                stStudentApplyRecords.setApplyTime(now);
+                stStudentApplyRecords.setCreateTime(now);
+                stStudentApplyRecords.setUpdateTime(now);
+                stStudentApplyRecords.setSkuId(skuId);
+                stStudentApplyRecords.setValid(StStudentApplyRecords.VALID.yes);
+                stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.pending);
+                stStudentApplyRecords.setIsRead(StStudentApplyRecords.ReadStatus.no);
+                stStudentApplyRecords.setWorkOrderId(scheduleModelSt.getWorkOrderId());
+                stStudentApplyRecords.setCourseScheleId(scheduleModelSt.getId());
+                stStudentApplyRecords.setMatchStatus(scheduleModelSt.getMatchStatus()==null? StStudentApplyRecords.MatchStatus.un_matched:scheduleModelSt.getMatchStatus());
+                stStudentApplyRecordsList.add(stStudentApplyRecords);
+                if(stStudentApplyRecords.getMatchStatus() == StStudentApplyRecords.MatchStatus.wait2apply){
+                    canPush = true;
+                }
             }
         }
-
+        if(Collections3.isNotEmpty(alreadyList)){
+            for (CourseSchedule courseSchedule : alreadyList) {
+                stStudentApplyRecords = new StStudentApplyRecords();
+                stStudentApplyRecords.setTeacherId(teacherId);
+                stStudentApplyRecords.setStudentId(studentId);
+                stStudentApplyRecords.setApplyTime(now);
+                stStudentApplyRecords.setCreateTime(now);
+                stStudentApplyRecords.setUpdateTime(now);
+                stStudentApplyRecords.setSkuId(skuId);
+                stStudentApplyRecords.setValid(StStudentApplyRecords.VALID.yes);
+                stStudentApplyRecords.setApplyStatus(StStudentApplyRecords.ApplyStatus.agree);
+                stStudentApplyRecords.setIsRead(StStudentApplyRecords.ReadStatus.yes);
+                stStudentApplyRecords.setWorkOrderId(courseSchedule.getWorkorderId());
+                stStudentApplyRecords.setCourseScheleId(courseSchedule.getId());
+                stStudentApplyRecords.setMatchStatus(StStudentApplyRecords.MatchStatus.matched);
+                stStudentApplyRecordsList.add(stStudentApplyRecords);
+            }
+        }
         //TODO 无时间片 请求记录入库 入库之前,先把之前的申请记录全部作废掉
         List<StStudentApplyRecords> invalidRecordsList = stStudentApplyRecordsJpaRepository.
                 findByStudentIdAndTeacherIdAndValid(studentId, teacherId, StStudentApplyRecords.VALID.yes);
@@ -372,7 +397,9 @@ public class StAssignTeacherService {
             }
             stStudentApplyRecordsJpaRepository.save(invalidRecordsList);
         }
-        stStudentApplyRecordsJpaRepository.save(stStudentApplyRecordsList);
+        if(Collections3.isNotEmpty(stStudentApplyRecordsList)){
+            stStudentApplyRecordsJpaRepository.save(stStudentApplyRecordsList);
+        }
         if(canPush){
             assignTeacherService.pushTeacherList(teacherId);
         }
