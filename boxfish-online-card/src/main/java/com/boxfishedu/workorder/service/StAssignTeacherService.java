@@ -79,7 +79,7 @@ public class StAssignTeacherService {
         logger.info("@@@@assign 指定老师 stp-2:::alreadyCourseSchedules:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                         "===>>skuId:{}====>>鱼卡IDS:{}===>>>总共{}条",
                 studentId, teacherId, skuId, Collections3.extractToList(alreadyCourseSchedules,"workorderId").toArray(),
-                aggressorCourseSchedules.size());
+                alreadyCourseSchedules.size());
 
         if(Collections3.isEmpty(aggressorCourseSchedules)){
             logger.info("@@@@assign 指定老师 stp-2:::排除相同指定老师:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
