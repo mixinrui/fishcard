@@ -29,6 +29,7 @@ public class CommentCardTimer {
 //    @Scheduled(cron = "0 0/1 * * * ?")
 //    @Scheduled(cron = "0/1 * * * * ?")
     public void judgeCommentCard(){
+
         logger.info("@CommentCardTimer>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
         foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
         foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
@@ -36,7 +37,7 @@ public class CommentCardTimer {
     }
 
 //    @Scheduled(cron = "0 0/1 * * * ?")
-    @RequestMapping(value = "/notify/member")
+    //@RequestMapping(value = "/notify/member")
     public void notifyCommentCard() {
         foreignTeacherCommentCardService.notifyExpireCommentCards();
     }

@@ -58,7 +58,8 @@ public enum TimerMessageType {
     //指定老师
     INSTANT_ASSGIN_TEACHER(148),
     // 外教点评会员过期提醒
-    EXPIRE_COMMENT_CARD(149);
+    EXPIRE_COMMENT_CARD(149),
+    ASSGIN_TEACHER(150);
 
 
     private int code;

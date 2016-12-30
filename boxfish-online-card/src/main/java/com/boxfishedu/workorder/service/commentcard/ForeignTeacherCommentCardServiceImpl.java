@@ -277,23 +277,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         // 超过24小时,未超过48小时
         LocalDateTime now = LocalDateTime.now();
         Date updateDate = DateUtil.localDate2Date(now);
-//        List<CommentCard> list =null;
-//        if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
-//            list = commentCardJpaRepository.findByDateRangeAndStatus(
-//                    DateUtil.localDate2Date(now.minusMinutes(20)),
-//                    DateUtil.localDate2Date(now.minusMinutes(10)),
-//                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
-//        }else{
-//            list = commentCardJpaRepository.findByDateRangeAndStatus(
-//                DateUtil.localDate2Date(now.minusDays(2)),
-//                DateUtil.localDate2Date(now.minusDays(1)),
-//                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
-//        }
         //2016-12-08 修改为从配置文件获取过滤时间
-        System.out.println("nodeOne:" + commentCardTimeConf.getNodeOne());
-        System.out.println("nodeTwo:" + commentCardTimeConf.getNodeTwo());
-        System.out.println("nodeThree:" + commentCardTimeConf.getNodeThree());
-        System.out.println("nodeFour:" + commentCardTimeConf.getNodeFour());
         List<CommentCard> list = commentCardJpaRepository.findByDateRangeAndStatus(
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeThree()))),
                 DateUtil.localDate2Date(now.minusMinutes(Long.parseLong(commentCardTimeConf.getNodeTwo()))),
@@ -376,18 +360,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     public void foreignTeacherCommentUnAnswer2() {
         logger.info("@foreignTeacherCommentUnAnswer21 调用--查询48小时未点评的外教--接口");
         LocalDateTime now = LocalDateTime.now();
-//        List<CommentCard> list = null;
-//        if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
-//            list = commentCardJpaRepository.findByDateRangeAndStatus2(
-//                    DateUtil.localDate2Date(now.minusMinutes(6000)),
-//                    DateUtil.localDate2Date(now.minusMinutes(20)),
-//                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
-//        }else{
-//             list = commentCardJpaRepository.findByDateRangeAndStatus2(
-//                DateUtil.localDate2Date(now.minusDays(30)),
-//                DateUtil.localDate2Date(now.minusDays(2)),
-//                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
-//        }
         //2016-12-08 修改为从配置文件获取过滤时间
         System.out.println("nodeOne2:" + commentCardTimeConf.getNodeOne());
         System.out.println("nodeTwo2:" + commentCardTimeConf.getNodeTwo());
@@ -454,18 +426,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         String name;
         logger.info("@foreignUndistributedTeacherCommentCards1 调用-查询24小时内暂时还未分配到老师的点评卡--接口,为其重新请求分配老师...");
         LocalDateTime now = LocalDateTime.now();
-//        List<CommentCard> list = null;
-//        if(serviceGateWayType.getType().trim().equals("test") || serviceGateWayType.getType().trim().equals("development_new")){
-//            list = commentCardJpaRepository.findUndistributedTeacher(
-//                    DateUtil.localDate2Date(now.minusMinutes(6000)),
-//                    DateUtil.localDate2Date(now.minusMinutes(0)),
-//                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
-//        }else{
-//            list = commentCardJpaRepository.findUndistributedTeacher(
-//                DateUtil.localDate2Date(now.minusDays(30)),
-//                DateUtil.localDate2Date(now.minusDays(0)),
-//                    CommentCardStatus.ASSIGNED_TEACHER.getCode());
-//        }
         //2016-12-08 修改为从配置文件获取过滤时间
         System.out.println("nodeOne3:" + commentCardTimeConf.getNodeOne());
         System.out.println("nodeTwo3:" + commentCardTimeConf.getNodeTwo());
@@ -629,8 +589,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     // 推送
     private void pushExpireMessage(Set<Long> ids) {
-        ids.forEach(id -> commentCardSDK.notifyCommentCardExpire(
-                id, commentCardTimeConf.getExpireMessage(), "MEMBER_FOREIGN_COMMENT"));
+        commentCardSDK.notifyCommentCardExpire(ids, commentCardTimeConf.getExpireMessage(), "MEMBER_FOREIGN_COMMENT");
     }
 
     private String getTeacherName(String teacherFirstName,String teacherLastName){
