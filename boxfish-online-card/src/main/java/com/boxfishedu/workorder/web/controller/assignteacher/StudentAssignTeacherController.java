@@ -73,14 +73,14 @@ public class StudentAssignTeacherController {
                                                 Long studentId, Long teacherId, Long userId) {
         studentId = userId;
         logger.info("assign_teacher_act :oldWorkOrderId [{}] skuId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,sku_id,teacherId,userId);
-        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
-            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
-        }
+//        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
+//            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
+//        }
 
         // 验证重复提交问题
         JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId,sku_id, studentId,teacherId);
 
-        checker.evictRepeatedSubmission(oldWorkOrderId);
+//        checker.evictRepeatedSubmission(oldWorkOrderId);
         return JsonResultModel.newJsonResultModel("OK");
     }
 

@@ -57,8 +57,8 @@ parameter:
   #允许立即上课的类型:   0:All  1:中教    2:外教
   instant_allow_teacher_type: 0
 
-  network_bad: 800
-  network_general: 400
+  network_bad: 1000
+  network_general: 500
 
   #封面服务器的地址
   thumbnail_server: http://api.boxfish.cn/student/publication/data/data/
