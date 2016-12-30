@@ -192,7 +192,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -258,7 +258,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -325,7 +325,7 @@ interface:
     pay_service: http://101.201.237.252:8888/pay-inside
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -400,7 +400,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  师生运营匹配老师
     #消息推送地址
@@ -482,7 +482,7 @@ interface:
     absenteeism_deduct_score: https://api.online.test.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
@@ -556,7 +556,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -624,7 +624,7 @@ interface:
     absenteeism_deduct_score: https://api.test.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
     course_type_and_difficulty: https://base.boxfish.cn
@@ -713,7 +713,7 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.boxfish.cn//online/figure
+    teacher_photo: https://api.boxfish.cn//online/figure
     resource_url: http://api.boxfish.cn//online
 #消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push
@@ -791,7 +791,7 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.boxfish.cn/online/figure
+    teacher_photo: https://api.boxfish.cn/online/figure
     resource_url: http://api.boxfish.cn/online
     #消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push
