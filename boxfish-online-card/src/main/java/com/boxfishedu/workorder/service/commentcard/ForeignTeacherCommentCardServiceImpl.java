@@ -550,7 +550,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Override
     public JsonResultModel pushInfoToStudentAndTeacher(Long userId, String title, String type) {
-        return commentCardSDK.pushToStudentAndTeacher(userId,title,type);
+        commentCardSDK.pushToStudentAndTeacher(userId,title,type);
+        return new JsonResultModel();
     }
 
     @Override
