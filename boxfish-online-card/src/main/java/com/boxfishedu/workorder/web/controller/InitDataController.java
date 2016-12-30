@@ -294,6 +294,7 @@ public class InitDataController {
     public JsonResultModel initNet() {
         List<Long> cardIds = workOrderJpaRepository.findAllWorkOrderId();
         cardIds.forEach(cardId -> {
+            logger.debug("正在初始化网络数据>>>>[{}]",cardId);
             try {
                 fetchHeartBeatServiceX.persistAnalysisAsync(workOrderJpaRepository.findOne(cardId));
             } catch (Exception ex) {

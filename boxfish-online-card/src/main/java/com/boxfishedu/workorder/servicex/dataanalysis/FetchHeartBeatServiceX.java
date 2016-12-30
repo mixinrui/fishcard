@@ -98,10 +98,13 @@ public class FetchHeartBeatServiceX {
     public void persistAnalysis(WorkOrder workOrder) {
         logger.debug("@persistAnalysis#开始初始化网络情况#参数[{}]", workOrder);
         this.persistAnalysis(workOrder.getId(), workOrder.getStudentId(), this.getAllNetPing(workOrder, "student"));
-        this.persistAnalysis(workOrder.getId(), workOrder.getTeacherId(), this.getAllNetPing(workOrder, "student"));
+        this.persistAnalysis(workOrder.getId(), workOrder.getTeacherId(), this.getAllNetPing(workOrder, "teacher"));
     }
 
     public void persistAnalysisAsync(WorkOrder workOrder) {
+        if(workOrder.getStartTime().after(new Date())){
+            return;
+        }
         threadPoolManager.execute(new Thread(() -> {
             this.persistAnalysis(workOrder);
         }));
