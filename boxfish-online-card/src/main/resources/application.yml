@@ -57,8 +57,8 @@ parameter:
   #允许立即上课的类型:   0:All  1:中教    2:外教
   instant_allow_teacher_type: 0
 
-  network_bad: 600
-  network_general: 300
+  network_bad: 800
+  network_general: 400
 
   #封面服务器的地址
   thumbnail_server: http://api.boxfish.cn/student/publication/data/data/
@@ -648,7 +648,7 @@ time:
 
 #===============================================================生产环境===============================================================
 #=============192.168.1.30===============192.168.1.29======================192.168.1.25===============================================#
-#=================mongo:    mongo --host dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
+#=================mongo:    mongo --host dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
 #=================外网mq:   120.27.227.72:5672(映射:120.27.227.72:5672)================================================================#
 ---
 spring:
