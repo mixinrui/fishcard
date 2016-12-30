@@ -15,6 +15,7 @@ import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -74,8 +75,15 @@ public class LastClassStrategy implements ScheduleStrategy {
 
         dealFirstWorkOrder(instantClassCard, workOrders.get(0), logMap);
 
+        ThreadLocalUtil.waitReleasedWorkOrder.set(null);
+
         for (int i = 1; i < workOrders.size(); i++) {
             WorkOrder tmp = workOrders.get(i).clone();
+
+            //释放最后一个教师的资源
+            if (i == workOrders.size() - 1) {
+                ThreadLocalUtil.waitReleasedWorkOrder.set(tmp.clone());
+            }
 
             workOrders.get(i).setStartTime(oldCard.getStartTime());
             workOrders.get(i).setEndTime(oldCard.getEndTime());
@@ -107,7 +115,7 @@ public class LastClassStrategy implements ScheduleStrategy {
     public Optional<WorkOrder> getCardToStart(InstantRequestParam instantRequestParam, int teachingType) {
         return workOrderJpaRepository
                 .findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterOrderByStartTimeAsc(instantRequestParam
-                        .getStudentId(), teachingType, new Integer(0), new Date());
+                                                                                                    .getStudentId(), teachingType, new Integer(0), new Date());
     }
 
     private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder, Map<WorkOrder, String> logMap) {
