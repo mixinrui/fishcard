@@ -107,6 +107,7 @@ public class InstantClassTeacherService {
 
         if (!Objects.isNull(ThreadLocalUtil.waitReleasedWorkOrder.get())) {
             //释放最后一节教师的课
+            logger.debug("@prepareForInstantClass释放最后一节课的教师资源,参数[{}]", instantClassCard);
             teacherStudentRequester.releaseTeacher(ThreadLocalUtil.waitReleasedWorkOrder.get());
         }
 
