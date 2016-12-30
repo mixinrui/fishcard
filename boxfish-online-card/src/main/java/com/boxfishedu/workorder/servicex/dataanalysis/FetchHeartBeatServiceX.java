@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.dataanalysis;
 
 import com.boxfishedu.workorder.common.bean.AppPointRecordEventEnum;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -103,6 +104,9 @@ public class FetchHeartBeatServiceX {
 
     public void persistAnalysisAsync(WorkOrder workOrder) {
         if(workOrder.getStartTime().after(new Date())){
+            return;
+        }
+        if(workOrder.getStatus()== FishCardStatusEnum.COURSE_ASSIGNED.getCode()){
             return;
         }
         threadPoolManager.execute(new Thread(() -> {

@@ -292,9 +292,10 @@ public class InitDataController {
 
     @RequestMapping(value = "/net", method = RequestMethod.POST)
     public JsonResultModel initNet() {
-        List<Long> cardIds = workOrderJpaRepository.findAllWorkOrderId();
+        List<Long> cardIds = workOrderJpaRepository.findAllFinishedId(new Date());
+        logger.debug("初始化网络,总数[{}]", cardIds.size());
         cardIds.forEach(cardId -> {
-            logger.debug("正在初始化网络数据>>>>[{}]",cardId);
+            logger.debug("正在初始化网络数据>>>>[{}]", cardId);
             try {
                 fetchHeartBeatServiceX.persistAnalysisAsync(workOrderJpaRepository.findOne(cardId));
             } catch (Exception ex) {
