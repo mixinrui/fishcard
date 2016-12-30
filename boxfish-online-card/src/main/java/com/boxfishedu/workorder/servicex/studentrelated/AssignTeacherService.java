@@ -139,8 +139,7 @@ public class AssignTeacherService {
         }
         assignTeacherServiceX.insertOrUpdateSchema(studentId, teacherId, skuId);
         assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
-
-        pushTeacherList(teacherId);
+        
         return JsonResultModel.newJsonResultModel(null);
     }
 
