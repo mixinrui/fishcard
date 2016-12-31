@@ -11,9 +11,11 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
 import com.boxfishedu.workorder.requester.MsgPushRequester;
+import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.OtherEntranceDataGenerator;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
@@ -26,10 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by hucl on 16/11/7.
@@ -59,6 +58,9 @@ public class InstantClassTeacherService {
 
     @Autowired
     private MsgPushRequester msgPushRequester;
+
+    @Autowired
+    private TeacherStudentRequester teacherStudentRequester;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -102,6 +104,13 @@ public class InstantClassTeacherService {
             InstantClassCard instantClassCard
             , InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher, InstantGroupInfo instantGroupInfo) {
         List<WorkOrder> workOrders = this.initCardAndSchedule(instantClassCard, instantAssignTeacher);
+
+        if (!Objects.isNull(ThreadLocalUtil.waitReleasedWorkOrder.get())) {
+            //释放最后一节教师的课
+            logger.debug("@prepareForInstantClass释放最后一节课的教师资源,参数[{}]", instantClassCard);
+            teacherStudentRequester.releaseTeacher(ThreadLocalUtil.waitReleasedWorkOrder.get());
+        }
+
         try {
             BeanUtils.copyProperties(instantGroupInfo
                     , courseOnlineRequester.instantCreateGroup(workOrderService.findOne(instantClassCard.getWorkorderId())));

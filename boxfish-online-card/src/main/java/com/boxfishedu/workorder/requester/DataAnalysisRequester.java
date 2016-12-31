@@ -34,7 +34,7 @@ public class DataAnalysisRequester {
      */
     public EventResultBean fetchHeartBeatLog(DataAnalysisLogParam dataAnalysisLogParam) {
         String url = String.format("%s/api/log/query/condition?userId=%s&startTime=%s&endTime=%s&event=%s",
-                urlConf.getData_analysis_service(), dataAnalysisLogParam.getUserId()
+                                   urlConf.getData_analysis_service(), dataAnalysisLogParam.getUserId()
                 , dataAnalysisLogParam.getStartTime(), dataAnalysisLogParam.getEndTime(), dataAnalysisLogParam.getEvent());
         EventResultBean eventResultBean = null;
         try {
@@ -52,10 +52,10 @@ public class DataAnalysisRequester {
 
     public NetSourceBean getNetSourceBean(DataAnalysisLogParam dataAnalysisLogParam, Pageable pageable) {
 
-        String url = String.format("%s/api/log/query/condition?userId=%s&startTime=%s&endTime=%s&event=%s&size=%s",
-                urlConf.getData_analysis_service(), dataAnalysisLogParam.getUserId()
+        String url = String.format("%s/api/log/query/condition?userId=%s&startTime=%s&endTime=%s&event=%s&size=%s&page=%s",
+                                   urlConf.getData_analysis_service(), dataAnalysisLogParam.getUserId()
                 , dataAnalysisLogParam.getStartTime(), dataAnalysisLogParam.getEndTime()
-                , dataAnalysisLogParam.getEvent(), pageable.getPageSize());
+                , dataAnalysisLogParam.getEvent(), pageable.getPageSize(), pageable.getPageNumber());
 
         NetSourceBean netSourceBean = null;
         try {

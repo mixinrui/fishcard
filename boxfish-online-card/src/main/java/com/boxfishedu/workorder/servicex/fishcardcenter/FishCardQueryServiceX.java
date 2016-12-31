@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.SkuTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mongo.NetPingAnalysisInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -31,6 +32,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -90,9 +93,14 @@ public class FishCardQueryServiceX {
                 continue;
             }
 
+            LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(
+                    workOrder.getEndTime().toInstant(), ZoneId.systemDefault());
+            Date deadDate = DateUtil.localDate2Date(endLocalDateTime.plusMinutes(11));
+
             //正在进行
             if (workOrder.getStatus() > FishCardStatusEnum.TEACHER_ASSIGNED.getCode()
-                    && !java.util.Objects.equals(new Short((short) 1), workOrder.getIsCourseOver())) {
+                    && (!java.util.Objects.equals(new Short((short) 1), workOrder.getIsCourseOver())
+                    && deadDate.after(new Date()))) {
                 workOrder.addStudentStatus(FishCardNetStatusEnum.CLASSING);
                 workOrder.addTeacherStatus(FishCardNetStatusEnum.CLASSING);
                 continue;
@@ -100,7 +108,7 @@ public class FishCardQueryServiceX {
 
             //教师网络
             NetPingAnalysisInfo teacherNetInfo = fetchHeartBeatServiceX
-                    .getNetAnalysis(workOrder.getId(), workOrder.getStudentId());
+                    .getNetAnalysis(workOrder.getId(), workOrder.getTeacherId());
             if (Objects.isNull(teacherNetInfo)) {
                 workOrder.addTeacherStatus(FishCardNetStatusEnum.UNKNOWN);
             } else {
@@ -116,7 +124,7 @@ public class FishCardQueryServiceX {
 
             //学生网络
             NetPingAnalysisInfo studentNetInfo = fetchHeartBeatServiceX
-                    .getNetAnalysis(workOrder.getId(), workOrder.getTeacherId());
+                    .getNetAnalysis(workOrder.getId(), workOrder.getStudentId());
             if (Objects.isNull(studentNetInfo)) {
                 workOrder.addStudentStatus(FishCardNetStatusEnum.UNKNOWN);
             } else {

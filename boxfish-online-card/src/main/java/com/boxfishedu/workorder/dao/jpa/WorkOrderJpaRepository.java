@@ -170,6 +170,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select wo.id from WorkOrder wo")
     public List<Long> findAllWorkOrderId();
 
+    @Query("select wo.id from WorkOrder wo where wo.startTime<?1")
+    public List<Long> findAllFinishedId(Date date);
+
     List<WorkOrder> findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(Integer freezeFlag,Short isCourseOver,Integer status,Date startTime);
 
     // 获取兑换类型一个种类下最大的一个序号
