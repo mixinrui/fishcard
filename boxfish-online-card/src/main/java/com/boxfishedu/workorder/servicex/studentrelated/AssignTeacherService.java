@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -85,6 +86,7 @@ public class AssignTeacherService {
     private AssignTeacherServiceX assignTeacherServiceX;
 
 
+
     //1 判断按钮是否出现
     public JsonResultModel checkAssignTeacherFlag(Long workOrderId) {
         List<WorkOrder> workOrders = this.getAssignTeacherList(workOrderId);
@@ -137,9 +139,11 @@ public class AssignTeacherService {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
             skuId = workOrder.getSkuId();
         }
-        assignTeacherServiceX.insertOrUpdateSchema(studentId, teacherId, skuId);
+
+        //分配
+        assignTeacherServiceX.insertOrUpdateSchema(studentId, teacherId, skuId,StStudentSchema.StSchema.assgin);
         assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
-        
+
         return JsonResultModel.newJsonResultModel(null);
     }
 
@@ -454,16 +458,31 @@ public class AssignTeacherService {
 
 
     // 9 app换个老师
+    @Transactional
     public JsonResultModel changeATeacher(StudentTeacherParam studentTeacherParam) {
         if (null == studentTeacherParam.getOrderId() || null == studentTeacherParam.getTeacherId()
                 || null == studentTeacherParam.getStudentId()) {
             throw new BusinessException("数据参数不全");
         }
 
+        Service service = serveService.findTop1ByOrderId(studentTeacherParam.getOrderId());
+
+        String tutorType = service.getTutorType();
+        Integer SkuId = 0;
+        logger.debug("changeATeacher,参数tutorType[{}]",tutorType);
+        if(Objects.equals(tutorType, TutorType.CN.name()) || Objects.equals(tutorType, TutorType.MIXED.name())) {
+            SkuId = 1; //中教
+        }else {
+            SkuId=2;   // 外教
+        }
+
+        //更新schema模式为自由模式  un_assign
+        assignTeacherServiceX.insertOrUpdateSchema(studentTeacherParam.getStudentId(), studentTeacherParam.getTeacherId(), SkuId,StStudentSchema.StSchema.un_assgin);
+
         JsonResultModel jsonResultModel = teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
 
         if (null != jsonResultModel && HttpStatus.OK.value() == jsonResultModel.getReturnCode()) {
-            Service service = serveService.findTop1ByOrderId(studentTeacherParam.getOrderId());
+
             // 获取订单数据
             List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(studentTeacherParam.getOrderId());
             List<Long> workOrderIds = Collections3.extractToList(workOrders, "id");
