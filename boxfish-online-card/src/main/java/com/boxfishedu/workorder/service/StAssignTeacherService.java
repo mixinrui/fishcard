@@ -71,6 +71,7 @@ public class StAssignTeacherService {
     @Transactional
     public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,List<CourseSchedule> alreadyCourseSchedules,
                                 String channel, Integer skuId) {
+        Date startTime = DateTime.now().plusHours(48).toDate();
         logger.info("@@@@assign 指定老师 stp-2:::初始化:::channel=={}======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                         "===>>skuId:{}====>>鱼卡IDS:{}===>>>总共{}条",
                 channel,studentId, teacherId, skuId, Collections3.extractToList(aggressorCourseSchedules,"workorderId").toArray(),
@@ -94,7 +95,7 @@ public class StAssignTeacherService {
         //TODO 当前指定老师的其他学生的课表
         List<CourseSchedule> victimCourseSchedules =
                 courseScheduleRepository.
-                        findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleId(teacherId, studentId, 0, skuId);
+                        findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleIdAndStartTimeGreaterThan(teacherId, studentId, 0, skuId,startTime);
 
         Map<String,CourseSchedule> victimCourseSchedulesFinalMap = Maps.newHashMap();
         Map<String,CourseSchedule> assignedCourseSchedulesMap = Maps.newHashMap();  //也指定过改老师,这样的鱼卡就放弃
