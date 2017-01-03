@@ -57,8 +57,8 @@ parameter:
   #允许立即上课的类型:   0:All  1:中教    2:外教
   instant_allow_teacher_type: 0
 
-  network_bad: 600
-  network_general: 300
+  network_bad: 1000
+  network_general: 500
 
   #封面服务器的地址
   thumbnail_server: http://api.boxfish.cn/student/publication/data/data/
@@ -192,7 +192,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -258,7 +258,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -325,7 +325,7 @@ interface:
     pay_service: http://101.201.237.252:8888/pay-inside
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -400,7 +400,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  师生运营匹配老师
     #消息推送地址
@@ -482,7 +482,7 @@ interface:
     absenteeism_deduct_score: https://api.online.test.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
@@ -556,7 +556,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -624,7 +624,7 @@ interface:
     absenteeism_deduct_score: https://api.test.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
     course_type_and_difficulty: https://base.boxfish.cn
@@ -648,7 +648,7 @@ time:
 
 #===============================================================生产环境===============================================================
 #=============192.168.1.30===============192.168.1.29======================192.168.1.25===============================================#
-#=================mongo:    mongo --host dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
+#=================mongo:    mongo --host dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
 #=================外网mq:   120.27.227.72:5672(映射:120.27.227.72:5672)================================================================#
 ---
 spring:
@@ -713,7 +713,7 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.boxfish.cn//online/figure
+    teacher_photo: https://api.boxfish.cn//online/figure
     resource_url: http://api.boxfish.cn//online
 #消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push
@@ -791,7 +791,7 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.boxfish.cn/online/figure
+    teacher_photo: https://api.boxfish.cn/online/figure
     resource_url: http://api.boxfish.cn/online
     #消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push

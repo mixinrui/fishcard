@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -57,7 +59,7 @@ public class CommentCardSDK {
         Map<String,String> map = new HashMap<>();
         map.put("type",type);
         pushToStudentAndTeacher.setData(map);
-        return restTemplate.postForObject(createPushURI(), Arrays.asList(pushToStudentAndTeacher),JsonResultModel.class);
+        return restTemplate.postForObject(createPushURI(), new HttpEntity<>(pushToStudentAndTeacher),JsonResultModel.class);
     }
 
     public Map commentTypeAndDifficulty(String courseId){
@@ -76,14 +78,11 @@ public class CommentCardSDK {
         return restTemplate.postForObject(getAddScoreURI(studentId,accessToken,point),null,Object.class);
     }
 
-    public Object notifyCommentCardExpire(Long id, String message, String type) {
+    public Object notifyCommentCardExpire(Set<Long> ids, String message, String type) {
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("user_id", new Long[] {id});
+        requestBody.put("user_id", ids);
         requestBody.put("push_title", message);
-        Map<String, Object> data = new HashMap<>();
-        data.put("type", type);
-        data.put("user_id", id);
-        requestBody.put("data", data);
+        requestBody.put("data", Collections.singletonMap("type", type));
         return restTemplate.postForObject(createBoxfishPushURI(), requestBody, JsonResultModel.class);
     }
 

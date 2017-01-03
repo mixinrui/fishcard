@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -64,11 +65,18 @@ public class Application implements CommandLineRunner {
     }
 
     @Scheduled(cron = "0 30 2 * * ?")
+//    @Scheduled(cron = "0/50 * * * * ?")
     public void synchronousCourseInfo() {
         LocalDateTime now = LocalDateTime.now();
         repository.updateCourseInfosByDateRange(
                 convertToDate(now), convertToDate(now.plusWeeks(1))
         );
+    }
+
+
+    @RequestMapping(value = "/handle/thumbnail", method = RequestMethod.GET)
+    public void handleThumbnail() {
+        workOrderService.handlThumbnails();
     }
 
     private static Date convertToDate(LocalDateTime localDateTime) {
@@ -77,6 +85,7 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        repository.updateCourseInfoByFile();
+//        repository.updateCourseInfoByFile();
+//        workOrderService.handlThumbnails();
     }
 }

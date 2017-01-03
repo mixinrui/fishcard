@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.entity.mysql.CourseInfo;
 import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherService;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
+import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionAssignTeacherChecker;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionChecker;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
@@ -45,7 +46,7 @@ public class StudentAssignTeacherController {
     private AssignTeacherService assignTeacherService;
 
     @Autowired
-    private RepeatedSubmissionChecker checker;
+    private RepeatedSubmissionAssignTeacherChecker checker;
 
     //本地异常日志记录对象
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -75,9 +76,10 @@ public class StudentAssignTeacherController {
 //        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
 //            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
 //        }
+
         // 验证重复提交问题
         JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId,sku_id, studentId,teacherId);
-        //
+
 //        checker.evictRepeatedSubmission(oldWorkOrderId);
         return JsonResultModel.newJsonResultModel("OK");
     }

@@ -219,8 +219,8 @@ public class RabbitMqReciver {
                 logger.info("==========>EXPIRE_COMMENT_CARD ===>>> 会员外教点评过期提醒");
                 foreignTeacherCommentCardService.notifyExpireCommentCards();
             }
-            else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_ASSGIN_TEACHER.value()) {
-                logger.info("==========>ASSIGN TEACHER===>>> 指定老师定时任务");
+            else if(serviceTimerMessage.getType() == TimerMessageType.ASSGIN_TEACHER.value()) {
+                logger.info("==========>@@@@assign-timer===>>> 指定老师定时任务接受到任务");
                 assignTeacherServiceX.autoAssign();
             }
             //

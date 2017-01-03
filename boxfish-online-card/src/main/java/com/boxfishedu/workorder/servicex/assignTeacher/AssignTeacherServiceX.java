@@ -83,10 +83,8 @@ public class AssignTeacherServiceX {
         Date startTime = DateTime.now().plusHours(48).toDate();
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.
                 findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,skuId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
-        if(Collections3.isNotEmpty(aggressorCourseSchedules)){
-            stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules, ConstantUtil.STUDENT_CHANNLE,skuId);
-        }
-
+        List<CourseSchedule> alreadyCourseSchedules = courseScheduleRepository.findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherId(studentId,skuId,startTime,0,teacherId);
+        stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,alreadyCourseSchedules, ConstantUtil.STUDENT_CHANNLE,skuId);
         return JsonResultModel.newJsonResultModel(null);
     }
 
@@ -98,22 +96,21 @@ public class AssignTeacherServiceX {
      * @return
      */
     public JsonResultModel teacherAccept(Long teacherId,Long studentId,List<Long> workOrderIds){
-
         Integer skuId = stStudentSchemaJpaRepository.findByStudentIdAndTeacherId(studentId,teacherId).getSkuId().ordinal();
         logger.info("@@@@assign 指定老师stp-1::::::======>>>APP端学生ID{}===>>>>发起指定老师{}===>>skuId{}=====>>>channel::{}",studentId,teacherId,skuId,"老师接受");
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(workOrderIds);
         if(Collections3.isNotEmpty(aggressorCourseSchedules)){
-            stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules, ConstantUtil.TEACHER_CHANNLE,skuId);
+            stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,null, ConstantUtil.TEACHER_CHANNLE,skuId);
         }
         return JsonResultModel.newJsonResultModel(null);
 
     }
 
     /**
-     *
+     * 定时任务调用
      */
     public void autoAssign(){
-        logger.info("@@@@assign <定时任务>指定老师stp-1::::::开始==================");
+        logger.info("@@@@assign-timer指定老师stp-1::::::开始==================");
         List<StStudentSchema> list = stStudentSchemaJpaRepository.findByStSchema(StStudentSchema.StSchema.assgin);
         Date startTime = DateTime.now().plusHours(48).toDate();
         List<CourseSchedule> aggressorCourseSchedules = null;
@@ -121,30 +118,14 @@ public class AssignTeacherServiceX {
             aggressorCourseSchedules = courseScheduleRepository.
                     findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(stStudentSchema.getStudentId(),
                             stStudentSchema.getSkuId().ordinal(),startTime,0,stStudentSchema.getTeacherId());//TODO 发起指定老师的学生的48小时候的课表
-            if(Collections3.isNotEmpty(aggressorCourseSchedules)){
-                logger.info("@@@@assign 指定老师 <定时任务> stp-1::::::======>>>学生ID{}===>>>>指定老师{}===>>skuId{}",
-                        stStudentSchema.getStudentId(),stStudentSchema.getTeacherId(),stStudentSchema.getSkuId().ordinal());
-                stAssignTeacherService.doAssignTeacher(stStudentSchema.getTeacherId(),stStudentSchema.getStudentId(),
-                        aggressorCourseSchedules,ConstantUtil.TIMER_CHANNLE,stStudentSchema.getSkuId().ordinal());
-            }
-
+            List<CourseSchedule> alreadyCourseSchedules = courseScheduleRepository.findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherId(stStudentSchema.getStudentId(),
+                    stStudentSchema.getSkuId().ordinal(),startTime,0,stStudentSchema.getTeacherId());
+            logger.info("@@@@assign-timer 指定老师 <定时任务> stp-1::::::======>>>学生ID{}===>>>>指定老师{}===>>skuId===>>{}",
+                    stStudentSchema.getStudentId(),stStudentSchema.getTeacherId(),stStudentSchema.getSkuId().ordinal());
+            stAssignTeacherService.doAssignTeacher(stStudentSchema.getTeacherId(),stStudentSchema.getStudentId(),
+                    aggressorCourseSchedules,alreadyCourseSchedules,ConstantUtil.TIMER_CHANNLE,stStudentSchema.getSkuId().ordinal());
         }
     }
-    /**
-     *
-     * @param teacherId
-     * @param studentId
-     * @param aggressorCourseSchedules
-     * @param channel ss_manual APP端学生手工点击指定老师 auto 系统定时任务出发 st_manual 教师点击接受触发
-     * @param skuId 鱼卡ID
-     * @return
-     */
-
-
-
-
-
-
 
     /**
      * @param studentId

@@ -3,6 +3,7 @@ package com.boxfishedu.card.fixes.entity.mongo;
 import com.boxfishedu.card.fixes.entity.jpa.WorkOrder;
 import com.boxfishedu.card.fixes.entity.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.card.fixes.service.WorkOrderService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,9 +75,32 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
     public void updateCourseInfosByDateRange(Date from, Date to) {
         List<WorkOrder> workOrders = workOrderJpaRepository.findByStartTimeRange(from, to);
         workOrders.parallelStream().forEach(workOrder -> {
-            ScheduleCourseInfo courseInfo = findByWorkOrderId(workOrder.getId());
-            if(courseInfo != null) {
-                updateCourseInfo(courseInfo);
+            List<ScheduleCourseInfo> scheduleCourseInfos = findByWorkOrderIds(workOrder.getId());
+            if(CollectionUtils.isNotEmpty(scheduleCourseInfos)) {
+                // 有大于1个的courseScheduleInfo
+                if(scheduleCourseInfos.size() > 1) {
+                    boolean correct = false;
+                    for(ScheduleCourseInfo sci : scheduleCourseInfos) {
+                        if(Objects.equals(sci.getCourseId(), workOrder.getCourseId())) {
+                            correct = true;
+                            updateCourseInfo(sci);
+                            scheduleCourseInfos.remove(sci);
+                            break;
+                        }
+                    }
+
+                    // 如果没有一个courseScheduleInfo跟WorkOrder中的courseId匹配, 则取第一个
+                    if(!correct) {
+                        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfos.get(0);
+                        scheduleCourseInfos.remove(scheduleCourseInfo);
+                        scheduleCourseInfo.setCourseId(workOrder.getCourseId());
+                        // 修改第一个
+                        updateCourseInfo(scheduleCourseInfo);
+                    }
+                    removeCoruseInfo(scheduleCourseInfos);
+                } else {
+                    updateCourseInfo(scheduleCourseInfos.get(0));
+                }
             }
         });
     }
@@ -115,6 +139,12 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         }
     }
 
+    public void removeCoruseInfo(List<ScheduleCourseInfo> list) {
+        for(ScheduleCourseInfo sci : list) {
+            datastore.delete(sci);
+        }
+    }
+
 
     public void updateCourseEnglishName(ScheduleCourseInfo sci) {
         System.out.println("before update= [{" + sci + "}]");
@@ -144,6 +174,12 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
         System.out.println("modifyCount = " + longAdder.sumThenReset());
     }
 
+    public List<ScheduleCourseInfo> findByWorkOrderIds(Long workOrderId) {
+        Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
+        query.criteria("workOrderId").equal(workOrderId);
+        return query.asList();
+    }
+
     public ScheduleCourseInfo findByWorkOrderId(Long workOrderId) {
         Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
         query.criteria("workOrderId").equal(workOrderId);
@@ -153,6 +189,12 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
     public List<ScheduleCourseInfo> findByCourseId(String courseId) {
         Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
         query.criteria("courseId").equal(courseId);
+        return query.asList();
+    }
+
+    public List<ScheduleCourseInfo> findByThumbnail(String thmbnail) {
+        Query<ScheduleCourseInfo> query = datastore.createQuery(ScheduleCourseInfo.class);
+        query.criteria("thumbnail").equal(thmbnail);
         return query.asList();
     }
 

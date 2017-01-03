@@ -302,17 +302,22 @@ public class NotifyTimer {
     /**
      * 外教点评会员过期提前三天提示
      */
-    @Scheduled(cron = "0 0 17 * * ?")
+    //@Scheduled(cron = "0 0 17 * * ?")
     public void pushExpireCommentCard() {
         logger.info("<<<<<<开始通知<<<外教点评会员过期提醒>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.EXPIRE_COMMENT_CARD.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
-//    @Scheduled(cron = "0 1/30 * * * ?")
+
+    /**
+     * 指定老师====每周周6的凌晨4点开始跑定时任务
+     * @Scheduled(cron = "0 0 4 0 0 6 ")
+     */
+    @Scheduled(cron = "0 0 4 0 0 6 ")
     public void assginTeacher(){
-        logger.info("<<<<<<开始通知<<<指定老师>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
-        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.INSTANT_ASSGIN_TEACHER.value());
+        logger.info("<<<<<<@@@@assign-timer 开始通知<<<指定老师>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.ASSGIN_TEACHER.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
