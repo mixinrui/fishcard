@@ -97,6 +97,10 @@ public class StAssignTeacherService {
                 courseScheduleRepository.
                         findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleIdAndStartTimeGreaterThan(teacherId, studentId, 0, skuId,startTime);
 
+        logger.info("@@@@assign 指定老师 stp-2:::channel====>>{} :::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
+                        "===>>skuId:{}=====>>channel:{}====>>victimCourseSchedules==={}",
+                channel,studentId, teacherId, skuId,channel,victimCourseSchedules);
+
         Map<String,CourseSchedule> victimCourseSchedulesFinalMap = Maps.newHashMap();
         Map<String,CourseSchedule> assignedCourseSchedulesMap = Maps.newHashMap();  //也指定过改老师,这样的鱼卡就放弃
         if (Collections3.isNotEmpty(victimCourseSchedules)) {
