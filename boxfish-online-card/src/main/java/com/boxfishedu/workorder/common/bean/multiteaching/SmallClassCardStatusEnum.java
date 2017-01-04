@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.common.bean;
+package com.boxfishedu.workorder.common.bean.multiteaching;
 
 import java.util.HashMap;
 import java.util.Map;
