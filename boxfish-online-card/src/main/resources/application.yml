@@ -187,8 +187,8 @@ service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://123.56.13.168:9090/teaching-service
-    innerTeacherUrl: http://123.56.13.168:8099/teacher
+    pushInfoIrl: http://123.56.13.168:9091
+    innerTeacherUrl: http://123.56.13.168:8099
   gateway:
     type: test
 time:
@@ -251,8 +251,8 @@ service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://101.201.239.116:9090/teaching-service
-    innerTeacherUrl: http://101.201.237.252:8099/teacher
+    pushInfoIrl: http://123.56.13.168:9091
+    innerTeacherUrl: http://101.201.237.252:8099
 time:
   task:
     nodeOne: 0
@@ -315,8 +315,8 @@ service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://101.201.237.252:9090/teaching-service
-    innerTeacherUrl: http://101.201.237.252:8099/teacher
+    pushInfoIrl: http://123.56.13.168:9091
+    innerTeacherUrl: http://101.201.237.252:8099
   gateway:
       type: development_new
 time:
@@ -387,8 +387,8 @@ service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://123.56.13.168:9090/teaching-service
-    innerTeacherUrl: http://123.56.13.168:8099/teacher
+    pushInfoIrl: http://123.56.13.168:9091
+    innerTeacherUrl: http://123.56.13.168:8099
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
     type: test
@@ -464,8 +464,8 @@ service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://127.0.0.1:9090/teaching-service
-    innerTeacherUrl: http://127.0.0.1:8099/teacher
+    pushInfoIrl: http://123.56.13.168:9091
+    innerTeacherUrl: http://127.0.0.1:8099
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: pretest
@@ -534,8 +534,8 @@ service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://127.0.0.1:9090/teaching-service
-    innerTeacherUrl: http://127.0.0.1:8099/teacher
+    pushInfoIrl: http://123.56.13.168:9091
+    innerTeacherUrl: http://127.0.0.1:8099
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: demo
@@ -602,7 +602,7 @@ service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
     getPictureUrl: http://114.55.58.184:8099
-    pushInfoIrl: http://127.0.0.1:9090
+    pushInfoIrl: http://online.boxfish.cn/boxfish-push
     innerTeacherUrl: http://127.0.0.1:8099
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
@@ -693,7 +693,7 @@ service:
   sdk:
     teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
     getPictureUrl: http://base.boxfish.cn/passbook
-    pushInfoIrl: http://online-api.boxfish.cn/teaching-service
+    pushInfoIrl: http://online.boxfish.cn/boxfish-push
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
     scoreUrl: api.boxfish.cn
   gateway:
@@ -762,7 +762,7 @@ service:
   sdk:
     teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
     getPictureUrl: http://base.boxfish.cn/passbook
-    pushInfoIrl: http://online-api.boxfish.cn/teaching-service
+    pushInfoIrl: http://online.boxfish.cn/boxfish-push
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
     scoreUrl: api.boxfish.cn
   gateway:
