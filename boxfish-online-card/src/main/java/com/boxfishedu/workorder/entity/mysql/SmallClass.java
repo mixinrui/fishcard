@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.entity.mysql;
 
-//import com.boxfishedu.workorder.common.bean.SmallClassType;
+import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import lombok.Data;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "small_class")
-public class SmallClass {
+public class SmallClass implements Cloneable{
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -65,5 +66,15 @@ public class SmallClass {
     @Column(updatable = false)
     private Date updateTime = DateTime.now().toDate();
 
-    
+    //覆写clone方法
+    @Override
+    public SmallClass clone(){
+        SmallClass smallClass =null;
+        try {
+            smallClass =(SmallClass) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new BusinessException("clone error");
+        }
+        return smallClass;
+    }
 }

@@ -3,15 +3,16 @@ package com.boxfishedu.workorder.common.bean.multiteaching;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum SmallClassCardStatusEnum {
+public enum SmallClassCardStatus {
     UNKNOWN(0, "未知"),
-    TEACHER_ENTER_ROOM(100, "教师进入房间"),
-    CLASSING(200, "开始上课"),
-    BAD(300, "下课");
+    CREATE(100, "创建"),
+    TEACHER_ENTER_ROOM(200, "教师进入课堂"),
+    CLASSING(300,"开始上课"),
+    COMPLETED(400, "完成");
 
     private static Map<Integer, Enum> varMap = new HashMap<>();
 
-    SmallClassCardStatusEnum(int code, String desc) {
+    SmallClassCardStatus(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -20,14 +21,14 @@ public enum SmallClassCardStatusEnum {
     private String desc;
 
     static {
-        for (SmallClassCardStatusEnum v : SmallClassCardStatusEnum.values()) {
+        for (SmallClassCardStatus v : SmallClassCardStatus.values()) {
             varMap.put(v.getCode(), v);
         }
     }
 
-    public static SmallClassCardStatusEnum get(int code) {
+    public static SmallClassCardStatus get(int code) {
         if (varMap.containsKey(code)) {
-            return (SmallClassCardStatusEnum) varMap.get(code);
+            return (SmallClassCardStatus) varMap.get(code);
         }
         return UNKNOWN;
     }
