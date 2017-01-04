@@ -467,6 +467,11 @@ public class AssignTeacherService {
 
         Service service = serveService.findTop1ByOrderId(studentTeacherParam.getOrderId());
 
+        if(null==service){
+            logger.info("changeATeacher 订单id:[{}]",studentTeacherParam.getOrderId());
+            throw new BusinessException("数据有误");
+        }
+
         String tutorType = service.getTutorType();
         Integer SkuId = 0;
         logger.debug("changeATeacher,参数tutorType[{}]",tutorType);

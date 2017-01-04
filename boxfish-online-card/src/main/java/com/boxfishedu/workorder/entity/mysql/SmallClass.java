@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
-import com.boxfishedu.workorder.common.bean.SmallClassType;
+//import com.boxfishedu.workorder.common.bean.SmallClassType;
 import lombok.Data;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
