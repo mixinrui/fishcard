@@ -10,7 +10,7 @@ import java.util.List;
  */
 public interface StStudentSchemaJpaRepository extends JpaRepository<StStudentSchema, Long> {
     List<StStudentSchema> findByStudentId(Long studentId);
-    StStudentSchema findByStudentIdAndTeacherIdAndSkuId(Long studentId,Long teacherId, StStudentSchema.CourseType courseType);
+    StStudentSchema findByStudentIdAndSkuId(Long studentId, StStudentSchema.CourseType courseType);
     StStudentSchema findByStudentIdAndTeacherIdAndSkuIdAndStSchema(Long studentId,Long teacherId, StStudentSchema.CourseType courseType,StStudentSchema.StSchema stSchema);
     StStudentSchema findByStudentIdAndTeacherId(Long studentId,Long teacherId);
     StStudentSchema findByStudentIdAndTeacherIdAndStSchema(Long studentId,Long teacherId, StStudentSchema.StSchema stSchema);
