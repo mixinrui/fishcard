@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.common.bean;
+package com.boxfishedu.workorder.common.bean.multiteaching;
 
 import com.boxfishedu.workorder.common.exception.BusinessException;
 
