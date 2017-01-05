@@ -134,6 +134,7 @@ public class AssignTeacherService {
     //2.1  指定这位老师上课
     @Transactional
     public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Integer skuIdParameter, Long studentId, Long teacherId) {
+        logger.info("matchCourseInfoAssignTeacher oldWorkOrderId:[{}],skuIdParameter:[{}],studentId:[{}],teacherId:[{}]",oldWorkOrderId,skuIdParameter,studentId,teacherId);
         Integer skuId = skuIdParameter;
         if (null != oldWorkOrderId) {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
@@ -472,6 +473,8 @@ public class AssignTeacherService {
             throw new BusinessException("数据有误");
         }
 
+        logger.info("changeATeacher studentTeacherParam:getStudentId:[{}],getOrderId:[{}],getTeacherId:[{}]",studentTeacherParam.getStudentId(),studentTeacherParam.getOrderId(),studentTeacherParam.getTeacherId());
+
         String tutorType = service.getTutorType();
         Integer SkuId = 0;
         logger.debug("changeATeacher,参数tutorType[{}]",tutorType);
@@ -487,7 +490,7 @@ public class AssignTeacherService {
         JsonResultModel jsonResultModel = teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
 
         if (null != jsonResultModel && HttpStatus.OK.value() == jsonResultModel.getReturnCode()) {
-
+            logger.info("changeATeacher studentTeacherParam:getStudentId:[{}],getOrderId:[{}],getTeacherId:[{}]",studentTeacherParam.getStudentId(),studentTeacherParam.getOrderId(),studentTeacherParam.getTeacherId());
             // 获取订单数据
             List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(studentTeacherParam.getOrderId());
             List<Long> workOrderIds = Collections3.extractToList(workOrders, "id");
