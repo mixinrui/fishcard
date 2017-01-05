@@ -2,13 +2,18 @@ package com.boxfishedu.workorder.servicex.multiteaching.statusdealer;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Observable;
 
 /**
  * Created by hucl on 17/1/4.
  */
+@Data
 public class SmallClassEvent extends Observable {
+    @Autowired
+    private SmallClassEventDispatch smallClassEventDispatch;
     //事件起源
     private SmallClass source;
     //事件的类型
@@ -27,10 +32,9 @@ public class SmallClassEvent extends Observable {
         this.notifyEventDispatch();
     }
 
-
     //通知事件处理中心
     private void notifyEventDispatch(){
-//        super.addObserver(EventDispatch.getEventDispathc());
+        super.addObserver(smallClassEventDispatch);
         super.setChanged();
         super.notifyObservers(source);
     }

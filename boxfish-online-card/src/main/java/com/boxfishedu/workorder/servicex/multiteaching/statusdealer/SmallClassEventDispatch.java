@@ -1,53 +1,30 @@
 package com.boxfishedu.workorder.servicex.multiteaching.statusdealer;
 
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Vector;
 
-public class SmallClassEventDispatch implements Observer{
-	@Override
-	public void update(Observable o, Object arg) {
+@Component
+public class SmallClassEventDispatch implements Observer {
+    @Autowired
+    private List<SmallClassEventCustomer> smallClassEventCustomers;
 
-	}
-//	//µ¥ÀıÄ£Ê½
-//	private final static EventDispatch dispatch = new EventDispatch();
-//	//ÊÂ¼şÏû·ÑÕß
-//	private Vector<EventCustomer> customer = new Vector<EventCustomer>();
-//
-//	//²»ÔÊĞíÉú³ÉĞÂµÄÊµÀı
-//	private EventDispatch(){
-//
-//	}
-//
-//	//»ñµÃµ¥Àı¶ÔÏó
-//	public static EventDispatch getEventDispathc(){
-//		return dispatch;
-//	}
-//
-//	//ÊÂ¼ş´¥·¢
-//	public void update(Observable o, Object arg) {
-//		//ÊÂ¼şµÄÔ´Í·
-//		Product product = (Product)arg;
-//		//ÊÂ¼ş
-//		ProductEvent event = (ProductEvent)o;
-//
-//		//´¦ÀíÕß´¦Àí£¬ÕâÀïÊÇÖĞ½éÕßÄ£Ê½µÄºËĞÄ£¬¿ÉÒÔÊÇºÜ¸´ÔÓµÄÒµÎñÂß¼­
-//		for(EventCustomer e:customer){
-//			//´¦ÀíÄÜÁ¦ÊÇ·ñÆ¥Åä
-//			for(EventCustomType t:e.getCustomType()){
-//				if(t.getValue() == event.getEventType().getValue()){
-//					e.exec(event);
-//				}
-//			}
-//
-//		}
-//	}
-//
-//	//×¢²áÊÂ¼ş´¦ÀíÕß
-//	public void registerCustomer(EventCustomer _customer){
-//		customer.add(_customer);
-//	}
+    public void update(Observable source, Object arg) {
+        //äº‹ä»¶çš„æºå¤´
+        SmallClass smallClass = (SmallClass) arg;
 
-	
+        //äº‹ä»¶
+        SmallClassEvent event = (SmallClassEvent) source;
+
+        for (SmallClassEventCustomer smallClassEventCustomer : smallClassEventCustomers) {
+            if (smallClassEventCustomer.getSmallClassCardStatus().getCode() == event.getType().getCode()) {
+                smallClassEventCustomer.exec(event);
+            }
+        }
+    }
 }
 
