@@ -3,7 +3,9 @@ package com.boxfishedu.workorder.requester;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +64,7 @@ public class SmallClassRequester {
         Integer info = null;
         try {
             info = restTemplate.getForObject(url, Integer.class);
-            logger.debug("@fetchUserStudyInfo获取用户学习计数,url[{}],结果[{}]", url,info);
+            logger.debug("@fetchUserStudyInfo获取用户学习计数,url[{}],结果[{}]", url, info);
         } catch (Exception ex) {
             logger.error("@fetchUserStudyInfo获取用户学习计数,url[{}]", url, ex);
             throw new BusinessException("获取用户学习计数");
@@ -70,32 +72,50 @@ public class SmallClassRequester {
         return info;
     }
 
-    public RecommandCourseView fetchSmallClassCNCourse(List<Long> studentIds, String difficultyLevel, Integer seq, TutorTypeEnum tutorTypeEnum){
-        String userIdsStr=StringUtils.arrayToDelimitedString(studentIds.toArray(),"-");
-        String url=null;
-        switch (tutorTypeEnum){
+    /**
+     * 小班推荐－外教,中教：
+     *
+     * @param studentIds      小班课学生id列表
+     * @param difficultyLevel 难度级别
+     * @param seq             序列
+     * @param tutorTypeEnum   中外教类型
+     * @return
+     */
+    public RecommandCourseView fetchSmallClassCourse(
+            List<Long> studentIds, String difficultyLevel, Integer seq, TutorTypeEnum tutorTypeEnum) {
+        String userIdsStr = StringUtils.arrayToDelimitedString(studentIds.toArray(), "-");
+        String url = null;
+        switch (tutorTypeEnum) {
             case CN:
                 url = String.format("%s/promote_xp/%s/%s/%s"
-                        , urlConf.getCourse_wudaokou_recommend_service(), userIdsStr, difficultyLevel,seq);
+                        , urlConf.getCourse_wudaokou_recommend_service(), userIdsStr, difficultyLevel, seq);
                 break;
             case FRN:
-                url=null;
+                url = String.format("%s/ultimate_xp/%s/%s/%s"
+                        , urlConf.getCourse_wudaokou_recommend_service(), userIdsStr, difficultyLevel, seq);
                 break;
             default:
                 throw new BusinessException("不支持的类型");
-
         }
 
         RecommandCourseView info = null;
         try {
             info = restTemplate.getForObject(url, RecommandCourseView.class);
-            logger.debug("@fetchUserStudyInfo获取用户学习计数,url[{}],结果[{}]", url,info);
+            logger.debug("@fetchUserStudyInfo获取用户学习计数,url[{}],结果[{}]", url, info);
         } catch (Exception ex) {
             logger.error("@fetchUserStudyInfo获取用户学习计数,url[{}]", url, ex);
             throw new BusinessException("获取用户学习计数");
         }
         return info;
+    }
 
+    public RecommandCourseView fetchSmallClassCNCourse(
+            List<WorkOrder> workOrders, String difficultyLevel, Integer seq, TutorTypeEnum tutorTypeEnum) {
+        List<Long> students = Lists.newArrayList();
+        workOrders.forEach(workOrder -> {
+            students.add(workOrder.getStudentId());
+        });
+        return this.fetchSmallClassCourse(students, difficultyLevel, seq, tutorTypeEnum);
     }
 
 
