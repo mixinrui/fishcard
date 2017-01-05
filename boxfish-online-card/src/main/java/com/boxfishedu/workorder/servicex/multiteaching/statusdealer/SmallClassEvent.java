@@ -21,11 +21,11 @@ public class SmallClassEvent extends Observable {
 
     //传入事件的源头,默认为新建类型
     public SmallClassEvent(SmallClass smallClass) {
-        this(smallClass,SmallClassCardStatus.CREATE);
+        this(smallClass, SmallClassCardStatus.CREATE);
     }
 
     //事件源头以及事件类型
-    public SmallClassEvent(SmallClass p,SmallClassCardStatus type){
+    public SmallClassEvent(SmallClass p, SmallClassCardStatus type) {
         this.source = p;
         this.type = type;
         //事件触发
@@ -33,7 +33,7 @@ public class SmallClassEvent extends Observable {
     }
 
     //通知事件处理中心
-    private void notifyEventDispatch(){
+    private void notifyEventDispatch() {
         super.addObserver(smallClassEventDispatch);
         super.setChanged();
         super.notifyObservers(source);
