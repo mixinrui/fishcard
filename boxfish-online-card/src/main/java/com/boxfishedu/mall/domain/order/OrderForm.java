@@ -8,11 +8,13 @@ import com.boxfishedu.mall.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 @Data(staticConstructor = "getInstance")
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderForm extends BaseEntity {
