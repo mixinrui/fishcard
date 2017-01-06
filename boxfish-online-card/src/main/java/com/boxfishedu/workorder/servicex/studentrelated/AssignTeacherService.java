@@ -146,7 +146,7 @@ public class AssignTeacherService {
         }
 
         // 该学生其他教师接受邀请设为无效 后续版本添加推送消息 通知其他教师 邀请取消
-        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.yes, studentId, teacherId, StStudentApplyRecords.VALID.no, StStudentApplyRecords.MatchStatus.wait2apply);
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, studentId, teacherId, StStudentApplyRecords.VALID.yes, StStudentApplyRecords.MatchStatus.wait2apply,skuId);
 
         logger.info("matchCourseInfoAssignTeacher redonum:[{}]", num);
 
@@ -441,7 +441,7 @@ public class AssignTeacherService {
         if (null == stStudentSchema) {
             logger.info("acceptInvitedCourseByStudentId->studentId:[{}],teacherId:[{}]", stStudentApplyRecordsList.get(0).getStudentId(), stStudentApplyRecordsList.get(0).getTeacherId());
             // 数据设置为失效
-            stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.yes, idsneedAgree);
+            stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, idsneedAgree);
             return JsonResultModel.newJsonResultModel(null);
         }
 
@@ -507,7 +507,7 @@ public class AssignTeacherService {
 
 
         // 该学生 同类型课程的 未被接受的  设为无效
-        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.yes, studentTeacherParam.getStudentId(), SkuId, StStudentApplyRecords.VALID.no, StStudentApplyRecords.MatchStatus.wait2apply);
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, studentTeacherParam.getStudentId(), SkuId, StStudentApplyRecords.VALID.yes, StStudentApplyRecords.MatchStatus.wait2apply);
         logger.info("changeATeacher redonum:[{}]", num);
 
         //更新schema模式为自由模式  un_assign
