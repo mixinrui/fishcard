@@ -174,7 +174,7 @@ public class StudentAssignTeacherController {
         teacherId = userId;
         List<StStudentApplyRecords> stStudentApplyRecordsList = assignTeacherService.checkMyClassesByStudentId(teacherId,studentId);
         if(CollectionUtils.isEmpty(stStudentApplyRecordsList)){
-            return JsonResultModel.newJsonResultModel(true);
+            return JsonResultModel.newJsonResultModel(false);
         }
         return JsonResultModel.newJsonResultModel(true);
     }
