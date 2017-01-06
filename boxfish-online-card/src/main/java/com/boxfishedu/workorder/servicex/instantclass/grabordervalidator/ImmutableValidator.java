@@ -44,7 +44,7 @@ public class ImmutableValidator implements IGrabInstantClassValidator {
         TeacherInstantRequestParam teacherInstantRequestParam = ThreadLocalUtil.getTeacherInstantParam();
         String matchedResult = opsValue.get(GrabInstatntClassKeyGenerator.matchedKey(teacherInstantRequestParam.getCardId()));
         if (!StringUtils.isEmpty(matchedResult)) {
-            logger.debug("/(ㄒoㄒ)/~~teacherInstantClass#fail#参数[{}]进行抢课[{}],但是已经被教师[{}]抢走;退出抢单......"
+            logger.debug("/(ㄒoㄒ)/~~teacherInstantClass#fail#参数[{}]进行抢课,但是已经被教师[{}]抢走;退出抢单......"
                     , JacksonUtil.toJSon(teacherInstantRequestParam), matchedResult);
             return TeacherInstantClassStatus.FAIL_TO_MATCH;
         }
