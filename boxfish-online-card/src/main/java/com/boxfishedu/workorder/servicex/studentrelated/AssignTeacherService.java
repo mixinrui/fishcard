@@ -121,8 +121,12 @@ public class AssignTeacherService {
         }
 
 
+        //该学生 是否 同类型课 是否指定过老师
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(workOrder.getSkuId()));
+        //用于判断 是否为同类型最后一节课
         List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
+
+        // 未指定过该类型课的老师   或者 指定该类型课的老师 和 改刚刚上过课的老师 不是一个人
         if (null == stStudentSchema || !stStudentSchema.getTeacherId().equals(workOrder.getTeacherId())) {
             if (CollectionUtils.isEmpty(listWorkOrders)) {
                 return null;
@@ -145,9 +149,14 @@ public class AssignTeacherService {
             skuId = workOrder.getSkuId();
         }
 
-        // 该学生其他教师接受邀请设为无效 后续版本添加推送消息 通知其他教师 邀请取消
-        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, studentId, teacherId, StStudentApplyRecords.VALID.yes, StStudentApplyRecords.MatchStatus.wait2apply,skuId);
+        if(skuId==null || teacherId==null || teacherId==0){
+            throw new BusinessException("数据参数不合法");
+        }
 
+        // 该学生
+        // 同类型(中外教)
+        // 其他教师接受邀请(待确认)设为无效                                     后续版本添加推送消息 通知其他教师 邀请取消
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, studentId, teacherId, StStudentApplyRecords.VALID.yes, StStudentApplyRecords.MatchStatus.wait2apply,skuId);
         logger.info("matchCourseInfoAssignTeacher redonum:[{}]", num);
 
         //分配

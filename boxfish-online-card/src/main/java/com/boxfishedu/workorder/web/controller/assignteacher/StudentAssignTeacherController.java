@@ -51,34 +51,50 @@ public class StudentAssignTeacherController {
     //本地异常日志记录对象
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @RequestMapping(value = "{teacherId}/test", method = RequestMethod.GET)
-    public JsonResultModel test(@PathVariable("teacherId") Long teacherId) {
-         assignTeacherService.pushTeacherList(teacherId);
-        return JsonResultModel.newJsonResultModel(null);
-    }
+//    @RequestMapping(value = "{teacherId}/test", method = RequestMethod.GET)
+//    public JsonResultModel test(@PathVariable("teacherId") Long teacherId) {
+//         assignTeacherService.pushTeacherList(teacherId);
+//        return JsonResultModel.newJsonResultModel(null);
+//    }
 
 
     //1 判断指定这位老师上课 按钮是否出现
     // 新增老鱼卡ID oldWorkOrderId
     @RequestMapping(value = "{workorder_Id}/show/assign", method = RequestMethod.GET)
     public JsonResultModel showAssign(@PathVariable("workorder_Id") Long oldWorkOrderId) {
-        logger.info("show_assign :oldWorkOrderId [{}]",oldWorkOrderId);
+        logger.info("show_assign :oldWorkOrderId [{}]", oldWorkOrderId);
         return assignTeacherService.checkAssignTeacherFlag(oldWorkOrderId);
     }
 
 
-    //2.1 指定老师上课按钮(上完课) *****sku_id  *****
+    /**
+     * 2.1 指定老师上课按钮(上完课) ***** sku_id  *****
+     * (1)上完课指定老师  oldWorkOrderId
+     * (2)新下单指定老师  sku_id
+     * <p>
+     * 指定老师,需要清除之前该学生该类型课其他老师 邀请中的数据
+     *
+     * @param oldWorkOrderId
+     * @param sku_id
+     * @param studentId
+     * @param teacherId
+     * @param userId
+     * @return
+     */
     @RequestMapping(value = "/assign/teacher/act", method = RequestMethod.GET)
-    public JsonResultModel assignTeacherAct (Long oldWorkOrderId,Integer sku_id,
-                                                Long studentId, Long teacherId, Long userId) {
+    public JsonResultModel assignTeacherAct(Long oldWorkOrderId, Integer sku_id,
+                                            Long studentId, Long teacherId, Long userId) {
         studentId = userId;
-        logger.info("assign_teacher_act :oldWorkOrderId [{}] skuId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,sku_id,teacherId,userId);
+        checkUserId(studentId);
+        logger.info("assign_teacher_act :oldWorkOrderId [{}] skuId [{}] teacherId [{}] userId [{}]", oldWorkOrderId, sku_id, teacherId, userId);
+
+        //       下一个版本 可以考虑 通过userId  进行重复提交的过滤条件
 //        if(checker.checkRepeatedSubmission(oldWorkOrderId)) {
 //            throw new RepeatedSubmissionException("正在提交当中,请稍候...");
 //        }
 
         // 验证重复提交问题
-        JsonResultModel  jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId,sku_id, studentId,teacherId);
+        JsonResultModel jsonResultModel = assignTeacherService.matchCourseInfoAssignTeacher(oldWorkOrderId, sku_id, studentId, teacherId);
 
 //        checker.evictRepeatedSubmission(oldWorkOrderId);
         return JsonResultModel.newJsonResultModel("OK");
@@ -88,81 +104,82 @@ public class StudentAssignTeacherController {
     //2 获取指定老师带的课程列表  studentId 学生id   assignteacherId 分配老师ID
     @RequestMapping(value = "/assign/teacher/page")
     public JsonResultModel getAssignTeacherCourseSchedulePage(Long oldWorkOrderId,
-            Long studentId, Long teacherId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
-            direction = Sort.Direction.ASC) Pageable pageable,Long userId) {
+                                                              Long studentId, Long teacherId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
+            direction = Sort.Direction.ASC) Pageable pageable, Long userId) {
         studentId = userId;
-        return assignTeacherService.getAssginTeacherCourseList(oldWorkOrderId,studentId,teacherId,pageable);
+        checkUserId(studentId);
+        return assignTeacherService.getAssginTeacherCourseList(oldWorkOrderId, studentId, teacherId, pageable);
     }
 
     //2.2 获取指定老师带的课程列表  studentId 学生id   assignteacherId 分配老师ID
     @RequestMapping(value = "/assign/teacher/newpage")
     public JsonResultModel getAssignTeacherCourseSchedulePageNew(Long oldWorkOrderId,
-                                                              Long studentId, Long teacherId,Long orderId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
-            direction = Sort.Direction.ASC) Pageable pageable,Long userId) {
-        logger.info("assign_teacher_newpage :oldWorkOrderId [{}] studentId [{}] teacherId [{}] userId [{}]",oldWorkOrderId,studentId,teacherId,userId);
+                                                                 Long studentId, Long teacherId, Long orderId, @PageableDefault(value = 10, sort = {"classDate", "timeSlotId"},
+            direction = Sort.Direction.ASC) Pageable pageable, Long userId) {
+        logger.info("assign_teacher_newpage :oldWorkOrderId [{}] studentId [{}] teacherId [{}] userId [{}]", oldWorkOrderId, studentId, teacherId, userId);
         studentId = userId;
-        return assignTeacherService.getAssginTeacherCourseListnew(oldWorkOrderId,studentId,teacherId,orderId,pageable);
+        checkUserId(studentId);
+        return assignTeacherService.getAssginTeacherCourseListnew(oldWorkOrderId, studentId, teacherId, orderId, pageable);
     }
 
     //3 开始上课界面接口
     @RequestMapping(value = "/{workorder_Id}/beginclass/assign", method = RequestMethod.GET)
-    public JsonResultModel showBeginClass(@PathVariable("workorder_Id") Long workOrderId){
-        return JsonResultModel.newJsonResultModel(  assignTeacherService.getCourseInfo(workOrderId));
+    public JsonResultModel showBeginClass(@PathVariable("workorder_Id") Long workOrderId) {
+        return JsonResultModel.newJsonResultModel(assignTeacherService.getCourseInfo(workOrderId));
 
     }
 
 
     //4 老师端 查看我的上课邀请（提醒）
     @RequestMapping(value = "/{teacher_Id}/invitenum/assign", method = RequestMethod.GET)
-    public JsonResultModel getInvitedNum(@PathVariable("teacher_Id")Long teacherId,Long userId){
+    public JsonResultModel getInvitedNum(@PathVariable("teacher_Id") Long teacherId, Long userId) {
         teacherId = userId;
         JSONObject jo = new JSONObject();
-        jo.put("unreadnum",assignTeacherService.getMyInvited(teacherId));
+        jo.put("unreadnum", assignTeacherService.getMyInvited(teacherId));
         return JsonResultModel.newJsonResultModel(jo);
     }
 
 
     // 5 老师端上课邀请列表
     @RequestMapping(value = "/{teacher_Id}/invitelist/assign", method = RequestMethod.GET)
-    public JsonResultModel getInvitedList(@PathVariable("teacher_Id") Long teacherId,@PageableDefault(value = 10, sort = {"applyTime"},
-            direction = Sort.Direction.DESC) Pageable pageable,Long userId){
+    public JsonResultModel getInvitedList(@PathVariable("teacher_Id") Long teacherId, @PageableDefault(value = 10, sort = {"applyTime"},
+            direction = Sort.Direction.DESC) Pageable pageable, Long userId) {
         teacherId = userId;
         JSONObject jo = new JSONObject();
-        jo.put("baseHours",48);
-        jo.put("results",assignTeacherService.getmyInviteList(teacherId,pageable));
+        jo.put("baseHours", 48);
+        jo.put("results", assignTeacherService.getmyInviteList(teacherId, pageable));
         return JsonResultModel.newJsonResultModel(jo);
     }
 
     // 6老师端获取学生的上课邀请列表详情
     @RequestMapping(value = "/{student_id}/invitelist/assign/{teacher_id}", method = RequestMethod.GET)
-    public JsonResultModel getInvitedDetailList(@PathVariable("student_id") Long studentId,@PathVariable("teacher_id") Long teacherId ,@PageableDefault(value = 10) Pageable pageable,Long userId){
+    public JsonResultModel getInvitedDetailList(@PathVariable("student_id") Long studentId, @PathVariable("teacher_id") Long teacherId, @PageableDefault(value = 10) Pageable pageable, Long userId) {
         teacherId = userId;
-        Page<StStudentApplyRecords> stStudentApplyRecordsList = assignTeacherService.getMyClassesByStudentId(teacherId,studentId,pageable);
+        Page<StStudentApplyRecords> stStudentApplyRecordsList = assignTeacherService.getMyClassesByStudentId(teacherId, studentId, pageable);
         return JsonResultModel.newJsonResultModel(stStudentApplyRecordsList);
     }
 
 
-
     // 7 接受上课邀请接口
     @RequestMapping(value = "/acceptInvite", method = RequestMethod.POST)
-    public JsonResultModel acceptInvite(@RequestBody StTeacherInviteParam stTeacherInviteParam,Long userId){
-        if(null==userId)
-            throw new BusinessException("非法反问被拒绝");
-        return assignTeacherService.acceptInvitedCourseByStudentId(stTeacherInviteParam,userId);
+    public JsonResultModel acceptInvite(@RequestBody StTeacherInviteParam stTeacherInviteParam, Long userId) {
+        checkUserId(userId);
+        return assignTeacherService.acceptInvitedCourseByStudentId(stTeacherInviteParam, userId);
     }
 
     //8 下单 是否弹出 是否继续指定该老师上课
     @RequestMapping(value = "/{student_Id}/show/assign/first/{sku_id}", method = RequestMethod.GET)
-    public JsonResultModel showAssignFirst(@PathVariable("student_Id") Long studentId,@PathVariable("sku_id") Integer sku_id,Long userId) {
+    public JsonResultModel showAssignFirst(@PathVariable("student_Id") Long studentId, @PathVariable("sku_id") Integer sku_id, Long userId) {
         studentId = userId;
-        return JsonResultModel.newJsonResultModel(assignTeacherService.getMyLastAssignTeacher(studentId,sku_id));
+        return JsonResultModel.newJsonResultModel(assignTeacherService.getMyLastAssignTeacher(studentId, sku_id));
     }
 
     //9 换个老师接口
     @RequestMapping(value = "/neworder/changeTeacher", method = RequestMethod.POST)
-    public JsonResultModel showAssignFirst(@RequestBody StudentTeacherParam studentTeacherParam,Long userId) {
+    public JsonResultModel showAssignFirst(@RequestBody StudentTeacherParam studentTeacherParam, Long userId) {
+        checkUserId(userId);
         studentTeacherParam.setStudentId(userId);
-        return  assignTeacherService.changeATeacher(studentTeacherParam);
+        return assignTeacherService.changeATeacher(studentTeacherParam);
     }
 
     //10 在 StudentAppRelatedController ensureCourseTimesV11
@@ -170,18 +187,20 @@ public class StudentAssignTeacherController {
 
     //11老师端获取学生的上课邀请列表详情
     @RequestMapping(value = "/{student_id}/invitelist/assign/{teacher_id}/check", method = RequestMethod.GET)
-    public JsonResultModel getInvitedDetaiCheck(@PathVariable("student_id") Long studentId,@PathVariable("teacher_id") Long teacherId ,Long userId){
+    public JsonResultModel getInvitedDetaiCheck(@PathVariable("student_id") Long studentId, @PathVariable("teacher_id") Long teacherId, Long userId) {
         teacherId = userId;
-        List<StStudentApplyRecords> stStudentApplyRecordsList = assignTeacherService.checkMyClassesByStudentId(teacherId,studentId);
-        if(CollectionUtils.isEmpty(stStudentApplyRecordsList)){
+        List<StStudentApplyRecords> stStudentApplyRecordsList = assignTeacherService.checkMyClassesByStudentId(teacherId, studentId);
+        if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
             return JsonResultModel.newJsonResultModel(false);
         }
         return JsonResultModel.newJsonResultModel(true);
     }
 
-
-
-
+    private void checkUserId(Long userId) {
+        if (null == userId || 0 == userId) {
+            throw new BusinessException("用户信息不正确");
+        }
+    }
 
 
 }
