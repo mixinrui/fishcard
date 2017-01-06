@@ -145,6 +145,11 @@ public class AssignTeacherService {
             skuId = workOrder.getSkuId();
         }
 
+        // 该学生其他教师接受邀请设为无效 后续版本添加推送消息 通知其他教师 邀请取消
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.yes, studentId, teacherId, StStudentApplyRecords.VALID.no, StStudentApplyRecords.MatchStatus.wait2apply);
+
+        logger.info("matchCourseInfoAssignTeacher redonum:[{}]", num);
+
         //分配
         assignTeacherServiceX.insertOrUpdateSchema(studentId, teacherId, skuId, StStudentSchema.StSchema.assgin);
         assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
@@ -403,14 +408,16 @@ public class AssignTeacherService {
                 checkTimeOutForInvitedClass(stStu, now)
         ).collect(Collectors.toList());
 
-
-        List<Long> ids = Collections3.extractToList(stStudentApplyRecordsList, "id");
-        logger.info("acceptInvitedCourseByStudentId 能够接受的id [{}]", ids.toArray());
         //已经全部超时
         if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
             throw new BusinessException("课程已经全部超时");
             //return JsonResultModel.newJsonResultModel(null);
         }
+
+
+        List<Long> ids = Collections3.extractToList(stStudentApplyRecordsList, "id");
+        logger.info("acceptInvitedCourseByStudentId 能够接受的id [{}]", ids.toArray());
+
 
         Map<Long, Long> teachers = Collections3.extractToMap(stStudentApplyRecordsList, "teacherId", "teacherId");
 
@@ -427,6 +434,15 @@ public class AssignTeacherService {
         if (null == teachers.get(teacherId) || teachers.size() > 1 || null == students || students.size() > 1) {
             logger.info("acceptInvitedCourseByStudentId teacherId:[{}], teachers :[{}] ,students :[{}]", teacherId, JSON.toJSONString(teachers), JSON.toJSONString(students));
             throw new BusinessException("您的访问不安全,请联系客服");
+        }
+
+        // 判断是否为指定老师的数据  不是指定老师的数据  数据设置成失效
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(stStudentApplyRecordsList.get(0).getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(stStudentApplyRecordsList.get(0).getSkuId()));
+        if (null == stStudentSchema) {
+            logger.info("acceptInvitedCourseByStudentId->studentId:[{}],teacherId:[{}]", stStudentApplyRecordsList.get(0).getStudentId(), stStudentApplyRecordsList.get(0).getTeacherId());
+            // 数据设置为失效
+            stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.yes, idsneedAgree);
+            return JsonResultModel.newJsonResultModel(null);
         }
 
 
@@ -488,6 +504,11 @@ public class AssignTeacherService {
         } else {
             SkuId = 2;   // 外教
         }
+
+
+        // 该学生 同类型课程的 未被接受的  设为无效
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.yes, studentTeacherParam.getStudentId(), SkuId, StStudentApplyRecords.VALID.no, StStudentApplyRecords.MatchStatus.wait2apply);
+        logger.info("changeATeacher redonum:[{}]", num);
 
         //更新schema模式为自由模式  un_assign
         assignTeacherServiceX.insertOrUpdateSchema(studentTeacherParam.getStudentId(), studentTeacherParam.getTeacherId(), SkuId, StStudentSchema.StSchema.un_assgin);
