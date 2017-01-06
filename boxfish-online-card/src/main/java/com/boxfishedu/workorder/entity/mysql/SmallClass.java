@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by hucl on 16/12/28.
@@ -45,7 +46,7 @@ public class SmallClass implements Cloneable{
     private Date classDate;
 
     @Column(name = "slot_id")
-    private Long slotId;
+    private Integer slotId;
 
     @Column(name = "role_id")
     private Integer roleId;
@@ -56,8 +57,18 @@ public class SmallClass implements Cloneable{
     @Column(name = "teacher_name")
     private String teacherName;
 
+    private Long groupLeader;
+
+    private Long groupLeaderCard;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
+
+    private Integer status;
+
+    private List<Long> allStudentIds;
+
+    private List<Long> allCardIds;
 
     //班级类型
     public SmallClassType smallClassType;

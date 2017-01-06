@@ -5,6 +5,7 @@ import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.log.ServiceLog;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -112,7 +113,12 @@ public class RabbitMqReciver {
             serveService.order2ServiceAndWorkOrder(orderView);
         } catch (Exception ex) {
             ex.printStackTrace();
-            logger.error("订单[{}]转换失败", orderView.getId());
+            logger.error(
+                    new ServiceLog()
+                            .data(orderView)
+                            .errorLevel()
+                            .operation("订单转换为服务")
+                            .toString());
 //            throw new Exception("转换失败放回队列");
         }
 

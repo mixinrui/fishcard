@@ -81,29 +81,43 @@ public class AvaliableTimeServiceXV1 {
 
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(avaliableTimeParam.getStudentId());
         // 获取时间片模板,并且复制
-        List<DayTimeSlots> dayTimeSlotsList = dateRange.forEach(
-            // 过滤掉时间片
-            (localDateTime, dayTimeSlot) -> {
-                dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
-                        .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString())))
-                        .collect(Collectors.toList()));
-                return CollectionUtils.isEmpty(dayTimeSlot.getDailyScheduleTime()) ? null : dayTimeSlot;
-            },
-            // 根据日期获取到对应的DayTimeSlots
-            (d) -> {
-                int teachingType = BaseTimeSlots.TEACHING_TYPE_CN;
-                if(StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
-                    teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
-                }
-                List<BaseTimeSlots> timeSlotsList = redisMapService.getMap( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d)) ;
-                if(CollectionUtils.isEmpty(timeSlotsList)){
-                    timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType( DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
-                    redisMapService.setMap ( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d),timeSlotsList); ;
-                }
-                return createDayTimeSlots(d, timeSlotsList);
-            });
+        for(int i = 0; i < 4; i++) {
+            List<DayTimeSlots> result = getTimeAvailable(avaliableTimeParam, dateRange, classDateTimeSlotsSet);
+            if(org.apache.commons.collections.CollectionUtils.isNotEmpty(result)) {
+                return JsonResultModel.newJsonResultModel(new MonthTimeSlots(result).getData());
+            } else {
+                // 如果为空, 则推后一周
+                dateRange.incrementAWeek();
+            }
+        }
+        // 如果推后了一个月都没有可选时间则, 则返回空
+        return JsonResultModel.newJsonResultModel();
+    }
 
-        return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
+
+    private List<DayTimeSlots> getTimeAvailable(AvaliableTimeParam avaliableTimeParam, DateRange dateRange, Set<String> classDateTimeSlotsSet) throws CloneNotSupportedException {
+        // 获取时间片模板,并且复制
+        return dateRange.forEach(
+                // 过滤掉时间片
+                (localDateTime, dayTimeSlot) -> {
+                    dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
+                            .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString())))
+                            .collect(Collectors.toList()));
+                    return CollectionUtils.isEmpty(dayTimeSlot.getDailyScheduleTime()) ? null : dayTimeSlot;
+                },
+                // 根据日期获取到对应的DayTimeSlots
+                (d) -> {
+                    int teachingType = BaseTimeSlots.TEACHING_TYPE_CN;
+                    if(StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
+                        teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
+                    }
+                    List<BaseTimeSlots> timeSlotsList = redisMapService.getMap( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d)) ;
+                    if(CollectionUtils.isEmpty(timeSlotsList)){
+                        timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType( DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
+                        redisMapService.setMap ( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d),timeSlotsList); ;
+                    }
+                    return createDayTimeSlots(d, timeSlotsList);
+                });
     }
 
 

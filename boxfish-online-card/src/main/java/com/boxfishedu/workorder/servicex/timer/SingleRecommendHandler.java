@@ -1,17 +1,14 @@
 package com.boxfishedu.workorder.servicex.timer;
 
-import com.boxfishedu.workorder.common.config.UrlConf;
-import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
-import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
-import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
+import com.boxfishedu.workorder.common.log.RecommendLog;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.DefaultRecommendHandler;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +24,8 @@ import java.util.function.Predicate;
 @Service
 public class SingleRecommendHandler {
 
+    private final static Logger logger = LoggerFactory.getLogger(SingleRecommendHandler.class);
+
     @Autowired
     private DefaultRecommendHandler defaultRecommendHandler;
 
@@ -34,26 +33,21 @@ public class SingleRecommendHandler {
     private WorkOrderService workOrderService;
 
     @Autowired
-    private WorkOrderJpaRepository workOrderJpaRepository;
-
-    @Autowired
-    private WorkOrderLogService workOrderLogService;
-
-    @Autowired
-    private ScheduleCourseInfoService scheduleCourseInfoService;
-
-    @Autowired
-    private UrlConf urlConf;
-
-    @Autowired
     private PersistCoursesHandler persistCoursesHandler;
-
-    @Autowired
-    private CourseScheduleRepository courseScheduleRepository;
 
     @Transactional
     public void singleRecommend(WorkOrder workOrder, CourseSchedule courseSchedule) {
-        singleRecommend(workOrder, courseSchedule, (w) -> true);
+        try {
+            singleRecommend(workOrder, courseSchedule, (w) -> true);
+        } catch (Exception e) {
+            logger.error(
+                    new RecommendLog(workOrder.getStudentId())
+                            .operation("课程推荐")
+                            .errorLevel()
+                            .businessObjectKey(Objects.toString(workOrder.getId()))
+                            .toString());
+            throw e;
+        }
     }
 
 

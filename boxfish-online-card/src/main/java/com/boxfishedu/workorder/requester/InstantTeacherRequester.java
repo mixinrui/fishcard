@@ -87,8 +87,13 @@ public class InstantTeacherRequester {
         JsonResultModel jsonResultModel = null;
         try {
             jsonResultModel = restTemplate.postForObject(url, instantAssignTeacherParam, JsonResultModel.class);
+            if (jsonResultModel == null) {
+                logger.error("InstantGrabFail#返回值为null");
+            }
             if (jsonResultModel.getReturnCode() != HttpStatus.OK.value()) {
-                logger.error("");
+
+                logger.error("InstantGrabFail#向师生运营校验失败,url[{}],参数[{}],结果[{}]"
+                        , url, JacksonUtil.toJSon(instantAssignTeacherParam), JacksonUtil.toJSon(jsonResultModel));
                 throw new BusinessException("向师生运营发起请求获取失败,参数[{}]" + jsonResultModel.getReturnMsg());
             }
         } catch (Exception ex) {
@@ -104,24 +109,24 @@ public class InstantTeacherRequester {
         try {
             logger.debug(">>>>>>>>>>>@InstantTeacherRequester# IIIIIIIIIIIIIII 获取教师列表 getInstantTeachers#url:{}#param:{},学生[{}],instantcard[{}]"
                     , url, JacksonUtil.toJSon(fetchTeacherParam), instantClassCard.getStudentId(), instantClassCard.getId());
-            JsonResultModel jsonResultModel= this.getInstantTeachers(fetchTeacherParam, url);
-            this.log(jsonResultModel,instantClassCard,url,fetchTeacherParam);
+            JsonResultModel jsonResultModel = this.getInstantTeachers(fetchTeacherParam, url);
+            this.log(jsonResultModel, instantClassCard, url, fetchTeacherParam);
             return jsonResultModel;
         } catch (Exception ex) {
             logger.error("!!!!!!!@InstantTeacherRequester# IIIIIIIIIIIIIII getInstantTeachers失败,url{},参数[{}],学生[{}],instantcard[{}]"
                     , url, JacksonUtil.toJSon(fetchTeacherParam), instantClassCard.getStudentId(), instantClassCard.getId(), ex);
-            instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,null,"获取教师出异常"+ex.toString(),url,fetchTeacherParam);
+            instantCardLogMorphiaRepository.saveInstantLog(instantClassCard, null, "获取教师出异常" + ex.toString(), url, fetchTeacherParam);
             throw new BusinessException("获取实时推荐教师失败");
         }
     }
 
-    private void log(JsonResultModel jsonResultModel,InstantClassCard instantClassCard, String url,InstantFetchTeacherParam fetchTeacherParam){
+    private void log(JsonResultModel jsonResultModel, InstantClassCard instantClassCard, String url, InstantFetchTeacherParam fetchTeacherParam) {
         List<Long> teachers = jsonResultModel.getListData(Long.class);
-        if(CollectionUtils.isEmpty(teachers)){
-            instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,null,"未获取到教师列表",url,fetchTeacherParam);
+        if (CollectionUtils.isEmpty(teachers)) {
+            instantCardLogMorphiaRepository.saveInstantLog(instantClassCard, null, "未获取到教师列表", url, fetchTeacherParam);
             return;
         }
-        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teachers,"获取到教师列表",url,fetchTeacherParam);
+        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard, teachers, "获取到教师列表", url, fetchTeacherParam);
     }
 
     private JsonResultModel getInstantTeachers(InstantFetchTeacherParam fetchTeacherParam, String url) {

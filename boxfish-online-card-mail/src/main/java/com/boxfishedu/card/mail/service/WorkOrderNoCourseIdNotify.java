@@ -8,10 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
 
 import javax.mail.MessagingException;
 import java.time.LocalDateTime;
@@ -38,11 +36,6 @@ public class WorkOrderNoCourseIdNotify {
 
     @Autowired
     private WorkOrderJavaMailConfig javaMailConfig;
-
-    @Autowired
-    public void initMailSender(JavaMailSender mailSender, TemplateEngine templateEngine) {
-        CardMimeMailSender.initMailSender(mailSender, templateEngine);
-    }
 
 //    @Scheduled(cron = "0 0 9-23/2 * * *")
     @Scheduled(cron = "0 0 5 * * *")

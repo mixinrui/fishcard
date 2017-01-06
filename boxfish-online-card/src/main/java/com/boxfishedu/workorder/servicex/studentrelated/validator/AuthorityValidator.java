@@ -1,10 +1,15 @@
 package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
+import com.boxfishedu.workorder.common.exception.ValidationException;
+import com.boxfishedu.workorder.common.log.ServiceLog;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -16,9 +21,19 @@ import java.util.List;
 @Component
 public class AuthorityValidator implements StudentTimePickerValidator {
 
+    private final static Logger logger = LoggerFactory.getLogger(AuthorityValidator.class);
+
     @Override
     public void prepareValidate(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> serviceList) {
-        BoxfishAsserts.notEmpty(serviceList, "无对应的服务");
+        if (CollectionUtils.isEmpty(serviceList)) {
+            logger.error(
+                    new ServiceLog(timeSlotParam.getStudentId())
+                            .data(timeSlotParam)
+                            .operation("上课选时间")
+                            .errorLevel()
+                            .toString());
+            throw new ValidationException("无对应的服务");
+        }
         // 操作权限认证,防止非法的访问
         serviceList.forEach(s -> s.authentication(timeSlotParam.getStudentId()));
     }

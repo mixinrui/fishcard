@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
@@ -39,6 +40,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -89,6 +92,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     @Autowired
     SyncCommentCard2SystemService syncCommentCard2SystemService;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -320,7 +326,6 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                 } else {
                     key = productComboDetail.getTutorType().name();
                 }
-
             }
             Service service = serviceHashMap.get(key);
             if(service != null) {
@@ -338,6 +343,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         save(services);
 
         for (Service service:services){
+            // 如果是外教点评, 则刷新外教点评次数缓存
+            if(Objects.equals(service.getProductType(), ProductType.COMMENT.value())) {
+                cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(service.getStudentId());
+            }
             logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
             if (Objects.equals(service.getProductType(),1002)){
                 logger.info("@order2Service2 购买点评次数,通知跟单系统");
@@ -492,6 +501,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfoService.save(scheduleCourseInfo);
     }
 
+    @Cacheable(value = CacheKeyConstant.COMMENT_CARD_AMOUNT, key = "#studentId")
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
         List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
                 studentId, ProductType.COMMENT.value());

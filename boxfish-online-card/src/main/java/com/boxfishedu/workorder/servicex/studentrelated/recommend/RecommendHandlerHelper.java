@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.studentrelated.recommend;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.log.RecommendLog;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseType2TeachingTypeService;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
@@ -61,6 +62,12 @@ public class RecommendHandlerHelper {
             return resultMap;
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error(
+                    new RecommendLog(timeSlotParam.getStudentId())
+                            .data(timeSlotParam)
+                            .operation("课程推荐")
+                            .errorLevel()
+                            .toString());
             throw new BusinessException("暂时没有与你的水平匹配的课程，新课即将上线，请过些时候再选课或者调整学习设置");
         }
 

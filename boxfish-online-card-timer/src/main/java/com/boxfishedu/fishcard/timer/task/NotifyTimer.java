@@ -302,7 +302,7 @@ public class NotifyTimer {
     /**
      * 外教点评会员过期提前三天提示
      */
-    @Scheduled(cron = "0 0 17 * * ?")
+//    @Scheduled(cron = "0 0 17 * * ?")
     public void pushExpireCommentCard() {
         logger.info("<<<<<<开始通知<<<外教点评会员过期提醒>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.EXPIRE_COMMENT_CARD.value());

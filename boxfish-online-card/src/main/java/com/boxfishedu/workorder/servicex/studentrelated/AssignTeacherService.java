@@ -121,8 +121,12 @@ public class AssignTeacherService {
         }
 
 
+        //该学生 是否 同类型课 是否指定过老师
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(workOrder.getSkuId()));
+        //用于判断 是否为同类型最后一节课
         List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
+
+        // 未指定过该类型课的老师   或者 指定该类型课的老师 和 改刚刚上过课的老师 不是一个人
         if (null == stStudentSchema || !stStudentSchema.getTeacherId().equals(workOrder.getTeacherId())) {
             if (CollectionUtils.isEmpty(listWorkOrders)) {
                 return null;
@@ -144,6 +148,16 @@ public class AssignTeacherService {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
             skuId = workOrder.getSkuId();
         }
+
+        if(skuId==null || teacherId==null || teacherId==0){
+            throw new BusinessException("数据参数不合法");
+        }
+
+        // 该学生
+        // 同类型(中外教)
+        // 其他教师接受邀请(待确认)设为无效                                     后续版本添加推送消息 通知其他教师 邀请取消
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, studentId, teacherId, StStudentApplyRecords.VALID.yes, StStudentApplyRecords.MatchStatus.wait2apply,skuId);
+        logger.info("matchCourseInfoAssignTeacher redonum:[{}]", num);
 
         //分配
         assignTeacherServiceX.insertOrUpdateSchema(studentId, teacherId, skuId, StStudentSchema.StSchema.assgin);
@@ -403,14 +417,16 @@ public class AssignTeacherService {
                 checkTimeOutForInvitedClass(stStu, now)
         ).collect(Collectors.toList());
 
-
-        List<Long> ids = Collections3.extractToList(stStudentApplyRecordsList, "id");
-        logger.info("acceptInvitedCourseByStudentId 能够接受的id [{}]", ids.toArray());
         //已经全部超时
         if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
             throw new BusinessException("课程已经全部超时");
             //return JsonResultModel.newJsonResultModel(null);
         }
+
+
+        List<Long> ids = Collections3.extractToList(stStudentApplyRecordsList, "id");
+        logger.info("acceptInvitedCourseByStudentId 能够接受的id [{}]", ids.toArray());
+
 
         Map<Long, Long> teachers = Collections3.extractToMap(stStudentApplyRecordsList, "teacherId", "teacherId");
 
@@ -427,6 +443,15 @@ public class AssignTeacherService {
         if (null == teachers.get(teacherId) || teachers.size() > 1 || null == students || students.size() > 1) {
             logger.info("acceptInvitedCourseByStudentId teacherId:[{}], teachers :[{}] ,students :[{}]", teacherId, JSON.toJSONString(teachers), JSON.toJSONString(students));
             throw new BusinessException("您的访问不安全,请联系客服");
+        }
+
+        // 判断是否为指定老师的数据  不是指定老师的数据  数据设置成失效
+        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(stStudentApplyRecordsList.get(0).getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(stStudentApplyRecordsList.get(0).getSkuId()));
+        if (null == stStudentSchema) {
+            logger.info("acceptInvitedCourseByStudentId->studentId:[{}],teacherId:[{}]", stStudentApplyRecordsList.get(0).getStudentId(), stStudentApplyRecordsList.get(0).getTeacherId());
+            // 数据设置为失效
+            stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, idsneedAgree);
+            return JsonResultModel.newJsonResultModel(null);
         }
 
 
@@ -488,6 +513,11 @@ public class AssignTeacherService {
         } else {
             SkuId = 2;   // 外教
         }
+
+
+        // 该学生 同类型课程的 未被接受的  设为无效
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, studentTeacherParam.getStudentId(), SkuId, StStudentApplyRecords.VALID.yes, StStudentApplyRecords.MatchStatus.wait2apply);
+        logger.info("changeATeacher redonum:[{}]", num);
 
         //更新schema模式为自由模式  un_assign
         assignTeacherServiceX.insertOrUpdateSchema(studentTeacherParam.getStudentId(), studentTeacherParam.getTeacherId(), SkuId, StStudentSchema.StSchema.un_assgin);

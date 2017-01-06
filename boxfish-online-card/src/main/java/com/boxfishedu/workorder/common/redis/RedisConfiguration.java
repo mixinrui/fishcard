@@ -94,6 +94,8 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 3*60L);
         // 选时间缓存一周
         expires.put(CacheKeyConstant.BASE_TIME_SLOTS, 3600 * 24 * 7L);
+        // 外教点评次数缓存
+        expires.put(CacheKeyConstant.COMMENT_CARD_AMOUNT, 3600 * 24 * 30 *12 * 15L);
         cacheManager.setExpires(expires);
         return cacheManager;
     }

@@ -34,6 +34,11 @@ public class DateRange {
         this.to = from.plusDays(this.range);
     }
 
+    public void incrementAWeek() {
+        from = from.plusWeeks(1);
+        to = to.plusWeeks(1);
+    }
+
     public <K> List<K> forEach(K k,Handle<? super K> handle) throws CloneNotSupportedException {
         ArrayList<K> results = Lists.newArrayList();
         for(int i=0; i < range; i++) {
