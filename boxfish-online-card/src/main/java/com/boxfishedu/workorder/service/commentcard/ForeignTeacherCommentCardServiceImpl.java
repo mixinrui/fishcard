@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NotFoundException;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
@@ -24,6 +25,7 @@ import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -73,6 +75,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Autowired
     CommentCardTimeConf commentCardTimeConf;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
@@ -391,6 +396,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardJpaRepository.save(commentCard);
                 serviceTemp.setAmount(serviceTemp.getAmount() + 1);
                 serviceTemp.setUpdateTime(updateDate);
+
+                // 刷新点评次数缓存
+                cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(commentCard.getStudentId());
                 serviceJpaRepository.save(serviceTemp);
                 logger.info("@foreignTeacherCommentUnAnswer24 外教在48小时内未点评,为学生返还点评次数...");
                 CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
