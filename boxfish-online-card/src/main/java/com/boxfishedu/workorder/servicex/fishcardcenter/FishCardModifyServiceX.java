@@ -44,6 +44,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -153,6 +154,22 @@ public class FishCardModifyServiceX {
         workOrderLog.setContent(String.format("更换教师:%s,旧的教师id%s"
                 , FishCardStatusEnum.getDesc(workOrder.getStatus()), oldWorkOrder.getTeacherId()));
         workOrderLogService.save(workOrderLog);
+    }
+
+    /**
+     * 验证换老师的时候,验证原来老师是否处于联通 呼叫 上课  (31,32,33,34,35,37) 的状态中
+     * @param teacherChangeParam
+     * @return
+     */
+    public JsonResultModel checkCurrentTeacherStatus(TeacherChangeParam teacherChangeParam){
+        if(null==teacherChangeParam.getWorkOrderId()){
+            throw  new BusinessException("鱼卡id不存在");
+        }
+        List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkIdAndStaus(teacherChangeParam.getWorkOrderId());
+        if(CollectionUtils.isEmpty(workOrderLogs)){
+            return JsonResultModel.newJsonResultModel(false);//不需要弹出提示 确认按钮
+        }
+        return JsonResultModel.newJsonResultModel(true);//需要弹出提示 确认按钮
     }
 
     private void changeTeacherLog(WorkOrder workOrder) {
