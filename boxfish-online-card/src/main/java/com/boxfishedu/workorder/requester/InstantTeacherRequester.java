@@ -88,6 +88,7 @@ public class InstantTeacherRequester {
         try {
             jsonResultModel = restTemplate.postForObject(url, instantAssignTeacherParam, JsonResultModel.class);
             if (jsonResultModel.getReturnCode() != HttpStatus.OK.value()) {
+                logger.error("");
                 throw new BusinessException("向师生运营发起请求获取失败,参数[{}]" + jsonResultModel.getReturnMsg());
             }
         } catch (Exception ex) {

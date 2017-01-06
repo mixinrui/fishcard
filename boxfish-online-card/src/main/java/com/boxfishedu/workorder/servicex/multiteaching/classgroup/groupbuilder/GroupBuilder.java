@@ -21,9 +21,21 @@ public abstract class GroupBuilder {
 
     protected abstract Map<String, List<WorkOrder>> groupByRelation(List<WorkOrder> workOrders);
 
-//    public void group() {
-//        List<WorkOrder> cards = this.cardsToGroup();
-//        Map<String,WorkOrder>
-//
-//    }
+    public void group() {
+        List<WorkOrder> cards = this.cardsToGroup();
+        Map<String, List<WorkOrder>> timeGrouped = this.groupByTime(cards);
+
+        timeGrouped.forEach((timeKey, timedWorkOrders) -> {
+            Map<String, List<WorkOrder>> levelGrouped = this.groupbyLevel(timedWorkOrders);
+
+            levelGrouped.forEach((levelKey, leveledWorkOrders) -> {
+                Map<String, List<WorkOrder>> studyCounterGrouped = this.groupByStudyCounter(leveledWorkOrders);
+
+                studyCounterGrouped.forEach((studyCounterKey, studyCounterWorkOrders) -> {
+                    Map<String,List<WorkOrder>> relationGrouped=this.groupByRelation(studyCounterWorkOrders);
+                });
+            });
+        });
+
+    }
 }
