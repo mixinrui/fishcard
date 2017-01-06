@@ -111,6 +111,7 @@ public class RabbitMqReciver {
             System.out.println(orderView);
             serveService.order2ServiceAndWorkOrder(orderView);
         } catch (Exception ex) {
+            ex.printStackTrace();
             logger.error("订单[{}]转换失败", orderView.getId());
 //            throw new Exception("转换失败放回队列");
         }

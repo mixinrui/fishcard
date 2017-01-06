@@ -402,7 +402,7 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: https://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api-online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  师生运营匹配老师
     #消息推送地址

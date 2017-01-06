@@ -54,5 +54,7 @@ public  class WorkOrderConstant {
     /** end 鱼卡换时间  **/
 
     //指定老师消息推送
-    public final static String SEND_ASSIGN_TEACHER ="A student would like to have class with you. Please check your class schedule and accept their class request.";
+    //public final static String SEND_ASSIGN_TEACHER ="A student would like to have class with you. Please check your class schedule and accept their class request.";
+
+    public final static String SEND_ASSIGN_TEACHER ="A student wants to fix classes with you! (Please ensure your APP is updated)";
 }

@@ -36,8 +36,9 @@ public class MsgPushRequester {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void notifyInstantGroupClassMsg(InstantClassCard instantClassCard, List<Long> teacherIds) {
-        String url = String.format("%s/notification/push",
-                                   urlConf.getMsg_push_url());
+        String url = String.format("%s/notification/push?type=%s",
+                                   urlConf.getMsg_push_url(),"INSTANCE_CLASS");
+        logger.info("@notifyInstantGroupClassMsg,向教师发起立即上课推送,url[{}]",url);
 //        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard, teacherIds, "向教师发起推送");
         TeachingOnlineGroupMsg teachingOnlineGroupMsg = new TeachingOnlineGroupMsg();
         teachingOnlineGroupMsg.setPush_title("Many students are waiting for class. Now matching...");

@@ -86,8 +86,12 @@ public class AssignTeacherService {
     private AssignTeacherServiceX assignTeacherServiceX;
 
 
-
-    //1 判断按钮是否出现
+    /**
+     * 1 判断按钮是否出现
+     *
+     * @param workOrderId
+     * @return
+     */
     public JsonResultModel checkAssignTeacherFlag(Long workOrderId) {
         List<WorkOrder> workOrders = this.getAssignTeacherList(workOrderId);
         if (CollectionUtils.isEmpty(workOrders)) {
@@ -134,6 +138,7 @@ public class AssignTeacherService {
     //2.1  指定这位老师上课
     @Transactional
     public JsonResultModel matchCourseInfoAssignTeacher(Long oldWorkOrderId, Integer skuIdParameter, Long studentId, Long teacherId) {
+        logger.info("matchCourseInfoAssignTeacher oldWorkOrderId:[{}],skuIdParameter:[{}],studentId:[{}],teacherId:[{}]", oldWorkOrderId, skuIdParameter, studentId, teacherId);
         Integer skuId = skuIdParameter;
         if (null != oldWorkOrderId) {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
@@ -141,7 +146,7 @@ public class AssignTeacherService {
         }
 
         //分配
-        assignTeacherServiceX.insertOrUpdateSchema(studentId, teacherId, skuId,StStudentSchema.StSchema.assgin);
+        assignTeacherServiceX.insertOrUpdateSchema(studentId, teacherId, skuId, StStudentSchema.StSchema.assgin);
         assignTeacherServiceX.maualAssign(teacherId, studentId, skuId);
 
         return JsonResultModel.newJsonResultModel(null);
@@ -368,11 +373,12 @@ public class AssignTeacherService {
         Map<String, String> teacherInfoMap = teacherPhotoRequester.getTeacherInfo(stStudentSchema.getTeacherId());
         if (!CollectionUtils.isEmpty(teacherInfoMap)) {
             jo.put("teacherImg", teacherInfoMap.get("figure_url"));
-            jo.put("teacherId", stStudentSchema.getTeacherId());
-            jo.put("sku_id", stStudentSchema.getSkuId().ordinal());
-            //jo.put("oldWokrOrderId", stStudentApplyRecords.getWorkOrderId());
-
         }
+
+        jo.put("teacherId", stStudentSchema.getTeacherId());
+        jo.put("sku_id", stStudentSchema.getSkuId().ordinal());
+
+
         jo.put("teacherName", getTeacherName(stStudentSchema.getTeacherId()));
         return jo;
 
@@ -467,22 +473,29 @@ public class AssignTeacherService {
 
         Service service = serveService.findTop1ByOrderId(studentTeacherParam.getOrderId());
 
+        if (null == service) {
+            logger.info("changeATeacher 订单id:[{}]", studentTeacherParam.getOrderId());
+            throw new BusinessException("数据有误");
+        }
+
+        logger.info("changeATeacher studentTeacherParam:getStudentId:[{}],getOrderId:[{}],getTeacherId:[{}]", studentTeacherParam.getStudentId(), studentTeacherParam.getOrderId(), studentTeacherParam.getTeacherId());
+
         String tutorType = service.getTutorType();
         Integer SkuId = 0;
-        logger.debug("changeATeacher,参数tutorType[{}]",tutorType);
-        if(Objects.equals(tutorType, TutorType.CN.name()) || Objects.equals(tutorType, TutorType.MIXED.name())) {
+        logger.debug("changeATeacher,参数tutorType[{}]", tutorType);
+        if (Objects.equals(tutorType, TutorType.CN.name()) || Objects.equals(tutorType, TutorType.MIXED.name())) {
             SkuId = 1; //中教
-        }else {
-            SkuId=2;   // 外教
+        } else {
+            SkuId = 2;   // 外教
         }
 
         //更新schema模式为自由模式  un_assign
-        assignTeacherServiceX.insertOrUpdateSchema(studentTeacherParam.getStudentId(), studentTeacherParam.getTeacherId(), SkuId,StStudentSchema.StSchema.un_assgin);
+        assignTeacherServiceX.insertOrUpdateSchema(studentTeacherParam.getStudentId(), studentTeacherParam.getTeacherId(), SkuId, StStudentSchema.StSchema.un_assgin);
 
         JsonResultModel jsonResultModel = teacherStudentRequester.notifyAssignTeacher(studentTeacherParam);
 
         if (null != jsonResultModel && HttpStatus.OK.value() == jsonResultModel.getReturnCode()) {
-
+            logger.info("changeATeacher studentTeacherParam:getStudentId:[{}],getOrderId:[{}],getTeacherId:[{}]", studentTeacherParam.getStudentId(), studentTeacherParam.getOrderId(), studentTeacherParam.getTeacherId());
             // 获取订单数据
             List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByOrderId(studentTeacherParam.getOrderId());
             List<Long> workOrderIds = Collections3.extractToList(workOrders, "id");

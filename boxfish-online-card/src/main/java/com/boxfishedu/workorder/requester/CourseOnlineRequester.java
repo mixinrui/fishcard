@@ -118,8 +118,8 @@ public class CourseOnlineRequester {
     public void pushWrappedMsg(TeachingOnlineMsg teachingOnlineMsg){
         List<TeachingOnlineMsg> requestBody= Lists.newArrayList();
         requestBody.add(teachingOnlineMsg);
-        String url=String.format("%s/teaching/callback/push?type=%s",
-                urlConf.getCourse_online_service(),"INSTANCE_CLASS");
+        String url=String.format("%s/teaching/callback/push",
+                urlConf.getCourse_online_service());
         logger.debug("<<<<<<<<<<<<<@[pushWrappedMsg]向在线教育发起通知操作,[[[[通知用户[{}]推送消息[{}]]]]],url[{}],内容:{}",url,
                 teachingOnlineMsg.getUser_id(),teachingOnlineMsg.getPush_title(), JacksonUtil.toJSon(requestBody));
         threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,requestBody,Object.class);}));
