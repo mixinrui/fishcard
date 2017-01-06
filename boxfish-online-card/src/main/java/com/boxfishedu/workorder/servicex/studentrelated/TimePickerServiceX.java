@@ -15,6 +15,7 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
+import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.StudentCourseSchedule;
@@ -91,6 +92,9 @@ public class TimePickerServiceX {
 
     @Autowired
     private DataCollectorService dataCollectorService;
+
+    @Autowired
+    private OnlineAccountService accountService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -281,6 +285,11 @@ public class TimePickerServiceX {
     }
 
     public Object getCourseSchedulePage(Long studentId, Pageable pageable, Locale locale) {
+        // 先判断是否是在线上课用户, 如果不是, 则不需要查询数据库, 直接返回默认的空
+        if(!accountService.isMember(studentId)) {
+            return DEFAULT_STUDENT_SCHEDULE_PAGE;
+        }
+
         Page<CourseSchedule> page = courseScheduleService.findByStudentId(studentId, pageable);
         List<Map<String, Object>> result = adapterCourseScheduleList(page.getContent(), locale);
         HashMap<String, Object> resultMap = Maps.newHashMap();
@@ -291,6 +300,18 @@ public class TimePickerServiceX {
         resultMap.put("totalPages", page.getTotalPages());
         resultMap.put("size", page.getSize());
         return resultMap;
+    }
+
+    final static Map<String, Object> DEFAULT_STUDENT_SCHEDULE_PAGE;
+
+    static {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("returnCode", HttpStatus.SC_OK);
+        map.put("totalElements", 0);
+        map.put("number", 0);
+        map.put("totalPages", 0);
+        map.put("size", 15);
+        DEFAULT_STUDENT_SCHEDULE_PAGE = Collections.unmodifiableMap(map);
     }
 
     private List<Map<String, Object>> adapterCourseScheduleList(List<CourseSchedule> courseScheduleList, Locale locale) {
