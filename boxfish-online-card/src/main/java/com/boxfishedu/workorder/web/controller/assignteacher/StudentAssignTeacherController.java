@@ -51,6 +51,14 @@ public class StudentAssignTeacherController {
     //本地异常日志记录对象
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+
+    @RequestMapping(value = "{teacherId}/paytest", method = RequestMethod.GET)
+    public JsonResultModel payTest(@PathVariable("teacherId") Long teacherId) {
+        assignTeacherService.pushPayTest(teacherId);
+        return JsonResultModel.newJsonResultModel(null);
+    }
+
+
     @RequestMapping(value = "{teacherId}/test", method = RequestMethod.GET)
     public JsonResultModel test(@PathVariable("teacherId") Long teacherId) {
          assignTeacherService.pushTeacherList(teacherId);
