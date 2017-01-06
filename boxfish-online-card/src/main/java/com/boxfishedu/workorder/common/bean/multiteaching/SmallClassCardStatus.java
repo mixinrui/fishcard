@@ -6,6 +6,8 @@ import java.util.Map;
 public enum SmallClassCardStatus {
     UNKNOWN(0, "未知"),
     CREATE(100, "创建"),
+    COURSE_ASSIGNED(110,"分配课程"),
+    TEACHER_ASSIGNED(120,"分配老师"),
     TEACHER_ENTER_ROOM(200, "教师进入课堂"),
     CLASSING(300,"开始上课"),
     COMPLETED(400, "完成");

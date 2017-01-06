@@ -9,7 +9,7 @@ import javax.annotation.PostConstruct;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(20)
+@Order(200)
 @Component
 public class EnterRoomEventCustomer extends SmallClassEventCustomer {
 

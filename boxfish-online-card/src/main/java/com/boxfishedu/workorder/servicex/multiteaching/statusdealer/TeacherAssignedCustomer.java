@@ -9,16 +9,16 @@ import javax.annotation.PostConstruct;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(300)
+@Order(120)
 @Component
-public class ClassingEventCustomer extends SmallClassEventCustomer{
+public class TeacherAssignedCustomer extends SmallClassEventCustomer {
     @PostConstruct
     public void initEvent(){
-        this.setSmallClassCardStatus(SmallClassCardStatus.CLASSING);
+        this.setSmallClassCardStatus(SmallClassCardStatus.CREATE);
     }
 
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
-        logger.info("教师开始上课...");
+        logger.info("分配老师...");
     }
 }
