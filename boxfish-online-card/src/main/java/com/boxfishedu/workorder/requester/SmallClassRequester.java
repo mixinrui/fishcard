@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class SmallClassRequester {
      * @param tutorTypeEnum   中外教类型
      * @return
      */
-    public RecommandCourseView fetchSmallClassCourse(
+    public RecommandCourseView fetchClassCourseByUserIds(
             List<Long> studentIds, String difficultyLevel, Integer seq, TutorTypeEnum tutorTypeEnum) {
         String userIdsStr = StringUtils.arrayToDelimitedString(studentIds.toArray(), "-");
         String url = null;
@@ -109,13 +110,18 @@ public class SmallClassRequester {
         return info;
     }
 
-    public RecommandCourseView fetchSmallClassCNCourse(
+    public RecommandCourseView fetchSmallClassCourse(
             List<WorkOrder> workOrders, String difficultyLevel, Integer seq, TutorTypeEnum tutorTypeEnum) {
         List<Long> students = Lists.newArrayList();
         workOrders.forEach(workOrder -> {
             students.add(workOrder.getStudentId());
         });
-        return this.fetchSmallClassCourse(students, difficultyLevel, seq, tutorTypeEnum);
+        return this.fetchClassCourseByUserIds(students, difficultyLevel, seq, tutorTypeEnum);
+    }
+
+    public RecommandCourseView fetchSmallClassCNCourse(
+            List<Long> studentIds, String difficultyLevel, Integer seq) {
+        return this.fetchClassCourseByUserIds(studentIds, difficultyLevel, seq, TutorTypeEnum.CN);
     }
 
 
