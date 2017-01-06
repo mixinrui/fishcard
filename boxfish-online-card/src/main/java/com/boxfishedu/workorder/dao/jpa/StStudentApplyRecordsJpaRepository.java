@@ -58,8 +58,8 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
     int setFixedValidFor(StStudentApplyRecords.VALID valid    , List<Long> ids);
 
     @Modifying
-    @Query("update StStudentApplyRecords o set o.valid =?1 where o.studentId=?2 and o.teacherId!=?3 and o.valid=?4 and o.matchStatus=?5")
-    int setFixedValidFor(StStudentApplyRecords.VALID valid,Long studentId,Long teacherId,StStudentApplyRecords.VALID whereValid,StStudentApplyRecords.MatchStatus matchStatus);
+    @Query("update StStudentApplyRecords o set o.valid =?1 where o.studentId=?2 and o.teacherId!=?3 and o.valid=?4 and o.matchStatus=?5 and o.skuId=?6")
+    int setFixedValidFor(StStudentApplyRecords.VALID valid,Long studentId,Long teacherId,StStudentApplyRecords.VALID whereValid,StStudentApplyRecords.MatchStatus matchStatus,Integer skuId);
 
 
     @Modifying

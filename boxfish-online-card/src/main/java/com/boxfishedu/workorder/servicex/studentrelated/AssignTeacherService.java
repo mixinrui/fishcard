@@ -146,7 +146,7 @@ public class AssignTeacherService {
         }
 
         // 该学生其他教师接受邀请设为无效 后续版本添加推送消息 通知其他教师 邀请取消
-        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.yes, studentId, teacherId, StStudentApplyRecords.VALID.no, StStudentApplyRecords.MatchStatus.wait2apply);
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, studentId, teacherId, StStudentApplyRecords.VALID.yes, StStudentApplyRecords.MatchStatus.wait2apply,skuId);
 
         logger.info("matchCourseInfoAssignTeacher redonum:[{}]", num);
 
