@@ -40,6 +40,9 @@ mail:
     sender: online@send.boxfish.cn
     subject: 48小时以内未成功推荐课程的鱼卡id列表
 
+  sender: online@send.boxfish.cn
+  token: Tpn7MvMDAxLuS4reWbveS6uuacgOWuueaYk
+
 
 #===============================================================product环境======================================================================
 ---
