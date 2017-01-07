@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.entity.mysql;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "small_class")
-public class SmallClass implements Cloneable{
+public class SmallClass implements Cloneable {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -66,23 +67,26 @@ public class SmallClass implements Cloneable{
 
     private Integer status;
 
+    @JsonIgnore
+    @Transient
     private List<Long> allStudentIds;
 
+    @JsonIgnore
+    @Transient
     private List<Long> allCardIds;
 
     //班级类型
-    public SmallClassType smallClassType;
+    public String smallClassType;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
     private Date updateTime = DateTime.now().toDate();
 
-    //覆写clone方法
     @Override
-    public SmallClass clone(){
-        SmallClass smallClass =null;
+    public SmallClass clone() {
+        SmallClass smallClass = null;
         try {
-            smallClass =(SmallClass) super.clone();
+            smallClass = (SmallClass) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new BusinessException("clone error");
         }

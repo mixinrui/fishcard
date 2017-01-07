@@ -6,7 +6,6 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.servicex.multiteaching.statusdealer.SmallClassEvent;
 import com.google.common.collect.Lists;
-import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -59,7 +58,7 @@ public class Timer6Group extends GroupBuilder {
             smallClass.setGroupLeader(leader.getStudentId());
             smallClass.setGroupLeaderCard(leader.getId());
             smallClass.setRoleId(leader.getSkuId());
-            smallClass.setSmallClassType(SmallClassType.SMALL);
+            smallClass.setSmallClassType(SmallClassType.SMALL.name());
             smallClass.setAllCardIds(this.fetchCardIds(groupMembers));
             smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
 
