@@ -25,8 +25,6 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
     private SmallClassTeacherRequester smallClassTeacherRequester;
 
 
-
-
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(SmallClassCardStatus.CREATE);
