@@ -101,8 +101,10 @@ spring.profiles.active: test
 ---
 spring:
   datasource:
+    validation-query: select 1
+    test-on-borrow: true
 #    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
-    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://boxfish2016outside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&zeroDateTimeBehavior=convertToNull&validationQuery=select 1
     username: service
     password: Box123456
 

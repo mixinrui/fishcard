@@ -61,7 +61,6 @@ public enum TimerMessageType {
     EXPIRE_COMMENT_CARD(149),
     ASSGIN_TEACHER(150);
 
-
     private int code;
 
     private TimerMessageType(int code) {

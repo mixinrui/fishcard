@@ -214,6 +214,10 @@ public class WorkOrder implements Cloneable {
     @Column(name = "class_type", nullable = true)
     private String classType;
 
+    //小班课id
+    @Column(name = "small_class_id")
+    private Long smallClassId;
+
     @Transient
     private Boolean freezeBtnShowFlag = false;
 
@@ -320,12 +324,12 @@ public class WorkOrder implements Cloneable {
         return prototypeClass;
     }
 
-    public void addStudentStatus(FishCardNetStatusEnum fishCardNetStatusEnum){
-        this.addNetStatus(fishCardNetStatusEnum,"student");
+    public void addStudentStatus(FishCardNetStatusEnum fishCardNetStatusEnum) {
+        this.addNetStatus(fishCardNetStatusEnum, "student");
     }
 
-    public void addTeacherStatus(FishCardNetStatusEnum fishCardNetStatusEnum){
-        this.addNetStatus(fishCardNetStatusEnum,"teacher");
+    public void addTeacherStatus(FishCardNetStatusEnum fishCardNetStatusEnum) {
+        this.addNetStatus(fishCardNetStatusEnum, "teacher");
     }
 
     private void addNetStatus(FishCardNetStatusEnum fishCardNetStatusEnum, String role) {
