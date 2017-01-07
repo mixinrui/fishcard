@@ -115,7 +115,7 @@ public class InstantClassTeacherService {
             BeanUtils.copyProperties(instantGroupInfo
                     , courseOnlineRequester.instantCreateGroup(workOrderService.findOne(instantClassCard.getWorkorderId())));
         } catch (Exception ex) {
-            logger.error("@prepareForInstantClass#创建群组失败,instantcard:{}", instantClassCard, ex);
+            logger.error("@prepareForInstantClass#创建群组失败,instantcard:[{}]", instantClassCard, ex);
             throw new BusinessException("创建群组失败");
         }
         return workOrders;
