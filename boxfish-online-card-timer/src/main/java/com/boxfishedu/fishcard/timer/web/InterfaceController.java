@@ -18,38 +18,38 @@ public class InterfaceController {
     @Autowired
     private NotifyTimer notifyTimer;
 
-    @RequestMapping(value = "/assign", method = RequestMethod.POST)
-    public JsonResultModel assignTeacher(){
-        try {
-            notifyTimer.notifyService();
-            return JsonResultModel.newJsonResultModel("ok");
-        }
-        catch (Exception ex){
-            return JsonResultModel.newJsonResultModel("error"+ex.getMessage());
-        }
-    }
-
-    @RequestMapping(value = "/alert", method = RequestMethod.GET)
-    public JsonResultModel alert(){
-        notifyTimer.teacherOutNumberNotifyService();
-        return JsonResultModel.newJsonResultModel("ok");
-    }
-
-    @RequestMapping(value = "/absent/teacher", method = RequestMethod.GET)
-    public JsonResultModel teacherAbsent(){
-        notifyTimer.notifyTeacherAbsentService();
-        return JsonResultModel.newJsonResultModel("ok");
-    }
-
-    @RequestMapping(value = "/complete/force", method = RequestMethod.POST)
-    public JsonResultModel completeForce(){
-        notifyTimer.completeForceService();
-        return JsonResultModel.newJsonResultModel("ok");    
-    }
-
-    @RequestMapping(value = "/freeze/update", method = RequestMethod.POST)
-    public JsonResultModel freezeUpdate(){
-        notifyTimer.dealFreeze();
-        return JsonResultModel.newJsonResultModel("ok");
-    }
+//    @RequestMapping(value = "/assign", method = RequestMethod.POST)
+//    public JsonResultModel assignTeacher(){
+//        try {
+//            notifyTimer.notifyService();
+//            return JsonResultModel.newJsonResultModel("ok");
+//        }
+//        catch (Exception ex){
+//            return JsonResultModel.newJsonResultModel("error"+ex.getMessage());
+//        }
+//    }
+//
+//    @RequestMapping(value = "/alert", method = RequestMethod.GET)
+//    public JsonResultModel alert(){
+//        notifyTimer.teacherOutNumberNotifyService();
+//        return JsonResultModel.newJsonResultModel("ok");
+//    }
+//
+//    @RequestMapping(value = "/absent/teacher", method = RequestMethod.GET)
+//    public JsonResultModel teacherAbsent(){
+//        notifyTimer.notifyTeacherAbsentService();
+//        return JsonResultModel.newJsonResultModel("ok");
+//    }
+//
+//    @RequestMapping(value = "/complete/force", method = RequestMethod.POST)
+//    public JsonResultModel completeForce(){
+//        notifyTimer.completeForceService();
+//        return JsonResultModel.newJsonResultModel("ok");
+//    }
+//
+//    @RequestMapping(value = "/freeze/update", method = RequestMethod.POST)
+//    public JsonResultModel freezeUpdate(){
+//        notifyTimer.dealFreeze();
+//        return JsonResultModel.newJsonResultModel("ok");
+//    }
 }

@@ -21,6 +21,10 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public Page<WorkOrder> findByServiceIdOrderByStartTime(Long serviceId, Pageable pageable);
 
+
+    //按照订单id查找鱼卡
+    public Page<WorkOrder> findByOrderIdAndIsFreeze(Long orderId,Integer isFreeze,Pageable pageable);
+
     public WorkOrder findByOrderIdAndServiceId(Long orderId, Long serviceId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -40,6 +44,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByStudentIdAndStartTimeBetween(Long studentId, Date beginDate, Date endDate);
 
     public List<WorkOrder> findByStudentId(Long studentId);
+
+    @Query("select wo from  WorkOrder wo where wo.studentId =?1 and wo.startTime <current_timestamp  and wo.isFreeze!=1  order by wo.startTime desc ")
+    public List<WorkOrder> findByStudentIdAfterNow(Long studentId);
 
     public List<WorkOrder> findByIsFreezeAndStartTimeBetweenAndParentIdNotNull( Integer isFreeze, Date startDate, Date endDate);
 
@@ -121,7 +128,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     @Query("select wo from WorkOrder wo where wo.id in (?1) ")
     public List<WorkOrder> findWorkOrderAll(Long[] ids);
-
+    @Query("select wo from WorkOrder wo where wo.id in (?1) ")
+    public List<WorkOrder> findWorkOrderAll(List<Long> ids);
 
     public List<WorkOrder> findByCourseType(String courseType);
 
@@ -162,6 +170,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select wo.id from WorkOrder wo")
     public List<Long> findAllWorkOrderId();
 
+    @Query("select wo.id from WorkOrder wo where wo.startTime<?1")
+    public List<Long> findAllFinishedId(Date date);
+
     List<WorkOrder> findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(Integer freezeFlag,Short isCourseOver,Integer status,Date startTime);
 
     // 获取兑换类型一个种类下最大的一个序号
@@ -183,4 +194,19 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     @Query(value = "select distinct wo.skuId from WorkOrder wo where studentId=? and startTime>?")
     List<Integer> findDistinctSkuIds(Long studentId,Date startTime);
+
+    List<WorkOrder>  findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId,Date startTime,Integer skuId,Integer isFreeze);
+
+    List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeIn(Long teacherId,Integer isFreeze,List startTimes);
+
+    @Query("select wo from  WorkOrder wo where wo.teacherId=?1 and (wo.endTime between ?2 and ?3) and status=?4 order by wo.endTime ")
+    public List<WorkOrder> findByStartTime(Long teacherId, Date beginDate, Date endDate, Integer status);
+
+    public List<WorkOrder> findByIdIn(List workOrderIds);
+
+
+    @Query("select wo from  WorkOrder wo where wo.studentId=?1 and (wo.startTime between ?2 and ?3) and isFreeze=0 order by wo.startTime ")
+    public List<WorkOrder> findByMyClasses(Long studentId, Date beginDate, Date endDate);
+
+
 }

@@ -29,6 +29,7 @@ import org.springframework.cache.CacheManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,6 +114,9 @@ public class TeacherAppRelatedServiceX {
             return map;
         }
         Date endDate = workOrder.getEndTime();
+        Date deadEndDate = DateUtil.localDate2Date(
+                LocalDateTime.ofInstant(
+                        endDate.toInstant(), ZoneId.systemDefault()).plusMinutes(5));
         Date startDate = workOrder.getStartTime();
         Date now = new Date();
 
@@ -124,15 +128,10 @@ public class TeacherAppRelatedServiceX {
             logger.info("当前鱼卡[{}]课程的状态[{}]不允许上课", workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             map.put("valid", FishCardAuthEnum.TOO_LATE.getCode());
             map.put("desc", FishCardAuthEnum.TOO_LATE.getDesc());
-        } else if (now.after(endDate)) {
+        } else if (now.after(deadEndDate)) {
             map.put("valid", FishCardAuthEnum.CLASS_OVER.getCode());
             map.put("desc", FishCardAuthEnum.CLASS_OVER.getDesc());
-        }
-//        else if(workOrder.getStatus() == FishCardStatusEnum.STUDENT_ABSENT.getCode()){
-//            map.put("valid", FishCardAuthEnum.STUDENT_ABSENT.getCode());
-//            map.put("desc", FishCardAuthEnum.STUDENT_ABSENT.getDesc());
-//        }
-        else {
+        } else {
             map.put("valid", FishCardAuthEnum.OK.getCode());
             map.put("desc", FishCardAuthEnum.OK.getDesc());
             logger.info("鱼卡:[{}]校验通过:", workOrderId);
@@ -147,8 +146,9 @@ public class TeacherAppRelatedServiceX {
         return map;
     }
 
-    public MonthTimeSlots getScheduleByIdAndDateRange(Long teacherId, YearMonth yearMonth,
-                                                      Integer count, Locale locale) {
+    public MonthTimeSlots getScheduleByIdAndDateRange(
+            Long teacherId, YearMonth yearMonth,
+            Integer count, Locale locale) {
         DateRangeForm dateRangeForm;
         // 如果没有指定查询的年月,则默认查询半年的数据
         if (yearMonth == null) {
@@ -339,24 +339,24 @@ public class TeacherAppRelatedServiceX {
                 teacherId, getInternationalDateRange(date));
 
         List<DayTimeSlots> result = dayTimeSlotsList.parallelStream()
-                // 可选时间过滤,即北京时间周一到周五  周六到周日的时间规则
-                .map(timeLimitPolicy::limit)
-                // 判空
-                .filter(this::notEmptyPredicate)
-                // 国际化时间转换
-                .map(d -> this.filterInternationalDayTimeSlots(d, getInternationalDateTimeRange(date)))
-                .filter(this::notEmptyPredicate)
-                // 3 覆盖,课程信息覆盖
-                .peek(d -> d.override(courseScheduleList, serviceSDK, locale))
-                // 历史日期时间片过滤,只显示有课的
-                .map(dayTimeSLots -> dayTimeSLots.filter(
-                        d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
-                        t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()))
-                // 非空
-                .filter(d -> d != null)
-                // 排序
-                //.sorted((f, s) -> Long.compare(f.getDayStamp(), s.getDayStamp()))
-                .collect(Collectors.toList());
+                                                    // 可选时间过滤,即北京时间周一到周五  周六到周日的时间规则
+                                                    .map(timeLimitPolicy::limit)
+                                                    // 判空
+                                                    .filter(this::notEmptyPredicate)
+                                                    // 国际化时间转换
+                                                    .map(d -> this.filterInternationalDayTimeSlots(d, getInternationalDateTimeRange(date)))
+                                                    .filter(this::notEmptyPredicate)
+                                                    // 3 覆盖,课程信息覆盖
+                                                    .peek(d -> d.override(courseScheduleList, serviceSDK, locale))
+                                                    // 历史日期时间片过滤,只显示有课的
+                                                    .map(dayTimeSLots -> dayTimeSLots.filter(
+                                                            d -> LocalDate.now().isAfter(parseLocalDate(d.getDay())),
+                                                            t -> t.getCourseScheduleStatus() != FishCardStatusEnum.UNKNOWN.getCode()))
+                                                    // 非空
+                                                    .filter(d -> d != null)
+                                                    // 排序
+                                                    //.sorted((f, s) -> Long.compare(f.getDayStamp(), s.getDayStamp()))
+                                                    .collect(Collectors.toList());
         return JsonResultModel.newJsonResultModel(result);
     }
 
@@ -394,7 +394,7 @@ public class TeacherAppRelatedServiceX {
         Long firstDayTimeStamp = cacheManager.getCache(
                 CacheKeyConstant.SCHEDULE_HAS_MORE_HISTORY).get(teacherId, Long.class);
         // 如果缓存为空,再查数据库
-        if(firstDayTimeStamp == null) {
+        if (firstDayTimeStamp == null) {
             Optional<Date> firstDay = courseScheduleService.findMinClassDateByTeacherId(teacherId);
             if (firstDay.isPresent()) {
                 firstDayTimeStamp = firstDay.get().getTime();

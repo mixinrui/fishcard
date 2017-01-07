@@ -1,16 +1,15 @@
 package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.workorder.common.bean.AccountCourseBean;
-import com.boxfishedu.workorder.common.bean.AccountCourseEnum;
-import com.boxfishedu.workorder.common.bean.CommentCardStatus;
-import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.mall.enums.ProductType;
+import com.boxfishedu.workorder.common.bean.*;
 import com.boxfishedu.workorder.common.config.CommentCardTimeConf;
 import com.boxfishedu.workorder.common.config.ServiceGateWayType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NotFoundException;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
@@ -21,15 +20,18 @@ import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -73,6 +75,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Autowired
     CommentCardTimeConf commentCardTimeConf;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
@@ -391,6 +396,9 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardJpaRepository.save(commentCard);
                 serviceTemp.setAmount(serviceTemp.getAmount() + 1);
                 serviceTemp.setUpdateTime(updateDate);
+
+                // 刷新点评次数缓存
+                cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(commentCard.getStudentId());
                 serviceJpaRepository.save(serviceTemp);
                 logger.info("@foreignTeacherCommentUnAnswer24 外教在48小时内未点评,为学生返还点评次数...");
                 CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
@@ -566,6 +574,29 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             newCommentCard.setStatus(CommentCardStatus.ASSIGNED_TEACHER.getCode());
             commentCardJpaRepository.save(newCommentCard);
         }
+    }
+
+    /**
+     * 外教点评过期通知
+     */
+    @Override
+    public void notifyExpireCommentCards() {
+        // 会员有效期倒数第三天时,如果用户还有会员外教点评未使用,下午17:00点推送提醒: 会员要到期啦,外教点评还没用完呢,赶快去行使会员特权~
+        LocalDate now = LocalDate.now();
+        Set<Long> studentIds = serviceJpaRepository.getAvailableForeignCommentService(
+                ProductType.COMMENT.value(),
+                DateUtil.convertToDate(now.plusDays(3)),
+                DateUtil.convertToDate(now.plusDays(4)),
+                UserTypeEnum.GENERAL_MEMBER.type());
+        logger.info("push expire commentCards to {}", studentIds);
+        if(CollectionUtils.isNotEmpty(studentIds)) {
+            pushExpireMessage(studentIds);
+        }
+    }
+
+    // 推送
+    private void pushExpireMessage(Set<Long> ids) {
+        commentCardSDK.notifyCommentCardExpire(ids, commentCardTimeConf.getExpireMessage(), "MEMBER_FOREIGN_COMMENT");
     }
 
     private String getTeacherName(String teacherFirstName,String teacherLastName){

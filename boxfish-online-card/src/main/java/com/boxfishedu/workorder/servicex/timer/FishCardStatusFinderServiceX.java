@@ -42,7 +42,10 @@ public class FishCardStatusFinderServiceX {
             FishCardDelayMessage fishCardDelayMessage=iterator.next();
             MessageProperties messageProperties = fishCardStatusService.getMsgProperties(fishCardDelayMessage.getStartTime()
                     , FishCardDelayMsgType.TEACHER_ABSENT);
-            logger.debug("@teacherAbsentFinder[检测教师旷课的教师先后顺序发送消息：{},id:[{}];分发期限[{}]",fishCardDelayMessage.getStartTime(),fishCardDelayMessage.getId(),messageProperties.getExpiration());
+
+            logger.debug("@teacherAbsentFinder[检测教师旷课的教师先后顺序发送消息：{},id:[{}];分发期限[{}]"
+                    ,fishCardDelayMessage.getStartTime(),fishCardDelayMessage.getId(),messageProperties.getExpiration());
+
             rabbitMqDelaySender.send(fishCardDelayMessage,messageProperties);
         }
     }
@@ -57,7 +60,10 @@ public class FishCardStatusFinderServiceX {
             FishCardDelayMessage fishCardDelayMessage=iterator.next();
             MessageProperties messageProperties = fishCardStatusService.getMsgProperties(fishCardDelayMessage.getStartTime()
                     , FishCardDelayMsgType.STUDENT_ABSENT);
-            logger.debug("@studentAbsentFinder[检测学生旷课先后顺序发送消息：{},id:[{}];分发期限[{}]",fishCardDelayMessage.getStartTime(),fishCardDelayMessage.getId(),messageProperties.getExpiration());
+
+            logger.debug("@studentAbsentFinder[检测学生旷课先后顺序发送消息：{},id:[{}];分发期限[{}]"
+                    ,fishCardDelayMessage.getStartTime(),fishCardDelayMessage.getId(),messageProperties.getExpiration());
+
             rabbitMqDelaySender.send(fishCardDelayMessage,messageProperties);
         }
     }
@@ -70,13 +76,16 @@ public class FishCardStatusFinderServiceX {
             logger.info("没有检测到上课前需要通知的教师,返回");
             return;
         }
+
         TreeSet<FishCardDelayMessage> treeSet = getFishCardDelayMessages(workOrderList,FishCardDelayMsgType.NOTIFY_TEACHER_PREPARE_CLASS);
+
         Iterator<FishCardDelayMessage> iterator=treeSet.iterator();
         while (iterator.hasNext()){
             FishCardDelayMessage fishCardDelayMessage=iterator.next();
             MessageProperties messageProperties = fishCardStatusService.getMsgProperties(fishCardDelayMessage.getStartTime()
                     , FishCardDelayMsgType.NOTIFY_TEACHER_PREPARE_CLASS);
-            logger.debug("@teacherPrepareClassFinder[检测通知上课的教师先后顺序发送消息：{},id:[{}];分发期限[{}]",fishCardDelayMessage.getStartTime(),fishCardDelayMessage.getId(),messageProperties.getExpiration());
+            logger.debug("@teacherPrepareClassFinder[检测通知上课的教师先后顺序发送消息：{},id:[{}];分发期限[{}]"
+                    ,fishCardDelayMessage.getStartTime(),fishCardDelayMessage.getId(),messageProperties.getExpiration());
             rabbitMqDelaySender.send(fishCardDelayMessage,messageProperties);
         }
     }
@@ -89,26 +98,27 @@ public class FishCardStatusFinderServiceX {
         logger.info("=================forceCompleteFinder开始轮询课程开始情况,判断是否应该强制标记课程完成");
         List<WorkOrder> workOrderList = fishCardStatusService.getCardsBeyondEndTime();
         logger.info("超过下课时间没有下课的数量:{}", workOrderList.size());
+
         TreeSet<FishCardDelayMessage> treeSet = getFishCardDelayMessages(workOrderList,FishCardDelayMsgType.FORCE_COMPLETE_SERVER);
+
         Iterator<FishCardDelayMessage> iterator=treeSet.iterator();
         while (iterator.hasNext()){
             FishCardDelayMessage fishCardDelayMessage=iterator.next();
-            logger.info("@forceCompleteFinder[超时课程状态没更改,强制课程完成]按时间的先后顺序发送消息：[{}],id:[{}]",fishCardDelayMessage.getEndTime(),fishCardDelayMessage.getId());
-            MessageProperties messageProperties = fishCardStatusService.getMsgProperties(fishCardDelayMessage.getEndTime()
-                    , FishCardDelayMsgType.FORCE_COMPLETE_SERVER);
+
+            logger.info("@forceCompleteFinder[超时课程状态没更改,强制课程完成]按时间的先后顺序发送消息：[{}],id:[{}]"
+                    ,fishCardDelayMessage.getEndTime(),fishCardDelayMessage.getId());
+
+            MessageProperties messageProperties = fishCardStatusService
+                    .getMsgProperties(fishCardDelayMessage.getEndTime(), FishCardDelayMsgType.FORCE_COMPLETE_SERVER);
+
             logger.info("@forceCompleteFinder到期执行时间[{}ms]",messageProperties.getExpiration());
+
             rabbitMqDelaySender.send(fishCardDelayMessage,messageProperties);
         }
     }
 
-    /**
-     *TODO:检查没有补课的学生情况,检查到后,直接修改数据库
-     */
-    public void makeUpOutOfValidDay(){
-
-    }
-
-    private TreeSet<FishCardDelayMessage> getFishCardDelayMessages(List<WorkOrder> workOrderList,FishCardDelayMsgType fishCardDelayMsgType) {
+    private TreeSet<FishCardDelayMessage> getFishCardDelayMessages(List<WorkOrder> workOrderList
+            ,FishCardDelayMsgType fishCardDelayMsgType) {
         TreeSet<FishCardDelayMessage> treeSet=null;
         if(fishCardDelayMsgType.toString().equals(FishCardDelayMsgType.FORCE_COMPLETE_SERVER.toString())){
             logger.info("@getFishCardDelayMessages->使用endtime的比较器");

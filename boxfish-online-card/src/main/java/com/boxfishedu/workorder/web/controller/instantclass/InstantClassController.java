@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.instantclass;
 
 import com.alibaba.fastjson.JSON;
+import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
@@ -85,8 +86,8 @@ public class InstantClassController {
             JsonResultModel jsonResultModel = teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
             return jsonResultModel;
         } catch (Exception ex) {
-            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
-                    .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
+            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(
+                    InstantClassResult.newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
             logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII  grabresult ,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
                     , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel), ex);
             return jsonResultModel;
@@ -107,13 +108,19 @@ public class InstantClassController {
         }
     }
 
+    /**
+     * 获取学生端的上课时间情况
+     *
+     * @return
+     */
     @RequestMapping(value = "/service/student/instant/timerange", method = RequestMethod.GET)
-    public JsonResultModel timeRange() {
-        String timeDesc = instantClassServiceX.timeRange();
+    public JsonResultModel timeRange(Long userId) {
+        logger.debug("timeRange用户id:[{}]", userId);
+        String timeDesc = instantClassServiceX.timeRange(userId);
         if (StringUtils.isEmpty(timeDesc)) {
             return JsonResultModel.newJsonResultModel(null);
         }
-        return JsonResultModel.newJsonResultModel(instantClassServiceX.timeRange() + " 开启");
+        return JsonResultModel.newJsonResultModel(timeDesc + " 开启");
     }
 
     /**
@@ -123,7 +130,7 @@ public class InstantClassController {
     @RequestMapping(value = "/instanttimes/date/{date}", method = RequestMethod.GET)
     public JsonResultModel getRangeByDay(@PathVariable("date") String date) {
         Optional<List<InstantClassTimeRules>> instantClassTimeRulesList = instantClassTimeRulesMorphiaRepository
-                .getByDay(date);
+                .getByDay(date, TutorTypeEnum.FRN.toString());
         return JsonResultModel.newJsonResultModel(instantClassServiceX.getSortedTimeRulesList(instantClassTimeRulesList.get()));
     }
 
@@ -131,12 +138,11 @@ public class InstantClassController {
      * 教师端显示时间片用
      */
     @RequestMapping(value = "/service/teacher/instant/range", method = RequestMethod.GET)
-    public JsonResultModel getTeacherRangeByDay() {
-        return instantClassServiceX.getTeacherRangeByDay();
+    public JsonResultModel getTeacherRangeByDay(Long userId) {
+        return instantClassServiceX.getTeacherRangeByDay(userId);
     }
 
     //初始化数据
-    //@RequestMapping(value = "/instanttimes/date", method = RequestMethod.POST)
     @RequestMapping(value = "/instanttimes/initdata/date", method = RequestMethod.POST)
     public JsonResultModel instantDayClassTimes(@RequestBody DayRangeBean dateInfo) {
         instantClassServiceX.initTimeRange(dateInfo);
@@ -144,7 +150,10 @@ public class InstantClassController {
     }
 
     /**
-     * 教师端显示时间片用
+     * 判断学生当前的课程表中有中教,外教,还是都有
+     *
+     * @param studentId
+     * @return
      */
     @RequestMapping(value = "/service/student/scheduletype/{student_id}", method = RequestMethod.GET)
     public JsonResultModel getScheduleType(@PathVariable("student_id") Long studentId) {

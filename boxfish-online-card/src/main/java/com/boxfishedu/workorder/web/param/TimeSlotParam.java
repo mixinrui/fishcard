@@ -12,6 +12,8 @@ import java.util.List;
  */
 @Data
 public class TimeSlotParam {
+
+    private Integer skuId; // 1 中教   2 外教
     private Long orderId;
     private Integer productType;
     private String tutorType;

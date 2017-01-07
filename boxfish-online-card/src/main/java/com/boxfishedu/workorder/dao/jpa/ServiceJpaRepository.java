@@ -1,18 +1,16 @@
 package com.boxfishedu.workorder.dao.jpa;
 
-import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
-import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -45,15 +43,21 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     @Query("select s from Service s where s.studentId=?1 and s.coursesSelected=?2")
     List<Service> getServiceSelectedStatus(long studentId,int coursesSelected);
 
+    // 当前可用的点评, (有可用次数的, 在有效期以内的, 并且取截止时间最近的service)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0")
+    @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0 and s.endTime>=CURRENT_DATE order by s.endTime asc")
     Page<Service> getFirstAvailableForeignCommentService(long studentId, int productType, Pageable pageable);
 
-    @Query("select count(s) from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0")
+    // 在有效期以内的外教点评总数
+    @Query("select count(s) from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0 and s.endTime>=CURRENT_DATE")
     Integer getAvailableForeignCommentServiceCount(long studentId, int productType);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Service findById(Long id);
+
+    // 外教点评带会员过期时间
+    @Query("select s.studentId from Service s where s.productType=?1 and s.amount>0 and s.endTime between ?2 and ?3 and s.userType=?4")
+    Set<Long> getAvailableForeignCommentService(Integer productType, Date from, Date to, Integer userType);
 
     /*********兼容老版本*************/
     Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);

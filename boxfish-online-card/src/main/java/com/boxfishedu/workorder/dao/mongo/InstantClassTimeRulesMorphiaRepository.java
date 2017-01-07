@@ -17,17 +17,18 @@ public class InstantClassTimeRulesMorphiaRepository extends BaseMorphiaRepositor
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    public Optional<List<InstantClassTimeRules>> getByDate(Date date) {
-        return this.getByDay(DateUtil.date2SimpleString(date));
+    public Optional<List<InstantClassTimeRules>> getByDate(Date date,String tutorType) {
+        return this.getByDay(DateUtil.date2SimpleString(date),tutorType);
     }
 
     public void delete(){
 
     }
 
-    public Optional<List<InstantClassTimeRules>> getByDay(String day) {
+    public Optional<List<InstantClassTimeRules>> getByDay(String day,String tutorType) {
         Query<InstantClassTimeRules> query = datastore.createQuery(InstantClassTimeRules.class);
         query.criteria("date").equal(day);
+        query.criteria("tutorType").equal(tutorType);
         return Optional.ofNullable(query.asList());
     }
 }

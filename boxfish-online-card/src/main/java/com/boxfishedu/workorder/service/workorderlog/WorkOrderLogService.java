@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.dao.mongo.WorkOrderLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,6 +53,19 @@ public class WorkOrderLogService {
     public List<WorkOrderLog> queryByWorkId(Long workId) {
         List<WorkOrderLog> workOrderLogs=workOrderLogMorphiaRepository.queryByWorkId(workId,true);
         return workOrderLogs;
+    }
+
+    public List<WorkOrderLog> queryByWorkIdAndStaus(Long workOrderId){
+        List<Integer> status = Lists.newArrayList();
+        /** 31 32 33 34 35 37 **/
+        status.add(FishCardStatusEnum.WAITFORSTUDENT.getCode());
+        status.add(FishCardStatusEnum.CONNECTED.getCode());
+        status.add(FishCardStatusEnum.STUDENT_INVITED_SCREEN.getCode());
+        status.add(FishCardStatusEnum.STUDENT_ACCEPTED.getCode());
+        status.add(FishCardStatusEnum.READY.getCode());
+        status.add(FishCardStatusEnum.ONCLASS.getCode());
+
+        return workOrderLogMorphiaRepository.queryByWorkIdAndStatus(workOrderId,status);
     }
 
     public void batchSaveWorkOrderLogs(List<WorkOrder> workOrders){

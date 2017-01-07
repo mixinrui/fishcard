@@ -29,4 +29,10 @@ public class ConstantUtil {
     public static final String THREADPOOL_ORDER2SERVICE="THREADPOOL_ORDER2SERVICE";
     public static final String THREADPOOL_LOG="THREADPOOL_LOG";
     public static final String THREADPOOL_ASYNC_NOTIFY="THREADPOOL_ASYNC_NOTIFY";
+    public static final String STUDENT_CHANNLE = "ss_manual";
+    public static final String TEACHER_CHANNLE = "st_manual";
+    public static final String TIMER_CHANNLE = "auto";
+    public static final String MANUAL_OPERATOR ="manual";//OperateType
+    public static final String MANUAL_TECH_OPERATOR ="agree";//OperateType
+    public static final String TIMER_OPERATOR ="auto";//OperateType
 }

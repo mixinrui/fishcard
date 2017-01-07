@@ -1,11 +1,9 @@
 package com.boxfishedu.workorder.servicex.instantclass;
 
-import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
-import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
@@ -13,7 +11,6 @@ import com.boxfishedu.workorder.requester.InstantTeacherRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassTeacherService;
-import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstantClassValidators;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstatntClassKeyGenerator;
@@ -21,8 +18,6 @@ import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.google.common.collect.Lists;
-import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +27,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -62,9 +56,6 @@ public class TeacherInstantClassServiceX {
     private InstantClassTeacherService instantClassTeacherService;
 
     @Autowired
-    private WorkOrderJpaRepository workOrderJpaRepository;
-
-    @Autowired
     private CourseOnlineRequester courseOnlineRequester;
 
     @Autowired
@@ -76,33 +67,25 @@ public class TeacherInstantClassServiceX {
     @Autowired
     private DataCollectorService dataCollectorService;
 
-    @Autowired
-    private ScheduleEntranceDataGenerator scheduleEntranceDataGenerator;
-
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
         putParameterIntoThreadLocal(teacherInstantRequestParam);
         //校验是否需要走抢单的流程
         TeacherInstantClassStatus validateResult = grabInstantClassValidators.preValidate();
-        if (validateResult.getCode()!=TeacherInstantClassStatus.UNKNOWN.getCode()) {
-            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
-                    .newInstantClassResult(validateResult));
-            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII grabresult ,校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
-                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel));
-            return jsonResultModel;
+        if (validateResult.getCode() != TeacherInstantClassStatus.UNKNOWN.getCode()) {
+            return invalidateFailResult(teacherInstantRequestParam, validateResult);
         }
 
         //前往师生运营校验
-        InstantClassCard instantClassCard = instantClassJpaRepository.findOne(teacherInstantRequestParam.getCardId());
+        InstantClassCard instantClassCard = instantClassJpaRepository
+                .findOne(teacherInstantRequestParam.getCardId());
+
         InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher = null;
         try {
-            instantAssignTeacher = instantTeacherRequester.assignGrabteacher(instantClassCard, teacherInstantRequestParam);
+            instantAssignTeacher = instantTeacherRequester
+                    .assignGrabteacher(instantClassCard, teacherInstantRequestParam);
         } catch (Exception ex) {
-            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
-                    .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
-            logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII  grabresult fail,前往师生运营校验不通过,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
-                    , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel), ex);
-            return jsonResultModel;
+            return this.returnMatchFailResult(teacherInstantRequestParam, ex);
         }
 
         //入InstantCard库,初始化鱼卡信息,创建群组
@@ -121,9 +104,13 @@ public class TeacherInstantClassServiceX {
 
         //创建群组,将群组数据返回给App
         JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
-                .newInstantClassResult(updateGroupInfoInstantCard(instantGroupInfo, instantClassCard), TeacherInstantClassStatus.MATCHED));
-        logger.info("~^o^~~^o^~~^o^~~^o^~~^o^~, IIIIIIIIIIIIIII grabresult ,instantcard:[{}],teacher:[{}]~^o^~~^o^~~^o^~~^o^~~^o^~成功,结果:{}"
-                , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel));
+                .newInstantClassResult(updateGroupInfoInstantCard(instantGroupInfo
+                        , instantClassCard), TeacherInstantClassStatus.MATCHED));
+
+        logger.info("~^o^~~^o^~~^o^~~^o^, IIIIIIIIIIIIIII grabresult ,instantcard:[{}],teacher:[{}]成功,结果:{}"
+                , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId()
+                , JacksonUtil.toJSon(jsonResultModel));
+
         return jsonResultModel;
     }
 
@@ -141,7 +128,7 @@ public class TeacherInstantClassServiceX {
                 Boolean result = workOrderService.changeTeacherForTypeChanged(workOrders.get(i));
                 //如果能上此种类型的课程,重新生成关系
                 if (BooleanUtils.isFalse(result)) {
-                    scheduleEntranceDataGenerator.rebuildGroup(Arrays.asList(workOrders.get(i)));
+                    courseOnlineRequester.rebuildGroup(Arrays.asList(workOrders.get(i)));
                 }
             }
         }));
@@ -155,7 +142,7 @@ public class TeacherInstantClassServiceX {
                         , JacksonUtil.toJSon(teacherInstantRequestParam));
             } else {
                 logger.error("@markMatchedIntoRedis#参数[{}],往redis中存入匹配上的情况失败,该课已被教师[{}]匹配走"
-                        , JacksonUtil.toJSon(teacherInstantRequestParam),redisTemplate.opsForValue().get(matchedKey));
+                        , JacksonUtil.toJSon(teacherInstantRequestParam), redisTemplate.opsForValue().get(matchedKey));
             }
             redisTemplate.expire(matchedKey, 1, TimeUnit.DAYS);
         } catch (Exception ex) {
@@ -167,10 +154,37 @@ public class TeacherInstantClassServiceX {
         ThreadLocalUtil.TeacherInstantParamThreadLocal.set(teacherInstantRequestParam);
     }
 
-    private InstantClassCard updateGroupInfoInstantCard(InstantGroupInfo instantGroupInfo, InstantClassCard instantClassCard) {
+    private InstantClassCard updateGroupInfoInstantCard(InstantGroupInfo instantGroupInfo
+            , InstantClassCard instantClassCard) {
+
         instantClassCard.setGroupName(instantGroupInfo.getGroupName());
         instantClassCard.setGroupId(instantGroupInfo.getGroupId());
         instantClassCard.setChatRoomId(instantGroupInfo.getChatRoomId());
+
         return instantClassJpaRepository.save(instantClassCard);
+    }
+
+    private JsonResultModel returnMatchFailResult(TeacherInstantRequestParam teacherInstantRequestParam, Exception ex) {
+        JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
+                .newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
+
+        logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII  grabresult fail,师生运营校验不通过,instantcard:[{}]" +
+                        ",teacher:[{}]~~失败,结果:{}", teacherInstantRequestParam.getCardId()
+                , teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel), ex);
+
+        return jsonResultModel;
+    }
+
+
+    private JsonResultModel invalidateFailResult(TeacherInstantRequestParam teacherInstantRequestParam
+            , TeacherInstantClassStatus validateResult) {
+
+        JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
+                .newInstantClassResult(validateResult));
+
+        logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII grabresult ,校验不通过,instantcard:[{}],teacher:[{}]~~失败,结果:{}"
+                , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel));
+
+        return jsonResultModel;
     }
 }

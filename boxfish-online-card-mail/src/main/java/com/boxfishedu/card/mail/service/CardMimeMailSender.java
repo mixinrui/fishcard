@@ -50,6 +50,7 @@ public class CardMimeMailSender {
         return this;
     }
 
+
     /**
      * 添加收件人
      * @param recipients
@@ -75,6 +76,11 @@ public class CardMimeMailSender {
         return this;
     }
 
+
+    public CardMimeMailSender setMailContent(String content) throws MessagingException {
+        mimeMessageHelper.setText(content);
+        return this;
+    }
 
     /**
      * 设置邮件内容

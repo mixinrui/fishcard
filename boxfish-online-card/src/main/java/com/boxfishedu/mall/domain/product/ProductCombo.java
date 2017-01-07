@@ -22,6 +22,8 @@ public class ProductCombo extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ComboTypeToRoleId comboType;
 
+    private String comboCode;
+
     private Integer originalFee;
 
     private Integer couponFee;

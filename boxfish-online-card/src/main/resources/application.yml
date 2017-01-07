@@ -54,6 +54,12 @@ parameter:
   #距离上课时间提醒教师,单位：minutes
   notify_teacher_prepare_class_limit: 5
 
+  #允许立即上课的类型:   0:All  1:中教    2:外教
+  instant_allow_teacher_type: 0
+
+  network_bad: 1000
+  network_general: 500
+
   #封面服务器的地址
   thumbnail_server: http://api.boxfish.cn/student/publication/data/data/
 
@@ -75,8 +81,12 @@ spring.datasource:
   autoReconnect: true
   jdbc-interceptors: SlowQueryReport(threshold=1000)
 
+time.task.expireMessage: "会员要到期啦,外教点评还没用完呢,赶快去行使会员特权~"
+
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
+server.compression.enabled: true
+server.compression.mime-types: "text/html,text/xml,text/plain,text/html,text/css,application/json"
 
 #spring.profiles.active: local_hucl
 #spring.profiles.active: product
@@ -182,13 +192,16 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
+#消息推送地址
+    msg_push_url: http://123.56.13.168:9091
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
-    innerTeacherUrl: http://123.56.13.168:8099
+    innerTeacherUrl: http://123.56.13.168:8099/teacher
   gateway:
     type: test
 time:
@@ -245,14 +258,16 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
-
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
+#消息推送地址
+    msg_push_url: http://123.56.13.168:9091
 service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
-    innerTeacherUrl: http://101.201.237.252:8099
+    innerTeacherUrl: http://101.201.237.252:8099/teacher
 time:
   task:
     nodeOne: 0
@@ -310,13 +325,16 @@ interface:
     pay_service: http://101.201.237.252:8888/pay-inside
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
+#消息推送地址
+    msg_push_url: http://123.56.13.168:9091
 service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
-    innerTeacherUrl: http://101.201.237.252:8099
+    innerTeacherUrl: http://101.201.237.252:8099/teacher
   gateway:
       type: development_new
 time:
@@ -364,7 +382,7 @@ spring:
 interface:
   address:
     teacher_service: http://123.56.13.168:8099/teacher
-    teacher_service_admin: http://123.56.13.168:8098
+    teacher_service_admin: http://123.56.13.168:8098/teacheradmin
     course_recommended_service: http://123.56.13.168:8001/recommend
     course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
@@ -372,7 +390,7 @@ interface:
     order_service: http://123.56.13.168:8082/order
     course_online_service: http://123.56.13.168:9090/teaching-service
     auth_user: http://114.55.58.184:8099
-    data_analysis_service: http://114.55.65.28:9301
+    data_analysis_service: http://114.55.255.121:9301/log/mongo
     student_teacher_relation: http://api.test.boxfish.cn
 #  学生旷课扣积分
     absenteeism_deduct_score: https://api.online.test.boxfish.cn
@@ -382,13 +400,17 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api-online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
+#  师生运营匹配老师
+    #消息推送地址
+    msg_push_url: http://123.56.13.168:9091
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
-    innerTeacherUrl: http://123.56.13.168:8099
+    innerTeacherUrl: http://123.56.13.168:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
     type: test
@@ -412,6 +434,9 @@ server:
   compression:
     enabled: true
     mime-types: "text/html,text/xml,text/plain,text/html,text/css,application/json"
+
+parameter:
+  thumbnail_server: https://api.boxfish.cn/student/publication/data/data/
 
 #===============================================================pretest环境:123.56.13.168 机器密码:Boxfish2016===============================================================
 ---
@@ -451,21 +476,24 @@ interface:
     order_service: http://127.0.0.1:8082/order
     course_online_service: http://127.0.0.1:9090
     auth_user: http://114.55.58.184:8099
-    data_analysis_service: http://114.55.65.28:9301
+    data_analysis_service: http://114.55.255.121:9301
     student_teacher_relation: http://api.test.boxfish.cn
 #  学生旷课扣积分
     absenteeism_deduct_score: https://api.online.test.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
+#消息推送地址
+    msg_push_url: http://123.56.13.168:9091
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
-    innerTeacherUrl: http://127.0.0.1:8099
+    innerTeacherUrl: http://127.0.0.1:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: pretest
@@ -528,14 +556,16 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
-
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
+#消息推送地址
+    msg_push_url: http://123.56.13.168:9091
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099/teacher
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
-    innerTeacherUrl: http://127.0.0.1:8099
+    innerTeacherUrl: http://127.0.0.1:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
   gateway:
       type: demo
@@ -594,10 +624,12 @@ interface:
     absenteeism_deduct_score: https://api.test.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.online.test.boxfish.cn/online/figure
+    teacher_photo: https://api.online.test.boxfish.cn/online/figure
+    resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
     course_type_and_difficulty: https://base.boxfish.cn
-
+#消息推送地址
+    msg_push_url: http://123.56.13.168:9091
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
@@ -616,14 +648,14 @@ time:
 
 #===============================================================生产环境===============================================================
 #=============192.168.1.30===============192.168.1.29======================192.168.1.25===============================================#
-#=================mongo:    mongo --host dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
+#=================mongo:    mongo --host dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
 #=================外网mq:   120.27.227.72:5672(映射:120.27.227.72:5672)================================================================#
 ---
 spring:
   datasource:
     url: jdbc:mysql://boxfish-online-2016-inside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&&zeroDateTimeBehavior=convertToNull
-    username: service
-    password: nEaJiP7hwoXEUkPDnDjaBK3hEJanHTec
+    username: service2016
+    password: kENpyAGFPgNKzVbDeR42MGfsZmQRzwVg
   mongo:
     serverAddress: dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717,dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717
     dbName: fishcard
@@ -681,7 +713,10 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.boxfish.cn//online/figure
+    teacher_photo: https://api.boxfish.cn//online/figure
+    resource_url: http://api.boxfish.cn//online
+#消息推送地址
+    msg_push_url: http://online.boxfish.cn/boxfish-push
 time:
   task:
     nodeOne: 0
@@ -707,8 +742,8 @@ service:
 spring:
   datasource:
     url: jdbc:mysql://boxfish-online-2016-inside.mysql.rds.aliyuncs.com:3306/service?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&&zeroDateTimeBehavior=convertToNull
-    username: service
-    password: nEaJiP7hwoXEUkPDnDjaBK3hEJanHTec
+    username: service2016
+    password: kENpyAGFPgNKzVbDeR42MGfsZmQRzwVg
   mongo:
     serverAddress: dds-bp1d8c5924fd01641.mongodb.rds.aliyuncs.com:3717,dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717
     dbName: fishcard
@@ -756,7 +791,10 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
     login_filter_url: http://114.55.140.96:6901
-    teacher_photo: http://api.boxfish.cn/online/figure
+    teacher_photo: https://api.boxfish.cn/online/figure
+    resource_url: http://api.boxfish.cn/online
+    #消息推送地址
+    msg_push_url: http://online.boxfish.cn/boxfish-push
 #外教点评接口调用地址
 service:
   sdk:

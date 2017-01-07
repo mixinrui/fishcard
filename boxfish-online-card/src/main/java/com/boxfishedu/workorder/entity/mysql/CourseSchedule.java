@@ -1,6 +1,10 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.Where;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -42,6 +46,7 @@ public class CourseSchedule {
     private Long workorderId;
 
     @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+08:00")
     private Date classDate;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -85,9 +90,9 @@ public class CourseSchedule {
     /** 由于假期原因,提示该鱼卡需要更换时间   10 需要更换时间  **/
     @Column(name = "need_change_time", nullable = true)
     private Integer needChangeTime;
-    
+
+    @Transient
+    private Integer matchStatus;  // 用于指定老师列表判断
 
 
-//    @Column(name="schedule_type")
-//    private Integer scheduleType;
 }

@@ -23,6 +23,7 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.absencendeal.AbsenceDealService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.dataanalysis.FetchHeartBeatServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardFreezeServiceX;
 import com.boxfishedu.workorder.web.view.fishcard.WorkOrderView;
 import org.apache.commons.lang3.StringUtils;
@@ -79,6 +80,9 @@ public class CourseOnlineServiceX {
 
     @Autowired
     private DataCollectorService dataCollectorService;
+
+    @Autowired
+    private FetchHeartBeatServiceX fetchHeartBeatServiceX;
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -210,6 +214,8 @@ public class CourseOnlineServiceX {
         //通知订单修改状态
         serveService.notifyOrderUpdateStatus(workOrder, ConstantUtil.WORKORDER_COMPLETED);
 
+        //处理网络数据
+        fetchHeartBeatServiceX.persistAnalysisAsync(workOrder);
         //通知推荐课服务,目前由App调用
 //        recommandCourseRequester.notifyCompleteCourse(workOrder);
     }

@@ -13,6 +13,8 @@ import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -24,6 +26,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.commentcard.SyncCommentCard2SystemService;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.ResponseCourseView;
@@ -37,6 +40,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -45,7 +50,9 @@ import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,6 +92,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     @Autowired
     SyncCommentCard2SystemService syncCommentCard2SystemService;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -316,12 +326,11 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                 } else {
                     key = productComboDetail.getTutorType().name();
                 }
-
             }
             Service service = serviceHashMap.get(key);
             if(service != null) {
                 //增加有效期,数量
-                setServiceExistedSpecs(service, productComboDetail);
+                setServiceExistedSpecs(service, productComboDetail, orderView);
             } else {
                 service = getServiceByOrderView(orderView, productComboDetail, productCombo, isOverAll);
                 services.add(service);
@@ -330,10 +339,14 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         });
 
         // service的开始日期,结束日期设置
-        addValidTimeForServices(services);
+        addValidTimeForServices(services, orderView);
         save(services);
 
         for (Service service:services){
+            // 如果是外教点评, 则刷新外教点评次数缓存
+            if(Objects.equals(service.getProductType(), ProductType.COMMENT.value())) {
+                cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(service.getStudentId());
+            }
             logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
             if (Objects.equals(service.getProductType(),1002)){
                 logger.info("@order2Service2 购买点评次数,通知跟单系统");
@@ -383,61 +396,31 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return JSONObject.parseObject(orderDetailView.getProductInfo(), ProductSKUView.class);
     }
 
-    private void addValidTimeForServices(List<Service> services) {
+    private void addValidTimeForServices(List<Service> services, OrderForm orderForm) throws ParseException {
+        LocalDate now = LocalDate.now();
         for (Service service : services) {
-            service.setStartTime(Calendar.getInstance().getTime());
-            Calendar calendar = Calendar.getInstance();
-            //service的validate day来自sku的validate day
-            // 暂时没有validatyDay这个字段了
-            calendar.add(Calendar.DAY_OF_YEAR, service.getValidityDay());
-            service.setEndTime(calendar.getTime());
+            service.setStartTime(DateUtil.convertToDate(now));
+            if(StringUtils.isEmpty(orderForm.getExpiredDate())) {
+                // 从购买当天0点算起, 到过期的第一天0点为止
+                service.setEndTime(DateUtil.convertToDate(now.plusDays(service.getValidityDay() + 1)));
+            } else {
+                service.setEndTime(ThreadLocalUtil.dateTimeFormat.get().parse(orderForm.getExpiredDate()));
+            }
             logger.info("订单[{}]生成服务类型[{}]成功]", service.getOrderId(), service.getSkuName());
         }
     }
 
-//    private void setServiceExistedSpecs(Service service, OrderDetailView orderDetailView
-//            , ProductSKUView productSKUView) {
-//        ServiceSKU serviceSKU = productSKUView.getServiceSKU();
-//        service.setOriginalAmount(service.getOriginalAmount() + orderDetailView.getAmount());
-//        service.setAmount(service.getOriginalAmount());
-//        service.setValidityDay(service.getValidityDay() + serviceSKU.getValidDay());
-//    }
 
-    private void setServiceExistedSpecs(Service service, ProductComboDetail productComboDetail) {
+    private void setServiceExistedSpecs(Service service, ProductComboDetail productComboDetail, OrderForm orderForm) {
         service.setOriginalAmount(service.getOriginalAmount() + productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
         // TODO 长期有效service.getValidityDay() + serviceSKU.getValidDay()
-        service.setValidityDay(365);
+        if(Objects.isNull(orderForm.getValidDays())) {
+            service.setValidityDay(365 * 2);
+        } else {
+            service.setValidityDay(orderForm.getValidDays());
+        }
     }
-
-
-//    private Service getServiceByOrderView(OrderForm orderView, OrderDetailView orderDetailView,
-//                                          ProductSKUView productSKUView) throws BoxfishException {
-//        ServiceSKU serviceSKU = productSKUView.getServiceSKU();
-//        Service service = new Service();
-//        service.setStudentId(orderView.getUserId());
-//        // TODO 没有username
-////        service.setStudentName(orderView.getUserName());
-//        service.setOrderId(orderView.getId());
-//        if (productSKUView.getSkuCycle() == -1) {
-//            service.setOriginalAmount(productSKUView.getSkuAmount());
-//        } else {
-//            service.setOriginalAmount(orderDetailView.getAmount() * productSKUView.getSkuAmount() * productSKUView.getSkuCycle());
-//        }
-//        service.setAmount(service.getOriginalAmount());
-//        service.setAmount(service.getOriginalAmount());
-//        service.setValidityDay(serviceSKU.getValidDay());
-//        service.setSkuId(Long.parseLong(serviceSKU.getServiceType()));
-//        service.setRoleId(Integer.parseInt(serviceSKU.getServiceType()));
-//        service.setSkuName(serviceSKU.getSkuName());
-//        service.setComboCycle(productSKUView.getSkuCycle());
-//        service.setCountInMonth(productSKUView.getSkuAmount());
-//        service.setCreateTime(new Date());
-//        service.setOrderCode(orderView.getOrderCode());
-//        service.setCoursesSelected(0);
-//        return service;
-//    }
-
 
     private Service getServiceByOrderView(OrderForm orderView, ProductComboDetail productComboDetail,
                                           ProductCombo productCombo, boolean isOverAll) throws BoxfishException {
@@ -447,6 +430,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOriginalAmount(productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
         service.setSkuId(productCombo.getId());
+        // 设置用户会员类型
+        service.setUserType(UserTypeEnum.getUserTypeByComboCode(productCombo.getComboCode()).type());
         // 课程类型
         if(isOverAll) {
             service.setTutorType(TutorType.MIXED.name());
@@ -461,8 +446,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);
-        service.setValidityDay(365);
+        service.setValidityDay(365 * 2);
         service.setOrderChannel(orderView.getOrderChannel().name());
+
+        productCombo.getComboCode();
 
         List<ComboDurations> durations = productCombo.getComboDurations();
         if(CollectionUtils.isNotEmpty(durations)) {
@@ -514,6 +501,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfoService.save(scheduleCourseInfo);
     }
 
+    @Cacheable(value = CacheKeyConstant.COMMENT_CARD_AMOUNT, key = "#studentId")
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
         List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
                 studentId, ProductType.COMMENT.value());

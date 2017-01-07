@@ -42,7 +42,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     public CourseSchedule findByWorkorderId(Long workorderId);
 
     public List<CourseSchedule> findByWorkorderIdIn(Long[] workOrderIds);
-
+    List<CourseSchedule> findByWorkorderIdIn(List<Long> workOrderIds);
     public CourseSchedule findByTeacherIdAndTimeSlotIdAndClassDate(Long teacherId, Long timeSlotId, Date classDate);
 
     public CourseSchedule findTop1ByWorkorderId(Long workOrderId);
@@ -94,4 +94,15 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     // 查找48小时以内,没有课程推荐的课表
     @Query("select c from CourseSchedule c,WorkOrder w where c.workorderId=w.id and w.startTime<=?1 and w.courseId is null")
     List<CourseSchedule> findWithinHoursCreatedCourseScheduleList(Date endTime);
+
+    List<CourseSchedule> findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(Long studentId,Integer roleId,Date startTime,Integer isFreeze,Long teacherId);
+    List<CourseSchedule> findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherId(Long studentId,Integer roleId,Date startTime,Integer isFreeze,Long teacherId);
+    List<CourseSchedule> findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleIdAndStartTimeGreaterThan(Long teacherId,Long studentId,Integer isFreeze,Integer roleId,Date startTime);
+//    findByTeacherIdAndTimeslotsIdInAndClassDateInAndIsFreeze
+
+    @Query(value = "select s from CourseSchedule s,WorkOrder wo  where s.workorderId=wo.id and  s.studentId=?1 and s.status <=30 and s.startTime>?2  and s.isFreeze=?3 and wo.skuId=?4")
+    Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long studentId,Date startTime, Integer isFreeze,Integer skuId, Pageable pageable);
+
+    @Query(value = "select s from CourseSchedule s ,WorkOrder wo  where  s.workorderId=wo.id   and wo.orderId=?1 ")
+    Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long orderId, Pageable pageable);
 }

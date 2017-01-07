@@ -40,4 +40,21 @@ public class WorkOrderLogMorphiaRepository extends BaseMorphiaRepository<WorkOrd
         return workOrderLogs;
     }
 
+    /**
+     * 查看老师是否处于呼叫 或者 联通情况
+     * @param workId
+     * @param status
+     * @return
+     */
+    public List<WorkOrderLog> queryByWorkIdAndStatus(Long workId, List<Integer> status) {
+        Query<WorkOrderLog> query = datastore.createQuery(WorkOrderLog.class);
+        query.and(query.criteria("workOrderId").equal(workId));
+
+        query.and(query.criteria("status").in(status));
+
+        List<WorkOrderLog> workOrderLogs= query.asList();
+
+        return workOrderLogs;
+    }
+
 }

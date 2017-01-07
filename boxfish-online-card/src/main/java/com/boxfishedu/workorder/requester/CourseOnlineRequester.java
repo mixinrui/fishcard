@@ -2,7 +2,6 @@ package com.boxfishedu.workorder.requester;
 
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingNotificationEnum;
-import com.boxfishedu.workorder.common.bean.TeachingOnlineGroupMsg;
 import com.boxfishedu.workorder.common.bean.TeachingOnlineMsg;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
@@ -11,11 +10,12 @@ import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +40,8 @@ public class CourseOnlineRequester {
     private WorkOrderLogService workOrderLogService;
     @Autowired
     private InstantCardLogMorphiaRepository instantCardLogMorphiaRepository;
+    @Autowired
+    private ServiceSDK serviceSDK;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
     public void releaseGroup(WorkOrder workOrder){
@@ -56,6 +58,21 @@ public class CourseOnlineRequester {
         workOrderLogService.saveWorkOrderLog(workOrder,"立即解散群组关系");
     }
 
+    public void rebuildGroup(List<WorkOrder> typeUnchangedList){
+        if(CollectionUtils.isEmpty(typeUnchangedList)){
+            return;
+        }
+        threadPoolManager.execute(new Thread(()->{
+            typeUnchangedList.forEach(card->{
+                workOrderLogService.saveWorkOrderLog(card
+                        ,String.format("实时上课重建鱼卡群组关系,teacher[%s],student[%s]"
+                                ,card.getTeacherId(),card.getStudentId()));
+                // 创建群组
+                serviceSDK.createGroup(card);
+            });
+        }));
+    }
+
     /**
      *向运营组发起通知请求
      */
@@ -66,34 +83,10 @@ public class CourseOnlineRequester {
         threadPoolManager.execute(new Thread(()->{restTemplate.getForObject(url,Object.class);}));
     }
 
-
-    public void notifyInstantGroupClassMsg(InstantClassCard instantClassCard,List<Long> teacherIds){
-        String url=String.format("%s/teaching/callback/push/group",
-                urlConf.getCourse_online_service());
-        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
-        TeachingOnlineGroupMsg teachingOnlineGroupMsg=new TeachingOnlineGroupMsg();
-        teachingOnlineGroupMsg.setPush_title("Many a student calls in for online LIVE teaching. Click and get prepared.");
-
-        TeachingOnlineGroupMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach=new  TeachingOnlineGroupMsg.TeachingOnlineMsgAttach();
-        teachingOnlineMsgAttach.setType(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
-        teachingOnlineMsgAttach.setCardId(instantClassCard.getId());
-        teachingOnlineMsgAttach.setDay(DateUtil.simpleDate2String(instantClassCard.getClassDate()));
-        teachingOnlineMsgAttach.setSlotId(instantClassCard.getSlotId());
-        teachingOnlineMsgAttach.setCount(teacherIds.size());
-        teachingOnlineMsgAttach.setStudentId(instantClassCard.getStudentId());
-        teachingOnlineGroupMsg.setData(teachingOnlineMsgAttach);
-
-        teacherIds.forEach(teacherId-> teachingOnlineGroupMsg.getAlias().add(teacherId.toString()));
-
-        logger.debug(">>>>>>@notifyInstantClassMsg, IIIIIIIIIIIIIII 向教师发起推送实时上课请求,courseInfo[{}],教师信息[{}]"
-                ,JacksonUtil.toJSon(teachingOnlineGroupMsg),teacherIds);
-        threadPoolManager.execute(new Thread(()->{restTemplate.postForObject(url,teachingOnlineGroupMsg,Object.class);}));
-    }
-
     public void notifyInstantClassMsg(InstantClassCard instantClassCard,List<Long> teacherIds){
         String url=String.format("%s/teaching/callback/push",
                 urlConf.getCourse_online_service());
-        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
+//        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard,teacherIds,"向教师发起推送");
         List<TeachingOnlineMsg> teachingOnlineMsgList=Lists.newArrayList();
         teacherIds.forEach(teacherId->{
             TeachingOnlineMsg teachingOnlineMsg=new TeachingOnlineMsg();

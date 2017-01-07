@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -29,24 +30,48 @@ public class ParameterValidator implements InstantClassValidator {
     @Autowired
     private OnlineAccountService onlineAccountService;
 
-    private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
 
+    private final String ALLOW_ALL = "0";
+    private final String ALLOW_CN = "1";
+    private final String ALLOW_FRN = "2";
+
+    //
+    @Value("${parameter.instant_allow_teacher_type}")
+    private String INSTANT_ALLOW_TEACHER_TYPE;
+
     @Override
     public int preValidate() {
-        InstantRequestParam instantRequestParam= ThreadLocalUtil.instantRequestParamThreadLocal.get();
-        logger.debug("@instantcard_{}_validate0#ParameterValidator,参数校验开始",instantRequestParam.getStudentId());
-        if(Objects.isNull(instantRequestParam.getStudentId())){
+
+        InstantRequestParam instantRequestParam = ThreadLocalUtil.instantRequestParamThreadLocal.get();
+        logger.debug("@instantcard_{}_validate0#ParameterValidator,参数校验开始", instantRequestParam.getStudentId());
+        if (Objects.isNull(instantRequestParam.getStudentId())) {
             throw new BusinessException("用户参数为必填");
         }
-        //中教立即上课放开
-//        if(!StringUtils.isEmpty(instantRequestParam.getTutorType())){
-//            if(!instantRequestParam.getTutorType().equals(TutorTypeEnum.FRN.toString())){
-//                return InstantClassRequestStatus.TUTOR_TYPE_NOT_SUPPORT.getCode();
-//            }
-//        }
-        return InstantClassRequestStatus.UNKNOWN.getCode();
+
+        String tutorTypeParam = instantRequestParam.getTutorType();
+
+        if (INSTANT_ALLOW_TEACHER_TYPE.equals(ALLOW_CN)) {
+
+            if (!tutorTypeParam.equals(TutorTypeEnum.CN.toString())) {
+                return InstantClassRequestStatus.TUTOR_TYPE_NOT_SUPPORT.getCode();
+            }
+            return InstantClassRequestStatus.UNKNOWN.getCode();
+
+        } else if (INSTANT_ALLOW_TEACHER_TYPE.equals(ALLOW_FRN)) {
+
+            if (!tutorTypeParam.equals(TutorTypeEnum.FRN.toString())) {
+                return InstantClassRequestStatus.TUTOR_TYPE_NOT_SUPPORT.getCode();
+            }
+            return InstantClassRequestStatus.UNKNOWN.getCode();
+
+        } else {
+
+            return InstantClassRequestStatus.UNKNOWN.getCode();
+
+        }
     }
 }

@@ -44,6 +44,16 @@ public class FishCardModifyController {
         return fishCardModifyServiceX.changeTeacher(teacherChangeParam);
     }
 
+    /**
+     * 换老师之前  检查老师是否处于联通(31-37  除去 36 的状态)
+     * @param teacherChangeParam
+     * @return
+     */
+    @RequestMapping(value = "/check/teacher", method = RequestMethod.PUT)
+    public JsonResultModel checkCurrentTeacher(@RequestBody TeacherChangeParam teacherChangeParam){
+        return fishCardModifyServiceX.checkCurrentTeacherStatus(teacherChangeParam);
+    }
+
     
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)

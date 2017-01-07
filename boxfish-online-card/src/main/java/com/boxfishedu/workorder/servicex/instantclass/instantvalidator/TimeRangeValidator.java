@@ -29,7 +29,11 @@ public class TimeRangeValidator implements InstantClassValidator {
     public int preValidate() {
         Date date=new Date();
         String day=DateUtil.date2SimpleString(date);
-        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList=instantClassTimeRulesMorphiaRepository.getByDay(day);
+        InstantRequestParam instantRequestParam = ThreadLocalUtil.instantRequestParamThreadLocal.get();
+
+        Optional<List<InstantClassTimeRules>> instantClassTimeRulesList
+                =instantClassTimeRulesMorphiaRepository.getByDay(day,instantRequestParam.getTutorType());
+
         if(instantClassTimeRulesList.isPresent()){
             long inRange=instantClassTimeRulesList.get().stream().map(
                     instantClassTimeRules -> new DateRange(

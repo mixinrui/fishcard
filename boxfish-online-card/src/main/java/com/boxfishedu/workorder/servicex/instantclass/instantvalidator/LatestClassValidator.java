@@ -25,24 +25,31 @@ public class LatestClassValidator implements InstantClassValidator {
     @Autowired
     private OnlineAccountService onlineAccountService;
 
-    private org.slf4j.Logger logger= LoggerFactory.getLogger(this.getClass());
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
 
     @Override
     public int preValidate() {
-        InstantRequestParam instantRequestParam=ThreadLocalUtil.instantRequestParamThreadLocal.get();
-        logger.debug("@instantcard_{}_validate#3_LatestClassValidator,校验开始",instantRequestParam.getStudentId());
-        if(!onlineAccountService.isMember(instantRequestParam.getStudentId())){
-            logger.debug("@instantcard_{}_validate3_LatestClassValidator#preValidate#[{}]不是购买用户",instantRequestParam.getStudentId(),instantRequestParam.getStudentId());
+        InstantRequestParam instantRequestParam = ThreadLocalUtil.instantRequestParamThreadLocal.get();
+        logger.debug("@instantcard_{}_validate#3_LatestClassValidator,校验开始", instantRequestParam.getStudentId());
+
+        if (!onlineAccountService.isMember(instantRequestParam.getStudentId())) {
+
+            logger.debug("@instantcard_{}_validate3_LatestClassValidator#preValidate#[{}]不是购买用户"
+                    , instantRequestParam.getStudentId(), instantRequestParam.getStudentId());
+
             return InstantClassRequestStatus.UNKNOWN.getCode();
         }
-        Optional<Date> dateOptional = workOrderJpaRepository.findLatestClassDateByStudentId(instantRequestParam.getStudentId(),new Integer(0),new Date());
-        if(dateOptional.isPresent()){
-            if(LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30).isAfter(
+
+        Optional<Date> dateOptional = workOrderJpaRepository
+                .findLatestClassDateByStudentId(instantRequestParam.getStudentId(), new Integer(0), new Date());
+
+        if (dateOptional.isPresent()) {
+            if (LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30).isAfter(
                     LocalDateTime.ofInstant(dateOptional.get().toInstant(), ZoneId.systemDefault()))) {
-                logger.debug("@LatestClassValidator#preValidate#[{}]30分钟内有课",instantRequestParam.getStudentId());
+                logger.debug("@LatestClassValidator#preValidate#[{}]30分钟内有课", instantRequestParam.getStudentId());
                 ThreadLocalUtil.classDateIn30Minutes.set(dateOptional.get());
                 return InstantClassRequestStatus.HAVE_CLASS_IN_HALF_HOURS.getCode();
             }

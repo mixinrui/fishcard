@@ -99,7 +99,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                 workOrder.setIdDesc(idDesc);
             }
             if (StringUtils.isNotEmpty(workOrder.getService().getComboType())) {
-                if (workOrder.getService().getComboType().equals(ComboTypeEnum.EXCHANGE.toString())) {
+//                if (workOrder.getService().getComboType().equals(ComboTypeEnum.EXCHANGE.toString())) {
                     if (workOrder.getStatus() < FishCardStatusEnum.WAITFORSTUDENT.getCode()) {
                         LocalDateTime beginLocalDate = LocalDateTime.ofInstant(DateUtil.date2SimpleDate(new Date()).toInstant(), ZoneId.systemDefault()).minusHours(24);
                         if (workOrder.getStartTime().after(DateUtil.localDate2Date(beginLocalDate))) {
@@ -110,7 +110,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
                                 workOrder.setFreezeBtnShowFlag(Boolean.TRUE);
                             }
                         }
-                    }
+//                    }
 
                 }
             }

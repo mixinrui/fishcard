@@ -2,9 +2,9 @@ package com.boxfishedu.workorder.service.instantclass;
 
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -14,25 +14,22 @@ import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseType2TeachingTypeService;
-import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
-import org.joda.time.DateTime;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by hucl on 16/11/3.
@@ -57,34 +54,41 @@ public class InstantClassService {
     @Autowired
     private InstantClassUpdatorService instantClassUpdatorService;
 
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     * 获取学生的匹配情况
+     *
+     * @return
+     */
     public InstantClassResult getMatchResult() {
-        Optional<TimeSlots> timeSlotsOptional = getMostSimilarSlot(new Long(CourseType2TeachingTypeService
-                .instantCourseType2TeachingType(TutorType.resolve(getInstantRequestParam().getTutorType()))));
+        Optional<TimeSlots> timeSlotsOptional = getMostSimilarSlot(this.getRoleId());
         if (!timeSlotsOptional.isPresent()) {
             return this.matchResultWrapper(InstantClassRequestStatus.NOT_IN_RANGE, teacherPhotoRequester);
         }
 
-        logger.debug("@InstantClassService#user{}#最接近的时间片是{}"
-                , getInstantRequestParam().getStudentId(), timeSlotsOptional.get().getSlotId());
+        logger.debug("@InstantClassService#参数[{}]#最接近时间片是[{}]"
+                , getInstantRequestParam(), timeSlotsOptional.get().getSlotId());
 
-        Optional<InstantClassCard> instantClassCardOptional = getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
+        Optional<InstantClassCard> instantClassCardOptional
+                = this.getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
+
         if (!instantClassCardOptional.isPresent()) {
             return getFirstInstantClassResult(timeSlotsOptional);
         }
 
-        //入口变化
-        if (getInstantRequestParam().getSelectMode() != instantClassCardOptional.get().getEntrance()) {
-            dealDifferentEntrance(instantClassCardOptional);
-            instantClassJpaRepository.delete(instantClassCardOptional.get());
-            dealFirstRequest(timeSlotsOptional);
-        }
+        //如果教师类型或者入口变化,重新生成立即上课卡
+        instantClassCardOptional = regenerateInstantCard(timeSlotsOptional, instantClassCardOptional);
 
         if (instantClassCardOptional.get().getResultReadFlag() == 1
                 && instantClassCardOptional.get().getStatus() == InstantClassRequestStatus.NO_MATCH.getCode()) {
+
             InstantClassCard instantClassCard = instantClassUpdatorService
-                    .resetInstantCard(instantClassCardOptional.get().getId(), 0, InstantClassRequestStatus.WAIT_TO_MATCH);
+                    .resetInstantCard(instantClassCardOptional.get()
+                                                              .getId(), 0, InstantClassRequestStatus.WAIT_TO_MATCH);
 
             instantClassTeacherService.dealFetchedTeachersAsync(instantClassCard, false);
 
@@ -93,6 +97,68 @@ public class InstantClassService {
             //直接返回结果,由定时器负责触发获取教师,推送消息给教师的任务
             return matchResultWrapper(instantClassCardOptional.get());
         }
+    }
+
+    /**
+     * 如果教师类型或者入口变化,重新生成立即上课卡
+     *
+     * @param timeSlotsOptional
+     * @param instantClassCardOptional
+     * @return
+     */
+    private Optional<InstantClassCard> regenerateInstantCard(
+            Optional<TimeSlots> timeSlotsOptional, Optional<InstantClassCard> instantClassCardOptional) {
+        //入口变化
+        if (getInstantRequestParam().getSelectMode() != instantClassCardOptional.get().getEntrance()) {
+            this.entranceChanged(timeSlotsOptional, instantClassCardOptional);
+            instantClassCardOptional = this.getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
+        }
+
+        //请求的教师类型发生变化
+        if (!this.isTutorTypeSame(instantClassCardOptional)) {
+            this.tutorTypeChanged(timeSlotsOptional, instantClassCardOptional);
+            instantClassCardOptional = this.getClassCardByStudentIdAndTimeParam(timeSlotsOptional.get());
+        }
+        return instantClassCardOptional;
+    }
+
+    private void tutorTypeChanged(
+            Optional<TimeSlots> timeSlotsOptional
+            , Optional<InstantClassCard> instantClassCardOptional) {
+
+        this.reInitInstantCard(timeSlotsOptional, instantClassCardOptional);
+    }
+
+    private void reInitInstantCard(
+            Optional<TimeSlots> timeSlotsOptional
+            , Optional<InstantClassCard> instantClassCardOptional) {
+
+        dealDifferentEntrance(instantClassCardOptional);
+        instantClassJpaRepository.delete(instantClassCardOptional.get());
+        dealFirstRequest(timeSlotsOptional);
+    }
+
+    private boolean isTutorTypeSame(Optional<InstantClassCard> instantClassCardOptional) {
+        return StringUtils.equals(getInstantRequestParam().getTutorType()
+                , instantClassCardOptional.get().getTutorType());
+    }
+
+    private void entranceChanged(
+            Optional<TimeSlots> timeSlotsOptional
+            , Optional<InstantClassCard> instantClassCardOptional) {
+
+        this.reInitInstantCard(timeSlotsOptional, instantClassCardOptional);
+    }
+
+    /**
+     * 获取传给师生运营的教师类型参数
+     *
+     * @return
+     */
+    private Long getRoleId() {
+        return new Long(CourseType2TeachingTypeService
+                                .instantCourseType2TeachingType(
+                                        TutorType.resolve(getInstantRequestParam().getTutorType())));
     }
 
     //当无对应的鱼卡数据时候,获取第一条数据
@@ -106,7 +172,8 @@ public class InstantClassService {
         }
 
         Optional<InstantClassCard> latestInstantCardOptional30Minutes = instantClassJpaRepository
-                .findTop1ByStudentIdAndRequestMatchTeacherTimeAfterOrderByCreateTimeDesc(getInstantRequestParam().getStudentId()
+                .findTop1ByStudentIdAndRequestMatchTeacherTimeAfterOrderByCreateTimeDesc(
+                        getInstantRequestParam().getStudentId()
                         , DateUtil.localDate2Date(LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(30)));
 
         if (latestInstantCardOptional30Minutes.isPresent()) {
@@ -152,9 +219,11 @@ public class InstantClassService {
     private Optional<TimeSlots> getMostSimilarSlot(DayTimeSlots dayTimeSlots) {
         LocalDateTime nextSlotTime = LocalDateTime.now(ZoneId.systemDefault()).plusMinutes(30);
         return dayTimeSlots.getDailyScheduleTime().stream()
-                .filter(timeSlot -> nextSlotTime
-                        .isAfter(DateUtil.string2LocalDateTime(String.join(" ", DateUtil.date2SimpleString(new Date()), timeSlot.getStartTime()))))
-                .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
+                           .filter(timeSlot -> nextSlotTime.isAfter(
+                                   DateUtil.string2LocalDateTime(String.join(
+                                           " ", DateUtil.date2SimpleString(new Date())
+                                           , timeSlot.getStartTime()))))
+                           .max(Comparator.comparing(timeSlots -> timeSlots.getSlotId()));
     }
 
     public Optional<InstantClassCard> getClassCardByStudentIdAndTimeParam(TimeSlots timeSlots) {
@@ -167,7 +236,9 @@ public class InstantClassService {
         return instantClassJpaRepository.save(instantClassCard);
     }
 
-    private InstantClassResult matchResultWrapper(InstantClassRequestStatus instantClassRequestStatus, TeacherPhotoRequester teacherPhotoRequester) {
+    private InstantClassResult matchResultWrapper(
+            InstantClassRequestStatus instantClassRequestStatus
+            , TeacherPhotoRequester teacherPhotoRequester) {
         return InstantClassResult.newInstantClassResult(instantClassRequestStatus);
     }
 
@@ -198,18 +269,12 @@ public class InstantClassService {
 
     private InstantClassCard initClassCard(TimeSlots timeSlots) {
         InstantClassCard instantClassCard = new InstantClassCard();
-        instantClassCard.setClassDate(DateUtil.date2SimpleDate(new Date()));
-        instantClassCard.setSlotId(timeSlots.getSlotId());
+
+        instantClassCard.initDefault(timeSlots);
+
         instantClassCard.setStudentId(getInstantRequestParam().getStudentId());
-        instantClassCard.setRequestTeacherTimes(0);
-        instantClassCard.setStudentRequestTimes(0);
-        instantClassCard.setResultReadFlag(0);
-        instantClassCard.setMatchResultReadFlag(0);
-        instantClassCard.setTeacherId(0l);
-        instantClassCard.setChatRoomId(0l);
-        instantClassCard.setCreateTime(new Date());
-        instantClassCard.setRequestMatchTeacherTime(DateTime.now().toDate());
         instantClassCard.setEntrance(getInstantRequestParam().getSelectMode());
+        instantClassCard.setTutorType(getInstantRequestParam().getTutorType());
         //课程表入口
         if (getInstantRequestParam().getSelectMode() == 0) {
             instantClassCard.setWorkorderId(getAvaliableWorkOrder().getId());
@@ -217,28 +282,40 @@ public class InstantClassService {
         } else {
             instantClassCard.setOrderId(getInstantRequestParam().getOrderId());
             instantClassCard.setProductType(getInstantRequestParam().getProductType());
-            instantClassCard.setTutorType(getInstantRequestParam().getTutorType());
             instantClassCard.setComboType(getInstantRequestParam().getComboType());
-            instantClassCard.setRoleId(TeachingType.WAIJIAO.getCode());
+            instantClassCard.setRoleId(this.getTeachingCode());
         }
         instantClassCard.setStatus(InstantClassRequestStatus.WAIT_TO_MATCH.getCode());
         return instantClassCard;
     }
 
+    private int getTeachingCode() {
+        return TeachingType.tutorType2TeachingType(
+                TutorTypeEnum.getByValue(
+                        getInstantRequestParam().getTutorType())).getCode();
+    }
+
     private RecommandCourseView getCourseInfo() {
         RecommandCourseView recommandCourseView = new RecommandCourseView();
-        switch (InstantRequestParam.SelectModeEnum.getSelectMode(getInstantRequestParam().getSelectMode())) {
+        switch (this.getSelectMode()) {
             case COURSE_SCHEDULE_ENTERANCE:
                 WorkOrder latestWorkOrder = ThreadLocalUtil.latestWorkOrderThreadLocal.get();
                 recommandCourseView.setCourseId(latestWorkOrder.getCourseId());
                 recommandCourseView.setCourseType(latestWorkOrder.getCourseType());
                 return recommandCourseView;
+
             case OTHER_ENTERANCE:
-                return recommandCourseRequester.getInstantCourseView(getInstantRequestParam().getStudentId()
-                        , 1, TutorType.resolve(getInstantRequestParam().getTutorType()));
+                return recommandCourseRequester.getInstantCourseView(
+                        getInstantRequestParam().getStudentId(), 1, TutorType.resolve(getInstantRequestParam().getTutorType()));
+
             default:
                 throw new BusinessException("入口参数错误");
         }
+    }
+
+    private InstantRequestParam.SelectModeEnum getSelectMode() {
+        return InstantRequestParam.SelectModeEnum
+                .getSelectMode(getInstantRequestParam().getSelectMode());
     }
 
     private InstantRequestParam getInstantRequestParam() {
@@ -247,6 +324,33 @@ public class InstantClassService {
 
     private WorkOrder getAvaliableWorkOrder() {
         return ThreadLocalUtil.latestWorkOrderThreadLocal.get();
+    }
+
+    public Map<String, Object> getScheduleTypeMap(Long studentId) {
+        LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
+
+        List<Integer> skuIds = workOrderJpaRepository.findDistinctSkuIds(
+                studentId, DateUtil.localDate2Date(localDateTime.minusMinutes(30)));
+
+        java.util.Map<String, Object> map = new HashMap<>();
+        map.put("status", 0);
+        map.put("statusDesc", "既无中教也无外教");
+        if (!CollectionUtils.isEmpty(skuIds)) {
+            if (1 == skuIds.size()) {
+                if (skuIds.get(0) == TeachingType.ZHONGJIAO.getCode()) {
+                    map.put("status", TeachingType.ZHONGJIAO.getCode());
+                    map.put("statusDesc", "只有中教");
+                }
+                if (skuIds.get(0) == TeachingType.WAIJIAO.getCode()) {
+                    map.put("status", TeachingType.WAIJIAO.getCode());
+                    map.put("statusDesc", "只有外教");
+                }
+            } else {
+                map.put("status", 3);
+                map.put("statusDesc", "既有中教也有外教");
+            }
+        }
+        return map;
     }
 
 }

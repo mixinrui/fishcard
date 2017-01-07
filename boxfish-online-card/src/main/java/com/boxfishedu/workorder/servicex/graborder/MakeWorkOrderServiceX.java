@@ -364,11 +364,16 @@ public class MakeWorkOrderServiceX {
      * @param map
      */
     public void pushTeacherList(Map<Long, List<WorkOrder>> map) {
-        List list = Lists.newArrayList();
+
         for (Long key : map.keySet()) {
+
+            JSONObject  jsonObject = new JSONObject();
+            JSONObject  jsonObjectData = new JSONObject();
+            JSONArray jsonArray = new JSONArray();
+
             String pushTitle = WorkOrderConstant.SEND_GRAB_ORDER_MESSAGE_FOREIGH;
-            Map map1 = Maps.newHashMap();
-            map1.put("user_id", key);
+            jsonArray.add(key);
+            jsonObject.put("user_id", jsonArray);
 
             if (null == map.get(key)) {
                 continue;
@@ -380,11 +385,12 @@ public class MakeWorkOrderServiceX {
             }
 
 
-            map1.put("push_title", pushTitle);
+            jsonObject.put("push_title", pushTitle);
 
             JSONObject jo = new JSONObject();
-            jo.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE.toString());
-            jo.put("count", null == map.get(key) ? "0" : map.get(key).size());
+            jsonObjectData.put("type", MessagePushTypeEnum.SEND_GRAB_ORDER_TYPE.toString());
+            jsonObjectData.put("count", null == map.get(key) ? "0" : map.get(key).size());
+            jsonObjectData.put("user_id",key);
 
             try {
                 logger.info("makeSendWorkOrder:::sendToTecherContent::::pushTitle:[{}]:size[{}]", pushTitle, map.get(key).size());
@@ -392,11 +398,10 @@ public class MakeWorkOrderServiceX {
                 logger.error("makeSendWorkOrder::::dataError::::::::");
             }
 
-            map1.put("data", jo);
-
-            list.add(map1);
+            jsonObject.put("data", jsonObjectData);
+            teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
         }
-        teacherStudentRequester.pushTeacherListOnlineMsg(list);
+
     }
 
 

@@ -1,18 +1,14 @@
 package com.boxfishedu.workorder.web.controller;
 
-import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.online.order.entity.OrderForm;
 import com.boxfishedu.workorder.common.bean.RedisTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.dao.redis.RedisRepository;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
-import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.CourseOnlineService;
 import com.boxfishedu.workorder.service.RedisService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,16 +26,10 @@ import java.util.Random;
 public class IndexController {
     @Autowired
     private WorkOrderService workOrderService;
-    @Autowired
-    private RedisRepository redisRepository;
+
     @Autowired
     private RedisService redisService;
-    @Autowired
-    private CacheManager cacheManager;
-    @Autowired
-    private CourseOnlineService courseOnlineService;
-    @Autowired
-    private TeacherStudentRequester teacherStudentRequester;
+
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
 

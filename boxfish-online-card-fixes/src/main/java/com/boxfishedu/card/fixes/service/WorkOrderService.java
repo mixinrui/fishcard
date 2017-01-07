@@ -40,6 +40,9 @@ public class WorkOrderService {
     @Value("${recommend.url.courseInfo}")
     private String url;
 
+    @Value("${recommend.url.cover}")
+    private String coverUrl;
+
     private AtomicInteger counter = new AtomicInteger(0);
 
     public void handleAllDifferent() {
@@ -61,6 +64,38 @@ public class WorkOrderService {
                         sc.setCourseId(workOrder.getCourseId());
                         scheduleCourseInfoMorphiaRepository.updateCourseInfo(sc);
                     }
+                });
+    }
+
+
+    public void handlThumbnails() {
+        List<ScheduleCourseInfo> scheduleCourseInfos = scheduleCourseInfoMorphiaRepository.findByThumbnail(
+                "http://api.boxfish.cn/student/publication/data/data/null");
+        scheduleCourseInfos
+                .parallelStream()
+                .forEach(scheduleCourseInfo -> {
+                    System.out.println("before handle " + scheduleCourseInfo);
+                    // 如果课程Id为空表明课程推荐为空, 则需要将课程封面设置为null
+                    if(StringUtils.isEmpty(scheduleCourseInfo.getCourseId())) {
+                        scheduleCourseInfo.setThumbnail(null);
+                    } else {
+                        String cover = null;
+                        try {
+                            Map courseMap = new RestTemplate().getForObject(
+                                    String.format(url, scheduleCourseInfo.getCourseId()), Map.class);
+                            cover = (String) courseMap.get("cover");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        if(!StringUtils.isEmpty(cover)) {
+                            scheduleCourseInfo.setThumbnail(String.format(coverUrl, cover));
+                        } else {
+                            scheduleCourseInfo.setThumbnail(null);
+                        }
+                    }
+                    System.out.println("after handle " + scheduleCourseInfo);
+                    scheduleCourseInfoMorphiaRepository.save(scheduleCourseInfo);
                 });
     }
 

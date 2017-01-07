@@ -70,6 +70,10 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
         return jpa.findByWorkorderIdIn(workOrderIds);
     }
 
+    public List<CourseSchedule> findByWorkorderIdIn(List workOrderIds) {
+        return jpa.findByWorkorderIdIn(workOrderIds);
+    }
+
     public List<CourseSchedule> findByTeacherIdAndClassDateBetween(Long teacherId, DateRangeForm dateRangeForm) {
         return jpa.findByTeacherIdAndClassDateBetween(teacherId, dateRangeForm.getFrom(), dateRangeForm.getTo());
     }
@@ -161,6 +165,17 @@ public class CourseScheduleService extends BaseService<CourseSchedule,CourseSche
     public Page<CourseSchedule> findFinishCourseSchedulePage(Long userId, Pageable pageable) {
         return courseScheduleRepository.findFinishCourseScheduleByStudentId(userId, pageable);
     }
+
+    // 查询指定老师之后 学生未上 未冻结 的课程列表
+    public Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long userId,Date startTime,  Integer skuId,Pageable pageable) {
+        return courseScheduleRepository.findAssignCourseScheduleByStudentId(userId,startTime,0,skuId, pageable);
+    }
+
+    // 新下单指定老师查看课表
+    public Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long orderId, Pageable pageable) {
+        return courseScheduleRepository.findAssignCourseScheduleByStudentId(orderId, pageable);
+    }
+
 
     public Page<CourseSchedule> findUnfinishCourseSchedulePage(Long userId, Pageable pageable) {
         return courseScheduleRepository.findByStudentIdAndStatusBefore(

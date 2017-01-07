@@ -6,7 +6,8 @@ package com.boxfishedu.workorder.common.bean;
 public enum TutorTypeEnum {
     CN("CN"),
     FRN("FRN"),
-    MIXED("MIXED");
+    MIXED("MIXED"),
+    UNKNOWN("UNKNOWN");
 
     private String value;
 
@@ -17,5 +18,14 @@ public enum TutorTypeEnum {
     @Override
     public String toString() {
         return this.value;
+    }
+
+    public static TutorTypeEnum getByValue(String value){
+        for(TutorTypeEnum tutorTypeEnum:TutorTypeEnum.values()){
+            if(tutorTypeEnum.toString().equals(value)){
+                return tutorTypeEnum;
+            }
+        }
+        return TutorTypeEnum.UNKNOWN;
     }
 }
