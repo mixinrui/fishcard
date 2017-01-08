@@ -121,8 +121,9 @@ public class LastClassStrategy implements ScheduleStrategy {
 
     private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder, Map<WorkOrder, String> logMap) {
         if (instantClassCard.getWorkorderId() != firstWorkOrder.getId()) {
-            logger.error("@initCardAndSchedule#exception数据存在问题,放弃匹配教师,鱼卡:[{}],instantcard:[{}]"
-                    , firstWorkOrder, JacksonUtil.toJSon(instantClassCard));
+            WorkOrder instantWorkOrder = workOrderService.findOne(instantClassCard.getWorkorderId());
+            logger.error("@initCardAndSchedule#exception数据存在问题,放弃匹配教师,鱼卡:[{}],instantcard:[{}],instantWorkOrder[{}]"
+                    , firstWorkOrder, JacksonUtil.toJSon(instantClassCard), JacksonUtil.toJSon(instantWorkOrder));
             throw new BusinessException("内部数据错误");
         }
         String oldTime = DateUtil.Date2String(firstWorkOrder.getStartTime());
