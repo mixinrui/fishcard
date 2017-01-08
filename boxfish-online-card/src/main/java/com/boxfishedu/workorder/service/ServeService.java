@@ -448,8 +448,13 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setCoursesSelected(0);
         service.setValidityDay(365 * 2);
         service.setOrderChannel(orderView.getOrderChannel().name());
-
-        productCombo.getComboCode();
+        // 小班课规模, 如果没有指定默认为-1
+        String optionTwo = productComboDetail.getProductSku().getOptionTwo();
+        if(org.apache.commons.lang3.StringUtils.isNotEmpty(optionTwo)) {
+            service.setClassSize(Integer.valueOf(optionTwo));
+        } else {
+            service.setClassSize(-1);
+        }
 
         List<ComboDurations> durations = productCombo.getComboDurations();
         if(CollectionUtils.isNotEmpty(durations)) {

@@ -19,6 +19,7 @@ import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
+import com.google.common.collect.Lists;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
@@ -103,22 +104,30 @@ public class InstantClassTeacherService {
     public List<WorkOrder> prepareForInstantClass(
             InstantClassCard instantClassCard
             , InstantTeacherRequester.InstantAssignTeacher instantAssignTeacher, InstantGroupInfo instantGroupInfo) {
-        List<WorkOrder> workOrders = this.initCardAndSchedule(instantClassCard, instantAssignTeacher);
-
-        if (!Objects.isNull(ThreadLocalUtil.waitReleasedWorkOrder.get())) {
-            //释放最后一节教师的课
-            logger.debug("@prepareForInstantClass释放最后一节课的教师资源,参数[{}]", instantClassCard);
-            teacherStudentRequester.releaseTeacher(ThreadLocalUtil.waitReleasedWorkOrder.get());
-        }
-
         try {
-            BeanUtils.copyProperties(instantGroupInfo
-                    , courseOnlineRequester.instantCreateGroup(workOrderService.findOne(instantClassCard.getWorkorderId())));
-        } catch (Exception ex) {
-            logger.error("@prepareForInstantClass#创建群组失败,instantcard:[{}]", instantClassCard, ex);
-            throw new BusinessException("创建群组失败");
+            List<WorkOrder> workOrders = this.initCardAndSchedule(instantClassCard, instantAssignTeacher);
+
+            if (!Objects.isNull(ThreadLocalUtil.waitReleasedWorkOrder.get())) {
+                //释放最后一节教师的课
+                logger.debug("@prepareForInstantClass释放最后一节课的教师资源,参数[{}]", instantClassCard);
+                teacherStudentRequester.releaseTeacher(ThreadLocalUtil.waitReleasedWorkOrder.get());
+            }
+            try {
+                BeanUtils.copyProperties(
+                        instantGroupInfo, courseOnlineRequester.instantCreateGroup(
+                                workOrderService.findOne(instantClassCard.getWorkorderId())));
+            } catch (Exception ex) {
+                logger.error("@prepareForInstantClass#创建群组失败,instantcard:[{}]", instantClassCard, ex);
+                throw new BusinessException("创建群组失败");
+            }
+            return workOrders;
         }
-        return workOrders;
+        //所有在分配老师后异常的抢课卡需要释放原来的教师资源
+        catch (Exception ex) {
+            //TODO:释放已经占用的教师资源2016-01-08
+            logger.error("教师抢单校验通过后,鱼卡校验失败instantClassCard[{}]", JacksonUtil.toJSon(instantClassCard), ex);
+            throw new BusinessException("数据校验失败");
+        }
 
     }
 

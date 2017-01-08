@@ -20,7 +20,11 @@ public enum ComboTypeToRoleId {
     // 老师奖励课
     REWARD(2),
     // 只能套餐
-    INTELLIGENT(3);
+    INTELLIGENT(3),
+    // 小班课
+    SMALLCLASS(3),
+    // 公开课
+    PUBLIC(3);
 
     private int value;
 

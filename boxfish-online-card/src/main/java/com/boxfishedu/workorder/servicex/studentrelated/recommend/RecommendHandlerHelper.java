@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.studentrelated.recommend;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.log.RecommendLog;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -10,6 +11,7 @@ import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,10 @@ public class RecommendHandlerHelper {
 
             for (int i = 0, size = workOrders.size(); i < size; i++) {
                 WorkOrder workOrder = workOrders.get(i);
+                // 如果是小班课, 不进行课程推荐
+                if(StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name())) {
+                    continue;
+                }
                 logger.debug("鱼卡序号{}", workOrder.getSeqNum());
 //            Integer index=recommandedCourseService.getCourseIndex(workOrder);
                 RecommandCourseView recommandCourseView = resultMap.get(i);

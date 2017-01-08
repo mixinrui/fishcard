@@ -141,6 +141,12 @@ public class Service {
     @Column(name = "user_type", nullable = true)
     private Integer userType;
 
+    /**
+     * 小班课规模
+     */
+    @Column(name = "class_size")
+    private Integer classSize;
+
     public void authentication(Long userId) {
         if(!Objects.equals(studentId, userId)) {
             throw new BusinessException("非法用户,拒绝访问!");
