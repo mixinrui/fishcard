@@ -26,6 +26,7 @@ import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerSer
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
@@ -36,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.lang.annotation.ElementType;
 import java.util.Date;
@@ -102,29 +104,33 @@ public class RabbitMqReciver {
     @Autowired
     private AssignTeacherServiceX assignTeacherServiceX;
 
+    private final static ObjectMapper objectMapper = new ObjectMapper();
+
     /**
      * 订单中心转换请求
      */
     @RabbitListener(queues = RabbitMqConstant.ORDER_TO_SERVICE_QUEUE)
-    public void orderConsumer(OrderForm orderView) {
+    public void orderConsumer(Map orderViewMap) {
+        OrderForm orderView = null;
         logger.info("@orderConsumer");
         try {
+            orderView = objectMapper.convertValue(orderViewMap, OrderForm.class);
             System.out.println(orderView);
             serveService.order2ServiceAndWorkOrder(orderView);
+
+            //更新首页和用户信息
+            dataCollectorService.updateBothChnAndFnItemAsync(orderView.getUserId());
+            onlineAccountService.add(orderView.getUserId());
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.error(
                     new ServiceLog()
-                            .data(orderView)
+                            .data(orderViewMap)
                             .errorLevel()
                             .operation("订单转换为服务")
                             .toString());
 //            throw new Exception("转换失败放回队列");
         }
-
-        //更新首页和用户信息
-        dataCollectorService.updateBothChnAndFnItemAsync(orderView.getUserId());
-        onlineAccountService.add(orderView.getUserId());
     }
 
 
