@@ -124,8 +124,9 @@ public class InstantClassTeacherService {
         }
         //所有在分配老师后异常的抢课卡需要释放原来的教师资源
         catch (Exception ex) {
-
-            return Collections.emptyList();
+            //TODO:释放已经占用的教师资源2016-01-08
+            logger.error("教师抢单校验通过后,鱼卡校验失败instantClassCard[{}]", JacksonUtil.toJSon(instantClassCard), ex);
+            throw new BusinessException("数据校验失败");
         }
 
     }
