@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import static com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil.*;
 
@@ -378,6 +379,16 @@ public class DateUtil {
         int w =  cal.get(Calendar.DAY_OF_WEEK) - 1;
         return (w==0 ||w==6) ?true:false;
 
+    }
+
+    // 是否包含在list的天中  2345671   周一到周日 4671
+    public static boolean getWeekInByDate(Date date  ,List<Integer> list){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int week = cal.get(Calendar.DAY_OF_WEEK);
+        if(list.contains(week))
+            return true;
+        return false;
     }
 
 
