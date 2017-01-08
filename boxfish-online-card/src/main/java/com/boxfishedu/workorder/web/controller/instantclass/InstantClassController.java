@@ -1,24 +1,17 @@
 package com.boxfishedu.workorder.web.controller.instantclass;
 
-import com.alibaba.fastjson.JSON;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
-import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
-import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
-import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.servicex.instantclass.InstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.TeacherInstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.config.DayRangeBean;
-import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstatntClassKeyGenerator;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
-import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.apache.commons.lang3.StringUtils;
@@ -26,19 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -82,31 +66,25 @@ public class InstantClassController {
     @RequestMapping(value = "/service/teacher/instantclass", method = RequestMethod.POST)
     public JsonResultModel teacherInstantClass(@RequestBody TeacherInstantRequestParam teacherInstantRequestParam, Long userId) {
         logger.info("x__xx__xx__xx__x>>>> IIIIIIIIIIIIIII 教师立即上课抢单,参数{}", JacksonUtil.toJSon(teacherInstantRequestParam));
+        JsonResultModel jsonResultModel = null;
         try {
-            JsonResultModel jsonResultModel = teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
+            jsonResultModel = teacherInstantClassServiceX.teacherInstantClass(teacherInstantRequestParam);
+            teacherInstantClassServiceX.exitGrab(teacherInstantRequestParam);
+            return jsonResultModel;
+        } catch (RepeatedSubmissionException repeatedException) {
+            jsonResultModel = JsonResultModel.newJsonResultModel(
+                    InstantClassResult.newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
             return jsonResultModel;
         } catch (Exception ex) {
-            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(
+            jsonResultModel = JsonResultModel.newJsonResultModel(
                     InstantClassResult.newInstantClassResult(TeacherInstantClassStatus.FAIL_TO_MATCH));
             logger.error("/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~ IIIIIIIIIIIIIII  grabresult ,instantcard:[{}],teacher:[{}]/(ㄒoㄒ)/~~/(ㄒoㄒ)/~~失败,结果:{}"
                     , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId(), JacksonUtil.toJSon(jsonResultModel), ex);
+            teacherInstantClassServiceX.exitGrab(teacherInstantRequestParam);
             return jsonResultModel;
-        } finally {
-            String key = GrabInstatntClassKeyGenerator.generateKey(teacherInstantRequestParam);
-            //无论是否成功都删除当前用户的资源,需要增加判断
-            String lockedUserId = redisTemplate.opsForValue().get(key);
-            if (lockedUserId != null) {
-                if (lockedUserId.equals(teacherInstantRequestParam.getTeacherId().toString())) {
-                    logger.debug("@teacherInstantClass IIIIIIIIIIIIIII 参数为[{}]的抢单教师[{}]结束抢单,删除redis数据,正在退出..."
-                            , JacksonUtil.toJSon(teacherInstantRequestParam), lockedUserId);
-                    redisTemplate.delete(key);
-                } else {
-                    logger.debug("@teacherInstantClass IIIIIIIIIIIIIII (ㄒoㄒ)/~~/(ㄒoㄒ) 参数为[{}]的抢单教师[{}]完成抢单,与正在抢单的教师[{}]不是同一个教师,正在退出..."
-                            , JacksonUtil.toJSon(teacherInstantRequestParam), teacherInstantRequestParam.getTeacherId(), lockedUserId);
-                }
-            }
         }
     }
+
 
     /**
      * 获取学生端的上课时间情况
