@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service.graborder;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderGrabHistoryJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderGrabJpaRepository;
@@ -49,7 +50,8 @@ public class MakeWorkOrderService extends BaseService<WorkOrderGrab, WorkOrderGr
         Date end = DateUtil.parseTime( DateUtil.getBeforeDays(  new Date(),-2),1);
         Date createTime =DateUtil.addSecond(new Date(),-10);
         logger.info(":::::findByTeacherIdAndStartTimeBetweenOrderByStartTime:::conditionDateFrom{[]}:::::To{[]}",DateUtil.Date2String(begin),DateUtil.Date2String(end));
-       return workOrderJpaRepository.findByTeacherIdAndIsFreezeAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(0L,0,begin,end,createTime);
+        List<String> listClassTypes=  Lists.newArrayList(ClassTypeEnum.PUBLIC.name(),ClassTypeEnum.SMALL.name());
+       return workOrderJpaRepository.findByTeacherIdAndIsFreezeAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(0L,0,begin,end,createTime,listClassTypes);
     }
 
 
