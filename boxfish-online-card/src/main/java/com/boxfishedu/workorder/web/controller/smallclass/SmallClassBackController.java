@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class SmallClassBackController {
         return JsonResultModel.newJsonResultModel("OK");
     }
 
+    @Data
     @RequestMapping(value = "/status", method = RequestMethod.POST)
     static class PublicClassBuilderParam {
         private Long smallClassId;
