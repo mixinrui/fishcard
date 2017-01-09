@@ -2,16 +2,12 @@ package com.boxfishedu.workorder.servicex.studentrelated.validator;
 
 import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.common.log.ServiceLog;
+import com.boxfishedu.workorder.common.util.MailSupport;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.boxfishedu.workorder.common.util.MailSupport;
-import com.boxfishedu.workorder.entity.mysql.Service;
-import com.boxfishedu.workorder.servicex.studentrelated.selectmode.SelectMode;
-import com.boxfishedu.workorder.web.param.TimeSlotParam;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -35,7 +31,7 @@ public class AuthorityValidator implements StudentTimePickerValidator {
     @Override
     public void prepareValidate(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> serviceList) {
         if (CollectionUtils.isEmpty(serviceList)) {
-            mailSupport.reportError("无对应的服务", timeSlotParam + "/n" + ExceptionUtils.getStackTrace(e));
+            mailSupport.reportError("无对应的服务", timeSlotParam.toString());
             logger.error(
                     new ServiceLog(timeSlotParam.getStudentId())
                             .data(timeSlotParam)
