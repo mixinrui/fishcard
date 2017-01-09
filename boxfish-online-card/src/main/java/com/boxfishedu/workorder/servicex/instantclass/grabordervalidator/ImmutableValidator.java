@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.instantclass.grabordervalidator;
 import com.boxfishedu.workorder.common.bean.instanclass.TeacherInstantClassStatus;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
+import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -50,6 +51,10 @@ public class ImmutableValidator implements IGrabInstantClassValidator {
         }
         //如果失败了
         if (!opsValue.setIfAbsent(key, teacherInstantRequestParam.getTeacherId().toString())) {
+            if(StringUtils.equals(teacherInstantRequestParam.getTeacherId().toString(),opsValue.get(key))){
+                logger.error("教师[{}]已经在抢课,由于重复提交,退出抢单",teacherInstantRequestParam.getTeacherId());
+                throw new RepeatedSubmissionException("重复提交抢单");
+            }
             logger.debug("/(ㄒoㄒ)/~~teacherInstantClass#fail#参数[{}],已经有教师[{}]正在抢单,退出抢单...."
                     , JacksonUtil.toJSon(teacherInstantRequestParam), opsValue.get(key));
             return TeacherInstantClassStatus.FAIL_TO_MATCH;

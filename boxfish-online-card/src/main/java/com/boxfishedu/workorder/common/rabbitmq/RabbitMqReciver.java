@@ -39,6 +39,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.lang.annotation.ElementType;
 import java.util.Date;
@@ -114,16 +115,22 @@ public class RabbitMqReciver {
      * 订单中心转换请求
      */
     @RabbitListener(queues = RabbitMqConstant.ORDER_TO_SERVICE_QUEUE)
-    public void orderConsumer(OrderForm orderView) {
+    public void orderConsumer(Map orderViewMap) {
+        OrderForm orderView = null;
         logger.info("@orderConsumer");
         try {
+            orderView = objectMapper.convertValue(orderViewMap, OrderForm.class);
             System.out.println(orderView);
             serveService.order2ServiceAndWorkOrder(orderView);
+
+            //更新首页和用户信息
+            dataCollectorService.updateBothChnAndFnItemAsync(orderView.getUserId());
+            onlineAccountService.add(orderView.getUserId());
         } catch (Exception ex) {
             ex.printStackTrace();
             logger.error(
                     new ServiceLog()
-                            .data(orderView)
+                            .data(orderViewMap)
                             .errorLevel()
                             .operation("订单转换为服务")
                             .toString());
@@ -131,10 +138,6 @@ public class RabbitMqReciver {
             logger.error("订单[{}]转换失败", orderView.getId());
 //            throw new Exception("转换失败放回队列");
         }
-
-        //更新首页和用户信息
-        dataCollectorService.updateBothChnAndFnItemAsync(orderView.getUserId());
-        onlineAccountService.add(orderView.getUserId());
     }
 
 
