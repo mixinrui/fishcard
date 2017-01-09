@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service.fishcardcenter;
 
 import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.*;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -240,6 +241,12 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             }
         }
 
+        //小班课 公开课的 处理
+        if(ClassTypeEnum.NORMAL.name().equals(fishCardFilterParam.getClassType())){
+            sql.append(" and classType !='SMALL' and classType !='PUBLIC' ");  // 除了小班课 和公开课
+        }else if(!ClassTypeEnum.NORMAL.name().equals(fishCardFilterParam.getClassType())  && null != fishCardFilterParam.getClassType()){
+            sql.append("and classType =:classType ");
+        }
 
         if (null != fishCardFilterParam.getStartTimeSort()) {
             sql.append("order by wo.startTime   ").append(fishCardFilterParam.getStartTimeSort().toLowerCase());
@@ -253,9 +260,12 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             sql.append("order by wo.teacherId asc , wo.createTime desc");
         }
 
+
         if (null != fishCardFilterParam.getTeacherNameSort()) {
             sql.append(" order by teacherName ").append(fishCardFilterParam.getTeacherNameSort());
         }
+
+
 
         return sql.toString();
     }
@@ -355,6 +365,11 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         if (null != fishCardFilterParam.getTeachingType()) {
 
             query.setParameter("teachingType", fishCardFilterParam.getTeachingType());
+        }
+
+        //小班课 公开课的 处理
+        if(!ClassTypeEnum.NORMAL.name().equals(fishCardFilterParam.getClassType())  && null != fishCardFilterParam.getClassType()){
+            query.setParameter("classType", fishCardFilterParam.getClassType());
         }
 
 

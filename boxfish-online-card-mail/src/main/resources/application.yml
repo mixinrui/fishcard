@@ -22,7 +22,7 @@ spring.jackson.time-zone: GMT+8
 #spring.profiles.active: product
 #spring.profiles.active: local
 #spring.profiles.active: development
-spring.profiles.active: product
+spring.profiles.active: test
 #spring.profiles.active: demo
 #spring.profiles.active: pretest
 
@@ -43,6 +43,9 @@ mail:
   sender: online@send.boxfish.cn
   token: Tpn7MvMDAxLuS4reWbveS6uuacgOWuueaYk
 
+server:
+  port: 9098
+  servlet-path: /mail
 
 #===============================================================product环境======================================================================
 ---
@@ -71,8 +74,6 @@ service:
   sdk:
     teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
 
-server.port: 9098
-
 ---
 spring:
   datasource:
@@ -99,5 +100,3 @@ spring:
 service:
   sdk:
     teacherAbsenceUrl: http://online-api.boxfish.cn/teacher
-
-  server.port: 9098

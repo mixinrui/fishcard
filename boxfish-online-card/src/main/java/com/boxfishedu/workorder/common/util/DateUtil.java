@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import static com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil.*;
 
@@ -380,18 +381,32 @@ public class DateUtil {
 
     }
 
+    // 是否包含在list的天中  2345671   周一到周日 4671
+    public static boolean getWeekInByDate(Date date  ,List<Integer> list){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int week = cal.get(Calendar.DAY_OF_WEEK);
+        if(list.contains(week))
+            return true;
+        return false;
+    }
 
-    //注：周日是一周的开始 获取周一的日期
+
+    //注：周日是一周的开始 获取周一的日期  week 2345671
     public static Date getMonday(Date date)throws Exception{
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int week = cal.get(Calendar.DAY_OF_WEEK);
-        if(week>2){
-            cal.add(Calendar.DAY_OF_MONTH,-(week-2)+7);
+        if(week>=2){
+            cal.add(Calendar.DAY_OF_MONTH,-(week-2));
         }else{
-            cal.add(Calendar.DAY_OF_MONTH,2-week+7);
+            cal.add(Calendar.DAY_OF_MONTH,1-7);
         }
         return cal.getTime();
+    }
+
+    public static void main(String[] args) throws Exception{
+        System.out.print(Date2String24(  getMonday(new Date())));
     }
 
 

@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.timer;
 
 import com.boxfishedu.workorder.common.log.RecommendLog;
+import com.boxfishedu.workorder.common.util.MailSupport;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
@@ -35,6 +36,9 @@ public class SingleRecommendHandler {
     @Autowired
     private PersistCoursesHandler persistCoursesHandler;
 
+    @Autowired
+    private MailSupport mailSupport;
+
     @Transactional
     public void singleRecommend(WorkOrder workOrder, CourseSchedule courseSchedule) {
         try {
@@ -46,6 +50,7 @@ public class SingleRecommendHandler {
                             .errorLevel()
                             .businessObjectKey(Objects.toString(workOrder.getId()))
                             .toString());
+            mailSupport.reportError("课程推荐失败" + workOrder.getId(), e);
             throw e;
         }
     }

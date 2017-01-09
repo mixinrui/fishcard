@@ -13,17 +13,17 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
 
 /**
  * Created by LuoLiBing on 17/1/6.
  */
-@RequestMapping(value = "/mail")
+@RestController
 public class MailSupportController {
 
     private final static Logger logger = LoggerFactory.getLogger(MailSupportController.class);
-
 
     @Autowired
     private BaseMailConfig mailConfig;
@@ -47,7 +47,7 @@ public class MailSupportController {
     private SimpleMailMessage createMailMessage(MailParam mailParam) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(mailParam.getFrom());
-        mailMessage.setSubject(mailMessage.getSubject());
+        mailMessage.setSubject(mailParam.getSubject());
         return mailMessage;
     }
 
