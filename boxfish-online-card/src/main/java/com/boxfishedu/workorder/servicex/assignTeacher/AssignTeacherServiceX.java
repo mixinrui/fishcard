@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.assignTeacher;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
@@ -15,6 +16,7 @@ import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
 import com.boxfishedu.workorder.service.StStudentSchemaService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Lists;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -81,11 +84,32 @@ public class AssignTeacherServiceX {
     public JsonResultModel maualAssign(Long teacherId, Long studentId,Integer skuId){
         logger.info("@@@@assign 指定老师stp-1::::::======>>>APP端学生ID{}===>>>>发起指定老师{}===>>skuId{}=====>>>channel::{}",studentId,teacherId,skuId,"手动");
         Date startTime = DateTime.now().plusHours(48).toDate();
+
         List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.
                 findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(studentId,skuId,startTime,0,teacherId);//TODO 发起指定老师的学生的48小时候的课表
+        //TODO 去掉小班课和公开课的
+        filterClassType(aggressorCourseSchedules);
+
         List<CourseSchedule> alreadyCourseSchedules = courseScheduleRepository.findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherId(studentId,skuId,startTime,0,teacherId);
+        filterClassType(alreadyCourseSchedules);
         stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,alreadyCourseSchedules, ConstantUtil.STUDENT_CHANNLE,skuId);
         return JsonResultModel.newJsonResultModel(null);
+    }
+
+    /**
+     * 去掉小班课和公开课的
+     * @param courseSchedules
+     */
+    private void filterClassType(List<CourseSchedule> courseSchedules){
+        List<String> classTypes = Lists.newArrayList(ClassTypeEnum.PUBLIC.name(),ClassTypeEnum.SMALL.name());
+        CourseSchedule courseSchedule = null;
+        for (Iterator<CourseSchedule> iter = courseSchedules.iterator(); iter.hasNext();) {
+            courseSchedule = iter.next();
+            if(null != courseSchedule.getClassType() && classTypes.contains(courseSchedule.getClassType())){
+                iter.remove();
+            }
+        }
+
     }
 
     /**
@@ -114,12 +138,15 @@ public class AssignTeacherServiceX {
         List<StStudentSchema> list = stStudentSchemaJpaRepository.findByStSchema(StStudentSchema.StSchema.assgin);
         Date startTime = DateTime.now().plusHours(48).toDate();
         List<CourseSchedule> aggressorCourseSchedules = null;
+        List<String> classTypes = Lists.newArrayList(ClassTypeEnum.PUBLIC.name(),ClassTypeEnum.SMALL.name());
         for(StStudentSchema stStudentSchema : list){
             aggressorCourseSchedules = courseScheduleRepository.
                     findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherIdNot(stStudentSchema.getStudentId(),
                             stStudentSchema.getSkuId().ordinal(),startTime,0,stStudentSchema.getTeacherId());//TODO 发起指定老师的学生的48小时候的课表
+            filterClassType(aggressorCourseSchedules);
             List<CourseSchedule> alreadyCourseSchedules = courseScheduleRepository.findByStudentIdAndRoleIdAndStartTimeGreaterThanAndIsFreezeAndTeacherId(stStudentSchema.getStudentId(),
                     stStudentSchema.getSkuId().ordinal(),startTime,0,stStudentSchema.getTeacherId());
+            filterClassType(alreadyCourseSchedules);
             logger.info("@@@@assign-timer 指定老师 <定时任务> stp-1::::::======>>>学生ID{}===>>>>指定老师{}===>>skuId===>>{}",
                     stStudentSchema.getStudentId(),stStudentSchema.getTeacherId(),stStudentSchema.getSkuId().ordinal());
             stAssignTeacherService.doAssignTeacher(stStudentSchema.getTeacherId(),stStudentSchema.getStudentId(),

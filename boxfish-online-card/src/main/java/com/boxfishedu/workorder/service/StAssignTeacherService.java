@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
@@ -71,6 +72,7 @@ public class StAssignTeacherService {
     @Transactional
     public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,List<CourseSchedule> alreadyCourseSchedules,
                                 String channel, Integer skuId) {
+        List<String> classTypes = Lists.newArrayList(ClassTypeEnum.PUBLIC.name(),ClassTypeEnum.SMALL.name());
         Date startTime = DateTime.now().plusHours(48).toDate();
         logger.info("@@@@assign 指定老师 stp-2:::初始化:::channel=={}======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                         "===>>skuId:{}====>>鱼卡IDS:{}===>>>总共{}条",
@@ -97,6 +99,7 @@ public class StAssignTeacherService {
                 courseScheduleRepository.
                         findByTeacherIdAndStudentIdNotAndIsFreezeAndRoleIdAndStartTimeGreaterThan(teacherId, studentId, 0, skuId,startTime);
 
+        filterClassType(victimCourseSchedules);
         logger.info("@@@@assign 指定老师 stp-2:::channel====>>{} :::======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                         "===>>skuId:{}=====>>channel:{}====>>victimCourseSchedules==={}",
                 channel,studentId, teacherId, skuId,channel,victimCourseSchedules);
@@ -479,5 +482,21 @@ public class StAssignTeacherService {
             //通知小马添加新的群组
             serviceSDK.createGroup(workOrder);
         }
+    }
+
+    /**
+     * 去掉小班课和公开课的
+     * @param courseSchedules
+     */
+    private void filterClassType(List<CourseSchedule> courseSchedules){
+        List<String> classTypes = Lists.newArrayList(ClassTypeEnum.PUBLIC.name(),ClassTypeEnum.SMALL.name());
+        CourseSchedule courseSchedule = null;
+        for (Iterator<CourseSchedule> iter = courseSchedules.iterator(); iter.hasNext();) {
+            courseSchedule = iter.next();
+            if(null != courseSchedule.getClassType() && classTypes.contains(courseSchedule.getClassType())){
+                iter.remove();
+            }
+        }
+
     }
 }
