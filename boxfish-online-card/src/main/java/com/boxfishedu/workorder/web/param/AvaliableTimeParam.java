@@ -34,6 +34,8 @@ public class AvaliableTimeParam implements Serializable {
     // 推迟时间开始点
     private String    rangeStartTime;
 
+    private String classType; // classType 为 SMALLCLASS  小班课
+
     public ComboTypeToRoleId getComboTypeEnum() {
         return ComboTypeToRoleId.resolve(comboType);
     }

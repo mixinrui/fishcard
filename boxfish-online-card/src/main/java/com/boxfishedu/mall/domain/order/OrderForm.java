@@ -57,6 +57,9 @@ public class OrderForm extends BaseEntity {
 
     private String expiredDate;
 
+    // 小班课规模
+    private Integer classSize;
+
 //    @Transient
 //    private List<OrderDetail> orderDetails;
 

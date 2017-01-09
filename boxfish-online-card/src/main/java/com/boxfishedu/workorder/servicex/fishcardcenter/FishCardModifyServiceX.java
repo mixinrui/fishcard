@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NotFoundException;
@@ -39,12 +40,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -197,7 +195,10 @@ public class FishCardModifyServiceX {
             throw new NotFoundException();
         }
         try {
-            workOrders.forEach(workOrder -> {
+            workOrders.stream()
+                    // 小班课学生修改level难度, 不重新修改课程推荐
+                    .filter(workOrder -> !StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name()))
+                    .forEach(workOrder -> {
                 Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
                                                      DateUtil.convertLocalDateTime(workOrder.getStartTime()));
                 long hours = duration.toHours();

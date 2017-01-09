@@ -16,8 +16,10 @@ public class ProductSku extends BaseEntity {
 
     private Integer skuPrice;
 
+    // 国籍
     private String optionOne;
 
+    // 人数
     private String optionTwo;
 
     private String optionThree;

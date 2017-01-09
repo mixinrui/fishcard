@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.studentrelated.selectmode;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -37,6 +38,8 @@ public interface SelectMode {
         // skuIdExtra 字段
         workOrder.setSkuIdExtra(service.getSkuId().intValue());
         workOrder.setOrderChannel(service.getOrderChannel());
+        // 鱼卡的上课类型: 1对1, 小班课, 公开课
+        workOrder.setClassType(ClassTypeEnum.resolveByComboType(service.getComboType()).name());
         return workOrder;
     }
 

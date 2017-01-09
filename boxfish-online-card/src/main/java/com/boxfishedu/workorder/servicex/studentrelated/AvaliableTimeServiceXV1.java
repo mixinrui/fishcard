@@ -29,10 +29,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,7 +73,7 @@ public class AvaliableTimeServiceXV1 {
      * @throws CloneNotSupportedException
      */
     public JsonResultModel getTimeAvailable(AvaliableTimeParam avaliableTimeParam) throws CloneNotSupportedException {
-
+        List places = new ArrayList<Integer>(Arrays.asList(4, 6, 7,1));
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(avaliableTimeParam, getOptionalDays(avaliableTimeParam));
 
@@ -98,12 +95,29 @@ public class AvaliableTimeServiceXV1 {
 
     private List<DayTimeSlots> getTimeAvailable(AvaliableTimeParam avaliableTimeParam, DateRange dateRange, Set<String> classDateTimeSlotsSet) throws CloneNotSupportedException {
         // 获取时间片模板,并且复制
+        final List<Integer> list = Lists.newArrayList(4,6,7,1);
         return dateRange.forEach(
                 // 过滤掉时间片
                 (localDateTime, dayTimeSlot) -> {
-                    dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
-                            .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString())))
-                            .collect(Collectors.toList()));
+
+                    //小班课
+                    if("SMALLCLASS".equals(avaliableTimeParam.getClassType())){
+                            dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
+                                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
+                                            &&
+                                            DateUtil.getWeekInByDate(DateUtil.String2Date(String.join(" ",dayTimeSlot.getDay(),"00:00:00")),list)
+                                            && t.getSlotId()==27
+                                            )// 27 晚8点  小班课
+                                    .collect(Collectors.toList()));
+                    //1对1课程
+                    }else {
+                        dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
+                                .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString())))
+                                .collect(Collectors.toList()));
+                    }
+
+
+
                     return CollectionUtils.isEmpty(dayTimeSlot.getDailyScheduleTime()) ? null : dayTimeSlot;
                 },
                 // 根据日期获取到对应的DayTimeSlots
@@ -118,7 +132,14 @@ public class AvaliableTimeServiceXV1 {
                         redisMapService.setMap(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d), timeSlotsList);
                         ;
                     }
-                    return createDayTimeSlots(d, timeSlotsList);
+
+                    //小班课单独处理 只分0% 和 100% 对待
+                    if("SMALLCLASS".equals(avaliableTimeParam.getClassType())){
+                        return createDayTimeSlotsSmallClass(d, timeSlotsList);
+                    }else{
+                        return createDayTimeSlots(d, timeSlotsList);
+                    }
+
                 });
     }
 
@@ -128,6 +149,22 @@ public class AvaliableTimeServiceXV1 {
         result.setDay(DateUtil.formatLocalDate(date));
         List<TimeSlots> list = timeSlotsList.stream()
                 .filter(BaseTimeSlots::roll)
+                .map(baseTimeSlots -> {
+                    TimeSlots timeSlots = new TimeSlots();
+                    timeSlots.setSlotId(baseTimeSlots.getSlotId().longValue());
+                    timeSlots.setStartTime(DateUtil.timeShortString(baseTimeSlots.getStartTime()));
+                    timeSlots.setEndTime(DateUtil.timeShortString(baseTimeSlots.getEndTime()));
+                    return timeSlots;
+                }).collect(Collectors.toList());
+        result.setDailyScheduleTime(list);
+        return result;
+    }
+
+    public DayTimeSlots createDayTimeSlotsSmallClass(LocalDateTime date, List<BaseTimeSlots> timeSlotsList) {
+        DayTimeSlots result = new DayTimeSlots();
+        result.setDay(DateUtil.formatLocalDate(date));
+        List<TimeSlots> list = timeSlotsList.stream()
+                .filter(BaseTimeSlots::rollForSmallClass)
                 .map(baseTimeSlots -> {
                     TimeSlots timeSlots = new TimeSlots();
                     timeSlots.setSlotId(baseTimeSlots.getSlotId().longValue());
