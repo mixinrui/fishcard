@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import java.util.Map;
 public interface GroupInitStrategy {
     RecommandCourseView getRecommandCourse();
 
-    TeacherView getRecommandTeacher();
+    TeacherView getRecommandTeacher(SmallClass smallClass);
 
     void initGroupClass(SmallClass smallClass);
 
@@ -32,6 +33,11 @@ public interface GroupInitStrategy {
                 .teachingType2TutorType();
     }
 
+    void writeTeacherInfoBack(SmallClass smallClass,List<WorkOrder> workOrders);
+
+    void writeCourseBack(SmallClass smallClass,List<WorkOrder> workOrders);
+
+    @Transactional
     void persistGroupClass(SmallClass smallClass);
 
     void postCreate();

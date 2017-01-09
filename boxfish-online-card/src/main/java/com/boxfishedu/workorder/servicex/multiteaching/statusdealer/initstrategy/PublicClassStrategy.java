@@ -21,12 +21,22 @@ public class PublicClassStrategy implements GroupInitStrategy {
     }
 
     @Override
-    public TeacherView getRecommandTeacher() {
+    public TeacherView getRecommandTeacher(SmallClass smallClass) {
         return null;
     }
 
     @Override
     public void initGroupClass(SmallClass smallClass) {
+
+    }
+
+    @Override
+    public void writeTeacherInfoBack(SmallClass smallClass,List<WorkOrder> workOrders) {
+
+    }
+
+    @Override
+    public void writeCourseBack(SmallClass smallClass, List<WorkOrder> workOrders) {
 
     }
 
