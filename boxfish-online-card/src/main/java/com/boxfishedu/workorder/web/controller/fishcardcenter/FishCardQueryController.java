@@ -80,6 +80,18 @@ public class FishCardQueryController {
     }
 
     /**
+     * 小班课接口
+     *
+     * @param fishCardFilterParam
+     * @param pageable
+     * @return
+     */
+    @RequestMapping(value = "/smalllistitmem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondfirstForSmall(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam, pageable);
+    }
+
+    /**
      * 用户id不做限制的查询  鱼卡管理
      */
     @RequestMapping(value = "/listitem", method = RequestMethod.GET)

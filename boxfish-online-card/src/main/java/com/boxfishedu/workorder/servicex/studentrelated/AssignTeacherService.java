@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -101,6 +102,10 @@ public class AssignTeacherService {
         if (workOrder == null) {
             throw new BusinessException("课程信息有误");
         }
+        // 小班课不指定老师
+        if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+            return null;
+        }
 
         Boolean isActive = teacherStudentRequester.checkTeacherIsFreeze(workOrder.getTeacherId());
         if (!isActive || isActive == null) {
@@ -139,6 +144,9 @@ public class AssignTeacherService {
         Integer skuId = skuIdParameter;
         if (null != oldWorkOrderId) {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
+            if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+                return JsonResultModel.newJsonResultModel(null);
+            }
             skuId = workOrder.getSkuId();
         }
 
