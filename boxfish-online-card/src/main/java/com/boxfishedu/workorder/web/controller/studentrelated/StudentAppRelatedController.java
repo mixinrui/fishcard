@@ -147,7 +147,7 @@ StudentAppRelatedController {
      */
     @RequestMapping(value = "/v1/delay/week/smallclass" ,method = RequestMethod.GET)
     public JsonResultModel getDelaySmallClassWeeks(Long userId)throws  Exception{
-        return avaliableTimeServiceXV1.getDelayWeekDays();
+        return avaliableTimeServiceXV1.getDelayWeekDaysForSmallClass();
     }
 
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
