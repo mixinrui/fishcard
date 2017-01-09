@@ -66,6 +66,31 @@ public class FishCardQueryController {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam, pageable);
     }
 
+
+    /**
+     * 公开课接口
+     *
+     * @param fishCardFilterParam
+     * @param pageable
+     * @return
+     */
+    @RequestMapping(value = "/publiclistitmem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondfirstForPublic(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam, pageable);
+    }
+
+    /**
+     * 小班课接口
+     *
+     * @param fishCardFilterParam
+     * @param pageable
+     * @return
+     */
+    @RequestMapping(value = "/smalllistitmem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondfirstForSmall(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam, pageable);
+    }
+
     /**
      * 用户id不做限制的查询  鱼卡管理
      */

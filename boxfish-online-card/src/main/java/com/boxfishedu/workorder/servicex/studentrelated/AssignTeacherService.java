@@ -4,16 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.enums.TutorType;
-import com.boxfishedu.workorder.common.bean.AssignTeacherApplyStatusEnum;
-import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
-import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
@@ -24,14 +21,11 @@ import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
-import com.boxfishedu.workorder.web.filter.ParentRelationGetter;
 import com.boxfishedu.workorder.web.param.ScheduleBatchReqSt;
 import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
 import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +102,10 @@ public class AssignTeacherService {
         if (workOrder == null) {
             throw new BusinessException("课程信息有误");
         }
+        // 小班课不指定老师
+        if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+            return null;
+        }
 
         Boolean isActive = teacherStudentRequester.checkTeacherIsFreeze(workOrder.getTeacherId());
         if (!isActive || isActive == null) {
@@ -146,6 +144,9 @@ public class AssignTeacherService {
         Integer skuId = skuIdParameter;
         if (null != oldWorkOrderId) {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
+            if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+                return JsonResultModel.newJsonResultModel(null);
+            }
             skuId = workOrder.getSkuId();
         }
 

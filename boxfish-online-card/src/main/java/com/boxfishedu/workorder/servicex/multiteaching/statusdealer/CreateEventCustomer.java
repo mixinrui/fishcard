@@ -4,12 +4,14 @@ import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
+import com.boxfishedu.workorder.servicex.multiteaching.statusdealer.initstrategy.GroupInitStrategy;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Map;
 
 /**
  * Created by hucl on 17/1/5.
@@ -19,10 +21,7 @@ import javax.annotation.PostConstruct;
 public class CreateEventCustomer extends SmallClassEventCustomer {
 
     @Autowired
-    private SmallClassRequester smallClassRequester;
-
-    @Autowired
-    private SmallClassTeacherRequester smallClassTeacherRequester;
+    Map<String, GroupInitStrategy> groupInitStrategyMap;
 
 
     @PostConstruct
@@ -30,17 +29,18 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
         this.setSmallClassCardStatus(SmallClassCardStatus.CREATE);
     }
 
+    public final String prefix = "INIT_";
+
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
         SmallClass smallClass = smallClassEvent.getSource();
         smallClass.setStatus(smallClassEvent.getType().getCode());
 
-        //找出leader鱼卡
+        GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(prefix + smallClass.getSmallClassType());
 
-        //获取推荐课程
-//        RecommandCourseView recommandCourseView=smallClassRequester.;
+        //初始化小班课信息
+        groupInitStrategy.initGroupClass(smallClass);
 
-        //获取推荐教师
 
         //保存smallclass
 
