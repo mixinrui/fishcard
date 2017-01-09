@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -57,8 +58,12 @@ public class FishCardFreezeServiceX {
         if(null==workOrder){
             throw new BusinessException("不存在对应的鱼卡");
         }
+
         if (workOrder.getIsFreeze()==1) {
             throw new BusinessException("该鱼卡已处于冻结状态");
+        }
+        if(ClassTypeEnum.SMALL.name().equals(workOrder.getClassType()) || ClassTypeEnum.PUBLIC.name().equals(workOrder.getClassType())){
+            throw new BusinessException("小班课公开课不允许冻结操作");
         }
         validateOperationCond(workOrder);
 
@@ -175,6 +180,10 @@ public class FishCardFreezeServiceX {
         List<WorkOrder>   workOrders = workOrderService.getAllWorkOrdersByOrderId(orderId);
         if(CollectionUtils.isEmpty(workOrders)){
             throw new BusinessException("该订单没有对应的鱼卡信息");
+        }
+
+        if(ClassTypeEnum.PUBLIC.name().equals(workOrders.get(0).getClassType()) || ClassTypeEnum.SMALL.name().equals(workOrders.get(0).getClassType())){
+            throw new BusinessException("小班课和公开课不允许冻结,请核实数据");
         }
         Date now = new Date();
         List<WorkOrder> unfinishedClass =  workOrders.stream().filter(workOrder ->
