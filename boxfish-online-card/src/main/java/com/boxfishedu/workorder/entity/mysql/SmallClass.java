@@ -43,6 +43,9 @@ public class SmallClass implements Cloneable {
     @Column(name = "course_name")
     private String courseName;
 
+    @Column(name = "difficulty_level")
+    private String difficultyLevel;
+
     @Temporal(TemporalType.DATE)
     private Date classDate;
 
@@ -73,7 +76,7 @@ public class SmallClass implements Cloneable {
 
     @JsonIgnore
     @Transient
-    private List<Long> allCardIds;
+    private List<WorkOrder> allCards;
 
     //班级类型
     public String smallClassType;

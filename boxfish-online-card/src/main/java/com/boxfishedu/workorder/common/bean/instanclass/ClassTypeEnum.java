@@ -17,7 +17,6 @@ public enum ClassTypeEnum {
     public String toString() {
         return this.value;
     }
-
 }
 
 

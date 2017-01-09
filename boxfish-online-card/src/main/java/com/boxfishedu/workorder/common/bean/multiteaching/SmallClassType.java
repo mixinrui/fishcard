@@ -1,6 +1,8 @@
 package com.boxfishedu.workorder.common.bean.multiteaching;
 
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.sun.tools.javac.code.Attribute;
 
 /**
  * Created by hucl on 16/12/28.
@@ -28,4 +30,7 @@ public enum SmallClassType {
     public String toString() {
         return this.value;
     }
+
+    public static final  String INIT_SMALL="INIT"+ SmallClassType.SMALL.name();
+    public static final  String INIT_PUBLIC="INIT"+ SmallClassType.PUBLIC.name();
 }

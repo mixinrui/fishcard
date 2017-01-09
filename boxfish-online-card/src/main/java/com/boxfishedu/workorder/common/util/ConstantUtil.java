@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.common.util;
 
+import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
+
 /**
  * Created by hucl on 16/5/10.
  */
@@ -35,4 +37,7 @@ public class ConstantUtil {
     public static final String MANUAL_OPERATOR ="manual";//OperateType
     public static final String MANUAL_TECH_OPERATOR ="agree";//OperateType
     public static final String TIMER_OPERATOR ="auto";//OperateType
+
+    public static final String SMALL_CLASS_INIT="INIT_SMALL";
+    public static final String PUBLIC_CLASS_INIT="INIT_PUBLIC";
 }

@@ -3,11 +3,6 @@ package com.boxfishedu.workorder.servicex.home;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
-import com.boxfishedu.workorder.servicex.CommonServeServiceX;
-import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
-import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
-import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
-import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceXV1;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionChecker;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.slf4j.Logger;
@@ -23,8 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class HomePageServiceX {
     @Autowired
     private AccountCardInfoService accountCardInfoService;
-    @Autowired
-    private RepeatedSubmissionChecker checker;
     @Autowired
     private OnlineAccountService onlineAccountService;
 
