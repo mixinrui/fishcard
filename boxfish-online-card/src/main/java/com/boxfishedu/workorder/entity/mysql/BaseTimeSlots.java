@@ -46,6 +46,18 @@ public class BaseTimeSlots implements Serializable {
         return ThreadLocalRandom.current().nextInt(100) + 1 <= probability;
     }
 
+    /**
+     * 如果不是0 均当作 100%对待
+     * @return
+     */
+    public boolean rollForSmallClass() {
+        return probability>0;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(ThreadLocalRandom.current().nextInt(100) + 1);
+    }
+
     private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     private static LocalTime initStartTime = LocalTime.parse("07:00:00", timeFormatter);

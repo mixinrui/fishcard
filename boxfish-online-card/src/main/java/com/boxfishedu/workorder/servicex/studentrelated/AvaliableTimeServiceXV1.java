@@ -132,7 +132,14 @@ public class AvaliableTimeServiceXV1 {
                         redisMapService.setMap(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d), timeSlotsList);
                         ;
                     }
-                    return createDayTimeSlots(d, timeSlotsList);
+
+                    //小班课单独处理 只分0% 和 100% 对待
+                    if("SMALLCLASS".equals(avaliableTimeParam.getClassType())){
+                        return createDayTimeSlotsSmallClass(d, timeSlotsList);
+                    }else{
+                        return createDayTimeSlots(d, timeSlotsList);
+                    }
+
                 });
     }
 
@@ -142,6 +149,22 @@ public class AvaliableTimeServiceXV1 {
         result.setDay(DateUtil.formatLocalDate(date));
         List<TimeSlots> list = timeSlotsList.stream()
                 .filter(BaseTimeSlots::roll)
+                .map(baseTimeSlots -> {
+                    TimeSlots timeSlots = new TimeSlots();
+                    timeSlots.setSlotId(baseTimeSlots.getSlotId().longValue());
+                    timeSlots.setStartTime(DateUtil.timeShortString(baseTimeSlots.getStartTime()));
+                    timeSlots.setEndTime(DateUtil.timeShortString(baseTimeSlots.getEndTime()));
+                    return timeSlots;
+                }).collect(Collectors.toList());
+        result.setDailyScheduleTime(list);
+        return result;
+    }
+
+    public DayTimeSlots createDayTimeSlotsSmallClass(LocalDateTime date, List<BaseTimeSlots> timeSlotsList) {
+        DayTimeSlots result = new DayTimeSlots();
+        result.setDay(DateUtil.formatLocalDate(date));
+        List<TimeSlots> list = timeSlotsList.stream()
+                .filter(BaseTimeSlots::rollForSmallClass)
                 .map(baseTimeSlots -> {
                     TimeSlots timeSlots = new TimeSlots();
                     timeSlots.setSlotId(baseTimeSlots.getSlotId().longValue());
