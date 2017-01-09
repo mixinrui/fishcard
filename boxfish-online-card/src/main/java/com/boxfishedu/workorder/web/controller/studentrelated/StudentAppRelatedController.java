@@ -139,6 +139,17 @@ StudentAppRelatedController {
         return avaliableTimeServiceXV1.getDelayWeekDays();
     }
 
+    /**
+     * 小班课 延迟选时间
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/v1/delay/week/smallclass" ,method = RequestMethod.GET)
+    public JsonResultModel getDelaySmallClassWeeks(Long userId)throws  Exception{
+        return avaliableTimeServiceXV1.getDelayWeekDays();
+    }
+
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
     public JsonResultModel timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
         commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(), userId);

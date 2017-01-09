@@ -381,17 +381,21 @@ public class DateUtil {
     }
 
 
-    //注：周日是一周的开始 获取周一的日期
+    //注：周日是一周的开始 获取周一的日期  week 2345671
     public static Date getMonday(Date date)throws Exception{
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int week = cal.get(Calendar.DAY_OF_WEEK);
-        if(week>2){
-            cal.add(Calendar.DAY_OF_MONTH,-(week-2)+7);
+        if(week>=2){
+            cal.add(Calendar.DAY_OF_MONTH,-(week-2));
         }else{
-            cal.add(Calendar.DAY_OF_MONTH,2-week+7);
+            cal.add(Calendar.DAY_OF_MONTH,1-7);
         }
         return cal.getTime();
+    }
+
+    public static void main(String[] args) throws Exception{
+        System.out.print(Date2String24(  getMonday(new Date())));
     }
 
 
