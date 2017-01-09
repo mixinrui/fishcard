@@ -1,36 +1,23 @@
 package com.boxfishedu.workorder.requester;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
-import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.service.instantclass.InstantRecommandAlthom;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +30,9 @@ public class InstantTeacherRequester {
     private UrlConf urlConf;
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
 
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -77,6 +67,7 @@ public class InstantTeacherRequester {
         instantAssignTeacherParam.setSlotId(instantClassCard.getSlotId());
         instantAssignTeacherParam.setStudentId(instantClassCard.getStudentId());
         instantAssignTeacherParam.setTeacherId(teacherInstantRequestParam.getTeacherId());
+        ThreadLocalUtil.instantAssignTeacherParam.set(instantAssignTeacherParam);
         return this.assignGrabteacher(instantAssignTeacherParam);
     }
 
@@ -119,6 +110,27 @@ public class InstantTeacherRequester {
         }
     }
 
+    public void cancelInstantTeacherAsync(InstantAssignTeacherParam instantAssignTeacherParam) {
+        threadPoolManager.execute(new Thread(() -> {
+            this.cancelInstantTeacher(instantAssignTeacherParam);
+        }));
+    }
+
+    public JsonResultModel cancelInstantTeacher(InstantAssignTeacherParam instantAssignTeacherParam) {
+        String url = String.format("%s/immediately/course/schedule/online/grab/cancel",
+                                   urlConf.getTeacher_service());
+        JsonResultModel jsonResultModel = null;
+        try {
+            jsonResultModel = restTemplate.postForObject(url, instantAssignTeacherParam, JsonResultModel.class);
+            logger.debug("@cancelInstantTeacher#success#取消立即教师成功,url[{}],参数[{}],结果[{}]"
+                    , url, JacksonUtil.toJSon(instantAssignTeacherParam), JacksonUtil.toJSon(jsonResultModel));
+        } catch (Exception ex) {
+            logger.error("@cancelInstantTeacher#success#取消立即教师失败,url[{}],参数[{}],结果[{}]"
+                    , url, JacksonUtil.toJSon(instantAssignTeacherParam), JacksonUtil.toJSon(jsonResultModel));
+        }
+        return null;
+    }
+
     private void log(JsonResultModel jsonResultModel, InstantClassCard instantClassCard, String url, InstantFetchTeacherParam fetchTeacherParam) {
         List<Long> teachers = jsonResultModel.getListData(Long.class);
         if (CollectionUtils.isEmpty(teachers)) {
@@ -148,7 +160,7 @@ public class InstantTeacherRequester {
     }
 
     @Data
-    class InstantAssignTeacherParam {
+    public static class InstantAssignTeacherParam {
         private Long day;
         private Long slotId;
         private Long teacherId;
