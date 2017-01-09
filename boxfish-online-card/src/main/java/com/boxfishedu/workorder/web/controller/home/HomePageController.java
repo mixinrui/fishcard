@@ -17,6 +17,7 @@ import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmis
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,4 +53,47 @@ HomePageController {
         return homePageServiceX.getHomePage(order_type, studentId);
     }
 
+    @RequestMapping(value = "/student/{student_id}/public", method = RequestMethod.GET)
+    public JsonResultModel publicClassInfo(){
+        List<AccountCourseBean.CardCourseInfo> cardCourseInfos= Lists.newArrayList();
+
+        AccountCourseBean.CardCourseInfo cardCourseInfo=new AccountCourseBean.CardCourseInfo();
+        cardCourseInfo.setCourseId("L3NoYXJlL3N2bi9MZXZlbCAzX0NvbnZlcnNhdGlvbjIvMDExLumtlOacr-W4iOeahOW4veWtkOmHjOmDveiXj-edgOS7gOS5iO-8ny54bHN4");
+        cardCourseInfo.setCourseName("魔术师的帽子里都藏着什么？");
+        cardCourseInfo.setCourseType("CONVERSATION");
+        cardCourseInfo.setDateInfo(new Date());
+        cardCourseInfo.setDifficulty("LEVEL_2");
+        cardCourseInfo.setSmallClassId(15l);
+        cardCourseInfo.setThumbnail("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
+
+        AccountCourseBean.CardCourseInfo cardCourseInfo2=new AccountCourseBean.CardCourseInfo();
+        cardCourseInfo2.setCourseId("L3NoYXJlL3N2bi9MZXZlbCAzX0Z1bmN0aW9uMS8wMDMu5aaC5L2V5omT5ZCs5p-Q5Lq65piv6LCB77yfLnhsc3g");
+        cardCourseInfo2.setCourseName("如何询问你爸爸是做什么的");
+        cardCourseInfo2.setCourseType("CONVERSATION");
+        cardCourseInfo2.setDateInfo(new Date());
+        cardCourseInfo2.setDifficulty("LEVEL_3");
+        cardCourseInfo2.setSmallClassId(16l);
+        cardCourseInfo2.setThumbnail("https://api.boxfish.cn/student/publication/data/data/54b968303779a9d52ef68b4a201e97c1");
+
+        AccountCourseBean.CardCourseInfo cardCourseInfo3=new AccountCourseBean.CardCourseInfo();
+        cardCourseInfo3.setCourseId("L3NoYXJlL3N2bi9MZXZlbCA4X1JlYWRpbmc0LzAwNy7njq_kv53kuI7nvo7po5_lj6_ku6XlhbzlvpflkJfvvJ8ueGxzeA");
+        cardCourseInfo3.setCourseName("环保与美食可以兼得吗？");
+        cardCourseInfo3.setCourseType("CONVERSATION");
+        cardCourseInfo3.setDateInfo(new Date());
+        cardCourseInfo3.setDifficulty("LEVEL_4");
+        cardCourseInfo3.setSmallClassId(16l);
+        cardCourseInfo3.setThumbnail("http://api.boxfish.cn/student/publication/data/data/4949758367abb93e9f321d0ef50cede1");
+
+
+        AccountCourseBean.CardCourseInfo cardCourseInfo4=new AccountCourseBean.CardCourseInfo();
+        cardCourseInfo4.setCourseId("L3NoYXJlL3N2bi9MZXZlbCAzX0Z1bmN0aW9uMS8wMzAu5oCO5qC36K-i6Zeu5aSp5rCU5oOF5Ya177yfLnhsc3g");
+        cardCourseInfo4.setCourseName("怎样询问天气情况？");
+        cardCourseInfo4.setCourseType("FUNCTION");
+        cardCourseInfo4.setDateInfo(new Date());
+        cardCourseInfo4.setDifficulty("LEVEL_5");
+        cardCourseInfo4.setSmallClassId(16l);
+        cardCourseInfo4.setThumbnail("http://api.boxfish.cn/student/publication/data/data/1bcdfc18e71a4e94301d96099d5fb502");
+
+        return JsonResultModel.newJsonResultModel(cardCourseInfos);
+    }
 }
