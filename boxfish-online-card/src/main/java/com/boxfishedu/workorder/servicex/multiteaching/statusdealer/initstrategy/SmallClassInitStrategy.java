@@ -118,7 +118,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     public void persistGroupClass(SmallClass smallClass) {
         smallClassJpaRepository.save(smallClass);
         smallClass.getAllCards().forEach(workOrder -> {
-            workOrderService.saveWorkOrderAndSchedule();
+//            workOrderService.saveWorkOrderAndSchedule();
         });
     }
 
