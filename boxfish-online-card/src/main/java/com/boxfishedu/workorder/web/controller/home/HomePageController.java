@@ -94,6 +94,10 @@ HomePageController {
         cardCourseInfo4.setSmallClassId(16l);
         cardCourseInfo4.setThumbnail("http://api.boxfish.cn/student/publication/data/data/1bcdfc18e71a4e94301d96099d5fb502");
 
+        cardCourseInfos.add(cardCourseInfo);
+        cardCourseInfos.add(cardCourseInfo2);
+        cardCourseInfos.add(cardCourseInfo3);
+        cardCourseInfos.add(cardCourseInfo4);
         return JsonResultModel.newJsonResultModel(cardCourseInfos);
     }
 }
