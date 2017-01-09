@@ -59,7 +59,7 @@ public class Timer6Group extends GroupBuilder {
             smallClass.setGroupLeaderCard(leader.getId());
             smallClass.setRoleId(leader.getSkuId());
             smallClass.setSmallClassType(SmallClassType.SMALL.name());
-            smallClass.setAllCardIds(this.fetchCardIds(groupMembers));
+            smallClass.setAllCards(groupMembers);
             smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
 
             new SmallClassEvent(smallClass, SmallClassCardStatus.CREATE);
