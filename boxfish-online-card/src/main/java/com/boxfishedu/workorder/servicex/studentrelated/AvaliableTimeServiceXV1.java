@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
@@ -101,7 +102,7 @@ public class AvaliableTimeServiceXV1 {
                 (localDateTime, dayTimeSlot) -> {
 
                     //小班课
-                    if("SMALLCLASS".equals(avaliableTimeParam.getClassType())){
+                    if(ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType())){
                             dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
                                     .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
                                             &&
@@ -134,7 +135,7 @@ public class AvaliableTimeServiceXV1 {
                     }
 
                     //小班课单独处理 只分0% 和 100% 对待
-                    if("SMALLCLASS".equals(avaliableTimeParam.getClassType())){
+                    if(ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType())){
                         return createDayTimeSlotsSmallClass(d, timeSlotsList);
                     }else{
                         return createDayTimeSlots(d, timeSlotsList);

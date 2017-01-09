@@ -58,4 +58,6 @@ public class FishCardFilterParam {
 
     private Boolean   showGroup ;// 是否显示group信息  null 和 true 显示  false 不显示
 
+    private String classType;// classType   SMALL  小班课  PULIC 公开课  NORMAL 正常课程（1对1）
+
 }
