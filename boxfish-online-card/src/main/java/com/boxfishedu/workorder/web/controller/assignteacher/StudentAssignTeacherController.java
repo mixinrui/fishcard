@@ -2,19 +2,13 @@ package com.boxfishedu.workorder.web.controller.assignteacher;
 
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.entity.mysql.CourseInfo;
 import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherService;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionAssignTeacherChecker;
-import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionChecker;
-import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
-import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
 import com.boxfishedu.workorder.web.param.StTeacherInviteParam;
 import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +45,21 @@ public class StudentAssignTeacherController {
     //本地异常日志记录对象
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-//    @RequestMapping(value = "{teacherId}/test", method = RequestMethod.GET)
-//    public JsonResultModel test(@PathVariable("teacherId") Long teacherId) {
-//         assignTeacherService.pushTeacherList(teacherId);
-//        return JsonResultModel.newJsonResultModel(null);
-//    }
+
+
+    @RequestMapping(value = "{teacherId}/paytest", method = RequestMethod.GET)
+    public JsonResultModel payTest(@PathVariable("teacherId") Long teacherId) {
+        assignTeacherService.pushPayTest(teacherId);
+        return JsonResultModel.newJsonResultModel(null);
+    }
+
+
+    @RequestMapping(value = "{teacherId}/test", method = RequestMethod.GET)
+    public JsonResultModel test(@PathVariable("teacherId") Long teacherId) {
+         assignTeacherService.pushTeacherList(teacherId);
+        return JsonResultModel.newJsonResultModel(null);
+    }
+
 
 
     //1 判断指定这位老师上课 按钮是否出现

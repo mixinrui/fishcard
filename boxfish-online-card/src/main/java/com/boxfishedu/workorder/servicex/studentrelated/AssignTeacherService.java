@@ -500,8 +500,7 @@ public class AssignTeacherService {
         Service service = serveService.findTop1ByOrderId(studentTeacherParam.getOrderId());
 
         if (null == service) {
-            logger.info("changeATeacher 订单id:[{}]", studentTeacherParam.getOrderId());
-            throw new BusinessException("数据有误");
+
         }
 
         logger.info("changeATeacher studentTeacherParam:getStudentId:[{}],getOrderId:[{}],getTeacherId:[{}]", studentTeacherParam.getStudentId(), studentTeacherParam.getOrderId(), studentTeacherParam.getTeacherId());
@@ -568,6 +567,27 @@ public class AssignTeacherService {
         jsonObject.put("push_title", pushTitle);
         jsonObjectData.put("push_title", pushTitle);
         jsonObjectData.put("type", "ASSIGNTEACHER");
+        jsonObjectData.put("user_id", teahcerId);
+        jsonObject.put("data", jsonObjectData);
+
+        teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
+        logger.info("pushTeacherList::end");
+    }
+
+    public void pushPayTest(Long teahcerId) {
+        logger.info("pushTeacherList::begin");
+
+        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObjectData = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
+        String pushTitle = "测试数据,请忽略!";
+
+        jsonArray.add(teahcerId);
+        jsonObject.put("user_id", jsonArray);
+        jsonObject.put("push_title", pushTitle);
+        jsonObjectData.put("push_title", pushTitle);
+        jsonObjectData.put("type", "pay-success");
         jsonObjectData.put("user_id", teahcerId);
         jsonObject.put("data", jsonObjectData);
 

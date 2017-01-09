@@ -27,7 +27,7 @@ public class SmallClassTeacherController {
 
     @RequestMapping(value = "/{smallclass_id}/detail", method = RequestMethod.GET)
     public JsonResultModel classDetail(@PathVariable("smallclass_id") Long smallClassId) {
-        SmallClass smallClass=new SmallClass();
+        SmallClass smallClass = new SmallClass();
         smallClass.setGroupLeaderCard(1L);
         smallClass.setGroupLeader(11L);
         smallClass.setSmallClassType(SmallClassType.SMALL.name());
@@ -48,8 +48,8 @@ public class SmallClassTeacherController {
         return JsonResultModel.newJsonResultModel(smallClass);
     }
 
-    @RequestMapping(value = "/{smallclass_id}/status", method = RequestMethod.GET)
-    public JsonResultModel status(@RequestBody Map<String,String> statusReport){
+    @RequestMapping(value = "/{smallclass_id}/status", method = RequestMethod.POST)
+    public JsonResultModel status(@RequestBody Map<String, String> statusReport) {
         return JsonResultModel.newJsonResultModel("success");
     }
 }

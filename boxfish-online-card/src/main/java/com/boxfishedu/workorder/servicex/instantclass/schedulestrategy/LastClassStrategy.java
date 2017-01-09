@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.LogPoolManager;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -120,7 +121,9 @@ public class LastClassStrategy implements ScheduleStrategy {
 
     private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder, Map<WorkOrder, String> logMap) {
         if (instantClassCard.getWorkorderId() != firstWorkOrder.getId()) {
-            logger.error("@initCardAndSchedule#exception数据存在问题,放弃匹配教师,鱼卡:{}", firstWorkOrder);
+            WorkOrder instantWorkOrder = workOrderService.findOne(instantClassCard.getWorkorderId());
+            logger.error("@initCardAndSchedule#exception数据存在问题,放弃匹配教师,鱼卡:[{}],instantcard:[{}],instantWorkOrder[{}]"
+                    , firstWorkOrder, JacksonUtil.toJSon(instantClassCard), JacksonUtil.toJSon(instantWorkOrder));
             throw new BusinessException("内部数据错误");
         }
         String oldTime = DateUtil.Date2String(firstWorkOrder.getStartTime());

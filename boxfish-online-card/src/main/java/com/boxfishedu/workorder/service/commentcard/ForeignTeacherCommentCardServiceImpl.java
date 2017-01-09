@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.config.ServiceGateWayType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NotFoundException;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
+import com.boxfishedu.workorder.common.log.CommentCardLog;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -142,6 +143,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 return newCommentCard;
             }catch (Exception e){
                 flag = false;
+                logger.error(new CommentCardLog(userId)
+                        .data(commentCardForm)
+                        .errorLevel()
+                        .operation("学生新增外教点评")
+                        .toString());
                 throw new RuntimeException(e);
             }finally {
                 if(flag){
@@ -162,6 +168,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("@foreignTeacherCommentUpdateAnswer1 接收师生运营分配老师:"+fromTeacherStudentForm+",并准备修改点评卡:"+commentCard);
         if (Objects.isNull(commentCard)){
             logger.info("@foreignTeacherCommentUpdateAnswer2 根据点评卡id查到的点评卡为空,点评卡id来自师生运营回传参数:"+fromTeacherStudentForm);
+            logger.error(new CommentCardLog(fromTeacherStudentForm.getTeacherId())
+                    .data(fromTeacherStudentForm)
+                    .errorLevel()
+                    .operation("点评卡分配老师")
+                    .toString());
             throw new UnauthorizedException("不存在的点评卡!");
         }else {
             if(Objects.isNull(fromTeacherStudentForm.getTeacherId())){
@@ -242,6 +253,10 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         CommentCard commentCard = commentCardJpaRepository.findByIdAndStudentId(id,userId);
         if(Objects.isNull(commentCard)){
             logger.info("用户所查点评卡不存在,用户userId="+userId,", 点评卡id="+id);
+            logger.error(new CommentCardLog(userId)
+                    .errorLevel()
+                    .operation("学生查看点评卡")
+                    .toString());
             throw new UnauthorizedException();
         }
         if(commentCard.getStudentReadFlag() == CommentCardStatus.STUDENT_UNREAD.getCode()){
@@ -353,6 +368,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     commentCardJpaRepository.save(newCommentCard);
                 }
             } catch (Exception e) {
+                logger.error(new CommentCardLog()
+                        .data(list)
+                        .errorLevel()
+                        .operation("外教点评:24-48小时之间业务处理")
+                        .toString());
                 e.printStackTrace();
             }
             logger.info("@foreignTeacherCommentUnAnswer16 所有在24小时内为被点评的学生已重新请求分配外教完毕,一共重新分配外教点评的个数为:" + list.size());
@@ -414,6 +434,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 logger.info("@foreignTeacherCommentUnAnswer26 次数修改,通知客服系统....");
                 syncCommentCard2SystemService.syncCommentCard2System(serviceTemp.getId(),commentCard.getStatus(),commentCard.getTeacherAnswerTime());
             } catch (Exception e) {
+                logger.error(new CommentCardLog()
+                        .data(list)
+                        .errorLevel()
+                        .operation("外教点评:超过48小时之间业务处理")
+                        .toString());
                 e.printStackTrace();
             }
         }
@@ -468,6 +493,11 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     logger.info("@foreignUndistributedTeacherCommentCards3 向教师端推送消息失败,推送失败的教师teacherId=" + innerTeacher.getTeacherId());
                 }
             } catch (Exception e) {
+                logger.error(new CommentCardLog()
+                        .data(list)
+                        .errorLevel()
+                        .operation("外教点评:扫描未分配老师点评,为其分配内部账号")
+                        .toString());
                 e.printStackTrace();
             }
         }
