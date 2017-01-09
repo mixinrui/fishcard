@@ -72,7 +72,6 @@ public class StAssignTeacherService {
     @Transactional
     public void doAssignTeacher(Long teacherId, Long studentId, List<CourseSchedule> aggressorCourseSchedules,List<CourseSchedule> alreadyCourseSchedules,
                                 String channel, Integer skuId) {
-        List<String> classTypes = Lists.newArrayList(ClassTypeEnum.PUBLIC.name(),ClassTypeEnum.SMALL.name());
         Date startTime = DateTime.now().plusHours(48).toDate();
         logger.info("@@@@assign 指定老师 stp-2:::初始化:::channel=={}======>>>APP端学生ID:{}===>>>>发起指定老师:{}" +
                         "===>>skuId:{}====>>鱼卡IDS:{}===>>>总共{}条",
