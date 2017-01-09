@@ -15,7 +15,7 @@ public class AccountCourseBean {
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class CardCourseInfo{
+    public static class CardCourseInfo {
         private String courseId;
         private String courseName;
         private String courseType;
@@ -27,6 +27,9 @@ public class AccountCourseBean {
         //2012-11-12 11:11:11
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Date dateInfo;
+
+        //小班课id[如果是公开课,小班课]
+        private Long smallClassId;
     }
 
 }
