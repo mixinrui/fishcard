@@ -39,7 +39,7 @@ public class RecommendHandlerHelper {
 
 
     @Autowired
-    public RecommendHandlerHelper(List<RecommendHandler> handlerList, MailSupport mailSupport) {
+    public RecommendHandlerHelper(List<RecommendHandler> handlerList) {
         if(CollectionUtils.isEmpty(handlerList)) {
             return;
         }
