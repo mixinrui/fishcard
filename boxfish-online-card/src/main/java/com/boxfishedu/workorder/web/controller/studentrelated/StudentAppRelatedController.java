@@ -112,6 +112,25 @@ StudentAppRelatedController {
     }
 
 
+    /**
+     * 学生公开课
+     * @param studentId
+     * @param level
+     * @return
+     */
+    @RequestMapping(value = "{studentId}/schedule/public", method = RequestMethod.GET)
+    public JsonResultModel courseSchedulePublic(@PathVariable Long studentId, String level) {
+        return JsonResultModel.newJsonResultModel(timePickerServiceXV1.getStudentPublicClassTimeEnum(level));
+    }
+
+    @RequestMapping(value = "/enter/publicClassRoom", method = RequestMethod.PUT)
+    public JsonResultModel enterClassRoom(
+            Long userId, Integer slotId, @RequestParam(value = "access_token") String accessToken) {
+        return JsonResultModel.newJsonResultModel(
+                timePickerServiceXV1.enterPublicClassRoom(userId, slotId, accessToken));
+    }
+
+
     @RequestMapping(value = "{student_Id}/schedule/month", method = RequestMethod.GET)
     public JsonResultModel courseScheduleList(
             @PathVariable("student_Id") Long studentId, Long userId, Locale locale) {

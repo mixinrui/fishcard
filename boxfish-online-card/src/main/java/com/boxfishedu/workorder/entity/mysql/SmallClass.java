@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.entity.mysql;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;

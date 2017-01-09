@@ -39,7 +39,7 @@ public interface SelectMode {
         workOrder.setSkuIdExtra(service.getSkuId().intValue());
         workOrder.setOrderChannel(service.getOrderChannel());
         // 鱼卡的上课类型: 1对1, 小班课, 公开课
-        workOrder.setClassType(ClassTypeEnum.resolveByComboType(service.getComboType()).name());
+        workOrder.setClassType(ClassTypeEnum.resolveByComboType(service.getComboType()).toString());
         return workOrder;
     }
 

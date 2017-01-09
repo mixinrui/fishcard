@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.CourseView;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
@@ -20,11 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.net.URI;
+import java.util.*;
 
 /**
  * Created by LuoLiBing on 16/4/25.
@@ -86,12 +86,25 @@ public class ServiceSDK {
     }
 
 
-
     public CourseView getCourseInfoByWorkOrderId(Long workOrderId, Locale locale) {
         ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(workOrderId);
         return getCourseInfo(scheduleCourseInfo, locale);
     }
 
+
+    /**
+     * 判断是否是会员
+     * @param accessToken
+     * @return
+     */
+    public JsonResultModel getMemberInfo(String accessToken) {
+        try {
+            return restTemplate.getForObject(createMemberInfo(accessToken), JsonResultModel.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonResultModel.EMPTY;
+        }
+    }
 
     public CourseView getCourseInfo(ScheduleCourseInfo scheduleCourseInfo, Locale locale){
         CourseView courseView = CourseView.courseViewAdapter(scheduleCourseInfo);
@@ -138,5 +151,14 @@ public class ServiceSDK {
         param.put("end", dateRangeForm.getEndLongValue());
         logger.info("获取教师[{}]的参数:{}",teacherId, JacksonUtil.toJSon(param));
         return param;
+    }
+
+
+    private URI createMemberInfo(String accessToken) {
+        return UriComponentsBuilder.fromUriString(urlConf.getMemberUrl())
+                .path("/info")
+                .queryParam("access_token", accessToken)
+                .build()
+                .toUri();
     }
 }

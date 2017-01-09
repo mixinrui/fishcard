@@ -11,7 +11,8 @@ public enum ClassTypeEnum {
     // 小班课
     SMALL("SMALL"),
     // 公开课
-    PUBLIC("PUBLIC");
+    PUBLIC("PUBLIC"),
+    DEFAULT(null);
 
     private String value;
 
@@ -29,7 +30,7 @@ public enum ClassTypeEnum {
         try {
             comboTypeToRoleId = Enum.valueOf(ComboTypeToRoleId.class, comboType);
         } catch (Exception e) {
-            return NORMAL;
+            return DEFAULT;
         }
         switch (comboTypeToRoleId) {
             case SMALLCLASS: return SMALL;

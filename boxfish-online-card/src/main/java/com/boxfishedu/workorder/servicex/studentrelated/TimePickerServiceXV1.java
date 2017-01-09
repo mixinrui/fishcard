@@ -1,11 +1,15 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.mall.enums.TutorType;
-import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.common.bean.CourseDifficultyEnum;
+import com.boxfishedu.workorder.common.bean.PublicClassTimeEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentSchemaJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -31,6 +35,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,9 +91,14 @@ public class TimePickerServiceXV1 {
     @Autowired
     private DataCollectorService dataCollectorService;
 
-
     @Autowired
     private StStudentSchemaJpaRepository stStudentSchemaJpaRepository;
+
+    @Autowired
+    private SmallClassJpaRepository smallClassJpaRepository;
+
+    @Autowired
+    private PublicClassRoom publicClassRoom;
 
     /**
      * 学生选择时间
@@ -179,12 +190,22 @@ public class TimePickerServiceXV1 {
             timePickerService.getRecommandTeachers(serviceList.get(0), courseSchedules);
         }
 
-
         // 通知其他模块
         notifyOtherModules(workOrderList, serviceList.get(0));
 
         logger.info("学生[{}]选课结束", serviceList.get(0).getStudentId());
         return JsonResultModel.newJsonResultModel();
+    }
+
+
+    public PublicClassTimeEnum.TimeRange getStudentPublicClassTimeEnum(String level) {
+        CourseDifficultyEnum courseDifficulty;
+        try {
+            courseDifficulty = CourseDifficultyEnum.valueOf(level);
+            return PublicClassTimeEnum.publicClassTime(courseDifficulty).getTimeRange();
+        } catch (Exception e) {
+            throw new BusinessException("错误的level等级");
+        }
     }
 
 
@@ -230,5 +251,26 @@ public class TimePickerServiceXV1 {
             }
         }
         return services;
+    }
+
+
+    /**
+     * 学生进入公开课课堂
+     * @return
+     */
+    @Transactional
+    public SmallClass enterPublicClassRoom(Long studentId, Integer slotId, String accessToken) {
+
+        // 即使有2个一样的, 只返回第一个
+        List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndSmallClassType(
+                DateUtil.convertToDate(LocalDate.now()), slotId, ClassTypeEnum.PUBLIC.name());
+        if(CollectionUtils.isEmpty(publicClassList)) {
+            throw new BusinessException("今天没有对应的公开课!");
+        }
+
+        // 以后可能会同一时间多节公开课
+        SmallClass smallClass = publicClassList.get(0);
+        publicClassRoom.enter(smallClass, studentId, accessToken);
+        return smallClass;
     }
 }

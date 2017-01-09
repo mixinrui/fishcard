@@ -81,4 +81,8 @@ public class UrlConf {
     @Value("${parameter.recipients}")
     private List<String> recipients;
 
+    // 会员
+    @Value("${interface.address.memberUrl}")
+    private String memberUrl;
+
 }

@@ -115,11 +115,9 @@ public class RabbitMqReciver {
      * 订单中心转换请求
      */
     @RabbitListener(queues = RabbitMqConstant.ORDER_TO_SERVICE_QUEUE)
-    public void orderConsumer(Map orderViewMap) {
-        OrderForm orderView = null;
+    public void orderConsumer(OrderForm orderView) {
         logger.info("@orderConsumer");
         try {
-            orderView = objectMapper.convertValue(orderViewMap, OrderForm.class);
             System.out.println(orderView);
             serveService.order2ServiceAndWorkOrder(orderView);
 
@@ -130,7 +128,7 @@ public class RabbitMqReciver {
             ex.printStackTrace();
             logger.error(
                     new ServiceLog()
-                            .data(orderViewMap)
+                            .data(orderView)
                             .errorLevel()
                             .operation("订单转换为服务")
                             .toString());

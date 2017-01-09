@@ -3,8 +3,6 @@ package com.boxfishedu.workorder.common.util;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.joda.time.DateTime;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -121,6 +119,10 @@ public class DateUtil {
 
     public static LocalTime parseLocalTime(String time) {
         return LocalTime.parse(time, timeFormatter);
+    }
+
+    public static String formatLocalTime(LocalTime localTime) {
+        return timeFormatter.format(localTime);
     }
 
     public static String formatLocalDateTime(LocalDateTime localDateTime) {
@@ -440,6 +442,15 @@ public class DateUtil {
         return parseTime(monday,1)  ;
     }
 
+    public static LocalDate getFirstDateOfWeek(LocalDate localDate) {
+        int value = localDate.getDayOfWeek().getValue();
+        return localDate.minusDays(value - 1);
+    }
+
+    public static LocalDate getLastDateOfWeek(LocalDate localDate) {
+        int value = localDate.getDayOfWeek().getValue();
+        return localDate.plusDays(7 - value);
+    }
 
     private static int getMondayPlus() {
         Calendar cd = Calendar.getInstance();

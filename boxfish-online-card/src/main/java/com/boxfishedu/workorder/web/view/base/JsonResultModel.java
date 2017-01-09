@@ -17,6 +17,8 @@ public class JsonResultModel implements Serializable {
         return new JsonResultModel(data);
     }
 
+    public final static JsonResultModel EMPTY = new JsonResultModel();
+
     public static JsonResultModel newJsonResultModel() {
         return new JsonResultModel("ok");
     }
