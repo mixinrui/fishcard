@@ -141,7 +141,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     int setFixedStatusRechargeFor(Integer rechargeCodeAfter, Long id, Integer rechargeCodeBefore);
 
     //  获取未来两天内 未安排教师的鱼卡信息  teacherid =0
-    @Query(value = "select wo from WorkOrder wo where wo.teacherId=?1 and wo.isFreeze=?2 and wo.startTime between ?3 and ?4 and wo.createTime<?5 and wo.classType not in(?6)    order by wo.startTime")
+    @Query(value = "select wo from WorkOrder wo where wo.teacherId=?1 and wo.isFreeze=?2 and wo.startTime between ?3 and ?4 and wo.createTime<?5 and (wo.classType not in(?6) or wo.classType is null)    order by wo.startTime")
     public List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(Long teacherId, Integer isFreeze, Date startDate, Date endDate, Date createTime,List<String> classTypes);
 
     //查找出学生所有状态的工单

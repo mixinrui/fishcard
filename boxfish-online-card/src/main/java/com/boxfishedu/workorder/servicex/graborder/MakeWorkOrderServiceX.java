@@ -70,20 +70,20 @@ public class MakeWorkOrderServiceX {
     public void makeTest(Long teacherId) {
         List<WorkOrder> workOrderNOteacher = makeWorkOrderService.findByTeacherIdAndStartTimeBetweenOrderByStartTime();
 
-
-        List<TeacherForm> teacherForms = Lists.newArrayList();
-        TeacherForm tf = new TeacherForm();
-        tf.setTeacherId(teacherId);
-        tf.setTeacherType(TeachingType.WAIJIAO.getCode());
-        teacherForms.add(tf);
-
-        Map map = Maps.newConcurrentMap();
-        map.put(tf.getTeacherId(), workOrderNOteacher);
-
-
-        makeWorkOrderService.saveCurrentworkOrderMap(map);
-
-        pushTeacherList(map);
+        workOrderNOteacher.size();
+//        List<TeacherForm> teacherForms = Lists.newArrayList();
+//        TeacherForm tf = new TeacherForm();
+//        tf.setTeacherId(teacherId);
+//        tf.setTeacherType(TeachingType.WAIJIAO.getCode());
+//        teacherForms.add(tf);
+//
+//        Map map = Maps.newConcurrentMap();
+//        map.put(tf.getTeacherId(), workOrderNOteacher);
+//
+//
+//        makeWorkOrderService.saveCurrentworkOrderMap(map);
+//
+//        pushTeacherList(map);
 
 
     }
