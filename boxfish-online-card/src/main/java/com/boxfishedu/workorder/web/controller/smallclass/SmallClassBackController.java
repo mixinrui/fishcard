@@ -20,27 +20,27 @@ import java.util.List;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/service/backend/smallclass")
+@RequestMapping("/service/backend")
 public class SmallClassBackController {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @RequestMapping(value = "/slot", method = RequestMethod.GET)
+    @RequestMapping(value = "/smallclass/slot", method = RequestMethod.GET)
     public JsonResultModel publicSlots(String roleId) {
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(Long.parseLong(roleId));
         List<TimeSlots> timeSlotses = dayTimeSlots.getDailyScheduleTime();
         return JsonResultModel.newJsonResultModel(timeSlotses);
     }
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/smallclass", method = RequestMethod.POST)
     public JsonResultModel buildPublicClass(PublicClassBuilderParam publicClassBuilderParam) {
         logger.debug("@buildPublicClass创建公开课,参数[{}]", publicClassBuilderParam);
         return JsonResultModel.newJsonResultModel("OK");
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/smallclass", method = RequestMethod.PUT)
     public JsonResultModel updatePublicClass(PublicClassBuilderParam publicClassBuilderParam) {
         logger.debug("@updatePublicClass更新公开课,参数[{}]", publicClassBuilderParam);
         return JsonResultModel.newJsonResultModel("OK");
