@@ -19,6 +19,7 @@ public class MailParam {
     private String from;
 
     public Object[] params() {
-        return new Object[] {recipients, content, subject, from};
+        // 收件人, 内容, 主题是可变的
+        return new Object[] {recipients, content, subject};
     }
 }

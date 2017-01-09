@@ -16,4 +16,5 @@ public class CommentCardUrlConf {
     private String pushInfoIrl;
     private String innerTeacherUrl;
     private String scoreUrl;
+    private String errorReportMailUrl;
 }

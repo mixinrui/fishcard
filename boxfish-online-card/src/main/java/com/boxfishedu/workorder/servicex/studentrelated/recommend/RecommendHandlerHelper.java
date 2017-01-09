@@ -4,12 +4,14 @@ import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.log.RecommendLog;
+import com.boxfishedu.workorder.common.util.MailSupport;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseType2TeachingTypeService;
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,11 @@ public class RecommendHandlerHelper {
 
 
     @Autowired
-    public RecommendHandlerHelper(List<RecommendHandler> handlerList) {
+    private MailSupport mailSupport;
+
+
+    @Autowired
+    public RecommendHandlerHelper(List<RecommendHandler> handlerList, MailSupport mailSupport) {
         if(CollectionUtils.isEmpty(handlerList)) {
             return;
         }
@@ -68,6 +74,7 @@ public class RecommendHandlerHelper {
                             .operation("课程推荐")
                             .errorLevel()
                             .toString());
+            mailSupport.reportError("课程推荐失败", timeSlotParam + "/n" + ExceptionUtils.getStackTrace(e));
             throw new BusinessException("暂时没有与你的水平匹配的课程，新课即将上线，请过些时候再选课或者调整学习设置");
         }
 

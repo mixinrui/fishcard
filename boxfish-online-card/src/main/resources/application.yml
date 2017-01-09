@@ -63,6 +63,12 @@ parameter:
   #封面服务器的地址
   thumbnail_server: http://api.boxfish.cn/student/publication/data/data/
 
+  #邮件地址
+  mail_token: Tpn7MvMDAxLuS4reWbveS6uuacgOWuueaYk
+
+  #收件人
+  recipients: luolibing@boxfish.cn
+
 spring.jpa:
   show-sql: true
 #  generate-ddl: true
@@ -204,6 +210,8 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://123.56.13.168:8099/teacher
+    #错误异常提醒邮件发送地址
+#    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
     type: test
 time:
@@ -270,6 +278,8 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://101.201.237.252:8099/teacher
+    #错误异常提醒邮件发送地址
+#    errorReportMailUrl: http://120.27.236.110:9098/mail
 time:
   task:
     nodeOne: 0
@@ -337,6 +347,9 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://101.201.237.252:8099/teacher
+    #错误异常提醒邮件发送地址
+#    errorReportMailUrl: http://120.27.236.110:9098/mail
+
   gateway:
       type: development_new
 time:
@@ -414,6 +427,8 @@ service:
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://123.56.13.168:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
+    #错误异常提醒邮件发送地址
+    errorReportMailUrl: http://localhost:9098/mail
   gateway:
     type: test
 time:
@@ -497,6 +512,8 @@ service:
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://127.0.0.1:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
+    #错误异常提醒邮件发送地址
+    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
       type: pretest
 time:
@@ -569,6 +586,8 @@ service:
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://127.0.0.1:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
+    #错误异常提醒邮件发送地址
+#    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
       type: demo
 time:
@@ -639,6 +658,8 @@ service:
     pushInfoIrl: http://online.boxfish.cn/boxfish-push
     innerTeacherUrl: http://127.0.0.1:8099
     scoreUrl: http://api.online.test.boxfish.cn
+    #错误异常提醒邮件发送地址
+    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
       type: preproduct
 time:
@@ -733,6 +754,8 @@ service:
     pushInfoIrl: http://online.boxfish.cn/boxfish-push
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
     scoreUrl: api.boxfish.cn
+    #错误异常提醒邮件发送地址
+    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
     type: product
 
@@ -805,6 +828,8 @@ service:
     pushInfoIrl: http://online.boxfish.cn/boxfish-push
     innerTeacherUrl: http://online-api.boxfish.cn/teacher
     scoreUrl: api.boxfish.cn
+    #错误异常提醒邮件发送地址
+    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
     type: product
 time:

@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Created by hucl on 16/3/16.
  */
@@ -71,8 +73,12 @@ public class UrlConf {
     @Value("${interface.address.resource_url}")
     private String resource_url;//登录验证URL
 
+    // 邮件服务上报token
+    @Value("${parameter.mail_token}")
+    private String mailToken;
 
-
-
+    // 邮件上报token
+    @Value("${parameter.recipients}")
+    private List<String> recipients;
 
 }

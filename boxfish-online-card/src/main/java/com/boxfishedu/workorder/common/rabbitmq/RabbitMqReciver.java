@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.common.log.ServiceLog;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.common.util.MailSupport;
 import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
@@ -26,6 +27,8 @@ import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerSer
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
@@ -102,6 +105,11 @@ public class RabbitMqReciver {
     @Autowired
     private AssignTeacherServiceX assignTeacherServiceX;
 
+    private final static ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    private MailSupport mailSupport;
+
     /**
      * 订单中心转换请求
      */
@@ -119,6 +127,8 @@ public class RabbitMqReciver {
                             .errorLevel()
                             .operation("订单转换为服务")
                             .toString());
+            mailSupport.reportError("订单" + orderView.getId() + "转换失败", ex);
+            logger.error("订单[{}]转换失败", orderView.getId());
 //            throw new Exception("转换失败放回队列");
         }
 
