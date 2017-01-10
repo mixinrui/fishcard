@@ -41,7 +41,6 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
         //初始化小班课信息
         groupInitStrategy.initGroupClass(smallClass);
 
-
         //保存smallclass
 
         //将小班课信息更新进workorder,courseschedule
