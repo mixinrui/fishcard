@@ -98,10 +98,20 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }
         CommentCard commentCard=CommentCard.getCommentCard(commentCardForm);
         if(!serveService.findFirstAvailableForeignCommentService(userId).isPresent()){
+            logger.error(new CommentCardLog(userId)
+                    .data(commentCardForm)
+                    .errorLevel()
+                    .operation("学生新增外教点评")
+                    .toString());
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
         }
         com.boxfishedu.workorder.entity.mysql.Service service= serveService.findFirstAvailableForeignCommentService(userId).get();
         if(service.getAmount() <= 0){
+            logger.error(new CommentCardLog(userId)
+                    .data(commentCardForm)
+                    .errorLevel()
+                    .operation("学生新增外教点评")
+                    .toString());
             throw new BusinessException("学生的外教点评次数已经用尽,请先购买!");
         }else {
             CommentCard newCommentCard = null;

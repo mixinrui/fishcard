@@ -33,19 +33,24 @@ public class SmallClassTeacherRequester {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final String ONETOONE="ONE_TO_ONE_ONLINE";
-    private final String SMALL_CLASS="SMALL_CLASS";
-    private final String PUBLIC_CLASS="PUBLIC_CLASS";
+    private final String ONETOONE = "ONE_TO_ONE_ONLINE";
+    private final String SMALL_CLASS = "SMALL_CLASS";
+    private final String PUBLIC_CLASS = "PUBLIC_CLASS";
 
     public TeacherView getSmallClassTeacher(SmallClass smallClass) {
-        SmallClassFetchTeacherParam smallClassFetchTeacherParam=new SmallClassFetchTeacherParam();
+        SmallClassFetchTeacherParam smallClassFetchTeacherParam = new SmallClassFetchTeacherParam();
         smallClassFetchTeacherParam.setDay(smallClass.getClassDate().getTime());
         smallClassFetchTeacherParam.setSlotId(smallClass.getSlotId().longValue());
         smallClass.setRoleId(smallClass.getRoleId());
         smallClass.setSmallClassType(SMALL_CLASS);
 
-        String url=String.format("%s/course/schedule/teacher/web/match", urlConf.getTeacher_service());
+        String url = String.format("%s/course/schedule/teacher/web/match", urlConf.getTeacher_service());
         restTemplate.postForObject(url, smallClassFetchTeacherParam, JsonResultModel.class);
+        return null;
+    }
+
+    //获取公开课
+    public TeacherView getPublicTeacher(SmallClass smallClass) {
         return null;
     }
 

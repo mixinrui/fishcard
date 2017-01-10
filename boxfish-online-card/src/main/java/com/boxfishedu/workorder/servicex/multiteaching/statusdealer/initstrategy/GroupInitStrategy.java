@@ -33,12 +33,12 @@ public interface GroupInitStrategy {
                 .teachingType2TutorType();
     }
 
-    void writeTeacherInfoBack(SmallClass smallClass,List<WorkOrder> workOrders);
+    void writeTeacherInfoBack(SmallClass smallClass, List<WorkOrder> workOrders, TeacherView teacherView);
 
-    void writeCourseBack(SmallClass smallClass,List<WorkOrder> workOrders);
+    void writeCourseBack(SmallClass smallClass, List<WorkOrder> workOrders);
 
     @Transactional
-    void persistGroupClass(SmallClass smallClass);
+    void persistGroupClass(SmallClass smallClass, RecommandCourseView recommandCourseView);
 
     void postCreate();
 }

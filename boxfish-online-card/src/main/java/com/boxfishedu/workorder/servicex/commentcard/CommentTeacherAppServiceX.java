@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.common.bean.CommentCardStatus;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.log.CommentCardLog;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
@@ -80,7 +81,11 @@ public class CommentTeacherAppServiceX {
     public void markTeacherRead(TeacherReadMsgParam teacherReadMsgParam){
         CommentCard commentCard=this.findById(teacherReadMsgParam.getCommentCardId());
         if(null==commentCard){
-            logger.error("不存在对应的点评卡,点评卡id[{}]",teacherReadMsgParam.getCommentCardId());
+            logger.error(new CommentCardLog()
+                    .data(teacherReadMsgParam)
+                    .errorLevel()
+                    .operation("老师端标记点评卡已读")
+                    .toString());
             throw new BusinessException("不存在对应的点评卡");
         }
 //        commentCard.setTeacherReadFlag(CommentCardStatus.TEACHER_READ.getCode());
@@ -93,11 +98,21 @@ public class CommentTeacherAppServiceX {
     public void submitComment(@RequestBody CommentCardSubmitParam commentCardSubmitParam){
         CommentCard commentCard=commentCardTeacherAppService.findById(commentCardSubmitParam.getCommentCardId());
         if(null==commentCard){
+            logger.error(new CommentCardLog()
+                    .data(commentCardSubmitParam)
+                    .errorLevel()
+                    .operation("老师提交点评")
+                    .toString());
             throw new BusinessException("不存在对应的点评卡");
         }
 
         // 提交时验证点评状态
         if(!Objects.equals(commentCard.getStatus(),CommentCardStatus.ASSIGNED_TEACHER.getCode())) {
+            logger.error(new CommentCardLog()
+                    .data(commentCardSubmitParam)
+                    .errorLevel()
+                    .operation("老师提交点评")
+                    .toString());
             throw new BusinessException("Sorry! You do not have enough authorization.");
         }
 
@@ -174,14 +189,23 @@ public class CommentTeacherAppServiceX {
         cardCourseInfo.setCourseId(commentCard.getCourseId());
         cardCourseInfo.setCourseName(commentCard.getCourseName());
         if (Objects.nonNull(commentCard.getCourseId())){
-            Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
-            if (Objects.nonNull(typeAndDifficultyMap)){
-                if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
-                    cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
+            try {
+                Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
+                if (Objects.nonNull(typeAndDifficultyMap)){
+                    if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
+                        cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
+                    }
+                    if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
+                        cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()).toString());
+                    }
                 }
-                if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
-                    cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()).toString());
-                }
+            }catch (Exception e){
+                logger.error(new CommentCardLog(commentCard.getTeacherId())
+                        .data(commentCard)
+                        .errorLevel()
+                        .operation("设置首页")
+                        .toString());
+                e.printStackTrace();
             }
         }
         cardCourseInfo.setThumbnail(urlConf.getThumbnail_server()+commentCard.getCover());
