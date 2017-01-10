@@ -407,7 +407,8 @@ public class AssignTeacherService {
      */
     @Transactional
     public JsonResultModel acceptInvitedCourseByStudentId(StTeacherInviteParam stTeacherInviteParam, Long teacherId) {
-        List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findAll(stTeacherInviteParam.getIds());
+        List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.getAllStStudentRecords( StStudentApplyRecords.VALID.yes,stTeacherInviteParam.getIds());
+
         if (CollectionUtils.isEmpty(stStudentApplyRecordsList)) {
             throw new BusinessException("没有查询到匹配的课程");
         }

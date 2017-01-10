@@ -354,10 +354,10 @@ spring:
     username: service
     password: Box123456
   mongo:
-    serverAddress: dds-2ze58022fc5f94941.mongodb.rds.aliyuncs.com:3717,dds-2ze58022fc5f94942.mongodb.rds.aliyuncs.com:3717
+    serverAddress: 123.56.13.168:27017
     dbName: fishcard
     username: root
-    password: Box12345678
+    password: Boxfish2016
   redis:
     hostName: 8619f2f4a93c4a70.m.cnbja.kvstore.aliyuncs.com
 #    hostName: 127.0.0.1
@@ -365,7 +365,7 @@ spring:
     port: 6379
     timeout: 10000
   rabbitmq:
-    address: 123.56.13.168:5672
+    address: 123.56.13.168
 #    port: 5672
     username: admin
     password: boxfish123

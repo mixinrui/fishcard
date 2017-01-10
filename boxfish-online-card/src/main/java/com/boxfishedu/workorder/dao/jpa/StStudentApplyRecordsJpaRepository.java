@@ -29,6 +29,8 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
             "from StStudentApplyRecords s  , WorkOrder wo  where s.workOrderId=wo.id and  s.teacherId=?1 and s.applyTime>?2 and s.valid=?3  and   s.applyStatus!=?4    and wo.startTime between ?5 and ?6  and s.matchStatus=?7 group by s.studentId")
     Page<StStudentApplyRecordsResult> getmyInviteList(Long teacherId, Date date,StStudentApplyRecords.VALID valid,StStudentApplyRecords.ApplyStatus applyStatus , Date startTime,Date endTime,StStudentApplyRecords.MatchStatus matchStatus, Pageable pageable);
 
+    @Query(value ="select s from StStudentApplyRecords s    where s.valid=?1 and  s.id in (?2)")
+    List<StStudentApplyRecords> getAllStStudentRecords(StStudentApplyRecords.VALID  valid, List<Long> ids);
 
     @Query(value = "select s from  StStudentApplyRecords s " +
             " , WorkOrder wo  where s.workOrderId=wo.id and s.applyTime>?1 and s.teacherId = ?2 and s.studentId =?3 and s.valid =?4 and s.applyStatus != ?5 and wo.startTime between ?6 and ?7  and s.matchStatus=?8 order by wo.startTime asc")
@@ -75,4 +77,9 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
     List<StStudentApplyRecords> findByStudentIdAndTeacherIdAndValid(Long studentId,Long teacherId, StStudentApplyRecords.VALID valid);
 
     List<StStudentApplyRecords> findByWorkOrderIdIn(List<Long> workOrderIds);
+
+    /** 根据鱼卡id 设改节鱼卡申请纪录失效  **/
+    @Modifying
+    @Query("update StStudentApplyRecords o set o.valid =?1 where o.workOrderId=?2")
+    int setFixedNoValidFor(StStudentApplyRecords.VALID valid , Long workOrderId);
 }

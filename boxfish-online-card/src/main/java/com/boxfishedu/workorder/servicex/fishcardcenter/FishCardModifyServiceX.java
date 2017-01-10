@@ -23,6 +23,7 @@ import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherFixService;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.FishCardDeleteParam;
@@ -73,7 +74,7 @@ public class FishCardModifyServiceX {
     private ServiceSDK serviceSDK;
 
     @Autowired
-    private RestTemplate restTemplate;
+    private AssignTeacherFixService assignTeacherFixService;
 
 
     @Autowired
@@ -126,6 +127,9 @@ public class FishCardModifyServiceX {
         workOrder.setTeacherName(teacherChangeParam.getTeacherName());
         courseSchedule.setTeacherId(teacherChangeParam.getTeacherId());
         courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+
+        //异步操作  // 设置指定老师申请失效
+        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"换时间老师请假或者换老师");
 
         //通知师生运营更换老师
         teacherStudentRequester.notifyChangeTeacher(workOrder, teacherChangeParam);

@@ -5,8 +5,10 @@ import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
+import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
@@ -14,9 +16,12 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherFixService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +57,11 @@ public class FishCardFreezeServiceX {
     @Autowired
     private TimePickerService timePickerService;
 
+    @Autowired
+    private AssignTeacherFixService assignTeacherFixService;
+
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
+
     public JsonResultModel freeze(Long fishcardId){
         WorkOrder workOrder=workOrderService.findOne(fishcardId);
         if(null==workOrder){
@@ -75,6 +85,11 @@ public class FishCardFreezeServiceX {
         courseSchedule.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
         workOrder.setIsFreeze(1);
         courseSchedule.setIsFreeze(1);
+
+
+        //异步操作  // 设置指定老师申请失效
+        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"换时间freeze");
+
         workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
 
         dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
@@ -227,6 +242,10 @@ public class FishCardFreezeServiceX {
         dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
         workOrderLogService.saveWorkOrderLog(workOrder,"冻结课程,冻结前教师id["+teacherId+"],教师姓名["+teacherName+"]");
+
+        //异步操作  // 设置指定老师申请失效
+        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"冻结老师freezeSec");
+
 
         return JsonResultModel.newJsonResultModel("ok");
     }
