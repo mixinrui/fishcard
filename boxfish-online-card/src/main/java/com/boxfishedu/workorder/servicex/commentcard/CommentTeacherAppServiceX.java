@@ -174,14 +174,19 @@ public class CommentTeacherAppServiceX {
         cardCourseInfo.setCourseId(commentCard.getCourseId());
         cardCourseInfo.setCourseName(commentCard.getCourseName());
         if (Objects.nonNull(commentCard.getCourseId())){
-            Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
-            if (Objects.nonNull(typeAndDifficultyMap)){
-                if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
-                    cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
+            try {
+                Map typeAndDifficultyMap = commentCardSDK.commentTypeAndDifficulty(commentCard.getCourseId());
+                if (Objects.nonNull(typeAndDifficultyMap)){
+                    if (Objects.nonNull(typeAndDifficultyMap.get("courseType"))){
+                        cardCourseInfo.setCourseType(typeAndDifficultyMap.get("courseType").toString());
+                    }
+                    if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
+                        cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()).toString());
+                    }
                 }
-                if (Objects.nonNull(typeAndDifficultyMap.get("courseDifficulty"))){
-                    cardCourseInfo.setDifficulty(getLevel(typeAndDifficultyMap.get("courseDifficulty").toString()).toString());
-                }
+            }catch (Exception e){
+                logger.error("@setCommentHomePage2 获取难度类型失败");
+                e.printStackTrace();
             }
         }
         cardCourseInfo.setThumbnail(urlConf.getThumbnail_server()+commentCard.getCover());
