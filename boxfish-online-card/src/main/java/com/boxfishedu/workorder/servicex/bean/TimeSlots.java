@@ -36,6 +36,7 @@ public class TimeSlots implements Cloneable, Serializable {
     @JsonIgnore
     private String courseName;
     private String courseType;
+    private String classType;
     @JsonProperty(value = "courseInfo")
     private CourseView courseView;
     // 默认为未分配
@@ -57,6 +58,7 @@ public class TimeSlots implements Cloneable, Serializable {
         this.status = TimeSlotsStatus.ASSIGNED;
         this.workOrderId = courseSchedule.getWorkorderId();
         this.courseScheduleStatus = courseSchedule.getStatus();
+        this.classType = courseSchedule.getClassType();
         if(isInstant(courseSchedule)){
             this.startTime=courseSchedule.getInstantStartTtime();
             this.endTime=courseSchedule.getInstantEndTtime();

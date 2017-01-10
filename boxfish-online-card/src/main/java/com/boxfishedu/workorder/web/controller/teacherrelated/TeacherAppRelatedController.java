@@ -75,7 +75,7 @@ public class TeacherAppRelatedController {
         return teacherAppRelatedServiceX.getScheduleByIdAndDate(teacherId, date, locale);
     }
 
-    //    @Cacheable(value = "teacher_schedule_assigned", key = "T(java.util.Objects).hash(#teacherId,#date)")
+    // @Cacheable(value = "teacher_schedule_assigned", key = "T(java.util.Objects).hash(#teacherId,#date)")
     @RequestMapping(value = "{teacher_id}/schedule_assigned/day", method = RequestMethod.GET)
     public JsonResultModel courseScheduleListAssign(@PathVariable("teacher_id") Long teacherId, Long userId,
                                                     @RequestParam(required = false)
