@@ -2,7 +2,6 @@ package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.exception.ValidationException;
-import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
@@ -61,12 +60,6 @@ public class ForeignTeacherCommentController {
         }else {
             return JsonResultModel.newJsonResultModel(commentCard);
         }
-    }
-
-    @RequestMapping(value = "/evict/amount/all", method = RequestMethod.DELETE)
-    public JsonResultModel evictAmountAll() {
-        cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).clear();
-        return JsonResultModel.newJsonResultModel();
     }
 
     //@RequestMapping(value = "/isAvailable", method = RequestMethod.GET)
