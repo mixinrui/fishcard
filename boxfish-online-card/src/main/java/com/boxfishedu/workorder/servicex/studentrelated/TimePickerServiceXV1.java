@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.PublicClassException;
+import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -35,10 +36,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -99,6 +101,15 @@ public class TimePickerServiceXV1 {
 
     @Autowired
     private PublicClassRoom publicClassRoom;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    private Cache publicClassCacheWithLevelAndDate = cacheManager.getCache(
+            CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_LEVELANDDATE);
+
+    private Cache publicClassCacheWithId = cacheManager.getCache(
+            CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_ID);
 
     /**
      * 学生选择时间
@@ -197,38 +208,44 @@ public class TimePickerServiceXV1 {
         return JsonResultModel.newJsonResultModel();
     }
 
-
-
+    /**
+     * 获取公开课课表
+     * @param level
+     * @param now
+     * @return
+     */
     public Map<String, Object> getStudentPublicClassTimeEnum(String level, LocalDate now) {
-        // 先判断是否是可用的等级
-        CourseDifficultyEnum courseDifficulty;
+        int key = Objects.hash(level, now);
+        Map classRoom = publicClassCacheWithLevelAndDate.get(key, Map.class);
+        if(classRoom == null) {
+            synchronized (this) {
+                classRoom = getClassRoomByLevelAndNowWithDatabase(level, now);
+                publicClassCacheWithLevelAndDate.putIfAbsent(key, classRoom);
+            }
+        }
+        return classRoom;
+
+    }
+
+
+    /**
+     * 学生进入公开课课堂
+     * @return
+     */
+    public Map<String, Object> enterPublicClassRoom(Long studentId, Long smallClassId, String accessToken) {
+
+        // 以后可能会同一时间多节公开课
         try {
-            courseDifficulty = CourseDifficultyEnum.valueOf(level);
+            SmallClass smallClass = getClassRoomById(smallClassId);
+            publicClassRoom.enter(smallClass, studentId, accessToken);
+            return PublicClassMessageEnum.SUCCES.getMessageMap();
         } catch (Exception e) {
-            throw new BusinessException("错误的level等级");
+            if(e instanceof PublicClassException) {
+                return (((PublicClassException) e).publicClassMessage).getMessageMap();
+            }
+            throw new BusinessException(e.getMessage());
         }
-
-        PublicClassTimeEnum publicClass = PublicClassTimeEnum.publicClassTime(courseDifficulty);
-        List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndSmallClassType(
-                DateUtil.convertToDate(now), publicClass.getTimeRange().getSlotId(), ClassTypeEnum.PUBLIC.name());
-        if(CollectionUtils.isEmpty(publicClassList)) {
-            throw new BusinessException("今天没有对应的公开课!");
-        }
-        SmallClass smallClass = publicClassList.get(0);
-        HashMap<String, Object> resultMap = Maps.newHashMap();
-        resultMap.put("classRoom", smallClass);
-        resultMap.put("timeRange", publicClass.getTimeRange());
-        return resultMap;
-
     }
-
-
-    private List<WorkOrder> batchInitWorkorders(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> serviceList) {
-        // 中教优先于外教
-        serviceList.sort((c1, c2) -> Objects.equals(c1.getTutorType(), TutorType.CN.name()) ? 1 : 0);
-        return selectMode.initWorkOrderList(timeSlotParam, selectMode, serviceList);
-    }
-
 
     public List<Service> ensureConvertOver(TimeSlotParam timeSlotParam) {
         return ensureConvertOver(timeSlotParam, 0);
@@ -267,28 +284,52 @@ public class TimePickerServiceXV1 {
         return services;
     }
 
+    private SmallClass getClassRoomById(Long smallClassId) {
+
+        SmallClass smallClass = publicClassCacheWithId.get(smallClassId, SmallClass.class);
+        if(smallClass == null) {
+            synchronized (this) {
+                smallClass = smallClassJpaRepository.findOne(smallClassId);
+                if (smallClass == null) {
+                    throw new PublicClassException(PublicClassMessageEnum.ERROR_PUBLIC_CLASS);
+                }
+                publicClassCacheWithId.putIfAbsent(smallClassId, smallClass);
+            }
+        }
+        return smallClass;
+    }
 
     /**
-     * 学生进入公开课课堂
+     * 从数据库中查询课堂
+     * @param level
+     * @param now
      * @return
      */
-    @Transactional
-    public Map<String, Object> enterPublicClassRoom(Long studentId, Long smallClassId, String accessToken) {
-
-        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
-        if(smallClass == null) {
-            return PublicClassMessageEnum.ERROR_PUBLIC_CLASS.getMessageMap();
-        }
-
-        // 以后可能会同一时间多节公开课
+    private Map<String, Object> getClassRoomByLevelAndNowWithDatabase(String level, LocalDate now) {
+        // 先判断是否是可用的等级
+        CourseDifficultyEnum courseDifficulty;
         try {
-            publicClassRoom.enter(smallClass, studentId, accessToken);
-            return PublicClassMessageEnum.SUCCES.getMessageMap();
+            courseDifficulty = CourseDifficultyEnum.valueOf(level);
         } catch (Exception e) {
-            if(e instanceof PublicClassException) {
-                return (((PublicClassException) e).publicClassMessage).getMessageMap();
-            }
-            throw new BusinessException(e.getMessage());
+            throw new BusinessException("错误的level等级");
         }
+        PublicClassTimeEnum publicClass = PublicClassTimeEnum.publicClassTime(courseDifficulty);
+        List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndSmallClassType(
+                DateUtil.convertToDate(now), publicClass.getTimeRange().getSlotId(), ClassTypeEnum.PUBLIC.name());
+        if(CollectionUtils.isEmpty(publicClassList)) {
+            throw new BusinessException("今天没有对应的公开课!");
+        }
+        SmallClass smallClass = publicClassList.get(0);
+        HashMap<String, Object> resultMap = Maps.newHashMap();
+        resultMap.put("classRoom", smallClass);
+        resultMap.put("timeRange", publicClass.getTimeRange());
+        return resultMap;
+    }
+
+
+    private List<WorkOrder> batchInitWorkorders(TimeSlotParam timeSlotParam, SelectMode selectMode, List<Service> serviceList) {
+        // 中教优先于外教
+        serviceList.sort((c1, c2) -> Objects.equals(c1.getTutorType(), TutorType.CN.name()) ? 1 : 0);
+        return selectMode.initWorkOrderList(timeSlotParam, selectMode, serviceList);
     }
 }

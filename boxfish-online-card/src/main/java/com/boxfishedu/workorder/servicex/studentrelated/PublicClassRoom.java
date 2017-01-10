@@ -33,6 +33,8 @@ public class PublicClassRoom {
     }
 
     public void enter(SmallClass smallClass, Long studentId, String accessToken) {
+        // 是否是在正常的时间点
+
         // 一 判断是否曾经进入过这个房间, 是则直接进入
         if(isOnceEntered(smallClass.getId(), studentId)) {
             return;
