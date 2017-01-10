@@ -324,7 +324,7 @@ public class AvaliableTimeServiceXV1 {
     private List<String> getAvaliableDateRange(Date beginDate, int comboCycle) {
         List<String> listDate = Lists.newArrayList();
         for (int i = 1; i <= comboCycle; i++) {
-            beginDate = DateUtil.getAfter7Days(beginDate, i);
+            beginDate = i==1?beginDate:DateUtil.getAfter7Days(beginDate, 2);
             Date baseDate = beginDate;
             for (int j = 0; j < 7; j++) {
                 if (DateUtil.getWeekDay3567(DateUtil.getAfterOneDay(baseDate,j))) {
