@@ -62,6 +62,8 @@ public class RecommendHandlerHelper {
                 WorkOrder workOrder = workOrders.get(i);
                 // 如果是小班课, 不进行课程推荐
                 if(StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name())) {
+                    workOrder.setSkuId(CourseType2TeachingTypeService.courseType2TeachingType2(
+                            "", TutorType.resolve(workOrder.getService().getTutorType())));
                     continue;
                 }
                 logger.debug("鱼卡序号{}", workOrder.getSeqNum());
