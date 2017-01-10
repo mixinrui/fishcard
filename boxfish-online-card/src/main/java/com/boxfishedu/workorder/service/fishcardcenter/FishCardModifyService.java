@@ -8,9 +8,11 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
+import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
@@ -21,6 +23,7 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherFixService;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Lists;
@@ -69,6 +72,12 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
 
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
+
+    @Autowired
+    private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
+
+    @Autowired
+    private AssignTeacherFixService assignTeacherFixService;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -163,6 +172,7 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
             }
         }
 
+
         Long teacherId = workOrder.getTeacherId();
         String startTime = DateUtil.Date2String(  workOrder.getStartTime());
 
@@ -207,6 +217,9 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
             if(null!=courseSchedule.getNeedChangeTime()){
                 courseSchedule.setNeedChangeTime(null);
             }
+
+            //异步操作  // 设置指定老师申请失效
+            assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"换时间"+source);
 
             workOrder.setTeacherId(0L);
             workOrder.setTeacherName("");
