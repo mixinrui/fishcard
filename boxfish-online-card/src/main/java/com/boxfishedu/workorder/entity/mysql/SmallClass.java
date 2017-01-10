@@ -7,9 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
-import sun.text.normalizer.UBiDiProps;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +21,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "small_class")
-public class SmallClass implements Cloneable {
+public class SmallClass implements Cloneable, Serializable {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
