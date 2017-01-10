@@ -1,10 +1,13 @@
 package com.boxfishedu.workorder.entity.mysql;
 
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
+import sun.text.normalizer.UBiDiProps;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -95,5 +98,19 @@ public class SmallClass implements Cloneable {
             throw new BusinessException("clone error");
         }
         return smallClass;
+    }
+
+    public SmallClass() {
+
+    }
+
+    public SmallClass(PublicClassBuilderParam publicClassBuilderParam) {
+        this.setTeacherName(publicClassBuilderParam.getTeacherName());
+        this.setTeacherId(publicClassBuilderParam.getTeacherId());
+        this.setUpdateTime(new Date());
+        this.setRoleId(publicClassBuilderParam.getRoleId().intValue());
+        this.setClassDate(DateUtil.simpleString2Date(publicClassBuilderParam.getDate()));
+        this.setSlotId(publicClassBuilderParam.getSlotId().intValue());
+        this.setCreateTime(new Date());
     }
 }

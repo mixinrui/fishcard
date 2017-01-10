@@ -102,14 +102,17 @@ public class TimePickerServiceXV1 {
     @Autowired
     private PublicClassRoom publicClassRoom;
 
+    private Cache publicClassCacheWithLevelAndDate;
+
+    private Cache publicClassCacheWithId;
+
     @Autowired
-    private CacheManager cacheManager;
-
-    private Cache publicClassCacheWithLevelAndDate = cacheManager.getCache(
-            CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_LEVELANDDATE);
-
-    private Cache publicClassCacheWithId = cacheManager.getCache(
-            CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_ID);
+    public void initCache(CacheManager cacheManager) {
+        publicClassCacheWithLevelAndDate = cacheManager.getCache(
+                CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_LEVELANDDATE);
+        publicClassCacheWithId = cacheManager.getCache(
+                CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_ID);
+    }
 
     /**
      * 学生选择时间
