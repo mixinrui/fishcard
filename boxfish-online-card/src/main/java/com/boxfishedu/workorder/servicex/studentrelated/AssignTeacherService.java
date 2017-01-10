@@ -575,6 +575,7 @@ public class AssignTeacherService {
         logger.info("pushTeacherList::end");
     }
 
+
     public void pushPayTest(Long teahcerId) {
         logger.info("pushTeacherList::begin");
 
@@ -595,5 +596,25 @@ public class AssignTeacherService {
         teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
         logger.info("pushTeacherList::end");
     }
+
+
+
+    // 设置指定老师申请纪录失效
+    @Transactional
+    public int disableAssignWorkOrderinner(Long workOrderId, String reason) {
+        if (null == workOrderId) {
+            return 0;
+        }
+        if (StringUtils.isEmpty(reason)) {
+            reason = "其他原因";
+        }
+
+        List<StStudentApplyRecords> findByWorkOrderIdIn  = stStudentApplyRecordsJpaRepository.findByWorkOrderIdIn(Lists.newArrayList(workOrderId));
+        List<Long> ids = Collections3.extractToList(findByWorkOrderIdIn,"id");
+        int num = stStudentApplyRecordsJpaRepository.setFixedValidFor(StStudentApplyRecords.VALID.no, ids);
+        logger.info("changeStartTimeFishCard:更新指定老师失效纪录num:[{}],原因:[{}]", num, reason);
+        return num;
+    }
+
 
 }
