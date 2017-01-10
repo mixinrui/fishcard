@@ -88,7 +88,7 @@ public class FishCardFreezeServiceX {
 
 
         //异步操作  // 设置指定老师申请失效
-        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"换时间freeze");
+        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"冻结freeze");
 
         workOrderService.saveWorkOrderAndSchedule(workOrder,courseSchedule);
 
@@ -244,7 +244,7 @@ public class FishCardFreezeServiceX {
         workOrderLogService.saveWorkOrderLog(workOrder,"冻结课程,冻结前教师id["+teacherId+"],教师姓名["+teacherName+"]");
 
         //异步操作  // 设置指定老师申请失效
-        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"冻结老师freezeSec");
+        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"冻结freezeSec");
 
 
         return JsonResultModel.newJsonResultModel("ok");
