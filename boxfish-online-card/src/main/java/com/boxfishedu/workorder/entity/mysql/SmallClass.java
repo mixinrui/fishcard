@@ -45,6 +45,8 @@ public class SmallClass implements Cloneable {
     @Column(name = "difficulty_level")
     private String difficultyLevel;
 
+    private String cover;
+
     @Temporal(TemporalType.DATE)
     private Date classDate;
 

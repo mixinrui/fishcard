@@ -89,11 +89,11 @@ public enum PublicClassTimeEnum {
         }
 
         public String getFrom() {
-            return DateUtil.formatLocalTime(from);
+            return DateUtil.timeFormatter1.format(from);
         }
 
         public String getTo() {
-            return DateUtil.formatLocalTime(from);
+            return DateUtil.timeFormatter1.format(to);
         }
 
         public Integer getSlotId() {

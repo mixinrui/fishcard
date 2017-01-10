@@ -28,6 +28,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -121,18 +122,19 @@ StudentAppRelatedController {
      */
     @RequestMapping(value = "{studentId}/schedule/public", method = RequestMethod.GET)
     public JsonResultModel courseSchedulePublic(@PathVariable Long studentId, String level) {
-        return JsonResultModel.newJsonResultModel(timePickerServiceXV1.getStudentPublicClassTimeEnum(level));
+        return JsonResultModel.newJsonResultModel(
+                timePickerServiceXV1.getStudentPublicClassTimeEnum(level, LocalDate.now()));
     }
 
     @RequestMapping(value = "/{studentId}/enter/publicClassRoom", method = RequestMethod.PUT)
     public JsonResultModel enterClassRoom(
-            @PathVariable Long studentId, Long userId, Integer slotId,
+            @PathVariable Long studentId, Long userId, Long classRoomId,
             @RequestParam(value = "access_token") String accessToken) {
         if(!studentId.equals(userId)) {
             throw new UnauthorizedException();
         }
         return JsonResultModel.newJsonResultModel(
-                timePickerServiceXV1.enterPublicClassRoom(userId, slotId, accessToken));
+                timePickerServiceXV1.enterPublicClassRoom(userId, classRoomId, accessToken));
     }
 
 

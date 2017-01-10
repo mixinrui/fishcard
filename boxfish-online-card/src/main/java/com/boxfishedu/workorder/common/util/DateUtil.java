@@ -27,6 +27,8 @@ public class DateUtil {
 
     public final static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+    public final static DateTimeFormatter timeFormatter1 = DateTimeFormatter.ofPattern("HH:mm");
+
     public static Date String2Date(String str) throws RuntimeException {
         try {
             return dateTimeFormat.get().parse(str);

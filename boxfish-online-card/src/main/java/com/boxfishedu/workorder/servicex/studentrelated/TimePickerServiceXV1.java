@@ -2,10 +2,12 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.CourseDifficultyEnum;
+import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassTimeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -27,6 +29,7 @@ import com.boxfishedu.workorder.servicex.studentrelated.validator.StudentTimePic
 import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +40,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by hucl on 16/3/31.
@@ -198,21 +198,27 @@ public class TimePickerServiceXV1 {
     }
 
 
-    public SmallClass getStudentPublicClassTimeEnum(String level) {
+
+    public Map<String, Object> getStudentPublicClassTimeEnum(String level, LocalDate now) {
+        // 先判断是否是可用的等级
         CourseDifficultyEnum courseDifficulty;
         try {
             courseDifficulty = CourseDifficultyEnum.valueOf(level);
         } catch (Exception e) {
             throw new BusinessException("错误的level等级");
         }
+
         PublicClassTimeEnum publicClass = PublicClassTimeEnum.publicClassTime(courseDifficulty);
         List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndSmallClassType(
-                DateUtil.convertToDate(LocalDate.now()), publicClass.getTimeRange().getSlotId(), ClassTypeEnum.PUBLIC.name());
+                DateUtil.convertToDate(now), publicClass.getTimeRange().getSlotId(), ClassTypeEnum.PUBLIC.name());
         if(CollectionUtils.isEmpty(publicClassList)) {
             throw new BusinessException("今天没有对应的公开课!");
         }
         SmallClass smallClass = publicClassList.get(0);
-        return smallClass;
+        HashMap<String, Object> resultMap = Maps.newHashMap();
+        resultMap.put("classRoom", smallClass);
+        resultMap.put("timeRange", publicClass.getTimeRange());
+        return resultMap;
 
     }
 
@@ -267,18 +273,22 @@ public class TimePickerServiceXV1 {
      * @return
      */
     @Transactional
-    public SmallClass enterPublicClassRoom(Long studentId, Integer slotId, String accessToken) {
+    public Map<String, Object> enterPublicClassRoom(Long studentId, Long smallClassId, String accessToken) {
 
-        // 即使有2个一样的, 只返回第一个
-        List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndSmallClassType(
-                DateUtil.convertToDate(LocalDate.now()), slotId, ClassTypeEnum.PUBLIC.name());
-        if(CollectionUtils.isEmpty(publicClassList)) {
-            throw new BusinessException("今天没有对应的公开课!");
+        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
+        if(smallClass == null) {
+            return PublicClassMessageEnum.ERROR_PUBLIC_CLASS.getMessageMap();
         }
 
         // 以后可能会同一时间多节公开课
-        SmallClass smallClass = publicClassList.get(0);
-        publicClassRoom.enter(smallClass, studentId, accessToken);
-        return smallClass;
+        try {
+            publicClassRoom.enter(smallClass, studentId, accessToken);
+            return PublicClassMessageEnum.SUCCES.getMessageMap();
+        } catch (Exception e) {
+            if(e instanceof PublicClassException) {
+                return (((PublicClassException) e).publicClassMessage).getMessageMap();
+            }
+            throw new BusinessException(e.getMessage());
+        }
     }
 }

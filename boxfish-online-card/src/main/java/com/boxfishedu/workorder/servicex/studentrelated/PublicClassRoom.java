@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
-import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
+import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.PublicClassInfo;
 import com.boxfishedu.workorder.entity.mysql.PublicClassInfoJpaRepository;
@@ -91,7 +92,7 @@ public class PublicClassRoom {
                 DateUtil.getLastDateOfWeek(classDate),
                 studentId);
         if(count > 0) {
-            throw new BusinessException("成为BOXFISH学员, 每天都能上外教公开课~");
+            throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
         }
     }
 
@@ -102,7 +103,7 @@ public class PublicClassRoom {
         // 会员每天只能上一节课
         Integer count = publicClassInfoJpaRepository.findByClassDateAndStudentId(classDate, studentId);
         if(count > 0) {
-            throw new BusinessException("学员每天只能上一节公开课~");
+            throw new PublicClassException(PublicClassMessageEnum.EVERY_DAY_LIMIT);
         }
     }
 }
