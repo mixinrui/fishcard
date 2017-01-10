@@ -6,23 +6,24 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
+import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import com.google.common.collect.Interner;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by hucl on 17/1/8.
@@ -42,6 +43,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Autowired
     private WorkOrderService workOrderService;
+
+    @Autowired
+    private ScheduleCourseInfoService scheduleCourseInfoService;
 
     public WorkOrder selectLeader(List<WorkOrder> workOrders) {
         logger.debug("小班鱼卡[{}]", JacksonUtil.toJSon(workOrders));
@@ -71,19 +75,19 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
                         smallClass.getAllCards()), smallClass.getDifficultyLevel(), leader.getSeqNum(), this.teachingType2TutorType(smallClass));
 
         //获取推荐教师
-        TeacherView teacherView=this.getRecommandTeacher(smallClass);
+        TeacherView teacherView = this.getRecommandTeacher(smallClass);
 
         //回写课程信息
-        this.writeCourseBack(smallClass,smallClass.getAllCards());
+        this.writeCourseBack(smallClass, smallClass.getAllCards());
 
-        this.writeTeacherInfoBack(smallClass,smallClass.getAllCards());
+        this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
 
         //将课程信息保存入库
-        this.persistGroupClass(smallClass);
+        this.persistGroupClass(smallClass, recommandCourseView);
     }
 
     @Override
-    public void writeTeacherInfoBack(SmallClass smallClass, List<WorkOrder> workOrders) {
+    public void writeTeacherInfoBack(SmallClass smallClass, List<WorkOrder> workOrders, TeacherView teacherView) {
         if (!Objects.isNull(smallClass.getTeacherId())) {
             workOrders.forEach(workOrder -> {
                 workOrder.setSmallClassId(smallClass.getId());
@@ -91,6 +95,8 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
                 workOrder.setTeacherName(smallClass.getTeacherName());
                 workOrder.setUpdateTime(new Date());
                 workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+                workOrder.setTeacherId(teacherView.getTeacherId());
+                workOrder.setTeacherName(teacherView.getTeacherName());
             });
             smallClass.setAllCards(workOrders);
         }
@@ -115,10 +121,17 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Override
     @Transactional
-    public void persistGroupClass(SmallClass smallClass) {
+    public void persistGroupClass(SmallClass smallClass, RecommandCourseView recommandCourseView) {
         smallClassJpaRepository.save(smallClass);
         smallClass.getAllCards().forEach(workOrder -> {
-//            workOrderService.saveWorkOrderAndSchedule();
+            List<CourseSchedule> courseSchedules = workOrderService
+                    .batchUpdateCourseSchedule(workOrder.getService(), Arrays.asList(workOrder));
+
+            Map<Integer, RecommandCourseView> recommandCourseViewMap = Maps.newHashMap();
+            recommandCourseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
+
+            scheduleCourseInfoService.batchSaveCourseInfos(
+                    Arrays.asList(workOrder), courseSchedules, recommandCourseViewMap);
         });
     }
 
