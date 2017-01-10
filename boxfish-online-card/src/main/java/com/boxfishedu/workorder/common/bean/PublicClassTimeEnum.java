@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.common.bean;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.EnumMap;
 
@@ -79,7 +80,7 @@ public enum PublicClassTimeEnum {
     /**
      * 上课时间范围
      */
-    public class TimeRange {
+    public class TimeRange implements Serializable {
         public final Integer slotId;
         public final LocalTime from, to;
         public TimeRange(Integer slotId, LocalTime from, LocalTime to) {
