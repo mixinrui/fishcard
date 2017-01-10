@@ -501,7 +501,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfoService.save(scheduleCourseInfo);
     }
 
-    @Cacheable(value = CacheKeyConstant.COMMENT_CARD_AMOUNT, key = "#studentId")
+//    @Cacheable(value = CacheKeyConstant.COMMENT_CARD_AMOUNT, key = "#studentId")
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
         List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
                 studentId, ProductType.COMMENT.value());
