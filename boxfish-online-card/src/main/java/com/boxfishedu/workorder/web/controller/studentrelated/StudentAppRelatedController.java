@@ -171,9 +171,12 @@ StudentAppRelatedController {
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/v1/delay/week/smallclass" ,method = RequestMethod.GET)
-    public JsonResultModel getDelaySmallClassWeeks(Long userId)throws  Exception{
-        return avaliableTimeServiceXV1.getDelayWeekDaysForSmallClass();
+    @RequestMapping(value = "/v1/delay/week/smallclass/{orderId}" ,method = RequestMethod.GET)
+    public JsonResultModel getDelaySmallClassWeeks(@PathVariable("orderId") Long orderId,Long userId)throws  Exception{
+        if(null==userId){
+            throw new UnauthorizedException("请用正确的账号登录操作");
+        }
+        return avaliableTimeServiceXV1.getDelayWeekDaysForSmallClass(orderId,userId);
     }
 
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)

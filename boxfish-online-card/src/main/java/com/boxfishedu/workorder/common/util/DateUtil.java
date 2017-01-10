@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.common.util;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.web.view.form.DateRangeForm;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -386,7 +387,13 @@ public class DateUtil {
         cal.setTime(new Date());
         int w =  cal.get(Calendar.DAY_OF_WEEK) - 1;
         return (w==0 ||w==6) ?true:false;
+    }
 
+    public static boolean getWeekDay3567(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int w =  cal.get(Calendar.DAY_OF_WEEK);
+        return (w==4 ||w==6 || w==7 ||w==1) ?true:false;
     }
 
     // 是否包含在list的天中  2345671   周一到周日 4671
@@ -422,7 +429,12 @@ public class DateUtil {
         return  addMinutes(date,60*24*2);
     }
     public static Date getAfter7Days(Date date,int i ){
+        DateTime.now().minusHours(48).toDate();
         return  (i-1)==0?date : addMinutes(date,60*24*(i-1)*7);
+    }
+
+    public static Date getAfterOneDay(Date date,int i){
+        return addMinutes(date,60*24*i);
     }
 
     private final static long DAY_OF_SECONDS = 24 * 60 * 60 * 1000;
