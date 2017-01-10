@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.studentrelated;
 
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
+import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
@@ -123,9 +124,13 @@ StudentAppRelatedController {
         return JsonResultModel.newJsonResultModel(timePickerServiceXV1.getStudentPublicClassTimeEnum(level));
     }
 
-    @RequestMapping(value = "/enter/publicClassRoom", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{studentId}/enter/publicClassRoom", method = RequestMethod.PUT)
     public JsonResultModel enterClassRoom(
-            Long userId, Integer slotId, @RequestParam(value = "access_token") String accessToken) {
+            @PathVariable Long studentId, Long userId, Integer slotId,
+            @RequestParam(value = "access_token") String accessToken) {
+        if(!studentId.equals(userId)) {
+            throw new UnauthorizedException();
+        }
         return JsonResultModel.newJsonResultModel(
                 timePickerServiceXV1.enterPublicClassRoom(userId, slotId, accessToken));
     }

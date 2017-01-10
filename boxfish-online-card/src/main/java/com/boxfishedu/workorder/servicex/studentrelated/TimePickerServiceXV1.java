@@ -198,14 +198,22 @@ public class TimePickerServiceXV1 {
     }
 
 
-    public PublicClassTimeEnum.TimeRange getStudentPublicClassTimeEnum(String level) {
+    public SmallClass getStudentPublicClassTimeEnum(String level) {
         CourseDifficultyEnum courseDifficulty;
         try {
             courseDifficulty = CourseDifficultyEnum.valueOf(level);
-            return PublicClassTimeEnum.publicClassTime(courseDifficulty).getTimeRange();
         } catch (Exception e) {
             throw new BusinessException("错误的level等级");
         }
+        PublicClassTimeEnum publicClass = PublicClassTimeEnum.publicClassTime(courseDifficulty);
+        List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndSmallClassType(
+                DateUtil.convertToDate(LocalDate.now()), publicClass.getTimeRange().getSlotId(), ClassTypeEnum.PUBLIC.name());
+        if(CollectionUtils.isEmpty(publicClassList)) {
+            throw new BusinessException("今天没有对应的公开课!");
+        }
+        SmallClass smallClass = publicClassList.get(0);
+        return smallClass;
+
     }
 
 

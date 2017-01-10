@@ -76,10 +76,6 @@ public enum PublicClassTimeEnum {
         throw new BusinessException("不支持的上课时间");
     }
 
-    public Integer getSlotId() {
-        throw new BusinessException("不支持的上课时间");
-    }
-
     /**
      * 上课时间范围
      */
