@@ -29,6 +29,10 @@ public class DateUtil {
 
     public final static DateTimeFormatter timeFormatter1 = DateTimeFormatter.ofPattern("HH:mm");
 
+    public static Date simpleString2Date(String simpleStr){
+        return String2Date(String.join(" ",simpleStr,"00:00:00"));
+    }
+
     public static Date String2Date(String str) throws RuntimeException {
         try {
             return dateTimeFormat.get().parse(str);

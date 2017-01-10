@@ -1,13 +1,18 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +29,9 @@ import java.util.List;
 public class SmallClassBackController {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
+
+    @Autowired
+    private SmallClassJpaRepository smallClassJpaRepository;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -46,15 +54,8 @@ public class SmallClassBackController {
         return JsonResultModel.newJsonResultModel("OK");
     }
 
-    @Data
-    @RequestMapping(value = "/status", method = RequestMethod.POST)
-    static class PublicClassBuilderParam {
-        private Long smallClassId;
-        private String date;
-        private Long slotId;
-        private String difficulty;
-        private Long teacherId;
+    @RequestMapping(value = "/smallclass/list", method = RequestMethod.GET)
+    public JsonResultModel list(Pageable pageable) {
+        return JsonResultModel.newJsonResultModel(smallClassJpaRepository.findPage(pageable));
     }
-
-
 }
