@@ -422,7 +422,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
 
-    private List<CourseSchedule> batchUpdateCourseSchedule(Service service, List<WorkOrder> workOrders) {
+    public List<CourseSchedule> batchUpdateCourseSchedule(Service service, List<WorkOrder> workOrders) {
         List<CourseSchedule> courseSchedules = new ArrayList<>();
         for (WorkOrder workOrder : workOrders) {
             CourseSchedule courseSchedule = new CourseSchedule();

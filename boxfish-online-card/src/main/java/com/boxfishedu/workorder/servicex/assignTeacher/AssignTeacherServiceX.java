@@ -122,7 +122,7 @@ public class AssignTeacherServiceX {
     public JsonResultModel teacherAccept(Long teacherId,Long studentId,List<Long> workOrderIds){
         Integer skuId = stStudentSchemaJpaRepository.findByStudentIdAndTeacherId(studentId,teacherId).getSkuId().ordinal();
         logger.info("@@@@assign 指定老师stp-1::::::======>>>APP端学生ID{}===>>>>发起指定老师{}===>>skuId{}=====>>>channel::{}",studentId,teacherId,skuId,"老师接受");
-        List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(workOrderIds);
+        List<CourseSchedule> aggressorCourseSchedules = courseScheduleRepository.findByWorkorderIdInAndIsFreeze(workOrderIds,0);
         if(Collections3.isNotEmpty(aggressorCourseSchedules)){
             stAssignTeacherService.doAssignTeacher(teacherId,studentId,aggressorCourseSchedules,null, ConstantUtil.TEACHER_CHANNLE,skuId);
         }
