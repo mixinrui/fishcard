@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.service.instantclass.InstantClassTeacherService;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstantClassValidators;
 import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstatntClassKeyGenerator;
+import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherFixService;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.result.InstantGroupInfo;
@@ -67,6 +68,9 @@ public class TeacherInstantClassServiceX {
     @Autowired
     private DataCollectorService dataCollectorService;
 
+    @Autowired
+    private AssignTeacherFixService assignTeacherFixService;
+
 
     public JsonResultModel teacherInstantClass(TeacherInstantRequestParam teacherInstantRequestParam) {
         putParameterIntoThreadLocal(teacherInstantRequestParam);
@@ -106,6 +110,8 @@ public class TeacherInstantClassServiceX {
         JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(InstantClassResult
                 .newInstantClassResult(updateGroupInfoInstantCard(instantGroupInfo
                         , instantClassCard), TeacherInstantClassStatus.MATCHED));
+        //异步操作  // 设置指定老师申请失效
+        assignTeacherFixService.disableAssignWorkOrderOut(instantClassCard.getWorkorderId(),"立即上课");
 
         logger.info("~^o^~~^o^~~^o^~~^o^, IIIIIIIIIIIIIII grabresult ,instantcard:[{}],teacher:[{}]成功,结果:{}"
                 , teacherInstantRequestParam.getCardId(), teacherInstantRequestParam.getTeacherId()
