@@ -16,5 +16,5 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
 
     List<SmallClass> findByClassDateAndSlotIdAndSmallClassType(Date classDate, Integer slotId, String classType);
 
-    public Page<SmallClass> findPage(Pageable pageable);
+    Page<SmallClass> findPage(Pageable pageable);
 }
