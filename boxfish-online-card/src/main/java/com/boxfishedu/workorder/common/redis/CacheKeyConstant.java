@@ -27,4 +27,10 @@ public class CacheKeyConstant {
     public static final String SCHEDULE_HAS_MORE_HISTORY = "SCHEDULE_HAS_MORE_HISTORY";
 
     public static final String COMMENT_CARD_AMOUNT = "COMMENT_CARD_AMOUNT";
+
+    // 公开课课堂, 通过LEVEL和日期查询课堂
+    public static final String PUBLIC_CLASS_ROOM_WITH_LEVELANDDATE = "PUBLIC_CLASS_ROOM_WITH_LEVELANDDATE";
+
+    // 公开课课堂, 通过id查询
+    public static final String PUBLIC_CLASS_ROOM_WITH_ID = "PUBLIC_CLASS_ROOM_WITH_ID";
 }
