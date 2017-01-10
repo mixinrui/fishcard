@@ -17,6 +17,6 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
 
     List<SmallClass> findByClassDateAndSlotIdAndSmallClassType(Date classDate, Integer slotId, String classType);
 
-    @Query("select s from SmallClass s order by s.startTime")
+    @Query("select s from SmallClass s order by s.classDate")
     Page<SmallClass> findPage(Pageable pageable);
 }
