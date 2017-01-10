@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.service.commentcard;
 
 import com.boxfishedu.workorder.common.exception.NotFoundException;
+import com.boxfishedu.workorder.common.log.CommentCardLog;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
@@ -43,6 +44,11 @@ public class CommentCardInitiateService {
                 commentCardJpaRepository.save(commentCard);
             }catch (NotFoundException notFound){
                 logger.info("###initiateCourseTypeAndDifficulty2### 找不到对应课程信息 课程id为{}",commentCard.getCourseId());
+                logger.error(new CommentCardLog()
+                        .data(commentCardList)
+                        .errorLevel()
+                        .operation("外教点评:初始化课程难度和类型")
+                        .toString());
                 count += 1;
             }
         }
@@ -68,6 +74,11 @@ public class CommentCardInitiateService {
                 }
             }catch (NotFoundException notFound){
                 logger.info("###timeToUpdateTypeAndDifficulty2### 找不到对应课程信息 课程id为{}",courseIdStr);
+                logger.error(new CommentCardLog()
+                        .data(courseId)
+                        .errorLevel()
+                        .operation("外教点评:定时更新课程难度和类型")
+                        .toString());
                 count += 1;
             }
         }

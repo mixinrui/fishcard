@@ -74,7 +74,7 @@ public class FishCardQueryController {
      * @param pageable
      * @return
      */
-    @RequestMapping(value = "/publiclistitmem", method = RequestMethod.GET)
+    @RequestMapping(value = "/publiclistitem", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByCondfirstForPublic(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam, pageable);
     }
@@ -86,7 +86,7 @@ public class FishCardQueryController {
      * @param pageable
      * @return
      */
-    @RequestMapping(value = "/smalllistitmem", method = RequestMethod.GET)
+    @RequestMapping(value = "/smalllistitem", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByCondfirstForSmall(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam, pageable);
     }
