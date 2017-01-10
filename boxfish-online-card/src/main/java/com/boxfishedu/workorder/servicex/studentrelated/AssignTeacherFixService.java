@@ -27,10 +27,11 @@ public class AssignTeacherFixService {
     private ThreadPoolManager threadPoolManager;
 
     @Autowired
-    private AssignTeacherService assignTeacherService;
+    private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
+
 
     @Autowired
-    private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
+    private AssignTeacherService assignTeacherService;
 
     public void disableAssignWorkOrderOut(final Long workOrderId, final String reason) {
         threadPoolManager.execute(new Thread(() -> {

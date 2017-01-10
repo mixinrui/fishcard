@@ -575,6 +575,7 @@ public class AssignTeacherService {
         logger.info("pushTeacherList::end");
     }
 
+
     public void pushPayTest(Long teahcerId) {
         logger.info("pushTeacherList::begin");
 
@@ -595,6 +596,7 @@ public class AssignTeacherService {
         teacherStudentRequester.pushTeacherListOnlineMsgnew(jsonObject);
         logger.info("pushTeacherList::end");
     }
+
 
 
     // 设置指定老师申请纪录失效
