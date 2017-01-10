@@ -80,6 +80,6 @@ public interface StStudentApplyRecordsJpaRepository extends JpaRepository<StStud
 
     /** 根据鱼卡id 设改节鱼卡申请纪录失效  **/
     @Modifying
-    @Query("update StStudentApplyRecords o set o.valid =?1 where o.workOrderId=?2")
+    @Query("update StStudentApplyRecords o set o.valid =?1  ,updateTime=current_timestamp where o.workOrderId=?2")
     int setFixedNoValidFor(StStudentApplyRecords.VALID valid , Long workOrderId);
 }
