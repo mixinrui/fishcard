@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.dao.jpa.LocalDateAttributeConverter;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -14,7 +15,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "public_class_info")
-public class PublicClassInfo {
+public class PublicClassInfo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
