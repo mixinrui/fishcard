@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
-import sun.text.normalizer.UBiDiProps;
 
 import javax.persistence.*;
 import java.util.Date;
