@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
-import com.boxfishedu.workorder.common.bean.PublicClassInfoEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
 import com.boxfishedu.workorder.common.exception.PublicClassException;
@@ -190,7 +189,7 @@ public class PublicClassRoom {
      * @param studentId
      */
     private void turnToEnterStatus(Long smallClassId, Long studentId) {
-        publicClassInfoJpaRepository.updateStatus(PublicClassInfoEnum.ENTER.code, smallClassId, studentId);
+        publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.ENTER.code, smallClassId, studentId);
     }
 
     private void updateEnterStatus(Long smallClassId, Long studentId) {
