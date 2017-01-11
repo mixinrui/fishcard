@@ -12,7 +12,7 @@ public class FishCardGroupsInfo {
 
     private Long workOrderId;// 鱼卡id
 
-    private Integer chatRoomId;//房间号
+    private Long chatRoomId;//房间号
 
     private String [] memberAccount;//学生id 老师id
 

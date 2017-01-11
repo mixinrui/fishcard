@@ -55,7 +55,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     }
 
     @Override
-    public RecommandCourseView getRecommandCourse() {
+    public RecommandCourseView getRecommandCourse(SmallClass smallClass) {
         return null;
     }
 
@@ -82,61 +82,15 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
         this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
 
-        //将课程信息保存入库
+        //将小班课,公开课相关信息保存入库
         this.persistGroupClass(smallClass, recommandCourseView);
-    }
-
-    @Override
-    public void writeTeacherInfoBack(SmallClass smallClass, List<WorkOrder> workOrders, TeacherView teacherView) {
-        if (!Objects.isNull(smallClass.getTeacherId())) {
-            workOrders.forEach(workOrder -> {
-                workOrder.setSmallClassId(smallClass.getId());
-                workOrder.setTeacherId(smallClass.getTeacherId());
-                workOrder.setTeacherName(smallClass.getTeacherName());
-                workOrder.setUpdateTime(new Date());
-                workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
-                workOrder.setTeacherId(teacherView.getTeacherId());
-                workOrder.setTeacherName(teacherView.getTeacherName());
-            });
-            smallClass.setAllCards(workOrders);
-        }
-    }
-
-    @Override
-    public void writeCourseBack(SmallClass smallClass, List<WorkOrder> workOrders) {
-        if (Objects.isNull(smallClass.getCourseId())) {
-            logger.error("@writeCourseBack#小班课没有课程信息,不回写到数据库,smallclass[{}],workOrders[{}]"
-                    , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(workOrders));
-            throw new BusinessException("小班课没有获取到课程信息,不作回写");
-        }
-        workOrders.forEach(workOrder -> {
-            workOrder.setCourseId(smallClass.getCourseId());
-            workOrder.setCourseName(smallClass.getCourseName());
-            if (workOrder.getStatus() != FishCardStatusEnum.TEACHER_ASSIGNED.getCode()) {
-                workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
-            }
-        });
-        smallClass.setAllCards(workOrders);
     }
 
     @Override
     @Transactional
     public void persistGroupClass(SmallClass smallClass, RecommandCourseView recommandCourseView) {
-        smallClassJpaRepository.save(smallClass);
-        smallClass.getAllCards().forEach(workOrder -> {
-            List<CourseSchedule> courseSchedules = workOrderService
-                    .batchUpdateCourseSchedule(workOrder.getService(), Arrays.asList(workOrder));
-
-            Map<Integer, RecommandCourseView> recommandCourseViewMap = Maps.newHashMap();
-            recommandCourseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
-
-            scheduleCourseInfoService.batchSaveCourseInfos(
-                    Arrays.asList(workOrder), courseSchedules, recommandCourseViewMap);
-        });
+        this.persistSmallClass(smallClass, smallClassJpaRepository);
+        this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }
 
-    @Override
-    public void postCreate() {
-
-    }
 }

@@ -3,6 +3,8 @@ package com.boxfishedu.workorder.requester;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Lists;
@@ -122,6 +124,24 @@ public class SmallClassRequester {
     public RecommandCourseView fetchSmallClassCNCourse(
             List<Long> studentIds, String difficultyLevel, Integer seq) {
         return this.fetchClassCourseByUserIds(studentIds, difficultyLevel, seq, TutorTypeEnum.CN);
+    }
+
+    /**
+     *
+     * @param smallClass
+     * @return 获取公开课
+     */
+    public RecommandCourseView getPublicCourse(SmallClass smallClass) {
+        String url = String.format("%s/demon/get/%s", urlConf.getCourse_wudaokou_recommend_service(), smallClass.getDifficultyLevel());
+        RecommandCourseView recommandCourseView = null;
+        try {
+            recommandCourseView = restTemplate.getForObject(url, RecommandCourseView.class);
+            logger.info("@getPublicCourse推荐课程成功,url[{}],结果[{}]", url, JacksonUtil.toJSon(recommandCourseView));
+        } catch (Exception ex) {
+            logger.error("@getPublicCourse推荐公开课失败url[{}]", ex);
+            throw new BusinessException("推荐课程失败");
+        }
+        return recommandCourseView;
     }
 
 

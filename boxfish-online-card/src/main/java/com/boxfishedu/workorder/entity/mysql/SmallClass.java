@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
@@ -72,7 +73,20 @@ public class SmallClass implements Cloneable, Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date actualStartTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date actualTime;
+
     private Integer status;
+
 
     @JsonIgnore
     @Transient
@@ -109,8 +123,10 @@ public class SmallClass implements Cloneable, Serializable {
         this.setTeacherId(publicClassBuilderParam.getTeacherId());
         this.setUpdateTime(new Date());
         this.setRoleId(publicClassBuilderParam.getRoleId().intValue());
+        this.setSmallClassType(SmallClassType.PUBLIC.name());
         this.setClassDate(DateUtil.simpleString2Date(publicClassBuilderParam.getDate()));
         this.setSlotId(publicClassBuilderParam.getSlotId().intValue());
         this.setCreateTime(new Date());
+        this.setDifficultyLevel(publicClassBuilderParam.getDifficulty());
     }
 }

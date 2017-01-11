@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
 import com.boxfishedu.workorder.entity.mysql.Service;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.RecommandedCourseService;
 import com.boxfishedu.workorder.servicex.studentrelated.recommend.RecommendCourseType;
@@ -45,17 +46,17 @@ public class RecommandCourseRequester {
 
     /**
      * 换课
+     *
      * @param workOrder
      * @return
      */
     public RecommandCourseView changeCourse(WorkOrder workOrder) {
         Service service = workOrder.getService();
         String tutorType = service.getTutorType();
-        logger.debug("@RecommandCourseRequester#changeCourse,参数tutorType[{}]",tutorType);
-        if(Objects.equals(tutorType, TutorType.CN.name()) || Objects.equals(tutorType, TutorType.MIXED.name())) {
+        logger.debug("@RecommandCourseRequester#changeCourse,参数tutorType[{}]", tutorType);
+        if (Objects.equals(tutorType, TutorType.CN.name()) || Objects.equals(tutorType, TutorType.MIXED.name())) {
             return changeChineseCourse(workOrder);
-        }
-        else{
+        } else {
             // 终极梦想换课
             return changeForeignCourse(workOrder);
         }
@@ -64,6 +65,7 @@ public class RecommandCourseRequester {
 
     /**
      * 核心素养
+     *
      * @param workOrder
      * @return
      */
@@ -85,6 +87,7 @@ public class RecommandCourseRequester {
 
     /**
      * 终极梦想
+     *
      * @param workOrder
      * @return
      */
@@ -111,7 +114,7 @@ public class RecommandCourseRequester {
     //课程完成后,通知推荐课程服务
     public void notifyCompleteCourse(WorkOrder workOrder) {
         String url = String.format("%s/counter/user_id/%s/lesson_id/%s", urlConf.getCourse_recommended_service(),
-                workOrder.getStudentId(), workOrder.getCourseId());
+                                   workOrder.getStudentId(), workOrder.getCourseId());
         logger.info("上课结束,通知推荐课url::::[{}]", url);
         threadPoolManager.execute(new Thread(() -> {
             try {
@@ -126,12 +129,13 @@ public class RecommandCourseRequester {
 
     /**
      * 核心素养
+     *
      * @param workOrder
      * @param predicate
      * @return
      */
     public RecommandCourseView getPromoteRecommend(WorkOrder workOrder, Predicate<WorkOrder> predicate) {
-        if(predicate.test(workOrder)) {
+        if (predicate.test(workOrder)) {
             return getPromoteRecommend(workOrder);
         } else {
             return RecommendCourseType.recommendCN(workOrder.getRecommendSequence());
@@ -140,6 +144,7 @@ public class RecommandCourseRequester {
 
     /**
      * 核心素养
+     *
      * @param workorder
      * @return
      */
@@ -149,6 +154,7 @@ public class RecommandCourseRequester {
 
     /**
      * 核心素养
+     *
      * @param workorder
      * @return
      */
@@ -160,12 +166,13 @@ public class RecommandCourseRequester {
 
     /**
      * 终极梦想
+     *
      * @param workOrder
      * @param predicate
      * @return
      */
     public RecommandCourseView getUltimateRecommend(WorkOrder workOrder, Predicate<WorkOrder> predicate) {
-        if(predicate.test(workOrder)) {
+        if (predicate.test(workOrder)) {
             return getUltimateRecommend(workOrder);
         } else {
             return RecommendCourseType.recommendFRN(workOrder.getRecommendSequence());
@@ -174,6 +181,7 @@ public class RecommandCourseRequester {
 
     /**
      * 终极梦想
+     *
      * @param workorder
      * @return
      */
@@ -183,6 +191,7 @@ public class RecommandCourseRequester {
 
     /**
      * 终极梦想
+     *
      * @param studentId
      * @param index
      * @return
@@ -196,9 +205,9 @@ public class RecommandCourseRequester {
     // 核心素养 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/promote/18826/9
     private URI createPromoteRecommend(Long studentId, int index) {
         URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
-                .path(String.format("/promote/%s/%s", studentId, index))
-                .build()
-                .toUri();
+                                      .path(String.format("/promote/%s/%s", studentId, index))
+                                      .build()
+                                      .toUri();
         logger.info("recommendURL: [{}]", uri);
         return uri;
     }
@@ -206,9 +215,9 @@ public class RecommandCourseRequester {
     // 终极梦想 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/ultimate/18826/1
     private URI createUltimateRecommend(Long studentId, int index) {
         URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
-                .path(String.format("/ultimate/%s/%s", studentId, index))
-                .build()
-                .toUri();
+                                      .path(String.format("/ultimate/%s/%s", studentId, index))
+                                      .build()
+                                      .toUri();
         logger.info("recommendURL: [{}]", uri);
         return uri;
     }
@@ -217,9 +226,9 @@ public class RecommandCourseRequester {
     // 终极梦想换课 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/ultimate/exchange/18826/L3NoYXJlL3N2bi9GdW5jdGlvbiDlhbPliIcvMzEyLuWmguS9leihqOi-vuaLheW_g-afkOS6i--8ny54bHN4
     private URI createUltimateExchangeCourse(Long studentId, int index, String lessonId) {
         URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
-                .path(String.format("/ultimate/exchange/%s/%s/%s", studentId.toString(), index, lessonId))
-                .build()
-                .toUri();
+                                      .path(String.format("/ultimate/exchange/%s/%s/%s", studentId.toString(), index, lessonId))
+                                      .build()
+                                      .toUri();
         logger.info("recommendURL: [{}]", uri);
         return uri;
     }
@@ -227,9 +236,9 @@ public class RecommandCourseRequester {
     // 核心素养换课 123.56.13.168:8001/boxfish-wudaokou-recommend/recommend/core/exchange/promote/18826/1/L3NoYXJlL3N2bi9GdW5jdGlvbiDlhbPliIcvMzEyLuWmguS9leihqOi-vuaLheW_g-afkOS6i—8ny54bHN4
     private URI createPromoteExchangeCourse(Long studentId, int index, String lessonId) {
         URI uri = UriComponentsBuilder.fromUriString(urlConf.getCourse_wudaokou_recommend_service())
-                .path(String.format("/exchange/promote/%s/%s/%s", studentId.toString(), index, lessonId))
-                .build()
-                .toUri();
+                                      .path(String.format("/exchange/promote/%s/%s/%s", studentId.toString(), index, lessonId))
+                                      .build()
+                                      .toUri();
         logger.info("recommendURL: [{}]", uri);
         return uri;
     }
@@ -238,39 +247,41 @@ public class RecommandCourseRequester {
     /**
      * 实时上课
      */
-    public RecommandCourseView getInstantCourseView(Long studentId,int index,TutorType tutorType) {
+    public RecommandCourseView getInstantCourseView(Long studentId, int index, TutorType tutorType) {
         logger.debug("@getInstantCourseView->获取实时推荐课程");
-        switch (tutorType){
-            case FRN:return this.getUltimateRecommend(studentId,index);
-            case CN:return this.getPromoteRecommend(studentId,index);
+        switch (tutorType) {
+            case FRN:
+                return this.getUltimateRecommend(studentId, index);
+            case CN:
+                return this.getPromoteRecommend(studentId, index);
             default:
-                throw  new BusinessException("不支持的参数类型");
+                throw new BusinessException("不支持的参数类型");
         }
     }
 
     public RecommandCourseView getCourseViewDetail(String courseId) {
-        String url=String.format("%s/%s",urlConf.getCourse_wudaokou_detail_service(),courseId);
-        logger.debug("@getCourseViewDetail->获取课程详细信息courseId:[{}],url:[{}]",courseId,url);
-        RecommandCourseView recommandCourseView=restTemplate.getForObject(url, RecommandCourseView.class);
+        String url = String.format("%s/%s", urlConf.getCourse_wudaokou_detail_service(), courseId);
+        logger.debug("@getCourseViewDetail->获取课程详细信息courseId:[{}],url:[{}]", courseId, url);
+        RecommandCourseView recommandCourseView = restTemplate.getForObject(url, RecommandCourseView.class);
         return recommandCourseView;
     }
 
     /***
      * 未匹配上教师的实时上课卡取消课程
+     *
      * @param instantClassCard
      */
     public void cancelUnmatchedInstantCourse(InstantClassCard instantClassCard) {
-        this.cancelUnmatchedInstantCourse(instantClassCard.getStudentId(),instantClassCard.getCourseId());
+        this.cancelUnmatchedInstantCourse(instantClassCard.getStudentId(), instantClassCard.getCourseId());
     }
 
-    public void cancelUnmatchedInstantCourse(Long studentId,String courseId) {
-        String url=String.format("%s/cancel/%s/%s",urlConf.getCourse_wudaokou_recommend_service(),studentId,courseId);
+    public void cancelUnmatchedInstantCourse(Long studentId, String courseId) {
+        String url = String.format("%s/cancel/%s/%s", urlConf.getCourse_wudaokou_recommend_service(), studentId, courseId);
         try {
-            logger.debug("@cancelUnmatchedInstantCourse#超时没有匹配上教师的实时上课卡课程取消,url[{}],学生[{}],课程[{}]",url,studentId,courseId);
+            logger.debug("@cancelUnmatchedInstantCourse#超时没有匹配上教师的实时上课卡课程取消,url[{}],学生[{}],课程[{}]", url, studentId, courseId);
             restTemplate.delete(url);
-        }
-        catch (Exception ex){
-            logger.error("@cancelUnmatchedInstantCourse#未匹配教师的推荐课取消失败,url[{}],学生[{}],课程[{}]",url,studentId,courseId);
+        } catch (Exception ex) {
+            logger.error("@cancelUnmatchedInstantCourse#未匹配教师的推荐课取消失败,url[{}],学生[{}],课程[{}]", url, studentId, courseId);
         }
 
     }
