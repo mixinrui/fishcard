@@ -22,6 +22,8 @@ import java.util.List;
 @Entity
 @Table(name = "small_class")
 public class SmallClass implements Cloneable, Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
