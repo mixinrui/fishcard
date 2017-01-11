@@ -125,7 +125,7 @@ StudentAppRelatedController {
      * @param level
      * @return
      */
-    @RequestMapping(value = "{studentId}/schedule/public", method = RequestMethod.GET)
+//    @RequestMapping(value = "{studentId}/schedule/public", method = RequestMethod.GET)
     public JsonResultModel courseSchedulePublic(@PathVariable Long studentId, String level) {
         return JsonResultModel.newJsonResultModel(
                 timePickerServiceXV1.getStudentPublicClassTimeEnum(level, LocalDate.now()));

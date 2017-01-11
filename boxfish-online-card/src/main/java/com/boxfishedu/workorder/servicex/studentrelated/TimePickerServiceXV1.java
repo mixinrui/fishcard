@@ -253,6 +253,7 @@ public class TimePickerServiceXV1 {
             if(e instanceof PublicClassException) {
                 return (((PublicClassException) e).publicClassMessage).getMessageMap();
             }
+            e.printStackTrace();
             throw new BusinessException(e.getMessage());
         }
     }

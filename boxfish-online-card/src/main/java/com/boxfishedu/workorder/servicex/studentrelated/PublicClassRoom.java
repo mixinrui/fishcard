@@ -57,9 +57,10 @@ public class PublicClassRoom {
     @Transactional
     public void enter(SmallClass smallClass, Long studentId, String accessToken) {
 
-        // 一 判断是否曾经进入过这个房间, 是则直接进入
+        // 一 判断是否是第一次进入这个课堂, 如果不是, 则直接返回
         if(isOnceEntered(smallClass.getId(), studentId)) {
-            turnToEnterStatus(smallClass.getId(), studentId);
+            // 更改状态
+            updateEnterStatus(smallClass.getId(), studentId);
             return;
         }
 
@@ -79,6 +80,7 @@ public class PublicClassRoom {
      * @param smallClassId
      * @param studentId
      */
+    @Transactional
     public void quit(Long smallClassId, Long studentId) {
         publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.QUIT.code, smallClassId, studentId);
         setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId);
@@ -100,6 +102,7 @@ public class PublicClassRoom {
         entity.setSlotId(smallClass.getSlotId());
         entity.setSmallClassId(smallClass.getId());
         entity.setStudentId(studentId);
+        entity.setStatus(PublicClassInfoStatusEnum.ENTER.code);
         publicClassInfoJpaRepository.save(entity);
         // 更新课堂实时缓存
         updateEnterCacheRealTime(smallClass.getId(), studentId);
