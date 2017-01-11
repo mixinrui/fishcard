@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.statusdealer;
+package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
 
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import org.springframework.beans.factory.annotation.Autowired;

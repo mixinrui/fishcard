@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.statusdealer.initstrategy;
+package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
 
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;

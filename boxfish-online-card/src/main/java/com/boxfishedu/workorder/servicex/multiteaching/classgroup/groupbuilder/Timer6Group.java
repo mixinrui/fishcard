@@ -6,7 +6,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
-import com.boxfishedu.workorder.servicex.multiteaching.statusdealer.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEvent;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

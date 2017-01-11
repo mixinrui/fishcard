@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.statusdealer;
+package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import lombok.Data;

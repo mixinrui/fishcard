@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.statusdealer;
+package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
