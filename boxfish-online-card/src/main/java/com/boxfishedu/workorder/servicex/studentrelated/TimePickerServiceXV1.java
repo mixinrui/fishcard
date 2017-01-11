@@ -340,7 +340,7 @@ public class TimePickerServiceXV1 {
             throw new BusinessException("错误的level等级");
         }
         PublicClassTimeEnum publicClass = PublicClassTimeEnum.publicClassTime(courseDifficulty);
-        List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndSmallClassType(
+        List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndClassType(
                 DateUtil.convertToDate(now), publicClass.getTimeRange().getSlotId(), ClassTypeEnum.PUBLIC.name());
         if(CollectionUtils.isEmpty(publicClassList)) {
             throw new BusinessException("今天没有对应的公开课!");

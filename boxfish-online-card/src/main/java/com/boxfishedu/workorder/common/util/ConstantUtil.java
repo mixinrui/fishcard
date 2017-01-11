@@ -1,7 +1,5 @@
 package com.boxfishedu.workorder.common.util;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
-
 /**
  * Created by hucl on 16/5/10.
  */

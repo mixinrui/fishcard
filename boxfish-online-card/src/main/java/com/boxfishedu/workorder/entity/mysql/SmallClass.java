@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
@@ -85,7 +85,7 @@ public class SmallClass implements Cloneable, Serializable {
     private Date actualStartTime;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date actualTime;
+    private Date actualEndTime;
 
     private Integer status;
 
@@ -99,7 +99,7 @@ public class SmallClass implements Cloneable, Serializable {
     private List<WorkOrder> allCards;
 
     //班级类型
-    public String smallClassType;
+    public String classType;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
@@ -125,7 +125,7 @@ public class SmallClass implements Cloneable, Serializable {
         this.setTeacherId(publicClassBuilderParam.getTeacherId());
         this.setUpdateTime(new Date());
         this.setRoleId(publicClassBuilderParam.getRoleId().intValue());
-        this.setSmallClassType(SmallClassType.PUBLIC.name());
+        this.setClassType(ClassTypeEnum.PUBLIC.name());
         this.setClassDate(DateUtil.simpleString2Date(publicClassBuilderParam.getDate()));
         this.setSlotId(publicClassBuilderParam.getSlotId().intValue());
         this.setCreateTime(new Date());

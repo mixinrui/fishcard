@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long> {
 
-    List<SmallClass> findByClassDateAndSlotIdAndSmallClassType(Date classDate, Integer slotId, String classType);
+    List<SmallClass> findByClassDateAndSlotIdAndClassType(Date classDate, Integer slotId, String classType);
 
     @Query("select s from SmallClass s order by s.classDate")
     Page<SmallClass> findPage(Pageable pageable);

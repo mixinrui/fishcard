@@ -88,7 +88,7 @@ public class PublicClassRoom {
      */
     @Transactional
     public void quit(Long smallClassId, Long studentId) {
-        publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.QUIT.code, smallClassId, studentId);
+        publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.QUIT.getCode(), smallClassId, studentId);
         setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId);
     }
 
@@ -108,7 +108,7 @@ public class PublicClassRoom {
         entity.setSlotId(smallClass.getSlotId());
         entity.setSmallClassId(smallClass.getId());
         entity.setStudentId(studentId);
-        entity.setStatus(PublicClassInfoStatusEnum.ENTER.code);
+        entity.setStatus(PublicClassInfoStatusEnum.ENTER.getCode());
         publicClassInfoJpaRepository.save(entity);
         // 更新课堂实时缓存
         updateEnterCacheRealTime(smallClass.getId(), studentId);
@@ -170,7 +170,7 @@ public class PublicClassRoom {
 
 
     private void updateEnterStatus(Long smallClassId, Long studentId) {
-        publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.ENTER.code, smallClassId, studentId);
+        publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.ENTER.getCode(), smallClassId, studentId);
         // 更新课堂实时缓存
         updateEnterCacheRealTime(smallClassId, studentId);
     }
