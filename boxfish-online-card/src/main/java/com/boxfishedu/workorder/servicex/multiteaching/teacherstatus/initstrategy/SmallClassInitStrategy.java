@@ -1,12 +1,8 @@
-package com.boxfishedu.workorder.servicex.multiteaching.statusdealer.initstrategy;
+package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
 
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.TeachingType;
-import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
@@ -15,8 +11,6 @@ import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
-import com.google.common.collect.Interner;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,13 +1,12 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.entity.mysql.PublicClassInfo;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.service.instantclass.PublicClassInfoQueryService;
 import com.boxfishedu.workorder.service.instantclass.SmallClassQueryService;
-import com.boxfishedu.workorder.web.param.FishCardFilterParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Maps;
@@ -17,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -26,21 +25,21 @@ import java.util.Map;
  * Created by jiaozijun on 17/1/11.
  */
 
-@Component
-public class SmallClassQueryServiceX {
+@Service
+public class PublicClassInfoQueryServiceX {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private SmallClassQueryService smallClassQueryService;
+    private PublicClassInfoQueryService publicClassInfoQueryService;
 
 
     public JsonResultModel listFishCardsByUnlimitedUserCond(PublicFilterParam publicFilterParam, Pageable pageable) {
         processDateParam(publicFilterParam);
-        List<SmallClass> workOrderList = smallClassQueryService.filterFishCards(publicFilterParam, pageable);
+        List<PublicClassInfo> workOrderList = publicClassInfoQueryService.filterFishCards(publicFilterParam, pageable);
 
-        Long count = smallClassQueryService.filterFishCardsCount(publicFilterParam);
-        Page<SmallClass> page = new PageImpl(workOrderList, pageable, count);
+        Long count = publicClassInfoQueryService.filterFishCardsCount(publicFilterParam);
+        Page<PublicClassInfo> page = new PageImpl(workOrderList, pageable, count);
 
         return JsonResultModel.newJsonResultModel(page);
     }
@@ -78,5 +77,4 @@ public class SmallClassQueryServiceX {
         }
         return JsonResultModel.newJsonResultModel(statusMap);
     }
-
 }

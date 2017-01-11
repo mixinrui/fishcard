@@ -15,6 +15,7 @@ public class PublicFilterParam {
     private String end;
 
     private Long id;
+    private Long smallClassId;
     private Long studentId;
     private Long teacherId;
     private String orderCode;

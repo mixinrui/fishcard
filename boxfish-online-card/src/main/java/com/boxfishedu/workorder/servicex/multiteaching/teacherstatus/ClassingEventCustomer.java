@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.statusdealer;
+package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import org.springframework.core.annotation.Order;
@@ -9,16 +9,16 @@ import javax.annotation.PostConstruct;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(400)
+@Order(300)
 @Component
-public class CompleteEventCustomer  extends SmallClassEventCustomer{
+public class ClassingEventCustomer extends SmallClassEventCustomer{
     @PostConstruct
     public void initEvent(){
-        this.setSmallClassCardStatus(SmallClassCardStatus.COMPLETED);
+        this.setSmallClassCardStatus(SmallClassCardStatus.CLASSING);
     }
 
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
-        logger.info("课程结束...");
+        logger.info("教师开始上课...");
     }
 }

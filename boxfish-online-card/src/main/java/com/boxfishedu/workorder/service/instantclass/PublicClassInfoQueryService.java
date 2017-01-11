@@ -4,6 +4,7 @@ import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
+import com.boxfishedu.workorder.entity.mysql.PublicClassInfo;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import org.apache.commons.lang.StringUtils;
@@ -16,12 +17,10 @@ import javax.persistence.Query;
 import java.util.List;
 
 /**
- * 公开课查询
  * Created by jiaozijun on 17/1/11.
  */
-
 @Component
-public class SmallClassQueryService {
+public class PublicClassInfoQueryService {
 
     @Autowired
     private EntityManager entityManager;
@@ -35,20 +34,20 @@ public class SmallClassQueryService {
     }
 
 
-    public List<SmallClass> filterFishCards(PublicFilterParam publicFilterParam, Pageable pageable) {
+    public List<PublicClassInfo> filterFishCards(PublicFilterParam publicFilterParam, Pageable pageable) {
         String prefix = "select wo ";
         String sql = prefix + getFilterSql(publicFilterParam);
         Query query = getFilterQuery(sql, publicFilterParam, entityManager);
         query.setFirstResult(pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
-        List<SmallClass> smallClasss = query.getResultList();
+        List<PublicClassInfo> smallClasss = query.getResultList();
         return smallClasss;
     }
 
 
     private String getFilterSql(PublicFilterParam publicFilterParam) {
 
-        StringBuilder sql = new StringBuilder("from SmallClass wo where wo.startTime between :begin and :end ");
+        StringBuilder sql = new StringBuilder("from PublicClassInfo wo where wo.startTime between :begin and :end ");
 
         if (null != publicFilterParam.getOrderType()) {
             if (publicFilterParam.getOrderType().equals(OrderChannelDesc.OVERALL.getCode())
@@ -183,7 +182,7 @@ public class SmallClassQueryService {
         if (null != publicFilterParam.getId()) {
             query.setParameter("id", publicFilterParam.getId());
         }
-        
+
         if (null != publicFilterParam.getOrderType()) {
             query.setParameter("classType", publicFilterParam.getClassType());
         }
@@ -263,6 +262,5 @@ public class SmallClassQueryService {
         }
         return condition.substring(0, condition.length() - 1);
     }
-
 
 }
