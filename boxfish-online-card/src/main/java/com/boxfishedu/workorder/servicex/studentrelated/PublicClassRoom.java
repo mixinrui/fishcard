@@ -189,7 +189,7 @@ public class PublicClassRoom {
      * @param smallClassId
      * @param studentId
      */
-    private void turnToEnterStatus(Long smallClassId, Long studentId) {
+    private void updateEnterStatus(Long smallClassId, Long studentId) {
         publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.ENTER.code, smallClassId, studentId);
         // 更新课堂实时缓存
         updateEnterCacheRealTime(smallClassId, studentId);
