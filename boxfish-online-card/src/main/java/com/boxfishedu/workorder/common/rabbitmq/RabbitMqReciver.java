@@ -25,6 +25,7 @@ import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
+import com.boxfishedu.workorder.servicex.studentrelated.PublicClassRoom;
 import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -106,7 +107,8 @@ public class RabbitMqReciver {
     @Autowired
     private AssignTeacherServiceX assignTeacherServiceX;
 
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private PublicClassRoom publicClassRoom;
 
 
     /**
@@ -237,6 +239,9 @@ public class RabbitMqReciver {
             else if(serviceTimerMessage.getType() == TimerMessageType.ASSGIN_TEACHER.value()) {
                 logger.info("==========>@@@@assign-timer===>>> 指定老师定时任务接受到任务");
                 assignTeacherServiceX.autoAssign();
+            } else if(serviceTimerMessage.getType() == TimerMessageType.EXPIRE_PUBLIC_CLASS.value()) {
+                logger.info("==========>@@@@assign-timer===>>> 删除公开课缓存");
+                publicClassRoom.expireClassRoomCache();
             }
             //
         } catch (Exception ex) {

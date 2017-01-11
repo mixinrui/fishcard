@@ -2,8 +2,10 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
+import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
 import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.PublicClassInfo;
 import com.boxfishedu.workorder.entity.mysql.PublicClassInfoJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
@@ -18,8 +20,10 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by LuoLiBing on 17/1/9.
@@ -29,27 +33,30 @@ import java.util.Optional;
 public class PublicClassRoom {
 
     // 进入过课堂的人
-    private final static String CLASS_ROOM_MEMBER_KEY = "publicClassRoom_member_";
-
-    // 一周以内学过的学生
-    private final static String CLASS_ROOM_MEMBER_WEEK_KEY = "publicClassRoom_member_week_";
+    public final static String CLASS_ROOM_MEMBER_KEY = "publicClassRoom_member_";
 
     // 一天以内进入过的学生
-    private final static String CLASS_ROOM_MEMBER_DAY_KEY = "publicClassRoom_member_day_";
+    public final static String CLASS_ROOM_MEMBER_DAY_KEY = "publicClassRoom_member_day_";
 
     // 课堂实时人数
-    private final static String CLASS_ROOM_MEMBER_REAL_TIME = "publicClassRoom_member_real_time_";
+    public final static String CLASS_ROOM_MEMBER_REAL_TIME = "publicClassRoom_member_real_time_";
 
     @Autowired
     private PublicClassInfoJpaRepository publicClassInfoJpaRepository;
 
     @Autowired
+    private SmallClassJpaRepository smallClassJpaRepository;
+
+    @Autowired
     private ServiceSDK serviceSdk;
+
+    private RedisTemplate<String, Long> redisTemplate;
 
     private SetOperations<String, Long> setOperations;
 
     @Autowired
     public void initRedis(@Qualifier(value = "stringLongRedisTemplate") RedisTemplate<String, Long> redisTemplate) {
+        this.redisTemplate = redisTemplate;
         setOperations = redisTemplate.opsForSet();
     }
 
@@ -126,11 +133,6 @@ public class PublicClassRoom {
 
     private void checkMember(SmallClass smallClass, Long studentId, String accessToken) {
 
-        // 先判断这周是否已经上过课, 如果没有, 可以直接进入课堂, 否则, 再判断是否是会员, 今天是否上课
-        if(!setOperations.isMember(createClassRoomWeekKey(smallClass.getClassDate()), studentId)) {
-            return;
-        }
-
         // 获取会员信息
         JsonResultModel resultModel = serviceSdk.getMemberInfo(accessToken);
         Map memberInfo = (Map) resultModel.getData();
@@ -143,26 +145,10 @@ public class PublicClassRoom {
         }
         LocalDate classDate = DateUtil.convertLocalDate(smallClass.getClassDate());
         switch (memberType) {
-            // 非会员验证, 这周已经上过课, 提示不能上课
+            // 非会员直接不让上课
             case "NONE" : throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
             // 会员验证
             default: memberCheck(classDate, studentId); break;
-        }
-    }
-
-    /**
-     * 非会员验证
-     * @param classDate
-     * @param studentId
-     */
-    private void nonMemberCheck(LocalDate classDate, Long studentId) {
-        // 非会员, 每周只能上一节课
-        Integer count = publicClassInfoJpaRepository.findByClassDateRangeAndStudentId(
-                DateUtil.getFirstDateOfWeek(classDate),
-                DateUtil.getLastDateOfWeek(classDate),
-                studentId);
-        if(count > 0) {
-            throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
         }
     }
 
@@ -182,15 +168,6 @@ public class PublicClassRoom {
 //        }
     }
 
-
-    /**
-     * 更新状态
-     * @param smallClassId
-     * @param studentId
-     */
-    private void turnToEnterStatus(Long smallClassId, Long studentId) {
-        publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.ENTER.code, smallClassId, studentId);
-    }
 
     private void updateEnterStatus(Long smallClassId, Long studentId) {
         publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.ENTER.code, smallClassId, studentId);
@@ -214,11 +191,58 @@ public class PublicClassRoom {
         // 加入到这一天的上课当中.
         setOperations.add(CLASS_ROOM_MEMBER_DAY_KEY + DateUtil.simpleDate2String(smallClass.getClassDate()), studentId);
         // 加入到一周上课学生列表当中.
-        setOperations.add(createClassRoomWeekKey(smallClass.getClassDate()), studentId);
+//        setOperations.add(createClassRoomWeekKey(smallClass.getClassDate()), studentId);
     }
+
+
+    // ********************************* 过期缓存 *********************************** //
+    // 每天删除前天的房间
+    public void expireClassRoomCache() {
+        LocalDate localDate = LocalDate.now().minusDays(2);
+        List<SmallClass> smallClassList = smallClassJpaRepository.findByClassDateAndSmallClassType(
+                DateUtil.convertToDate(localDate), SmallClassType.PUBLIC.name());
+        expireClassRoomCacheByDate(localDate);
+        for(SmallClass smallClass : smallClassList) {
+            expireClassRoomCacheBySmallClassId(smallClass.getId());
+        }
+    }
+
+    // 过期掉公开课实时缓存
+    private void expireClassRoomCacheBySmallClassId(Long smallClassId) {
+        redisTemplate.expire(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, 1, TimeUnit.SECONDS);
+        redisTemplate.expire(CLASS_ROOM_MEMBER_KEY + smallClassId, 1, TimeUnit.SECONDS);
+    }
+
+    // 过期掉根据日期创建的缓存
+    private void expireClassRoomCacheByDate(LocalDate localDate) {
+        redisTemplate.expire(CLASS_ROOM_MEMBER_DAY_KEY + DateUtil.dateFormatter.format(localDate), 1, TimeUnit.SECONDS);
+    }
+
+
+    // ********************************* 暂时不用的方法 *********************************** //
+
+    // 一周以内学过的学生
+    public final static String CLASS_ROOM_MEMBER_WEEK_KEY = "publicClassRoom_member_week_";
 
     private String createClassRoomWeekKey(Date classDate) {
         LocalDate firstDateOfWeek = DateUtil.getFirstDateOfWeek(DateUtil.convertLocalDate(classDate));
         return CLASS_ROOM_MEMBER_WEEK_KEY + DateUtil.dateFormatter.format(firstDateOfWeek);
+    }
+
+
+    /**
+     * 非会员验证
+     * @param classDate
+     * @param studentId
+     */
+    private void nonMemberCheck(LocalDate classDate, Long studentId) {
+        // 非会员, 每周只能上一节课
+        Integer count = publicClassInfoJpaRepository.findByClassDateRangeAndStudentId(
+                DateUtil.getFirstDateOfWeek(classDate),
+                DateUtil.getLastDateOfWeek(classDate),
+                studentId);
+        if(count > 0) {
+            throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
+        }
     }
 }

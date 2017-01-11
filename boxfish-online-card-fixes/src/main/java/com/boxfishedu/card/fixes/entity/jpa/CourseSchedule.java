@@ -67,6 +67,9 @@ public class CourseSchedule {
     @Column(name = "is_freeze", nullable = true)
     private Integer isFreeze;
 
+    @Column(name = "small_class_id", nullable = true)
+    private Long smallClassId;
+
 //    @Column(name="schedule_type")
 //    private Integer scheduleType;
 }

@@ -42,6 +42,7 @@ public class TimeSlots implements Cloneable, Serializable {
     // 默认为未分配
     private Integer courseScheduleStatus = NOT_ASSIGN_STATUS;
     private Long workOrderId;
+    private Long smallClassId;
 
     public TimeSlots() {}
 
@@ -59,6 +60,7 @@ public class TimeSlots implements Cloneable, Serializable {
         this.workOrderId = courseSchedule.getWorkorderId();
         this.courseScheduleStatus = courseSchedule.getStatus();
         this.classType = courseSchedule.getClassType();
+        this.smallClassId = courseSchedule.getSmallClassId();
         if(isInstant(courseSchedule)){
             this.startTime=courseSchedule.getInstantStartTtime();
             this.endTime=courseSchedule.getInstantEndTtime();
