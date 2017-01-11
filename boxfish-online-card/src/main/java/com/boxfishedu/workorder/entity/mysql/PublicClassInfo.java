@@ -32,6 +32,8 @@ public class PublicClassInfo implements Serializable {
 
     private Date createTime;
 
+    private Integer status;
+
     public PublicClassInfo() {
         this.createTime = new Date();
     }

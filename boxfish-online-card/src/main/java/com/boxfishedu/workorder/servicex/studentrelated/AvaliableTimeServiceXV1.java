@@ -119,7 +119,8 @@ public class AvaliableTimeServiceXV1 {
                 (localDateTime, dayTimeSlot) -> {
 
                     //小班课
-                    if (ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType())) {
+                    if (ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getComboType()) || "SMALLCLASS".equals(avaliableTimeParam.getComboType())) {
+                        logger.info("getTimeAvailable:compotye [{}]",avaliableTimeParam.getComboType());
                         dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
                                 .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
                                         &&
@@ -313,7 +314,7 @@ public class AvaliableTimeServiceXV1 {
             jb.put("id", i);
             jb.put("text", text);
             jb.put("date", DateUtil.Date2String24(date));
-            jb.put("show", true);
+            jb.put("valid", true);
             jb.put("realDate", date);
             jb.put("endDate", DateUtil.getAfter7Days(date, (service.getComboCycle() + 1)));
             delayRange.add(jb);

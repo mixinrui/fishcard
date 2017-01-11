@@ -253,8 +253,24 @@ public class TimePickerServiceXV1 {
             if(e instanceof PublicClassException) {
                 return (((PublicClassException) e).publicClassMessage).getMessageMap();
             }
+            e.printStackTrace();
             throw new BusinessException(e.getMessage());
         }
+    }
+
+
+    /**
+     * 学生退出公开课课堂
+     * @param smallClassId
+     * @param studentId
+     */
+    public void quitPublicClassRoom(Long smallClassId, Long studentId) {
+        publicClassRoom.quit(smallClassId, studentId);
+    }
+
+
+    public long getPublicClassRoomStudentCount(Long smallClassId) {
+        return publicClassRoom.getClassRoomStudentCount(smallClassId);
     }
 
     public List<Service> ensureConvertOver(TimeSlotParam timeSlotParam) {
