@@ -36,7 +36,7 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
         SmallClass smallClass = smallClassEvent.getSource();
         smallClass.setStatus(smallClassEvent.getType().getCode());
 
-        GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(prefix + smallClass.getSmallClassType());
+        GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(prefix + smallClass.getClassType());
 
         //初始化小班课信息
         groupInitStrategy.initGroupClass(smallClass);

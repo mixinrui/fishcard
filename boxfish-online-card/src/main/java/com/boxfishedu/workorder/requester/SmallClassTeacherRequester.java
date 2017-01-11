@@ -42,7 +42,7 @@ public class SmallClassTeacherRequester {
         smallClassFetchTeacherParam.setDay(smallClass.getClassDate().getTime());
         smallClassFetchTeacherParam.setSlotId(smallClass.getSlotId().longValue());
         smallClass.setRoleId(smallClass.getRoleId());
-        smallClass.setSmallClassType(SMALL_CLASS);
+        smallClass.setClassType(SMALL_CLASS);
 
         String url = String.format("%s/course/schedule/teacher/web/match", urlConf.getTeacher_service());
         restTemplate.postForObject(url, smallClassFetchTeacherParam, JsonResultModel.class);

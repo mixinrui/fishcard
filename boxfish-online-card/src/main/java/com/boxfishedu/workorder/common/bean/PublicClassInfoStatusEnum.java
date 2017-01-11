@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by LuoLiBing on 17/1/11.
  */
-public enum PublicClassInfoEnum {
+public enum PublicClassInfoStatusEnum {
     UNKNOWN(0, "未知"),
     ENTER(100, "校验通过"),
     VOICE_VIDEO_SUCCESS(200, "接入音视频成功"),
@@ -16,12 +16,14 @@ public enum PublicClassInfoEnum {
     OFF_WHEAT(410, "下麦"),
     COMPLETED(500, "正常完成"),
     COMPLETED_FORCE(510, "强退"),
-    LEAVE_EARLY(520, "早退");
+    LEAVE_EARLY(520, "早退"),
+    //主要给数据库用
+    QUIT(550, "退出");
 
 
     private static Map<Integer, Enum> varMap = new HashMap<>();
 
-    PublicClassInfoEnum(int code, String desc) {
+    PublicClassInfoStatusEnum(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -30,14 +32,14 @@ public enum PublicClassInfoEnum {
     private String desc;
 
     static {
-        for (PublicClassInfoEnum v : PublicClassInfoEnum.values()) {
+        for (PublicClassInfoStatusEnum v : PublicClassInfoStatusEnum.values()) {
             varMap.put(v.getCode(), v);
         }
     }
 
-    public static PublicClassInfoEnum get(int code) {
+    public static PublicClassInfoStatusEnum get(int code) {
         if (varMap.containsKey(code)) {
-            return (PublicClassInfoEnum) varMap.get(code);
+            return (PublicClassInfoStatusEnum) varMap.get(code);
         }
         return UNKNOWN;
     }
