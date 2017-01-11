@@ -45,7 +45,7 @@ HomePageController {
         smallClass.setChatRoomId(111111L);
         smallClass.setClassDate(new Date());
         smallClass.setCourseId("JJJKKKKKLLLSS");
-        smallClass.setCourseName("test course");
+        smallClass.setCourseName("魔术师的帽子里都藏着什么？");
         smallClass.setCourseType("TALK");
         smallClass.setCreateTime(new Date());
         smallClass.setGroupId("group id");
@@ -55,6 +55,18 @@ HomePageController {
         smallClass.setTeacherId(222L);
         smallClass.setUpdateTime(new Date());
         smallClass.setId(333L);
+        smallClass.setDifficultyLevel("LEVEL_2");
+        smallClass.setCreateTime(new Date());
+        smallClass.setStatus(20);
+        smallClass.setClassDate(new Date());
+        smallClass.setActualEndTime(new Date());
+        smallClass.setActualStartTime(new Date());
+        smallClass.setCover("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
+        smallClass.setRoleId(2);
+        smallClass.setUpdateTime(new Date());
+        smallClass.setTeacherName("张老师");
+        smallClass.setStartTime(new Date());
+        smallClass.setEndTime(new Date());
 
 
         List<AccountCourseBean.CardCourseInfo> cardCourseInfos = Lists.newArrayList();

@@ -40,9 +40,6 @@ public class MsgPushRequester {
         String url = String.format("%s/notification/push?type=%s",
                                    urlConf.getMsg_push_url(),"INSTANCE_CLASS");
 
-//        String url = String.format("%s/notification/push",
-//                                   urlConf.getMsg_push_url());
-
         logger.info("@notifyInstantGroupClassMsg,向教师发起立即上课推送,url[{}]", url);
 //        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard, teacherIds, "向教师发起推送");
         TeachingOnlineGroupMsg teachingOnlineGroupMsg = new TeachingOnlineGroupMsg();
