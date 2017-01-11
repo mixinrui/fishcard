@@ -442,7 +442,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setTeachingType(productCombo.getComboType().getValue());
         // 产品类型
         service.setProductType(productComboDetail.getProductCode());
-        service.setComboType(productCombo.getComboType().name());
+        String comboType = productCombo.getComboType().name();
+        service.setComboType(comboType);
         service.setCreateTime(new Date());
         service.setOrderCode(orderView.getOrderCode());
         service.setCoursesSelected(0);
@@ -450,7 +451,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOrderChannel(orderView.getOrderChannel().name());
         // 小班课规模, 如果没有指定默认为-1
         String optionTwo = productComboDetail.getProductSku().getOptionTwo();
-        if(org.apache.commons.lang3.StringUtils.isNotEmpty(optionTwo)) {
+
+        // 如果是小班课, OptionTwo为上课人数
+        if(org.apache.commons.lang3.StringUtils.equals(ComboTypeToRoleId.SMALLCLASS.name(), comboType)
+                && org.apache.commons.lang3.StringUtils.isNotEmpty(optionTwo)) {
             service.setClassSize(Integer.valueOf(optionTwo));
         } else {
             service.setClassSize(-1);
@@ -506,7 +510,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfoService.save(scheduleCourseInfo);
     }
 
-     @Cacheable(value = CacheKeyConstant.COMMENT_CARD_AMOUNT, key = "#studentId")
+    @Cacheable(value = CacheKeyConstant.COMMENT_CARD_AMOUNT, key = "#studentId")
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
         List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
                 studentId, ProductType.COMMENT.value());

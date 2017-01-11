@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
 import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -47,17 +48,17 @@ public class PublicClassRoom {
 
     @Transactional
     public void enter(SmallClass smallClass, Long studentId, String accessToken) {
-        // 是否是在正常的时间点
 
         // 一 判断是否曾经进入过这个房间, 是则直接进入
         if(isOnceEntered(smallClass.getId(), studentId)) {
+            turnToEnterStatus(smallClass.getId(), studentId);
             return;
         }
 
         // 二 判断会员属性, 判断上公开课的次数
         checkMember(smallClass, studentId, accessToken);
 
-        // 三 如果没有消费过, 则直接进入房间, 保存
+        // 三 如果没有消费过, 则直接进入房间, 保存, 默认就是进入课堂
         savePublicClassInfo(smallClass, studentId);
 
         // 四 更新redis
@@ -138,8 +139,17 @@ public class PublicClassRoom {
     }
 
 
+    /**
+     * 更新状态
+     * @param smallClassId
+     * @param studentId
+     */
+    private void turnToEnterStatus(Long smallClassId, Long studentId) {
+        publicClassInfoJpaRepository.updateStatus(PublicClassInfoEnum.ENTER.code, smallClassId, studentId);
+    }
 
-    private void updateEnterRealTimeCache(SmallClass smallClass, Long studentId) {
+
+    private void updateEnterCache() {
 
     }
 

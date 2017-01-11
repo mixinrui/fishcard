@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoEnum;
 import com.boxfishedu.workorder.dao.jpa.LocalDateAttributeConverter;
 import lombok.Data;
 
@@ -32,7 +33,10 @@ public class PublicClassInfo implements Serializable {
 
     private Date createTime;
 
+    private Integer status;
+
     public PublicClassInfo() {
         this.createTime = new Date();
+        this.status = PublicClassInfoEnum.ENTER.code;
     }
 }
