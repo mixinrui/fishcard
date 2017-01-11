@@ -2,7 +2,7 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
@@ -199,8 +199,8 @@ public class PublicClassRoom {
     // 每天删除前天的房间
     public void expireClassRoomCache() {
         LocalDate localDate = LocalDate.now().minusDays(2);
-        List<SmallClass> smallClassList = smallClassJpaRepository.findByClassDateAndSmallClassType(
-                DateUtil.convertToDate(localDate), SmallClassType.PUBLIC.name());
+        List<SmallClass> smallClassList = smallClassJpaRepository.findByClassDateAndClassType(
+                DateUtil.convertToDate(localDate), ClassTypeEnum.PUBLIC.name());
         expireClassRoomCacheByDate(localDate);
         for(SmallClass smallClass : smallClassList) {
             expireClassRoomCacheBySmallClassId(smallClass.getId());
