@@ -41,6 +41,8 @@ public class StudentCourseSchedule implements Serializable {
 
     private Integer status;
 
+    private String classType;
+
     public String getCourseType() {
         if(courseView == null || CollectionUtils.isEmpty(courseView.getCourseType())) {
             return courseType;

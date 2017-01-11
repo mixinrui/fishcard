@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.exception.ValidationException;
+import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
@@ -11,11 +12,12 @@ import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardSer
 import com.boxfishedu.workorder.service.commentcard.sdk.CommentCardSDK;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by ansel on 16/7/18.
@@ -39,6 +41,9 @@ public class ForeignTeacherCommentController {
     @Autowired
     CommentTeacherAppServiceX commentTeacherAppServiceX;
 
+    @Autowired
+    private CacheManager cacheManager;
+
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public JsonResultModel addCommentCard(@RequestBody CommentCardForm commentCardForm, Long userId, String access_token) throws Exception {
         return JsonResultModel.newJsonResultModel(foreignTeacherCommentCardService.foreignTeacherCommentCardAdd(commentCardForm,userId,access_token));
@@ -57,6 +62,25 @@ public class ForeignTeacherCommentController {
         }else {
             return JsonResultModel.newJsonResultModel(commentCard);
         }
+    }
+
+    @RequestMapping(value = "/evict/amount/{studentId}", method = RequestMethod.DELETE)
+    public JsonResultModel evictAmount(@PathVariable Long studentId, String sign) {
+        if(Objects.equals(sign, "foreignTeacherCommentCardService")) {
+            throw new UnsupportedOperationException();
+        }
+        cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(studentId);
+        return JsonResultModel.newJsonResultModel();
+    }
+
+
+    @RequestMapping(value = "/evict/amount/all", method = RequestMethod.DELETE)
+    public JsonResultModel clear(String sign) {
+        if(Objects.equals(sign, "foreignTeacherCommentCardService")) {
+            throw new UnsupportedOperationException();
+        }
+        foreignTeacherCommentCardService.clearAmountCache();
+        return JsonResultModel.newJsonResultModel();
     }
 
     //@RequestMapping(value = "/isAvailable", method = RequestMethod.GET)

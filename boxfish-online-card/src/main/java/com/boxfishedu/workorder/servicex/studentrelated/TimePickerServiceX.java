@@ -278,6 +278,7 @@ public class TimePickerServiceX {
         studentCourseSchedule.setWorkOrderId(courseSchedule.getWorkorderId());
         studentCourseSchedule.setStatus(courseSchedule.getStatus());
         studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
+        studentCourseSchedule.setClassType(courseSchedule.getClassType());
         if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
             studentCourseSchedule.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
         }
@@ -286,9 +287,9 @@ public class TimePickerServiceX {
 
     public Object getCourseSchedulePage(Long studentId, Pageable pageable, Locale locale) {
         // 先判断是否是在线上课用户, 如果不是, 则不需要查询数据库, 直接返回默认的空
-        if(!accountService.isMember(studentId)) {
-            return DEFAULT_STUDENT_SCHEDULE_PAGE;
-        }
+//        if(!accountService.isMember(studentId)) {
+//            return DEFAULT_STUDENT_SCHEDULE_PAGE;
+//        }
 
         Page<CourseSchedule> page = courseScheduleService.findByStudentId(studentId, pageable);
         List<Map<String, Object>> result = adapterCourseScheduleList(page.getContent(), locale);

@@ -3,6 +3,8 @@ package com.boxfishedu.workorder.common.bean;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 
+import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.EnumMap;
 
@@ -79,13 +81,22 @@ public enum PublicClassTimeEnum {
     /**
      * 上课时间范围
      */
-    public class TimeRange {
+    public class TimeRange implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         public final Integer slotId;
         public final LocalTime from, to;
+        private LocalDate classDate;
+
         public TimeRange(Integer slotId, LocalTime from, LocalTime to) {
             this.slotId = slotId;
             this.from = from;
             this.to = to;
+        }
+
+        public TimeRange setClassDate(LocalDate classDate) {
+            this.classDate = classDate;
+            return this;
         }
 
         public String getFrom() {
@@ -98,6 +109,14 @@ public enum PublicClassTimeEnum {
 
         public Integer getSlotId() {
             return slotId;
+        }
+
+        public String getFromDate() {
+            return classDate == null? null: DateUtil.formatLocalDateTime(DateUtil.merge(classDate, from));
+        }
+
+        public String getToDate() {
+            return classDate == null? null: DateUtil.formatLocalDateTime(DateUtil.merge(classDate, to));
         }
     }
 }

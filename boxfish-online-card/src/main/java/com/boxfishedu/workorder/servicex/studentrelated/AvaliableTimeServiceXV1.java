@@ -5,12 +5,19 @@ import com.boxfishedu.mall.enums.ComboTypeToRoleId;
 import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
+import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.RedisMapService;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
@@ -20,6 +27,7 @@ import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +60,15 @@ public class AvaliableTimeServiceXV1 {
     @Autowired
     private RedisMapService redisMapService;
 
+    @Autowired
+    private ServeService serveService;
+
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
+
+    @Autowired
+    private CourseScheduleRepository courseScheduleRepository;
+
     /**
      * 免费体验的天数
      */
@@ -74,7 +91,7 @@ public class AvaliableTimeServiceXV1 {
      * @throws CloneNotSupportedException
      */
     public JsonResultModel getTimeAvailable(AvaliableTimeParam avaliableTimeParam) throws CloneNotSupportedException {
-        List places = new ArrayList<Integer>(Arrays.asList(4, 6, 7,1));
+        List places = new ArrayList<Integer>(Arrays.asList(4, 6, 7, 1));
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(avaliableTimeParam, getOptionalDays(avaliableTimeParam));
 
@@ -96,27 +113,26 @@ public class AvaliableTimeServiceXV1 {
 
     private List<DayTimeSlots> getTimeAvailable(AvaliableTimeParam avaliableTimeParam, DateRange dateRange, Set<String> classDateTimeSlotsSet) throws CloneNotSupportedException {
         // 获取时间片模板,并且复制
-        final List<Integer> list = Lists.newArrayList(4,6,7,1);
+        final List<Integer> list = Lists.newArrayList(4, 6, 7, 1);
         return dateRange.forEach(
                 // 过滤掉时间片
                 (localDateTime, dayTimeSlot) -> {
 
                     //小班课
-                    if(ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType())){
-                            dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
-                                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
-                                            &&
-                                            DateUtil.getWeekInByDate(DateUtil.String2Date(String.join(" ",dayTimeSlot.getDay(),"00:00:00")),list)
-                                            && t.getSlotId()==27
-                                            )// 27 晚8点  小班课
-                                    .collect(Collectors.toList()));
-                    //1对1课程
-                    }else {
+                    if (ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType())) {
+                        dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
+                                .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
+                                        &&
+                                        DateUtil.getWeekInByDate(DateUtil.String2Date(String.join(" ", dayTimeSlot.getDay(), "00:00:00")), list)
+                                        && t.getSlotId() == 27
+                                )// 27 晚8点  小班课
+                                .collect(Collectors.toList()));
+                        //1对1课程
+                    } else {
                         dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
                                 .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString())))
                                 .collect(Collectors.toList()));
                     }
-
 
 
                     return CollectionUtils.isEmpty(dayTimeSlot.getDailyScheduleTime()) ? null : dayTimeSlot;
@@ -135,9 +151,9 @@ public class AvaliableTimeServiceXV1 {
                     }
 
                     //小班课单独处理 只分0% 和 100% 对待
-                    if(ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType())){
+                    if (ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType())) {
                         return createDayTimeSlotsSmallClass(d, timeSlotsList);
-                    }else{
+                    } else {
                         return createDayTimeSlots(d, timeSlotsList);
                     }
 
@@ -269,35 +285,142 @@ public class AvaliableTimeServiceXV1 {
         return JsonResultModel.newJsonResultModel(delayRange);
     }
 
-    public JsonResultModel getDelayWeekDaysForSmallClass() throws Exception {
+    public JsonResultModel getDelayWeekDaysForSmallClass(Long orderId, Long userId) throws Exception {
         List delayRange = Lists.newArrayList();
         Date currentDate = new Date();
-        boolean weekFlag = DateUtil.getWeekDay();
+
+        List<Service> services = serveService.findByOrderId(orderId);
+        if (CollectionUtils.isEmpty(services)) {
+            throw new BusinessException("未生成服务数据");
+        }
+
+        // 获取服务信息   返回获取一周几次课  service 的 original_amount 次数 除  combo_cycle
+        Service service = services.get(0);
+        int countByWeek = service.getOriginalAmount() / service.getComboCycle();
+        int yushuByWeek = service.getOriginalAmount() % service.getComboCycle();
+        if (0 != yushuByWeek) {
+            //countByWeek=countByWeek+1;
+        }
+
+        logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);
+
 
         for (int i = 1; i < 9; i++) {
             JSONObject jb = new JSONObject();
-
-            String firstWeek =  "下周开始" ;
-            String text = i == 1 ? firstWeek + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate,2)) + ")" :
-                    "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate,2), i ))) + ")";
-            Date date = i == 1 ? DateUtil.getAfter7Days(currentDate,2) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate,2), i ));
+            String firstWeek = "下周开始";
+            String text = i == 1 ? firstWeek + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 2)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i))) + ")";
+            Date date = i == 1 ? DateUtil.getAfter7Days(currentDate, 2) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i));
             jb.put("id", i);
             jb.put("text", text);
             jb.put("date", DateUtil.Date2String24(date));
-
-            System.out.println(text);
-            System.out.println(DateUtil.Date2String24(date));
+            jb.put("show", true);
+            jb.put("realDate", date);
+            jb.put("endDate", DateUtil.getAfter7Days(date, (service.getComboCycle() + 1)));
             delayRange.add(jb);
+        }
+
+        //  1 计算时间总跨度
+
+        Date beginDate = DateUtil.String2SimpleDate(DateUtil.Date2String24(((JSONObject) delayRange.get(0)).getDate("realDate")));
+
+        Date endDate = DateUtil.String2SimpleDate(DateUtil.Date2String24(((JSONObject) delayRange.get(7)).getDate("endDate")));
+
+        logger.info("date begin:[{}],endDate:[{}]", DateUtil.Date2String24(beginDate), DateUtil.Date2String24(endDate));
+
+        // 获取课程信息 每天晚8点时间片 为27
+        List<CourseSchedule> listCourses = courseScheduleRepository.findByMyClasses(userId, beginDate, endDate, Lists.newArrayList(27));
+
+        if (CollectionUtils.isEmpty(listCourses)) {
+            return JsonResultModel.newJsonResultModel(delayRange);
+        }
+
+        Map<String, Integer> courseMap = extractToMap(listCourses, "classDate", "timeSlotId");
+
+        // 循环 判断每周 是否满足条件  countByWeek每周
+        for (int i = 0; i < 8; i++) {
+            JSONObject jsonObject = (JSONObject) delayRange.get(i);
+
+            Date realDate = jsonObject.getDate("realDate");
+
+            for (int j = 1; j <= service.getComboCycle(); j++) {
+
+                List<String> compareDateList = getAvaliableDateRange(realDate, 1); //每次向后叠加一周
+
+                //如果每周的时间片 小于每次几次课的数量 ,本周不可用
+                if (compareDateList.size() < countByWeek) {
+                    jsonObject.put("show", false);
+                    break;
+                }
+
+                //每周的课程数量
+                int countClassesWeek = 0;
+
+                for (String o : compareDateList) {
+                    if (courseMap.get(o) != null) countClassesWeek++;
+                }
+
+                // 可用的时间片数量 减去 每周已有课程的数量 小于
+                if ((compareDateList.size() - countClassesWeek) < countByWeek) {
+                    jsonObject.put("show", false);
+                    break;
+                }
+
+
+                realDate = DateUtil.getAfter7Days(realDate, 2); //每次向后加7天
+            }
+
         }
 
         return JsonResultModel.newJsonResultModel(delayRange);
     }
 
-    public static void main(String[] args) throws Exception {
-        AvaliableTimeServiceXV1 avaliableTimeServiceXV1 = new AvaliableTimeServiceXV1();
+    //获取可用的日期用于过滤
+    private List<String> getAvaliableDateRange(Date beginDate, int comboCycle) {
+        List<String> listDate = Lists.newArrayList();
+        for (int i = 1; i <= comboCycle; i++) {
+            beginDate = i == 1 ? beginDate : DateUtil.getAfter7Days(beginDate, 2);
+            Date baseDate = beginDate;
+            for (int j = 0; j < 7; j++) {
+                if (DateUtil.getWeekDay3567(DateUtil.getAfterOneDay(baseDate, j))) {
+                    listDate.add(DateUtil.date2SimpleString(DateUtil.getAfterOneDay(baseDate, j)));
+                }
+            }
 
-        JSONObject.toJSON(avaliableTimeServiceXV1.getDelayWeekDaysForSmallClass());//);
+        }
+
+        System.out.println(JSONObject.toJSONString(listDate));
+        return listDate;
 
     }
+
+
+    public static Map extractToMap(final Collection collection, final String keyPropertyName, final String valuePropertyName) {
+        Map map = new HashMap(collection.size());
+
+        try {
+            for (Object obj : collection) {
+                map.put(DateUtil.date2SimpleString((Date) PropertyUtils.getProperty(obj, keyPropertyName)), PropertyUtils.getProperty(obj, valuePropertyName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+
+    public static void main(String[] args) {
+//        AvaliableTimeServiceXV1 avaliableTimeServiceXV1 = new AvaliableTimeServiceXV1();
+//        avaliableTimeServiceXV1.getAvaliableDateRange(new Date(), 4);
+        List<String> list = Arrays.asList("123", "45634", "7892", "abch", "sdfhrthj", "mvkd");
+        for (int i = 0; i < 5; i++) {
+            list.stream().forEach(e -> {
+                if (e.length() >= 5) {
+                    return;
+                }
+                System.out.println(e);
+            });
+        }
+    }
+
 
 }
