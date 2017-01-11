@@ -61,7 +61,7 @@ public class PublicClassRoom {
         savePublicClassInfo(smallClass, studentId);
 
         // 四 更新redis
-        updateCache(smallClass, studentId);
+        updateEnterClassStatisticsCache(smallClass, studentId);
     }
 
     private void savePublicClassInfo(SmallClass smallClass, Long studentId) {
@@ -137,16 +137,25 @@ public class PublicClassRoom {
         }
     }
 
+
+
+    private void updateEnterRealTimeCache(SmallClass smallClass, Long studentId) {
+
+    }
+
+
     /**
-     * 更新缓存
+     * 更新进入课堂统计分析缓存
      * @param classRoom
      * @param studentId
      */
-    private void updateCache(SmallClass classRoom, Long studentId) {
+    private void updateEnterClassStatisticsCache(SmallClass classRoom, Long studentId) {
         // 将学生加入到这个课堂当中,下次直接判断是否在缓存中
         setOperations.add(CLASS_ROOM_MEMBER_KEY + classRoom.getId(), studentId);
-        // 如果是会员将其加入到这一天的上课当中.
-
-        // 非会员, 加入到一周上课学生列表当中.
+        // 加入到这一天的上课当中.
+        setOperations.add(CLASS_ROOM_MEMBER_DAY_KEY + DateUtil.simpleDate2String(classRoom.getClassDate()), studentId);
+        // 加入到一周上课学生列表当中.
+        LocalDate firstDateOfWeek = DateUtil.getFirstDateOfWeek(DateUtil.convertLocalDate(classRoom.getClassDate()));
+        setOperations.add(CLASS_ROOM_MEMBER_WEEK_KEY + DateUtil.dateFormatter.format(firstDateOfWeek), studentId);
     }
 }

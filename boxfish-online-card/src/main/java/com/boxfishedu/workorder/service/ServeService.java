@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -505,7 +506,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfoService.save(scheduleCourseInfo);
     }
 
-//    @Cacheable(value = CacheKeyConstant.COMMENT_CARD_AMOUNT, key = "#studentId")
+     @Cacheable(value = CacheKeyConstant.COMMENT_CARD_AMOUNT, key = "#studentId")
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
         List<Service> services = serviceJpaRepository.getForeignCommentServiceCount(
                 studentId, ProductType.COMMENT.value());
