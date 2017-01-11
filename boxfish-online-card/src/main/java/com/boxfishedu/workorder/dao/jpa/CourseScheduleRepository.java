@@ -105,4 +105,6 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     @Query(value = "select s from CourseSchedule s ,WorkOrder wo  where  s.workorderId=wo.id   and wo.orderId=?1 ")
     Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long orderId, Pageable pageable);
+
+    List<CourseSchedule> findByWorkorderIdInAndIsFreeze(List<Long> workOrderIds,Integer isFreeze);
 }

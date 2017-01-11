@@ -199,8 +199,8 @@ public class StAssignTeacherService {
             makeApplyRecords(teacherId, studentId, scheduleModelStList,alreadyCourseSchedules, skuId);
         }
         if (Collections3.isNotEmpty(macthedWorkOrderIdList)) {
-            List<WorkOrder> workOrders = workOrderJpaRepository.findWorkOrderAll(macthedWorkOrderIdList);
-            List<CourseSchedule> courseSchedules = courseScheduleRepository.findByWorkorderIdIn(macthedWorkOrderIdList);
+            List<WorkOrder> workOrders = workOrderJpaRepository.findByIdInAndIsFreeze(macthedWorkOrderIdList,0);
+            List<CourseSchedule> courseSchedules = courseScheduleRepository.findByWorkorderIdInAndIsFreeze(macthedWorkOrderIdList,0);
             for (WorkOrder workOrder : workOrders) {
                 workOrder.setTeacherId(teacherId);
                 workOrder.setTeacherName(responseScheduleBatchReqSt.getAssginTeacherName());
@@ -228,8 +228,8 @@ public class StAssignTeacherService {
             if(Collections3.isNotEmpty(needFireWorkOrderIds)){
                 logger.info("@@@@assign ===channel====>>{}=====>> 指定老师 stp-3 needfire:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>需要被释放的的鱼卡IDS{}",
                         channel,studentId, teacherId, skuId, needFireWorkOrderIds.toArray());
-                List<WorkOrder> needFireWorkOrders = workOrderJpaRepository.findWorkOrderAll(needFireWorkOrderIds);
-                List<CourseSchedule> needFireCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(needFireWorkOrderIds);
+                List<WorkOrder> needFireWorkOrders = workOrderJpaRepository.findByIdInAndIsFreeze(needFireWorkOrderIds,0);
+                List<CourseSchedule> needFireCourseSchedules = courseScheduleRepository.findByWorkorderIdInAndIsFreeze(needFireWorkOrderIds,0);
                 for(WorkOrder workOrder :needFireWorkOrders ){
                     workOrder.setTeacherId(0L);
                     courseOnlineRequester.releaseGroup(workOrder);
