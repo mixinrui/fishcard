@@ -9,8 +9,10 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.CourseScheduleService;
@@ -63,6 +65,9 @@ public class AvaliableTimeServiceXV1 {
 
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
+
+    @Autowired
+    private CourseScheduleRepository courseScheduleRepository;
 
     /**
      * 免费体验的天数
@@ -292,7 +297,12 @@ public class AvaliableTimeServiceXV1 {
         // 获取服务信息   返回获取一周几次课  service 的 original_amount 次数 除  combo_cycle
         Service service = services.get(0);
         int countByWeek = service.getOriginalAmount() / service.getComboCycle();
-        logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}]", userId, countByWeek);
+        int yushuByWeek = service.getOriginalAmount() % service.getComboCycle();
+        if(0!=yushuByWeek){
+            countByWeek=countByWeek+1;
+        }
+
+        logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek,yushuByWeek);
 
 
         for (int i = 1; i < 9; i++) {
@@ -302,25 +312,25 @@ public class AvaliableTimeServiceXV1 {
             Date date = i == 1 ? DateUtil.getAfter7Days(currentDate, 2) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i));
             jb.put("id", i);
             jb.put("text", text);
-            jb.put("show", true);
             jb.put("date", DateUtil.Date2String24(date));
+            jb.put("show", true);
             jb.put("realDate", date);
-            jb.put("endDateWeek", DateUtil.getAfter7Days(date, 1));
-            jb.put("endDate", DateUtil.getAfter7Days(date, service.getComboCycle() * 7));
+            jb.put("endDate", DateUtil.getAfter7Days(date, (service.getComboCycle() * 7+1)));
             delayRange.add(jb);
         }
 
+        //  1 计算时间总跨度
         Date beginDate = ((JSONObject) delayRange.get(0)).getDate("realDate");
         Date endDate = ((JSONObject) delayRange.get(7)).getDate("endDate");
 
         // 获取课程信息 每天晚8点时间片 为27
-        List<WorkOrder> listWorks = workOrderJpaRepository.findByMyClasses(userId, beginDate, endDate, Lists.newArrayList(27));
+        List<CourseSchedule> listWorks = courseScheduleRepository.findByMyClasses(userId, beginDate, endDate, Lists.newArrayList(27));
 
         if(CollectionUtils.isEmpty(listWorks)){
             return JsonResultModel.newJsonResultModel(delayRange);
         }
 
-        Map<String,Long>  workOrderMap = Collections3.extractToMap(listWorks,"startTime","id");
+        Map<String,Integer>  workOrderMap = Collections3.extractToMap(listWorks,"classDate","timeSlotId");
 
         for (int i = 0; i < 8; i++) {
             List<String> compareDateList = getAvaliableDateRange(((JSONObject) delayRange.get(i)).getDate("realDate"),service.getComboCycle());

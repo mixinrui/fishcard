@@ -429,7 +429,6 @@ public class DateUtil {
         return  addMinutes(date,60*24*2);
     }
     public static Date getAfter7Days(Date date,int i ){
-        DateTime.now().minusHours(48).toDate();
         return  (i-1)==0?date : addMinutes(date,60*24*(i-1)*7);
     }
 
