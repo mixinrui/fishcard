@@ -108,8 +108,6 @@ public class RabbitMqReciver {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
-    private MailSupport mailSupport;
 
     /**
      * 订单中心转换请求
@@ -132,7 +130,6 @@ public class RabbitMqReciver {
                             .errorLevel()
                             .operation("订单转换为服务")
                             .toString());
-            mailSupport.reportError("订单" + orderView.getId() + "转换失败", ex);
             logger.error("订单[{}]转换失败", orderView.getId());
 //            throw new Exception("转换失败放回队列");
         }
