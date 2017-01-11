@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.web.controller.studentrelated;
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.exception.UnauthorizedException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.MailSupport;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
@@ -67,6 +68,9 @@ StudentAppRelatedController {
     private CourseChangeTimeNotifySerceX courseChangeTimeNotifySerceX;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private MailSupport mailSupport;
 
     /**
      * 学生端批量选择课程的接口
@@ -138,6 +142,13 @@ StudentAppRelatedController {
     }
 
 
+//    @RequestMapping(value = "/schedule/public/evict")
+    public JsonResultModel evictPublicSchedule(String level) {
+        timePickerServiceXV1.evictPublicClassRoom(level);
+        return JsonResultModel.newJsonResultModel();
+    }
+
+
     @RequestMapping(value = "{student_Id}/schedule/month", method = RequestMethod.GET)
     public JsonResultModel courseScheduleList(
             @PathVariable("student_Id") Long studentId, Long userId, Locale locale) {
@@ -146,6 +157,15 @@ StudentAppRelatedController {
                 studentId, DateUtil.createDateRangeForm(), locale);
     }
 
+    @RequestMapping(value = "/test/mail")
+    public JsonResultModel testMail() {
+        try {
+            int i = 1 / 0;
+        } catch (Exception e) {
+            mailSupport.reportError("测试邮件" + System.currentTimeMillis(), e);
+        }
+        return JsonResultModel.newJsonResultModel();
+    }
 
     @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,

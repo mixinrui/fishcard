@@ -218,7 +218,7 @@ public class TimePickerServiceXV1 {
      * @return
      */
     public Map<String, Object> getStudentPublicClassTimeEnum(String level, LocalDate now) {
-        int key = Objects.hash(level, now);
+        String key = createPublicClassCacheWithLevelAndDateKey(level, now);
         Map classRoom = publicClassCacheWithLevelAndDate.get(key, Map.class);
         if(classRoom == null) {
             synchronized (this) {
@@ -228,6 +228,15 @@ public class TimePickerServiceXV1 {
         }
         return classRoom;
 
+    }
+
+
+    public void evictPublicClassRoom(String level) {
+        publicClassCacheWithLevelAndDate.evict(createPublicClassCacheWithLevelAndDateKey(level, LocalDate.now()));
+    }
+
+    private String createPublicClassCacheWithLevelAndDateKey(String level, LocalDate now) {
+        return DateUtil.dateFormatter.format(now) + "_" + level;
     }
 
 
@@ -325,7 +334,7 @@ public class TimePickerServiceXV1 {
         SmallClass smallClass = publicClassList.get(0);
         HashMap<String, Object> resultMap = Maps.newHashMap();
         resultMap.put("classRoom", smallClass);
-        resultMap.put("timeRange", publicClass.getTimeRange());
+        resultMap.put("timeRange", publicClass.getTimeRange().setClassDate(now));
         return resultMap;
     }
 

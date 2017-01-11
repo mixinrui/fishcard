@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * Created by ansel on 16/7/18.
@@ -64,13 +65,19 @@ public class ForeignTeacherCommentController {
     }
 
     @RequestMapping(value = "/evict/amount/{studentId}", method = RequestMethod.DELETE)
-    public JsonResultModel evictAmount(@PathVariable Long studentId) {
+    public JsonResultModel evictAmount(@PathVariable Long studentId, String sign) {
+        if(Objects.equals(sign, "foreignTeacherCommentCardService")) {
+            throw new UnsupportedOperationException();
+        }
         cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(studentId);
         return JsonResultModel.newJsonResultModel();
     }
 
     @RequestMapping(value = "/evict/amount/all", method = RequestMethod.DELETE)
-    public JsonResultModel clear() {
+    public JsonResultModel clear(String sign) {
+        if(Objects.equals(sign, "foreignTeacherCommentCardService")) {
+            throw new UnsupportedOperationException();
+        }
         foreignTeacherCommentCardService.clearAmountCache();
         return JsonResultModel.newJsonResultModel();
     }
