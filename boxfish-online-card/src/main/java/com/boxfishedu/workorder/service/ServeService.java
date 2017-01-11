@@ -16,6 +16,7 @@ import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.common.util.MailSupport;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
@@ -95,6 +96,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private MailSupport mailSupport;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -258,6 +262,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             logger.info("*****订单:[{}]转换服务,答疑单,鱼卡成功*****;耗时:[{}]", orderView.getId(),stopWatch.getTotalTimeSeconds());
         } catch (Exception ex) {
             logger.error("订单:[{}]转换为服务失败", orderView.getId(), ex);
+            mailSupport.reportError("订单" + orderView.getId() + "转换失败", ex);
 //            throw new BusinessException("订单转换为服务失败");
         }
     }

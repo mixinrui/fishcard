@@ -30,6 +30,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -157,6 +158,21 @@ StudentAppRelatedController {
                 studentId, DateUtil.createDateRangeForm(), locale);
     }
 
+    @RequestMapping(value = "/{studentId}/quit/publicClassRoom", method = RequestMethod.PUT)
+    public JsonResultModel quitClassRoom(@PathVariable Long studentId, Long userId, Long smallClassId) {
+        if(!studentId.equals(userId)) {
+            throw new UnauthorizedException();
+        }
+        timePickerServiceXV1.quitPublicClassRoom(smallClassId, studentId);
+        return JsonResultModel.EMPTY;
+    }
+
+    @RequestMapping(value = "/publicClassRoom/studentCount", method = RequestMethod.GET)
+    public JsonResultModel publicClassStudentCount(Long smallClassId) {
+        long count = timePickerServiceXV1.getPublicClassRoomStudentCount(smallClassId);
+        return JsonResultModel.newJsonResultModel(Collections.singletonMap("count", count));
+    }
+
     @RequestMapping(value = "/test/mail")
     public JsonResultModel testMail() {
         try {
@@ -164,7 +180,7 @@ StudentAppRelatedController {
         } catch (Exception e) {
             mailSupport.reportError("测试邮件" + System.currentTimeMillis(), e);
         }
-        return JsonResultModel.newJsonResultModel();
+        return JsonResultModel.EMPTY;
     }
 
     @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
