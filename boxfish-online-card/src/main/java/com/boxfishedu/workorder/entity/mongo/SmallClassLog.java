@@ -38,7 +38,7 @@ public class SmallClassLog {
 
     //进入房间的学生
     private Long studentId;
-    
+
     //事件的id:当前是什么动作
     private Integer eventId;
 
