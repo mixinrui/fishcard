@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.common.bean;
 
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
@@ -30,6 +32,9 @@ public class AccountCourseBean {
 
         //小班课id[如果是公开课,小班课]
         private Long smallClassId;
+
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        private SmallClass smallClassInfo;
     }
 
 }

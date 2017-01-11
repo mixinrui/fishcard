@@ -14,7 +14,7 @@ public class GroupInfo {
     private String [] infoMissIn; // 学生老师加密信息从鱼卡加密后      (加密之后的学生老师ID  组)
 
     private boolean normal = false; //是否正常
-    private Integer chatRoomId;//房间号
+    private Long chatRoomId;//房间号
 
 
 

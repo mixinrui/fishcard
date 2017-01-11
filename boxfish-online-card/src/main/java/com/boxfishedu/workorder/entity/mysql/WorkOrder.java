@@ -248,7 +248,7 @@ public class WorkOrder implements Cloneable {
 
     @Transient
 
-    private Integer chatRoomId;//房间号
+    private Long chatRoomId;//房间号
 
     @Transient
     private boolean haveTeacherRequested = true; //是否有教师操作

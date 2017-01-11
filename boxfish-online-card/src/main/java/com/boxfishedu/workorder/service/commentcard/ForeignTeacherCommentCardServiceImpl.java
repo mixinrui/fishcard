@@ -118,6 +118,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             boolean flag = true;
             try{
                 service.setAmount(service.getAmount() - 1);
+                // 刷新点评次数缓存
+                cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(commentCard.getStudentId());
                 updateCommentAmount(service);
                 commentCard.setStudentId(userId);
                 commentCard.setService(service);

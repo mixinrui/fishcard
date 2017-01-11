@@ -2,14 +2,21 @@ package com.boxfishedu.workorder.servicex.multiteaching.classgroup.groupbuilder;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.servicex.multiteaching.statusdealer.SmallClassEvent;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.partitioningBy;
 
 /**
  * Created by hucl on 17/1/6.
@@ -17,6 +24,9 @@ import java.util.Map;
  */
 @Component
 public class Timer6Group extends GroupBuilder {
+    @Autowired
+    private SmallClassRequester smallClassRequester;
+
     @Override
     protected List<WorkOrder> cardsToGroup() {
         return null;
@@ -24,12 +34,14 @@ public class Timer6Group extends GroupBuilder {
 
     @Override
     protected Map<String, List<WorkOrder>> groupByTime(List<WorkOrder> workOrders) {
-        return null;
+        return workOrders.parallelStream()
+                         .collect(groupingBy(workOrder -> DateUtil.Date2String(workOrder.getStartTime())));
     }
 
     @Override
     protected Map<String, List<WorkOrder>> groupbyLevel(List<WorkOrder> workOrders) {
-        return null;
+        return workOrders.parallelStream()
+                         .collect(groupingBy(workOrder -> smallClassRequester.fetchUserDifficultyInfo(workOrder.getStudentId())));
     }
 
     @Override
@@ -45,6 +57,11 @@ public class Timer6Group extends GroupBuilder {
     @Override
     protected WorkOrder selectLeader(List<WorkOrder> workOrders) {
         return workOrders.get(0);
+    }
+
+    @Override
+    protected Integer smallClassMemeberNum() {
+        return null;
     }
 
     @Override

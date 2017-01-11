@@ -1,9 +1,5 @@
 package com.boxfishedu.workorder.servicex.multiteaching;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
-import com.boxfishedu.workorder.entity.mysql.SmallClass;
-import com.boxfishedu.workorder.servicex.multiteaching.statusdealer.SmallClassEvent;
-import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,8 +7,5 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SmallClassServiceX {
-    public void configPublicClass(PublicClassBuilderParam publicClassBuilderParam) {
-        SmallClass smallClass = new SmallClass(publicClassBuilderParam);
-        new SmallClassEvent(smallClass, SmallClassCardStatus.CREATE);
-    }
+
 }

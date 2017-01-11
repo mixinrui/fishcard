@@ -36,11 +36,12 @@ public class MsgPushRequester {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void notifyInstantGroupClassMsg(InstantClassCard instantClassCard, List<Long> teacherIds) {
-//        String url = String.format("%s/notification/push?type=%s",
-//                                   urlConf.getMsg_push_url(),"INSTANCE_CLASS");
+        //打开混合的情况
+        String url = String.format("%s/notification/push?type=%s",
+                                   urlConf.getMsg_push_url(),"INSTANCE_CLASS");
 
-        String url = String.format("%s/notification/push",
-                                   urlConf.getMsg_push_url());
+//        String url = String.format("%s/notification/push",
+//                                   urlConf.getMsg_push_url());
 
         logger.info("@notifyInstantGroupClassMsg,向教师发起立即上课推送,url[{}]", url);
 //        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard, teacherIds, "向教师发起推送");

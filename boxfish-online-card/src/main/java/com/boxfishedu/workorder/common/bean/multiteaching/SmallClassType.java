@@ -29,6 +29,6 @@ public enum SmallClassType {
         return this.value;
     }
 
-    public static final  String INIT_SMALL="INIT"+ SmallClassType.SMALL.name();
-    public static final  String INIT_PUBLIC="INIT"+ SmallClassType.PUBLIC.name();
+    public static final String INIT_SMALL = "INIT" + SmallClassType.SMALL.name();
+    public static final String INIT_PUBLIC = "INIT" + SmallClassType.PUBLIC.name();
 }
