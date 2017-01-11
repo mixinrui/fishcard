@@ -1,17 +1,10 @@
 package com.boxfishedu.workorder.servicex.multiteaching.classgroup.groupbuilder;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
-import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.servicex.multiteaching.statusdealer.SmallClassEvent;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.org.apache.xml.internal.security.algorithms.implementations.IntegrityHmac;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/6.
