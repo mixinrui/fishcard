@@ -12,4 +12,9 @@ public class PublicClassException extends BusinessException {
     public PublicClassException(PublicClassMessageEnum publicClassMessage) {
         this.publicClassMessage = publicClassMessage;
     }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
+    }
 }

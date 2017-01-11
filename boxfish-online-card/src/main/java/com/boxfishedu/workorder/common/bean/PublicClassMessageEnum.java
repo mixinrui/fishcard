@@ -28,6 +28,11 @@ public enum PublicClassMessageEnum {
         public String getMessage() {
             return "成为BOXFISH学员, 每天都能上外教公开课~";
         }
+
+        @Override
+        public char getCode() {
+            return 'M';
+        }
     },
 
     // 每天上课限制
@@ -47,12 +52,12 @@ public enum PublicClassMessageEnum {
     ERROR_TIME {
         @Override
         public String getTitle() {
-            return "温馨提醒";
+            return "未到上课时间";
         }
 
         @Override
         public String getMessage() {
-            return "还没到上课时间呢, 先去自学一课吧~";
+            return "同学, 你很积极呦, 但是上课时间还没到呢, 准点再来吧~";
         }
     },
 
