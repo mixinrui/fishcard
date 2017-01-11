@@ -6,6 +6,7 @@ import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -24,6 +25,7 @@ import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
 import com.boxfishedu.workorder.web.view.base.DateRange;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.codec.binary.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -312,8 +314,23 @@ public class AvaliableTimeServiceXV1 {
         Date endDate = ((JSONObject) delayRange.get(7)).getDate("endDate");
 
         // 获取课程信息 每天晚8点时间片 为27
-        List listWorks = workOrderJpaRepository.findByMyClasses(userId, beginDate, endDate, Lists.newArrayList(27));
+        List<WorkOrder> listWorks = workOrderJpaRepository.findByMyClasses(userId, beginDate, endDate, Lists.newArrayList(27));
+
+        if(CollectionUtils.isEmpty(listWorks)){
+            return JsonResultModel.newJsonResultModel(delayRange);
+        }
+
+        Map<String,Long>  workOrderMap = Collections3.extractToMap(listWorks,"startTime","id");
+
         for (int i = 0; i < 8; i++) {
+            List<String> compareDateList = getAvaliableDateRange(((JSONObject) delayRange.get(i)).getDate("realDate"),service.getComboCycle());
+            final JSONObject jsonObject = (JSONObject)delayRange.get(i);
+            compareDateList.forEach(compareDate->{
+                if(workOrderMap.get(compareDate)!=null){
+                    jsonObject.put("show",false);
+                    return;
+                }
+            });
 
         }
 
@@ -328,7 +345,7 @@ public class AvaliableTimeServiceXV1 {
             Date baseDate = beginDate;
             for (int j = 0; j < 7; j++) {
                 if (DateUtil.getWeekDay3567(DateUtil.getAfterOneDay(baseDate,j))) {
-                    listDate.add(DateUtil.Date2String24(DateUtil.getAfterOneDay(baseDate,j)));
+                    listDate.add(DateUtil.date2SimpleString(DateUtil.getAfterOneDay(baseDate,j)));
                 }
             }
 
@@ -339,9 +356,33 @@ public class AvaliableTimeServiceXV1 {
 
     }
 
+
+    public static Map extractToMap(final Collection collection, final String keyPropertyName, final String valuePropertyName) {
+        Map map = new HashMap(collection.size());
+
+        try {
+            for (Object obj : collection) {
+                map.put( DateUtil.date2SimpleString((Date)PropertyUtils.getProperty(obj, keyPropertyName) ), PropertyUtils.getProperty(obj, valuePropertyName));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+
     public static void main(String[] args) {
-        AvaliableTimeServiceXV1 avaliableTimeServiceXV1 = new AvaliableTimeServiceXV1();
-        avaliableTimeServiceXV1.getAvaliableDateRange(new Date(), 4);
+//        AvaliableTimeServiceXV1 avaliableTimeServiceXV1 = new AvaliableTimeServiceXV1();
+//        avaliableTimeServiceXV1.getAvaliableDateRange(new Date(), 4);
+        List<String> list = Arrays.asList("123", "45634", "7892", "abch", "sdfhrthj", "mvkd");
+        for(int i=0;i<5;i++) {
+            list.stream().forEach(e -> {
+                if (e.length() >= 5) {
+                    return;
+                }
+                System.out.println(e);
+            });
+        }
     }
 
 

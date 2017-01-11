@@ -421,7 +421,7 @@ public class DateUtil {
     }
 
     public static void main(String[] args) throws Exception{
-        System.out.print(Date2String24(  getMonday(new Date())));
+        System.out.println(date2SimpleString(new Date()));
     }
 
 
