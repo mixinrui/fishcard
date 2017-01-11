@@ -28,6 +28,10 @@ public class PublicClassRoom {
 
     private final static String CLASS_ROOM_MEMBER_KEY = "classRoom_member_";
 
+    private final static String CLASS_ROOM_MEMBER_WEEK_KEY = "classRoom_member_week";
+
+    private final static String CLASS_ROOM_MEMBER_DAY_KEY = "classRoom_member_day";
+
     @Autowired
     private PublicClassInfoJpaRepository publicClassInfoJpaRepository;
 

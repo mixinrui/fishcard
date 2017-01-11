@@ -47,4 +47,6 @@ public interface ForeignTeacherCommentCardService {
 
     void notifyExpireCommentCards();
 
+    void clearAmountCache();
+
 }

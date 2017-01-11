@@ -683,4 +683,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     public List<Service> getUnselectedService(Long studentId,List<ComboTypeEnum> comboTypeEnums,Integer selectedFlag){
         return jpa.findByStudentIdAndComboTypeInAndCoursesSelectedAndProductType(studentId, workOrderService.enums2StringAray(comboTypeEnums) ,selectedFlag,ProductType.TEACHING.value());
     }
+
+    public Set<Long> getForeignCommentStudentIds() {
+        return jpa.getForeignCommentStudentIds();
+    }
 }
