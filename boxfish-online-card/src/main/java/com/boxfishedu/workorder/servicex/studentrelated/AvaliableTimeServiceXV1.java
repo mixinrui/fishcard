@@ -298,11 +298,11 @@ public class AvaliableTimeServiceXV1 {
         Service service = services.get(0);
         int countByWeek = service.getOriginalAmount() / service.getComboCycle();
         int yushuByWeek = service.getOriginalAmount() % service.getComboCycle();
-        if(0!=yushuByWeek){
-            countByWeek=countByWeek+1;
+        if (0 != yushuByWeek) {
+            //countByWeek=countByWeek+1;
         }
 
-        logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek,yushuByWeek);
+        logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);
 
 
         for (int i = 1; i < 9; i++) {
@@ -315,32 +315,59 @@ public class AvaliableTimeServiceXV1 {
             jb.put("date", DateUtil.Date2String24(date));
             jb.put("show", true);
             jb.put("realDate", date);
-            jb.put("endDate", DateUtil.getAfter7Days(date, (service.getComboCycle() * 7+1)));
+            jb.put("endDate", DateUtil.getAfter7Days(date, (service.getComboCycle() + 1)));
             delayRange.add(jb);
         }
 
         //  1 计算时间总跨度
-        Date beginDate = ((JSONObject) delayRange.get(0)).getDate("realDate");
-        Date endDate = ((JSONObject) delayRange.get(7)).getDate("endDate");
+
+        Date beginDate = DateUtil.String2SimpleDate(DateUtil.Date2String24(((JSONObject) delayRange.get(0)).getDate("realDate")));
+
+        Date endDate = DateUtil.String2SimpleDate(DateUtil.Date2String24(((JSONObject) delayRange.get(7)).getDate("endDate")));
+
+        logger.info("date begin:[{}],endDate:[{}]", DateUtil.Date2String24(beginDate), DateUtil.Date2String24(endDate));
 
         // 获取课程信息 每天晚8点时间片 为27
-        List<CourseSchedule> listWorks = courseScheduleRepository.findByMyClasses(userId, beginDate, endDate, Lists.newArrayList(27));
+        List<CourseSchedule> listCourses = courseScheduleRepository.findByMyClasses(userId, beginDate, endDate, Lists.newArrayList(27));
 
-        if(CollectionUtils.isEmpty(listWorks)){
+        if (CollectionUtils.isEmpty(listCourses)) {
             return JsonResultModel.newJsonResultModel(delayRange);
         }
 
-        Map<String,Integer>  workOrderMap = Collections3.extractToMap(listWorks,"classDate","timeSlotId");
+        Map<String, Integer> courseMap = extractToMap(listCourses, "classDate", "timeSlotId");
 
+        // 循环 判断每周 是否满足条件  countByWeek每周
         for (int i = 0; i < 8; i++) {
-            List<String> compareDateList = getAvaliableDateRange(((JSONObject) delayRange.get(i)).getDate("realDate"),service.getComboCycle());
-            final JSONObject jsonObject = (JSONObject)delayRange.get(i);
-            compareDateList.forEach(compareDate->{
-                if(workOrderMap.get(compareDate)!=null){
-                    jsonObject.put("show",false);
-                    return;
+            JSONObject jsonObject = (JSONObject) delayRange.get(i);
+
+            Date realDate = jsonObject.getDate("realDate");
+
+            for (int j = 1; j <= service.getComboCycle(); j++) {
+
+                List<String> compareDateList = getAvaliableDateRange(realDate, 1); //每次向后叠加一周
+
+                //如果每周的时间片 小于每次几次课的数量 ,本周不可用
+                if (compareDateList.size() < countByWeek) {
+                    jsonObject.put("show", false);
+                    break;
                 }
-            });
+
+                //每周的课程数量
+                int countClassesWeek = 0;
+
+                for (String o : compareDateList) {
+                    if (courseMap.get(o) != null) countClassesWeek++;
+                }
+
+                // 可用的时间片数量 减去 每周已有课程的数量 小于
+                if ((compareDateList.size() - countClassesWeek) < countByWeek) {
+                    jsonObject.put("show", false);
+                    break;
+                }
+
+
+                realDate = DateUtil.getAfter7Days(realDate, 2); //每次向后加7天
+            }
 
         }
 
@@ -351,11 +378,11 @@ public class AvaliableTimeServiceXV1 {
     private List<String> getAvaliableDateRange(Date beginDate, int comboCycle) {
         List<String> listDate = Lists.newArrayList();
         for (int i = 1; i <= comboCycle; i++) {
-            beginDate = i==1?beginDate:DateUtil.getAfter7Days(beginDate, 2);
+            beginDate = i == 1 ? beginDate : DateUtil.getAfter7Days(beginDate, 2);
             Date baseDate = beginDate;
             for (int j = 0; j < 7; j++) {
-                if (DateUtil.getWeekDay3567(DateUtil.getAfterOneDay(baseDate,j))) {
-                    listDate.add(DateUtil.date2SimpleString(DateUtil.getAfterOneDay(baseDate,j)));
+                if (DateUtil.getWeekDay3567(DateUtil.getAfterOneDay(baseDate, j))) {
+                    listDate.add(DateUtil.date2SimpleString(DateUtil.getAfterOneDay(baseDate, j)));
                 }
             }
 
@@ -372,7 +399,7 @@ public class AvaliableTimeServiceXV1 {
 
         try {
             for (Object obj : collection) {
-                map.put( DateUtil.date2SimpleString((Date)PropertyUtils.getProperty(obj, keyPropertyName) ), PropertyUtils.getProperty(obj, valuePropertyName));
+                map.put(DateUtil.date2SimpleString((Date) PropertyUtils.getProperty(obj, keyPropertyName)), PropertyUtils.getProperty(obj, valuePropertyName));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -385,7 +412,7 @@ public class AvaliableTimeServiceXV1 {
 //        AvaliableTimeServiceXV1 avaliableTimeServiceXV1 = new AvaliableTimeServiceXV1();
 //        avaliableTimeServiceXV1.getAvaliableDateRange(new Date(), 4);
         List<String> list = Arrays.asList("123", "45634", "7892", "abch", "sdfhrthj", "mvkd");
-        for(int i=0;i<5;i++) {
+        for (int i = 0; i < 5; i++) {
             list.stream().forEach(e -> {
                 if (e.length() >= 5) {
                     return;
