@@ -65,7 +65,7 @@ public class Timer6Group extends GroupBuilder {
     }
 
     @Override
-    protected void initGroup(Map<String, List<WorkOrder>> groups) {
+    protected void initGroup(Map<Integer, List<WorkOrder>> groups) {
         groups.forEach((key, groupMembers) -> {
             WorkOrder leader = this.selectLeader(groupMembers);
             SmallClass smallClass = new SmallClass();

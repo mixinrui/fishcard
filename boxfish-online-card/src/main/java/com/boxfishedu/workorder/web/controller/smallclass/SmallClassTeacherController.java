@@ -51,7 +51,7 @@ public class SmallClassTeacherController {
         SmallClass smallClass = new SmallClass();
         smallClass.setGroupLeaderCard(1L);
         smallClass.setGroupLeader(11L);
-        smallClass.setSmallClassType(SmallClassType.SMALL.name());
+        smallClass.setSmallClassType(SmallClassType.PUBLIC.name());
         smallClass.setRoleId(2);
         smallClass.setChatRoomId(111111L);
         smallClass.setClassDate(new Date());
