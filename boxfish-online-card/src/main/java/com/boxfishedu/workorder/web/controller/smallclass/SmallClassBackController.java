@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
+import com.boxfishedu.workorder.servicex.multiteaching.SmallClassBackServiceX;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -31,6 +32,9 @@ public class SmallClassBackController {
     @Autowired
     private SmallClassJpaRepository smallClassJpaRepository;
 
+    @Autowired
+    private SmallClassBackServiceX smallClassBackServiceX;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @RequestMapping(value = "/smallclass/slot", method = RequestMethod.GET)
@@ -43,6 +47,7 @@ public class SmallClassBackController {
     @RequestMapping(value = "/smallclass", method = RequestMethod.POST)
     public JsonResultModel buildPublicClass(PublicClassBuilderParam publicClassBuilderParam) {
         logger.debug("@buildPublicClass创建公开课,参数[{}]", publicClassBuilderParam);
+        smallClassBackServiceX.configPublicClass(publicClassBuilderParam);
         return JsonResultModel.newJsonResultModel("OK");
     }
 
@@ -53,7 +58,7 @@ public class SmallClassBackController {
     }
 
     @RequestMapping(value = "/smallclass/list", method = RequestMethod.GET)
-    public JsonResultModel list(PublicFilterParam publicFilterParam,Pageable pageable) {
+    public JsonResultModel list(PublicFilterParam publicFilterParam, Pageable pageable) {
         return JsonResultModel.newJsonResultModel(smallClassJpaRepository.findPage(pageable));
     }
 }
