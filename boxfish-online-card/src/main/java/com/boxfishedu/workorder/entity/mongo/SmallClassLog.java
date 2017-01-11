@@ -37,11 +37,8 @@ public class SmallClassLog {
     private Integer status;
 
     //进入房间的学生
-    private Long enterStudent;
-
-    //离开房间的学生
-    private Long leaveStudent;
-
+    private Long studentId;
+    
     //事件的id:当前是什么动作
     private Integer eventId;
 
