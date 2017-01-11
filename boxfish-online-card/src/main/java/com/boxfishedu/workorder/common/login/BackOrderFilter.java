@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -51,9 +52,13 @@ public class BackOrderFilter extends OncePerRequestFilter {
     @Value("${parameter.allow_test}")
     private Boolean allowTest;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    @Value("spring.profiles.active")
+    private String active;
 
+    @Override
+    @Profile({"local_hucl","product","local","development","development_new","demo","pretest"})
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    logger.info("doFilterInternal");
         if(allowTest){
             if(request.getParameter("test")!=null&&request.getParameter("test").equals("true")) {
                 logger.info("允许测试api的接口,不需要验证accesstoken");

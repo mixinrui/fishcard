@@ -73,7 +73,6 @@ public class ForeignTeacherCommentController {
         return JsonResultModel.newJsonResultModel();
     }
 
-
     @RequestMapping(value = "/evict/amount/all", method = RequestMethod.DELETE)
     public JsonResultModel clear(String sign) {
         if(Objects.equals(sign, "foreignTeacherCommentCardService")) {
