@@ -245,8 +245,6 @@ public class TimePickerServiceXV1 {
      * @return
      */
     public Map<String, Object> enterPublicClassRoom(Long studentId, Long smallClassId, String accessToken) {
-
-        // 以后可能会同一时间多节公开课
         try {
             SmallClass smallClass = getClassRoomById(smallClassId);
             publicClassRoom.enter(smallClass, studentId, accessToken);

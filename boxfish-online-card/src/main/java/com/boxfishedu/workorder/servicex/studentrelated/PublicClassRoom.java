@@ -145,7 +145,8 @@ public class PublicClassRoom {
     private void updateCache(SmallClass classRoom, Long studentId) {
         // 将学生加入到这个课堂当中,下次直接判断是否在缓存中
         setOperations.add(CLASS_ROOM_MEMBER_KEY + classRoom.getId(), studentId);
+        // 如果是会员将其加入到这一天的上课当中.
+
+        // 非会员, 加入到一周上课学生列表当中.
     }
-
-
 }
