@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.multiteaching.SmallClassBackServiceX;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassQueryServiceX;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -30,7 +31,9 @@ public class SmallClassBackController {
     private TeacherStudentRequester teacherStudentRequester;
 
     @Autowired
-    private SmallClassJpaRepository smallClassJpaRepository;
+    private SmallClassQueryServiceX smallClassQueryServiceX;
+
+
 
     @Autowired
     private SmallClassBackServiceX smallClassBackServiceX;
@@ -57,8 +60,22 @@ public class SmallClassBackController {
         return JsonResultModel.newJsonResultModel("OK");
     }
 
+    /**
+     * 查询公开课(后台)
+     * @param publicFilterParam
+     * @param pageable
+     * @return
+     */
     @RequestMapping(value = "/smallclass/list", method = RequestMethod.GET)
     public JsonResultModel list(PublicFilterParam publicFilterParam, Pageable pageable) {
-        return JsonResultModel.newJsonResultModel(smallClassJpaRepository.findPage(pageable));
+        return smallClassQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam,pageable);
+    }
+
+    /**
+     * 提供状态的查询列表
+     */
+    @RequestMapping(value = "/smallclass/status/list", method = RequestMethod.GET)
+    public JsonResultModel listAllStatus() {
+        return smallClassQueryServiceX.listAllStatus();
     }
 }
