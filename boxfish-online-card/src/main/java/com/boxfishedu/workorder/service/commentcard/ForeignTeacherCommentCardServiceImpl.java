@@ -634,6 +634,14 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         }
     }
 
+    @Override
+    public void clearAmountCache() {
+        Set<Long> ids = serveService.getForeignCommentStudentIds();
+        for(Long id : ids) {
+            cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(id);
+        }
+    }
+
     // 推送
     private void pushExpireMessage(Set<Long> ids) {
         commentCardSDK.notifyCommentCardExpire(ids, commentCardTimeConf.getExpireMessage(), "MEMBER_FOREIGN_COMMENT");

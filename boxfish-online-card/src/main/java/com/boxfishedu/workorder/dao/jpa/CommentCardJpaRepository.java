@@ -165,4 +165,5 @@ public interface CommentCardJpaRepository extends JpaRepository<CommentCard, Lon
     @Modifying
     @Query("update CommentCard c set c.courseType = ?1, c.courseDifficulty = ?2  where c.courseId = ?3 ")
     public void updateCourseTypeAndDifficulty(String type, String difficulty,String courseId);
+
 }

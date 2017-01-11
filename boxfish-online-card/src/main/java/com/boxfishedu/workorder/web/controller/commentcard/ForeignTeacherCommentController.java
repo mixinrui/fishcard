@@ -63,9 +63,16 @@ public class ForeignTeacherCommentController {
         }
     }
 
+    @RequestMapping(value = "/evict/amount/{studentId}", method = RequestMethod.DELETE)
+    public JsonResultModel evictAmount(@PathVariable Long studentId) {
+        cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(studentId);
+        return JsonResultModel.newJsonResultModel();
+    }
+
+
     @RequestMapping(value = "/evict/amount/all", method = RequestMethod.DELETE)
-    public JsonResultModel evictAmountAll() {
-        cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).clear();
+    public JsonResultModel clear() {
+        foreignTeacherCommentCardService.clearAmountCache();
         return JsonResultModel.newJsonResultModel();
     }
 
