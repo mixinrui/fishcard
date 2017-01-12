@@ -160,7 +160,7 @@ public class CourseOnlineRequester {
         String url = String.format("%s/teaching/smallclass/group",
                                    urlConf.getCourse_online_service());
         Map param = Maps.newHashMap();
-        param.put("smallCardId", smallClassId);
+        param.put("smallClassId", smallClassId);
         param.put("teacherId", teacherIds);
         param.put("studentId", studentIds);
 

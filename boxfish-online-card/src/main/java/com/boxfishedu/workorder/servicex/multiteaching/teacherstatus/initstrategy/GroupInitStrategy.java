@@ -55,7 +55,7 @@ public interface GroupInitStrategy {
         }
     }
 
-    default void writeChatRoomBack(SmallClass smallClass, List<WorkOrder> workOrders,FishCardGroupsInfo fishCardGroupsInfo) {
+    default void writeChatRoomBack(SmallClass smallClass, List<WorkOrder> workOrders, FishCardGroupsInfo fishCardGroupsInfo) {
         smallClass.setChatRoomId(fishCardGroupsInfo.getChatRoomId());
         smallClass.setGroupId(fishCardGroupsInfo.getGroupId());
         workOrders.forEach(workOrder -> {
@@ -107,5 +107,5 @@ public interface GroupInitStrategy {
     FishCardGroupsInfo buildChatRoom(SmallClass smallClass);
 
     @Transactional
-    void persistGroupClass(SmallClass smallClass,List<WorkOrder> workOrders, RecommandCourseView recommandCourseView);
+    void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView);
 }

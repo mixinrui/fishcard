@@ -14,10 +14,13 @@ public enum PublicClassInfoStatusEnum {
     CLASSING(300, "正在上课"),
     ON_WHEAT(400, "上麦"),
     OFF_WHEAT(410, "下麦"),
-    COMPLETED(500, "正常完成"),
-    COMPLETED_FORCE(510, "强退"),
-    LEAVE_EARLY(520, "早退"),
-    //主要给数据库用
+    LEAVE_UNACTIVE(500, "被动退出"),
+    LEAVE_ACTIVE(510, "主动退出"),
+
+    //主要给服务器用
+    COMPLETED(520, "正常完成"),
+    LEAVE_EARLY(530, "早退"),
+
     QUIT(550, "退出");
 
 
