@@ -35,6 +35,8 @@ public class SmallClassLog {
 
     //小班课当前状态(教师动作)
     private Integer status;
+    //"STUDENT" "TEACHER"
+    private String role;
 
     //进入房间的学生
     private Long studentId;

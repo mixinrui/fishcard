@@ -1,15 +1,18 @@
 package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -44,6 +47,9 @@ public class PublicClassStrategy implements GroupInitStrategy {
     @Autowired
     private ScheduleCourseInfoService scheduleCourseInfoService;
 
+    @Autowired
+    private CourseOnlineRequester courseOnlineRequester;
+
     private final String GENERATE_PUBLIC_SERVICE = "GENERATE_PUBLIC_SERVICE";
 
     @Autowired
@@ -56,7 +62,14 @@ public class PublicClassStrategy implements GroupInitStrategy {
 
     @Override
     public RecommandCourseView getRecommandCourse(SmallClass smallClass) {
-        return smallClassRequester.getPublicCourse(smallClass);
+        RecommandCourseView recommandCourseView = new RecommandCourseView();
+        recommandCourseView.setCover("http://api.boxfish.cn/student/publication/data/data/10fb562cdc2b3c184a418c1c18d0d8b8");
+        recommandCourseView.setCourseId("ccccccccid");
+        recommandCourseView.setCourseName("课程名称");
+        recommandCourseView.setCourseType("type");
+        recommandCourseView.setDifficulty("LEVEL_4");
+        return recommandCourseView;
+//        return smallClassRequester.getPublicCourse(smallClass);
     }
 
     @Override
@@ -78,11 +91,20 @@ public class PublicClassStrategy implements GroupInitStrategy {
         WorkOrder workOrder = this.virtualCard(smallClass);
         smallClass.setAllCards(Arrays.asList(workOrder));
 
-        this.writeCourseBack(smallClass, Arrays.asList(workOrder));
+        this.writeCourseBack(smallClass, Arrays.asList(workOrder), recommandCourseView);
 
         this.writeTeacherInfoBack(smallClass, Arrays.asList(workOrder), teacherView);
 
+        FishCardGroupsInfo fishCardGroupsInfo=this.buildChatRoom(smallClass);
+
+        this.writeChatRoomBack(smallClass,Arrays.asList(workOrder),fishCardGroupsInfo);
+
         this.persistGroupClass(smallClass, recommandCourseView);
+    }
+
+    @Override
+    public FishCardGroupsInfo buildChatRoom(SmallClass smallClass) {
+        return courseOnlineRequester.buildsmallClassChatRoom(smallClass);
     }
 
     @Override
@@ -104,6 +126,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         workOrder.setGroupId(smallClass.getGroupId());
         workOrder.setClassType(smallClass.getClassType());
         workOrder.setService(service);
+        workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
 
         return workOrder;
     }
@@ -121,6 +144,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         service.setCreateTime(new Date());
         service.setStudentId(0l);
         service.setOrderId(this.virtualOrderId());
+        service.setClassSize(0);
 
         if (redisTemplate.opsForValue().setIfAbsent(GENERATE_PUBLIC_SERVICE, Boolean.TRUE.toString())) {
             service = serviceJpaRepository.save(service);

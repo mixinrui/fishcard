@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEventDispatch;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,9 @@ import static java.util.stream.Collectors.partitioningBy;
 public class Timer6Group extends GroupBuilder {
     @Autowired
     private SmallClassRequester smallClassRequester;
+
+    @Autowired
+    private SmallClassEventDispatch smallClassEventDispatch;
 
     @Override
     protected List<WorkOrder> cardsToGroup() {
@@ -78,7 +82,7 @@ public class Timer6Group extends GroupBuilder {
             smallClass.setAllCards(groupMembers);
             smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
 
-            new SmallClassEvent(smallClass, SmallClassCardStatus.CREATE);
+            new SmallClassEvent(smallClass, smallClassEventDispatch,SmallClassCardStatus.CREATE);
         });
     }
 

@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,12 +73,17 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
 
         //回写课程信息
-        this.writeCourseBack(smallClass, smallClass.getAllCards());
+        this.writeCourseBack(smallClass, smallClass.getAllCards(),recommandCourseView);
 
         this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
 
         //将小班课,公开课相关信息保存入库
         this.persistGroupClass(smallClass, recommandCourseView);
+    }
+
+    @Override
+    public FishCardGroupsInfo buildChatRoom(SmallClass smallClass) {
+        return null;
     }
 
     @Override
