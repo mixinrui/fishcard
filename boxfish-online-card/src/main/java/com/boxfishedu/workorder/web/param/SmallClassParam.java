@@ -15,7 +15,8 @@ public class SmallClassParam {
     private Long teacherId;
     private Long studentId;
     private Long smallClassId;
-
+    private int limit;
+    private int offSet;
 
     private String createTimeSort; //时间排序
 }
