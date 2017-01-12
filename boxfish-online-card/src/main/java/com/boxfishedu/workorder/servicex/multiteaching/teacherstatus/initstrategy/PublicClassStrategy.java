@@ -67,13 +67,6 @@ public class PublicClassStrategy implements GroupInitStrategy {
 
     @Override
     public RecommandCourseView getRecommandCourse(SmallClass smallClass) {
-//        RecommandCourseView recommandCourseView = new RecommandCourseView();
-//        recommandCourseView.setCover("http://api.boxfish.cn/student/publication/data/data/10fb562cdc2b3c184a418c1c18d0d8b8");
-//        recommandCourseView.setCourseId("ccccccccid");
-//        recommandCourseView.setCourseName("课程名称");
-//        recommandCourseView.setCourseType("type");
-//        recommandCourseView.setDifficulty("LEVEL_4");
-//        return recommandCourseView;
         return smallClassRequester.getPublicCourse(smallClass);
     }
 
