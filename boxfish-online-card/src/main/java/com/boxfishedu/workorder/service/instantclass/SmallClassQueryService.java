@@ -154,7 +154,7 @@ public class SmallClassQueryService {
         }
 
         // 按照时间倒序
-        sql.append(" wo.createTime desc ");
+        sql.append(" wo.id desc ");
 
 
         return sql.toString();
