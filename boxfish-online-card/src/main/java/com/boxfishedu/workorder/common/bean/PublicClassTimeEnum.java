@@ -68,6 +68,13 @@ public enum PublicClassTimeEnum {
         for(PublicClassTimeEnum val : values()) {
             for(CourseDifficultyEnum key : val.difficulties) {
                 publicClassTimes.put(key, val);
+                slotIdPublicClassTimes.compute(val.getTimeRange().getSlotId(), (k, v) -> {
+                    if(v == null) {
+                       v = new HashSet<>();
+                    }
+                    v.add(key);
+                    return v;
+                });
                 slotIdPublicClassTimes.putIfAbsent(val.getTimeRange().getSlotId(), new HashSet<>()).add(key);
             }
         }

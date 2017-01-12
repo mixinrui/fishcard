@@ -237,7 +237,7 @@ public class RabbitMqReciver {
                 publicClassRoom.expireClassRoomCache();
             } else if(serviceTimerMessage.getType() == TimerMessageType.PUBLIC_CLASS_NOTIFY.value()) {
                 logger.info("==========>@@@@PUBLIC_CLASS_NOTIFY===>>> 公开课通知");
-                publicClassRoom.expireClassRoomCache();
+                publicClassRoom.publicClassRoomNotification();
             }
             //
         } catch (Exception ex) {

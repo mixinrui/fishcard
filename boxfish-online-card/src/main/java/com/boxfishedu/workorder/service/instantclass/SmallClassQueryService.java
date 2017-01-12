@@ -129,27 +129,32 @@ public class SmallClassQueryService {
 
 
 
+        sql.append(" order by ");
+
         //小班课 公开课的 处理
         if(null != publicFilterParam.getClassType()){
             sql.append(" and classType =:classType ");  // 除了小班课 和公开课
         }
 
         if (null != publicFilterParam.getStartTimeSort()) {
-            sql.append("order by wo.startTime   ").append(publicFilterParam.getStartTimeSort().toLowerCase());
+            sql.append(" wo.startTime   ").append(publicFilterParam.getStartTimeSort().toLowerCase()) .append(" ,");
         }
 
         if (null != publicFilterParam.getActualStartTimeSort()) {
-            sql.append("order by wo.actualStartTime ").append(publicFilterParam.getActualStartTimeSort());
+            sql.append("  wo.actualStartTime ").append(publicFilterParam.getActualStartTimeSort())  .append(" ,");
         }
 
         if (null != publicFilterParam.getStartTimeSort() && null != publicFilterParam.getActualStartTimeSort()) {
-            sql.append("order by wo.teacherId asc , wo.createTime desc");
+            sql.append("  wo.teacherId asc , wo.createTime desc")  .append(" ,");
         }
 
 
         if (null != publicFilterParam.getTeacherNameSort()) {
-            sql.append(" order by teacherName ").append(publicFilterParam.getTeacherNameSort());
+            sql.append("   teacherName ").append(publicFilterParam.getTeacherNameSort());
         }
+
+        // 按照时间倒序
+        sql.append(" wo.id desc ");
 
 
         return sql.toString();

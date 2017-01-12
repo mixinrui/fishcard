@@ -7,8 +7,6 @@ import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.requester.CourseOnlineRequester;
-import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.bean.CourseView;
 import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
@@ -18,13 +16,15 @@ import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by LuoLiBing on 16/4/25.
@@ -42,22 +42,12 @@ public class ServiceSDK {
     private RabbitMqSender rabbitMqSender;
 
     @Autowired
-    private CacheManager cacheManager;
-
-    @Autowired
     private ScheduleCourseInfoService scheduleCourseInfoService;
-
-    @Autowired
-    private CourseOnlineRequester courseOnlineRequester;
-
-    @Autowired
-    private TeacherStudentRequester teacherStudentRequester;
 
     @Autowired
     private WorkOrderLogService workOrderLogService;
 
     private final static Logger logger = LoggerFactory.getLogger(ServiceSDK.class);
-
 
     /**
      * 获取老师一个月选的时间片
@@ -152,7 +142,6 @@ public class ServiceSDK {
         logger.info("获取教师[{}]的参数:{}",teacherId, JacksonUtil.toJSon(param));
         return param;
     }
-
 
     private URI createMemberInfo(String accessToken) {
         return UriComponentsBuilder.fromUriString(urlConf.getMemberUrl())

@@ -36,6 +36,9 @@ public class ProductCombo extends BaseEntity {
 
     private String comboUnit;
 
+    // 班级人数
+    private Integer classSize;
+
     private Integer comboCycle;//限制该套餐在几周内完成,不需要限制的标识为-1,用于需要选时间的订单在生成服务时计算选时间的次数
 
     @Enumerated(EnumType.STRING)

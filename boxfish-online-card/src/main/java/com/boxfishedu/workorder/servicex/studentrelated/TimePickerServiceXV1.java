@@ -273,6 +273,11 @@ public class TimePickerServiceXV1 {
         return publicClassRoom.getClassRoomStudentCount(smallClassId);
     }
 
+
+    public Long rollCall(Long smallClassId) {
+        return publicClassRoom.rollCall(smallClassId);
+    }
+
     public List<Service> ensureConvertOver(TimeSlotParam timeSlotParam) {
         return ensureConvertOver(timeSlotParam, 0);
     }

@@ -143,6 +143,13 @@ StudentAppRelatedController {
     }
 
 
+    @RequestMapping(value = "/publicClass/{smallClassId}/roll", method = RequestMethod.GET)
+    public JsonResultModel publicClassRoll(@PathVariable Long smallClassId) {
+        return JsonResultModel.newJsonResultModel(
+                Collections.singletonMap("studentId", timePickerServiceXV1.rollCall(smallClassId)));
+    }
+
+
 //    @RequestMapping(value = "/schedule/public/evict")
     public JsonResultModel evictPublicSchedule(String level) {
         timePickerServiceXV1.evictPublicClassRoom(level);
