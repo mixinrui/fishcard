@@ -2,16 +2,20 @@ package com.boxfishedu.workorder.common.util;
 
 import com.boxfishedu.workorder.common.config.CommentCardUrlConf;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,6 +34,8 @@ public class MailSupport {
     @Autowired
     private RestTemplate restTemplate;
 
+    private final static ObjectMapper objectMapper = new ObjectMapper();
+
     private ExecutorService exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public void reportError(String subject, Throwable e) {
@@ -37,11 +43,35 @@ public class MailSupport {
     }
 
     public void reportError(String subject, String content) {
+        reportError(subject, content, null);
+    }
+
+    public void reportError(String subject, Throwable e, Object data) {
+        String dataStr = null;
+        if(!Objects.isNull(data)) {
+            try {
+                dataStr = objectMapper.writeValueAsString(data);
+            } catch (JsonProcessingException e1) {
+            }
+        }
+        reportError(subject, ExceptionUtils.getStackTrace(e), dataStr);
+    }
+
+    private void reportError(String subject, String content, String data) {
+        // 如果没有配置邮箱url, 默认不发送
+        if(commentCardUrlConf.getErrorReportMailUrl() == null) {
+            return;
+        }
+
+        if(!StringUtils.isEmpty(data)) {
+            content = String.format(", data: [%s] \n", data) + content;
+        }
+        final String finalContent = content;
         exec.execute(() -> {
-            String sign = sign(urlConf.getMailToken(), urlConf.getRecipients(), content, subject);
+            String sign = sign(urlConf.getMailToken(), urlConf.getRecipients(), finalContent, subject);
             restTemplate.postForObject(
                     createErrorReportMailURI(sign),
-                    createRequestBody(subject, content),
+                    createRequestBody(subject, finalContent),
                     Object.class);
         });
     }

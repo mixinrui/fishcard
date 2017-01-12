@@ -261,7 +261,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             logger.info("*****订单:[{}]转换服务,答疑单,鱼卡成功*****;耗时:[{}]", orderView.getId(),stopWatch.getTotalTimeSeconds());
         } catch (Exception ex) {
             logger.error("订单:[{}]转换为服务失败", orderView.getId(), ex);
-            mailSupport.reportError("订单" + orderView.getId() + "转换失败", ex);
+            mailSupport.reportError("订单" + orderView.getId() + "转换失败", ex, orderView);
 //            throw new BusinessException("订单转换为服务失败");
         }
     }
