@@ -6,7 +6,7 @@ import com.boxfishedu.workorder.common.util.DateUtil;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.EnumMap;
+import java.util.*;
 
 import static com.boxfishedu.workorder.common.bean.CourseDifficultyEnum.*;
 
@@ -62,12 +62,18 @@ public enum PublicClassTimeEnum {
     private static EnumMap<CourseDifficultyEnum, PublicClassTimeEnum> publicClassTimes
             = new EnumMap<>(CourseDifficultyEnum.class);
 
+    private static Map<Integer, Set<String>> slotIdPublicClassTimes = new HashMap<>();
+
     static {
         for(PublicClassTimeEnum val : values()) {
             for(CourseDifficultyEnum key : val.difficulties) {
                 publicClassTimes.put(key, val);
+                slotIdPublicClassTimes.putIfAbsent(val.getTimeRange().getSlotId(), new HashSet<>()).add(key.name());
             }
         }
+
+//        Arrays.stream(values()).collect(
+//                Collectors.groupingBy((p) -> p.getTimeRange().getSlotId(), Collectors.mapping(p -> {return Arrays.asList(p.difficulties);}, Collectors.toSet())));
     }
 
     public static PublicClassTimeEnum publicClassTime(CourseDifficultyEnum courseDifficulty) {

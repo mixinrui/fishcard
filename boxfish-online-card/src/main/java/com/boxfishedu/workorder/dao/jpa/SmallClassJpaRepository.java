@@ -20,4 +20,7 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
     Page<SmallClass> findPage(Pageable pageable);
 
     List<SmallClass> findByClassDateAndClassType(Date classDate, String classType);
+
+    @Query("select s from SmallClass s where s.startTime between ?1 and ?2 and s.classType=?3")
+    List<SmallClass> findByStartTimeRange(Date from, Date to, String classType);
 }

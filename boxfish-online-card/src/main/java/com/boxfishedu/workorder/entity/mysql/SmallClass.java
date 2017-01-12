@@ -88,7 +88,6 @@ public class SmallClass implements Cloneable, Serializable {
 
     private Integer status;
 
-
     @JsonIgnore
     @Transient
     private List<Long> allStudentIds;

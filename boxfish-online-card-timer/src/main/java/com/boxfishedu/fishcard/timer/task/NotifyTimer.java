@@ -322,10 +322,25 @@ public class NotifyTimer {
         rabbitMqSender.send(serviceTimerMessage);
     }
 
+    /**
+     * 清理公开课缓存
+     */
     @Scheduled(cron = "0 0 3 * * ?")
     public void clearPublicClassCache(){
         logger.info("<<<<<<@@@@assign-timer 开始通知<<<清理公开课缓存>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.EXPIRE_PUBLIC_CLASS.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+
+    /**
+     * 公开课上课通知
+     */
+    @Scheduled(cron = "0 25,55 9-23 * * ?")
+    public void publicClassNotify(){
+        logger.info("<<<<<<@@@@assign-timer 开始通知<<<公开课提醒推送>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.PUBLIC_CLASS_NOTIFY.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
