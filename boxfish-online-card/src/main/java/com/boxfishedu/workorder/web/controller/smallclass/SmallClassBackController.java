@@ -104,6 +104,6 @@ public class SmallClassBackController {
 
     @RequestMapping(value = "/classlog/details", method = RequestMethod.GET)
     public JsonResultModel listCardDetail(SmallClassParam smallClassParam, Pageable pageable) throws Exception {
-        return JsonResultModel.newJsonResultModel(smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam,pageable));
+        return  smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam,pageable);
     }
 }
