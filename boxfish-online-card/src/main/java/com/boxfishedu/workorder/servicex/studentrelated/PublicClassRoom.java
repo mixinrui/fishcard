@@ -63,6 +63,12 @@ public class PublicClassRoom {
     @Transactional
     public void enter(SmallClass smallClass, Long studentId, String accessToken) {
 
+        // 是否在上课正常时间范围内
+//        long time = new Date().getTime();
+//        if(time < smallClass.getStartTime().getTime() || time > smallClass.getEndTime().getTime()) {
+//            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
+//        }
+
         // 一 判断是否是第一次进入这个课堂, 如果不是, 则直接返回
         if(isOnceEntered(smallClass.getId(), studentId)) {
             // 更改状态
