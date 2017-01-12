@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.web.param.SmallClassParam;
 import org.jboss.netty.util.internal.StringUtil;
 import org.mongodb.morphia.query.Query;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.Optional;
 /**
  * Created by jiaozijun on 17/1/12.
  */
+
+@Component
 public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallClassLog> {
 
     public Long queryCount(SmallClassParam smallClassParam){
