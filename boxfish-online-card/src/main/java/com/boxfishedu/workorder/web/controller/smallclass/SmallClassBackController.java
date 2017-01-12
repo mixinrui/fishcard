@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
@@ -14,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -94,5 +92,12 @@ public class SmallClassBackController {
     @RequestMapping(value = "/smallclass/status/list", method = RequestMethod.GET)
     public JsonResultModel listAllStatus() {
         return smallClassQueryServiceX.listAllStatus();
+    }
+
+
+    @RequestMapping(value = "/classlog/details", method = RequestMethod.GET)
+    public JsonResultModel listCardDetail(PublicFilterParam publicFilterParam, Pageable pageable) throws Exception {
+        List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(cardId);
+        return JsonResultModel.newJsonResultModel(workOrderLogs);
     }
 }
