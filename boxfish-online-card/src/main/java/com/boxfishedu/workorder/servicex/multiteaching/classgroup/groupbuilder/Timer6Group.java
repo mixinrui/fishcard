@@ -3,15 +3,19 @@ package com.boxfishedu.workorder.servicex.multiteaching.classgroup.groupbuilder;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEventDispatch;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +34,18 @@ public class Timer6Group extends GroupBuilder {
     @Autowired
     private SmallClassEventDispatch smallClassEventDispatch;
 
+    @Autowired
+    private SmallClassJpaRepository smallClassJpaRepository;
+
+    @Autowired
+    private WorkOrderService workOrderService;
+
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
+
     @Override
     protected List<WorkOrder> cardsToGroup() {
-        return null;
+        return workOrderJpaRepository.findByClassTypeAndStartTimeGreaterThan(ClassTypeEnum.SMALL.name(), new Date());
     }
 
     @Override
@@ -82,7 +95,7 @@ public class Timer6Group extends GroupBuilder {
             smallClass.setAllCards(groupMembers);
             smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
 
-            new SmallClassEvent(smallClass, smallClassEventDispatch,SmallClassCardStatus.CREATE);
+            new SmallClassEvent(smallClass, smallClassEventDispatch, SmallClassCardStatus.CREATE);
         });
     }
 

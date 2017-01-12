@@ -44,8 +44,6 @@ public interface GroupInitStrategy {
         if (!Objects.isNull(smallClass.getTeacherId())) {
             workOrders.forEach(workOrder -> {
                 workOrder.setSmallClassId(smallClass.getId());
-                workOrder.setTeacherId(smallClass.getTeacherId());
-                workOrder.setTeacherName(smallClass.getTeacherName());
                 workOrder.setUpdateTime(new Date());
                 workOrder.setAssignTeacherTime(new Date());
                 workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
@@ -93,6 +91,7 @@ public interface GroupInitStrategy {
             , ScheduleCourseInfoService scheduleCourseInfoService, RecommandCourseView recommandCourseView) {
 
         smallClass.getAllCards().forEach(workOrder -> {
+            workOrder.setSmallClassId(smallClass.getId());
             workOrderService.save(workOrder);
             List<CourseSchedule> courseSchedules = workOrderService
                     .batchUpdateCourseSchedule(workOrder.getService(), Arrays.asList(workOrder));
