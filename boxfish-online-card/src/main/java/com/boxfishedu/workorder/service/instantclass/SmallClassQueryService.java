@@ -87,8 +87,8 @@ public class SmallClassQueryService {
         }
 
         // 中外教
-        if (null != publicFilterParam.getTeachingType()) {
-            sql.append(" and wo.skuId = :teachingType ");
+        if (null != publicFilterParam.getRoleId()) {
+            sql.append(" and wo.roleId = :roleId ");
         }
 
         if (null != publicFilterParam.getCreateBeginDateFormat()) {
@@ -128,25 +128,6 @@ public class SmallClassQueryService {
         }
 
 
-
-//        if (StringUtils.isNotEmpty(publicFilterParam.getDemoType())) {
-//            if (publicFilterParam.getDemoType().trim().equals("true")) {
-//                sql.append("and orderId=:orderId ");
-//            } else {
-//                sql.append("and orderId !=:orderId ");
-//            }
-//        } else {
-//            sql.append("and orderId !=:orderId ");
-//        }
-
-
-        if (null != publicFilterParam.getMakeUpFlag()) {
-            if (publicFilterParam.getMakeUpFlag()) {
-                sql.append(" and parentId is not null ");
-            } else {
-                sql.append(" and parentId is  null  ");
-            }
-        }
 
         //小班课 公开课的 处理
         if(null != publicFilterParam.getClassType()){
@@ -233,9 +214,8 @@ public class SmallClassQueryService {
             }
         }
 
-        if (null != publicFilterParam.getTeachingType()) {
-
-            query.setParameter("teachingType", publicFilterParam.getTeachingType());
+        if (null != publicFilterParam.getRoleId()) {
+            query.setParameter("roleId", publicFilterParam.getRoleId());
         }
 
         //小班课 公开课的 处理
