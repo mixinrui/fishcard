@@ -23,6 +23,7 @@ public class SmallClassEventDispatch implements Observer {
         for (SmallClassEventCustomer smallClassEventCustomer : smallClassEventCustomers) {
             if (smallClassEventCustomer.getSmallClassCardStatus().getCode() == event.getType().getCode()) {
                 smallClassEventCustomer.exec(event);
+                return;
             }
         }
     }

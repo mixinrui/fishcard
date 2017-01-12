@@ -13,6 +13,7 @@ public class PublicFilterParam {
 
     private String begin;
     private String end;
+    private Integer roleId; // 1 中教 2 外教
 
     private Long id;
     private Long smallClassId;
