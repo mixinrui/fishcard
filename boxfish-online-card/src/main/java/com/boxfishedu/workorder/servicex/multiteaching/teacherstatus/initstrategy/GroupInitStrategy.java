@@ -91,6 +91,7 @@ public interface GroupInitStrategy {
             , ScheduleCourseInfoService scheduleCourseInfoService, RecommandCourseView recommandCourseView) {
 
         smallClass.getAllCards().forEach(workOrder -> {
+            workOrder.setSmallClassId(smallClass.getId());
             workOrderService.save(workOrder);
             List<CourseSchedule> courseSchedules = workOrderService
                     .batchUpdateCourseSchedule(workOrder.getService(), Arrays.asList(workOrder));

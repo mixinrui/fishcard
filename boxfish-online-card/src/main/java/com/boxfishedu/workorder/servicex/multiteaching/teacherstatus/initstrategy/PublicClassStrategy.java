@@ -84,7 +84,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         RecommandCourseView recommandCourseView = this.getRecommandCourse(smallClass);
 
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
-        String teacherPhoto=teacherPhotoRequester.getTeacherPhoto(smallClass.getTeacherId());
+        String teacherPhoto = teacherPhotoRequester.getTeacherPhoto(smallClass.getTeacherId());
         smallClass.setTeacherPhoto(teacherPhoto);
 
         //虚拟鱼卡
@@ -134,6 +134,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         workOrder.setService(service);
         workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
         workOrder.setSeqNum(0);
+        workOrder.setOrderId(service.getOrderId());
 
         return workOrder;
     }
