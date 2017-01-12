@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.studentrelated;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
+import com.boxfishedu.workorder.common.bean.PublicClassTimeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -11,6 +12,7 @@ import com.boxfishedu.workorder.entity.mysql.PublicClassInfoJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,11 +22,9 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Created by LuoLiBing on 17/1/9.
@@ -127,19 +127,27 @@ public class PublicClassRoom {
     /**
      * 公开课上课通知
      */
-    public void pubclassRoomNotification() {
+    public void publicclassRoomNotification() {
         // 判断离上课不超过10分钟的公开课, 发起推送
         LocalDateTime from = LocalDateTime.now();
         LocalDateTime to = from.plusMinutes(10);
         List<SmallClass> smallClassList = smallClassJpaRepository.findByStartTimeRange(
                 DateUtil.convertToDate(from), DateUtil.convertToDate(to), ClassTypeEnum.PUBLIC.name());
-        smallClassList.stream()
+        Set<String> tags = smallClassList.stream()
                 .map(SmallClass::getSlotId)
                 .distinct()
-                .map((slotId) -> {
-                    return null;
-                });
+                .map(PublicClassTimeEnum::getCourseDifficultiesBySlotId)
+                .flatMap(Collection::stream)
+                .map(c -> c.pushCode)
+                .collect(Collectors.toSet());
+        if(CollectionUtils.isNotEmpty(tags)) {
+            System.out.println(tags);
 
+            // TODO 生产环境放开
+//            new PublicClassRoomNotification()
+//                    .addTag(tags)
+//                    .notifyPush();
+        }
     }
 
 

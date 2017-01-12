@@ -1,10 +1,12 @@
 package com.boxfishedu.workorder.task;
 
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.servicex.studentrelated.PublicClassRoom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,6 +22,9 @@ public class CommentCardTimer {
 
     @Autowired
     ForeignTeacherCommentCardService foreignTeacherCommentCardService;
+
+    @Autowired
+    private PublicClassRoom publicClassRoom;
 
     /**
       * 检查24小时内没有点评学生的外教。。每天凌晨0点定时执行
@@ -40,5 +45,11 @@ public class CommentCardTimer {
     @RequestMapping(value = "/notify/member")
     public void notifyCommentCard() {
         foreignTeacherCommentCardService.notifyExpireCommentCards();
+    }
+
+
+//    @Scheduled(cron = "0 0/1 * * * ?")
+    public void notifyPublicClass() {
+        publicClassRoom.publicclassRoomNotification();
     }
 }
