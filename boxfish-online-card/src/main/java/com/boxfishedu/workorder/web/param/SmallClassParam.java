@@ -16,11 +16,6 @@ public class SmallClassParam {
     private Long studentId;
     private Long smallClassId;
 
-    private int offSet;
-    private int limit;
-
-    private int page;
-    private int size;
 
     private String createTimeSort; //时间排序
 }
