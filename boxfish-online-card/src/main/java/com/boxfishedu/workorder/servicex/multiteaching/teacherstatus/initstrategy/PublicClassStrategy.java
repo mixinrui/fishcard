@@ -95,11 +95,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
 
         this.writeTeacherInfoBack(smallClass, Arrays.asList(workOrder), teacherView);
 
-        FishCardGroupsInfo fishCardGroupsInfo=this.buildChatRoom(smallClass);
-
-        this.writeChatRoomBack(smallClass,Arrays.asList(workOrder),fishCardGroupsInfo);
-
-        this.persistGroupClass(smallClass, recommandCourseView);
+        this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
     }
 
     @Override
@@ -109,8 +105,14 @@ public class PublicClassStrategy implements GroupInitStrategy {
 
     @Override
     @Transactional
-    public void persistGroupClass(SmallClass smallClass, RecommandCourseView recommandCourseView) {
+    public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
+
+        //回写群组信息到smallclass
+        FishCardGroupsInfo fishCardGroupsInfo = this.buildChatRoom(smallClass);
+        this.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
+
+        smallClassJpaRepository.save(smallClass);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }
 
@@ -125,8 +127,10 @@ public class PublicClassStrategy implements GroupInitStrategy {
         workOrder.setChatRoomId(smallClass.getChatRoomId());
         workOrder.setGroupId(smallClass.getGroupId());
         workOrder.setClassType(smallClass.getClassType());
+        workOrder.setSkuId(smallClass.getRoleId());
         workOrder.setService(service);
         workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
+        workOrder.setSeqNum(1);
 
         return workOrder;
     }
@@ -145,6 +149,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         service.setStudentId(0l);
         service.setOrderId(this.virtualOrderId());
         service.setClassSize(0);
+        service.setUserType(0);
 
         if (redisTemplate.opsForValue().setIfAbsent(GENERATE_PUBLIC_SERVICE, Boolean.TRUE.toString())) {
             service = serviceJpaRepository.save(service);
