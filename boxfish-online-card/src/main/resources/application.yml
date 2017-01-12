@@ -375,8 +375,8 @@ spring:
     username: root
     password: Boxfish2016
   redis:
-    hostName: 8619f2f4a93c4a70.m.cnbja.kvstore.aliyuncs.com
-#    hostName: 127.0.0.1
+    hostName: 123.56.13.168
+    # hostName: 127.0.0.1
     password: Box12345678
     port: 6379
     timeout: 10000
