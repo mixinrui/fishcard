@@ -1,13 +1,17 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.multiteaching.SmallClassBackServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.PublicClassInfoQueryServiceX;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassLogServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassQueryServiceX;
+import com.boxfishedu.workorder.web.param.SmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -37,6 +41,9 @@ public class SmallClassBackController {
 
     @Autowired
     private SmallClassBackServiceX smallClassBackServiceX;
+
+    @Autowired
+    private SmallClassLogServiceX smallClassLogServiceX;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -96,8 +103,7 @@ public class SmallClassBackController {
 
 
     @RequestMapping(value = "/classlog/details", method = RequestMethod.GET)
-    public JsonResultModel listCardDetail(PublicFilterParam publicFilterParam, Pageable pageable) throws Exception {
-        List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(cardId);
-        return JsonResultModel.newJsonResultModel(workOrderLogs);
+    public JsonResultModel listCardDetail(SmallClassParam smallClassParam, Pageable pageable) throws Exception {
+        return JsonResultModel.newJsonResultModel(smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam,pageable));
     }
 }
