@@ -134,6 +134,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         workOrder.setService(service);
         workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
         workOrder.setSeqNum(0);
+        workOrder.setSlotId(smallClass.getSlotId());
         workOrder.setOrderId(service.getOrderId());
 
         return workOrder;

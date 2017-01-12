@@ -49,6 +49,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         return workOrders.get(0);
     }
 
+    //推荐课写到初始化代码里去
     @Override
     public RecommandCourseView getRecommandCourse(SmallClass smallClass) {
         return null;
