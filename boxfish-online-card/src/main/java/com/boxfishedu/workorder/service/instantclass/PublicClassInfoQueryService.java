@@ -25,6 +25,7 @@ public class PublicClassInfoQueryService {
     @Autowired
     private EntityManager entityManager;
 
+
     public Long filterFishCardsCount(PublicFilterParam publicFilterParam) {
         String prefix = "select count(wo) ";
         String sql = prefix + getFilterSql(publicFilterParam);
@@ -48,6 +49,11 @@ public class PublicClassInfoQueryService {
     private String getFilterSql(PublicFilterParam publicFilterParam) {
 
         StringBuilder sql = new StringBuilder("from PublicClassInfo wo where wo.startTime between :begin and :end ");
+
+        if(null!=publicFilterParam.getSmallClassId()){
+            sql.append(" and wo.smallClassId = :smallClassId ");
+        }
+
 
         if (null != publicFilterParam.getOrderType()) {
             if (publicFilterParam.getOrderType().equals(OrderChannelDesc.OVERALL.getCode())
@@ -178,6 +184,10 @@ public class PublicClassInfoQueryService {
         Query query = entityManager.createQuery(sql);
         query.setParameter("begin", publicFilterParam.getBeginDateFormat());
         query.setParameter("end", publicFilterParam.getEndDateFormat());
+
+        if(null!=publicFilterParam.getSmallClassId()){
+            query.setParameter("smallClassId", publicFilterParam.getSmallClassId());
+        }
 
         if (null != publicFilterParam.getId()) {
             query.setParameter("id", publicFilterParam.getId());

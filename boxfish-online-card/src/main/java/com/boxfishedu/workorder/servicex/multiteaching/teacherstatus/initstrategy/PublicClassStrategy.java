@@ -7,8 +7,7 @@ import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.requester.CourseOnlineRequester;
-import com.boxfishedu.workorder.requester.SmallClassRequester;
+import com.boxfishedu.workorder.requester.*;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
@@ -50,6 +49,9 @@ public class PublicClassStrategy implements GroupInitStrategy {
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
 
+    @Autowired
+    private SmallClassTeacherRequester smallClassTeacherRequester;
+
     private final String GENERATE_PUBLIC_SERVICE = "GENERATE_PUBLIC_SERVICE";
 
     @Autowired
@@ -60,16 +62,19 @@ public class PublicClassStrategy implements GroupInitStrategy {
     @Autowired
     private ServiceJpaRepository serviceJpaRepository;
 
+    @Autowired
+    private TeacherPhotoRequester teacherPhotoRequester;
+
     @Override
     public RecommandCourseView getRecommandCourse(SmallClass smallClass) {
-        RecommandCourseView recommandCourseView = new RecommandCourseView();
-        recommandCourseView.setCover("http://api.boxfish.cn/student/publication/data/data/10fb562cdc2b3c184a418c1c18d0d8b8");
-        recommandCourseView.setCourseId("ccccccccid");
-        recommandCourseView.setCourseName("课程名称");
-        recommandCourseView.setCourseType("type");
-        recommandCourseView.setDifficulty("LEVEL_4");
-        return recommandCourseView;
-//        return smallClassRequester.getPublicCourse(smallClass);
+//        RecommandCourseView recommandCourseView = new RecommandCourseView();
+//        recommandCourseView.setCover("http://api.boxfish.cn/student/publication/data/data/10fb562cdc2b3c184a418c1c18d0d8b8");
+//        recommandCourseView.setCourseId("ccccccccid");
+//        recommandCourseView.setCourseName("课程名称");
+//        recommandCourseView.setCourseType("type");
+//        recommandCourseView.setDifficulty("LEVEL_4");
+//        return recommandCourseView;
+        return smallClassRequester.getPublicCourse(smallClass);
     }
 
     @Override
@@ -86,6 +91,8 @@ public class PublicClassStrategy implements GroupInitStrategy {
         RecommandCourseView recommandCourseView = this.getRecommandCourse(smallClass);
 
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
+        String teacherPhoto=teacherPhotoRequester.getTeacherPhoto(smallClass.getTeacherId());
+        smallClass.setTeacherPhoto(teacherPhoto);
 
         //虚拟鱼卡
         WorkOrder workOrder = this.virtualCard(smallClass);
@@ -111,6 +118,9 @@ public class PublicClassStrategy implements GroupInitStrategy {
         //回写群组信息到smallclass
         FishCardGroupsInfo fishCardGroupsInfo = this.buildChatRoom(smallClass);
         this.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
+
+        //分配教师
+        smallClassTeacherRequester.assignPublicClassTeacher(smallClass);
 
         smallClassJpaRepository.save(smallClass);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
