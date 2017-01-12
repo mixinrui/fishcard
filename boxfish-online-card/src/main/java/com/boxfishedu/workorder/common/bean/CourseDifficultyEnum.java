@@ -5,5 +5,9 @@ package com.boxfishedu.workorder.common.bean;
  * 课程难度枚举
  */
 public enum CourseDifficultyEnum {
-    LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5, LEVEL_6, LEVEL_7, LEVEl_8
+    LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEl8;
+
+    public String getPushTag() {
+        return name();
+    }
 }
