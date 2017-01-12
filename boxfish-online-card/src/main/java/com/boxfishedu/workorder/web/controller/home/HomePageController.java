@@ -42,7 +42,7 @@ HomePageController {
     @RequestMapping(value = "/student/{student_id}/public", method = RequestMethod.GET)
     public JsonResultModel publicClassInfo() {
         List<SmallClass> smallClasses =
-                smallClassJpaRepository.findByClassDateAndClassType(new Date(), ClassTypeEnum.SMALL.name());
+                smallClassJpaRepository.findByClassDateAndClassType(new Date(), ClassTypeEnum.PUBLIC.name());
         List<AccountCourseBean.CardCourseInfo> cardCourseInfos = Lists.newArrayList();
         smallClasses.forEach(smallClass -> {
             AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
