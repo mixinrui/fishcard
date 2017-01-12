@@ -61,7 +61,9 @@ public enum TimerMessageType {
     EXPIRE_COMMENT_CARD(149),
     ASSGIN_TEACHER(150),
     // 公开课缓存清理
-    EXPIRE_PUBLIC_CLASS(151);
+    EXPIRE_PUBLIC_CLASS(151),
+    // 公开课提前5分钟推送
+    PUBLIC_CLASS_NOTIFY(152);
 
     private int code;
 

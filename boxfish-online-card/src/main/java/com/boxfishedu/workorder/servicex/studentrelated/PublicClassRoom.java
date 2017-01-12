@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,34 @@ public class PublicClassRoom {
     public long getClassRoomStudentCount(Long smallClassId) {
         return setOperations.size(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId);
     }
+
+
+    /**
+     * 每天删除前天的房间缓存
+     */
+    public void expireClassRoomCache() {
+        LocalDate localDate = LocalDate.now().minusDays(2);
+        List<SmallClass> smallClassList = smallClassJpaRepository.findByClassDateAndClassType(
+                DateUtil.convertToDate(localDate), ClassTypeEnum.PUBLIC.name());
+        expireClassRoomCacheByDate(localDate);
+        for(SmallClass smallClass : smallClassList) {
+            expireClassRoomCacheBySmallClassId(smallClass.getId());
+        }
+    }
+
+
+    /**
+     * 公开课上课通知
+     */
+    public void pubclassRoomNotification() {
+        // 判断离上课不超过10分钟的公开课, 发起推送
+        LocalDateTime from = LocalDateTime.now();
+        LocalDateTime to = from.plusMinutes(10);
+        List<SmallClass> smallClassList = smallClassJpaRepository.findByStartTimeRange(
+                DateUtil.convertToDate(from), DateUtil.convertToDate(to), ClassTypeEnum.PUBLIC.name());
+        
+    }
+
 
     private void savePublicClassInfo(SmallClass smallClass, Long studentId) {
         PublicClassInfo entity = new PublicClassInfo();
@@ -201,18 +230,6 @@ public class PublicClassRoom {
     }
 
 
-    // ********************************* 过期缓存 *********************************** //
-    // 每天删除前天的房间
-    public void expireClassRoomCache() {
-        LocalDate localDate = LocalDate.now().minusDays(2);
-        List<SmallClass> smallClassList = smallClassJpaRepository.findByClassDateAndClassType(
-                DateUtil.convertToDate(localDate), ClassTypeEnum.PUBLIC.name());
-        expireClassRoomCacheByDate(localDate);
-        for(SmallClass smallClass : smallClassList) {
-            expireClassRoomCacheBySmallClassId(smallClass.getId());
-        }
-    }
-
     // 过期掉公开课实时缓存
     private void expireClassRoomCacheBySmallClassId(Long smallClassId) {
         redisTemplate.expire(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, 1, TimeUnit.SECONDS);
@@ -223,6 +240,7 @@ public class PublicClassRoom {
     private void expireClassRoomCacheByDate(LocalDate localDate) {
         redisTemplate.expire(CLASS_ROOM_MEMBER_DAY_KEY + DateUtil.dateFormatter.format(localDate), 1, TimeUnit.SECONDS);
     }
+
 
 
     // ********************************* 暂时不用的方法 *********************************** //

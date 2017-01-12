@@ -233,7 +233,10 @@ public class RabbitMqReciver {
                 logger.info("==========>@@@@assign-timer===>>> 指定老师定时任务接受到任务");
                 assignTeacherServiceX.autoAssign();
             } else if(serviceTimerMessage.getType() == TimerMessageType.EXPIRE_PUBLIC_CLASS.value()) {
-                logger.info("==========>@@@@assign-timer===>>> 删除公开课缓存");
+                logger.info("==========>@@@@EXPIRE_PUBLIC_CLASS===>>> 删除公开课缓存");
+                publicClassRoom.expireClassRoomCache();
+            } else if(serviceTimerMessage.getType() == TimerMessageType.PUBLIC_CLASS_NOTIFY.value()) {
+                logger.info("==========>@@@@PUBLIC_CLASS_NOTIFY===>>> 公开课通知");
                 publicClassRoom.expireClassRoomCache();
             }
             //
