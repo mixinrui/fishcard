@@ -86,7 +86,7 @@ HomePageController {
         cardCourseInfo2.setCourseName("魔术师的帽子里都藏着什么？");
         cardCourseInfo2.setCourseType("CONVERSATION");
         cardCourseInfo2.setDateInfo(new Date());
-        cardCourseInfo2.setDifficulty("LEVEL_2");
+        cardCourseInfo2.setDifficulty("LEVEL_3");
         cardCourseInfo2.setSmallClassId(15l);
         cardCourseInfo2.setThumbnail("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
 
@@ -95,7 +95,7 @@ HomePageController {
         cardCourseInfo3.setCourseName("魔术师的帽子里都藏着什么？");
         cardCourseInfo3.setCourseType("CONVERSATION");
         cardCourseInfo3.setDateInfo(new Date());
-        cardCourseInfo3.setDifficulty("LEVEL_2");
+        cardCourseInfo3.setDifficulty("LEVEL_4");
         cardCourseInfo3.setSmallClassId(15l);
         cardCourseInfo3.setThumbnail("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
 
@@ -104,7 +104,7 @@ HomePageController {
         cardCourseInfo4.setCourseName("魔术师的帽子里都藏着什么？");
         cardCourseInfo4.setCourseType("CONVERSATION");
         cardCourseInfo4.setDateInfo(new Date());
-        cardCourseInfo4.setDifficulty("LEVEL_2");
+        cardCourseInfo4.setDifficulty("LEVEL_5");
         cardCourseInfo4.setSmallClassId(15l);
         cardCourseInfo4.setThumbnail("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
 
