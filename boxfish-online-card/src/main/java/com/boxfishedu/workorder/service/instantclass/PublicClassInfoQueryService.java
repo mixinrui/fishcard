@@ -25,6 +25,7 @@ public class PublicClassInfoQueryService {
     @Autowired
     private EntityManager entityManager;
 
+
     public Long filterFishCardsCount(PublicFilterParam publicFilterParam) {
         String prefix = "select count(wo) ";
         String sql = prefix + getFilterSql(publicFilterParam);
