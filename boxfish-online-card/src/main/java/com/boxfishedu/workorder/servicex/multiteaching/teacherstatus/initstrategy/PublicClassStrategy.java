@@ -112,6 +112,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         FishCardGroupsInfo fishCardGroupsInfo = this.buildChatRoom(smallClass);
         this.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
 
+        smallClassJpaRepository.save(smallClass);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }
 
