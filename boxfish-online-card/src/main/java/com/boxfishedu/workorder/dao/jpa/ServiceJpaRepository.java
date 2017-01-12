@@ -37,7 +37,7 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     public Service findTop1ByOrderId(Long orderId);
 
-    @Query("select s from Service s where s.studentId=?1 and s.productType=?2")
+    @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.endTime>CURRENT_DATE")
     List<Service> getForeignCommentServiceCount(long studentId, int productType);
 
     @Query("select s from Service s where s.studentId=?1 and s.coursesSelected=?2")
@@ -45,11 +45,11 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
 
     // 当前可用的点评, (有可用次数的, 在有效期以内的, 并且取截止时间最近的service)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0 and s.endTime>=CURRENT_DATE order by s.endTime asc")
+    @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0 and s.endTime>CURRENT_DATE order by s.endTime asc")
     Page<Service> getFirstAvailableForeignCommentService(long studentId, int productType, Pageable pageable);
 
     // 在有效期以内的外教点评总数
-    @Query("select count(s) from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0 and s.endTime>=CURRENT_DATE")
+    @Query("select count(s) from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0 and s.endTime>CURRENT_DATE")
     Integer getAvailableForeignCommentServiceCount(long studentId, int productType);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

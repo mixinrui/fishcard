@@ -22,7 +22,7 @@ import static com.boxfishedu.workorder.common.bean.CourseDifficultyEnum.*;
 public enum PublicClassTimeEnum {
 
     // 19:00
-    NINETEEN_1(LEVEL_1, LEVEL_2) {
+    NINETEEN_1(LEVEL1, LEVEL2) {
         @Override
         public TimeRange getTimeRange() {
             return new TimeRange(25, LocalTime.of(19, 0, 0), LocalTime.of(19, 30, 0));
@@ -30,7 +30,7 @@ public enum PublicClassTimeEnum {
     },
 
     // 19:30
-    NINETEEN_2(LEVEL_3) {
+    NINETEEN_2(LEVEL3) {
         @Override
         public TimeRange getTimeRange() {
             return new TimeRange(26, LocalTime.of(19,30, 0), LocalTime.of(20, 0, 0));
@@ -38,7 +38,7 @@ public enum PublicClassTimeEnum {
     },
 
     // 20:00
-    TWENTY_1(LEVEL_4) {
+    TWENTY_1(LEVEL4) {
         @Override
         public TimeRange getTimeRange() {
             return new TimeRange(27, LocalTime.of(20,0, 0), LocalTime.of(20, 30, 0));
@@ -46,7 +46,7 @@ public enum PublicClassTimeEnum {
     },
 
     // 20:30
-    TWENTY_2(LEVEL_5, LEVEL_6, LEVEL_7, LEVEl_8) {
+    TWENTY_2(LEVEL5, LEVEL6, LEVEL7, LEVEl8) {
         @Override
         public TimeRange getTimeRange() {
             return new TimeRange(28, LocalTime.of(20,30, 0), LocalTime.of(21, 0, 0));
@@ -62,22 +62,23 @@ public enum PublicClassTimeEnum {
     private static EnumMap<CourseDifficultyEnum, PublicClassTimeEnum> publicClassTimes
             = new EnumMap<>(CourseDifficultyEnum.class);
 
-    private static Map<Integer, Set<String>> slotIdPublicClassTimes = new HashMap<>();
+    private static Map<Integer, Set<CourseDifficultyEnum>> slotIdPublicClassTimes = new HashMap<>();
 
     static {
         for(PublicClassTimeEnum val : values()) {
             for(CourseDifficultyEnum key : val.difficulties) {
                 publicClassTimes.put(key, val);
-                slotIdPublicClassTimes.putIfAbsent(val.getTimeRange().getSlotId(), new HashSet<>()).add(key.name());
+                slotIdPublicClassTimes.putIfAbsent(val.getTimeRange().getSlotId(), new HashSet<>()).add(key);
             }
         }
-
-//        Arrays.stream(values()).collect(
-//                Collectors.groupingBy((p) -> p.getTimeRange().getSlotId(), Collectors.mapping(p -> {return Arrays.asList(p.difficulties);}, Collectors.toSet())));
     }
 
     public static PublicClassTimeEnum publicClassTime(CourseDifficultyEnum courseDifficulty) {
         return publicClassTimes.get(courseDifficulty);
+    }
+
+    public static Set<CourseDifficultyEnum> getCourseDifficultiesBySlotId(Integer slotId) {
+        return slotIdPublicClassTimes.get(slotId);
     }
 
     public TimeRange getTimeRange() {
