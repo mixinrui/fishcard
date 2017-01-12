@@ -130,7 +130,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         workOrder.setSkuId(smallClass.getRoleId());
         workOrder.setService(service);
         workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
-        workOrder.setSeqNum(1);
+        workOrder.setSeqNum(0);
 
         return workOrder;
     }
