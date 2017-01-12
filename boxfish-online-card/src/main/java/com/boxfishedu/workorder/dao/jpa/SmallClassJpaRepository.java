@@ -20,4 +20,6 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
     Page<SmallClass> findPage(Pageable pageable);
 
     List<SmallClass> findByClassDateAndClassType(Date classDate, String classType);
+
+    List<SmallClass> findByClassTypeAndStartTimeGreaterThan(String classType,Date date);
 }

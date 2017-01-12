@@ -44,8 +44,6 @@ public interface GroupInitStrategy {
         if (!Objects.isNull(smallClass.getTeacherId())) {
             workOrders.forEach(workOrder -> {
                 workOrder.setSmallClassId(smallClass.getId());
-                workOrder.setTeacherId(smallClass.getTeacherId());
-                workOrder.setTeacherName(smallClass.getTeacherName());
                 workOrder.setUpdateTime(new Date());
                 workOrder.setAssignTeacherTime(new Date());
                 workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());

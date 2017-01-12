@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.dao.jpa;
 
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -204,6 +205,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByStartTime(Long teacherId, Date beginDate, Date endDate, Integer status);
 
     public List<WorkOrder> findByIdIn(List workOrderIds);
+
+    List<WorkOrder> findByClassTypeAndStartTimeGreaterThan(String classType, Date date);
 
 
     @Query("select wo from  WorkOrder wo where wo.studentId=?1 and (wo.startTime between ?2 and ?3) and wo.isFreeze=0  and wo.slotId in(?4) order by wo.startTime ")
