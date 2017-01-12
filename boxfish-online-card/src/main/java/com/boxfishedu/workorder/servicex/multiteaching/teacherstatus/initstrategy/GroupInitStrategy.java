@@ -1,10 +1,9 @@
-package com.boxfishedu.workorder.servicex.multiteaching.statusdealer.initstrategy;
+package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
@@ -12,6 +11,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -55,7 +55,22 @@ public interface GroupInitStrategy {
         }
     }
 
-    default void writeCourseBack(SmallClass smallClass, List<WorkOrder> workOrders) {
+    default void writeChatRoomBack(SmallClass smallClass, List<WorkOrder> workOrders,FishCardGroupsInfo fishCardGroupsInfo) {
+        smallClass.setChatRoomId(fishCardGroupsInfo.getChatRoomId());
+        smallClass.setGroupId(fishCardGroupsInfo.getGroupId());
+        workOrders.forEach(workOrder -> {
+            workOrder.setGroupId(smallClass.getGroupId());
+            workOrder.setChatRoomId(smallClass.getChatRoomId());
+        });
+        smallClass.setAllCards(workOrders);
+    }
+
+    default void writeCourseBack(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
+        smallClass.setCourseId(recommandCourseView.getCourseId());
+        smallClass.setCourseName(recommandCourseView.getCourseName());
+        smallClass.setCourseType(recommandCourseView.getCourseType());
+        smallClass.setCover(recommandCourseView.getCover());
+
         if (Objects.isNull(smallClass.getCourseId())) {
             throw new BusinessException("没有获取到课程信息,不作回写");
         }
@@ -69,11 +84,12 @@ public interface GroupInitStrategy {
         });
     }
 
-    default void persistSmallClass(SmallClass smallClass, SmallClassJpaRepository smallClassJpaRepository){
+    default void persistSmallClass(SmallClass smallClass, SmallClassJpaRepository smallClassJpaRepository) {
         smallClassJpaRepository.save(smallClass);
     }
 
-    default void persistCardRelatedInfo(SmallClass smallClass, WorkOrderService workOrderService
+    default void persistCardRelatedInfo(
+            SmallClass smallClass, WorkOrderService workOrderService
             , ScheduleCourseInfoService scheduleCourseInfoService, RecommandCourseView recommandCourseView) {
 
         smallClass.getAllCards().forEach(workOrder -> {
@@ -88,6 +104,8 @@ public interface GroupInitStrategy {
         });
     }
 
+    FishCardGroupsInfo buildChatRoom(SmallClass smallClass);
+
     @Transactional
-    void persistGroupClass(SmallClass smallClass, RecommandCourseView recommandCourseView);
+    void persistGroupClass(SmallClass smallClass,List<WorkOrder> workOrders, RecommandCourseView recommandCourseView);
 }

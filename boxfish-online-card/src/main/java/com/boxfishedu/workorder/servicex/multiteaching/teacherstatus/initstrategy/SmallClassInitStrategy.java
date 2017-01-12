@@ -1,12 +1,8 @@
-package com.boxfishedu.workorder.servicex.multiteaching.statusdealer.initstrategy;
+package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
 
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.TeachingType;
-import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
@@ -14,9 +10,8 @@ import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
-import com.google.common.collect.Interner;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,17 +73,22 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
 
         //回写课程信息
-        this.writeCourseBack(smallClass, smallClass.getAllCards());
+        this.writeCourseBack(smallClass, smallClass.getAllCards(),recommandCourseView);
 
         this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
 
         //将小班课,公开课相关信息保存入库
-        this.persistGroupClass(smallClass, recommandCourseView);
+        this.persistGroupClass(smallClass, smallClass.getAllCards(),recommandCourseView);
+    }
+
+    @Override
+    public FishCardGroupsInfo buildChatRoom(SmallClass smallClass) {
+        return null;
     }
 
     @Override
     @Transactional
-    public void persistGroupClass(SmallClass smallClass, RecommandCourseView recommandCourseView) {
+    public void persistGroupClass(SmallClass smallClass,List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }
