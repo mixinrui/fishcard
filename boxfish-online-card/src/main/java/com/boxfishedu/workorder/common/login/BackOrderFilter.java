@@ -39,7 +39,8 @@ import java.util.Set;
 
         "/backend/backorder/*",
         "/backend/makeup/*",
-        "/backend/fishcard/*"
+        "/backend/fishcard/*",
+        "/service/backend/*"
 
         })
 public class BackOrderFilter extends OncePerRequestFilter {
