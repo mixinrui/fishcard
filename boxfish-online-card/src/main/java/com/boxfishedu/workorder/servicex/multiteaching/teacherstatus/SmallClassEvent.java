@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Observable;
 
@@ -12,7 +13,6 @@ import java.util.Observable;
  */
 @Data
 public class SmallClassEvent extends Observable {
-    @Autowired
     private SmallClassEventDispatch smallClassEventDispatch;
     //事件起源
     private SmallClass source;
@@ -20,12 +20,13 @@ public class SmallClassEvent extends Observable {
     private SmallClassCardStatus type;
 
     //传入事件的源头,默认为新建类型
-    public SmallClassEvent(SmallClass smallClass) {
-        this(smallClass, SmallClassCardStatus.CREATE);
+    public SmallClassEvent(SmallClass smallClass, SmallClassEventDispatch smallClassEventDispatch) {
+        this(smallClass, smallClassEventDispatch, SmallClassCardStatus.CREATE);
     }
 
     //事件源头以及事件类型
-    public SmallClassEvent(SmallClass p, SmallClassCardStatus type) {
+    public SmallClassEvent(SmallClass p, SmallClassEventDispatch smallClassEventDispatch, SmallClassCardStatus type) {
+        this.smallClassEventDispatch = smallClassEventDispatch;
         this.source = p;
         this.type = type;
         //事件触发

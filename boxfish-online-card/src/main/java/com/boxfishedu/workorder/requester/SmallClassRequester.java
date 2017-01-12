@@ -138,7 +138,7 @@ public class SmallClassRequester {
             recommandCourseView = restTemplate.getForObject(url, RecommandCourseView.class);
             logger.info("@getPublicCourse推荐课程成功,url[{}],结果[{}]", url, JacksonUtil.toJSon(recommandCourseView));
         } catch (Exception ex) {
-            logger.error("@getPublicCourse推荐公开课失败url[{}]", ex);
+            logger.error("@getPublicCourse推荐公开课失败url[{}]", url,ex);
             throw new BusinessException("推荐课程失败");
         }
         return recommandCourseView;

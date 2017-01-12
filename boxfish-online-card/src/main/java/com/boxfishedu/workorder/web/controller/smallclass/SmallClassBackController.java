@@ -55,7 +55,7 @@ public class SmallClassBackController {
     }
 
     @RequestMapping(value = "/smallclass", method = RequestMethod.POST)
-    public JsonResultModel buildPublicClass(PublicClassBuilderParam publicClassBuilderParam) {
+    public JsonResultModel buildPublicClass(@RequestBody PublicClassBuilderParam publicClassBuilderParam) {
         logger.debug("@buildPublicClass创建公开课,参数[{}]", publicClassBuilderParam);
         smallClassBackServiceX.configPublicClass(publicClassBuilderParam);
         return JsonResultModel.newJsonResultModel("OK");
