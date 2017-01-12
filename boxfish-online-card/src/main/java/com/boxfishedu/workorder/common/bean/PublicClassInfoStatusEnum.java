@@ -17,6 +17,7 @@ public enum PublicClassInfoStatusEnum {
     COMPLETED(500, "正常完成"),
     COMPLETED_FORCE(510, "强退"),
     LEAVE_EARLY(520, "早退"),
+    LEAVE_ACTIVE(530, "主动退出"),
     //主要给数据库用
     QUIT(550, "退出");
 

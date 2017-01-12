@@ -18,7 +18,6 @@ import java.util.List;
  * Created by hucl on 16/12/28.
  * 小班课
  */
-@Component
 @Data
 @Entity
 @Table(name = "small_class")
