@@ -67,6 +67,9 @@ public class SmallClass implements Cloneable, Serializable {
     @Column(name = "teacher_name")
     private String teacherName;
 
+    @Column(name = "teacher_photo")
+    private String teacherPhoto;
+
     private Long groupLeader;
 
     private Long groupLeaderCard;

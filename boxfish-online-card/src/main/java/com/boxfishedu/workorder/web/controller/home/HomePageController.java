@@ -67,7 +67,17 @@ HomePageController {
         smallClass.setTeacherName("张老师");
         smallClass.setStartTime(new Date());
         smallClass.setEndTime(new Date());
+        smallClass.setTeacherPhoto("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
 
+
+        SmallClass smallClass2 = smallClass.clone();
+        smallClass2.setDifficultyLevel("LEVEL_3");
+
+        SmallClass smallClass3 = smallClass.clone();
+        smallClass3.setDifficultyLevel("LEVEL_4");
+
+        SmallClass smallClass4 = smallClass.clone();
+        smallClass4.setDifficultyLevel("LEVEL_5");
 
 
         List<AccountCourseBean.CardCourseInfo> cardCourseInfos = Lists.newArrayList();
@@ -78,7 +88,7 @@ HomePageController {
         cardCourseInfo.setCourseType("CONVERSATION");
         cardCourseInfo.setDateInfo(new Date());
         cardCourseInfo.setDifficulty("LEVEL_2");
-        cardCourseInfo.setSmallClassId(15l);
+        cardCourseInfo.setSmallClassId(333L);
         cardCourseInfo.setThumbnail("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
 
         AccountCourseBean.CardCourseInfo cardCourseInfo2 = new AccountCourseBean.CardCourseInfo();
@@ -87,7 +97,7 @@ HomePageController {
         cardCourseInfo2.setCourseType("CONVERSATION");
         cardCourseInfo2.setDateInfo(new Date());
         cardCourseInfo2.setDifficulty("LEVEL_3");
-        cardCourseInfo2.setSmallClassId(15l);
+        cardCourseInfo2.setSmallClassId(333L);
         cardCourseInfo2.setThumbnail("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
 
         AccountCourseBean.CardCourseInfo cardCourseInfo3 = new AccountCourseBean.CardCourseInfo();
@@ -96,7 +106,7 @@ HomePageController {
         cardCourseInfo3.setCourseType("CONVERSATION");
         cardCourseInfo3.setDateInfo(new Date());
         cardCourseInfo3.setDifficulty("LEVEL_4");
-        cardCourseInfo3.setSmallClassId(15l);
+        cardCourseInfo3.setSmallClassId(333L);
         cardCourseInfo3.setThumbnail("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
 
         AccountCourseBean.CardCourseInfo cardCourseInfo4 = new AccountCourseBean.CardCourseInfo();
@@ -105,11 +115,14 @@ HomePageController {
         cardCourseInfo4.setCourseType("CONVERSATION");
         cardCourseInfo4.setDateInfo(new Date());
         cardCourseInfo4.setDifficulty("LEVEL_5");
-        cardCourseInfo4.setSmallClassId(15l);
+        cardCourseInfo4.setSmallClassId(333L);
         cardCourseInfo4.setThumbnail("https://api.boxfish.cn/student/publication/data/data/650d5e6131224e1406b5ca3e66aa64a2");
 
 
         cardCourseInfo.setSmallClassInfo(smallClass);
+        cardCourseInfo2.setSmallClassInfo(smallClass2);
+        cardCourseInfo3.setSmallClassInfo(smallClass3);
+        cardCourseInfo4.setSmallClassInfo(smallClass4);
 
         cardCourseInfos.add(cardCourseInfo);
         cardCourseInfos.add(cardCourseInfo2);
