@@ -1,14 +1,13 @@
 package com.boxfishedu.workorder.servicex.multiteaching.classgroup.groupbuilder;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.servicex.multiteaching.statusdealer.SmallClassEvent;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +64,7 @@ public class Timer6Group extends GroupBuilder {
     }
 
     @Override
-    protected void initGroup(Map<String, List<WorkOrder>> groups) {
+    protected void initGroup(Map<Integer, List<WorkOrder>> groups) {
         groups.forEach((key, groupMembers) -> {
             WorkOrder leader = this.selectLeader(groupMembers);
             SmallClass smallClass = new SmallClass();
@@ -75,7 +74,7 @@ public class Timer6Group extends GroupBuilder {
             smallClass.setGroupLeader(leader.getStudentId());
             smallClass.setGroupLeaderCard(leader.getId());
             smallClass.setRoleId(leader.getSkuId());
-            smallClass.setSmallClassType(SmallClassType.SMALL.name());
+            smallClass.setClassType(ClassTypeEnum.SMALL.name());
             smallClass.setAllCards(groupMembers);
             smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
 

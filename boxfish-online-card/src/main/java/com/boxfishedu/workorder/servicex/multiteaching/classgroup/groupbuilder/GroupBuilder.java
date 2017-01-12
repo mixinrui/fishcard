@@ -1,10 +1,12 @@
 package com.boxfishedu.workorder.servicex.multiteaching.classgroup.groupbuilder;
 
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/6.
@@ -22,7 +24,7 @@ public abstract class GroupBuilder {
 
     protected abstract Map<String, List<WorkOrder>> groupByRelation(List<WorkOrder> workOrders);
 
-    protected abstract void initGroup(Map<String, List<WorkOrder>> groups);
+    protected abstract void initGroup(Map<Integer, List<WorkOrder>> groups);
 
     protected abstract WorkOrder selectLeader(List<WorkOrder> workOrders);
 
@@ -30,9 +32,6 @@ public abstract class GroupBuilder {
 
 
     public void group() {
-        //小班群组
-        Map<String, List<WorkOrder>> groups = Maps.newHashMap();
-
         List<WorkOrder> cards = this.cardsToGroup();
 
         Map<String, List<WorkOrder>> timeGrouped = this.groupByTime(cards);
@@ -40,45 +39,43 @@ public abstract class GroupBuilder {
         timeGrouped.forEach((timeKey, timedWorkOrders) -> {
             Map<String, List<WorkOrder>> levelGrouped = this.groupbyLevel(timedWorkOrders);
 
-            levelGrouped.forEach((levelKey, leveledWorkOrders) -> {
-                Map<String, List<WorkOrder>> studyCounterGrouped = this.groupByStudyCounter(leveledWorkOrders);
+            levelGrouped.forEach((key, workOrders) -> {
+                Map<Integer, List<WorkOrder>> finalGroups = this.divideGroup(workOrders);
+                this.initGroup(finalGroups);
+            });
 
-                Integer groupSeq = 0;
-
-
-                //TODO:等待确定规则
+//            levelGrouped.forEach((levelKey, leveledWorkOrders) -> {
+//                Map<String, List<WorkOrder>> studyCounterGrouped = this.groupByStudyCounter(leveledWorkOrders);
+//
+//                Integer groupSeq = 0;
+            //TODO:等待确定规则
 //                studyCounterGrouped.forEach((studyCounterKey, studyCounterWorkOrders) -> {
 //                    Map<String, List<WorkOrder>> relationGrouped = this.groupByRelation(studyCounterWorkOrders);
 ////                    groups.putAll(relationGrouped);
 //                });
-            });
         });
-
-        this.initGroup(groups);
     }
 
     //将小班按照信息获取
-    protected Map<Integer, WorkOrder> divideGroup(List<WorkOrder> workOrders) {
-//        Integer memNum = this.smallClassMemeberNum();
-//        Integer groupNum = workOrders.size() / memNum;
-//        Map<Integer, List<WorkOrder>> finalGroup = new HashMap<>();
-//
-//        Integer groupCounter = 0;
-//        List<WorkOrder> currentGroup = finalGroup.get(groupCounter);
-//        for (int i = 0; i < workOrders.size(); i++) {
-//            if (Objects.isNull(currentGroup)) {
-//                currentGroup = Lists.newArrayList();
-//            }
-//            if (currentGroup.size() > memNum) {
-//                groupCounter++;
-//            }
-//            if (currentGroup.size() < memNum) {
-//                currentGroup.add(workOrders.get(i));
-//            } else {
-//                groupCounter++;
-//            }
-//        }
+    protected Map<Integer, List<WorkOrder>> divideGroup(List<WorkOrder> workOrders) {
+        Integer memNum = this.smallClassMemeberNum();
+        Map<Integer, List<WorkOrder>> finalGroup = new HashMap<>();
 
-        return null;
+        Integer groupCounter = 0;
+        List<WorkOrder> currentGroup = finalGroup.get(groupCounter);
+        for (int i = 0; i < workOrders.size(); i++) {
+            if (Objects.isNull(currentGroup)) {
+                currentGroup = Lists.newArrayList();
+                finalGroup.put(groupCounter, currentGroup);
+            }
+            if (currentGroup.size() == memNum) {
+                groupCounter++;
+                currentGroup = Lists.newArrayList();
+                finalGroup.put(groupCounter, currentGroup);
+            } else {
+                currentGroup.add(workOrders.get(i));
+            }
+        }
+        return finalGroup;
     }
 }

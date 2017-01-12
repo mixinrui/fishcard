@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassType;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Maps;
@@ -26,7 +26,7 @@ public class SmallClassTeacherController {
         SmallClass smallClass = new SmallClass();
         smallClass.setGroupLeaderCard(1L);
         smallClass.setGroupLeader(11L);
-        smallClass.setSmallClassType(SmallClassType.SMALL.name());
+        smallClass.setClassType(ClassTypeEnum.SMALL.name());
         smallClass.setRoleId(2);
         smallClass.setChatRoomId(111111L);
         smallClass.setClassDate(new Date());
@@ -42,7 +42,7 @@ public class SmallClassTeacherController {
         smallClass.setUpdateTime(new Date());
         smallClass.setId(333L);
 
-        map.put("classInfo",smallClass);
+        map.put("classInfo", smallClass);
         return JsonResultModel.newJsonResultModel(map);
     }
 
@@ -51,7 +51,7 @@ public class SmallClassTeacherController {
         SmallClass smallClass = new SmallClass();
         smallClass.setGroupLeaderCard(1L);
         smallClass.setGroupLeader(11L);
-        smallClass.setSmallClassType(SmallClassType.SMALL.name());
+        smallClass.setClassType(ClassTypeEnum.PUBLIC.name());
         smallClass.setRoleId(2);
         smallClass.setChatRoomId(111111L);
         smallClass.setClassDate(new Date());

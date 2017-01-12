@@ -102,7 +102,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         workOrder.setEndTime(smallClass.getEndTime());
         workOrder.setChatRoomId(smallClass.getChatRoomId());
         workOrder.setGroupId(smallClass.getGroupId());
-        workOrder.setClassType(smallClass.getSmallClassType());
+        workOrder.setClassType(smallClass.getClassType());
         workOrder.setService(service);
 
         return workOrder;
