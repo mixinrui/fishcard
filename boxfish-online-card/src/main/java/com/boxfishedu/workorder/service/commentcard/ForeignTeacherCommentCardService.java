@@ -46,7 +46,4 @@ public interface ForeignTeacherCommentCardService {
     public void forceToChangeTeacher(Long fromTeacherId,Long toTeacherId);
 
     void notifyExpireCommentCards();
-
-    void clearAmountCache();
-
 }

@@ -2,7 +2,6 @@ package com.boxfishedu.workorder.web.controller.commentcard;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.common.exception.ValidationException;
-import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.Objects;
 
 /**
  * Created by ansel on 16/7/18.
@@ -62,24 +60,6 @@ public class ForeignTeacherCommentController {
         }else {
             return JsonResultModel.newJsonResultModel(commentCard);
         }
-    }
-
-    @RequestMapping(value = "/evict/amount/{studentId}", method = RequestMethod.DELETE)
-    public JsonResultModel evictAmount(@PathVariable Long studentId, String sign) {
-        if(Objects.equals(sign, "foreignTeacherCommentCardService")) {
-            throw new UnsupportedOperationException();
-        }
-        cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(studentId);
-        return JsonResultModel.newJsonResultModel();
-    }
-
-    @RequestMapping(value = "/evict/amount/all", method = RequestMethod.DELETE)
-    public JsonResultModel clear(String sign) {
-        if(Objects.equals(sign, "foreignTeacherCommentCardService")) {
-            throw new UnsupportedOperationException();
-        }
-        foreignTeacherCommentCardService.clearAmountCache();
-        return JsonResultModel.newJsonResultModel();
     }
 
     //@RequestMapping(value = "/isAvailable", method = RequestMethod.GET)

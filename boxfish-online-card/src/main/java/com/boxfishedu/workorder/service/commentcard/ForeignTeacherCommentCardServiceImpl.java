@@ -77,9 +77,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
     @Autowired
     CommentCardTimeConf commentCardTimeConf;
 
-    @Autowired
-    private CacheManager cacheManager;
-
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
     @Override
@@ -118,8 +115,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
             boolean flag = true;
             try{
                 service.setAmount(service.getAmount() - 1);
-                // 刷新点评次数缓存
-                cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(userId);
                 updateCommentAmount(service);
                 commentCard.setStudentId(userId);
                 commentCard.setService(service);
@@ -428,9 +423,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                 commentCardJpaRepository.save(commentCard);
                 serviceTemp.setAmount(serviceTemp.getAmount() + 1);
                 serviceTemp.setUpdateTime(updateDate);
-
-                // 刷新点评次数缓存
-                cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(commentCard.getStudentId());
                 serviceJpaRepository.save(serviceTemp);
                 logger.info("@foreignTeacherCommentUnAnswer24 外教在48小时内未点评,为学生返还点评次数...");
                 CommentCardStatistics commentCardStatistics = new CommentCardStatistics();
@@ -633,14 +625,6 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         logger.info("push expire commentCards to {}", studentIds);
         if(CollectionUtils.isNotEmpty(studentIds)) {
             pushExpireMessage(studentIds);
-        }
-    }
-
-    @Override
-    public void clearAmountCache() {
-        Set<Long> ids = serveService.getForeignCommentStudentIds();
-        for(Long id : ids) {
-            cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(id);
         }
     }
 
