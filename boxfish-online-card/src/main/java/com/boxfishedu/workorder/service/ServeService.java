@@ -457,12 +457,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         String optionTwo = productComboDetail.getProductSku().getOptionTwo();
 
         // 如果是小班课, OptionTwo为上课人数
-        if(org.apache.commons.lang3.StringUtils.equals(ComboTypeToRoleId.SMALLCLASS.name(), comboType)
-                && org.apache.commons.lang3.StringUtils.isNotEmpty(optionTwo)) {
-            service.setClassSize(Integer.valueOf(optionTwo));
-        } else {
-            service.setClassSize(-1);
-        }
+        service.setClassSize(productCombo.getClassSize());
 
         List<ComboDurations> durations = productCombo.getComboDurations();
         if(CollectionUtils.isNotEmpty(durations)) {

@@ -127,7 +127,7 @@ public class PublicClassRoom {
     /**
      * 公开课上课通知
      */
-    public void publicclassRoomNotification() {
+    public void publicClassRoomNotification() {
         // 判断离上课不超过10分钟的公开课, 发起推送
         LocalDateTime from = LocalDateTime.now();
         LocalDateTime to = from.plusMinutes(10);
@@ -148,6 +148,11 @@ public class PublicClassRoom {
 //                    .addTag(tags)
 //                    .notifyPush();
         }
+    }
+
+
+    public Long rollCall(Long smallClassId) {
+        return setOperations.randomMember(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId);
     }
 
 
