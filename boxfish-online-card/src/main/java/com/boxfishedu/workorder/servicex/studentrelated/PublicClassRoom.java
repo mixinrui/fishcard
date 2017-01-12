@@ -133,7 +133,13 @@ public class PublicClassRoom {
         LocalDateTime to = from.plusMinutes(10);
         List<SmallClass> smallClassList = smallClassJpaRepository.findByStartTimeRange(
                 DateUtil.convertToDate(from), DateUtil.convertToDate(to), ClassTypeEnum.PUBLIC.name());
-        
+        smallClassList.stream()
+                .map(SmallClass::getSlotId)
+                .distinct()
+                .map((slotId) -> {
+                    return null;
+                });
+
     }
 
 

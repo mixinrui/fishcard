@@ -107,7 +107,7 @@ public class RabbitMqReciver {
     /**
      * 订单中心转换请求
      */
-//    @RabbitListener(queues = RabbitMqConstant.ORDER_TO_SERVICE_QUEUE)
+    @RabbitListener(queues = RabbitMqConstant.ORDER_TO_SERVICE_QUEUE)
     public void orderConsumer(OrderForm orderView) {
         logger.info("@orderConsumer");
         try {
