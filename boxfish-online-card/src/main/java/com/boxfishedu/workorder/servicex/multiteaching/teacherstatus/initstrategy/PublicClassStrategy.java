@@ -95,11 +95,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
 
         this.writeTeacherInfoBack(smallClass, Arrays.asList(workOrder), teacherView);
 
-        FishCardGroupsInfo fishCardGroupsInfo=this.buildChatRoom(smallClass);
-
-        this.writeChatRoomBack(smallClass,Arrays.asList(workOrder),fishCardGroupsInfo);
-
-        this.persistGroupClass(smallClass, recommandCourseView);
+        this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
     }
 
     @Override
@@ -109,8 +105,14 @@ public class PublicClassStrategy implements GroupInitStrategy {
 
     @Override
     @Transactional
-    public void persistGroupClass(SmallClass smallClass, RecommandCourseView recommandCourseView) {
+    public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
+
+        //回写群组信息到smallclass
+        FishCardGroupsInfo fishCardGroupsInfo = this.buildChatRoom(smallClass);
+        this.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
+
+        smallClassJpaRepository.save(smallClass);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }
 

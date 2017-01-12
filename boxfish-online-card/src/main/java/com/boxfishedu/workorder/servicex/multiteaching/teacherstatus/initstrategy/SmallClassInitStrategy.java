@@ -78,7 +78,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
 
         //将小班课,公开课相关信息保存入库
-        this.persistGroupClass(smallClass, recommandCourseView);
+        this.persistGroupClass(smallClass, smallClass.getAllCards(),recommandCourseView);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Override
     @Transactional
-    public void persistGroupClass(SmallClass smallClass, RecommandCourseView recommandCourseView) {
+    public void persistGroupClass(SmallClass smallClass,List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }
