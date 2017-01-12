@@ -127,8 +127,10 @@ public class PublicClassStrategy implements GroupInitStrategy {
         workOrder.setChatRoomId(smallClass.getChatRoomId());
         workOrder.setGroupId(smallClass.getGroupId());
         workOrder.setClassType(smallClass.getClassType());
+        workOrder.setSkuId(smallClass.getRoleId());
         workOrder.setService(service);
         workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
+        workOrder.setSeqNum(1);
 
         return workOrder;
     }
@@ -147,6 +149,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         service.setStudentId(0l);
         service.setOrderId(this.virtualOrderId());
         service.setClassSize(0);
+        service.setUserType(0);
 
         if (redisTemplate.opsForValue().setIfAbsent(GENERATE_PUBLIC_SERVICE, Boolean.TRUE.toString())) {
             service = serviceJpaRepository.save(service);
