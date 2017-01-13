@@ -21,6 +21,8 @@ public class SmallClassLog {
 
     private Long teacherId;
 
+    private Long smallClassId;
+
     //在线学生
     private List<Long> activeStudents;
 
