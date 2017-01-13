@@ -203,7 +203,7 @@ public class PublicClassRoom {
             // 非会员直接不让上课
             case "NONE" : throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
             // 会员验证
-            default: memberCheck(classDate, studentId); break;
+            default: // memberCheck(classDate, studentId);// break;
         }
     }
 
