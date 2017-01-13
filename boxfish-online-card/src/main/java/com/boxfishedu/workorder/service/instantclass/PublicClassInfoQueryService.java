@@ -55,41 +55,6 @@ public class PublicClassInfoQueryService {
         }
 
 
-        if (null != publicFilterParam.getOrderType()) {
-            if (publicFilterParam.getOrderType().equals(OrderChannelDesc.OVERALL.getCode())
-                    ||
-                    publicFilterParam.getOrderType().equals(OrderChannelDesc.FOREIGN.getCode())
-                    ) {
-                sql.append(" and wo.comboType=:orderChannel and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("' ");
-            } else if (publicFilterParam.getOrderType().equals(OrderChannelDesc.CHINESE.getCode())) {       // 终极梦想
-                sql.append(" and (wo.comboType=:orderChannel or ( wo.comboType= '").append(OrderChannelDesc.INTELLIGENT.getCode()).append("' ").
-                        append(" and  wo.service.tutorType= '").append(TutorTypeEnum.FRN).append("' )  )  and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
-            } else if (publicFilterParam.getOrderType().equals(OrderChannelDesc.INTELLIGENT.getCode())) { // 考试指导
-                sql.append(" and wo.comboType=:orderChannel  ").append(" and  wo.service.tutorType= '").append(TutorTypeEnum.CN).append("'   and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
-            } else {
-                sql.append(" and wo.orderChannel=:orderChannel ");
-            }
-
-        }
-        if (null != publicFilterParam.getConfirmFlag()) {
-            if ("1".equals(publicFilterParam.getConfirmFlag())) {
-                sql.append(" and (wo.confirmFlag=:confirmFlag or wo.confirmFlag is null )  ");
-            } else {
-                sql.append(" and wo.confirmFlag=:confirmFlag ");
-            }
-        }
-
-        if ("before".equals(publicFilterParam.getRechargeType())) {
-            sql.append(" and wo.statusRecharge = :statusRecharge ");  //
-        }
-
-        if ("after".equals(publicFilterParam.getRechargeType())) {
-            if (null == publicFilterParam.getRechargeValue()) {
-                sql.append(" and wo.statusRecharge > :statusRecharge ");  //
-            } else {
-                sql.append(" and wo.statusRecharge = :statusRechargeValue ");  //
-            }
-        }
 
         // 中外教
         if (null != publicFilterParam.getTeachingType()) {
@@ -103,9 +68,9 @@ public class PublicClassInfoQueryService {
             sql.append(" and wo.createTime<=:createend ");
         }
 
-//        if(null!=publicFilterParam.getStatus()){
-//            sql.append("and status in (:status )");
-//        }
+        if(null!=publicFilterParam.getStatus()){
+            sql.append("and status in (:status )");
+        }
         if (null != publicFilterParam.getOrderCode()) {
             sql.append("and orderCode=:orderCode ");
         }
@@ -134,37 +99,11 @@ public class PublicClassInfoQueryService {
 
 
 
-//        if (StringUtils.isNotEmpty(publicFilterParam.getDemoType())) {
-//            if (publicFilterParam.getDemoType().trim().equals("true")) {
-//                sql.append("and orderId=:orderId ");
-//            } else {
-//                sql.append("and orderId !=:orderId ");
-//            }
-//        } else {
-//            sql.append("and orderId !=:orderId ");
-//        }
-
-
-        if (null != publicFilterParam.getMakeUpFlag()) {
-            if (publicFilterParam.getMakeUpFlag()) {
-                sql.append(" and parentId is not null ");
-            } else {
-                sql.append(" and parentId is  null  ");
-            }
-        }
-
-        //小班课 公开课的 处理
-        if(null != publicFilterParam.getClassType()){
-            sql.append(" and classType =:classType ");  // 除了小班课 和公开课
-        }
-
         if (null != publicFilterParam.getStartTimeSort()) {
             sql.append("order by wo.startTime   ").append(publicFilterParam.getStartTimeSort().toLowerCase());
         }
 
-        if (null != publicFilterParam.getActualStartTimeSort()) {
-            sql.append("order by wo.actualStartTime ").append(publicFilterParam.getActualStartTimeSort());
-        }
+
 
         if (null != publicFilterParam.getStartTimeSort() && null != publicFilterParam.getActualStartTimeSort()) {
             sql.append("order by wo.teacherId asc , wo.createTime desc");
@@ -193,10 +132,6 @@ public class PublicClassInfoQueryService {
             query.setParameter("id", publicFilterParam.getId());
         }
 
-        if (null != publicFilterParam.getOrderType()) {
-            query.setParameter("classType", publicFilterParam.getClassType());
-        }
-
 
         // 订单类型
         if (null != publicFilterParam.getOrderType()) {
@@ -213,9 +148,9 @@ public class PublicClassInfoQueryService {
             query.setParameter("createend", publicFilterParam.getCreateEndDateFormat());
         }
 
-//        if(null!=publicFilterParam.getStatus()){
-//            query.setParameter("status",publicFilterParam.getStatus());
-//        }
+        if(null!=publicFilterParam.getStatus()){
+            query.setParameter("status",publicFilterParam.getStatus());
+        }
         if (null != publicFilterParam.getOrderCode()) {
             query.setParameter("orderCode", publicFilterParam.getOrderCode());
         }
@@ -230,22 +165,6 @@ public class PublicClassInfoQueryService {
             query.setParameter("confirmFlag", publicFilterParam.getConfirmFlag());
         }
 
-        if ("before".equals(publicFilterParam.getRechargeType())) {
-            query.setParameter("statusRecharge", FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
-        }
-
-        if ("after".equals(publicFilterParam.getRechargeType())) {
-            if (null == publicFilterParam.getRechargeValue()) {
-                query.setParameter("statusRecharge", FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
-            } else {
-                query.setParameter("statusRechargeValue", publicFilterParam.getRechargeValue());
-            }
-        }
-
-        if (null != publicFilterParam.getTeachingType()) {
-
-            query.setParameter("teachingType", publicFilterParam.getTeachingType());
-        }
 
         //小班课 公开课的 处理
         if( null != publicFilterParam.getClassType()){
