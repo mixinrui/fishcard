@@ -91,7 +91,6 @@ public class AvaliableTimeServiceXV1 {
      * @throws CloneNotSupportedException
      */
     public JsonResultModel getTimeAvailable(AvaliableTimeParam avaliableTimeParam) throws CloneNotSupportedException {
-        List places = new ArrayList<Integer>(Arrays.asList(4, 6, 7, 1));
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(avaliableTimeParam, getOptionalDays(avaliableTimeParam));
 
@@ -113,7 +112,6 @@ public class AvaliableTimeServiceXV1 {
 
     private List<DayTimeSlots> getTimeAvailable(AvaliableTimeParam avaliableTimeParam, DateRange dateRange, Set<String> classDateTimeSlotsSet) throws CloneNotSupportedException {
         // 获取时间片模板,并且复制
-        final List<Integer> list = Lists.newArrayList(4, 6, 7, 1);
         return dateRange.forEach(
                 // 过滤掉时间片
                 (localDateTime, dayTimeSlot) -> {
@@ -124,8 +122,8 @@ public class AvaliableTimeServiceXV1 {
                         dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
                                 .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
                                         &&
-                                        DateUtil.getWeekInByDate(DateUtil.String2Date(String.join(" ", dayTimeSlot.getDay(), "00:00:00")), list)
-                                        && t.getSlotId() == 27
+                                        DateUtil.getWeekInByDate(DateUtil.String2Date(String.join(" ", dayTimeSlot.getDay(), "00:00:00")), avaliableTimeParam.getWeekDays())
+                                        && avaliableTimeParam.getSlots().contains(t.getSlotId())
                                 )// 27 晚8点  小班课
                                 .collect(Collectors.toList()));
                         //1对1课程
@@ -286,6 +284,13 @@ public class AvaliableTimeServiceXV1 {
         return JsonResultModel.newJsonResultModel(delayRange);
     }
 
+    /**
+     *
+     * @param orderId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
     public JsonResultModel getDelayWeekDaysForSmallClass(Long orderId, Long userId) throws Exception {
         List delayRange = Lists.newArrayList();
         Date currentDate = new Date();
@@ -297,6 +302,7 @@ public class AvaliableTimeServiceXV1 {
 
         // 获取服务信息   返回获取一周几次课  service 的 original_amount 次数 除  combo_cycle
         Service service = services.get(0);
+        //每周的次数
         int countByWeek = service.getOriginalAmount() / service.getComboCycle();
         int yushuByWeek = service.getOriginalAmount() % service.getComboCycle();
         if (0 != yushuByWeek) {
@@ -305,7 +311,7 @@ public class AvaliableTimeServiceXV1 {
 
         logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);
 
-
+        // 一共延迟 8 周
         for (int i = 1; i < 9; i++) {
             JSONObject jb = new JSONObject();
             String firstWeek = "下周开始";
