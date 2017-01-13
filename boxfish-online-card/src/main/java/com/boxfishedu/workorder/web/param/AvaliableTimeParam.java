@@ -1,10 +1,12 @@
 package com.boxfishedu.workorder.web.param;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.google.common.collect.Lists;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by hucl on 16/5/12.
@@ -39,4 +41,6 @@ public class AvaliableTimeParam implements Serializable {
     public ComboTypeToRoleId getComboTypeEnum() {
         return ComboTypeToRoleId.resolve(comboType);
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.multiteaching.classgroup.groupbuilder;
 
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +63,7 @@ public abstract class GroupBuilder {
         Map<Integer, List<WorkOrder>> finalGroup = new HashMap<>();
 
         Integer groupCounter = 0;
-        List<WorkOrder> currentGroup = finalGroup.get(groupCounter);
+        List<WorkOrder> currentGroup = null;
         for (int i = 0; i < workOrders.size(); i++) {
             if (Objects.isNull(currentGroup)) {
                 currentGroup = Lists.newArrayList();

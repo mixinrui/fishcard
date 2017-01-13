@@ -95,6 +95,22 @@ public class ScheduleCourseInfoService {
         save(scheduleCourseInfos);
     }
 
+    public void saveSingleCourseInfo(WorkOrder workOrder, CourseSchedule courseSchedule, RecommandCourseView courseView) {
+        logger.info("->>>>>>>>开始向mongodb插入课程信息");
+        ScheduleCourseInfo scheduleCourseInfo = new ScheduleCourseInfo();
+        scheduleCourseInfo.setCourseId(courseView.getCourseId());
+        scheduleCourseInfo.setCourseType(courseView.getCourseType());
+        scheduleCourseInfo.setEnglishName(courseView.getEnglishName());
+        scheduleCourseInfo.setDifficulty(courseView.getDifficulty());
+        scheduleCourseInfo.setName(courseView.getCourseName());
+        String thumbnail = String.format("%s%s", urlConf.getThumbnail_server(), courseView.getCover());
+        scheduleCourseInfo.setThumbnail(thumbnail);
+        scheduleCourseInfo.setScheduleId(courseSchedule.getId());
+        scheduleCourseInfo.setWorkOrderId(workOrder.getId());
+
+        save(scheduleCourseInfo);
+    }
+
     public TrialCourse queryByCourseIdAndScheduleType(String courseId, String scheduleType) {
         TrialCourse trialCourse = null;
         try {
@@ -112,8 +128,8 @@ public class ScheduleCourseInfoService {
         Query<ScheduleCourseInfo> updateQuery = datastore.createQuery(ScheduleCourseInfo.class);
         updateQuery.criteria("workOrderId").equal(mewScheduleCourseInfo.getWorkOrderId());
 
-        ScheduleCourseInfo scheduleCourseInfo= updateQuery.get();
-        if(null!=scheduleCourseInfo){
+        ScheduleCourseInfo scheduleCourseInfo = updateQuery.get();
+        if (null != scheduleCourseInfo) {
             scheduleCourseInfo.setCourseId(mewScheduleCourseInfo.getCourseId());
             scheduleCourseInfo.setCourseType(mewScheduleCourseInfo.getCourseType());
             scheduleCourseInfo.setName(mewScheduleCourseInfo.getName());

@@ -45,8 +45,8 @@ public class SmallClassTeacherRequester {
         SmallClassFetchTeacherParam smallClassFetchTeacherParam = new SmallClassFetchTeacherParam();
         smallClassFetchTeacherParam.setDay(smallClass.getClassDate().getTime());
         smallClassFetchTeacherParam.setSlotId(smallClass.getSlotId().longValue());
-        smallClass.setRoleId(smallClass.getRoleId());
-        smallClass.setClassType(SMALL_CLASS);
+        smallClassFetchTeacherParam.setRoleId(smallClass.getRoleId());
+        smallClassFetchTeacherParam.setClassType(SMALL_CLASS);
 
         String url = String.format("%s/course/schedule/teacher/web/match", urlConf.getTeacher_service());
         JsonResultModel jsonResultModel = null;

@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
@@ -42,6 +43,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     @Autowired
     private ScheduleCourseInfoService scheduleCourseInfoService;
 
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
+
     public WorkOrder selectLeader(List<WorkOrder> workOrders) {
         logger.debug("小班鱼卡[{}]", JacksonUtil.toJSon(workOrders));
         workOrders.sort(Comparator.comparing(workOrder -> workOrder.getStartTime()));
@@ -49,6 +53,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         return workOrders.get(0);
     }
 
+    //推荐课写到初始化代码里去
     @Override
     public RecommandCourseView getRecommandCourse(SmallClass smallClass) {
         return null;
@@ -69,16 +74,17 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
                 .fetchClassCourseByUserIds(this.workOrders2Students(
                         smallClass.getAllCards()), smallClass.getDifficultyLevel(), leader.getSeqNum(), this.teachingType2TutorType(smallClass));
 
+        //回写课程信息
+        this.writeCourseBack(smallClass, smallClass.getAllCards()
+                , recommandCourseView, recommandCourseRequester);
+
         //获取推荐教师
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
-
-        //回写课程信息
-        this.writeCourseBack(smallClass, smallClass.getAllCards(),recommandCourseView);
 
         this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
 
         //将小班课,公开课相关信息保存入库
-        this.persistGroupClass(smallClass, smallClass.getAllCards(),recommandCourseView);
+        this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
     }
 
     @Override
@@ -88,7 +94,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Override
     @Transactional
-    public void persistGroupClass(SmallClass smallClass,List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
+    public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }

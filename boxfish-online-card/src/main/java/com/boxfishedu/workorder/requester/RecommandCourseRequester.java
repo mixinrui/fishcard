@@ -110,6 +110,10 @@ public class RecommandCourseRequester {
         return String.format("%s%s", urlConf.getThumbnail_server(), courseView.getCover());
     }
 
+    public String getThumbNailPath(String cover) {
+        return String.format("%s%s", urlConf.getThumbnail_server(), cover);
+    }
+
 
     //课程完成后,通知推荐课程服务
     public void notifyCompleteCourse(WorkOrder workOrder) {

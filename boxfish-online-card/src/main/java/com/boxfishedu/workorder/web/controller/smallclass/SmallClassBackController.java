@@ -1,9 +1,5 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
-import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
-import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
-import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
-import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
@@ -26,7 +22,6 @@ import java.util.List;
 /**
  * Created by hucl on 17/1/9.
  */
-@CrossOrigin
 @RestController
 @RequestMapping("/service/backend")
 public class SmallClassBackController {
@@ -69,29 +64,35 @@ public class SmallClassBackController {
 
     /**
      * 查询公开课(后台)
+     *
      * @param publicFilterParam
      * @param pageable
      * @return
      */
     @RequestMapping(value = "/smallclass/list", method = RequestMethod.GET)
     public JsonResultModel list(PublicFilterParam publicFilterParam, Pageable pageable) {
-        return smallClassQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam,pageable);
+        return smallClassQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam, pageable);
     }
 
     /**
      * public_class_info 公开课明细查询
-                       ***smallClassId****
-                       ***studentId*******
+     * **smallClassId****
+     * **studentId*******
+     *
      * @param publicFilterParam
      * @param pageable
      * @return
      */
     @RequestMapping(value = "/smallclass/public/list", method = RequestMethod.GET)
     public JsonResultModel publiclist(PublicFilterParam publicFilterParam, Pageable pageable) {
-        return publicClassInfoQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam,pageable);
+        return publicClassInfoQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam, pageable);
     }
 
-
+    @RequestMapping(value = "/smallclass/{smallclass_id}", method = RequestMethod.DELETE)
+    public JsonResultModel delete(@PathVariable("smallclass_id") Long smallClassId) {
+        smallClassBackServiceX.delete(smallClassId);
+        return JsonResultModel.newJsonResultModel();
+    }
 
     /**
      * 提供状态的查询列表
@@ -104,6 +105,6 @@ public class SmallClassBackController {
 
     @RequestMapping(value = "/classlog/details", method = RequestMethod.GET)
     public JsonResultModel listCardDetail(SmallClassParam smallClassParam, Pageable pageable) throws Exception {
-        return  smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam,pageable);
+        return smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam, pageable);
     }
 }

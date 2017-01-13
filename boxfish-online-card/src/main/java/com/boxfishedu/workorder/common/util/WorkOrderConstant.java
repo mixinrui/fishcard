@@ -1,5 +1,9 @@
 package com.boxfishedu.workorder.common.util;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 /**
  * 鱼卡常量类
  * Created by jiaozijun on 16/7/12.
@@ -57,4 +61,17 @@ public  class WorkOrderConstant {
     //public final static String SEND_ASSIGN_TEACHER ="A student would like to have class with you. Please check your class schedule and accept their class request.";
 
     public final static String SEND_ASSIGN_TEACHER ="A student wants to fix classes with you! (Please ensure your APP is updated)";
+
+
+    public final static List<Integer> weekDays = Lists.newArrayList(4, 6, 7, 1); /**  用于判断小班课 周几   周3 周五  六日 **/
+    public final static List<Long> slots    = Lists.newArrayList(27l);  // 每天的时间片
+
+    public static boolean checkContains(Long slot){
+        for(Long s:slots){
+            if(s.longValue()==slot.longValue()){
+                return true;
+            }
+        }
+        return false;
+    }
 }
