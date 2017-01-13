@@ -147,7 +147,7 @@ public class PublicClassInfoQueryService {
             query.setParameter("teacherId", publicFilterParam.getTeacherId());
         }
 
- 
+
         return query;
     }
 
