@@ -34,6 +34,9 @@ public class PublicClassStrategy implements GroupInitStrategy {
     @Autowired
     private SmallClassRequester smallClassRequester;
 
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
+
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -91,7 +94,8 @@ public class PublicClassStrategy implements GroupInitStrategy {
         WorkOrder workOrder = this.virtualCard(smallClass);
         smallClass.setAllCards(Arrays.asList(workOrder));
 
-        this.writeCourseBack(smallClass, Arrays.asList(workOrder), recommandCourseView);
+        this.writeCourseBack(smallClass, Arrays.asList(workOrder)
+                , recommandCourseView,recommandCourseRequester);
 
         this.writeTeacherInfoBack(smallClass, Arrays.asList(workOrder), teacherView);
 

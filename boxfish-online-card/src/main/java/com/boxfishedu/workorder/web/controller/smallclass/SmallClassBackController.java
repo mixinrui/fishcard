@@ -69,29 +69,35 @@ public class SmallClassBackController {
 
     /**
      * 查询公开课(后台)
+     *
      * @param publicFilterParam
      * @param pageable
      * @return
      */
     @RequestMapping(value = "/smallclass/list", method = RequestMethod.GET)
     public JsonResultModel list(PublicFilterParam publicFilterParam, Pageable pageable) {
-        return smallClassQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam,pageable);
+        return smallClassQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam, pageable);
     }
 
     /**
      * public_class_info 公开课明细查询
-                       ***smallClassId****
-                       ***studentId*******
+     * **smallClassId****
+     * **studentId*******
+     *
      * @param publicFilterParam
      * @param pageable
      * @return
      */
     @RequestMapping(value = "/smallclass/public/list", method = RequestMethod.GET)
     public JsonResultModel publiclist(PublicFilterParam publicFilterParam, Pageable pageable) {
-        return publicClassInfoQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam,pageable);
+        return publicClassInfoQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam, pageable);
     }
 
-
+    @RequestMapping(value = "/smallclass/{smallclass_id}", method = RequestMethod.POST)
+    public JsonResultModel delete(@PathVariable("smallclass_id") Long smallClassId) {
+        smallClassBackServiceX.delete(smallClassId);
+        return JsonResultModel.newJsonResultModel();
+    }
 
     /**
      * 提供状态的查询列表
@@ -104,6 +110,6 @@ public class SmallClassBackController {
 
     @RequestMapping(value = "/classlog/details", method = RequestMethod.GET)
     public JsonResultModel listCardDetail(SmallClassParam smallClassParam, Pageable pageable) throws Exception {
-        return  smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam,pageable);
+        return smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam, pageable);
     }
 }

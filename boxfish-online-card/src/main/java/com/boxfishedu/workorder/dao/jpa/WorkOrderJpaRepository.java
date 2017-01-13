@@ -212,5 +212,5 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select wo from  WorkOrder wo where wo.studentId=?1 and (wo.startTime between ?2 and ?3) and wo.isFreeze=0  and wo.slotId in(?4) order by wo.startTime ")
     public List<WorkOrder> findByMyClasses(Long studentId, Date beginDate, Date endDate ,List<Integer> slots);
 
-
+    List<WorkOrder> findBySmallClassId(Long smallClassId);
 }

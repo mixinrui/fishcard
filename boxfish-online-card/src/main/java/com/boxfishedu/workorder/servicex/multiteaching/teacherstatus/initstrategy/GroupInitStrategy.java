@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
@@ -63,11 +64,13 @@ public interface GroupInitStrategy {
         smallClass.setAllCards(workOrders);
     }
 
-    default void writeCourseBack(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
+    default void writeCourseBack(
+            SmallClass smallClass, List<WorkOrder> workOrders
+            , RecommandCourseView recommandCourseView, RecommandCourseRequester recommandCourseRequester) {
         smallClass.setCourseId(recommandCourseView.getCourseId());
         smallClass.setCourseName(recommandCourseView.getCourseName());
         smallClass.setCourseType(recommandCourseView.getCourseType());
-        smallClass.setCover(recommandCourseView.getCover());
+        smallClass.setCover(recommandCourseRequester.getThumbNailPath(recommandCourseView.getCover()));
 
         if (Objects.isNull(smallClass.getCourseId())) {
             throw new BusinessException("没有获取到课程信息,不作回写");

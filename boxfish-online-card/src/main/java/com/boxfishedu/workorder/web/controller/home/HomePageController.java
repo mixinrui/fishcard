@@ -53,7 +53,7 @@ HomePageController {
             cardCourseInfo.setSmallClassId(smallClass.getId());
             cardCourseInfo.setSmallClassInfo(smallClass);
             cardCourseInfo.setStatus(smallClass.getStatus());
-            cardCourseInfo.setThumbnail(recommandCourseRequester.getThumbNailPath(smallClass.getCover()));
+            cardCourseInfo.setThumbnail(smallClass.getCover());
             cardCourseInfo.setCourseType(smallClass.getCourseType());
             cardCourseInfo.setCourseId(smallClass.getCourseId());
             cardCourseInfo.setCourseName(smallClass.getCourseName());

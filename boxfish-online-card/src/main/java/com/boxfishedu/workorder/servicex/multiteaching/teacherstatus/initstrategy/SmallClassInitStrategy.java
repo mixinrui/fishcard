@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
@@ -42,6 +43,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     @Autowired
     private ScheduleCourseInfoService scheduleCourseInfoService;
 
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
+
     public WorkOrder selectLeader(List<WorkOrder> workOrders) {
         logger.debug("小班鱼卡[{}]", JacksonUtil.toJSon(workOrders));
         workOrders.sort(Comparator.comparing(workOrder -> workOrder.getStartTime()));
@@ -71,7 +75,8 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
                         smallClass.getAllCards()), smallClass.getDifficultyLevel(), leader.getSeqNum(), this.teachingType2TutorType(smallClass));
 
         //回写课程信息
-        this.writeCourseBack(smallClass, smallClass.getAllCards(), recommandCourseView);
+        this.writeCourseBack(smallClass, smallClass.getAllCards()
+                , recommandCourseView, recommandCourseRequester);
 
         //获取推荐教师
         TeacherView teacherView = this.getRecommandTeacher(smallClass);

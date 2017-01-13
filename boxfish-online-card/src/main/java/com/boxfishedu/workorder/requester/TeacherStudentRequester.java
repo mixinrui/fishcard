@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.param.TeacherParam;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
@@ -45,6 +46,7 @@ import java.util.*;
 /**
  * Created by hucl on 16/6/17.
  */
+@SuppressWarnings("ALL")
 @Component
 public class TeacherStudentRequester {
     @Autowired
@@ -281,7 +283,7 @@ public class TeacherStudentRequester {
      */
     public List pullTeacherListMsg(String teacherType) {
         String url = String.format("%s/seckillteacher/query/%s",
-                urlConf.getTeacher_service(), teacherType);
+                                   urlConf.getTeacher_service(), teacherType);
 //        String url=String.format("http://192.168.77.186:8099/seckillteacher/demo/query/%s",
 //                teacherType);
 //        String url=String.format("http://192.168.77.186:8099/seckillteacher/query/true/false",
@@ -291,8 +293,26 @@ public class TeacherStudentRequester {
         JsonResultModel jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
         List teacherList = (List) jsonResultModel.getData();
         logger.info("::::::::::::::::::::::::::::::::@[pullTeacherListMsg]向师生运营发起获取教师列表长度size[{}]  Datais[{}]::::::::::::::::::::::::::::::::",
-                teacherList == null ? 0 : teacherList.size(), JSON.toJSON(teacherList));
+                    teacherList == null ? 0 : teacherList.size(), JSON.toJSON(teacherList));
         return teacherList;
+
+    }
+
+    public void notifyCancelSmallClassTeacher(SmallClass smallClass) {
+        String url = String.format("%s/course/schedule/teacher/course/cancel", urlConf.getTeacher_service_admin());
+
+        Map map = Maps.newHashMap();
+        map.put("day", DateUtil.date2SimpleDate(smallClass.getClassDate()).getTime());
+        map.put("timeSlotId", smallClass.getSlotId());
+        map.put("teacherId", smallClass.getTeacherId());
+        map.put("studentId", 0);
+
+        logger.info("鱼卡[{}]向师生运营发起取消公开课教师的请求[{}],参数[{}]", smallClass.getId(), url,JacksonUtil.toJSon(map));
+
+        threadPoolManager.execute(new Thread(() -> {
+                                      restTemplate.postForObject(url, map, JsonResultModel.class);
+                                  })
+        );
 
     }
 
@@ -307,8 +327,8 @@ public class TeacherStudentRequester {
         map.put("studentId", workOrder.getStudentId());
 
         threadPoolManager.execute(new Thread(() -> {
-                    restTemplate.postForObject(url, map, JsonResultModel.class);
-                })
+                                      restTemplate.postForObject(url, map, JsonResultModel.class);
+                                  })
         );
 
     }
@@ -340,7 +360,7 @@ public class TeacherStudentRequester {
         JsonResultModel jsonResultModel = restTemplate.getForObject(url, JsonResultModel.class);
         List teacherList = (List) jsonResultModel.getData();
         logger.info("::::::::::::::::::::::::::::::::@[getTeachersBelongToStudent]向师生运营发起获取教师列表长度size[{}]  Datais[{}]::::::::::::::::::::::::::::::::",
-                teacherList == null ? 0 : teacherList.size(), JSON.toJSON(teacherList));
+                    teacherList == null ? 0 : teacherList.size(), JSON.toJSON(teacherList));
         return teacherList;
     }
 
@@ -520,6 +540,7 @@ public class TeacherStudentRequester {
 
     /**
      * 向师生运营检查老师是否冻结  true 活动  false 非活动
+     *
      * @param teacherId
      * @return
      */
@@ -537,7 +558,7 @@ public class TeacherStudentRequester {
             logger.error("向师生运营检查老师是否冻结", ex);
         }
 
-        if (null != teacherMap && teacherMap.size()>0) {
+        if (null != teacherMap && teacherMap.size() > 0) {
             return (Boolean) teacherMap.get("isActive");
         }
         logger.info("checkTeacherIsFreeze 向师生运营检查老师是否冻结");
