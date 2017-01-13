@@ -355,7 +355,7 @@ public class AvaliableTimeServiceXV1 {
 
                 //如果每周的时间片 小于每次几次课的数量 ,本周不可用
                 if (compareDateList.size() < countByWeek) {
-                    jsonObject.put("show", false);
+                    jsonObject.put("valid", false);
                     break;
                 }
 
@@ -368,7 +368,7 @@ public class AvaliableTimeServiceXV1 {
 
                 // 可用的时间片数量 减去 每周已有课程的数量 小于
                 if ((compareDateList.size() - countClassesWeek) < countByWeek) {
-                    jsonObject.put("show", false);
+                    jsonObject.put("valid", false);
                     break;
                 }
 
