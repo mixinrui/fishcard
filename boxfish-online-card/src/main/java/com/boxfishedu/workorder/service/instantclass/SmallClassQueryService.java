@@ -89,14 +89,14 @@ public class SmallClassQueryService {
             sql.append("and status in (").append(splitCourseTypeString(publicFilterParam.getStatuses())).append(") ");
         }
 
-
-
-        sql.append(" order by ");
-
         //小班课 公开课的 处理
         if(null != publicFilterParam.getClassType()){
             sql.append(" and classType =:classType ");  // 除了小班课 和公开课
         }
+
+        sql.append(" order by ");
+
+
 
         if (null != publicFilterParam.getStartTimeSort()) {
             sql.append(" wo.startTime   ").append(publicFilterParam.getStartTimeSort().toLowerCase()) .append(" ,");
@@ -132,18 +132,11 @@ public class SmallClassQueryService {
             query.setParameter("id", publicFilterParam.getSmallClassId());
         }
         
-        if (null != publicFilterParam.getOrderType()) {
+        if (null != publicFilterParam.getClassType()) {
             query.setParameter("classType", publicFilterParam.getClassType());
         }
 
 
-        // 订单类型
-        if (null != publicFilterParam.getOrderType()) {
-            query.setParameter("orderChannel", publicFilterParam.getOrderType());
-        }
-        if (null != publicFilterParam.getContineAbsenceNum()) {
-            query.setParameter("comboType", ComboTypeEnum.EXCHANGE.toString());
-        }
 
         if (null != publicFilterParam.getCreateBeginDateFormat()) {
             query.setParameter("createbegin", publicFilterParam.getCreateBeginDateFormat());
@@ -152,9 +145,9 @@ public class SmallClassQueryService {
             query.setParameter("createend", publicFilterParam.getCreateEndDateFormat());
         }
 
-//        if(null!=publicFilterParam.getStatus()){
-//            query.setParameter("status",publicFilterParam.getStatus());
-//        }
+        if(null!=publicFilterParam.getStatus()){
+            query.setParameter("status",publicFilterParam.getStatus());
+        }
         if (null != publicFilterParam.getOrderCode()) {
             query.setParameter("orderCode", publicFilterParam.getOrderCode());
         }
@@ -165,21 +158,7 @@ public class SmallClassQueryService {
             query.setParameter("teacherId", publicFilterParam.getTeacherId());
         }
 
-        if (null != publicFilterParam.getConfirmFlag()) {
-            query.setParameter("confirmFlag", publicFilterParam.getConfirmFlag());
-        }
 
-        if ("before".equals(publicFilterParam.getRechargeType())) {
-            query.setParameter("statusRecharge", FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
-        }
-
-        if ("after".equals(publicFilterParam.getRechargeType())) {
-            if (null == publicFilterParam.getRechargeValue()) {
-                query.setParameter("statusRecharge", FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
-            } else {
-                query.setParameter("statusRechargeValue", publicFilterParam.getRechargeValue());
-            }
-        }
 
         if (null != publicFilterParam.getRoleId()) {
             query.setParameter("roleId", publicFilterParam.getRoleId());
