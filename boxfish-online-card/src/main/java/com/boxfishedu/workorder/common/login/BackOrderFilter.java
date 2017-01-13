@@ -32,17 +32,17 @@ import java.util.Set;
  * Created by jiaozijun on 16/6/23.
  */
 @SuppressWarnings("ALL")
-//@WebFilter(urlPatterns = {
-//        "/fishcard/backend/backorder/*",
-//        "/fishcard/backend/makeup/*",
-//        "/fishcard/backend/fishcard/*",
-//
-//        "/backend/backorder/*",
-//        "/backend/makeup/*",
-//        "/backend/fishcard/*",
-//        "/service/backend/*"
-//
-//        })
+@WebFilter(urlPatterns = {
+        "/fishcard/backend/backorder/*",
+        "/fishcard/backend/makeup/*",
+        "/fishcard/backend/fishcard/*",
+
+        "/backend/backorder/*",
+        "/backend/makeup/*",
+        "/backend/fishcard/*",
+        "/service/backend/*"
+
+        })
 public class BackOrderFilter extends OncePerRequestFilter {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
