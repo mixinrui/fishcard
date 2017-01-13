@@ -46,6 +46,7 @@ public class SmallClassTeacherRequester {
         smallClassFetchTeacherParam.setDay(smallClass.getClassDate().getTime());
         smallClassFetchTeacherParam.setSlotId(smallClass.getSlotId().longValue());
         smallClassFetchTeacherParam.setRoleId(smallClass.getRoleId());
+        smallClassFetchTeacherParam.setCourseType(smallClass.getCourseType());
         smallClassFetchTeacherParam.setClassType(SMALL_CLASS);
 
         String url = String.format("%s/course/schedule/teacher/web/match", urlConf.getTeacher_service());
@@ -77,19 +78,17 @@ public class SmallClassTeacherRequester {
         param.put("studentId", 0);
 
         JsonResultModel jsonResultModel = null;
-        try{
-            jsonResultModel=restTemplate.postForObject(url,param,JsonResultModel.class);
-            if(jsonResultModel.getReturnCode()== HttpStatus.SC_OK){
+        try {
+            jsonResultModel = restTemplate.postForObject(url, param, JsonResultModel.class);
+            if (jsonResultModel.getReturnCode() == HttpStatus.SC_OK) {
                 logger.debug("@assignPublicClassTeacher#分配教师成功,url[{}],param[{}],结果[{}]"
-                        ,url,param,JacksonUtil.toJSon(jsonResultModel));
-            }
-            else{
+                        , url, param, JacksonUtil.toJSon(jsonResultModel));
+            } else {
                 throw new BusinessException("公开课分配教师失败");
             }
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             logger.error("@assignPublicClassTeacher#分配教师失败,url[{}],param[{}],结果[{}]"
-                    ,url,param,JacksonUtil.toJSon(jsonResultModel));
+                    , url, param, JacksonUtil.toJSon(jsonResultModel));
         }
     }
 

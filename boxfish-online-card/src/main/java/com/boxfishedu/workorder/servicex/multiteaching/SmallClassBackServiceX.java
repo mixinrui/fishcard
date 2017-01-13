@@ -9,8 +9,6 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEventDispatch;
@@ -18,6 +16,8 @@ import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -50,15 +50,16 @@ public class SmallClassBackServiceX {
         TimeSlots timeSlots = teacherStudentRequester.getTimeSlot(publicClassBuilderParam.getSlotId().intValue());
         smallClass.setStartTime(
                 DateUtil.String2Date(String.join(" ", publicClassBuilderParam.getDate(), timeSlots.getStartTime())));
-        smallClass.setEndTime(
-                DateUtil.String2Date(String.join(" ", publicClassBuilderParam.getDate(), timeSlots.getEndTime())));
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(
+                smallClass.getStartTime().toInstant(), ZoneId.systemDefault());
+        smallClass.setEndTime(DateUtil.localDate2Date(localDateTime.plusMinutes(30)));
     }
 
     public void delete(Long smallClassId) {
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
         teacherStudentRequester.notifyCancelSmallClassTeacher(smallClass);
-        List<WorkOrder> workOrders=workOrderJpaRepository.findBySmallClassId(smallClassId);
-        List<CourseSchedule> courseSchedules=courseScheduleRepository.findBySmallClassId(smallClassId);
+        List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
+        List<CourseSchedule> courseSchedules = courseScheduleRepository.findBySmallClassId(smallClassId);
         workOrderJpaRepository.delete(workOrders);
         courseScheduleRepository.delete(courseSchedules);
         smallClassJpaRepository.delete(smallClassId);

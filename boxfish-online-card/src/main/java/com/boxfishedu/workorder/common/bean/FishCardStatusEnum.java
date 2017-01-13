@@ -9,12 +9,17 @@ public enum FishCardStatusEnum {
     COURSE_ASSIGNED(20, "分配课程", ""),
     TEACHER_ASSIGNED(30, "分配教师", ""),//分配教师以后其实就已经是就绪,目前这两个状态有重叠
     WAITFORSTUDENT(31, "等待学生上课应答", ""),
-    //添加学生主动进入房间的状态
+    //添加学生主动进入房间的状态,校验通过
     STUDENT_ENTER_ROOM(36, "学生进入房间", ""),
     //师生连通关系介于等待与接受之间
     CONNECTED(35, "师生已连通", ""),
     //学生弹出受邀请界面,在师生已联通之后出现
     STUDENT_INVITED_SCREEN(37, "学生端弹出受邀界面", ""),
+
+    //暂时不用
+    ENTER_VIDEOROOM_SUCCESS(38, "进入音视频房间成功", ""),
+    ENTER_VIDEOROOM_FAIL(39, "进入音视频房间成功", ""),
+
     STUDENT_ACCEPTED(32, "学生接受上课请求", ""),
     //学生资源准备完成
     READY(33, "就绪", ""),
