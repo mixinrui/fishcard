@@ -50,41 +50,9 @@ public class SmallClassQueryService {
 
         StringBuilder sql = new StringBuilder("from SmallClass wo where wo.startTime between :begin and :end ");
 
-        if (null != publicFilterParam.getOrderType()) {
-            if (publicFilterParam.getOrderType().equals(OrderChannelDesc.OVERALL.getCode())
-                    ||
-                    publicFilterParam.getOrderType().equals(OrderChannelDesc.FOREIGN.getCode())
-                    ) {
-                sql.append(" and wo.comboType=:orderChannel and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("' ");
-            } else if (publicFilterParam.getOrderType().equals(OrderChannelDesc.CHINESE.getCode())) {       // 终极梦想
-                sql.append(" and (wo.comboType=:orderChannel or ( wo.comboType= '").append(OrderChannelDesc.INTELLIGENT.getCode()).append("' ").
-                        append(" and  wo.service.tutorType= '").append(TutorTypeEnum.FRN).append("' )  )  and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
-            } else if (publicFilterParam.getOrderType().equals(OrderChannelDesc.INTELLIGENT.getCode())) { // 考试指导
-                sql.append(" and wo.comboType=:orderChannel  ").append(" and  wo.service.tutorType= '").append(TutorTypeEnum.CN).append("'   and wo.orderChannel= '").append(OrderChannelDesc.STANDARD.getCode()).append("'");
-            } else {
-                sql.append(" and wo.orderChannel=:orderChannel ");
-            }
 
-        }
-        if (null != publicFilterParam.getConfirmFlag()) {
-            if ("1".equals(publicFilterParam.getConfirmFlag())) {
-                sql.append(" and (wo.confirmFlag=:confirmFlag or wo.confirmFlag is null )  ");
-            } else {
-                sql.append(" and wo.confirmFlag=:confirmFlag ");
-            }
-        }
 
-        if ("before".equals(publicFilterParam.getRechargeType())) {
-            sql.append(" and wo.statusRecharge = :statusRecharge ");  //
-        }
 
-        if ("after".equals(publicFilterParam.getRechargeType())) {
-            if (null == publicFilterParam.getRechargeValue()) {
-                sql.append(" and wo.statusRecharge > :statusRecharge ");  //
-            } else {
-                sql.append(" and wo.statusRecharge = :statusRechargeValue ");  //
-            }
-        }
 
         // 中外教
         if (null != publicFilterParam.getRoleId()) {
@@ -98,12 +66,6 @@ public class SmallClassQueryService {
             sql.append(" and wo.createTime<=:createend ");
         }
 
-//        if(null!=publicFilterParam.getStatus()){
-//            sql.append("and status in (:status )");
-//        }
-        if (null != publicFilterParam.getOrderCode()) {
-            sql.append("and orderCode=:orderCode ");
-        }
         if (null != publicFilterParam.getId()) {
             sql.append("and id=:id ");
         }
@@ -127,14 +89,14 @@ public class SmallClassQueryService {
             sql.append("and status in (").append(splitCourseTypeString(publicFilterParam.getStatuses())).append(") ");
         }
 
-
-
-        sql.append(" order by ");
-
         //小班课 公开课的 处理
         if(null != publicFilterParam.getClassType()){
             sql.append(" and classType =:classType ");  // 除了小班课 和公开课
         }
+
+        sql.append(" order by ");
+
+
 
         if (null != publicFilterParam.getStartTimeSort()) {
             sql.append(" wo.startTime   ").append(publicFilterParam.getStartTimeSort().toLowerCase()) .append(" ,");
@@ -170,18 +132,11 @@ public class SmallClassQueryService {
             query.setParameter("id", publicFilterParam.getId());
         }
         
-        if (null != publicFilterParam.getOrderType()) {
+        if (null != publicFilterParam.getClassType()) {
             query.setParameter("classType", publicFilterParam.getClassType());
         }
 
 
-        // 订单类型
-        if (null != publicFilterParam.getOrderType()) {
-            query.setParameter("orderChannel", publicFilterParam.getOrderType());
-        }
-        if (null != publicFilterParam.getContineAbsenceNum()) {
-            query.setParameter("comboType", ComboTypeEnum.EXCHANGE.toString());
-        }
 
         if (null != publicFilterParam.getCreateBeginDateFormat()) {
             query.setParameter("createbegin", publicFilterParam.getCreateBeginDateFormat());
@@ -190,9 +145,9 @@ public class SmallClassQueryService {
             query.setParameter("createend", publicFilterParam.getCreateEndDateFormat());
         }
 
-//        if(null!=publicFilterParam.getStatus()){
-//            query.setParameter("status",publicFilterParam.getStatus());
-//        }
+        if(null!=publicFilterParam.getStatus()){
+            query.setParameter("status",publicFilterParam.getStatus());
+        }
         if (null != publicFilterParam.getOrderCode()) {
             query.setParameter("orderCode", publicFilterParam.getOrderCode());
         }
@@ -203,21 +158,7 @@ public class SmallClassQueryService {
             query.setParameter("teacherId", publicFilterParam.getTeacherId());
         }
 
-        if (null != publicFilterParam.getConfirmFlag()) {
-            query.setParameter("confirmFlag", publicFilterParam.getConfirmFlag());
-        }
 
-        if ("before".equals(publicFilterParam.getRechargeType())) {
-            query.setParameter("statusRecharge", FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
-        }
-
-        if ("after".equals(publicFilterParam.getRechargeType())) {
-            if (null == publicFilterParam.getRechargeValue()) {
-                query.setParameter("statusRecharge", FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
-            } else {
-                query.setParameter("statusRechargeValue", publicFilterParam.getRechargeValue());
-            }
-        }
 
         if (null != publicFilterParam.getRoleId()) {
             query.setParameter("roleId", publicFilterParam.getRoleId());

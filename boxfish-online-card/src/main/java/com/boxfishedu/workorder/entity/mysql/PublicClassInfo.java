@@ -33,6 +33,10 @@ public class PublicClassInfo implements Serializable {
 
     private Date createTime;
 
+    private Date startTime;
+
+    private String studentName;
+
     private Integer status;
 
     public PublicClassInfo() {

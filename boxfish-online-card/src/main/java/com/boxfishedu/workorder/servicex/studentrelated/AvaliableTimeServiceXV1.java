@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -122,8 +123,8 @@ public class AvaliableTimeServiceXV1 {
                         dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
                                 .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
                                         &&
-                                        DateUtil.getWeekInByDate(DateUtil.String2Date(String.join(" ", dayTimeSlot.getDay(), "00:00:00")), avaliableTimeParam.getWeekDays())
-                                        && 27== t.getSlotId() // avaliableTimeParam.getSlots().contains(t.getSlotId())
+                                        DateUtil.getWeekInByDate(DateUtil.String2Date(String.join(" ", dayTimeSlot.getDay(), "00:00:00")), WorkOrderConstant.weekDays)
+                                        && WorkOrderConstant.checkContains(t.getSlotId())
                                 )// 27 晚8点  小班课
                                 .collect(Collectors.toList()));
                         //1对1课程
