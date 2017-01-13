@@ -66,7 +66,7 @@ public class SmallClassQueryService {
             sql.append(" and wo.createTime<=:createend ");
         }
 
-        if (null != publicFilterParam.getSmallClassId()) {
+        if (null != publicFilterParam.getId()) {
             sql.append("and id=:id ");
         }
         if (null != publicFilterParam.getStudentId()) {
@@ -128,8 +128,8 @@ public class SmallClassQueryService {
         query.setParameter("begin", publicFilterParam.getBeginDateFormat());
         query.setParameter("end", publicFilterParam.getEndDateFormat());
 
-        if (null != publicFilterParam.getSmallClassId()) {
-            query.setParameter("id", publicFilterParam.getSmallClassId());
+        if (null != publicFilterParam.getId()) {
+            query.setParameter("id", publicFilterParam.getId());
         }
         
         if (null != publicFilterParam.getClassType()) {
