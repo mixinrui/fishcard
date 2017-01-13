@@ -51,6 +51,11 @@ public class SmallClassRequester {
             logger.error("@fetchUserDifficultyInfo获取用户课程难度信息失败,url[{}]", url, ex);
             throw new BusinessException("获取用户难度信息失败");
         }
+        //api返回的数据真是诡异,非得加上引号..
+        if(difficulty.contains("\"")){
+            difficulty=StringUtils.trimLeadingCharacter(difficulty,'\"');
+            difficulty=StringUtils.trimTrailingCharacter(difficulty,'\"');
+        }
         return difficulty;
     }
 
@@ -104,10 +109,10 @@ public class SmallClassRequester {
         RecommandCourseView info = null;
         try {
             info = restTemplate.getForObject(url, RecommandCourseView.class);
-            logger.debug("@fetchUserStudyInfo获取用户学习计数,url[{}],结果[{}]", url, info);
+            logger.debug("@fetchUserStudyInfo获取用户课程成功,url[{}],结果[{}]", url, info);
         } catch (Exception ex) {
             logger.error("@fetchUserStudyInfo获取用户学习计数,url[{}]", url, ex);
-            throw new BusinessException("获取用户学习计数");
+            throw new BusinessException("获取用户学习计数失败");
         }
         return info;
     }

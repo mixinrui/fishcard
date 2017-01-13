@@ -4,37 +4,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum FishCardStatusEnum {
-    UNKNOWN(0, "未知",""),
-    CREATED(10, "创建",""),
-    COURSE_ASSIGNED(20, "分配课程",""),
-    TEACHER_ASSIGNED(30, "分配教师",""),//分配教师以后其实就已经是就绪,目前这两个状态有重叠
-    WAITFORSTUDENT(31, "等待学生上课应答",""),
+    UNKNOWN(0, "未知", ""),
+    CREATED(10, "创建", ""),
+    COURSE_ASSIGNED(20, "分配课程", ""),
+    TEACHER_ASSIGNED(30, "分配教师", ""),//分配教师以后其实就已经是就绪,目前这两个状态有重叠
+    WAITFORSTUDENT(31, "等待学生上课应答", ""),
     //添加学生主动进入房间的状态
-    STUDENT_ENTER_ROOM(36,"学生进入房间",""),
+    STUDENT_ENTER_ROOM(36, "学生进入房间", ""),
     //师生连通关系介于等待与接受之间
-    CONNECTED(35,"师生已连通",""),
+    CONNECTED(35, "师生已连通", ""),
     //学生弹出受邀请界面,在师生已联通之后出现
-    STUDENT_INVITED_SCREEN(37,"学生端弹出受邀界面",""),
-    STUDENT_ACCEPTED(32,"学生接受上课请求",""),
+    STUDENT_INVITED_SCREEN(37, "学生端弹出受邀界面", ""),
+    STUDENT_ACCEPTED(32, "学生接受上课请求", ""),
     //学生资源准备完成
-    READY(33, "就绪",""),
-    ONCLASS(34, "正在上课",""),
-    COMPLETED(40, "正常完成",""),
-    COMPLETED_FORCE(41,"强制完成",""),
+    READY(33, "就绪", ""),
+    ONCLASS(34, "正在上课", ""),
+    COMPLETED(40, "正常完成", ""),
+    COMPLETED_FORCE(41, "强制完成", ""),
     //下课5分钟后强制下课
-    COMPLETED_FORCE_SERVER(42,"服务器强制完成",""),
-    COMPLETED_BEYOND_MAKEUP_TIME(43,"超出补课期限,强制完成",""),
-    TEACHER_ABSENT(50,"教师旷课",""),
-    STUDENT_ABSENT(51,"学生旷课",""),
-    TEACHER_LEAVE_EARLY(52,"教师早退",""),
-    STUDENT_LEAVE_EARLY(53,"学生早退",""),
-    TEACHER_CANCEL_PUSH(54,"教师取消请求上课",""),
-    FISHCARD_CANCELED(55,"退课",""),
+    COMPLETED_FORCE_SERVER(42, "服务器强制完成", ""),
+    COMPLETED_BEYOND_MAKEUP_TIME(43, "超出补课期限,强制完成", ""),
+    TEACHER_ABSENT(50, "教师旷课", ""),
+    STUDENT_ABSENT(51, "学生旷课", ""),
+    TEACHER_LEAVE_EARLY(52, "教师早退", ""),
+    STUDENT_LEAVE_EARLY(53, "学生早退", ""),
+    TEACHER_CANCEL_PUSH(54, "教师取消请求上课", ""),
+    FISHCARD_CANCELED(55, "退课", ""),
     //客户端双方都上报信息
-    EXCEPTION(60, "系统异常",""),
-    EXCEPTION_RESOURCE_DOWNLOAD_FAIL(61,"资源下载异常",""),
+    EXCEPTION(60, "系统异常", ""),
+    EXCEPTION_RESOURCE_DOWNLOAD_FAIL(61, "资源下载异常", ""),
     //学生旷课扣积分
-    DEDUCT_SCORE_STATUS(70,"旷课已扣积分","");
+    DEDUCT_SCORE_STATUS(70, "旷课已扣积分", "");
+
     FishCardStatusEnum() {
     }
 
@@ -79,7 +80,7 @@ public enum FishCardStatusEnum {
         if (varMap.containsKey(code)) {
             return varMap.get(code).getDesc();
         }
-        return "未知:["+code+"]";
+        return "未知:[" + code + "]";
     }
 
     public static String getRemark(int code) {

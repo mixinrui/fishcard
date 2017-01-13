@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.servicex.home.HomePageServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
@@ -31,6 +32,9 @@ HomePageController {
     @Autowired
     private SmallClassJpaRepository smallClassJpaRepository;
 
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -49,7 +53,7 @@ HomePageController {
             cardCourseInfo.setSmallClassId(smallClass.getId());
             cardCourseInfo.setSmallClassInfo(smallClass);
             cardCourseInfo.setStatus(smallClass.getStatus());
-            cardCourseInfo.setThumbnail(smallClass.getCover());
+            cardCourseInfo.setThumbnail(recommandCourseRequester.getThumbNailPath(smallClass.getCover()));
             cardCourseInfo.setCourseType(smallClass.getCourseType());
             cardCourseInfo.setCourseId(smallClass.getCourseId());
             cardCourseInfo.setCourseName(smallClass.getCourseName());

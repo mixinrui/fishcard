@@ -99,8 +99,8 @@ public interface GroupInitStrategy {
             Map<Integer, RecommandCourseView> recommandCourseViewMap = Maps.newHashMap();
             recommandCourseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
 
-            scheduleCourseInfoService.batchSaveCourseInfos(
-                    Arrays.asList(workOrder), courseSchedules, recommandCourseViewMap);
+            scheduleCourseInfoService.saveSingleCourseInfo(
+                    workOrder, courseSchedules.get(0), recommandCourseView);
         });
     }
 

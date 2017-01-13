@@ -70,16 +70,16 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
                 .fetchClassCourseByUserIds(this.workOrders2Students(
                         smallClass.getAllCards()), smallClass.getDifficultyLevel(), leader.getSeqNum(), this.teachingType2TutorType(smallClass));
 
+        //回写课程信息
+        this.writeCourseBack(smallClass, smallClass.getAllCards(), recommandCourseView);
+
         //获取推荐教师
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
-
-        //回写课程信息
-        this.writeCourseBack(smallClass, smallClass.getAllCards(),recommandCourseView);
 
         this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
 
         //将小班课,公开课相关信息保存入库
-        this.persistGroupClass(smallClass, smallClass.getAllCards(),recommandCourseView);
+        this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
     }
 
     @Override
@@ -89,7 +89,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Override
     @Transactional
-    public void persistGroupClass(SmallClass smallClass,List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
+    public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }

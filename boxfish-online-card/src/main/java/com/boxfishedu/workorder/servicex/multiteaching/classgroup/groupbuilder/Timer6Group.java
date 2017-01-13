@@ -77,7 +77,7 @@ public class Timer6Group extends GroupBuilder {
 
     @Override
     protected Integer smallClassMemeberNum() {
-        return null;
+        return 6;
     }
 
     @Override
@@ -91,6 +91,12 @@ public class Timer6Group extends GroupBuilder {
             smallClass.setGroupLeader(leader.getStudentId());
             smallClass.setGroupLeaderCard(leader.getId());
             smallClass.setRoleId(leader.getSkuId());
+            smallClass.setCreateTime(new Date());
+            smallClass.setStartTime(leader.getStartTime());
+            smallClass.setEndTime(leader.getEndTime());
+            smallClass.setCourseType(leader.getCourseType());
+            smallClass.setDifficultyLevel(
+                    smallClassRequester.fetchUserDifficultyInfo(smallClass.getGroupLeader()));
             smallClass.setClassType(ClassTypeEnum.SMALL.name());
             smallClass.setAllCards(groupMembers);
             smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
