@@ -42,6 +42,5 @@ public class AvaliableTimeParam implements Serializable {
         return ComboTypeToRoleId.resolve(comboType);
     }
 
-    final List<Integer> weekDays = Lists.newArrayList(4, 6, 7, 1); /**  用于判断小班课 周几   周3 周五  六日 **/
-    final List<Integer> slots    = Lists.newArrayList(27);  // 每天的时间片
+
 }
