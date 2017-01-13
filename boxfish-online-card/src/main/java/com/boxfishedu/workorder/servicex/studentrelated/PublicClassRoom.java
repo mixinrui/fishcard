@@ -143,10 +143,9 @@ public class PublicClassRoom {
         if(CollectionUtils.isNotEmpty(tags)) {
             System.out.println(tags);
 
-            // TODO 生产环境放开
-//            new PublicClassRoomNotification()
-//                    .addTag(tags)
-//                    .notifyPush();
+            new PublicClassRoomNotification()
+                    .addTag(tags)
+                    .notifyPush();
         }
     }
 

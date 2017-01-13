@@ -198,6 +198,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedule.setTimeSlotId(workOrder.getSlotId());
             courseSchedule.setWorkorderId(workOrder.getId());
             courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
+            courseSchedule.setClassType(workOrder.getClassType());
             courseSchedule.setIsFreeze(0);
             // 设置上课类型, 1对1, 1对6, 公开课
 
