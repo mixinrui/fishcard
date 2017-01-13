@@ -56,10 +56,6 @@ public class PublicClassInfoQueryService {
 
 
 
-        // 中外教
-        if (null != publicFilterParam.getTeachingType()) {
-            sql.append(" and wo.skuId = :teachingType ");
-        }
 
         if (null != publicFilterParam.getCreateBeginDateFormat()) {
             sql.append(" and wo.createTime>=:createbegin ");
@@ -74,6 +70,7 @@ public class PublicClassInfoQueryService {
         if (null != publicFilterParam.getOrderCode()) {
             sql.append("and orderCode=:orderCode ");
         }
+
         if (null != publicFilterParam.getId()) {
             sql.append("and id=:id ");
         }
@@ -133,27 +130,16 @@ public class PublicClassInfoQueryService {
         }
 
 
-        // 订单类型
-        if (null != publicFilterParam.getOrderType()) {
-            query.setParameter("orderChannel", publicFilterParam.getOrderType());
-        }
-        if (null != publicFilterParam.getContineAbsenceNum()) {
-            query.setParameter("comboType", ComboTypeEnum.EXCHANGE.toString());
-        }
-
         if (null != publicFilterParam.getCreateBeginDateFormat()) {
             query.setParameter("createbegin", publicFilterParam.getCreateBeginDateFormat());
         }
+
         if (null != publicFilterParam.getCreateEndDateFormat()) {
             query.setParameter("createend", publicFilterParam.getCreateEndDateFormat());
         }
 
-        if(null!=publicFilterParam.getStatus()){
-            query.setParameter("status",publicFilterParam.getStatus());
-        }
-        if (null != publicFilterParam.getOrderCode()) {
-            query.setParameter("orderCode", publicFilterParam.getOrderCode());
-        }
+
+
         if (null != publicFilterParam.getStudentId()) {
             query.setParameter("studentId", publicFilterParam.getStudentId());
         }
@@ -161,15 +147,7 @@ public class PublicClassInfoQueryService {
             query.setParameter("teacherId", publicFilterParam.getTeacherId());
         }
 
-        if (null != publicFilterParam.getConfirmFlag()) {
-            query.setParameter("confirmFlag", publicFilterParam.getConfirmFlag());
-        }
-
-
-        //小班课 公开课的 处理
-        if( null != publicFilterParam.getClassType()){
-            query.setParameter("classType", publicFilterParam.getClassType());
-        }
+ 
         return query;
     }
 
