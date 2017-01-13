@@ -151,7 +151,7 @@ public class AvaliableTimeServiceXV1 {
                     }
 
                     //小班课单独处理 只分0% 和 100% 对待
-                    if (ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType())) {
+                    if (ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType()) || "SMALLCLASS".equals(avaliableTimeParam.getComboType())) {
                         return createDayTimeSlotsSmallClass(d, timeSlotsList);
                     } else {
                         return createDayTimeSlots(d, timeSlotsList);
