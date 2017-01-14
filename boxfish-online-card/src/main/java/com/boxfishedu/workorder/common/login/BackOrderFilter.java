@@ -43,6 +43,7 @@ import java.util.Set;
         "/service/backend/*"
 
         })
+@Profile({"local_hucl","product","local","development","development_new","demo","pretest"})
 public class BackOrderFilter extends OncePerRequestFilter {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -57,7 +58,6 @@ public class BackOrderFilter extends OncePerRequestFilter {
     private String active;
 
     @Override
-    @Profile({"local_hucl","product","local","development","development_new","demo","pretest"})
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     logger.info("doFilterInternal");
         if(allowTest){
