@@ -1,7 +1,6 @@
-package com.boxfishedu.workorder.servicex.smallclass.event;
+package com.boxfishedu.workorder.servicex.smallclass.status.event;
 
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
-import com.boxfishedu.workorder.servicex.smallclass.teacherstatus.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

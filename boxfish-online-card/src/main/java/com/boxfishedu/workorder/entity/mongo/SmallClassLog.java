@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mongo;
 
+import com.boxfishedu.workorder.common.bean.RoleEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,6 +25,8 @@ public class SmallClassLog {
     private Long teacherId;
 
     private Long smallClassId;
+
+    private Date reportTime;
 
     //在线学生
     private List<Long> activeStudents;
@@ -54,17 +57,32 @@ public class SmallClassLog {
     private Date createTime;
 
     public SmallClassLog(
-            SmallClass smallClass, PublicClassInfoStatusEnum publicClassInfoStatusEnum, Long studentId) {
-        this.setStatus(publicClassInfoStatusEnum.getCode());
+            SmallClass smallClass, int status
+            , Long userId, RoleEnum roleEnum, String desc) {
+        this.setStatus(status);
         this.setTeacherId(smallClass.getTeacherId());
         this.setCreateTime(new Date());
-        this.setDesc(publicClassInfoStatusEnum.getDesc());
-        this.setRole("STUDENT");
-        this.setStudentId(studentId);
+        this.setDesc(desc);
+        switch (roleEnum) {
+            case STUDENT:
+                this.setRole(roleEnum.name());
+                this.setStudentId(userId);
+                break;
+            default:
+                this.setRole(roleEnum.name());
+                this.setTeacherId(userId);
+        }
     }
 
-    public SmallClassLog(SmallClass smallClass, int code, Long studentId) {
-        this(smallClass, PublicClassInfoStatusEnum.getByCode(code), studentId);
+    public SmallClassLog(
+            SmallClass smallClass, PublicClassInfoStatusEnum publicClassInfoStatusEnum
+            , Long userId, RoleEnum roleEnum, String desc) {
+        this(smallClass, publicClassInfoStatusEnum.getCode()
+                , userId, roleEnum, desc);
+    }
+
+    public SmallClassLog(){
+
     }
 
 

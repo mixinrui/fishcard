@@ -1,11 +1,16 @@
-package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
+package com.boxfishedu.workorder.servicex.smallclass.status.commonstatus;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.bean.RoleEnum;
+import com.boxfishedu.workorder.dao.mongo.SmallClassLogMorphiaRepository;
+import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
-import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
+import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.StatusDealer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -16,29 +21,24 @@ import java.util.Map;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(10)
+@Order(PublicClassInfoConstantStatus.CREATE)
 @Component
 public class CreateEventCustomer extends SmallClassEventCustomer {
 
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;
 
-    private final Logger logger= LoggerFactory.getLogger(this.getClass());
-
+    @Autowired
+    private SmallClassLogService smallClassLogService;
 
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.CREATE);
     }
 
-    public final String prefix = "INIT_";
-
     @Override
-    public void exec(SmallClassEvent smallClassEvent) {
-        SmallClass smallClass = smallClassEvent.getSource();
-        smallClass.setStatus(smallClassEvent.getType().getCode());
-
-        GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(prefix + smallClass.getClassType());
+    public void execute(SmallClass smallClass) {
+        GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(this.prefix + smallClass.getClassType());
 
         //初始化小班课信息
         groupInitStrategy.initGroupClass(smallClass);
@@ -50,6 +50,6 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
         //持久化数据到数据库
 
         //记录流水日志
-
     }
+
 }

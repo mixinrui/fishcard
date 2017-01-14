@@ -67,6 +67,21 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     }
 
     @Override
+    public SmallClassJpaRepository getSmallClassRepository() {
+        return smallClassJpaRepository;
+    }
+
+    @Override
+    public WorkOrderService getWorkOrderService() {
+        return workOrderService;
+    }
+
+    @Override
+    public ScheduleCourseInfoService getScheduleCourseInfoService() {
+        return scheduleCourseInfoService;
+    }
+
+    @Override
     public void initGroupClass(SmallClass smallClass) {
         //找出leader鱼卡
         WorkOrder leader = this.selectLeader(smallClass.getAllCards());
@@ -100,9 +115,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     @Override
     @Transactional
     public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
-        this.persistSmallClass(smallClass, smallClassJpaRepository);
+        this.persistSmallClass(smallClass);
         smallClass.setAllCards(workOrders);
-        this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
+        this.persistCardRelatedInfo(smallClass, recommandCourseView);
     }
 
     @Override

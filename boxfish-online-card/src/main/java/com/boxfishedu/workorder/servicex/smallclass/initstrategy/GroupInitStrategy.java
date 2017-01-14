@@ -5,11 +5,13 @@ import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
+import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
@@ -28,6 +30,12 @@ public interface GroupInitStrategy {
     RecommandCourseView getRecommandCourse(SmallClass smallClass);
 
     TeacherView getRecommandTeacher(SmallClass smallClass);
+
+    SmallClassJpaRepository getSmallClassRepository();
+
+    WorkOrderService getWorkOrderService();
+
+    ScheduleCourseInfoService getScheduleCourseInfoService();
 
     void initGroupClass(SmallClass smallClass);
 
@@ -88,19 +96,19 @@ public interface GroupInitStrategy {
         });
     }
 
-    default void persistSmallClass(SmallClass smallClass, SmallClassJpaRepository smallClassJpaRepository) {
-        smallClassJpaRepository.save(smallClass);
+    default void persistSmallClass(SmallClass smallClass) {
+        this.getSmallClassRepository().save(smallClass);
     }
 
     List<CourseSchedule> saveOrUpdateCourseSchedules(Service service, List<WorkOrder> workOrders);
 
     default void persistCardRelatedInfo(
-            SmallClass smallClass, WorkOrderService workOrderService
-            , ScheduleCourseInfoService scheduleCourseInfoService, RecommandCourseView recommandCourseView) {
+            SmallClass smallClass
+            , RecommandCourseView recommandCourseView) {
 
         smallClass.getAllCards().forEach(workOrder -> {
             workOrder.setSmallClassId(smallClass.getId());
-            workOrderService.save(workOrder);
+            this.getWorkOrderService().save(workOrder);
 
             List<CourseSchedule> courseSchedules
                     = this.saveOrUpdateCourseSchedules(workOrder.getService(), Arrays.asList(workOrder));
@@ -108,7 +116,7 @@ public interface GroupInitStrategy {
             Map<Integer, RecommandCourseView> recommandCourseViewMap = Maps.newHashMap();
             recommandCourseViewMap.put(workOrder.getSeqNum(), recommandCourseView);
 
-            scheduleCourseInfoService.saveSingleCourseInfo(
+            getScheduleCourseInfoService().saveSingleCourseInfo(
                     workOrder, courseSchedules.get(0), recommandCourseView);
         });
     }
