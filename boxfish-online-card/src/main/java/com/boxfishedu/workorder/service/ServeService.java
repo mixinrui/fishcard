@@ -193,6 +193,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return jpa.findByOrderId(orderId);
     }
 
+    public List<Service> findByOrderIdAndComboTypeAndCoursesSelected(Long orderId,String comboType,Integer courseSelected){
+        return jpa.findByOrderIdAndComboTypeAndCoursesSelected(orderId,comboType,courseSelected);
+    }
+
     public Service findTop1ByOrderIdAndSkuId(Long orderId, Long skuId) {
         return jpa.findTop1ByOrderIdAndSkuId(orderId, skuId);
     }
