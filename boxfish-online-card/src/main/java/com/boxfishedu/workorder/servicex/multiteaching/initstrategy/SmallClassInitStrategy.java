@@ -72,7 +72,8 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         //获取推荐课程
         RecommandCourseView recommandCourseView =
                 smallClassRequester.fetchClassCourseByUserIds(this.workOrders2Students(
-                        smallClass.getAllCards()), smallClass.getDifficultyLevel(), leader.getRecommendSequence(), this.teachingType2TutorType(smallClass));
+                        smallClass.getAllCards()), smallClass.getDifficultyLevel()
+                        , leader.getRecommendSequence(), this.teachingType2TutorType(smallClass));
 
         //回写课程信息
         this.writeCourseBack(smallClass, smallClass.getAllCards()
