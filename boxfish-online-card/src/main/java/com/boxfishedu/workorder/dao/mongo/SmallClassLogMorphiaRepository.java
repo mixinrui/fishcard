@@ -27,8 +27,9 @@ public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallC
     public Query<SmallClassLog> queryCondition(SmallClassParam smallClassParam) {
         Query<SmallClassLog> query = datastore.createQuery(SmallClassLog.class);
 
-        if(null != smallClassParam.getSmallClassId()){
-            query.and(query.criteria("smallClassId").equal(smallClassParam.getSmallClassId()));
+        //公开课id
+        if(null != smallClassParam.getId()){
+            query.and(query.criteria("smallClassId").equal(smallClassParam.getId()));
         }
         if(null != smallClassParam.getTeacherId()){
             query.and(query.criteria("teacherId").equal(smallClassParam.getTeacherId()));
