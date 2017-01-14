@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
+package com.boxfishedu.workorder.servicex.multiteaching.initstrategy;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
@@ -42,9 +42,10 @@ public interface GroupInitStrategy {
     }
 
     default void writeTeacherInfoBack(SmallClass smallClass, List<WorkOrder> workOrders, TeacherView teacherView) {
+        smallClass.setTeacherId(teacherView.getTeacherId());
+        smallClass.setTeacherName(teacherView.getTeacherName());
         if (!Objects.isNull(smallClass.getTeacherId())) {
             workOrders.forEach(workOrder -> {
-                workOrder.setSmallClassId(smallClass.getId());
                 workOrder.setUpdateTime(new Date());
                 workOrder.setAssignTeacherTime(new Date());
                 workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());

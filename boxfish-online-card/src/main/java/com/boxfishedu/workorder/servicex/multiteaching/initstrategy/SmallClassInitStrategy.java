@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
+package com.boxfishedu.workorder.servicex.multiteaching.initstrategy;
 
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -98,6 +98,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     @Transactional
     public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
+        smallClass.setAllCards(workOrders);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }
 

@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
+package com.boxfishedu.workorder.servicex.multiteaching.initstrategy;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
