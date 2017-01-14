@@ -338,7 +338,7 @@ public class AvaliableTimeServiceXV1 {
         logger.info("date begin:[{}],endDate:[{}]", DateUtil.Date2String24(beginDate), DateUtil.Date2String24(endDate));
 
         // 获取课程信息 每天晚8点时间片 为27
-        List<CourseSchedule> listCourses = courseScheduleRepository.findByMyClasses(userId, beginDate, endDate, Lists.newArrayList(27));
+        List<CourseSchedule> listCourses = courseScheduleRepository.findByMyClasses(userId, beginDate, endDate, WorkOrderConstant.slots);
 
         if (CollectionUtils.isEmpty(listCourses)) {
             return JsonResultModel.newJsonResultModel(delayRange);
