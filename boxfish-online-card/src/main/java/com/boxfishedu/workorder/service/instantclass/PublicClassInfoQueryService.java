@@ -82,8 +82,8 @@ public class PublicClassInfoQueryService {
             sql.append("and teacherId=:teacherId ");
         }
 
-        if (null != publicFilterParam.getTeacherName() && StringUtils.isNotEmpty(publicFilterParam.getTeacherName().trim())) {
-            sql.append("and teacherName like '%").append(publicFilterParam.getTeacherName()).append("%' ");
+        if (null != publicFilterParam.getStudentName() && StringUtils.isNotEmpty(publicFilterParam.getStudentName().trim())) {
+            sql.append("and studentName like '%").append(publicFilterParam.getStudentName()).append("%' ");
         }
 
         if (null != publicFilterParam.getCourseType() && StringUtils.isNotEmpty(publicFilterParam.getCourseType())) {

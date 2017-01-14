@@ -12,6 +12,7 @@ import java.util.Date;
 @Data
 public class SmallClassParam {
 
+    private Long id;//smallClassId
     private Long teacherId;
     private Long studentId;
     private Long smallClassId;

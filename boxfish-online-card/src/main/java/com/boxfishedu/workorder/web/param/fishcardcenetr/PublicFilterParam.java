@@ -15,6 +15,8 @@ public class PublicFilterParam {
     private String end;
     private Integer roleId; // 1 中教 2 外教
 
+    private String studentName;
+
     private Long id;
     private Long smallClassId;
     private Long studentId;
