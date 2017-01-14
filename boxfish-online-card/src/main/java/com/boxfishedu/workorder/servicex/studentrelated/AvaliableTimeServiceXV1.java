@@ -296,9 +296,10 @@ public class AvaliableTimeServiceXV1 {
         List delayRange = Lists.newArrayList();
         Date currentDate = new Date();
 
-        List<Service> services = serveService.findByOrderId(orderId);
+        // 查找小班课的服务数据未选课程
+        List<Service> services = serveService.findByOrderIdAndComboTypeAndCoursesSelected(orderId,ComboTypeToRoleId.SMALLCLASS.name() ,0);
         if (CollectionUtils.isEmpty(services)) {
-            throw new BusinessException("未生成服务数据");
+            throw new BusinessException("未生成有效服务数据或者数据有误");
         }
 
         // 1 获取服务信息   返回获取一周几次课  service 的 original_amount 次数 除  combo_cycle
@@ -308,7 +309,7 @@ public class AvaliableTimeServiceXV1 {
         int countByWeek = service.getOriginalAmount() / service.getComboCycle();
         int yushuByWeek = service.getOriginalAmount() % service.getComboCycle();
         if (0 != yushuByWeek) {
-            //countByWeek=countByWeek+1;
+            countByWeek= (service.getOriginalAmount()+yushuByWeek)/service.getComboCycle();// 如果还有余数,推算一周上几节课
         }
 
         logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);

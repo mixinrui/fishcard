@@ -18,6 +18,8 @@ import java.util.Set;
 public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     public List<Service> findByOrderId(Long orderId);
 
+    public List<Service> findByOrderIdAndComboTypeAndCoursesSelected(Long orderId,String comboType,Integer courseSelected);
+
     //使用top1,是由于按照逻辑,根据查询条件只应该有一条结果返回
     public Service findTop1ByOrderIdAndSkuId(Long orderId, Long skuId);
 
