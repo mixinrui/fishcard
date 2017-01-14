@@ -3,7 +3,7 @@ package com.boxfishedu.workorder.web.controller.smallclass;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
-import com.boxfishedu.workorder.servicex.multiteaching.SmallClassBackServiceX;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassBackServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.PublicClassInfoQueryServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassLogServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassQueryServiceX;
