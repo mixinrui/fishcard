@@ -2,10 +2,8 @@ package com.boxfishedu.workorder.servicex.smallclass.studentstatus;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
-import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEventCustomer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;

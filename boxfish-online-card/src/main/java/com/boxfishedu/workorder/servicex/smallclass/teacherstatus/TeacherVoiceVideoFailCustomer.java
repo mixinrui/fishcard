@@ -1,12 +1,9 @@
 package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
-import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
