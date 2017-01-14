@@ -108,7 +108,7 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     Page<CourseSchedule> findAssignCourseScheduleByStudentId(Long orderId, Pageable pageable);
 
     @Query("select cs from  CourseSchedule cs where cs.studentId=?1 and (cs.classDate >= ?2 and cs.classDate<?3) and cs.isFreeze=0  and cs.timeSlotId in(?4) order by cs.classDate ")
-    public List<CourseSchedule> findByMyClasses(Long studentId, Date beginDate, Date endDate , List<Integer> slots);
+    public List<CourseSchedule> findByMyClasses(Long studentId, Date beginDate, Date endDate , List<Long> slots);
 
     List<CourseSchedule> findBySmallClassId(Long smallClassId);
 }
