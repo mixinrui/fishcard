@@ -1,8 +1,11 @@
-package com.boxfishedu.workorder.servicex.smallclass.event;
+package com.boxfishedu.workorder.servicex.smallclass.status.commonstatus;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -13,7 +16,7 @@ import java.util.Map;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(10)
+@Order(PublicClassInfoConstantStatus.CREATE)
 @Component
 public class CreateEventCustomer extends SmallClassEventCustomer {
 

@@ -59,6 +59,8 @@ public enum PublicClassInfoStatusEnum {
     private int code;
     private String desc;
 
+    public static final int WOCODE=PublicClassInfoStatusEnum.UNKNOWN.getCode();
+
     static {
         for (PublicClassInfoStatusEnum v : PublicClassInfoStatusEnum.values()) {
             varMap.put(v.getCode(), v);

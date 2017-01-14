@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.smallclass.event;
+package com.boxfishedu.workorder.servicex.smallclass.status.event;
 
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import org.springframework.beans.factory.annotation.Autowired;

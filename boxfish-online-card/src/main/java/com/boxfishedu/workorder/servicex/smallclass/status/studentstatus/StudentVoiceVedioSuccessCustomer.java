@@ -1,8 +1,9 @@
-package com.boxfishedu.workorder.servicex.smallclass.studentstatus;
+package com.boxfishedu.workorder.servicex.smallclass.status.studentstatus;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
-import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
-import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEventCustomer;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -14,20 +15,20 @@ import java.util.Map;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(410)
+@Order(PublicClassInfoConstantStatus.STUDENT_VOICE_VIDEO_SUCCESS)
 @Component
-public class StudentOffWheatCustomer extends SmallClassEventCustomer {
+public class StudentVoiceVedioSuccessCustomer extends SmallClassEventCustomer {
 
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;
 
     @PostConstruct
     public void initEvent() {
-        this.setSmallClassCardStatus(PublicClassInfoStatusEnum.STUDENT_OFF_WHEAT);
+        this.setSmallClassCardStatus(PublicClassInfoStatusEnum.STUDENT_VOICE_VIDEO_SUCCESS);
     }
 
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
-
+        logger.info("学生接入音视频成功...");
     }
 }
