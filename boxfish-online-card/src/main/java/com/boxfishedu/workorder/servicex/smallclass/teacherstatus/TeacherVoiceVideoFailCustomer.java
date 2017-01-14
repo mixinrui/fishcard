@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,40 +17,20 @@ import java.util.Map;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(10)
+@Order(1100)
 @Component
-public class CreateEventCustomer extends SmallClassEventCustomer {
+public class TeacherVoiceVideoFailCustomer extends SmallClassEventCustomer {
 
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;
-
-    private final Logger logger= LoggerFactory.getLogger(this.getClass());
-
 
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.CREATE);
     }
 
-    public final String prefix = "INIT_";
-
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
-        SmallClass smallClass = smallClassEvent.getSource();
-        smallClass.setStatus(smallClassEvent.getType().getCode());
-
-        GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(prefix + smallClass.getClassType());
-
-        //初始化小班课信息
-        groupInitStrategy.initGroupClass(smallClass);
-
-        //保存smallclass
-
-        //将小班课信息更新进workorder,courseschedule
-
-        //持久化数据到数据库
-
-        //记录流水日志
 
     }
 }

@@ -1,8 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
 
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEventCustomer;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +11,6 @@ import org.springframework.stereotype.Component;
 @Order(1220)
 @Component
 public class TeacherLeaveEarlyEventCustomer extends SmallClassEventCustomer {
-
-    private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @Override
     public void exec(SmallClassEvent smallClassEvent) {

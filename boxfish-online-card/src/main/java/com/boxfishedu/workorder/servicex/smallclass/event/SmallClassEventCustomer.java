@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
+package com.boxfishedu.workorder.servicex.smallclass.event;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 @Data
 public abstract class SmallClassEventCustomer {
     protected final Logger logger = LoggerFactory.getLogger("SmallClassEventCustomer");
+
+    public final String prefix = "INIT_";
 
     protected PublicClassInfoStatusEnum smallClassCardStatus;
 

@@ -1,7 +1,6 @@
-package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
+package com.boxfishedu.workorder.servicex.smallclass.event;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
-import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 

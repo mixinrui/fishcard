@@ -12,6 +12,4 @@ import org.springframework.stereotype.Component;
 @Component
 public class TeacherSwitchStudentCustomer {
 
-    private final Logger logger= LoggerFactory.getLogger(this.getClass());
-
 }
