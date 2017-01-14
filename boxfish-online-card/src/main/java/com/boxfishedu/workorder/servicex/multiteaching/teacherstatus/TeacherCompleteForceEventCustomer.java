@@ -2,6 +2,8 @@ package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.servicex.multiteaching.event.SmallClassEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,8 @@ import javax.annotation.PostConstruct;
 @Order(1210)
 @Component
 public class TeacherCompleteForceEventCustomer extends SmallClassEventCustomer {
+
+    private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @PostConstruct
     public void initEvent() {

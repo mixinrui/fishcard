@@ -3,6 +3,8 @@ package com.boxfishedu.workorder.servicex.multiteaching.initstrategy;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
@@ -13,6 +15,7 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,6 +104,13 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
         smallClass.setAllCards(workOrders);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
+    }
+
+    @Override
+    public List<CourseSchedule> saveOrUpdateCourseSchedules(Service service, List<WorkOrder> workOrders) {
+        List<CourseSchedule> courseSchedules = workOrderService
+                .batchUpdateCourseScheduleByWorkOrder(service, workOrders);
+        return courseSchedules;
     }
 
 }

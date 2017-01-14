@@ -5,6 +5,8 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.multiteaching.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.multiteaching.initstrategy.GroupInitStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,8 @@ public class StudentValidatedEventCustomer extends SmallClassEventCustomer {
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;
 
+    private final Logger logger= LoggerFactory.getLogger(this.getClass());
+
 
     @PostConstruct
     public void initEvent() {
@@ -32,21 +36,6 @@ public class StudentValidatedEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
-        SmallClass smallClass = smallClassEvent.getSource();
-        smallClass.setStatus(smallClassEvent.getType().getCode());
-
-        GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(prefix + smallClass.getClassType());
-
-        //初始化小班课信息
-        groupInitStrategy.initGroupClass(smallClass);
-
-        //保存smallclass
-
-        //将小班课信息更新进workorder,courseschedule
-
-        //持久化数据到数据库
-
-        //记录流水日志
 
     }
 }

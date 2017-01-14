@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
@@ -91,6 +92,8 @@ public interface GroupInitStrategy {
         smallClassJpaRepository.save(smallClass);
     }
 
+    List<CourseSchedule> saveOrUpdateCourseSchedules(Service service, List<WorkOrder> workOrders);
+
     default void persistCardRelatedInfo(
             SmallClass smallClass, WorkOrderService workOrderService
             , ScheduleCourseInfoService scheduleCourseInfoService, RecommandCourseView recommandCourseView) {
@@ -98,8 +101,9 @@ public interface GroupInitStrategy {
         smallClass.getAllCards().forEach(workOrder -> {
             workOrder.setSmallClassId(smallClass.getId());
             workOrderService.save(workOrder);
-            List<CourseSchedule> courseSchedules = workOrderService
-                    .batchUpdateCourseSchedule(workOrder.getService(), Arrays.asList(workOrder));
+
+            List<CourseSchedule> courseSchedules
+                    = this.saveOrUpdateCourseSchedules(workOrder.getService(), Arrays.asList(workOrder));
 
             Map<Integer, RecommandCourseView> recommandCourseViewMap = Maps.newHashMap();
             recommandCourseViewMap.put(workOrder.getSeqNum(), recommandCourseView);

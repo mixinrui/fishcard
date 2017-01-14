@@ -4,6 +4,8 @@ import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.multiteaching.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.multiteaching.initstrategy.GroupInitStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,8 @@ import java.util.Map;
 @Order(1100)
 @Component
 public class VoiceVideoFailCustomer extends SmallClassEventCustomer {
+
+    private final Logger logger= LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;

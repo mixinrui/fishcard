@@ -16,5 +16,6 @@ public abstract class SmallClassEventCustomer {
 
     protected SmallClassCardStatus smallClassCardStatus;
 
+
     public abstract void exec(SmallClassEvent smallClassEvent);
 }

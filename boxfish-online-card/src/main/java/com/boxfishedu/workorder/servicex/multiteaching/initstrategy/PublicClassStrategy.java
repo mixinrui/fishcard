@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -100,6 +101,13 @@ public class PublicClassStrategy implements GroupInitStrategy {
         this.writeTeacherInfoBack(smallClass, Arrays.asList(workOrder), teacherView);
 
         this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
+    }
+
+    @Override
+    public List<CourseSchedule> saveOrUpdateCourseSchedules(Service service, List<WorkOrder> workOrders) {
+        List<CourseSchedule> courseSchedules = workOrderService
+                .batchUpdateCourseSchedule(service, workOrders);
+        return courseSchedules;
     }
 
     @Override
