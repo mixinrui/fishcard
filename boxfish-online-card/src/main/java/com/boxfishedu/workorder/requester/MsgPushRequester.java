@@ -38,17 +38,19 @@ public class MsgPushRequester {
     public void notifyInstantGroupClassMsg(InstantClassCard instantClassCard, List<Long> teacherIds) {
         //打开混合的情况
         String url = String.format("%s/notification/push?type=%s",
-                                   urlConf.getMsg_push_url(),"INSTANCE_CLASS");
+                                   urlConf.getMsg_push_url(), "INSTANCE_CLASS");
 
         logger.info("@notifyInstantGroupClassMsg,向教师发起立即上课推送,url[{}]", url);
 //        instantCardLogMorphiaRepository.saveInstantLog(instantClassCard, teacherIds, "向教师发起推送");
         TeachingOnlineGroupMsg teachingOnlineGroupMsg = new TeachingOnlineGroupMsg();
         teachingOnlineGroupMsg.setPush_title("Many students are waiting for class. Now matching...");
 
-        TeachingOnlineGroupMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach = new TeachingOnlineGroupMsg.TeachingOnlineMsgAttach();
+        TeachingOnlineGroupMsg.TeachingOnlineMsgAttach teachingOnlineMsgAttach
+                = new TeachingOnlineGroupMsg.TeachingOnlineMsgAttach();
         teachingOnlineMsgAttach.setType(MessagePushTypeEnum.SEND_INSTANT_CLASS_TYPE.toString());
         teachingOnlineMsgAttach.setCardId(instantClassCard.getId());
-        teachingOnlineMsgAttach.setDay(DateUtil.simpleDate2String(instantClassCard.getClassDate()));
+        teachingOnlineMsgAttach.setDay(
+                DateUtil.simpleDate2String(instantClassCard.getClassDate()));
         teachingOnlineMsgAttach.setSlotId(instantClassCard.getSlotId());
         teachingOnlineMsgAttach.setCount(teacherIds.size());
         teachingOnlineMsgAttach.setStudentId(instantClassCard.getStudentId());

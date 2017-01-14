@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.entity.mongo;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -50,4 +52,20 @@ public class SmallClassLog {
     private String desc;
 
     private Date createTime;
+
+    public SmallClassLog(
+            SmallClass smallClass, PublicClassInfoStatusEnum publicClassInfoStatusEnum, Long studentId) {
+        this.setStatus(publicClassInfoStatusEnum.getCode());
+        this.setTeacherId(smallClass.getTeacherId());
+        this.setCreateTime(new Date());
+        this.setDesc(publicClassInfoStatusEnum.getDesc());
+        this.setRole("STUDENT");
+        this.setStudentId(studentId);
+    }
+
+    public SmallClassLog(SmallClass smallClass, int code, Long studentId) {
+        this(smallClass, PublicClassInfoStatusEnum.getByCode(code), studentId);
+    }
+
+
 }

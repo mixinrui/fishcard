@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
@@ -28,7 +28,7 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
     @PostConstruct
     public void initEvent() {
-        this.setSmallClassCardStatus(SmallClassCardStatus.CREATE);
+        this.setSmallClassCardStatus(PublicClassInfoStatusEnum.CREATE);
     }
 
     public final String prefix = "INIT_";

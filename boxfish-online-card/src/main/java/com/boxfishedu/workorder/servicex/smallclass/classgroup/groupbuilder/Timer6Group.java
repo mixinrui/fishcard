@@ -1,7 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass.classgroup.groupbuilder;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.partitioningBy;
 
 /**
  * Created by hucl on 17/1/6.
@@ -105,7 +104,7 @@ public class Timer6Group extends GroupBuilder {
             smallClass.setAllCards(groupMembers);
             smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
 
-            new SmallClassEvent(smallClass, smallClassEventDispatch, SmallClassCardStatus.CREATE);
+            new SmallClassEvent(smallClass, smallClassEventDispatch, PublicClassInfoStatusEnum.CREATE);
         });
     }
 

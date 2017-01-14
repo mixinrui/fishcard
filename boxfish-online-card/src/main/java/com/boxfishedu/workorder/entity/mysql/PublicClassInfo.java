@@ -44,6 +44,6 @@ public class PublicClassInfo implements Serializable {
 
     public PublicClassInfo() {
         this.createTime = new Date();
-        this.status = PublicClassInfoStatusEnum.ENTER.getCode();
+        this.status = PublicClassInfoStatusEnum.STUDENT_ENTER.getCode();
     }
 }

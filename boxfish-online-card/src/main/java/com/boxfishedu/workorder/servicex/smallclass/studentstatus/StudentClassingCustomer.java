@@ -1,7 +1,8 @@
 package com.boxfishedu.workorder.servicex.smallclass.studentstatus;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.smallclass.event.StatusDealer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
 import com.boxfishedu.workorder.servicex.smallclass.teacherstatus.SmallClassEventCustomer;
 import org.slf4j.Logger;
@@ -18,17 +19,16 @@ import java.util.Map;
  */
 @Order(300)
 @Component
-public class StudentClassingCustomer extends SmallClassEventCustomer {
+public class StudentClassingCustomer extends SmallClassEventCustomer implements StatusDealer {
 
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;
 
-    private final Logger logger= LoggerFactory.getLogger(this.getClass());
-
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @PostConstruct
     public void initEvent() {
-        this.setSmallClassCardStatus(SmallClassCardStatus.CREATE);
+        this.setSmallClassCardStatus(PublicClassInfoStatusEnum.STUDENT_CLASSING);
     }
 
     public final String prefix = "INIT_";

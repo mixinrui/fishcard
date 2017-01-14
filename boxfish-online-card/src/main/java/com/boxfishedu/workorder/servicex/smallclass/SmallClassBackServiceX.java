@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
@@ -43,7 +43,7 @@ public class SmallClassBackServiceX {
     public void configPublicClass(PublicClassBuilderParam publicClassBuilderParam) {
         SmallClass smallClass = new SmallClass(publicClassBuilderParam);
         addTime(publicClassBuilderParam, smallClass);
-        new SmallClassEvent(smallClass, smallClassEventDispatch, SmallClassCardStatus.CREATE);
+        new SmallClassEvent(smallClass, smallClassEventDispatch, PublicClassInfoStatusEnum.CREATE);
     }
 
     private void addTime(PublicClassBuilderParam publicClassBuilderParam, SmallClass smallClass) {

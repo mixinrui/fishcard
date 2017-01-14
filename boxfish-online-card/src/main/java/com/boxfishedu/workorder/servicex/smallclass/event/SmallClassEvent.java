@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.event;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import lombok.Data;
 
@@ -15,15 +15,15 @@ public class SmallClassEvent extends Observable {
     //事件起源
     private SmallClass source;
     //事件的类型
-    private SmallClassCardStatus type;
+    private PublicClassInfoStatusEnum type;
 
     //传入事件的源头,默认为新建类型
     public SmallClassEvent(SmallClass smallClass, SmallClassEventDispatch smallClassEventDispatch) {
-        this(smallClass, smallClassEventDispatch, SmallClassCardStatus.CREATE);
+        this(smallClass, smallClassEventDispatch, PublicClassInfoStatusEnum.CREATE);
     }
 
     //事件源头以及事件类型
-    public SmallClassEvent(SmallClass p, SmallClassEventDispatch smallClassEventDispatch, SmallClassCardStatus type) {
+    public SmallClassEvent(SmallClass p, SmallClassEventDispatch smallClassEventDispatch, PublicClassInfoStatusEnum type) {
         this.smallClassEventDispatch = smallClassEventDispatch;
         this.source = p;
         this.type = type;

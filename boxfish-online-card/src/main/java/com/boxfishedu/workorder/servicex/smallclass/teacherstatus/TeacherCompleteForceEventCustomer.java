@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class TeacherCompleteForceEventCustomer extends SmallClassEventCustomer {
 
     @PostConstruct
     public void initEvent() {
-        this.setSmallClassCardStatus(SmallClassCardStatus.COMPLETED_FORCE);
+        this.setSmallClassCardStatus(PublicClassInfoStatusEnum.TEACHER_COMPLETED_FORCE);
     }
 
     @Override

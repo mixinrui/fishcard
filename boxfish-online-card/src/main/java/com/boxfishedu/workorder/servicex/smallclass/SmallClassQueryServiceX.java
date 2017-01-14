@@ -1,13 +1,10 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.instantclass.SmallClassQueryService;
-import com.boxfishedu.workorder.web.param.FishCardFilterParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Maps;
@@ -73,7 +70,7 @@ public class SmallClassQueryServiceX {
 
     public JsonResultModel listAllStatus() {
         Map<Integer, String> statusMap = Maps.newHashMap();
-        for (SmallClassCardStatus smallClassCardStatus : SmallClassCardStatus.values()) {
+        for (PublicClassInfoStatusEnum smallClassCardStatus : PublicClassInfoStatusEnum.values()) {
             statusMap.put(smallClassCardStatus.getCode(), smallClassCardStatus.getDesc());
         }
         return JsonResultModel.newJsonResultModel(statusMap);

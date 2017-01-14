@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.teacherstatus;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct;
 public class CourseAssignedCustomer extends SmallClassEventCustomer {
     @PostConstruct
     public void initEvent(){
-        this.setSmallClassCardStatus(SmallClassCardStatus.COURSE_ASSIGNED);
+        this.setSmallClassCardStatus(PublicClassInfoStatusEnum.COURSE_ASSIGNED);
     }
 
     @Override

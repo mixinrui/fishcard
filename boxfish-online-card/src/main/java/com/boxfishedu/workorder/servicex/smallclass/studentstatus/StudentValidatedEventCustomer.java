@@ -1,9 +1,9 @@
 package com.boxfishedu.workorder.servicex.smallclass.studentstatus;
 
-import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.servicex.smallclass.event.SmallClassEvent;
-import com.boxfishedu.workorder.servicex.smallclass.teacherstatus.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
+import com.boxfishedu.workorder.servicex.smallclass.teacherstatus.SmallClassEventCustomer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class StudentValidatedEventCustomer extends SmallClassEventCustomer {
 
     @PostConstruct
     public void initEvent() {
-        this.setSmallClassCardStatus(SmallClassCardStatus.CREATE);
+        this.setSmallClassCardStatus(PublicClassInfoStatusEnum.CREATE);
     }
 
     public final String prefix = "INIT_";
