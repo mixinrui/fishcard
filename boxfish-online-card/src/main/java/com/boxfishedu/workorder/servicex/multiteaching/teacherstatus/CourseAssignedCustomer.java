@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.servicex.multiteaching.event.SmallClassEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.initstrategy;
+package com.boxfishedu.workorder.servicex.multiteaching.initstrategy;
 
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -72,7 +72,8 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         //获取推荐课程
         RecommandCourseView recommandCourseView =
                 smallClassRequester.fetchClassCourseByUserIds(this.workOrders2Students(
-                        smallClass.getAllCards()), smallClass.getDifficultyLevel(), leader.getRecommendSequence(), this.teachingType2TutorType(smallClass));
+                        smallClass.getAllCards()), smallClass.getDifficultyLevel()
+                        , leader.getRecommendSequence(), this.teachingType2TutorType(smallClass));
 
         //回写课程信息
         this.writeCourseBack(smallClass, smallClass.getAllCards()
@@ -81,7 +82,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         //获取推荐教师
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
 
-        this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
+        if (0 != teacherView.getId()) {
+            this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
+        }
 
         //将小班课,公开课相关信息保存入库
         this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
@@ -96,6 +99,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     @Transactional
     public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass, smallClassJpaRepository);
+        smallClass.setAllCards(workOrders);
         this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
     }
 

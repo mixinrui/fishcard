@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
+import com.boxfishedu.workorder.servicex.multiteaching.event.SmallClassEvent;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

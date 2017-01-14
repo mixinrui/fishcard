@@ -14,6 +14,7 @@ public class ScheduleModel {
         private Integer roleId;
         //此处id为请求方发向师生运营组的数据请求参数;此处暂时使用courseschedule的id作为标示
         private Long id;
+        private String classType;
         public ScheduleModel() {}
 
         public ScheduleModel(CourseSchedule courseSchedule) {

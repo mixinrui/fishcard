@@ -1,8 +1,9 @@
-package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
+package com.boxfishedu.workorder.servicex.multiteaching.studentstatus;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.multiteaching.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.multiteaching.initstrategy.GroupInitStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -14,9 +15,9 @@ import java.util.Map;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(10)
+@Order(100)
 @Component
-public class CreateEventCustomer extends SmallClassEventCustomer {
+public class StudentValidatedEventCustomer extends SmallClassEventCustomer {
 
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;

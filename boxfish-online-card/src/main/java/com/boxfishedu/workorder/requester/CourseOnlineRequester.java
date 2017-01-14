@@ -153,23 +153,24 @@ public class CourseOnlineRequester {
 
     public FishCardGroupsInfo buildsmallClassChatRoom(SmallClass smallClass) {
         return this.buildsmallClassChatRoom(
-                smallClass.getId(), smallClass.getAllStudentIds(), Arrays.asList(smallClass.getTeacherId()));
+                smallClass.getId(), smallClass.getClassType(), smallClass.getAllStudentIds(), Arrays.asList(smallClass.getTeacherId()));
     }
 
-    public FishCardGroupsInfo buildsmallClassChatRoom(Long smallClassId, List<Long> studentIds, List<Long> teacherIds) {
+    public FishCardGroupsInfo buildsmallClassChatRoom(Long smallClassId, String classType, List<Long> studentIds, List<Long> teacherIds) {
         String url = String.format("%s/teaching/smallclass/group",
                                    urlConf.getCourse_online_service());
         Map param = Maps.newHashMap();
         param.put("smallClassId", smallClassId);
         param.put("teacherId", teacherIds);
         param.put("studentId", studentIds);
+        param.put("classType", classType);
 
         JsonResultModel jsonResultModel = null;
         try {
             jsonResultModel = restTemplate.postForObject(url, param, JsonResultModel.class);
             logger.debug("@buildsmallClassChatRoom#创建群组,聊天室成功,url[{}],参数[{}],结果[{}]", url, param, JacksonUtil.toJSon(jsonResultModel));
         } catch (Exception ex) {
-            logger.error("@buildsmallClassChatRoom#创建群组,聊天室失败,url[{}],参数[{}]", url,param, ex);
+            logger.error("@buildsmallClassChatRoom#创建群组,聊天室失败,url[{}],参数[{}]", url, param, ex);
             throw new BusinessException("创建聊天室失败");
         }
         FishCardGroupsInfo fishCardGroupsInfo = jsonResultModel.getData(FishCardGroupsInfo.class);

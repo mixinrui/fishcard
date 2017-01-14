@@ -58,7 +58,6 @@ public class BackOrderFilter extends OncePerRequestFilter {
     private String active;
 
     @Override
-
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     logger.info("doFilterInternal");
         if(allowTest){
