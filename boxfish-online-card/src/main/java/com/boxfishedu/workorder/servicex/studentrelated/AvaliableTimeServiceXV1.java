@@ -124,7 +124,7 @@ public class AvaliableTimeServiceXV1 {
                                 .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
                                         &&
                                         DateUtil.getWeekInByDate(DateUtil.String2Date(String.join(" ", dayTimeSlot.getDay(), "00:00:00")), WorkOrderConstant.weekDays)
-                                        && WorkOrderConstant.checkContains(t.getSlotId())
+                                        && WorkOrderConstant.checkContains(t.getSlotId().intValue())
                                 )// 27 晚8点  小班课
                                 .collect(Collectors.toList()));
                         //1对1课程

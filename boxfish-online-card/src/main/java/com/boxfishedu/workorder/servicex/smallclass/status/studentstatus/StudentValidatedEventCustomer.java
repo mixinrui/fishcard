@@ -38,6 +38,7 @@ public class StudentValidatedEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
+        logger.debug("");
         smallClassLogService.recordStudentLog(smallClass);
     }
 }
