@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.joda.time.DateTime;
@@ -53,6 +54,7 @@ public class SmallClass implements Cloneable, Serializable {
     private String cover;
 
     @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+08:00")
     private Date classDate;
 
     @Column(name = "slot_id")

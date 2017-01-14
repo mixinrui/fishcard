@@ -133,13 +133,13 @@ StudentAppRelatedController {
 
     @RequestMapping(value = "/{studentId}/enter/publicClassRoom", method = RequestMethod.PUT)
     public JsonResultModel enterClassRoom(
-            @PathVariable Long studentId, Long userId, Long smallClassId,
+            @PathVariable Long studentId, Long userId, Long smallClassId, String nickName,
             @RequestParam(value = "access_token") String accessToken) {
         if(!studentId.equals(userId)) {
             throw new UnauthorizedException();
         }
         return JsonResultModel.newJsonResultModel(
-                timePickerServiceXV1.enterPublicClassRoom(userId, smallClassId, accessToken));
+                timePickerServiceXV1.enterPublicClassRoom(userId, nickName, smallClassId, accessToken));
     }
 
 

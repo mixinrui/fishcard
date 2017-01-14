@@ -198,6 +198,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedule.setTimeSlotId(workOrder.getSlotId());
             courseSchedule.setWorkorderId(workOrder.getId());
             courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
+            courseSchedule.setClassType(workOrder.getClassType());
             courseSchedule.setIsFreeze(0);
             // 设置上课类型, 1对1, 1对6, 公开课
 
@@ -421,6 +422,35 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return courseSchedules;
     }
 
+    public List<CourseSchedule> batchUpdateCourseScheduleByWorkOrder(Service service, List<WorkOrder> workOrders) {
+        List<CourseSchedule> courseSchedules = new ArrayList<>();
+        for (WorkOrder workOrder : workOrders) {
+            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
+            courseSchedule.setStatus(workOrder.getStatus());
+            courseSchedule.setStudentId(service.getStudentId());
+            courseSchedule.setTeacherId(workOrder.getTeacherId());
+            courseSchedule.setCourseId(workOrder.getCourseId());
+            courseSchedule.setCourseName(workOrder.getCourseName());
+            courseSchedule.setCourseType(workOrder.getCourseType());
+            courseSchedule.setClassDate(DateUtil.date2SimpleDate(workOrder.getStartTime()));
+            courseSchedule.setStartTime(workOrder.getStartTime());
+            courseSchedule.setClassType(workOrder.getClassType());
+            courseSchedule.setSmallClassId(workOrder.getSmallClassId());
+            //TODO:此处如果是外教,需要修改roleId为外教的Id
+            courseSchedule.setRoleId(workOrder.getSkuId().intValue());
+            courseSchedule.setTimeSlotId(workOrder.getSlotId());
+            courseSchedule.setWorkorderId(workOrder.getId());
+            courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
+            courseSchedule.setIsFreeze(0);
+            courseSchedule.setClassType(workOrder.getClassType());
+            if(org.apache.commons.lang3.StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),workOrder.getClassType())){
+                courseSchedule.setInstantStartTtime(DateUtil.dateTrimYear(workOrder.getStartTime()));
+                courseSchedule.setInstantEndTtime(DateUtil.dateTrimYear(workOrder.getEndTime()));
+            }
+            courseSchedules.add(courseSchedule);
+        }
+        return courseScheduleService.save(courseSchedules);
+    }
 
     public List<CourseSchedule> batchUpdateCourseSchedule(Service service, List<WorkOrder> workOrders) {
         List<CourseSchedule> courseSchedules = new ArrayList<>();

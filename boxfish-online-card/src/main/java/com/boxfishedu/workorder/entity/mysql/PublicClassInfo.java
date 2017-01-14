@@ -26,10 +26,13 @@ public class PublicClassInfo implements Serializable {
 
     private Long studentId;
 
+
     @Convert(converter = LocalDateAttributeConverter.class)
     private LocalDate classDate;
 
     private Integer slotId;
+
+
 
     private Date createTime;
 

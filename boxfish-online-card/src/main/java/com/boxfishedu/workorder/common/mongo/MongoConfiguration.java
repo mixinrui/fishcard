@@ -42,20 +42,20 @@ public class MongoConfiguration {
             }
             MongoClientOptions.Builder builder = MongoClientOptions.builder();
             builder.socketKeepAlive(true)
-                    .socketTimeout(60000)
-                    .connectTimeout(30000)
-                    .readPreference(ReadPreference.secondary())
-                    .connectionsPerHost(60);
+                   .socketTimeout(60000)
+                   .connectTimeout(30000)
+                   .readPreference(ReadPreference.secondary())
+                   .connectionsPerHost(60);
             //mongodb的连接方式 使用用户名和密码,非本地连接
             List<MongoCredential> credentials = new ArrayList<MongoCredential>();
             MongoClientOptions options = MongoClientOptions.builder()
-                    .socketTimeout(6000)
-                    .connectTimeout(3000)
-                    .readPreference(ReadPreference.secondary())
-                    .connectionsPerHost(60).build();
+                                                           .socketTimeout(6000)
+                                                           .connectTimeout(3000)
+                                                           .readPreference(ReadPreference.secondary())
+                                                           .connectionsPerHost(60).build();
             credentials.add(MongoCredential.createScramSha1Credential(mongoProperties.getUsername(),
-                    mongoProperties.getDbName(), mongoProperties.getPassword().toCharArray()));
-            MongoClient mongoClient = new MongoClient(servers,credentials,options);
+                                                                      mongoProperties.getDbName(), mongoProperties.getPassword().toCharArray()));
+            MongoClient mongoClient = new MongoClient(servers, credentials, options);
             return mongoClient;
         } catch (Exception e) {
             logger.error("mongodb初始化失败");
@@ -82,9 +82,13 @@ public class MongoConfiguration {
         morphia.map(InstantClassTimeRules.class);
         morphia.map(InstantCardLog.class);
         morphia.map(NetPingAnalysisInfo.class);
-        Datastore datastore = morphia.createDatastore(mongoClient(),mongoProperties.getDbName());
+        morphia.map(SmallClassLog.class);
+        morphia.map(SmallClassStudentsRelation.class);
+        Datastore datastore = morphia.createDatastore(mongoClient(), mongoProperties.getDbName());
         datastore.ensureIndexes();
-        return  datastore;
+        datastore.ensureIndex(
+                SmallClassStudentsRelation.class, "relationUniqueIndex", "master,partner,smallClassId", true, true);
+        return datastore;
     }
 }
 

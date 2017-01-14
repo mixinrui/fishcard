@@ -301,7 +301,8 @@ public class AvaliableTimeServiceXV1 {
             throw new BusinessException("未生成服务数据");
         }
 
-        // 获取服务信息   返回获取一周几次课  service 的 original_amount 次数 除  combo_cycle
+        // 1 获取服务信息   返回获取一周几次课  service 的 original_amount 次数 除  combo_cycle
+        // 2 如果抽奖存在多个service的情况 需要和需求对接
         Service service = services.get(0);
         //每周的次数
         int countByWeek = service.getOriginalAmount() / service.getComboCycle();

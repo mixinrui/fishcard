@@ -64,6 +64,12 @@ public class PublicClassInfoQueryService {
             sql.append(" and wo.createTime<=:createend ");
         }
 
+        if(null!=publicFilterParam.getStatus()){
+            sql.append("and status in (:status )");
+        }
+        if (null != publicFilterParam.getOrderCode()) {
+            sql.append("and orderCode=:orderCode ");
+        }
 
         if (null != publicFilterParam.getId()) {
             sql.append("and id=:id ");
@@ -94,9 +100,7 @@ public class PublicClassInfoQueryService {
             sql.append("order by wo.startTime   ").append(publicFilterParam.getStartTimeSort().toLowerCase());
         }
 
-        if (null != publicFilterParam.getActualStartTimeSort()) {
-            sql.append("order by wo.actualStartTime ").append(publicFilterParam.getActualStartTimeSort());
-        }
+
 
         if (null != publicFilterParam.getStartTimeSort() && null != publicFilterParam.getActualStartTimeSort()) {
             sql.append("order by wo.teacherId asc , wo.createTime desc");
@@ -125,6 +129,7 @@ public class PublicClassInfoQueryService {
             query.setParameter("id", publicFilterParam.getId());
         }
 
+
         if (null != publicFilterParam.getCreateBeginDateFormat()) {
             query.setParameter("createbegin", publicFilterParam.getCreateBeginDateFormat());
         }
@@ -134,13 +139,15 @@ public class PublicClassInfoQueryService {
         }
 
 
+
         if (null != publicFilterParam.getStudentId()) {
             query.setParameter("studentId", publicFilterParam.getStudentId());
         }
         if (null != publicFilterParam.getTeacherId()) {
             query.setParameter("teacherId", publicFilterParam.getTeacherId());
         }
-  
+
+
         return query;
     }
 

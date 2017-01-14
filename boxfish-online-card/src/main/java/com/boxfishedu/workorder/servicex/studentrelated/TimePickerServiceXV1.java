@@ -244,10 +244,10 @@ public class TimePickerServiceXV1 {
      * 学生进入公开课课堂
      * @return
      */
-    public Map<String, Object> enterPublicClassRoom(Long studentId, Long smallClassId, String accessToken) {
+    public Map<String, Object> enterPublicClassRoom(Long studentId, String nickName, Long smallClassId, String accessToken) {
         try {
             SmallClass smallClass = getClassRoomById(smallClassId);
-            publicClassRoom.enter(smallClass, studentId, accessToken);
+            publicClassRoom.enter(smallClass, studentId, nickName, accessToken);
             return PublicClassMessageEnum.SUCCES.getMessageMap();
         } catch (Exception e) {
             if(e instanceof PublicClassException) {

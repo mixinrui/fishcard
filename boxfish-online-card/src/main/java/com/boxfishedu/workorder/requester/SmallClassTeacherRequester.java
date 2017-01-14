@@ -5,8 +5,11 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.web.param.FetchTeacherParam;
+import com.boxfishedu.workorder.web.param.ScheduleModel;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.Data;
 import org.apache.http.HttpStatus;
@@ -18,7 +21,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hucl on 17/1/7.
@@ -42,25 +45,43 @@ public class SmallClassTeacherRequester {
     private final String PUBLIC_CLASS = "PUBLIC_CLASS";
 
     public TeacherView getSmallClassTeacher(SmallClass smallClass) {
-        SmallClassFetchTeacherParam smallClassFetchTeacherParam = new SmallClassFetchTeacherParam();
-        smallClassFetchTeacherParam.setDay(smallClass.getClassDate().getTime());
-        smallClassFetchTeacherParam.setSlotId(smallClass.getSlotId().longValue());
-        smallClassFetchTeacherParam.setRoleId(smallClass.getRoleId());
-        smallClassFetchTeacherParam.setCourseType(smallClass.getCourseType());
-        smallClassFetchTeacherParam.setClassType(SMALL_CLASS);
+        FetchTeacherParam fetchTeacherParam = new FetchTeacherParam();
+        fetchTeacherParam.setUserId(smallClass.getGroupLeader());
+
+        ScheduleModel scheduleModel = new ScheduleModel();
+        scheduleModel.setCourseType(smallClass.getCourseType());
+        scheduleModel.setDay(smallClass.getClassDate().getTime());
+        scheduleModel.setId(smallClass.getGroupLeader());
+        scheduleModel.setRoleId(smallClass.getRoleId());
+        scheduleModel.setSlotId(smallClass.getSlotId());
+        scheduleModel.setClassType(SMALL_CLASS);
+
+        fetchTeacherParam.setScheduleModelList(Arrays.asList(scheduleModel));
 
         String url = String.format("%s/course/schedule/teacher/web/match", urlConf.getTeacher_service());
         JsonResultModel jsonResultModel = null;
         try {
-            jsonResultModel = restTemplate.postForObject(url, smallClassFetchTeacherParam, JsonResultModel.class);
-            logger.debug("@getSmallClassTeacher#获取小班课教师成功,url[{}],参数[{}],结果[{}]"
-                    , url, smallClassFetchTeacherParam, JacksonUtil.toJSon(jsonResultModel));
+            jsonResultModel = restTemplate.postForObject(url, fetchTeacherParam, JsonResultModel.class);
+            if (Objects.isNull(jsonResultModel.getData())) {
+                logger.error("@getSmallClassTeacher#获取教师失败,没有获取到教师,url[{}],参数[{}],结果[{}]"
+                        , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
+            } else {
+
+                logger.debug("@getSmallClassTeacher#获取小班课教师成功,url[{}],参数[{}],结果[{}]"
+                        , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
+            }
         } catch (Exception ex) {
             logger.error("@getSmallClassTeacher#获取小班课教师失败,url[{}],参数[{}],结果[{}]"
-                    , url, smallClassFetchTeacherParam, JacksonUtil.toJSon(jsonResultModel));
+                    , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
             return null;
         }
-        TeacherView teacherView = jsonResultModel.getData(TeacherView.class);
+        HashMap<String, Map<String, Object>> result = jsonResultModel.getData(HashMap.class);
+        Map<String, Object> resultData = result.get(scheduleModel.getId().toString());
+        TeacherView teacherView = new TeacherView();
+        teacherView.setTeacherId(Long.parseLong(resultData.get("teacherId").toString()));
+        teacherView.setTeacherName(Objects.isNull(
+                resultData.get("teacherName")) ? null : resultData.get("teacherName").toString());
+        teacherView.setId(teacherView.getTeacherId());
         return teacherView;
     }
 
@@ -94,11 +115,13 @@ public class SmallClassTeacherRequester {
 
     @Data
     public static class SmallClassFetchTeacherParam {
+        private Long id;
         private Long day;
         private String courseType;
         private Long slotId;
         private Integer roleId;
         //ONE_TO_ONE_ONLINE, 在线授课一对一   SMALL_CLASS,//小班课   PUBLIC_CLASS//公开课
         private String classType;
+        private Long userId;
     }
 }

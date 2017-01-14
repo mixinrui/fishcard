@@ -62,7 +62,7 @@ public class PublicClassRoom {
     }
 
     @Transactional
-    public void enter(SmallClass smallClass, Long studentId, String accessToken) {
+    public void enter(SmallClass smallClass, Long studentId, String nickName, String accessToken) {
 
         // 是否在上课正常时间范围内
 //        long time = new Date().getTime();
@@ -81,7 +81,7 @@ public class PublicClassRoom {
         checkMember(smallClass, studentId, accessToken);
 
         // 三 如果没有消费过, 则直接进入房间, 保存, 默认就是进入课堂
-        savePublicClassInfo(smallClass, studentId);
+        savePublicClassInfo(smallClass, studentId, nickName);
 
         // 四 更新redis
         updateEnterClassStatisticsCache(smallClass, studentId);
@@ -143,10 +143,9 @@ public class PublicClassRoom {
         if(CollectionUtils.isNotEmpty(tags)) {
             System.out.println(tags);
 
-            // TODO 生产环境放开
-//            new PublicClassRoomNotification()
-//                    .addTag(tags)
-//                    .notifyPush();
+            new PublicClassRoomNotification()
+                    .addTag(tags)
+                    .notifyPush();
         }
     }
 
@@ -156,12 +155,14 @@ public class PublicClassRoom {
     }
 
 
-    private void savePublicClassInfo(SmallClass smallClass, Long studentId) {
+    private void savePublicClassInfo(SmallClass smallClass, Long studentId, String nickName) {
         PublicClassInfo entity = new PublicClassInfo();
         entity.setClassDate(DateUtil.convertLocalDate(smallClass.getClassDate()));
         entity.setSlotId(smallClass.getSlotId());
         entity.setSmallClassId(smallClass.getId());
         entity.setStudentId(studentId);
+        entity.setStartTime(smallClass.getStartTime());
+        entity.setStudentName(nickName);
         entity.setStatus(PublicClassInfoStatusEnum.ENTER.getCode());
         publicClassInfoJpaRepository.save(entity);
         // 更新课堂实时缓存
@@ -202,7 +203,7 @@ public class PublicClassRoom {
             // 非会员直接不让上课
             case "NONE" : throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
             // 会员验证
-            default: memberCheck(classDate, studentId); break;
+            default: // memberCheck(classDate, studentId);// break;
         }
     }
 

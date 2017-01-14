@@ -44,4 +44,5 @@ public class TeacherView  extends BaseView {
     private Integer serviceCount;
     private Long plannerId;
     private Long answerId;
+    private Boolean select;
 }
