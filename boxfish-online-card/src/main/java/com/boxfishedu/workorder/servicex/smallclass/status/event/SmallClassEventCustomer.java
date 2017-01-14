@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass.status.event;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,5 +19,10 @@ public abstract class SmallClassEventCustomer {
     protected PublicClassInfoStatusEnum smallClassCardStatus;
 
 
-    public abstract void exec(SmallClassEvent smallClassEvent);
+    public void exec(SmallClassEvent smallClassEvent) {
+        SmallClass smallClass = smallClassEvent.getSource();
+        this.execute(smallClass);
+    }
+
+    public abstract void execute(SmallClass smallClass);
 }

@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.teacherstatus;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.core.annotation.Order;
@@ -21,7 +22,7 @@ public class TeacherSwitchStudentCustomer  extends SmallClassEventCustomer {
     }
 
     @Override
-    public void exec(SmallClassEvent smallClassEvent) {
-        logger.info("教师上课切换学生...");
+    public void execute(SmallClass smallClass) {
+
     }
 }

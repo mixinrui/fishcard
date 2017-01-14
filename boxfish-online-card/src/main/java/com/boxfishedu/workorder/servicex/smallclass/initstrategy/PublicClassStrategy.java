@@ -83,6 +83,21 @@ public class PublicClassStrategy implements GroupInitStrategy {
     }
 
     @Override
+    public SmallClassJpaRepository getSmallClassRepository() {
+        return smallClassJpaRepository;
+    }
+
+    @Override
+    public WorkOrderService getWorkOrderService() {
+        return workOrderService;
+    }
+
+    @Override
+    public ScheduleCourseInfoService getScheduleCourseInfoService() {
+        return scheduleCourseInfoService;
+    }
+
+    @Override
     public void initGroupClass(SmallClass smallClass) {
         //获取推荐课程
         RecommandCourseView recommandCourseView = this.getRecommandCourse(smallClass);
@@ -118,7 +133,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
     @Override
     @Transactional
     public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
-        this.persistSmallClass(smallClass, smallClassJpaRepository);
+        this.persistSmallClass(smallClass);
 
         //回写群组信息到smallclass
         FishCardGroupsInfo fishCardGroupsInfo = this.buildChatRoom(smallClass);
@@ -128,7 +143,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         smallClassTeacherRequester.assignPublicClassTeacher(smallClass);
 
         smallClassJpaRepository.save(smallClass);
-        this.persistCardRelatedInfo(smallClass, workOrderService, scheduleCourseInfoService, recommandCourseView);
+        this.persistCardRelatedInfo(smallClass, recommandCourseView);
     }
 
     private WorkOrder virtualCard(SmallClass smallClass) {

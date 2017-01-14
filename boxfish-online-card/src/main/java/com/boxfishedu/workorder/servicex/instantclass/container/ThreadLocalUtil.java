@@ -22,6 +22,7 @@ public class ThreadLocalUtil {
     public static final ThreadLocal<String> unFinishedCourses30MinutesTips = new ThreadLocal<>();
     public static final ThreadLocal<WorkOrder> waitReleasedWorkOrder=new ThreadLocal<>();
     public static final ThreadLocal<InstantTeacherRequester.InstantAssignTeacherParam> instantAssignTeacherParam=new ThreadLocal<>();
+    public static final ThreadLocal<Long> visitUser=new ThreadLocal<>();
 
     public static TeacherInstantRequestParam getTeacherInstantParam(){
         return TeacherInstantParamThreadLocal.get();

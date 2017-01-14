@@ -93,6 +93,12 @@ public class SmallClass implements Cloneable, Serializable {
 
     private Integer status;
 
+    @Transient
+    private Date reportTime;
+
+    @Transient
+    private Long statusReporter;
+
     @JsonIgnore
     @Transient
     private List<Long> allStudentIds;
@@ -102,7 +108,7 @@ public class SmallClass implements Cloneable, Serializable {
     private List<WorkOrder> allCards;
 
     //班级类型
-    public String classType;
+    private String classType;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)

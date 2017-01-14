@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.teacherstatus;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
@@ -28,7 +29,7 @@ public class TeacherVoiceVideoFailCustomer extends SmallClassEventCustomer {
     }
 
     @Override
-    public void exec(SmallClassEvent smallClassEvent) {
-        logger.info("教师音视频进入失败...");
+    public void execute(SmallClass smallClass) {
+
     }
 }

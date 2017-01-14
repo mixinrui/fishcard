@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.studentstatus;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.StatusDealer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
@@ -29,7 +30,7 @@ public class StudentClassingCustomer extends SmallClassEventCustomer implements 
     }
 
     @Override
-    public void exec(SmallClassEvent smallClassEvent) {
+    public void execute(SmallClass smallClass) {
 
     }
 }
