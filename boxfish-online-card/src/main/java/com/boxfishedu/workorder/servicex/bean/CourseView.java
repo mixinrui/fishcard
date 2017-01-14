@@ -52,6 +52,9 @@ public class CourseView implements Serializable {
         if (scheduleCourseInfo == null) {
             return null;
         }
+        if(Objects.isNull(scheduleCourseInfo.getCourseId())){
+            return null;
+        }
         CourseView courseView = new CourseView();
         courseView.setBookSectionId(scheduleCourseInfo.getCourseId());
         courseView.setThumbnail(scheduleCourseInfo.getThumbnail());

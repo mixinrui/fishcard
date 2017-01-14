@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.timer;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.log.RecommendLog;
 import com.boxfishedu.workorder.common.util.MailSupport;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -42,7 +43,9 @@ public class SingleRecommendHandler {
     @Transactional
     public void singleRecommend(WorkOrder workOrder, CourseSchedule courseSchedule) {
         try {
-            singleRecommend(workOrder, courseSchedule, (w) -> true);
+            if (this.notGroupWorkOrder(workOrder)) {
+                singleRecommend(workOrder, courseSchedule, (w) -> true);
+            }
         } catch (Exception e) {
             logger.error(
                     new RecommendLog(workOrder.getStudentId())
@@ -55,9 +58,9 @@ public class SingleRecommendHandler {
         }
     }
 
-
     /**
      * 单课程推荐
+     *
      * @param workOrder
      * @param courseSchedule
      */
@@ -69,15 +72,20 @@ public class SingleRecommendHandler {
                         predicate);
         RecommandCourseView courseView = recommendCourseMap.get(0);
 
-        String oldCOurseType=workOrder.getCourseType();
+        String oldCOurseType = workOrder.getCourseType();
 
         persistCoursesHandler.persistCourseInfos(workOrder, courseSchedule, courseView);
 
         // 如果已经分配老师,课程类型如果与课程推荐不匹配重新更换老师
-        if(!StringUtils.equals(courseView.getCourseType(), oldCOurseType)
+        if (!StringUtils.equals(courseView.getCourseType(), oldCOurseType)
                 && !Objects.isNull(workOrder.getTeacherId())) {
             workOrderService.changeTeacherForTypeChanged(workOrder);
         }
+    }
+
+    private boolean notGroupWorkOrder(WorkOrder workOrder) {
+        return !Objects.equals(workOrder.getClassType(), ClassTypeEnum.PUBLIC.name())
+                && !Objects.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name());
     }
 
 
