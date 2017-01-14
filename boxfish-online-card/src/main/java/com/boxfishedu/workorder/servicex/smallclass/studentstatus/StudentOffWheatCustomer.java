@@ -26,8 +26,6 @@ public class StudentOffWheatCustomer extends SmallClassEventCustomer {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.STUDENT_OFF_WHEAT);
     }
 
-    public final String prefix = "INIT_";
-
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
 

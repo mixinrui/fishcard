@@ -26,8 +26,6 @@ public class StudentValidatedEventCustomer extends SmallClassEventCustomer {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.STUDENT_ENTER);
     }
 
-    public final String prefix = "INIT_";
-
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
 

@@ -26,8 +26,6 @@ public class StudentVoiceVedioFailCustomer extends SmallClassEventCustomer {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.STUDENT_VOICE_VIDEO_FAIL);
     }
 
-    public final String prefix = "INIT_";
-
     @Override
     public void exec(SmallClassEvent smallClassEvent) {
 
