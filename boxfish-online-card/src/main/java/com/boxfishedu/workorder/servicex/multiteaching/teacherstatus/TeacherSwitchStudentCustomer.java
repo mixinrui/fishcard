@@ -6,11 +6,7 @@ import org.springframework.stereotype.Component;
 /**
  * Created by hucl on 17/1/8.
  */
-@Order(420)
+@Order(1120)
 @Component
-public class LeaveEarlyEventCustomer extends SmallClassEventCustomer {
-    @Override
-    public void exec(SmallClassEvent smallClassEvent) {
-
-    }
+public class TeacherSwitchStudentCustomer {
 }

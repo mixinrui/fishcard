@@ -1,10 +1,8 @@
-package com.boxfishedu.workorder.servicex.multiteaching.teacherstatus;
+package com.boxfishedu.workorder.servicex.multiteaching.event;
 
 import com.boxfishedu.workorder.common.bean.multiteaching.SmallClassCardStatus;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Observable;
 

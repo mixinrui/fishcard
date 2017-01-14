@@ -51,6 +51,7 @@ public interface GroupInitStrategy {
                 workOrder.setTeacherId(teacherView.getTeacherId());
                 workOrder.setTeacherName(teacherView.getTeacherName());
             });
+            smallClass.setAllCards(workOrders);
         }
     }
 

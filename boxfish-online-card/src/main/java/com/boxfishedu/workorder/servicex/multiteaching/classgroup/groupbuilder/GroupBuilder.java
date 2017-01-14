@@ -31,7 +31,6 @@ public abstract class GroupBuilder {
 
     protected abstract Integer smallClassMemeberNum();
 
-
     public void group() {
         List<WorkOrder> cards = this.cardsToGroup();
 

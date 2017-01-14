@@ -14,9 +14,9 @@ import java.util.Map;
 /**
  * Created by hucl on 17/1/5.
  */
-@Order(10)
+@Order(1100)
 @Component
-public class CreateEventCustomer extends SmallClassEventCustomer {
+public class VoiceVideoFailCustomer extends SmallClassEventCustomer {
 
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;

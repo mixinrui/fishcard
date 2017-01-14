@@ -95,7 +95,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         smallClass.setAllCards(Arrays.asList(workOrder));
 
         this.writeCourseBack(smallClass, Arrays.asList(workOrder)
-                , recommandCourseView,recommandCourseRequester);
+                , recommandCourseView, recommandCourseRequester);
 
         this.writeTeacherInfoBack(smallClass, Arrays.asList(workOrder), teacherView);
 

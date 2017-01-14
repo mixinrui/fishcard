@@ -9,12 +9,13 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEvent;
-import com.boxfishedu.workorder.servicex.multiteaching.teacherstatus.SmallClassEventDispatch;
+import com.boxfishedu.workorder.servicex.multiteaching.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.multiteaching.event.SmallClassEventDispatch;
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,10 @@ public class Timer6Group extends GroupBuilder {
 
     @Override
     protected List<WorkOrder> cardsToGroup() {
-        return workOrderJpaRepository.findByClassTypeAndStartTimeGreaterThan(ClassTypeEnum.SMALL.name(), new Date());
+        LocalDateTime deadLocalDateTime = LocalDateTime.now().plusDays(10);
+        Date deadDate = DateUtil.localDate2Date(deadLocalDateTime);
+        return workOrderJpaRepository
+                .findByClassTypeAndSmallClassIdIsNullAndStartTimeBetween(ClassTypeEnum.SMALL.name(), new Date(), deadDate);
     }
 
     @Override
@@ -85,7 +89,7 @@ public class Timer6Group extends GroupBuilder {
         groups.forEach((key, groupMembers) -> {
             WorkOrder leader = this.selectLeader(groupMembers);
             SmallClass smallClass = new SmallClass();
-            smallClass.setClassDate(leader.getStartTime());
+            smallClass.setClassDate(DateUtil.date2SimpleDate(leader.getStartTime()));
             smallClass.setSlotId(leader.getSlotId());
             smallClass.setCourseType(leader.getCourseType());
             smallClass.setGroupLeader(leader.getStudentId());

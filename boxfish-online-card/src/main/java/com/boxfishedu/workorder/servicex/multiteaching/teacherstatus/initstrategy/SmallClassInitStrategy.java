@@ -81,7 +81,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         //获取推荐教师
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
 
-        this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
+        if (0 != teacherView.getId()) {
+            this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
+        }
 
         //将小班课,公开课相关信息保存入库
         this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
