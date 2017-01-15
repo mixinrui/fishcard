@@ -70,7 +70,9 @@ public class ScheduleCourseInfoService {
         return scheduleCourseInfo;
     }
 
-    public void batchSaveCourseInfos(List<WorkOrder> workOrders, List<CourseSchedule> courseSchedules, Map<Integer, RecommandCourseView> courseViewMap) {
+    public void batchSaveCourseInfos(
+            List<WorkOrder> workOrders, List<CourseSchedule> courseSchedules
+            , Map<Integer, RecommandCourseView> courseViewMap) {
         logger.info("->>>>>>>>开始向mongodb插入课程信息");
         List<ScheduleCourseInfo> scheduleCourseInfos = Lists.newArrayList();
         Map<String, CourseSchedule> courseScheduleMap = Maps.newHashMap();
@@ -98,7 +100,9 @@ public class ScheduleCourseInfoService {
         save(scheduleCourseInfos);
     }
 
-    public void saveSingleCourseInfo(WorkOrder workOrder, CourseSchedule courseSchedule, RecommandCourseView courseView) {
+    public void saveSingleCourseInfo(
+            WorkOrder workOrder, CourseSchedule courseSchedule
+            , RecommandCourseView courseView) {
         logger.info("->>>>>>>>开始向mongodb插入课程信息");
         ScheduleCourseInfo scheduleCourseInfo = new ScheduleCourseInfo();
         scheduleCourseInfo.setCourseId(courseView.getCourseId());

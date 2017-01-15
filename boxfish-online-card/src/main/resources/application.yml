@@ -531,7 +531,7 @@ time:
 
 server.port: 8080
 #===============================================================demo环境=====101.201.66.32===============================================================
-#==================mongo:     mongo --host dds-2zeab46e2bd819e41.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p
+#==================mongo:     mongo --host dds-2zeab46e2bd819e41.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p Boxfish2016
 ---
 spring:
   datasource:
