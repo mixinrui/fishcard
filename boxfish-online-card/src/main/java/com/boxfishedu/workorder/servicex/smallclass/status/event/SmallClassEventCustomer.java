@@ -9,6 +9,8 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 
 /**
  * Created by hucl on 17/1/5.
@@ -38,6 +40,11 @@ public abstract class SmallClassEventCustomer {
                         smallClass.getId(), smallClass.getStatusReporter());
         workOrder.setStatus(fishCardStatusEnum.getCode());
 
-        this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder);
+        if (Objects.isNull(smallClass.getWriteBackDesc())) {
+            this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder);
+        } else {
+            this.getWorkOrderService().saveStatusForCardAndSchedule(
+                    workOrder, smallClass.getWriteBackDesc());
+        }
     }
 }

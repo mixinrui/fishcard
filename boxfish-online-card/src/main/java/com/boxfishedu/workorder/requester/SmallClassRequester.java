@@ -136,7 +136,7 @@ public class SmallClassRequester {
      * @return 获取公开课
      */
     public RecommandCourseView getPublicCourse(SmallClass smallClass) {
-        String url = String.format("%s/open/get/%s", urlConf.getCourse_wudaokou_recommend_service(), smallClass.getDifficultyLevel());
+        String url = String.format("%s/open/%s", urlConf.getCourse_wudaokou_recommend_service(), smallClass.getDifficultyLevel());
         RecommandCourseView recommandCourseView = null;
         try {
             recommandCourseView = restTemplate.getForObject(url, RecommandCourseView.class);

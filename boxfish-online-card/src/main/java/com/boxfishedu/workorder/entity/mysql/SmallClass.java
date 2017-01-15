@@ -104,6 +104,10 @@ public class SmallClass implements Cloneable, Serializable {
 
     @JsonIgnore
     @Transient
+    private String writeBackDesc;
+
+    @JsonIgnore
+    @Transient
     private List<Long> allStudentIds;
 
     @JsonIgnore

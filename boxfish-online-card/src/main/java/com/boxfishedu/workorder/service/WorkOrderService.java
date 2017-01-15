@@ -135,13 +135,18 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Transactional
     public void saveStatusForCardAndSchedule(WorkOrder workOrder) {
+        this.saveStatusForCardAndSchedule(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()));
+    }
+
+    @Transactional
+    public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc) {
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         courseSchedule.setStatus(workOrder.getStatus());
         this.save(workOrder);
         courseScheduleService.save(courseSchedule);
         threadPoolManager.execute(new Thread(() -> {
             workOrderLogService.saveWorkOrderLog(
-                    workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()) + "[小班课回写]");
+                    workOrder, desc);
         }));
     }
 
