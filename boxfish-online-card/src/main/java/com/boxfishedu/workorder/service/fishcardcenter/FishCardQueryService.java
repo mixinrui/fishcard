@@ -243,7 +243,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
 
         //小班课 公开课的 处理
         if(ClassTypeEnum.NORMAL.name().equals(fishCardFilterParam.getClassType())){
-            sql.append(" and classType !='SMALL' and classType !='PUBLIC' ");  // 除了小班课 和公开课
+            sql.append(" and (classType !='SMALL' or classType !='PUBLIC') ");  // 除了小班课 和公开课
         }else if(!ClassTypeEnum.NORMAL.name().equals(fishCardFilterParam.getClassType())  && null != fishCardFilterParam.getClassType()){
             sql.append("and classType =:classType ");
         }
