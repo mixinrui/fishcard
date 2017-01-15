@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
@@ -47,6 +48,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Autowired
     private RecommandCourseRequester recommandCourseRequester;
+
+    @Autowired
+    private CourseOnlineRequester courseOnlineRequester;
 
     public WorkOrder selectLeader(List<WorkOrder> workOrders) {
         logger.debug("小班鱼卡[{}]", JacksonUtil.toJSon(workOrders));
@@ -109,7 +113,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Override
     public FishCardGroupsInfo buildChatRoom(SmallClass smallClass) {
-        return null;
+        return courseOnlineRequester.buildsmallClassChatRoom(smallClass);
     }
 
     @Override

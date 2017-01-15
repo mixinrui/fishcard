@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 17/1/8.
@@ -105,6 +106,15 @@ public interface GroupInitStrategy {
     default void persistCardRelatedInfo(
             SmallClass smallClass
             , RecommandCourseView recommandCourseView) {
+
+        List<Long> studentIds = smallClass.getAllCards()
+                                          .stream()
+                                          .map(workOrder -> workOrder.getStudentId())
+                                          .collect(Collectors.toList());
+        smallClass.setAllStudentIds(studentIds);
+
+        FishCardGroupsInfo fishCardGroupsInfo = this.buildChatRoom(smallClass);
+        this.writeChatRoomBack(smallClass, smallClass.getAllCards(), fishCardGroupsInfo);
 
         smallClass.getAllCards().forEach(workOrder -> {
             workOrder.setSmallClassId(smallClass.getId());
