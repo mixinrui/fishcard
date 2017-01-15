@@ -50,8 +50,8 @@ public class PublicClassInfoQueryService {
 
         StringBuilder sql = new StringBuilder("from PublicClassInfo wo where wo.startTime between :begin and :end ");
 
-        if(null!=publicFilterParam.getSmallClassId()){
-            sql.append(" and wo.smallClassId = :smallClassId ");
+        if(null!=publicFilterParam.getId()){
+            sql.append(" and wo.smallClassId = :id ");
         }
 
 
@@ -71,9 +71,7 @@ public class PublicClassInfoQueryService {
             sql.append("and orderCode=:orderCode ");
         }
 
-        if (null != publicFilterParam.getId()) {
-            sql.append("and id=:id ");
-        }
+
         if (null != publicFilterParam.getStudentId()) {
             sql.append("and studentId=:studentId ");
         }
@@ -121,13 +119,13 @@ public class PublicClassInfoQueryService {
         query.setParameter("begin", publicFilterParam.getBeginDateFormat());
         query.setParameter("end", publicFilterParam.getEndDateFormat());
 
-        if(null!=publicFilterParam.getSmallClassId()){
-            query.setParameter("smallClassId", publicFilterParam.getSmallClassId());
-        }
-
-        if (null != publicFilterParam.getId()) {
+        if(null!=publicFilterParam.getId()){
             query.setParameter("id", publicFilterParam.getId());
         }
+
+//        if (null != publicFilterParam.getId()) {
+//            query.setParameter("id", publicFilterParam.getId());
+//        }
 
 
         if (null != publicFilterParam.getCreateBeginDateFormat()) {
