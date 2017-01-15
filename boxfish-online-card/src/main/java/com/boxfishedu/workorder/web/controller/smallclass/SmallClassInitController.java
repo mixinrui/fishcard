@@ -1,6 +1,6 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
-import com.boxfishedu.workorder.servicex.smallclass.classgroup.groupbuilder.GroupBuilder;
+import com.boxfishedu.workorder.servicex.smallclass.groupbuilder.GroupBuilder;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;

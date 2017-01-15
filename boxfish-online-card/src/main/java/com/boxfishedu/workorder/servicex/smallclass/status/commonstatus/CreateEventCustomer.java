@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.bean.RoleEnum;
 import com.boxfishedu.workorder.dao.mongo.SmallClassLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
@@ -29,11 +30,19 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
     Map<String, GroupInitStrategy> groupInitStrategyMap;
 
     @Autowired
+    WorkOrderService workOrderService;
+
+    @Autowired
     private SmallClassLogService smallClassLogService;
 
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.CREATE);
+    }
+
+    @Override
+    protected WorkOrderService getWorkOrderService() {
+        return workOrderService;
     }
 
     @Override

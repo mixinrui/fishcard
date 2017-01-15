@@ -25,6 +25,16 @@ public enum ClassTypeEnum {
         return this.value;
     }
 
+    public static ClassTypeEnum getByName(String name) {
+        ClassTypeEnum classTypeEnum;
+        try {
+            return Enum.valueOf(ClassTypeEnum.class, name);
+        } catch (Exception ex) {
+            return DEFAULT;
+        }
+
+    }
+
     public static ClassTypeEnum resolveByComboType(String comboType) {
         ComboTypeToRoleId comboTypeToRoleId;
         try {
@@ -33,9 +43,12 @@ public enum ClassTypeEnum {
             return DEFAULT;
         }
         switch (comboTypeToRoleId) {
-            case SMALLCLASS: return SMALL;
-            case PUBLIC: return PUBLIC;
-            default: return DEFAULT;
+            case SMALLCLASS:
+                return SMALL;
+            case PUBLIC:
+                return PUBLIC;
+            default:
+                return DEFAULT;
         }
     }
 }

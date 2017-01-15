@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.smallclass.classgroup.groupbuilder;
+package com.boxfishedu.workorder.servicex.smallclass.groupbuilder;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;

@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -93,9 +94,11 @@ public class SmallClass implements Cloneable, Serializable {
 
     private Integer status;
 
+    @JsonIgnore
     @Transient
     private Date reportTime;
 
+    @JsonIgnore
     @Transient
     private Long statusReporter;
 
@@ -139,5 +142,9 @@ public class SmallClass implements Cloneable, Serializable {
         this.setSlotId(publicClassBuilderParam.getSlotId().intValue());
         this.setCreateTime(new Date());
         this.setDifficultyLevel(publicClassBuilderParam.getDifficulty());
+    }
+
+    public ClassTypeEnum getStatusEnum() {
+        return ClassTypeEnum.getByName(this.getClassType());
     }
 }

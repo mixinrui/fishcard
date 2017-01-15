@@ -215,5 +215,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     List<WorkOrder> findBySmallClassId(Long smallClassId);
 
+    WorkOrder findBySmallClassIdAndStudentId(Long smallClassId,Long studentId);
+
     List<WorkOrder> findByClassTypeAndSmallClassIdIsNullAndStartTimeBetween(String name, Date date, Date deadDate);
 }

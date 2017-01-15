@@ -52,9 +52,9 @@ public class SmallClassRequester {
             throw new BusinessException("获取用户难度信息失败");
         }
         //api返回的数据真是诡异,非得加上引号..
-        if(difficulty.contains("\"")){
-            difficulty=StringUtils.trimLeadingCharacter(difficulty,'\"');
-            difficulty=StringUtils.trimTrailingCharacter(difficulty,'\"');
+        if (difficulty.contains("\"")) {
+            difficulty = StringUtils.trimLeadingCharacter(difficulty, '\"');
+            difficulty = StringUtils.trimTrailingCharacter(difficulty, '\"');
         }
         return difficulty;
     }
@@ -132,18 +132,17 @@ public class SmallClassRequester {
     }
 
     /**
-     *
      * @param smallClass
      * @return 获取公开课
      */
     public RecommandCourseView getPublicCourse(SmallClass smallClass) {
-        String url = String.format("%s/demon/get/%s", urlConf.getCourse_wudaokou_recommend_service(), smallClass.getDifficultyLevel());
+        String url = String.format("%s/open/get/%s", urlConf.getCourse_wudaokou_recommend_service(), smallClass.getDifficultyLevel());
         RecommandCourseView recommandCourseView = null;
         try {
             recommandCourseView = restTemplate.getForObject(url, RecommandCourseView.class);
             logger.info("@getPublicCourse推荐课程成功,url[{}],结果[{}]", url, JacksonUtil.toJSon(recommandCourseView));
         } catch (Exception ex) {
-            logger.error("@getPublicCourse推荐公开课失败url[{}]", url,ex);
+            logger.error("@getPublicCourse推荐公开课失败url[{}]", url, ex);
             throw new BusinessException("推荐课程失败");
         }
         return recommandCourseView;

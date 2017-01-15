@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
@@ -72,13 +73,16 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     RestTemplate restTemplate;
 
     @Autowired
-    TeacherStudentRequester  teacherStudentRequester;
+    TeacherStudentRequester teacherStudentRequester;
 
     @Autowired
     private WorkOrderLogService workOrderLogService;
 
     @Autowired
     private TimePickerService timePickerService;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -114,15 +118,31 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByTeacherIdAndStartTimeBetweenOrderByStartTime(teacherId, startDate, endDate, pageable);
     }
 
-    public List<WorkOrder> findByCourseType(String courseType){
+    public List<WorkOrder> findByCourseType(String courseType) {
         return jpa.findByCourseType(courseType);
     }
 
+    public WorkOrder findBySmallClassIdAndStudentId(Long smallClassId, Long studentId) {
+        return jpa.findBySmallClassIdAndStudentId(smallClassId, studentId);
+    }
+
     @Transactional
-    public void saveWorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){
+    public void saveWorkOrderAndSchedule(WorkOrder workOrder, CourseSchedule courseSchedule) {
         this.save(workOrder);
         courseScheduleService.save(courseSchedule);
-        logger.info("||||||鱼卡[{}]入库成功;排课表入库成功[{}]",workOrder.getId(),courseSchedule.getId());
+        logger.info("||||||鱼卡[{}]入库成功;排课表入库成功[{}]", workOrder.getId(), courseSchedule.getId());
+    }
+
+    @Transactional
+    public void saveStatusForCardAndSchedule(WorkOrder workOrder) {
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
+        courseSchedule.setStatus(workOrder.getStatus());
+        this.save(workOrder);
+        courseScheduleService.save(courseSchedule);
+        threadPoolManager.execute(new Thread(() -> {
+            workOrderLogService.saveWorkOrderLog(
+                    workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()) + "[小班课回写]");
+        }));
     }
 
     public boolean isWorkOrderValid(Long workOrderId) throws BoxfishException {
@@ -148,8 +168,9 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         courseScheduleService.save(courseSchedule);
     }
 
-    private void batchUpdateCourseSchedule(Service service, List<WorkOrder> workOrders,
-                                           Map<WorkOrder, CourseView> workOrderCourseViewMapParam) {
+    private void batchUpdateCourseSchedule(
+            Service service, List<WorkOrder> workOrders,
+            Map<WorkOrder, CourseView> workOrderCourseViewMapParam) {
         // 重算hash值,不然会出错
         HashMap<WorkOrder, CourseView> workOrderCourseViewMap = Maps.newHashMap();
         workOrderCourseViewMapParam.forEach(workOrderCourseViewMap::put);
@@ -208,9 +229,10 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     @Transactional
-    public List<CourseSchedule> persistCardInfos(List<Service> services,List<WorkOrder> workOrders,Map<Integer,
-            RecommandCourseView> recommandCoursesMap){
-        for(Service service : services) {
+    public List<CourseSchedule> persistCardInfos(
+            List<Service> services, List<WorkOrder> workOrders, Map<Integer,
+            RecommandCourseView> recommandCoursesMap) {
+        for (Service service : services) {
             service = serveService.findByIdForUpdate(service.getId());
             if (service.getCoursesSelected() == 1) {
                 throw new BusinessException("您已选过课程,请勿重复选课");
@@ -219,22 +241,24 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             serveService.save(service);
         }
         this.save(workOrders);
-        List<CourseSchedule> courseSchedules=batchUpdateCourseSchedule(workOrders);
-        scheduleCourseInfoService.batchSaveCourseInfos(workOrders,courseSchedules, recommandCoursesMap);
+        List<CourseSchedule> courseSchedules = batchUpdateCourseSchedule(workOrders);
+        scheduleCourseInfoService.batchSaveCourseInfos(workOrders, courseSchedules, recommandCoursesMap);
         return courseSchedules;
     }
 
     @Transactional
-    public void saveWorkordersAndSchedules(Service service, List<WorkOrder> workOrders,
-                                           Map<WorkOrder, CourseView> workOrderCourseViewMap) {
+    public void saveWorkordersAndSchedules(
+            Service service, List<WorkOrder> workOrders,
+            Map<WorkOrder, CourseView> workOrderCourseViewMap) {
         this.save(workOrders);
         batchUpdateCourseSchedule(service, workOrders, workOrderCourseViewMap);
     }
 
     @Transactional
-    public void saveWorkordersAndSchedules(Service service, List<WorkOrder> chineseWorkOrders,
-                                           Map<WorkOrder, CourseView> chineseworkOrderCourseViewMap,
-                                           List<WorkOrder> foreignWorkOrders, Map<WorkOrder, CourseView> foreignworkOrderCourseViewMap
+    public void saveWorkordersAndSchedules(
+            Service service, List<WorkOrder> chineseWorkOrders,
+            Map<WorkOrder, CourseView> chineseworkOrderCourseViewMap,
+            List<WorkOrder> foreignWorkOrders, Map<WorkOrder, CourseView> foreignworkOrderCourseViewMap
     ) {
         this.save(chineseWorkOrders);
         batchUpdateCourseSchedule(service, chineseWorkOrders, chineseworkOrderCourseViewMap);
@@ -248,12 +272,12 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     //根据service查找出所有状态的工单
     public Page<WorkOrder> findByQueryCondAllStatus(FishCardFilterParam fishCardFilterParam, Long[] ids, Pageable pageable) {
         return jpa.findByQueryCondAllStatus(ids, fishCardFilterParam.getBeginDateFormat(),
-                fishCardFilterParam.getEndDateFormat(), pageable);
+                                            fishCardFilterParam.getEndDateFormat(), pageable);
     }
 
     public Page<WorkOrder> findByQueryCondSpecialStatus(FishCardFilterParam fishCardFilterParam, Long[] ids, Pageable pageable) {
         return jpa.findByQueryCondSpecialStatus(ids, fishCardFilterParam.getBeginDateFormat(),
-                fishCardFilterParam.getEndDateFormat(), fishCardFilterParam.getStatus(), pageable);
+                                                fishCardFilterParam.getEndDateFormat(), fishCardFilterParam.getStatus(), pageable);
     }
 
     public void processFilterParam(FishCardFilterParam fishCardFilterParam, boolean isTeacher) {
@@ -291,17 +315,17 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             fishCardFilterParam.setEndDateFormat(DateUtil.String2Date(fishCardFilterParam.getEndDate()));
         }
 
-        if(null != fishCardFilterParam.getCreateBeginDate()){
-            fishCardFilterParam.setCreateBeginDateFormat(  DateUtil.String2Date(fishCardFilterParam.getCreateBeginDate()));
+        if (null != fishCardFilterParam.getCreateBeginDate()) {
+            fishCardFilterParam.setCreateBeginDateFormat(DateUtil.String2Date(fishCardFilterParam.getCreateBeginDate()));
         }
 
-        if(null != fishCardFilterParam.getCreateEndDate()){
+        if (null != fishCardFilterParam.getCreateEndDate()) {
             fishCardFilterParam.setCreateEndDateFormat(DateUtil.String2Date(fishCardFilterParam.getCreateEndDate()));
         }
     }
 
     //查找出教师所有状态的工单
-    public List<WorkOrderView> findByQueryCondAllStatusForTeacher(Long teacherId, Date beginDate, Date endDate, Integer [] status) {
+    public List<WorkOrderView> findByQueryCondAllStatusForTeacher(Long teacherId, Date beginDate, Date endDate, Integer[] status) {
         String sqlOriginal = "select new com.boxfishedu.workorder.web.view.fishcard.WorkOrderView" +
                 "(wo.id,sv.orderId, wo.studentId, sv.id, wo.studentName, wo.teacherId, wo.teacherName, wo.startTime, wo.endTime, wo.status, wo.courseId, wo.courseName, sv.skuId, sv.orderCode)" +
                 " from  WorkOrder wo,Service sv where wo.service.id=sv.id and (wo.teacherId=? and wo.endTime between ? and ?) ";
@@ -329,15 +353,17 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findByStudentIdAndStartTimeBetween(studentId, beginDate, endDate);
     }
 
-    public List<WorkOrder> findByStudentId(Long studentId){
-        if(null==studentId)
+    public List<WorkOrder> findByStudentId(Long studentId) {
+        if (null == studentId) {
             throw new BusinessException("参数不正确");
+        }
         return jpa.findByStudentId(studentId);
     }
 
-    public List<WorkOrder> findByStudentIdAfterNow(Long studentId){
-        if(null==studentId)
+    public List<WorkOrder> findByStudentIdAfterNow(Long studentId) {
+        if (null == studentId) {
             throw new BusinessException("参数不正确");
+        }
         return jpa.findByStudentIdAfterNow(studentId);
     }
 
@@ -345,19 +371,21 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     public WorkOrder getLatestWorkOrderByStudentIdAndProductTypeAndTutorType(Long studentId, Integer productType, String tutorType) {
         String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.service.productType=? and wo.service.tutorType=? order by wo.endTime desc";
         Query query = entityManager.createQuery(sql)
-                .setParameter(1, studentId)
-                .setParameter(2, productType)
-                .setParameter(3, tutorType);
+                                   .setParameter(1, studentId)
+                                   .setParameter(2, productType)
+                                   .setParameter(3, tutorType);
         query.setMaxResults(1);
         List resultList = query.getResultList();
         return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
     }
 
 
-    /****************************兼容老版本************************/
-    public void batchSaveCoursesIntoCard(List<WorkOrder> workOrders,Map<Integer, RecommandCourseView> recommandCoursesMap){
+    /****************************
+     * 兼容老版本
+     ************************/
+    public void batchSaveCoursesIntoCard(List<WorkOrder> workOrders, Map<Integer, RecommandCourseView> recommandCoursesMap) {
         for (WorkOrder workOrder : workOrders) {
-            RecommandCourseView courseView=recommandCoursesMap.get(workOrder.getSeqNum());
+            RecommandCourseView courseView = recommandCoursesMap.get(workOrder.getSeqNum());
             workOrder.setCourseId(courseView.getCourseId());
             workOrder.setCourseName(courseView.getCourseName());
             workOrder.setCourseType(courseView.getCourseType());
@@ -367,7 +395,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     @Transactional
-    public void updateWorkStatusRechargeOrderByIds(List<WorkOrder> workOrders){
+    public void updateWorkStatusRechargeOrderByIds(List<WorkOrder> workOrders) {
         jpa.save(workOrders);
         logger.info("||||updateWorkStatusRechargeOrderByIds||鱼卡更新成功 ");
     }
@@ -375,50 +403,54 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     /**
      * 用于发起退款请求并发问题
+     *
      * @param
      * @return
      */
-    public int updateWorkFishRechargeOne(int rechargeStatus,Long workOrderId){
-        return  jpa.setFixedStatusRechargeFor(rechargeStatus,workOrderId,FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
+    public int updateWorkFishRechargeOne(int rechargeStatus, Long workOrderId) {
+        return jpa.setFixedStatusRechargeFor(rechargeStatus, workOrderId, FishCardChargebackStatusEnum.NEED_RECHARGEBACK.getCode());
     }
 
 
-    public List<WorkOrder> getAllWorkOrdersByIds(Long[] ids){
+    public List<WorkOrder> getAllWorkOrdersByIds(Long[] ids) {
         return jpa.findWorkOrderAll(ids);
     }
 
-    public String trimArry(Long [] ids){
+    public String trimArry(Long[] ids) {
         StringBuffer sb = new StringBuffer();
-        for(Long id :ids){
+        for (Long id : ids) {
             sb.append(id).append(",");
         }
-        return sb.toString().substring(0,sb.toString().length()-1);
+        return sb.toString().substring(0, sb.toString().length() - 1);
     }
 
     public WorkOrder getLatestWorkOrderByStudentIdAndComboType(Long studentId, String comboType) {
         int teachingType = ComboTypeToRoleId.resolve(comboType).getValue();
         String sql = "select wo from WorkOrder wo where wo.studentId=? and wo.service.teachingType=? order by wo.endTime desc";
         Query query = entityManager.createQuery(sql)
-                .setParameter(1, studentId)
-                .setParameter(2, teachingType);
+                                   .setParameter(1, studentId)
+                                   .setParameter(2, teachingType);
         query.setMaxResults(1);
         List resultList = query.getResultList();
         return (WorkOrder) (CollectionUtils.isEmpty(resultList) ? null : resultList.get(0));
     }
 
-    /**************** 兼容历史版本 **********************/
+    /****************
+     * 兼容历史版本
+     **********************/
     @Transactional
-    public List<CourseSchedule> persistCardInfos(Service service,List<WorkOrder> workOrders,Map<Integer,
-            RecommandCourseView> recommandCoursesMap){
-        service=serveService.findByIdForUpdate(service.getId());
-        if(service.getCoursesSelected()==1){
+    public List<CourseSchedule> persistCardInfos(
+            Service service, List<WorkOrder> workOrders, Map<Integer,
+            RecommandCourseView> recommandCoursesMap) {
+        service = serveService.findByIdForUpdate(service.getId());
+        if (service.getCoursesSelected() == 1) {
             throw new BusinessException("您已选过课程,请勿重复选课");
         }
         service.setCoursesSelected(1);
         serveService.save(service);
         this.save(workOrders);
-        List<CourseSchedule> courseSchedules=batchUpdateCourseSchedule(service, workOrders);
-        scheduleCourseInfoService.batchSaveCourseInfos(workOrders,courseSchedules, recommandCoursesMap);
+        List<CourseSchedule> courseSchedules = batchUpdateCourseSchedule(service, workOrders);
+        scheduleCourseInfoService.batchSaveCourseInfos(workOrders, courseSchedules, recommandCoursesMap);
         return courseSchedules;
     }
 
@@ -443,7 +475,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
             courseSchedule.setIsFreeze(0);
             courseSchedule.setClassType(workOrder.getClassType());
-            if(org.apache.commons.lang3.StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),workOrder.getClassType())){
+            if (org.apache.commons.lang3.StringUtils.equals(ClassTypeEnum.INSTNAT.toString(), workOrder.getClassType())) {
                 courseSchedule.setInstantStartTtime(DateUtil.dateTrimYear(workOrder.getStartTime()));
                 courseSchedule.setInstantEndTtime(DateUtil.dateTrimYear(workOrder.getEndTime()));
             }
@@ -473,7 +505,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
             courseSchedule.setSkuIdExtra(workOrder.getSkuIdExtra());
             courseSchedule.setIsFreeze(0);
             courseSchedule.setClassType(workOrder.getClassType());
-            if(org.apache.commons.lang3.StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),workOrder.getClassType())){
+            if (org.apache.commons.lang3.StringUtils.equals(ClassTypeEnum.INSTNAT.toString(), workOrder.getClassType())) {
                 courseSchedule.setInstantStartTtime(DateUtil.dateTrimYear(workOrder.getStartTime()));
                 courseSchedule.setInstantEndTtime(DateUtil.dateTrimYear(workOrder.getEndTime()));
             }
@@ -483,61 +515,61 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     // 根据订单id获取所有鱼卡信息
-    public List<WorkOrder> getAllWorkOrdersByOrderId(Long orderId){
-       return jpa.findByOrderId(orderId);
+    public List<WorkOrder> getAllWorkOrdersByOrderId(Long orderId) {
+        return jpa.findByOrderId(orderId);
     }
 
-    public List<WorkOrder> findByStudentIdAndOrderChannelAndStartTimeAfter(Long studentId,String orderChannel,Date date){
-        return jpa.findByStudentIdAndOrderChannelAndStartTimeAfter(studentId,orderChannel,date);
+    public List<WorkOrder> findByStudentIdAndOrderChannelAndStartTimeAfter(Long studentId, String orderChannel, Date date) {
+        return jpa.findByStudentIdAndOrderChannelAndStartTimeAfter(studentId, orderChannel, date);
     }
 
-    public String[] enums2StringAray(List<ComboTypeEnum> comboTypeEnums){
-        String[] comboTypes=new String[comboTypeEnums.size()];
-        for(int i=0;i<comboTypeEnums.size();i++){
-            comboTypes[i]=comboTypeEnums.get(i).toString();
+    public String[] enums2StringAray(List<ComboTypeEnum> comboTypeEnums) {
+        String[] comboTypes = new String[comboTypeEnums.size()];
+        for (int i = 0; i < comboTypeEnums.size(); i++) {
+            comboTypes[i] = comboTypeEnums.get(i).toString();
         }
         return comboTypes;
     }
 
-    public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums, TeachingType teachingType){
-        return jpa.findByStudentIdAndComboTypeInAndSkuIdAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),teachingType.getCode(),new Date());
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums, TeachingType teachingType) {
+        return jpa.findByStudentIdAndComboTypeInAndSkuIdAndStartTimeAfter(studentId, enums2StringAray(comboTypeEnums), teachingType.getCode(), new Date());
     }
 
-    public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums){
-        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),new Date());
+    public List<WorkOrder> getSelectedLeftAmount(Long studentId, List<ComboTypeEnum> comboTypeEnums) {
+        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId, enums2StringAray(comboTypeEnums), new Date());
     }
 
-    public List<WorkOrder> getSelectedLeftAmountNew(Long studentId, List<ComboTypeEnum> comboTypeEnums){
-        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId,enums2StringAray(comboTypeEnums),new Date());
+    public List<WorkOrder> getSelectedLeftAmountNew(Long studentId, List<ComboTypeEnum> comboTypeEnums) {
+        return jpa.findByStudentIdAndComboTypeInAndStartTimeAfter(studentId, enums2StringAray(comboTypeEnums), new Date());
     }
 
-    public WorkOrder getCardToStart(Long studentId){
+    public WorkOrder getCardToStart(Long studentId) {
 //        return jpa.findTop1ByStudentIdAndStartTimeAfterOrderByStartTime(studentId,new Date());
         return null;
     }
 
     public List<WorkOrder> findFreezeCardsToUpdate() {
-        return jpa.findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(new Integer(1),new Short((short)0),FishCardStatusEnum.WAITFORSTUDENT.getCode(),new Date());
+        return jpa.findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(new Integer(1), new Short((short) 0), FishCardStatusEnum.WAITFORSTUDENT.getCode(), new Date());
     }
 
     //课程类型发生变化后修改教师
-    public Boolean changeTeacherForTypeChanged(WorkOrder workOrder){
-        logger.debug("@changeTeacherForTypeChanged#{}课程类型发生变化向师生运营发起判断是否换课请求",workOrder.getId());
-        workOrderLogService.saveWorkOrderLog(workOrder,"课程类型发生变化,向师生运营发起判断是否换课请求");
-        Boolean result=teacherStudentRequester.changeTeacherForTypeChanged(workOrder);
-        if(BooleanUtils.isFalse(result)){
-            logger.debug("@changeTeacherForTypeChanged#[{}]#result#{}",workOrder.getId(),result.booleanValue());
-            workOrderLogService.saveWorkOrderLog(workOrder,"课程类型变化,教师能上此种类型课程");
+    public Boolean changeTeacherForTypeChanged(WorkOrder workOrder) {
+        logger.debug("@changeTeacherForTypeChanged#{}课程类型发生变化向师生运营发起判断是否换课请求", workOrder.getId());
+        workOrderLogService.saveWorkOrderLog(workOrder, "课程类型发生变化,向师生运营发起判断是否换课请求");
+        Boolean result = teacherStudentRequester.changeTeacherForTypeChanged(workOrder);
+        if (BooleanUtils.isFalse(result)) {
+            logger.debug("@changeTeacherForTypeChanged#[{}]#result#{}", workOrder.getId(), result.booleanValue());
+            workOrderLogService.saveWorkOrderLog(workOrder, "课程类型变化,教师能上此种类型课程");
             return result;
         }
-        logger.debug("@changeTeacherForTypeChanged#{}#result#{}",workOrder.getId(),result.booleanValue());
-        WorkOrder oldWorkOrder=workOrder.clone();
-        workOrderLogService.saveWorkOrderLog(workOrder,"课程类型变化,教师不能上此种类型课程,需要更换教师,旧教师:"+oldWorkOrder.getTeacherId());
+        logger.debug("@changeTeacherForTypeChanged#{}#result#{}", workOrder.getId(), result.booleanValue());
+        WorkOrder oldWorkOrder = workOrder.clone();
+        workOrderLogService.saveWorkOrderLog(workOrder, "课程类型变化,教师不能上此种类型课程,需要更换教师,旧教师:" + oldWorkOrder.getTeacherId());
         workOrder.setTeacherId(0l);
         workOrder.setTeacherName(null);
-        CourseSchedule courseSchedule=courseScheduleService.findByWorkOrderId(workOrder.getId());
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         courseSchedule.setTeacherId(0l);
-        saveWorkOrderAndSchedule(workOrder,courseSchedule);
+        saveWorkOrderAndSchedule(workOrder, courseSchedule);
         timePickerService.getRecommandTeachers(workOrder);
         return result;
     }
@@ -545,75 +577,76 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     /**
      * 获取需要提醒的学生数量
+     *
      * @return
      */
-    public Map<Long,List<WorkOrder>> getNotifyMessage(){
+    public Map<Long, List<WorkOrder>> getNotifyMessage() {
         List<WorkOrder> needNotifyWorkOrders = jpa.findByNeedChangeTime(20);
-        if(CollectionUtils.isEmpty(needNotifyWorkOrders)){
+        if (CollectionUtils.isEmpty(needNotifyWorkOrders)) {
             return null;
         }
         Date now = new Date();
 
-        needNotifyWorkOrders = needNotifyWorkOrders.stream().filter( workOrder ->
-                (  1!=workOrder.getIsFreeze()
-                        &&
-                        now.before(workOrder.getStartTime())
-                )
+        needNotifyWorkOrders = needNotifyWorkOrders.stream().filter(workOrder ->
+                                                                            (1 != workOrder.getIsFreeze()
+                                                                                    &&
+                                                                                    now.before(workOrder.getStartTime())
+                                                                            )
 
         ).collect(Collectors.toList());
 
-        Map<Long,List<WorkOrder>> notifyMaps = Maps.newHashMap();
+        Map<Long, List<WorkOrder>> notifyMaps = Maps.newHashMap();
 
-        for(WorkOrder workOrder:needNotifyWorkOrders){
-            List<WorkOrder> workOrders =  notifyMaps.get(workOrder.getStudentId());
-            if(CollectionUtils.isEmpty(workOrders)){
+        for (WorkOrder workOrder : needNotifyWorkOrders) {
+            List<WorkOrder> workOrders = notifyMaps.get(workOrder.getStudentId());
+            if (CollectionUtils.isEmpty(workOrders)) {
                 notifyMaps.put(workOrder.getStudentId(), Lists.newArrayList(workOrder));
-            }else {
+            } else {
                 workOrders.add(workOrder);
-                notifyMaps.put(workOrder.getStudentId(),workOrders);
+                notifyMaps.put(workOrder.getStudentId(), workOrders);
             }
         }
 
-        for(Long key :notifyMaps.keySet()){
-            notifyMaps.put(key,getSortOrders(notifyMaps.get(key)));
+        for (Long key : notifyMaps.keySet()) {
+            notifyMaps.put(key, getSortOrders(notifyMaps.get(key)));
         }
-        logger.info("getNotifyMessage@notifyMapsSize=[{}]",notifyMaps.size());
+        logger.info("getNotifyMessage@notifyMapsSize=[{}]", notifyMaps.size());
         return notifyMaps;
     }
 
     /**
      * 获取某个学生的通知信息
+     *
      * @param studentId
      * @return
      */
-    public List<WorkOrder> getNotifyMessageByStudentId(Long studentId){
-        if(null == studentId || studentId==0){
+    public List<WorkOrder> getNotifyMessageByStudentId(Long studentId) {
+        if (null == studentId || studentId == 0) {
             return null;
         }
-        List<WorkOrder> needNotifyWorkOrders = jpa.findByNeedChangeTimeAndStudentId(20,studentId);
+        List<WorkOrder> needNotifyWorkOrders = jpa.findByNeedChangeTimeAndStudentId(20, studentId);
 
-        if(CollectionUtils.isEmpty(needNotifyWorkOrders)){
+        if (CollectionUtils.isEmpty(needNotifyWorkOrders)) {
             return null;
         }
         Date now = new Date();
 
-        needNotifyWorkOrders = needNotifyWorkOrders.stream().filter( workOrder ->
-                (  1!=workOrder.getIsFreeze()
-                        &&
-                        now.before(workOrder.getStartTime())
-                )
+        needNotifyWorkOrders = needNotifyWorkOrders.stream().filter(workOrder ->
+                                                                            (1 != workOrder.getIsFreeze()
+                                                                                    &&
+                                                                                    now.before(workOrder.getStartTime())
+                                                                            )
 
         ).collect(Collectors.toList());
         return getSortOrders(needNotifyWorkOrders);
     }
 
 
-
-    private List<WorkOrder> getSortOrders(List<WorkOrder> workOrders){
+    private List<WorkOrder> getSortOrders(List<WorkOrder> workOrders) {
         workOrders.sort(new Comparator<WorkOrder>() {
             @Override
             public int compare(WorkOrder o1, WorkOrder o2) {
-                if(o1.getStartTime().after(o2.getStartTime())){
+                if (o1.getStartTime().after(o2.getStartTime())) {
                     return 0;
                 }
                 return -1;
@@ -623,15 +656,15 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return workOrders;
     }
 
-    public List<WorkOrder> findByStartTimeMoreThanAndSkuIdAndIsFreeze(WorkOrder workOrder){
-        return jpa.findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(workOrder.getStudentId() ,workOrder.getStartTime(),workOrder.getSkuId(),0);
+    public List<WorkOrder> findByStartTimeMoreThanAndSkuIdAndIsFreeze(WorkOrder workOrder) {
+        return jpa.findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(workOrder.getStudentId(), workOrder.getStartTime(), workOrder.getSkuId(), 0);
     }
 
-    public List<WorkOrder> getMatchWorkOrders(Long teacherId,List startTimes){
-        return jpa.findByTeacherIdAndIsFreezeAndStartTimeIn(teacherId,0,startTimes);
+    public List<WorkOrder> getMatchWorkOrders(Long teacherId, List startTimes) {
+        return jpa.findByTeacherIdAndIsFreezeAndStartTimeIn(teacherId, 0, startTimes);
     }
 
-    public List<WorkOrder> findByIdIn(List workOrderIds){
+    public List<WorkOrder> findByIdIn(List workOrderIds) {
         return jpa.findByIdIn(workOrderIds);
     }
 

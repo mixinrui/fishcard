@@ -41,6 +41,10 @@ public class SmallClassLogService {
         this.recordStudentLog(smallClass, smallClass.getStatusReporter());
     }
 
+    public void recordStudentLog(SmallClass smallClass,String desc){
+        this.recordLog(smallClass, smallClass.getStatus(), smallClass.getStatusReporter(), RoleEnum.STUDENT, desc);
+    }
+
     public void recordStudentLog(
             SmallClass smallClass,
             int status, Long userId,

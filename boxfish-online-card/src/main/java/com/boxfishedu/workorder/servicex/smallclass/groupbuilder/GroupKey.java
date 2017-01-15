@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.smallclass.classgroup.groupbuilder;
+package com.boxfishedu.workorder.servicex.smallclass.groupbuilder;
 
 import lombok.Data;
 

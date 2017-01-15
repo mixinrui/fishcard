@@ -1,4 +1,4 @@
-package com.boxfishedu.workorder.servicex.smallclass.classgroup.groupbuilder;
+package com.boxfishedu.workorder.servicex.smallclass.groupbuilder;
 
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.google.common.collect.Lists;

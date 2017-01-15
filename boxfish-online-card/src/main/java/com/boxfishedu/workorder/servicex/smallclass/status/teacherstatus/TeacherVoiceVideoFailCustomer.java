@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.teacherstatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
@@ -23,9 +24,17 @@ public class TeacherVoiceVideoFailCustomer extends SmallClassEventCustomer {
     @Autowired
     Map<String, GroupInitStrategy> groupInitStrategyMap;
 
+    @Autowired
+    WorkOrderService workOrderService;
+
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.TEACHER_VOICE_VIDEO_FAIL);
+    }
+
+    @Override
+    protected WorkOrderService getWorkOrderService() {
+        return workOrderService;
     }
 
     @Override
