@@ -305,11 +305,11 @@ public class AvaliableTimeServiceXV1 {
         // 1 获取服务信息   返回获取一周几次课  service 的 original_amount 次数 除  combo_cycle
         // 2 如果抽奖存在多个service的情况 需要和需求对接
         Service service = services.get(0);
-        //每周的次数
+        //每周的次数 暂时不考虑余数问题 如果考虑余数问题,却少每周 几节课的问题
         int countByWeek = service.getOriginalAmount() / service.getComboCycle();
         int yushuByWeek = service.getOriginalAmount() % service.getComboCycle();
         if (0 != yushuByWeek) {
-            countByWeek= (service.getOriginalAmount()+yushuByWeek)/service.getComboCycle();// 如果还有余数,推算一周上几节课
+            countByWeek= (service.getOriginalAmount()+(service.getComboCycle()-yushuByWeek))/service.getComboCycle();// 如果还有余数,推算一周上几节课
         }
 
         logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);
