@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
@@ -27,6 +28,9 @@ public class TeacherVoiceVideoFailCustomer extends SmallClassEventCustomer {
     @Autowired
     WorkOrderService workOrderService;
 
+    @Autowired
+    SmallClassLogService smallClassLogService;
+
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.TEACHER_VOICE_VIDEO_FAIL);
@@ -39,6 +43,6 @@ public class TeacherVoiceVideoFailCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
-
+        smallClassLogService.recordTeacherLog(smallClass);
     }
 }

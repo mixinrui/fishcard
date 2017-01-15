@@ -67,7 +67,7 @@ public abstract class GroupBuilder {
                 currentGroup = Lists.newArrayList();
                 finalGroup.put(groupCounter, currentGroup);
             }
-            if (currentGroup.size() == memNum) {
+            if (currentGroup.size() == (memNum + 1)) {
                 groupCounter++;
                 currentGroup = Lists.newArrayList();
                 finalGroup.put(groupCounter, currentGroup);

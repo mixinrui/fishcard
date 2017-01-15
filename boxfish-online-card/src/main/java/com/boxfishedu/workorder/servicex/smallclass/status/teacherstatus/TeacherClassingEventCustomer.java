@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
     @Autowired
     WorkOrderService workOrderService;
 
+    @Autowired
+    SmallClassLogService smallClassLogService;
+
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.TEACHER_CLASSING);
@@ -29,7 +33,7 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
 
     @Override
     protected WorkOrderService getWorkOrderService() {
-        return null;
+        return workOrderService;
     }
 
     @Override
@@ -39,6 +43,6 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
-
+        smallClassLogService.recordTeacherLog(smallClass);
     }
 }

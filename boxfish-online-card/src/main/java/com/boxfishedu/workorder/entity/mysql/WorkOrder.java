@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.entity.mysql;
 
 import com.boxfishedu.workorder.common.bean.FishCardNetStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -342,4 +343,10 @@ public class WorkOrder implements Cloneable {
             this.setTeacherNetStatusDesc(fishCardNetStatusEnum.getDesc());
         }
     }
+
+    public boolean notGroupWorkOrder() {
+        return !Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name())
+                && !Objects.equals(this.getClassType(), ClassTypeEnum.SMALL.name());
+    }
+
 }

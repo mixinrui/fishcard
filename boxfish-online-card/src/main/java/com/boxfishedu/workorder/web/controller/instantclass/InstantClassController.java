@@ -47,8 +47,6 @@ public class InstantClassController {
     @Autowired
     private
     @Qualifier("teachingServiceRedisTemplate")
-
-
     StringRedisTemplate redisTemplate;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

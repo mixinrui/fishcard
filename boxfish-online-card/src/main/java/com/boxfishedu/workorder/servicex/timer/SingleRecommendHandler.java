@@ -43,7 +43,7 @@ public class SingleRecommendHandler {
     @Transactional
     public void singleRecommend(WorkOrder workOrder, CourseSchedule courseSchedule) {
         try {
-            if (this.notGroupWorkOrder(workOrder)) {
+            if (workOrder.notGroupWorkOrder()) {
                 singleRecommend(workOrder, courseSchedule, (w) -> true);
             }
         } catch (Exception e) {
@@ -83,10 +83,7 @@ public class SingleRecommendHandler {
         }
     }
 
-    private boolean notGroupWorkOrder(WorkOrder workOrder) {
-        return !Objects.equals(workOrder.getClassType(), ClassTypeEnum.PUBLIC.name())
-                && !Objects.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name());
-    }
+
 
 
 }

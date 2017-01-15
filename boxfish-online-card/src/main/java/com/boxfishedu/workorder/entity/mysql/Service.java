@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.mall.enums.ComboTypeToRoleId;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
@@ -151,6 +153,10 @@ public class Service {
         if(!Objects.equals(studentId, userId)) {
             throw new BusinessException("非法用户,拒绝访问!");
         }
+    }
+
+    public boolean isGroupClass(){
+        return Objects.equals(this.comboType, ComboTypeToRoleId.SMALLCLASS.name());
     }
 
 }

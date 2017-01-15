@@ -79,6 +79,9 @@ public class ScheduleCourseInfoService {
         }
         for (int i = 0, size = workOrders.size(); i < size; i++) {
             WorkOrder workOrder = workOrders.get(i);
+            if (!workOrder.notGroupWorkOrder()) {
+                continue;
+            }
             RecommandCourseView courseView = courseViewMap.get(i);
             ScheduleCourseInfo scheduleCourseInfo = new ScheduleCourseInfo();
             scheduleCourseInfo.setCourseId(courseView.getCourseId());
