@@ -25,6 +25,7 @@ public class SmallClassLogService {
         smallClassLog.setRole(roleEnum.name());
         smallClassLog.setStatus(status);
         smallClassLog.setDesc(desc);
+        smallClassLog.setSmallClassId(smallClass.getId());
         smallClassLog.setReportTime(smallClass.getReportTime());
         switch (roleEnum) {
             case STUDENT:
@@ -41,7 +42,7 @@ public class SmallClassLogService {
         this.recordStudentLog(smallClass, smallClass.getStatusReporter());
     }
 
-    public void recordStudentLog(SmallClass smallClass,String desc){
+    public void recordStudentLog(SmallClass smallClass, String desc) {
         this.recordLog(smallClass, smallClass.getStatus(), smallClass.getStatusReporter(), RoleEnum.STUDENT, desc);
     }
 
