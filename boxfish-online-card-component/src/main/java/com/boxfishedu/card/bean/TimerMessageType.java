@@ -63,7 +63,10 @@ public enum TimerMessageType {
     // 公开课缓存清理
     EXPIRE_PUBLIC_CLASS(151),
     // 公开课提前5分钟推送
-    PUBLIC_CLASS_NOTIFY(152);
+    PUBLIC_CLASS_NOTIFY(152),
+
+    //保存小班课学生的上课关系
+    SMALLCLASS_STUDENTS_RELATION(155);
 
     private int code;
 

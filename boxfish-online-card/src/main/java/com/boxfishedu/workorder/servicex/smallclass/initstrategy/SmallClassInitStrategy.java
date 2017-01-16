@@ -105,6 +105,10 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
         if (0 != teacherView.getId()) {
             this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
+        } else {
+            logger.debug("@initGroupClass#getTeacher#fail#获取教师失败,退出小班课创建#smallclass[{}]"
+                    , JacksonUtil.toJSon(smallClass));
+            return;
         }
 
         //将小班课,公开课相关信息保存入库

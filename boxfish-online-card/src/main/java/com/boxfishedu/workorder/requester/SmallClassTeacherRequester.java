@@ -66,7 +66,6 @@ public class SmallClassTeacherRequester {
                 logger.error("@getSmallClassTeacher#获取教师失败,没有获取到教师,url[{}],参数[{}],结果[{}]"
                         , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
             } else {
-
                 logger.debug("@getSmallClassTeacher#获取小班课教师成功,url[{}],参数[{}],结果[{}]"
                         , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
             }

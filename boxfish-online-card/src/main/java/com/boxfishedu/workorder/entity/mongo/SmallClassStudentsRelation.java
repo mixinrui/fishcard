@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.entity.mongo;
 
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.bson.types.ObjectId;
@@ -25,4 +26,6 @@ public class SmallClassStudentsRelation {
     private Long partner;
 
     private Date createTime;
+
+    private Date updateTime;
 }

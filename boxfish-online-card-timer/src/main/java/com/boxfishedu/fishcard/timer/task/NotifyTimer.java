@@ -78,7 +78,7 @@ public class NotifyTimer {
     /**
      * 教师旷课通知定时器
      */
-    @Scheduled(cron="0 0/10 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void notifyTeacherAbsentService() {
         logger.info("<<<<<<开始通知<<<教师旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.TEACHER_ABSENT_QUERY_NOTIFY.value());
@@ -89,7 +89,7 @@ public class NotifyTimer {
     /**
      * 服务器强制下课定时器;从第三分钟开始,每五分钟;与上面区分开;目前允许将拖堂时间上升为10分钟
      */
-    @Scheduled(cron="0 2/10 * * * ?")
+    @Scheduled(cron = "0 2/10 * * * ?")
     public void completeForceService() {
         logger.info("<<<<<<开始通知<<<服务端强制下课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMPLETE_FORCE_SERVER_NOTIFY.value());
@@ -100,7 +100,7 @@ public class NotifyTimer {
     /**
      * 学生旷课通知定时器;该功能并入强制完成
      */
-    @Scheduled(cron="0 4/10 * * * ?")
+    @Scheduled(cron = "0 4/10 * * * ?")
     public void notifyStudentAbsentService() {
         logger.info("<<<<<<开始通知<<<检查学生旷课>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.STUDENT_ABSENT_QUERY_NOTIFY.value());
@@ -124,7 +124,7 @@ public class NotifyTimer {
      */
 //    @Scheduled(cron = "0 0/5 * * * ?")
     @Scheduled(cron = "0 0/2 * * * ?")
-    public void judgeCommentCard(){
+    public void judgeCommentCard() {
         logger.info("<<<<<<开始通知<<<获取在24/48小时内未评论的外教或没分配到老师的点评卡>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.COMMENT_CARD_NO_ANSWER.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
@@ -134,7 +134,7 @@ public class NotifyTimer {
     /**
      * 抢单: 每天18点到 24点  每10分钟 轮训查询(中教)
      */
-   @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
+    @Scheduled(cron = "0 0/10 18,19,20,21,22,23 * * ?")
     public void initGrabOrderDataChinese() {
         logger.info("<<<<<<graborder-initGrabOrderDataChinese<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<<轮训抢单初始化数据>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
@@ -183,7 +183,7 @@ public class NotifyTimer {
     /**
      * 每天18:00 向教师发送 从现在开始  未来48+6小时内 变更课程的数量  的消息
      */
-     @Scheduled(cron = "0 0 18 * * ?")
+    @Scheduled(cron = "0 0 18 * * ?")
     public void courseChangeSendMessage() {
         logger.info("<<<<<<courseChangeSendMessage<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<开始通知<<< 变更课程的数量  >>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
@@ -191,7 +191,6 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
-
 
 
     /**
@@ -224,7 +223,7 @@ public class NotifyTimer {
 
     @Scheduled(cron = "0 0 1 * * ?")
 //    @Scheduled(cron = "0 0/5 * * * ?")    //测试时5分钟检查一次
-    public void deductScore(){
+    public void deductScore() {
         logger.info("<<<<<<deductScore<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<查询旷课的学生<<<<<<扣积分,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.STUDENT_ABSENT_DEDUCT_SCORE.value());
@@ -248,7 +247,7 @@ public class NotifyTimer {
     // 课程推荐
     @Scheduled(cron = "0 0 3 * * ?")
 //    @Scheduled(cron = "0 0/5 * * * ?")
-    public void recommendCourses(){
+    public void recommendCourses() {
         logger.info("<<<<<<recommendCourses<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<课程推荐<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
@@ -261,7 +260,7 @@ public class NotifyTimer {
      */
     //@Scheduled(cron = "0 0 4 * * ?")
     //@Scheduled(cron = "0 10 15 * * ?")
-    public void autoConfirmStatus(){
+    public void autoConfirmStatus() {
 //        logger.info("<<<<<<autoConfirmStatus<<<<<<<<<<<<<<<<");
 //        logger.info("<<<<<<自动确认状态<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
 //        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.RECOMMEND_COURSES.value());
@@ -271,7 +270,7 @@ public class NotifyTimer {
 
     // 即时上课,每20S一次
     @Scheduled(cron = "0/20 * * * * ?")
-    public void instantClasses(){
+    public void instantClasses() {
         logger.info("<<<<<<instantClasses<<<<<<<<<<<<<<<<");
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.INSTANT_CLASS.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
@@ -279,7 +278,7 @@ public class NotifyTimer {
     }
 
     @Scheduled(cron = "0 0/1 * * * ?")
-    public void markUnmatchInstantClass(){
+    public void markUnmatchInstantClass() {
         logger.info("<<<<<<markUnmatchInstantClass<<<<<<<<<<<<<<<<");
         logger.info("<<<<<<自动将超过一分钟没匹配上教师的instantCard标记为未匹配教师<<<<<<,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.INSTANT_CLASS_MARK_UNMATCH.value());
@@ -312,10 +311,11 @@ public class NotifyTimer {
 
     /**
      * 指定老师====每周周6的凌晨4点开始跑定时任务
+     *
      * @Scheduled(cron = "0 0 4 0 0 6 ")
      */
     @Scheduled(cron = "0 0 4 * * 6 ")
-    public void assginTeacher(){
+    public void assginTeacher() {
         logger.info("<<<<<<@@@@assign-timer 开始通知<<<指定老师>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.ASSGIN_TEACHER.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
@@ -326,7 +326,7 @@ public class NotifyTimer {
      * 清理公开课缓存
      */
     @Scheduled(cron = "0 0 3 * * ?")
-    public void clearPublicClassCache(){
+    public void clearPublicClassCache() {
         logger.info("<<<<<<@@@@assign-timer 开始通知<<<清理公开课缓存>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.EXPIRE_PUBLIC_CLASS.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
@@ -338,9 +338,21 @@ public class NotifyTimer {
      * 公开课上课通知
      */
     @Scheduled(cron = "0 25,55 9-23 * * ?")
-    public void publicClassNotify(){
+    public void publicClassNotify() {
         logger.info("<<<<<<@@@@assign-timer 开始通知<<<公开课提醒推送>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.PUBLIC_CLASS_NOTIFY.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    /**
+     * 创建小班课的群组关系
+     */
+    @Scheduled(cron = "0 1/30 * * * ?")
+    public void buildStudentsRelation() {
+        logger.info("<<<<<<@@@@创建学生关系 开始通知<<<创建学生关系>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage =
+                new ServiceTimerMessage(TimerMessageType.SMALLCLASS_STUDENTS_RELATION.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

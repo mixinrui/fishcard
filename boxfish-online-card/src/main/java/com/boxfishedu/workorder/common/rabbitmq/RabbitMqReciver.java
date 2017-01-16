@@ -24,6 +24,8 @@ import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassServiceX;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.PublicClassRoom;
 import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -44,7 +46,7 @@ import java.util.Map;
  */
 @Component
 @Configuration
-@Profile({"local_hucl","product","local","development","development_new","test","demo","pretest"})
+@Profile({"local_hucl", "product", "local", "development", "development_new", "test", "demo", "pretest"})
 public class RabbitMqReciver {
     @Autowired
     private OrderRelatedServiceX orderRelatedServiceX;
@@ -102,6 +104,9 @@ public class RabbitMqReciver {
 
     @Autowired
     private PublicClassRoom publicClassRoom;
+
+    @Autowired
+    private SmallClassTimerServiceX smallClassTimerServiceX;
 
 
     /**
@@ -176,7 +181,7 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_INIT90message");
                 logger.info("=========>初始化抢单数据(中教)");
                 makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.FUNCTION.toString());
-            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGN.value()) {
+            } else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_INIT_FOREIGN.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_INIT91message");
                 logger.info("=========>初始化抢单数据(外教)");
                 makeWorkOrderServiceX.makeSendWorkOrder(null, CourseTypeEnum.TALK.toString());
@@ -186,58 +191,57 @@ public class RabbitMqReciver {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY100message");
                 logger.info("=========>清理抢单数据(中教)");
                 makeWorkOrderServiceX.clearGrabData();
-            }else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH.value()) {
+            } else if (serviceTimerMessage.getType() == TimerMessageType.GRAB_ORDER_DATA_CLEAR_DAY_FOREIGH.value()) {
                 logger.info("=========>getGRAB_ORDER_DATA_CLEAR_DAY101message");
                 logger.info("=========>清理抢单数据(外教)");
                 makeWorkOrderServiceX.clearGrabData();
-            }else if(serviceTimerMessage.getType() == TimerMessageType.COURSE_CHANGER_WORKORDER.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.COURSE_CHANGER_WORKORDER.value()) {
                 courseChangeServiceX.sendCourseChangeWorkOrders();
-            }
-            else if(serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.COMMENT_CARD_NO_ANSWER.value()) {
                 logger.info("@CommentCardTimer>>>>>COMMENT_CARD_NO_ANSWER>>>>检查24小时和48小时内为点评的外教,判定重新分配或返还学生购买点评次数");
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer();
                 foreignTeacherCommentCardService.foreignTeacherCommentUnAnswer2();
                 foreignTeacherCommentCardService.foreignUndistributedTeacherCommentCards();
-            }else if(serviceTimerMessage.getType() == TimerMessageType.CLASSS_TOMO_STU_NOTIFY.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.CLASSS_TOMO_STU_NOTIFY.value()) {
                 logger.info("=========>receiveMessageTomoStuhasClass");
                 courseNotifyOneDayServiceX.notiFyStudentClass();
-            }else if(serviceTimerMessage.getType() == TimerMessageType.STUDENT_ABSENT_DEDUCT_SCORE.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.STUDENT_ABSENT_DEDUCT_SCORE.value()) {
                 logger.info("@CommentCardTimer>>>>>STUDENT_ABSENT_DEDUCT_SCORE>>>>查询旷课的学生,扣积分");
                 absenteeismService.queryAbsentStudent();
-            }else if(serviceTimerMessage.getType() == TimerMessageType.CLASSS_TODY_TEA_NOTIFY.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.CLASSS_TODY_TEA_NOTIFY.value()) {
                 logger.info("=========>notifyTomoStudentHasClass=====>>>>通知老师今天有课");
                 courseNotifyOneDayServiceX.notiFyTeacherClass();
-            }else if(serviceTimerMessage.getType()==TimerMessageType.FREEZE_UPDATE_HOME.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.FREEZE_UPDATE_HOME.value()) {
                 courseScheduleUpdatorServiceX.freezeUpdateHome();
-            } else if(serviceTimerMessage.getType() == TimerMessageType.RECOMMEND_COURSES.value()) {
+            } else if (serviceTimerMessage.getType() == TimerMessageType.RECOMMEND_COURSES.value()) {
                 courseScheduleUpdatorServiceX.recommendCourses();
-            } else  if(serviceTimerMessage.getType() == TimerMessageType.AUTO_CONFIRM_STATUS.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.AUTO_CONFIRM_STATUS.value()) {
                 logger.info("==========>AutuConfirmFishCardServiceX ===>>> 自动确认鱼卡状态");
                 autuConfirmFishCardServiceX.autoConfirmFishCard();
-            }else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS.value()) {
                 logger.info("==========>INSTANT_CLASS ===>>> 立即上课");
                 instantClassTimerServiceX.putCardsToMatchTeachers();
-            }
-            else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS_MARK_UNMATCH.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS_MARK_UNMATCH.value()) {
                 logger.info("==========>INSTANT_CLASS_MARK_UNMATCH ===>>> 一分钟未匹配教师,标记未匹配");
                 instantClassTimerServiceX.markUnmatchCard();
-            }
-            else if(serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS_BACK_COURSES.value()){
+            } else if (serviceTimerMessage.getType() == TimerMessageType.INSTANT_CLASS_BACK_COURSES.value()) {
                 logger.info("==========>INSTANT_CLASS_BACK_COURSES ===>>> 未上的课程退回到课程推荐");
                 instantClassTimerServiceX.backUnmatchCoursesAsync();
-            } else if(serviceTimerMessage.getType() == TimerMessageType.EXPIRE_COMMENT_CARD.value()) {
+            } else if (serviceTimerMessage.getType() == TimerMessageType.EXPIRE_COMMENT_CARD.value()) {
                 logger.info("==========>EXPIRE_COMMENT_CARD ===>>> 会员外教点评过期提醒");
                 foreignTeacherCommentCardService.notifyExpireCommentCards();
-            }
-            else if(serviceTimerMessage.getType() == TimerMessageType.ASSGIN_TEACHER.value()) {
+            } else if (serviceTimerMessage.getType() == TimerMessageType.ASSGIN_TEACHER.value()) {
                 logger.info("==========>@@@@assign-timer===>>> 指定老师定时任务接受到任务");
                 assignTeacherServiceX.autoAssign();
-            } else if(serviceTimerMessage.getType() == TimerMessageType.EXPIRE_PUBLIC_CLASS.value()) {
+            } else if (serviceTimerMessage.getType() == TimerMessageType.EXPIRE_PUBLIC_CLASS.value()) {
                 logger.info("==========>@@@@EXPIRE_PUBLIC_CLASS===>>> 删除公开课缓存");
                 publicClassRoom.expireClassRoomCache();
-            } else if(serviceTimerMessage.getType() == TimerMessageType.PUBLIC_CLASS_NOTIFY.value()) {
+            } else if (serviceTimerMessage.getType() == TimerMessageType.PUBLIC_CLASS_NOTIFY.value()) {
                 logger.info("==========>@@@@PUBLIC_CLASS_NOTIFY===>>> 公开课通知");
                 publicClassRoom.publicClassRoomNotification();
+            } else if (serviceTimerMessage.getType() == TimerMessageType.SMALLCLASS_STUDENTS_RELATION.value()) {
+                logger.info("==========>@@@@SMALLCLASS_STUDENTS_RELATION===>>> 小班课上课关系记录");
+                smallClassTimerServiceX.buildSmallCLassRelations();
             }
             //
         } catch (Exception ex) {
@@ -270,15 +274,15 @@ public class RabbitMqReciver {
     }
 
     /**
-     *师生运营组发送的外教点评教师分配情况
+     * 师生运营组发送的外教点评教师分配情况
      */
     @RabbitListener(queues = RabbitMqConstant.ALLOT_FOREIGN_TEACHER_COMMENT_QUEUE)
     public void assignForeignTeacher(String param) {
-        try{
-            FromTeacherStudentForm fromTeacherStudentForm = JSONParser.fromJson(param,FromTeacherStudentForm.class);
+        try {
+            FromTeacherStudentForm fromTeacherStudentForm = JSONParser.fromJson(param, FromTeacherStudentForm.class);
             foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
             logger.info("@assignForeignTeacher接收外教点评分配老师Message:{},", param);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             logger.info("@assignForeignTeacher接收外教点评分配老师失败!");
         }
@@ -288,16 +292,16 @@ public class RabbitMqReciver {
      * 种老师通知外教点评卡头像更新
      */
     @RabbitListener(queues = RabbitMqConstant.UPDATE_PICTURE_QUEUE)
-    public void updateCommentCardsPictures(String param){
-        try{
-            UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param,UpdatePicturesForm.class);
-            if(updatePicturesForm.getFigure_url().isEmpty()){
+    public void updateCommentCardsPictures(String param) {
+        try {
+            UpdatePicturesForm updatePicturesForm = JSONParser.fromJson(param, UpdatePicturesForm.class);
+            if (updatePicturesForm.getFigure_url().isEmpty()) {
                 throw new AmqpRejectAndDontRequeueException("param 为 null!");
-            }else {
+            } else {
                 foreignTeacherCommentCardService.updateCommentCardsPictures(updatePicturesForm);
                 logger.info("@updateCommentCardsPictures接收修改外教点评卡头像Message:{},", param);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             logger.info("接收头像更新通知,但更新失败!");
         }
@@ -312,7 +316,7 @@ public class RabbitMqReciver {
         try {
             courseOnlineServiceX.updateTeachingStatus(map);
         } catch (Exception ex) {
-            logger.error("@updateWorkOrderStatus,消息[{}]处理失败",JacksonUtil.toJSon(map));
+            logger.error("@updateWorkOrderStatus,消息[{}]处理失败", JacksonUtil.toJSon(map));
         }
     }
 
