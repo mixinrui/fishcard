@@ -24,7 +24,8 @@ public class SmallClassTimerServiceX {
                     List<WorkOrder> workOrders = getCardsToBuildRelation(smallClass);
                 }
         );
-        List<WorkOrder> workOrders = getCardsToBuildRelation();
+        return;
+//        List<WorkOrder> workOrders = getCardsToBuildRelation();
 
     }
 
