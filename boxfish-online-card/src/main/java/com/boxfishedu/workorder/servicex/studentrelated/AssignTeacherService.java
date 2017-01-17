@@ -253,6 +253,14 @@ public class AssignTeacherService {
 
         }
 
+        // showBeginClass  课前五分钟现实开始上课按钮
+
+        if(DateUtil.addMinutes(new Date(),WorkOrderConstant.FIVE_MINUTE_BEFORE_CLASSS.intValue()).before(workOrder.getStartTime()) && workOrder.getIsFreeze()==0){
+            courseInfo.setShowBeginClass(true);
+        }else {
+            courseInfo.setShowBeginClass(false);
+        }
+
 
         //4 获取课程信息 词义数 阅读量 听力时长
         if (!StringUtils.isEmpty(workOrder.getCourseId())) {

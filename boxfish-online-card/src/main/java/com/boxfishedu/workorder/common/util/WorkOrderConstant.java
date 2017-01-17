@@ -86,4 +86,7 @@ public class WorkOrderConstant {
         }
         return false;
     }
+
+    // 上课前五分钟 显示开始上课按钮
+    public final static Integer FIVE_MINUTE_BEFORE_CLASSS = 5;
 }
