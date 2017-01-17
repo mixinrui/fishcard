@@ -393,7 +393,7 @@ public class DateUtil {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int w =  cal.get(Calendar.DAY_OF_WEEK);
-        return (w==4 ||w==6 || w==7 ||w==1) ?true:false;
+        return WorkOrderConstant.weekDays.contains (w) ?true:false;
     }
 
     // 是否包含在list的天中  2345671   周一到周日 4671

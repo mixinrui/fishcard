@@ -18,5 +18,7 @@ public class CourseInfo {
     private Integer readNum; //阅读量
     private Integer scoreNum;//积分
 
+    private boolean showBeginClass; //课前五分钟内 显示该按钮
+
 
 }
