@@ -48,8 +48,8 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
-        logger.debug("触发状态改变事件,smallClass[{}],触发的事件[{}]"
-                , JacksonUtil.toJSon(smallClass), smallClass.getClassStatusEnum().getDesc());
+        logger.debug("触发状态改变事件,smallClass[{}]"
+                , JacksonUtil.toJSon(smallClass));
         GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(this.prefix + smallClass.getClassType());
 
         //初始化小班课信息
