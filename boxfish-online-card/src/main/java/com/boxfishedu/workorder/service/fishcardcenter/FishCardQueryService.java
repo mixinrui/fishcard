@@ -245,7 +245,13 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         if(ClassTypeEnum.NORMAL.name().equals(fishCardFilterParam.getClassType())){
             sql.append(" and (classType !='SMALL' or classType !='PUBLIC') ");  // 除了小班课 和公开课
         }else if(!ClassTypeEnum.NORMAL.name().equals(fishCardFilterParam.getClassType())  && null != fishCardFilterParam.getClassType()){
-            sql.append("and classType =:classType ");
+            sql.append(" and classType =:classType ");
+        }
+
+
+        //小班课id
+        if(null != fishCardFilterParam.getSmallClassId()){
+            sql.append(" and smallClassId =:smallClassId");
         }
 
         if (null != fishCardFilterParam.getStartTimeSort()) {
@@ -372,6 +378,9 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             query.setParameter("classType", fishCardFilterParam.getClassType());
         }
 
+        if(null != fishCardFilterParam.getSmallClassId()){
+            query.setParameter("smallClassId",fishCardFilterParam.getSmallClassId());
+        }
 
 //        if(null!=fishCardFilterParam.getTeacherName()){
 //            query.setParameter("teacherName",fishCardFilterParam.getTeacherName());

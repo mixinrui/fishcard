@@ -60,4 +60,6 @@ public class FishCardFilterParam {
 
     private String classType;// classType   SMALL  小班课  PULIC 公开课  NORMAL 正常课程（1对1）
 
+    private Long smallClassId;//小班课id
+
 }
