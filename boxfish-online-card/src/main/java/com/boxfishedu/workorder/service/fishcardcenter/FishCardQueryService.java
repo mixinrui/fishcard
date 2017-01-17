@@ -254,6 +254,11 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
             sql.append(" and smallClassId =:smallClassId");
         }
 
+        //小班课id
+        if(null != fishCardFilterParam.getSmallClassId()){
+            sql.append(" and smallClassId =:smallClassId");
+        }
+
         if (null != fishCardFilterParam.getStartTimeSort()) {
             sql.append("order by wo.startTime   ").append(fishCardFilterParam.getStartTimeSort().toLowerCase());
         }
@@ -381,6 +386,7 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
         if(null != fishCardFilterParam.getSmallClassId()){
             query.setParameter("smallClassId",fishCardFilterParam.getSmallClassId());
         }
+ 
 
 //        if(null!=fishCardFilterParam.getTeacherName()){
 //            query.setParameter("teacherName",fishCardFilterParam.getTeacherName());
