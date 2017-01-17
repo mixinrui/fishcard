@@ -60,7 +60,8 @@ public class Timer6Group extends GroupBuilder {
     @Override
     protected Map<String, List<WorkOrder>> groupbyLevel(List<WorkOrder> workOrders) {
         return workOrders.parallelStream()
-                         .collect(groupingBy(workOrder -> smallClassRequester.fetchUserDifficultyInfo(workOrder.getStudentId())));
+                         .collect(groupingBy(
+                                 workOrder -> smallClassRequester.fetchUserDifficultyInfo(workOrder.getStudentId())));
     }
 
     @Override

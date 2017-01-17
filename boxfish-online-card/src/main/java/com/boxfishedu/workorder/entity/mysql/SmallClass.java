@@ -114,6 +114,10 @@ public class SmallClass implements Cloneable, Serializable {
     @Transient
     private List<WorkOrder> allCards;
 
+    @JsonIgnore
+    @Transient
+    private PublicClassInfoStatusEnum classStatusEnum;
+
     //班级类型
     private String classType;
 

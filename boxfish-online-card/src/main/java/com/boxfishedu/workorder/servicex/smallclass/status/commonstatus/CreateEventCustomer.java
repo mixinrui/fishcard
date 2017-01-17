@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.commonstatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.RoleEnum;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.SmallClassLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
@@ -47,6 +48,8 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
+        logger.debug("触发状态改变事件,smallClass[{}],触发的事件[{}]"
+                , JacksonUtil.toJSon(smallClass), smallClass.getClassStatusEnum().getDesc());
         GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(this.prefix + smallClass.getClassType());
 
         //初始化小班课信息

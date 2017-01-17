@@ -43,7 +43,8 @@ public class SmallClassBackServiceX {
     public void configPublicClass(PublicClassBuilderParam publicClassBuilderParam) {
         SmallClass smallClass = new SmallClass(publicClassBuilderParam);
         addTime(publicClassBuilderParam, smallClass);
-        new SmallClassEvent(smallClass, smallClassEventDispatch, PublicClassInfoStatusEnum.CREATE);
+        smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.CREATE);
+        new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
     }
 
     private void addTime(PublicClassBuilderParam publicClassBuilderParam, SmallClass smallClass) {
