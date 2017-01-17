@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.status.teacherstatus;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
@@ -43,6 +44,8 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
+        smallClass.setWriteBackDesc("正常完成[教师]");
+        this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED);
         smallClassLogService.recordTeacherLog(smallClass);
     }
 }

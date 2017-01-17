@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -154,5 +156,14 @@ public class SmallClass implements Cloneable, Serializable {
 
     public ClassTypeEnum getStatusEnum() {
         return ClassTypeEnum.getByName(this.getClassType());
+    }
+
+    //小班课上课时间30分钟
+    public boolean reachOverTime() {
+        LocalDateTime startLocalTime =
+                LocalDateTime.ofInstant(
+                        this.getStartTime().toInstant(), ZoneId.systemDefault());
+        LocalDateTime overTime = startLocalTime.plusMinutes(30);
+        return LocalDateTime.now().isAfter(overTime);
     }
 }

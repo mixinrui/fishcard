@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Objects;
 
@@ -348,5 +350,4 @@ public class WorkOrder implements Cloneable {
         return !Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name())
                 && !Objects.equals(this.getClassType(), ClassTypeEnum.SMALL.name());
     }
-
 }

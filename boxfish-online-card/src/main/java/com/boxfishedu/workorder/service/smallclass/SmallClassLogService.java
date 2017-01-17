@@ -8,6 +8,8 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 /**
  * Created by hucl on 17/1/14.
  */
@@ -27,6 +29,7 @@ public class SmallClassLogService {
         smallClassLog.setDesc(desc);
         smallClassLog.setSmallClassId(smallClass.getId());
         smallClassLog.setReportTime(smallClass.getReportTime());
+        smallClassLog.setCreateTime(new Date());
 
         switch (roleEnum) {
             case STUDENT:
