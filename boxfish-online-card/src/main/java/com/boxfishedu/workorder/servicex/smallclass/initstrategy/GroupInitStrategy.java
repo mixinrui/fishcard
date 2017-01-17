@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass.initstrategy;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -61,6 +62,7 @@ public interface GroupInitStrategy {
                 workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
                 workOrder.setTeacherId(teacherView.getTeacherId());
                 workOrder.setTeacherName(teacherView.getTeacherName());
+                smallClass.setStatus(PublicClassInfoStatusEnum.TEACHER_ASSIGNED.getCode());
             });
             smallClass.setAllCards(workOrders);
         }
@@ -92,6 +94,7 @@ public interface GroupInitStrategy {
             workOrder.setCourseName(smallClass.getCourseName());
             workOrder.setCourseType(smallClass.getCourseType());
             if (workOrder.getStatus() != FishCardStatusEnum.TEACHER_ASSIGNED.getCode()) {
+                smallClass.setStatus(PublicClassInfoStatusEnum.COURSE_ASSIGNED.getCode());
                 workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
             }
         });

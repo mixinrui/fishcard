@@ -89,6 +89,7 @@ public class Timer6Group extends GroupBuilder {
         groups.forEach((key, groupMembers) -> {
             WorkOrder leader = this.selectLeader(groupMembers);
             SmallClass smallClass = new SmallClass();
+            smallClass.setStatus(PublicClassInfoStatusEnum.CREATE.getCode());
             smallClass.setClassDate(DateUtil.date2SimpleDate(leader.getStartTime()));
             smallClass.setSlotId(leader.getSlotId());
             smallClass.setCourseType(leader.getCourseType());

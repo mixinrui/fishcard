@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.status.studentstatus;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
@@ -49,5 +50,16 @@ public class StudentLeaveUnActiveCustomer extends SmallClassEventCustomer {
     @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordStudentLog(smallClass);
+        switch (smallClass.getStatusEnum()) {
+            case SMALL:
+                if (smallClass.reachOverTime()) {
+                    smallClass.setWriteBackDesc("完成[学生被动退出]");
+                    this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED);
+                }
+                //没有到下课时间的鱼卡如何去处理
+                break;
+            default:
+                break;
+        }
     }
 }
