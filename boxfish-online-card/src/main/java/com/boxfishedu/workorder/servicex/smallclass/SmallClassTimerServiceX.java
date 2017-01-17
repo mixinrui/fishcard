@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.SmallStudentsRelationMorphiaRepository;
@@ -12,6 +14,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +28,6 @@ import java.util.stream.Collectors;
 public class SmallClassTimerServiceX {
     @Autowired
     private SmallStudentsRelationMorphiaRepository classelationMorphiaRepository;
-
-    @Autowired
-    private WorkOrderService workOrderService;
 
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
@@ -67,7 +67,9 @@ public class SmallClassTimerServiceX {
     }
 
     private List<SmallClass> getSmallClasses() {
-        return null;
+        Date deadEndTime = DateUtil.localDate2Date(LocalDateTime.now().minusMinutes(30));
+        return smallClassJpaRepository
+                .findByClassTypeAndStartTimeLessThan(ClassTypeEnum.SMALL.name(), deadEndTime);
     }
 
     private List<WorkOrder> getCardsToBuildRelation(SmallClass smallClass) {

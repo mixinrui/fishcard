@@ -25,7 +25,8 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
     List<SmallClass> findByStartTimeRange(Date from, Date to, String classType);
 
 
-    
-    List<SmallClass> findByClassTypeAndStartTimeGreaterThan(String classType,Date date);
+    List<SmallClass> findByClassTypeAndStartTimeGreaterThan(String classType, Date date);
+
+    List<SmallClass> findByClassTypeAndStartTimeLessThan(String classType, Date date);
 
 }
