@@ -4,6 +4,8 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class TeacherAssignedCustomer extends SmallClassEventCustomer {
     @Autowired
     WorkOrderService workOrderService;
 
+    @Autowired
+    SmallClassLogService smallClassLogService;
+
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.CREATE);
@@ -32,7 +37,14 @@ public class TeacherAssignedCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected void postHandle(SmallClass smallClass) {
+
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
-        logger.info("分配老师...");
+        smallClassLogService.recordSystemLog(
+                smallClass, PublicClassInfoStatusEnum.COURSE_ASSIGNED.getCode()
+                , String.join(smallClass.getTeacherId().toString(), "分配教师[", "]"));
     }
 }

@@ -37,8 +37,8 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
     }
 
     @Override
-    public void exec(SmallClassEvent smallClassEvent) {
-        logger.info("教师开始上课...");
+    protected void postHandle(SmallClass smallClass) {
+        
     }
 
     @Override

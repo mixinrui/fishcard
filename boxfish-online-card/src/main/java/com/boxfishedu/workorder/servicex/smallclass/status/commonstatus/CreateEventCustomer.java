@@ -47,21 +47,20 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected void postHandle(SmallClass smallClass) {
+
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         logger.debug("触发状态改变事件,smallClass[{}]"
                 , JacksonUtil.toJSon(smallClass));
-        GroupInitStrategy groupInitStrategy = groupInitStrategyMap.get(this.prefix + smallClass.getClassType());
+
+        GroupInitStrategy groupInitStrategy
+                = groupInitStrategyMap.get(this.prefix + smallClass.getClassType());
 
         //初始化小班课信息
         groupInitStrategy.initGroupClass(smallClass);
-
-        //保存smallclass
-
-        //将小班课信息更新进workorder,courseschedule
-
-        //持久化数据到数据库
-
-        //记录流水日志
     }
 
 }

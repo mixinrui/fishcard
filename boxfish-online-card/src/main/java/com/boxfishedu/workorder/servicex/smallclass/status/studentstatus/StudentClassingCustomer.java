@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/5.
@@ -41,6 +42,10 @@ public class StudentClassingCustomer extends SmallClassEventCustomer implements 
     @Override
     protected WorkOrderService getWorkOrderService() {
         return workOrderService;
+    }
+
+    @Override
+    protected void postHandle(SmallClass smallClass) {
     }
 
     @Override

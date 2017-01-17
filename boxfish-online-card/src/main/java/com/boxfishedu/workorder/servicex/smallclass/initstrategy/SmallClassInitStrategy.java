@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.initstrategy;
 
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
@@ -13,6 +14,8 @@ import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -48,6 +51,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Autowired
     private RecommandCourseRequester recommandCourseRequester;
+
+    @Autowired
+    private SmallClassEventDispatch smallClassEventDispatch;
 
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
@@ -113,6 +119,10 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
         //将小班课,公开课相关信息保存入库
         this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
+
+        this.recordCourseAssignedLog(smallClass);
+
+        this.recordTeacherAssignedLog(smallClass);
     }
 
     @Override
@@ -126,6 +136,26 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         this.persistSmallClass(smallClass);
         smallClass.setAllCards(workOrders);
         this.persistCardRelatedInfo(smallClass, recommandCourseView);
+    }
+
+
+    private void recordCourseAssignedLog(SmallClass smallClass) {
+        try {
+            smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.COURSE_ASSIGNED);
+            new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
+        } catch (Exception ex) {
+            logger.error("@recordCourseAssignedLog#日志记录错误", ex);
+        }
+
+    }
+
+    private void recordTeacherAssignedLog(SmallClass smallClass) {
+        try {
+            smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.TEACHER_ASSIGNED);
+            new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
+        } catch (Exception ex) {
+            logger.error("@recordTeacherAssignedLog#日志记录错误", ex);
+        }
     }
 
     @Override

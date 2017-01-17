@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class CourseAssignedCustomer extends SmallClassEventCustomer {
     @Autowired
     WorkOrderService workOrderService;
 
+    @Autowired
+    SmallClassLogService smallClassLogService;
+
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.COURSE_ASSIGNED);
@@ -32,7 +36,14 @@ public class CourseAssignedCustomer extends SmallClassEventCustomer {
     }
 
     @Override
-    public void execute(SmallClass smallClass) {
+    protected void postHandle(SmallClass smallClass) {
 
+    }
+
+    @Override
+    public void execute(SmallClass smallClass) {
+        smallClassLogService.recordSystemLog(
+                smallClass, PublicClassInfoStatusEnum.COURSE_ASSIGNED.getCode()
+                , String.join(smallClass.getCourseName(), "分配课程[", "]"));
     }
 }

@@ -25,10 +25,13 @@ public abstract class SmallClassEventCustomer {
 
     protected abstract WorkOrderService getWorkOrderService();
 
+    protected abstract void postHandle(SmallClass smallClass);
+
 
     public void exec(SmallClassEvent smallClassEvent) {
         SmallClass smallClass = smallClassEvent.getSource();
         this.execute(smallClass);
+        this.postHandle(smallClass);
     }
 
     public abstract void execute(SmallClass smallClass);

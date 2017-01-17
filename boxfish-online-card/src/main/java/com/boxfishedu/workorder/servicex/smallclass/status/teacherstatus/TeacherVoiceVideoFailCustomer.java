@@ -42,6 +42,11 @@ public class TeacherVoiceVideoFailCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected void postHandle(SmallClass smallClass) {
+
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
     }

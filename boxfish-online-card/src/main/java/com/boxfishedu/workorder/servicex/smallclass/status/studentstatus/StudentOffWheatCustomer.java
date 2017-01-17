@@ -42,6 +42,11 @@ public class StudentOffWheatCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected void postHandle(SmallClass smallClass) {
+
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordStudentLog(smallClass);
     }

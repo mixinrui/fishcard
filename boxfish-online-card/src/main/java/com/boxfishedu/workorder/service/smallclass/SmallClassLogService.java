@@ -27,12 +27,16 @@ public class SmallClassLogService {
         smallClassLog.setDesc(desc);
         smallClassLog.setSmallClassId(smallClass.getId());
         smallClassLog.setReportTime(smallClass.getReportTime());
+
         switch (roleEnum) {
             case STUDENT:
                 smallClassLog.setStudentId(userId);
                 break;
-            default:
+            case TEACHER:
                 smallClassLog.setTeacherId(userId);
+                break;
+            default:
+                break;
 
         }
         smallClassLogMorphiaRepository.save(smallClassLog);
@@ -63,7 +67,7 @@ public class SmallClassLogService {
     }
 
     public void recordTeacherLog(SmallClass smallClass) {
-        this.recordStudentLog(smallClass, smallClass.getStatusReporter());
+        this.recordTeacherLog(smallClass, smallClass.getStatusReporter());
     }
 
     public void recordTeacherLog(
@@ -71,6 +75,10 @@ public class SmallClassLogService {
             int status, Long userId,
             String desc) {
         this.recordLog(smallClass, status, userId, RoleEnum.TEACHER, desc);
+    }
+
+    public void recordSystemLog(SmallClass smallClass, int status, String desc) {
+        this.recordLog(smallClass, status, 0l, RoleEnum.SYSTEM, desc);
     }
 
     public void recordTeacherLog(
