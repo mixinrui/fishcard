@@ -47,10 +47,12 @@ public class TeacherCompleteEventCustomer extends SmallClassEventCustomer {
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:
-                smallClass.setWriteBackDesc("正常完成[教师]");
+                smallClass.setWriteBackDesc("正常完成[教师小班课]");
                 this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED);
                 break;
             default:
+                smallClass.setWriteBackDesc("正常完成[教师公开课]");
+                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED);
                 break;
         }
     }
