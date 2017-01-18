@@ -126,6 +126,16 @@ public class PublicClassRoom {
 
 
     /**
+     * 获取公开课学生集合
+     * @param smallClassId
+     * @return
+     */
+    public Set<Long> getPublicClassRoomMembers(Long smallClassId) {
+        return setOperations.members(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId);
+    }
+
+
+    /**
      * 公开课上课通知
      */
     public void publicClassRoomNotification() {

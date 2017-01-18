@@ -24,7 +24,6 @@ import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
-import com.boxfishedu.workorder.servicex.smallclass.SmallClassServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.PublicClassRoom;
 import com.boxfishedu.workorder.servicex.timer.*;

@@ -2,15 +2,12 @@ package com.boxfishedu.workorder.dao.mongo;
 
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.entity.mongo.ContinousAbsenceRecord;
-import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
-import com.boxfishedu.workorder.entity.mongo.TrialCourse;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class ContinousAbsenceMorphiaRepository extends BaseMorphiaRepository<ContinousAbsenceRecord>{
