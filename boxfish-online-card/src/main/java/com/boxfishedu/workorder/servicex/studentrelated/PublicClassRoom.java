@@ -95,8 +95,9 @@ public class PublicClassRoom {
      */
     @Transactional
     public void quit(Long smallClassId, Long studentId) {
-        publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.STUDENT_QUIT.getCode(), smallClassId, studentId);
-        setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId);
+        if(setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId) > 0) {
+            publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.STUDENT_QUIT.getCode(), smallClassId, studentId);
+        }
     }
 
 
