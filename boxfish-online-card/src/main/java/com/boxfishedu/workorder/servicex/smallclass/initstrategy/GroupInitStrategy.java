@@ -15,11 +15,15 @@ import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -29,6 +33,8 @@ import java.util.stream.Collectors;
  * Created by hucl on 17/1/8.
  */
 public interface GroupInitStrategy {
+    Logger logger= LoggerFactory.getLogger("GroupInitStrategy");
+
     RecommandCourseView getRecommandCourse(SmallClass smallClass);
 
     TeacherView getRecommandTeacher(SmallClass smallClass);
@@ -38,6 +44,8 @@ public interface GroupInitStrategy {
     WorkOrderService getWorkOrderService();
 
     ScheduleCourseInfoService getScheduleCourseInfoService();
+
+    SmallClassEventDispatch getSmallEventDispathch();
 
     void initGroupClass(SmallClass smallClass);
 
@@ -50,6 +58,15 @@ public interface GroupInitStrategy {
     default TutorTypeEnum teachingType2TutorType(SmallClass smallClass) {
         return ((TeachingType) TeachingType.get(smallClass.getRoleId()))
                 .teachingType2TutorType();
+    }
+
+    default void recordLog(SmallClass smallClass, PublicClassInfoStatusEnum publicClassInfoStatusEnum) {
+        try {
+            smallClass.setClassStatusEnum(publicClassInfoStatusEnum);
+            new SmallClassEvent(smallClass, this.getSmallEventDispathch(), smallClass.getClassStatusEnum());
+        } catch (Exception ex) {
+           logger.error("@recordLog,记录日志错误",ex);
+        }
     }
 
     default void writeTeacherInfoBack(SmallClass smallClass, List<WorkOrder> workOrders, TeacherView teacherView) {

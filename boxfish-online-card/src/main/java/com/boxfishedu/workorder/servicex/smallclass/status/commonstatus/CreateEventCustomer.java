@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/5.
@@ -53,7 +54,7 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
-        logger.debug("触发状态改变事件,smallClass[{}]"
+        logger.debug("@CreateEventCustomer触发状态改变事件,smallClass[{}]"
                 , JacksonUtil.toJSon(smallClass));
 
         GroupInitStrategy groupInitStrategy
@@ -61,6 +62,7 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
         //初始化小班课信息
         groupInitStrategy.initGroupClass(smallClass);
+
     }
 
 }

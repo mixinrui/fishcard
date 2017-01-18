@@ -346,6 +346,18 @@ public class NotifyTimer {
     }
 
     /**
+     *  创建小班课
+     */
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void BuildSmallClassGroup() {
+        logger.info("<<<<<<@@@@创建学生关系 开始通知<<<创建学生关系>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage =
+                new ServiceTimerMessage(TimerMessageType.CREATE_SMALL_CLASS.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    /**
      * 创建小班课的群组关系
      */
     @Scheduled(cron = "0 1/10 * * * ?")

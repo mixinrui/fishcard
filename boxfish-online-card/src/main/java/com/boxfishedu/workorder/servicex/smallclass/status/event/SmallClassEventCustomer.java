@@ -5,10 +5,13 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.google.common.collect.Lists;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -38,17 +41,43 @@ public abstract class SmallClassEventCustomer {
 
 
     public void writeStatusBack2Card(SmallClass smallClass, FishCardStatusEnum fishCardStatusEnum) {
-        WorkOrder workOrder =
-                this.getWorkOrderService().findBySmallClassIdAndStudentId(
-                        smallClass.getId(), smallClass.getStatusReporter());
-        workOrder.setStatus(fishCardStatusEnum.getCode());
+        List<WorkOrder> workOrders = this.getWorkOrders(smallClass);
 
-        if (Objects.isNull(smallClass.getWriteBackDesc())) {
-            this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder);
-        } else {
-            this.getWorkOrderService().saveStatusForCardAndSchedule(
-                    workOrder, smallClass.getWriteBackDesc());
+        this.updateWorkStatuses(workOrders, fishCardStatusEnum);
+
+        workOrders.forEach(workOrder -> {
+            if (Objects.isNull(smallClass.getWriteBackDesc())) {
+                this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder);
+            } else {
+                this.getWorkOrderService().saveStatusForCardAndSchedule(
+                        workOrder, smallClass.getWriteBackDesc());
+            }
+        });
+
+    }
+
+    private List<WorkOrder> getWorkOrders(SmallClass smallClass) {
+        List<WorkOrder> workOrders;//system
+        if (smallClass.getStatus() < PublicClassInfoStatusEnum.STUDENT_ENTER.getCode()) {
+            workOrders = this.getWorkOrderService().findBySmallClassId(smallClass.getId());
         }
+        //student
+        else if (smallClass.getStatus() < PublicClassInfoStatusEnum.TEACHER_CARD_VALIDATED.getCode()) {
+            WorkOrder workOrder
+                    = this.getWorkOrderService()
+                          .findBySmallClassIdAndStudentId(
+                                  smallClass.getId(), smallClass.getStatusReporter());
+            workOrders = Arrays.asList(workOrder);
+        }
+        //teacher
+        else {
+            workOrders = this.getWorkOrderService().findBySmallClassId(smallClass.getId());
+        }
+        return workOrders;
+    }
+
+    private void updateWorkStatuses(List<WorkOrder> workOrders, FishCardStatusEnum fishCardStatusEnum) {
+        workOrders.forEach(workOrder -> workOrder.setStatus(fishCardStatusEnum.getCode()));
     }
 
 

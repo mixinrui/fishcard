@@ -65,8 +65,11 @@ public enum TimerMessageType {
     // 公开课提前5分钟推送
     PUBLIC_CLASS_NOTIFY(152),
 
+    //创建小班课
+    CREATE_SMALL_CLASS(154),
     //保存小班课学生的上课关系
     SMALLCLASS_STUDENTS_RELATION(155);
+
 
     private int code;
 

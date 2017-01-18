@@ -25,6 +25,7 @@ import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassTimerServiceX;
+import com.boxfishedu.workorder.servicex.smallclass.groupbuilder.GroupBuilder;
 import com.boxfishedu.workorder.servicex.studentrelated.PublicClassRoom;
 import com.boxfishedu.workorder.servicex.timer.*;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -106,6 +107,9 @@ public class RabbitMqReciver {
 
     @Autowired
     private SmallClassTimerServiceX smallClassTimerServiceX;
+
+    @Autowired
+    private GroupBuilder groupBuilder;
 
 
     /**
@@ -238,7 +242,11 @@ public class RabbitMqReciver {
             } else if (serviceTimerMessage.getType() == TimerMessageType.PUBLIC_CLASS_NOTIFY.value()) {
                 logger.info("==========>@@@@PUBLIC_CLASS_NOTIFY===>>> 公开课通知");
                 publicClassRoom.publicClassRoomNotification();
-            } else if (serviceTimerMessage.getType() == TimerMessageType.SMALLCLASS_STUDENTS_RELATION.value()) {
+            }else if (serviceTimerMessage.getType() == TimerMessageType.CREATE_SMALL_CLASS.value()) {
+                logger.info("==========>@@@@SMALLCLASS_STUDENTS_RELATION===>>> 创建小班课");
+                groupBuilder.group();
+            }
+            else if (serviceTimerMessage.getType() == TimerMessageType.SMALLCLASS_STUDENTS_RELATION.value()) {
                 logger.info("==========>@@@@SMALLCLASS_STUDENTS_RELATION===>>> 小班课上课关系记录");
                 smallClassTimerServiceX.buildSmallCLassRelations();
             }

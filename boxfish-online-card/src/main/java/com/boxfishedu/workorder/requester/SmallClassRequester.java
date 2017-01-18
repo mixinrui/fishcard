@@ -41,7 +41,7 @@ public class SmallClassRequester {
      * @return 如:"LEVEL_2"
      */
     public String fetchUserDifficultyInfo(Long userId) {
-        String url = String.format("%s/core/difficulty/%s", urlConf.getCourse_wudaokou_recommend_service(), userId);
+        String url = String.format("%s/difficulty/%s", urlConf.getCourse_wudaokou_recommend_service(), userId);
         String difficulty = null;
         try {
             difficulty = restTemplate.getForObject(url, String.class);
@@ -67,7 +67,7 @@ public class SmallClassRequester {
      * @return
      */
     public Integer fetchUserStudyInfo(Long userId, String difficultyLevel) {
-        String url = String.format("%s/core/counter/%s/%s"
+        String url = String.format("%s/counter/%s/%s"
                 , urlConf.getCourse_wudaokou_recommend_service(), userId, difficultyLevel);
         Integer info = null;
         try {

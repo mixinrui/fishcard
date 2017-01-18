@@ -129,6 +129,10 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         return jpa.findBySmallClassIdAndStudentId(smallClassId, studentId);
     }
 
+    public List<WorkOrder> findBySmallClassId(Long smallClassId){
+        return jpa.findBySmallClassId(smallClassId);
+    }
+
     @Transactional
     public void saveWorkOrderAndSchedule(WorkOrder workOrder, CourseSchedule courseSchedule) {
         this.save(workOrder);

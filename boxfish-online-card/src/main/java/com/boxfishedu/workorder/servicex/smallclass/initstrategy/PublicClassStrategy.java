@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass.initstrategy;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
@@ -11,6 +12,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.*;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -58,6 +60,9 @@ public class PublicClassStrategy implements GroupInitStrategy {
     @Autowired
     private SmallClassTeacherRequester smallClassTeacherRequester;
 
+    @Autowired
+    private SmallClassEventDispatch smallClassEventDispatch;
+
     private final String GENERATE_PUBLIC_SERVICE = "GENERATE_PUBLIC_SERVICE";
 
     @Autowired
@@ -100,6 +105,11 @@ public class PublicClassStrategy implements GroupInitStrategy {
     }
 
     @Override
+    public SmallClassEventDispatch getSmallEventDispathch() {
+        return smallClassEventDispatch;
+    }
+
+    @Override
     public void initGroupClass(SmallClass smallClass) {
         //获取推荐课程
         RecommandCourseView recommandCourseView = this.getRecommandCourse(smallClass);
@@ -118,6 +128,9 @@ public class PublicClassStrategy implements GroupInitStrategy {
         this.writeTeacherInfoBack(smallClass, Arrays.asList(workOrder), teacherView);
 
         this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
+
+        recordLog(smallClass, PublicClassInfoStatusEnum.COURSE_ASSIGNED);
+        recordLog(smallClass, PublicClassInfoStatusEnum.TEACHER_ASSIGNED);
     }
 
     @Override

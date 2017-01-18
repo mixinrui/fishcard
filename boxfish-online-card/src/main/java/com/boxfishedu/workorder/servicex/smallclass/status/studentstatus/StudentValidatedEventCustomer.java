@@ -68,7 +68,7 @@ public class StudentValidatedEventCustomer extends SmallClassEventCustomer {
         smallClassLogService.recordStudentLog(smallClass);
         switch (smallClass.getStatusEnum()) {
             case SMALL:
-                smallClass.setWriteBackDesc("学生进入房间[小班课]");
+                smallClass.setWriteBackDesc("学生进入房间[小班课学生校验通过]");
                 this.writeStatusBack2Card(smallClass, FishCardStatusEnum.STUDENT_ENTER_ROOM);
                 break;
             default:
