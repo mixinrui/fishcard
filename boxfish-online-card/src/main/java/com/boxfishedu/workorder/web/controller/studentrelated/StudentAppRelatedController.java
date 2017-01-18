@@ -11,10 +11,7 @@ import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseChangeTimeNotifySerceX;
 import com.boxfishedu.workorder.servicex.home.HomePageServiceX;
-import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
-import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceXV1;
-import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceX;
-import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceXV1;
+import com.boxfishedu.workorder.servicex.studentrelated.*;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionChecker;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.AvaliableTimeParam;
@@ -73,6 +70,9 @@ StudentAppRelatedController {
     @Autowired
     private MailSupport mailSupport;
 
+    @Autowired
+    private PublicClassService publicClassService;
+
     /**
      * 学生端批量选择课程的接口
      * 1.获取课程的接口为假数据 2.获取教师的时候需要根据coursetype把外教区分出来,并且体现到workorder和course_schedule的冗余表里
@@ -128,7 +128,7 @@ StudentAppRelatedController {
 //    @RequestMapping(value = "{studentId}/schedule/public", method = RequestMethod.GET)
     public JsonResultModel courseSchedulePublic(@PathVariable Long studentId, String level) {
         return JsonResultModel.newJsonResultModel(
-                timePickerServiceXV1.getStudentPublicClassTimeEnum(level, LocalDate.now()));
+                publicClassService.getStudentPublicClassTimeEnum(level, LocalDate.now()));
     }
 
     @RequestMapping(value = "/{studentId}/enter/publicClassRoom", method = RequestMethod.PUT)
@@ -139,25 +139,25 @@ StudentAppRelatedController {
             throw new UnauthorizedException();
         }
         return JsonResultModel.newJsonResultModel(
-                timePickerServiceXV1.enterPublicClassRoom(userId, nickName, smallClassId, accessToken));
+                publicClassService.enterPublicClassRoom(userId, nickName, smallClassId, accessToken));
     }
 
     @RequestMapping(value = "/publicClass/{smallClassId}/roll", method = RequestMethod.GET)
     public JsonResultModel publicClassRoll(@PathVariable Long smallClassId) {
         return JsonResultModel.newJsonResultModel(
-                Collections.singletonMap("studentId", timePickerServiceXV1.rollCall(smallClassId)));
+                Collections.singletonMap("studentId", publicClassService.rollCall(smallClassId)));
     }
 
     @RequestMapping(value = "/publicClass/members/{smallClassId}", method = RequestMethod.GET)
     public JsonResultModel publicClassMembers(@PathVariable Long smallClassId) {
         return JsonResultModel.newJsonResultModel(
-                Collections.singletonMap("members", timePickerServiceXV1.getPublicClassRoomMembers(smallClassId)));
+                Collections.singletonMap("members", publicClassService.getPublicClassRoomMembers(smallClassId)));
     }
 
 
 //    @RequestMapping(value = "/schedule/public/evict")
     public JsonResultModel evictPublicSchedule(String level) {
-        timePickerServiceXV1.evictPublicClassRoom(level);
+        publicClassService.evictPublicClassRoom(level);
         return JsonResultModel.newJsonResultModel();
     }
 
@@ -175,24 +175,14 @@ StudentAppRelatedController {
         if(!studentId.equals(userId)) {
             throw new UnauthorizedException();
         }
-        timePickerServiceXV1.quitPublicClassRoom(smallClassId, studentId);
+        publicClassService.quitPublicClassRoom(smallClassId, studentId);
         return JsonResultModel.EMPTY;
     }
 
     @RequestMapping(value = "/publicClassRoom/studentCount", method = RequestMethod.GET)
     public JsonResultModel publicClassStudentCount(Long smallClassId) {
-        long count = timePickerServiceXV1.getPublicClassRoomStudentCount(smallClassId);
+        long count = publicClassService.getPublicClassRoomStudentCount(smallClassId);
         return JsonResultModel.newJsonResultModel(Collections.singletonMap("count", count));
-    }
-
-    @RequestMapping(value = "/test/mail")
-    public JsonResultModel testMail() {
-        try {
-            int i = 1 / 0;
-        } catch (Exception e) {
-            mailSupport.reportError("测试邮件" + System.currentTimeMillis(), e);
-        }
-        return JsonResultModel.EMPTY;
     }
 
     @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
