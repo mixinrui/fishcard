@@ -255,7 +255,7 @@ public class AssignTeacherService {
 
         // showBeginClass  课前五分钟现实开始上课按钮
 
-        if(workOrder.getStartTime().before(  DateUtil.addMinutes(new Date(),WorkOrderConstant.FIVE_MINUTE_BEFORE_CLASSS.intValue())) && workOrder.getIsFreeze()==0){
+        if(new Date().after(  DateUtil.addMinutes(workOrder.getStartTime(),-1*WorkOrderConstant.FIVE_MINUTE_BEFORE_CLASSS.intValue())) && workOrder.getIsFreeze()==0){
             courseInfo.setShowBeginClass(true);
         }else {
             courseInfo.setShowBeginClass(false);
