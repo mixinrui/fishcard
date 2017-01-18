@@ -142,11 +142,16 @@ StudentAppRelatedController {
                 timePickerServiceXV1.enterPublicClassRoom(userId, nickName, smallClassId, accessToken));
     }
 
-
     @RequestMapping(value = "/publicClass/{smallClassId}/roll", method = RequestMethod.GET)
     public JsonResultModel publicClassRoll(@PathVariable Long smallClassId) {
         return JsonResultModel.newJsonResultModel(
                 Collections.singletonMap("studentId", timePickerServiceXV1.rollCall(smallClassId)));
+    }
+
+    @RequestMapping(value = "/publicClass/members/{smallClassId}", method = RequestMethod.GET)
+    public JsonResultModel publicClassMembers(@PathVariable Long smallClassId) {
+        return JsonResultModel.newJsonResultModel(
+                Collections.singletonMap("members", timePickerServiceXV1.getPublicClassRoomMembers(smallClassId)));
     }
 
 

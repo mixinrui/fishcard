@@ -95,8 +95,9 @@ public class PublicClassRoom {
      */
     @Transactional
     public void quit(Long smallClassId, Long studentId) {
-        publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.STUDENT_QUIT.getCode(), smallClassId, studentId);
-        setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId);
+        if(setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId) > 0) {
+            publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.STUDENT_QUIT.getCode(), smallClassId, studentId);
+        }
     }
 
 
@@ -121,6 +122,16 @@ public class PublicClassRoom {
         for(SmallClass smallClass : smallClassList) {
             expireClassRoomCacheBySmallClassId(smallClass.getId());
         }
+    }
+
+
+    /**
+     * 获取公开课学生集合
+     * @param smallClassId
+     * @return
+     */
+    public Set<Long> getPublicClassRoomMembers(Long smallClassId) {
+        return setOperations.members(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId);
     }
 
 

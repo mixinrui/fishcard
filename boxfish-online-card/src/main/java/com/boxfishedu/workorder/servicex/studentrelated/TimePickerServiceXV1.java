@@ -273,6 +273,10 @@ public class TimePickerServiceXV1 {
         return publicClassRoom.getClassRoomStudentCount(smallClassId);
     }
 
+    public Set<Long> getPublicClassRoomMembers(Long smallClassId) {
+        return publicClassRoom.getPublicClassRoomMembers(smallClassId);
+    }
+
 
     public Long rollCall(Long smallClassId) {
         return publicClassRoom.rollCall(smallClassId);

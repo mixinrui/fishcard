@@ -8,6 +8,9 @@ import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.io.Serializable;
+import java.util.Objects;
+
+import static com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum.SMALL;
 
 /**
  * Created by LuoLiBing on 16/4/22.
@@ -48,6 +51,14 @@ public class StudentCourseSchedule implements Serializable {
             return courseType;
         } else {
             return courseView.getCourseType().get(0);
+        }
+    }
+
+    public String getClassTypeDesc() {
+        if(Objects.equals(classType, SMALL.name())) {
+            return "6人小班";
+        } else {
+            return "1对1";
         }
     }
 }
