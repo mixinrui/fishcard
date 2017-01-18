@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.status.teacherstatus;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
@@ -43,5 +44,14 @@ public class TeacherCompleteForceEventCustomer extends SmallClassEventCustomer {
     @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
+
+        switch (smallClass.getStatusEnum()) {
+            case SMALL:
+                smallClass.setWriteBackDesc("强制完成[教师]");
+                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED_FORCE);
+                break;
+            default:
+                break;
+        }
     }
 }

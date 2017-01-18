@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.smallclass.status.teacherstatus;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
@@ -43,5 +44,14 @@ public class TeacherLeaveEarlyEventCustomer extends SmallClassEventCustomer {
     @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
+
+        switch (smallClass.getStatusEnum()) {
+            case SMALL:
+                smallClass.setWriteBackDesc("教师早退[教师]");
+                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.TEACHER_LEAVE_EARLY);
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -43,9 +43,16 @@ public class TeacherCompleteEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
-        smallClass.setWriteBackDesc("强制完成[教师]");
-        this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED_FORCE);
         smallClassLogService.recordTeacherLog(smallClass);
+
+        switch (smallClass.getStatusEnum()) {
+            case SMALL:
+                smallClass.setWriteBackDesc("正常完成[教师]");
+                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED);
+                break;
+            default:
+                break;
+        }
     }
 
 

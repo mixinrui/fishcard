@@ -39,13 +39,20 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
 
     @Override
     protected void postHandle(SmallClass smallClass) {
-        
+
     }
 
     @Override
     public void execute(SmallClass smallClass) {
-        smallClass.setWriteBackDesc("正常完成[教师]");
-        this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED);
         smallClassLogService.recordTeacherLog(smallClass);
+
+        switch (smallClass.getStatusEnum()) {
+            case SMALL:
+                smallClass.setWriteBackDesc("正在上课[教师]");
+                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.ONCLASS);
+                break;
+            default:
+                break;
+        }
     }
 }

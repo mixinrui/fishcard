@@ -53,7 +53,12 @@ public class StudentClassingCustomer extends SmallClassEventCustomer implements 
         smallClassLogService.recordStudentLog(smallClass);
         switch (smallClass.getStatusEnum()) {
             case SMALL:
-                smallClass.setWriteBackDesc("正在上课[学生]");
+                //模拟师生已连通
+                smallClass.setWriteBackDesc("师生已连通[小班学生上报正在上课]");
+                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.CONNECTED);
+
+                //模拟学生正在上课
+                smallClass.setWriteBackDesc("正在上课[小班学生上报正在上课]");
                 this.writeStatusBack2Card(smallClass, FishCardStatusEnum.ONCLASS);
                 break;
             default:
