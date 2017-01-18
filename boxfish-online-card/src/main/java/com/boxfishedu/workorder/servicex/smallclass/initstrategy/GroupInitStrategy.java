@@ -112,7 +112,7 @@ public interface GroupInitStrategy {
 
         List<Long> studentIds = smallClass.getAllCards()
                                           .stream()
-                                          .map(workOrder -> workOrder.getStudentId())
+                                          .map(WorkOrder::getStudentId)
                                           .collect(Collectors.toList());
         smallClass.setAllStudentIds(studentIds);
 
