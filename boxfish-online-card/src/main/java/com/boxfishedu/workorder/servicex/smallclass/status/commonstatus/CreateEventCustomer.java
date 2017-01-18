@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/5.
@@ -61,6 +62,7 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
         //初始化小班课信息
         groupInitStrategy.initGroupClass(smallClass);
+
     }
 
 }

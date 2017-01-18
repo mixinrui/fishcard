@@ -15,6 +15,8 @@ import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
@@ -39,6 +41,8 @@ public interface GroupInitStrategy {
 
     ScheduleCourseInfoService getScheduleCourseInfoService();
 
+    SmallClassEventDispatch getSmallEventDispathch();
+
     void initGroupClass(SmallClass smallClass);
 
     default List<Long> workOrders2Students(List<WorkOrder> workOrders) {
@@ -50,6 +54,15 @@ public interface GroupInitStrategy {
     default TutorTypeEnum teachingType2TutorType(SmallClass smallClass) {
         return ((TeachingType) TeachingType.get(smallClass.getRoleId()))
                 .teachingType2TutorType();
+    }
+
+    default void recordLog(SmallClass smallClass, PublicClassInfoStatusEnum publicClassInfoStatusEnum) {
+        try {
+            smallClass.setClassStatusEnum(publicClassInfoStatusEnum);
+            new SmallClassEvent(smallClass, this.getSmallEventDispathch(), smallClass.getClassStatusEnum());
+        } catch (Exception ex) {
+            System.out.println("记录日志错误");
+        }
     }
 
     default void writeTeacherInfoBack(SmallClass smallClass, List<WorkOrder> workOrders, TeacherView teacherView) {

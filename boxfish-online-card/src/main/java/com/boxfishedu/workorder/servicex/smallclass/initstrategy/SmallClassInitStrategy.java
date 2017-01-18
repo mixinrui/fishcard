@@ -92,6 +92,11 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     }
 
     @Override
+    public SmallClassEventDispatch getSmallEventDispathch() {
+        return smallClassEventDispatch;
+    }
+
+    @Override
     public void initGroupClass(SmallClass smallClass) {
         //找出leader鱼卡
         WorkOrder leader = this.selectLeader(smallClass.getAllCards());
@@ -120,9 +125,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         //将小班课,公开课相关信息保存入库
         this.persistGroupClass(smallClass, smallClass.getAllCards(), recommandCourseView);
 
-        this.recordCourseAssignedLog(smallClass);
 
-        this.recordTeacherAssignedLog(smallClass);
+        this.recordLog(smallClass, PublicClassInfoStatusEnum.COURSE_ASSIGNED);
+        this.recordLog(smallClass, PublicClassInfoStatusEnum.TEACHER_ASSIGNED);
     }
 
     @Override
@@ -136,26 +141,6 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         this.persistSmallClass(smallClass);
         smallClass.setAllCards(workOrders);
         this.persistCardRelatedInfo(smallClass, recommandCourseView);
-    }
-
-
-    private void recordCourseAssignedLog(SmallClass smallClass) {
-        try {
-            smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.COURSE_ASSIGNED);
-            new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
-        } catch (Exception ex) {
-            logger.error("@recordCourseAssignedLog#日志记录错误", ex);
-        }
-
-    }
-
-    private void recordTeacherAssignedLog(SmallClass smallClass) {
-        try {
-            smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.TEACHER_ASSIGNED);
-            new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
-        } catch (Exception ex) {
-            logger.error("@recordTeacherAssignedLog#日志记录错误", ex);
-        }
     }
 
     @Override

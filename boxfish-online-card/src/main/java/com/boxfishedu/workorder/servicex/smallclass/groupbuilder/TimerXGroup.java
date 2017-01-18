@@ -24,10 +24,10 @@ import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Created by hucl on 17/1/6.
- * 6人小班组
+ * X人小班组
  */
 @Component
-public class Timer6Group extends GroupBuilder {
+public class TimerXGroup extends GroupBuilder {
     @Autowired
     private SmallClassRequester smallClassRequester;
 
@@ -81,7 +81,7 @@ public class Timer6Group extends GroupBuilder {
 
     @Override
     protected Integer smallClassMemeberNum() {
-        return 6;
+        return 4;
     }
 
     @Override
