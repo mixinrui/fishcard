@@ -22,6 +22,8 @@ import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
  * Created by hucl on 17/1/8.
  */
 public interface GroupInitStrategy {
+    Logger logger= LoggerFactory.getLogger("GroupInitStrategy");
+
     RecommandCourseView getRecommandCourse(SmallClass smallClass);
 
     TeacherView getRecommandTeacher(SmallClass smallClass);
@@ -61,7 +65,7 @@ public interface GroupInitStrategy {
             smallClass.setClassStatusEnum(publicClassInfoStatusEnum);
             new SmallClassEvent(smallClass, this.getSmallEventDispathch(), smallClass.getClassStatusEnum());
         } catch (Exception ex) {
-            System.out.println("记录日志错误");
+           logger.error("@recordLog,记录日志错误",ex);
         }
     }
 

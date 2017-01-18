@@ -106,7 +106,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
 
     @Override
     public SmallClassEventDispatch getSmallEventDispathch() {
-        return null;
+        return smallClassEventDispatch;
     }
 
     @Override

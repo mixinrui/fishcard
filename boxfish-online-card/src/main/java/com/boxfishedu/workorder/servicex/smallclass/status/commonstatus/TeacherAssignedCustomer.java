@@ -52,7 +52,7 @@ public class TeacherAssignedCustomer extends SmallClassEventCustomer {
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordSystemLog(
                 smallClass, PublicClassInfoStatusEnum.TEACHER_ASSIGNED.getCode()
-                , String.join(smallClass.getCourseName(), "分配教师[", "]"));
+                , String.join(smallClass.getTeacherId().toString(), "分配教师[", "]"));
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:

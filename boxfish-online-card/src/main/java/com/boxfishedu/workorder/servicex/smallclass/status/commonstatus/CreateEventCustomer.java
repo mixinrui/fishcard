@@ -54,7 +54,7 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
-        logger.debug("触发状态改变事件,smallClass[{}]"
+        logger.debug("@CreateEventCustomer触发状态改变事件,smallClass[{}]"
                 , JacksonUtil.toJSon(smallClass));
 
         GroupInitStrategy groupInitStrategy
