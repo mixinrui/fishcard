@@ -56,7 +56,7 @@ public class StudentCourseSchedule implements Serializable {
 
     public String getClassTypeDesc() {
         if(Objects.equals(classType, SMALL.name())) {
-            return "6人小班";
+            return "4人小班";
         } else {
             return "1对1";
         }
