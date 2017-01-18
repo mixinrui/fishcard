@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.web.controller.smallclass;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassStudentStatusServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class SmallClassTeacherController {
 
     @Autowired
     private SmallClassJpaRepository smallClassJpaRepository;
+
+    @Autowired
+    SmallClassStudentStatusServiceX smallClassStudentStatusServiceX;
 
     @RequestMapping(value = "/{smallclass_id}/validate", method = RequestMethod.GET)
     public JsonResultModel validate(@PathVariable("smallclass_id") Long smallClassId) {
@@ -41,7 +45,9 @@ public class SmallClassTeacherController {
     }
 
     @RequestMapping(value = "/{smallclass_id}/status", method = RequestMethod.POST)
-    public JsonResultModel status(@RequestBody Map<String, String> statusReport) {
+    public JsonResultModel status(@PathVariable("smallclass_id") Long smallClassId
+            ,@RequestBody Map<String, String> statusReport, Long userId) {
+        smallClassStudentStatusServiceX.status(smallClassId, userId, statusReport);
         return JsonResultModel.newJsonResultModel("success");
     }
 }
