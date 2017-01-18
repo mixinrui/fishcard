@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 2016/6/20.
@@ -53,6 +54,7 @@ public class FishCardStatusFinderServiceX {
     public void studentAbsentFinder() {
         logger.info("=================studentAbsentFinder开始轮询课程开始情况,判断学生是否旷课");
         List<WorkOrder> workOrderList = fishCardStatusService.getCardsWaitStudentAccepted();
+        workOrderList=workOrderList.stream().filter(WorkOrder::notPublicWorkOrder).collect(Collectors.toList());
         logger.info("超过上课时间没有学生没有接受上课的数量:{}", workOrderList.size());
         TreeSet<FishCardDelayMessage> treeSet = getFishCardDelayMessages(workOrderList,FishCardDelayMsgType.STUDENT_ABSENT);
         Iterator<FishCardDelayMessage> iterator=treeSet.iterator();

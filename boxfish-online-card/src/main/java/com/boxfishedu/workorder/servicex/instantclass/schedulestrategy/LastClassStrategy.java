@@ -30,10 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Created by hucl on 16/12/20.
@@ -115,8 +112,8 @@ public class LastClassStrategy implements ScheduleStrategy {
     @Override
     public Optional<WorkOrder> getCardToStart(InstantRequestParam instantRequestParam, int teachingType) {
         return workOrderJpaRepository
-                .findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterOrderByStartTimeAsc(instantRequestParam
-                                                                                                    .getStudentId(), teachingType, new Integer(0), new Date());
+                .findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterAndClassTypeNotInOrderByStartTimeAsc(
+                        instantRequestParam.getStudentId(), teachingType, new Integer(0), new Date(), Arrays.asList(ClassTypeEnum.SMALL.name()));
     }
 
     private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder, Map<WorkOrder, String> logMap) {

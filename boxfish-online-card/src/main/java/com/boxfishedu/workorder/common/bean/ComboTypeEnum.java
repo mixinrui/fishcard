@@ -16,6 +16,9 @@ public enum ComboTypeEnum {
     CHINESE("CHINESE"),
     //免费体验
     EXPERIENCE("EXPERIENCE"),
+
+    SMALLCLASS("SMALLCLASS"),
+
     REWARD("REWARD"),
     //终极梦想+考试指导
     INTELLIGENT("INTELLIGENT");
