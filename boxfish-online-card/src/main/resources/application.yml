@@ -199,7 +199,7 @@ interface:
 #  获取课程类型和难度
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
@@ -267,7 +267,7 @@ interface:
 #  获取课程类型和难度
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
@@ -337,7 +337,7 @@ interface:
 #支付系统
     pay_service: http://101.201.237.252:8888/pay-inside
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
@@ -417,7 +417,7 @@ interface:
 #  获取课程类型和难度
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api-online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  师生运营匹配老师
@@ -504,7 +504,7 @@ interface:
 #  学生旷课扣积分
     absenteeism_deduct_score: https://api.online.test.boxfish.cn
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
@@ -580,7 +580,7 @@ interface:
 #  获取课程类型和难度
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
@@ -650,7 +650,7 @@ interface:
 #  学生旷课扣积分
     absenteeism_deduct_score: https://api.test.boxfish.cn
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api.online.test.boxfish.cn/online/figure
     resource_url: http://api.online.test.boxfish.cn/online
 #  获取课程类型和难度
@@ -741,7 +741,7 @@ interface:
 #  获取课程类型和难度
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api.boxfish.cn//online/figure
     resource_url: http://api.boxfish.cn//online
 #消息推送地址
@@ -824,7 +824,7 @@ interface:
 #  获取课程类型和难度
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
-    login_filter_url: http://114.55.140.96:6901
+    login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api.boxfish.cn/online/figure
     resource_url: http://api.boxfish.cn/online
     #消息推送地址
