@@ -65,10 +65,10 @@ public class PublicClassRoom {
     public void enter(SmallClass smallClass, Long studentId, String nickName, String accessToken) {
 
         // 是否在上课正常时间范围内
-//        long time = new Date().getTime();
-//        if(time < smallClass.getStartTime().getTime() || time > smallClass.getEndTime().getTime()) {
-//            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
-//        }
+        long time = new Date().getTime();
+        if(time < smallClass.getStartTime().getTime() || time > smallClass.getEndTime().getTime()) {
+            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
+        }
 
         // 一 判断是否是第一次进入这个课堂, 如果不是, 则直接返回
         if(isOnceEntered(smallClass.getId(), studentId)) {
@@ -148,6 +148,7 @@ public class PublicClassRoom {
                 .map(SmallClass::getSlotId)
                 .distinct()
                 .map(PublicClassTimeEnum::getCourseDifficultiesBySlotId)
+                .filter(t -> t != null)
                 .flatMap(Collection::stream)
                 .map(c -> c.pushCode)
                 .collect(Collectors.toSet());
@@ -214,7 +215,7 @@ public class PublicClassRoom {
             // 非会员直接不让上课
             case "NONE" : throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
             // 会员验证
-            default: // memberCheck(classDate, studentId);// break;
+            default:  memberCheck(classDate, studentId); break;
         }
     }
 
@@ -228,10 +229,10 @@ public class PublicClassRoom {
         }
 
         // 会员每天只能上一节课
-//        Integer count = publicClassInfoJpaRepository.findByClassDateAndStudentId(classDate, studentId);
-//        if(count > 0) {
-//            throw new PublicClassException(PublicClassMessageEnum.EVERY_DAY_LIMIT);
-//        }
+        Integer count = publicClassInfoJpaRepository.findByClassDateAndStudentId(classDate, studentId);
+        if(count > 0) {
+            throw new PublicClassException(PublicClassMessageEnum.EVERY_DAY_LIMIT);
+        }
     }
 
 

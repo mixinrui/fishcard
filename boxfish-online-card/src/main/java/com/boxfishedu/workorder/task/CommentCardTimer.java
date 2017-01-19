@@ -41,12 +41,13 @@ public class CommentCardTimer {
     }
 
 //    @Scheduled(cron = "0 0/1 * * * ?")
-    @RequestMapping(value = "/notify/member")
+//    @RequestMapping(value = "/notify/member")
     public void notifyCommentCard() {
         foreignTeacherCommentCardService.notifyExpireCommentCards();
     }
 
 
+    @RequestMapping(value = "/notify/public")
 //    @Scheduled(cron = "0 0/1 * * * ?")
     public void notifyPublicClass() {
         publicClassRoom.publicClassRoomNotification();
