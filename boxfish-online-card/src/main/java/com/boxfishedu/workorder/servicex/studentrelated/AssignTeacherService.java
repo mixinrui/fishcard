@@ -144,7 +144,8 @@ public class AssignTeacherService {
         Integer skuId = skuIdParameter;
         if (null != oldWorkOrderId) {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
-            if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+
+            if(null==workOrder || ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
                 return JsonResultModel.newJsonResultModel(null);
             }
             skuId = workOrder.getSkuId();
