@@ -45,25 +45,7 @@ HomePageController {
 
     @RequestMapping(value = "/student/{student_id}/public", method = RequestMethod.GET)
     public JsonResultModel publicClassInfo() {
-        List<SmallClass> smallClasses =
-                smallClassJpaRepository.findByClassDateAndClassType(new Date(), ClassTypeEnum.PUBLIC.name());
-        List<AccountCourseBean.CardCourseInfo> cardCourseInfos = Lists.newArrayList();
-        smallClasses.forEach(smallClass -> {
-            AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
-            cardCourseInfo.setSmallClassId(smallClass.getId());
-            cardCourseInfo.setSmallClassInfo(smallClass);
-            cardCourseInfo.setStatus(smallClass.getStatus());
-            cardCourseInfo.setThumbnail(smallClass.getCover());
-            cardCourseInfo.setCourseType(smallClass.getCourseType());
-            cardCourseInfo.setCourseId(smallClass.getCourseId());
-            cardCourseInfo.setCourseName(smallClass.getCourseName());
-            cardCourseInfo.setDateInfo(smallClass.getStartTime());
-            cardCourseInfo.setDifficulty(smallClass.getDifficultyLevel());
-
-            cardCourseInfos.add(cardCourseInfo);
-        });
-
-        return JsonResultModel.newJsonResultModel(cardCourseInfos);
+        return homePageServiceX.getPublicHomePage();
     }
 
 }

@@ -1,16 +1,10 @@
 package com.boxfishedu.workorder.servicex.instantclass.tutorrange;
 
-import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.instantclass.InstantClassService;
 import com.boxfishedu.workorder.servicex.instantclass.bean.TeacherInstantRangeBean;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Map;
 

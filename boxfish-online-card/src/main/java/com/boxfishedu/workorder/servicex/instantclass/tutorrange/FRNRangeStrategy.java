@@ -4,12 +4,7 @@ import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.mongo.InstantClassTimeRulesMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
