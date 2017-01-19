@@ -95,6 +95,7 @@ public class ScheduleCourseValidator implements InstantClassValidator {
 
         if (latestMatchedDateOptional.isPresent()) {
             //TODO:25分钟之内匹配上的,则放行;需要做配置
+
             LocalDateTime localDateTimeBegin = LocalDateTime.now(ZoneId.systemDefault()).minusMinutes(30);
 
             if (latestMatchedDateOptional.get().getRequestMatchTeacherTime().after(DateUtil.localDate2Date(localDateTimeBegin))) {

@@ -24,7 +24,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
 
     //按照订单id查找鱼卡
-    public Page<WorkOrder> findByOrderIdAndIsFreeze(Long orderId,Integer isFreeze,Pageable pageable);
+    public Page<WorkOrder> findByOrderIdAndIsFreeze(Long orderId, Integer isFreeze, Pageable pageable);
 
     public WorkOrder findByOrderIdAndServiceId(Long orderId, Long serviceId);
 
@@ -49,11 +49,11 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select wo from  WorkOrder wo where wo.studentId =?1 and wo.startTime <current_timestamp  and wo.isFreeze!=1  order by wo.startTime desc ")
     public List<WorkOrder> findByStudentIdAfterNow(Long studentId);
 
-    public List<WorkOrder> findByIsFreezeAndStartTimeBetweenAndParentIdNotNull( Integer isFreeze, Date startDate, Date endDate);
+    public List<WorkOrder> findByIsFreezeAndStartTimeBetweenAndParentIdNotNull(Integer isFreeze, Date startDate, Date endDate);
 
     public List<WorkOrder> findByNeedChangeTime(Integer needChangeTime);
 
-    public List<WorkOrder> findByNeedChangeTimeAndStudentId(Integer needChangeTime,Long studentId);
+    public List<WorkOrder> findByNeedChangeTimeAndStudentId(Integer needChangeTime, Long studentId);
 
 
     //查找出学生所有状态的工单
@@ -129,6 +129,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     @Query("select wo from WorkOrder wo where wo.id in (?1) ")
     public List<WorkOrder> findWorkOrderAll(Long[] ids);
+
     @Query("select wo from WorkOrder wo where wo.id in (?1) ")
     public List<WorkOrder> findWorkOrderAll(List<Long> ids);
 
@@ -143,7 +144,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     //  获取未来两天内 未安排教师的鱼卡信息  teacherid =0
     @Query(value = "select wo from WorkOrder wo where wo.teacherId=?1 and wo.isFreeze=?2 and wo.startTime between ?3 and ?4 and wo.createTime<?5 and (wo.classType not in(?6) or wo.classType is null)    order by wo.startTime")
-    public List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(Long teacherId, Integer isFreeze, Date startDate, Date endDate, Date createTime,List<String> classTypes);
+    public List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeBetweenAndCreateTimeLessThanOrderByStartTime(Long teacherId, Integer isFreeze, Date startDate, Date endDate, Date createTime, List<String> classTypes);
 
     //查找出学生所有状态的工单
     @Query("select distinct wo.studentId from WorkOrder wo where wo.orderId<11111111")
@@ -159,15 +160,15 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select  wo from WorkOrder wo where wo.status = 51 and wo.deductScoreStatus is null and (wo.startTime between?1 and?2) and wo.orderChannel != ?3")
     List<WorkOrder> queryAbsentStudent(Date startTime, Date endTime, String param);
 
-    List<WorkOrder> findByStudentIdAndComboTypeAndSkuIdAndStartTimeAfter(Long studentId,String comboType,Integer skuId, Date date);
+    List<WorkOrder> findByStudentIdAndComboTypeAndSkuIdAndStartTimeAfter(Long studentId, String comboType, Integer skuId, Date date);
 
-    List<WorkOrder> findByStudentIdAndComboTypeInAndSkuIdAndStartTimeAfter(Long studentId,String[] comboType,Integer skuId, Date date);
+    List<WorkOrder> findByStudentIdAndComboTypeInAndSkuIdAndStartTimeAfter(Long studentId, String[] comboType, Integer skuId, Date date);
 
-    List<WorkOrder> findByStudentIdAndComboTypeAndStartTimeAfter(Long studentId,String comboType, Date date);
+    List<WorkOrder> findByStudentIdAndComboTypeAndStartTimeAfter(Long studentId, String comboType, Date date);
 
-    List<WorkOrder> findByStudentIdAndComboTypeInAndStartTimeAfter(Long studentId,String[] comboType, Date date);
+    List<WorkOrder> findByStudentIdAndComboTypeInAndStartTimeAfter(Long studentId, String[] comboType, Date date);
 
-    public WorkOrder findTop1ByStudentIdAndSkuIdAndStartTimeAfterOrderByStartTime(Long studentId,Integer skuId, Date date);
+    public WorkOrder findTop1ByStudentIdAndSkuIdAndStartTimeAfterOrderByStartTime(Long studentId, Integer skuId, Date date);
 
     @Query("select wo.id from WorkOrder wo")
     public List<Long> findAllWorkOrderId();
@@ -175,7 +176,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("select wo.id from WorkOrder wo where wo.startTime<?1")
     public List<Long> findAllFinishedId(Date date);
 
-    List<WorkOrder> findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(Integer freezeFlag,Short isCourseOver,Integer status,Date startTime);
+    List<WorkOrder> findByIsFreezeAndIsCourseOverAndStatusLessThanAndStartTimeLessThan(Integer freezeFlag, Short isCourseOver, Integer status, Date startTime);
 
     // 获取兑换类型一个种类下最大的一个序号
     @Query("select max(w.seqNum) from WorkOrder w where w.studentId=?1 and w.comboType=?2 and w.skuIdExtra=?3")
@@ -186,20 +187,23 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     List<WorkOrder> findWithinHoursCreatedWorkOrderList(Date endTime);
 
     //查找最新一节上过的课程
-    Optional<WorkOrder> findTop1ByStudentIdAndStartTimeLessThanOrderByStartTimeDesc(Long studentId,Date date);
+    Optional<WorkOrder> findTop1ByStudentIdAndStartTimeLessThanOrderByStartTimeDesc(Long studentId, Date date);
 
 
     @Query(value = "select min(wo.startTime) from WorkOrder wo where studentId=? and isFreeze=? and startTime>?")
-    Optional<Date> findLatestClassDateByStudentId(Long studentId,Integer isFreeze,Date date);
+    Optional<Date> findLatestClassDateByStudentId(Long studentId, Integer isFreeze, Date date);
 
-    Optional<WorkOrder> findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterOrderByStartTimeAsc(Long studentId,Integer skuId,Integer isFreeze,Date date);
+    Optional<WorkOrder> findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterOrderByStartTimeAsc(Long studentId, Integer skuId, Integer isFreeze, Date date);
+
+    Optional<WorkOrder> findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterAndClassTypeIsNullOrderByStartTimeAsc(Long studentId, Integer skuId, Integer isFreeze, Date date);
 
     @Query(value = "select distinct wo.skuId from WorkOrder wo where studentId=? and startTime>?")
-    List<Integer> findDistinctSkuIds(Long studentId,Date startTime);
+    List<Integer> findDistinctSkuIds(Long studentId, Date startTime);
 
-    List<WorkOrder>  findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId,Date startTime,Integer skuId,Integer isFreeze);
+    @Query(value = "select wo from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and wo.skuId=?3 and wo.isFreeze=?4  and (wo.classType not in(?5) or wo.classType is null)  ")
+    List<WorkOrder>  findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId,Date startTime,Integer skuId,Integer isFreeze,List<String> listClassTypes);
 
-    List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeIn(Long teacherId,Integer isFreeze,List startTimes);
+    List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeIn(Long teacherId, Integer isFreeze, List startTimes);
 
     @Query("select wo from  WorkOrder wo where wo.teacherId=?1 and (wo.endTime between ?2 and ?3) and status=?4 order by wo.endTime ")
     public List<WorkOrder> findByStartTime(Long teacherId, Date beginDate, Date endDate, Integer status);
@@ -211,11 +215,11 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     List<WorkOrder> findByClassTypeAndSmallClassIdIsNotNullAndStartTimeGreaterThan(String classType, Date date);
 
     @Query("select wo from  WorkOrder wo where wo.studentId=?1 and (wo.startTime between ?2 and ?3) and wo.isFreeze=0  and wo.slotId in(?4) order by wo.startTime ")
-    public List<WorkOrder> findByMyClasses(Long studentId, Date beginDate, Date endDate ,List<Integer> slots);
+    public List<WorkOrder> findByMyClasses(Long studentId, Date beginDate, Date endDate, List<Integer> slots);
 
     List<WorkOrder> findBySmallClassId(Long smallClassId);
 
-    WorkOrder findBySmallClassIdAndStudentId(Long smallClassId,Long studentId);
+    WorkOrder findBySmallClassIdAndStudentId(Long smallClassId, Long studentId);
 
     List<WorkOrder> findByClassTypeAndSmallClassIdIsNullAndStartTimeBetween(String name, Date date, Date deadDate);
 }

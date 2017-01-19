@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/9/26.
@@ -75,29 +76,31 @@ public class DataCollectorService {
     public Integer getChineseUnselectedServices(Long studentId) {
         List<Service> overAllServices = serveService.getUnselectedService(studentId, ComboTypeEnum.OVERALL, 0);
         List<Service> otherChineseServices = serveService.getUnselectedService(studentId,
-                Lists.newArrayList(ComboTypeEnum.EXCHANGE,ComboTypeEnum.INTELLIGENT,ComboTypeEnum.EXPERIENCE,ComboTypeEnum.REWARD), TutorTypeEnum.CN, 0);
+                                                                               Lists.newArrayList(ComboTypeEnum.EXCHANGE, ComboTypeEnum.INTELLIGENT, ComboTypeEnum.EXPERIENCE, ComboTypeEnum.REWARD,ComboTypeEnum.SMALLCLASS), TutorTypeEnum.CN, 0);
 
         return (CollectionUtils.isEmpty(overAllServices) ? 0 : this.getAmountFromServices(overAllServices))
                 + (CollectionUtils.isEmpty(otherChineseServices) ? 0 : this.getAmountFromServices(otherChineseServices));
     }
 
     public Integer getForeignUnselectedServices(Long studentId) {
-        List<Service> communctionServices = serveService.getUnselectedService(studentId, Lists.newArrayList(ComboTypeEnum.FOREIGN,ComboTypeEnum.CHINESE), 0);
+        List<Service> communctionServices = serveService.getUnselectedService(studentId, Lists.newArrayList(ComboTypeEnum.FOREIGN, ComboTypeEnum.CHINESE), 0);
         List<Service> otherFrnServices = serveService.getUnselectedService(studentId,
-                Lists.newArrayList(ComboTypeEnum.EXCHANGE,ComboTypeEnum.INTELLIGENT,ComboTypeEnum.EXPERIENCE,ComboTypeEnum.REWARD), TutorTypeEnum.FRN, 0);
+                                                                           Lists.newArrayList(ComboTypeEnum.EXCHANGE, ComboTypeEnum.INTELLIGENT, ComboTypeEnum.EXPERIENCE, ComboTypeEnum.REWARD,ComboTypeEnum.SMALLCLASS), TutorTypeEnum.FRN, 0);
         return (CollectionUtils.isEmpty(communctionServices) ? 0 : this.getAmountFromServices(communctionServices))
                 + (CollectionUtils.isEmpty(otherFrnServices) ? 0 : this.getAmountFromServices(otherFrnServices));
     }
 
-    private List<WorkOrder> getOtherCards(com.boxfishedu.card.bean.TeachingType teachingType,Long studentId){
-        switch (teachingType){
+    private List<WorkOrder> getOtherCards(com.boxfishedu.card.bean.TeachingType teachingType, Long studentId) {
+        switch (teachingType) {
             case ZHONGJIAO:
-                return workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.INTELLIGENT,
-                        ComboTypeEnum.EXCHANGE,ComboTypeEnum.EXPERIENCE,ComboTypeEnum.REWARD), com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
+                return workOrderService.getSelectedLeftAmount(
+                        studentId, Lists.newArrayList(ComboTypeEnum.INTELLIGENT
+                                ,ComboTypeEnum.EXCHANGE, ComboTypeEnum.EXPERIENCE, ComboTypeEnum.REWARD,ComboTypeEnum.SMALLCLASS), com.boxfishedu.card.bean.TeachingType.ZHONGJIAO);
             case WAIJIAO:
-                return workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.INTELLIGENT,
-                        ComboTypeEnum.EXCHANGE,ComboTypeEnum.EXPERIENCE,ComboTypeEnum.REWARD), com.boxfishedu.card.bean.TeachingType.WAIJIAO);
-            default: return null;
+                return workOrderService.getSelectedLeftAmount(
+                        studentId, Lists.newArrayList(ComboTypeEnum.INTELLIGENT, ComboTypeEnum.EXCHANGE, ComboTypeEnum.EXPERIENCE, ComboTypeEnum.REWARD,ComboTypeEnum.SMALLCLASS), com.boxfishedu.card.bean.TeachingType.WAIJIAO);
+            default:
+                return null;
         }
     }
 
@@ -105,7 +108,7 @@ public class DataCollectorService {
         logger.debug("#getChineseSelectedLeftWorkOrders#用户[{}]", studentId);
         //中教:核心素养
         List<WorkOrder> overallCards = workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.OVERALL));
-        List<WorkOrder> otherChineses = getOtherCards(com.boxfishedu.card.bean.TeachingType.ZHONGJIAO,studentId);
+        List<WorkOrder> otherChineses = getOtherCards(com.boxfishedu.card.bean.TeachingType.ZHONGJIAO, studentId);
 
         List<WorkOrder> chineseCards = Lists.newArrayList(overallCards);
         chineseCards.addAll(otherChineses);
@@ -116,8 +119,8 @@ public class DataCollectorService {
     public List<WorkOrder> getForeignSelectedLeftWorkOrders(Long studentId) {
         logger.debug("#getForeignSelectedLeftWorkOrders#用户[{}]", studentId);
         //外教+金币换课外教+终极梦想
-        List<WorkOrder> communictionCards = workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.FOREIGN,ComboTypeEnum.CHINESE));
-        List<WorkOrder> otherForeigns = getOtherCards(com.boxfishedu.card.bean.TeachingType.WAIJIAO,studentId);
+        List<WorkOrder> communictionCards = workOrderService.getSelectedLeftAmount(studentId, Lists.newArrayList(ComboTypeEnum.FOREIGN, ComboTypeEnum.CHINESE));
+        List<WorkOrder> otherForeigns = getOtherCards(com.boxfishedu.card.bean.TeachingType.WAIJIAO, studentId);
 
         List<WorkOrder> foreignCards = Lists.newArrayList(communictionCards);
         foreignCards.addAll(otherForeigns);
@@ -182,7 +185,7 @@ public class DataCollectorService {
         threadPoolManager.execute(new Thread(() -> this.updateBothChnAndFnItem(studentId)));
     }
 
-    public void updateBothChnAndFnItemForCardId(Long fishcardId){
+    public void updateBothChnAndFnItemForCardId(Long fishcardId) {
         updateBothChnAndFnItem(workOrderService.findOne(fishcardId).getStudentId());
     }
 
@@ -193,12 +196,15 @@ public class DataCollectorService {
             AccountCourseBean foreignCourseBean = updateForeignItem(studentId);
             accountCardInfoService.saveOrUpdateChAndFrn(studentId, chineseCourseBean, foreignCourseBean);
         } catch (Exception ex) {
-            logger.error("@updateBothChnAndFnItem#exception#user[{}]更新首页信息失败", studentId,ex);
+            logger.error("@updateBothChnAndFnItem#exception#user[{}]更新首页信息失败", studentId, ex);
         }
     }
 
     public AccountCourseBean.CardCourseInfo scheduleCourseAdapter(ScheduleCourseInfo scheduleCourseInfo, WorkOrder workOrder) {
         AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
+        if(Objects.isNull(scheduleCourseInfo)){
+            return null;
+        }
         cardCourseInfo.setThumbnail(scheduleCourseInfo.getThumbnail());
         cardCourseInfo.setCourseId(scheduleCourseInfo.getCourseId());
         cardCourseInfo.setCourseName(scheduleCourseInfo.getName());

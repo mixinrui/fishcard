@@ -102,8 +102,8 @@ public class AssignTeacherService {
         if (workOrder == null) {
             throw new BusinessException("课程信息有误");
         }
-        // 小班课不指定老师
-        if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+        // 小班课不指定老师 公开课
+        if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType()) || ClassTypeEnum.PUBLIC.name().equals(workOrder.getClassType())){
             return null;
         }
 
@@ -121,7 +121,7 @@ public class AssignTeacherService {
 
         //该学生 是否 同类型课 是否指定过老师
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(workOrder.getSkuId()));
-        //用于判断 是否为同类型最后一节课
+        //用于判断 是否为同类型最后一节课 排除小班课 和公开课
         List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
 
         // 未指定过该类型课的老师   或者 指定该类型课的老师 和 改刚刚上过课的老师 不是一个人
@@ -144,7 +144,8 @@ public class AssignTeacherService {
         Integer skuId = skuIdParameter;
         if (null != oldWorkOrderId) {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
-            if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+
+            if(null==workOrder || ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
                 return JsonResultModel.newJsonResultModel(null);
             }
             skuId = workOrder.getSkuId();

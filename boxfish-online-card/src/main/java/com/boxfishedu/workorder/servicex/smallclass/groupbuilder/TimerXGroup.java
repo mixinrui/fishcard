@@ -45,7 +45,7 @@ public class TimerXGroup extends GroupBuilder {
 
     @Override
     protected List<WorkOrder> cardsToGroup() {
-        LocalDateTime deadLocalDateTime = LocalDateTime.now().plusDays(10);
+        LocalDateTime deadLocalDateTime = LocalDateTime.now().plusDays(30);
         Date deadDate = DateUtil.localDate2Date(deadLocalDateTime);
         return workOrderJpaRepository
                 .findByClassTypeAndSmallClassIdIsNullAndStartTimeBetween(ClassTypeEnum.SMALL.name(), new Date(), deadDate);

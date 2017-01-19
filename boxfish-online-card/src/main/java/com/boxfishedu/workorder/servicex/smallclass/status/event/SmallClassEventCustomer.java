@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.event;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
@@ -42,6 +43,9 @@ public abstract class SmallClassEventCustomer {
 
     public void writeStatusBack2Card(SmallClass smallClass, FishCardStatusEnum fishCardStatusEnum) {
         List<WorkOrder> workOrders = this.getWorkOrders(smallClass);
+
+        logger.debug("@writeStatusBack2Card,smallclass[{}],workorders[{}]"
+                                             , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(workOrders));
 
         this.updateWorkStatuses(workOrders, fishCardStatusEnum);
 
