@@ -401,9 +401,9 @@ interface:
   address:
     teacher_service: http://123.56.13.168:8099/teacher
     teacher_service_admin: http://123.56.13.168:8098/teacheradmin
-    course_recommended_service: http://123.56.13.168:8001/recommend
-    course_wudaokou_recommend_service: http://123.56.13.168:8001/boxfish-wudaokou-recommend/recommend
-    course_wudaokou_detail_service: http://123.56.13.168:8001/boxfish-wudaokou-course/course/info
+    course_recommended_service: https://online-api.test.boxfish.cn/recommend
+    course_wudaokou_recommend_service: https://online-api.test.boxfish.cn/boxfish-wudaokou-recommend/recommend
+    course_wudaokou_detail_service: https://online-api.test.boxfish.cn/boxfish-wudaokou-course/course/info
     fishcard_service: http://123.56.13.168:8080/fishcard
     order_service: http://123.56.13.168:8082/order
     course_online_service: http://123.56.13.168:9090/teaching-service

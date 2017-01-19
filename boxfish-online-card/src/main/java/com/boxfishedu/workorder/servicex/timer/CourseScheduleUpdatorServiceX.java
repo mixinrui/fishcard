@@ -92,7 +92,7 @@ public class CourseScheduleUpdatorServiceX {
     private static Map<Long, List<CourseSchedule>> groupByUserId(List<CourseSchedule> courseScheduleList) {
         Map<Long, List<CourseSchedule>> resultMap = Maps.newLinkedHashMap();
         for (CourseSchedule courseSchedule : courseScheduleList) {
-            if(courseSchedule.getIsFreeze()==1){
+            if (courseSchedule.getIsFreeze() == 1) {
                 continue;
             }
             List<CourseSchedule> studentCourseScheduleList = resultMap.get(courseSchedule.getStudentId());
@@ -154,21 +154,21 @@ public class CourseScheduleUpdatorServiceX {
         workOrderLogService.saveWorkOrderLog(workOrder);
     }
 
-    public void freezeUpdateHome(){
+    public void freezeUpdateHome() {
         logger.info("@freezeUpdateHome###########");
-        List<WorkOrder> workOrders=workOrderService.findFreezeCardsToUpdate();
-        if(CollectionUtils.isEmpty(workOrders)){
+        List<WorkOrder> workOrders = workOrderService.findFreezeCardsToUpdate();
+        if (CollectionUtils.isEmpty(workOrders)) {
             return;
         }
-        Set<Long> userIdSet= Sets.newHashSet();
+        Set<Long> userIdSet = Sets.newHashSet();
         workOrders.forEach(workOrder -> {
-            if(!userIdSet.contains(workOrder.getStudentId())) {
+            if (!userIdSet.contains(workOrder.getStudentId())) {
                 userIdSet.add(workOrder.getStudentId());
             }
-            workOrder.setIsCourseOver((short)1);
+            workOrder.setIsCourseOver((short) 1);
         });
         workOrderService.save(workOrders);
-        userIdSet.forEach(userId->{
+        userIdSet.forEach(userId -> {
             logger.info("@freezeUpdateHome###########updateBothChnAndFnItemAsync");
             dataCollectorService.updateBothChnAndFnItemAsync(userId);
         });
@@ -190,7 +190,7 @@ public class CourseScheduleUpdatorServiceX {
         Map<Long, List<WorkOrder>> workOrderMap = workOrderList.stream().collect(
                 Collectors.groupingBy(WorkOrder::getStudentId, Collectors.toList()));
         Map<Long, CourseSchedule> courseScheduleMap = courseScheduleList.stream()
-                .collect(Collectors.toMap(CourseSchedule::getWorkorderId, (courseSchedule -> courseSchedule)));
+                                                                        .collect(Collectors.toMap(CourseSchedule::getWorkorderId, (courseSchedule -> courseSchedule)));
 
         ThreadPoolExecutor exec = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         workOrderMap.forEach((studentId, list) -> exec.execute(new RecommendCourseTask(list, courseScheduleMap)));
@@ -203,7 +203,7 @@ public class CourseScheduleUpdatorServiceX {
                 int progress = Math.round((exec.getCompletedTaskCount() * 100) / exec.getTaskCount());
                 String msg = progress + "% has done," + exec.getCompletedTaskCount()
                         + " has completed!! count=" + exec.getTaskCount();
-                if(!StringUtils.equals(message, msg)) {
+                if (!StringUtils.equals(message, msg)) {
                     System.out.println(message = msg);
                 }
             }
@@ -212,6 +212,6 @@ public class CourseScheduleUpdatorServiceX {
         }
         System.out.println("recommend courses finished!!");
 
-        workOrderMap.forEach((studentId,list)->dataCollectorService.updateBothChnAndFnItemAsync(studentId));
+        workOrderMap.forEach((studentId, list) -> dataCollectorService.updateBothChnAndFnItemAsync(studentId));
     }
 }

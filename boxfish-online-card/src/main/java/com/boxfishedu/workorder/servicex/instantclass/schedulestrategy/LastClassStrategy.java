@@ -112,8 +112,8 @@ public class LastClassStrategy implements ScheduleStrategy {
     @Override
     public Optional<WorkOrder> getCardToStart(InstantRequestParam instantRequestParam, int teachingType) {
         return workOrderJpaRepository
-                .findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterAndClassTypeNotInOrderByStartTimeAsc(
-                        instantRequestParam.getStudentId(), teachingType, new Integer(0), new Date(), Arrays.asList(ClassTypeEnum.SMALL.name()));
+                .findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterAndClassTypeIsNullOrderByStartTimeAsc(
+                        instantRequestParam.getStudentId(), teachingType, new Integer(0), new Date());
     }
 
     private WorkOrder dealFirstWorkOrder(InstantClassCard instantClassCard, WorkOrder firstWorkOrder, Map<WorkOrder, String> logMap) {

@@ -13,6 +13,9 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -31,6 +34,20 @@ public class HomePageServiceX {
 
     @Autowired
     private SmallClassJpaRepository smallClassJpaRepository;
+
+//    @Autowired
+//    StringRedisTemplate redisTemplate;
+
+//    private ZSetOperations zSetOperations;
+
+    private final String PUBLIC_CLASS_KEY_PREFIX = "public_class:";
+
+//    @Autowired
+//    void opsForSet(
+//            @Qualifier("teachingServiceRedisTemplate")
+//            StringRedisTemplate redisTemplate) {
+//        zSetOperations = redisTemplate.opsForZSet();
+//    }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -68,8 +85,8 @@ public class HomePageServiceX {
         return JsonResultModel.newJsonResultModel(cardCourseInfos);
     }
 
-    public void putIntoRedis(){
-
+    public void putIntoRedis() {
+//        zSetOperations
     }
 
     private List<AccountCourseBean.CardCourseInfo> getPublicCourseInfosFromDb() {
@@ -87,7 +104,6 @@ public class HomePageServiceX {
             cardCourseInfo.setCourseName(smallClass.getCourseName());
             cardCourseInfo.setDateInfo(smallClass.getStartTime());
             cardCourseInfo.setDifficulty(smallClass.getDifficultyLevel());
-
             cardCourseInfos.add(cardCourseInfo);
         });
         return cardCourseInfos;
