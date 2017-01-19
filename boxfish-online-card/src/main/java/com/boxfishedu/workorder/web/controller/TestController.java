@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
@@ -69,6 +70,9 @@ public class TestController {
 
     @Autowired
     private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
 
     @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
     public void changeFishCardTime(@RequestBody Map<String,String> param){
@@ -209,4 +213,12 @@ public class TestController {
         List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList,"workOrderId");
         assignTeacherServiceX.teacherAccept(teacherId,studentId, workOrderIds);
     }
+
+    @RequestMapping(value = "/homeupdate", method = RequestMethod.GET)
+    public JsonResultModel homeupdate(Long studentId){
+        dataCollectorService.updateBothChnAndFnItem(studentId);
+        return JsonResultModel.newJsonResultModel("ok");
+    }
+
+
 }

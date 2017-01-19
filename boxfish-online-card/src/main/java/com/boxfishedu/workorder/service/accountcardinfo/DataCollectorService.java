@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/9/26.
@@ -201,6 +202,9 @@ public class DataCollectorService {
 
     public AccountCourseBean.CardCourseInfo scheduleCourseAdapter(ScheduleCourseInfo scheduleCourseInfo, WorkOrder workOrder) {
         AccountCourseBean.CardCourseInfo cardCourseInfo = new AccountCourseBean.CardCourseInfo();
+        if(Objects.isNull(scheduleCourseInfo)){
+            return null;
+        }
         cardCourseInfo.setThumbnail(scheduleCourseInfo.getThumbnail());
         cardCourseInfo.setCourseId(scheduleCourseInfo.getCourseId());
         cardCourseInfo.setCourseName(scheduleCourseInfo.getName());
