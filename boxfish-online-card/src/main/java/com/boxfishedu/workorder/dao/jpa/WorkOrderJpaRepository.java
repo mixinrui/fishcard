@@ -200,7 +200,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query(value = "select distinct wo.skuId from WorkOrder wo where studentId=? and startTime>?")
     List<Integer> findDistinctSkuIds(Long studentId, Date startTime);
 
-    List<WorkOrder> findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId, Date startTime, Integer skuId, Integer isFreeze);
+    @Query(value = "select wo from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and wo.skuId=?3 and wo.isFreeze=?4  and (wo.classType not in(?5) or wo.classType is null)  ")
+    List<WorkOrder>  findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId,Date startTime,Integer skuId,Integer isFreeze,List<String> listClassTypes);
 
     List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeIn(Long teacherId, Integer isFreeze, List startTimes);
 
