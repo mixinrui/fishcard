@@ -121,7 +121,7 @@ public class AssignTeacherService {
 
         //该学生 是否 同类型课 是否指定过老师
         StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(workOrder.getStudentId(), StStudentSchema.StSchema.assgin, StStudentSchema.CourseType.getEnum(workOrder.getSkuId()));
-        //用于判断 是否为同类型最后一节课
+        //用于判断 是否为同类型最后一节课 排除小班课 和公开课
         List<WorkOrder> listWorkOrders = workOrderService.findByStartTimeMoreThanAndSkuIdAndIsFreeze(workOrder);
 
         // 未指定过该类型课的老师   或者 指定该类型课的老师 和 改刚刚上过课的老师 不是一个人
