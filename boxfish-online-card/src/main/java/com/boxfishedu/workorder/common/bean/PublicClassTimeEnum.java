@@ -15,8 +15,8 @@ import static com.boxfishedu.workorder.common.bean.CourseDifficultyEnum.*;
  * 上课时间设置枚举类
  * 学生难度为level1, 2, 只显示19:00, 上level2的课程
  * 学生难度为level3, 只显示19:30, 上level3的课程
- * 学生难度为level4, 只显示20:00, 上level4的课程
- * 学生难度为level5|6|7|8, 只显示20:30, 上level5的课课程
+ * 学生难度为level4, 只显示20:30, 上level4的课程
+ * 学生难度为level5|6|7|8, 只显示21:00, 上level5的课课程
  *
  */
 public enum PublicClassTimeEnum {
@@ -37,19 +37,19 @@ public enum PublicClassTimeEnum {
         }
     },
 
-    // 20:00
+    // 20:30
     TWENTY_1(LEVEL4) {
         @Override
         public TimeRange getTimeRange() {
-            return new TimeRange(27, LocalTime.of(20,0, 0), LocalTime.of(20, 30, 0));
+            return new TimeRange(28, LocalTime.of(20,30, 0), LocalTime.of(21, 0, 0));
         }
     },
 
-    // 20:30
+    // 21:00
     TWENTY_2(LEVEL5, LEVEL6, LEVEL7, LEVEl8) {
         @Override
         public TimeRange getTimeRange() {
-            return new TimeRange(28, LocalTime.of(20,30, 0), LocalTime.of(21, 0, 0));
+            return new TimeRange(29, LocalTime.of(21,0, 0), LocalTime.of(21, 30, 0));
         }
     };
 
