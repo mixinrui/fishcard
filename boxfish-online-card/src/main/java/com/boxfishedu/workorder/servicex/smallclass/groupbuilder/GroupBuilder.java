@@ -2,11 +2,9 @@ package com.boxfishedu.workorder.servicex.smallclass.groupbuilder;
 
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by hucl on 17/1/6.
@@ -39,8 +37,10 @@ public abstract class GroupBuilder {
             Map<String, List<WorkOrder>> levelGrouped = this.groupbyLevel(timedWorkOrders);
 
             levelGrouped.forEach((key, workOrders) -> {
-                Map<Integer, List<WorkOrder>> finalGroups = this.divideGroup(workOrders);
-                this.initGroup(finalGroups);
+                if (!CollectionUtils.isEmpty(workOrders)) {
+                    Map<Integer, List<WorkOrder>> finalGroups = this.divideGroup(workOrders);
+                    this.initGroup(finalGroups);
+                }
             });
 
 //            levelGrouped.forEach((levelKey, leveledWorkOrders) -> {
@@ -67,7 +67,7 @@ public abstract class GroupBuilder {
                 currentGroup = Lists.newArrayList();
                 finalGroup.put(groupCounter, currentGroup);
             }
-            if (currentGroup.size() == (memNum + 1)) {
+            if (currentGroup.size() == memNum) {
                 groupCounter++;
                 currentGroup = Lists.newArrayList();
                 finalGroup.put(groupCounter, currentGroup);

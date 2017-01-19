@@ -128,6 +128,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
         this.recordLog(smallClass, PublicClassInfoStatusEnum.COURSE_ASSIGNED);
         this.recordLog(smallClass, PublicClassInfoStatusEnum.TEACHER_ASSIGNED);
+
+        logger.debug("@initGroupClass#small#创建小班成功,小班是[{}],小班里的鱼卡是[{}]"
+                , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(smallClass.getAllCards()));
     }
 
     @Override

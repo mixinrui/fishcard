@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent
 import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -87,26 +88,28 @@ public class TimerXGroup extends GroupBuilder {
     @Override
     protected void initGroup(Map<Integer, List<WorkOrder>> groups) {
         groups.forEach((key, groupMembers) -> {
-            WorkOrder leader = this.selectLeader(groupMembers);
-            SmallClass smallClass = new SmallClass();
-            smallClass.setStatus(PublicClassInfoStatusEnum.CREATE.getCode());
-            smallClass.setClassDate(DateUtil.date2SimpleDate(leader.getStartTime()));
-            smallClass.setSlotId(leader.getSlotId());
-            smallClass.setCourseType(leader.getCourseType());
-            smallClass.setGroupLeader(leader.getStudentId());
-            smallClass.setGroupLeaderCard(leader.getId());
-            smallClass.setRoleId(leader.getSkuId());
-            smallClass.setCreateTime(new Date());
-            smallClass.setStartTime(leader.getStartTime());
-            smallClass.setEndTime(leader.getEndTime());
-            smallClass.setCourseType(leader.getCourseType());
-            smallClass.setDifficultyLevel(
-                    smallClassRequester.fetchUserDifficultyInfo(smallClass.getGroupLeader()));
-            smallClass.setClassType(ClassTypeEnum.SMALL.name());
-            smallClass.setAllCards(groupMembers);
-            smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
+            if (!CollectionUtils.isEmpty(groupMembers)) {
+                WorkOrder leader = this.selectLeader(groupMembers);
+                SmallClass smallClass = new SmallClass();
+                smallClass.setStatus(PublicClassInfoStatusEnum.CREATE.getCode());
+                smallClass.setClassDate(DateUtil.date2SimpleDate(leader.getStartTime()));
+                smallClass.setSlotId(leader.getSlotId());
+                smallClass.setCourseType(leader.getCourseType());
+                smallClass.setGroupLeader(leader.getStudentId());
+                smallClass.setGroupLeaderCard(leader.getId());
+                smallClass.setRoleId(leader.getSkuId());
+                smallClass.setCreateTime(new Date());
+                smallClass.setStartTime(leader.getStartTime());
+                smallClass.setEndTime(leader.getEndTime());
+                smallClass.setCourseType(leader.getCourseType());
+                smallClass.setDifficultyLevel(
+                        smallClassRequester.fetchUserDifficultyInfo(smallClass.getGroupLeader()));
+                smallClass.setClassType(ClassTypeEnum.SMALL.name());
+                smallClass.setAllCards(groupMembers);
+                smallClass.setAllStudentIds(this.fetchStudents(groupMembers));
 
-            new SmallClassEvent(smallClass, smallClassEventDispatch, PublicClassInfoStatusEnum.CREATE);
+                new SmallClassEvent(smallClass, smallClassEventDispatch, PublicClassInfoStatusEnum.CREATE);
+            }
         });
     }
 
