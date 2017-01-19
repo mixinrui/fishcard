@@ -317,9 +317,15 @@ public class AvaliableTimeServiceXV1 {
         // 一共延迟 8 周
         for (int i = 1; i < 9; i++) {
             JSONObject jb = new JSONObject();
-            String firstWeek = "下周开始";
-            String text = i == 1 ? firstWeek + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 2)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i))) + ")";
-            Date date = i == 1 ? DateUtil.getAfter7Days(currentDate, 2) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i));
+//            String firstWeek = "下周开始";
+//            String text = i == 1 ? firstWeek + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 2)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i))) + ")";
+//            Date date = i == 1 ? DateUtil.getAfter7Days(currentDate, 2) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i));
+
+
+            String text = i == 1 ? "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 3)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i))) + ")";
+            Date date = i == 1 ? DateUtil.getAfter7Days(currentDate, 3) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i));
+
+
             jb.put("id", i);
             jb.put("text", text);
             jb.put("date", DateUtil.Date2String24(date));

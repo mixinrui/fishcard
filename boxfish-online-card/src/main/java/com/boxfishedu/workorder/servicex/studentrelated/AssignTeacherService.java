@@ -102,8 +102,8 @@ public class AssignTeacherService {
         if (workOrder == null) {
             throw new BusinessException("课程信息有误");
         }
-        // 小班课不指定老师
-        if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+        // 小班课不指定老师 公开课
+        if(ClassTypeEnum.SMALL.name().equals( workOrder.getClassType()) || ClassTypeEnum.PUBLIC.name().equals(workOrder.getClassType())){
             return null;
         }
 
