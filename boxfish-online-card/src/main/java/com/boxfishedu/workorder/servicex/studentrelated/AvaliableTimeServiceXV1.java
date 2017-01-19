@@ -314,7 +314,7 @@ public class AvaliableTimeServiceXV1 {
 
         logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);
 
-        // 一共延迟 8 周
+        // 一共延迟 8 周  最早下下周开始
         for (int i = 1; i < 9; i++) {
             JSONObject jb = new JSONObject();
 //            String firstWeek = "下周开始";
@@ -323,7 +323,7 @@ public class AvaliableTimeServiceXV1 {
 
 
             String text = i == 1 ? "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 3)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i))) + ")";
-            Date date = i == 1 ? DateUtil.getAfter7Days(currentDate, 3) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i));
+            Date date   = i == 1 ? DateUtil.getAfter7Days(currentDate, 3) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i));
 
 
             jb.put("id", i);
