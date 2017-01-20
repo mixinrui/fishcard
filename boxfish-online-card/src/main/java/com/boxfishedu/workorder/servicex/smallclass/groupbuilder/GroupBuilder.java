@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public abstract class GroupBuilder {
 
-    protected abstract List<WorkOrder> cardsToGroup();
+    protected abstract List<WorkOrder> cardsToGroup(Integer days);
 
     protected abstract Map<String, List<WorkOrder>> groupByTime(List<WorkOrder> workOrders);
 
@@ -31,8 +31,12 @@ public abstract class GroupBuilder {
 
     protected abstract void updateHomePage(List<WorkOrder> workOrders);
 
-    public void group() {
-        List<WorkOrder> cards = this.cardsToGroup();
+    public void group(){
+        this.group(30);
+    }
+
+    public void group(Integer days) {
+        List<WorkOrder> cards = this.cardsToGroup(days);
 
         if (CollectionUtils.isEmpty(cards)) {
             return;

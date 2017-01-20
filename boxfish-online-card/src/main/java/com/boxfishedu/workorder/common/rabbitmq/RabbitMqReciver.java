@@ -244,7 +244,7 @@ public class RabbitMqReciver {
                 publicClassRoom.publicClassRoomNotification();
             }else if (serviceTimerMessage.getType() == TimerMessageType.CREATE_SMALL_CLASS.value()) {
                 logger.info("==========>@@@@SMALLCLASS_STUDENTS_RELATION===>>> 创建小班课");
-                groupBuilder.group();
+                groupBuilder.group(2);
             }
             else if (serviceTimerMessage.getType() == TimerMessageType.SMALLCLASS_STUDENTS_RELATION.value()) {
                 logger.info("==========>@@@@SMALLCLASS_STUDENTS_RELATION===>>> 小班课上课关系记录");

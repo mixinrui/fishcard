@@ -50,8 +50,8 @@ public class TimerXGroup extends GroupBuilder {
     private DataCollectorService dataCollectorService;
 
     @Override
-    protected List<WorkOrder> cardsToGroup() {
-        LocalDateTime deadLocalDateTime = LocalDateTime.now().plusDays(30);
+    protected List<WorkOrder> cardsToGroup(Integer days) {
+        LocalDateTime deadLocalDateTime = LocalDateTime.now().plusDays(days);
         Date deadDate = DateUtil.localDate2Date(deadLocalDateTime);
         return workOrderJpaRepository
                 .findByClassTypeAndSmallClassIdIsNullAndStartTimeBetween(ClassTypeEnum.SMALL.name(), new Date(), deadDate);
