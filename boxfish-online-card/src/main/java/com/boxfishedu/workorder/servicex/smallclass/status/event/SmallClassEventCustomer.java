@@ -51,6 +51,7 @@ public abstract class SmallClassEventCustomer {
                 .stream()
                 .filter(workOrder -> this.getSmallClassLogService().studentActed(workOrder))
                 .collect(Collectors.toList());
+        return
     }
 
     public void writeStatusBack2Card(SmallClass smallClass, FishCardStatusEnum fishCardStatusEnum) {

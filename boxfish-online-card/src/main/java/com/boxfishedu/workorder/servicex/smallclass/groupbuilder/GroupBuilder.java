@@ -34,6 +34,10 @@ public abstract class GroupBuilder {
     public void group() {
         List<WorkOrder> cards = this.cardsToGroup();
 
+        if (CollectionUtils.isEmpty(cards)) {
+            return;
+        }
+
         Map<String, List<WorkOrder>> timeGrouped = this.groupByTime(cards);
 
         timeGrouped.forEach((timeKey, timedWorkOrders) -> {
