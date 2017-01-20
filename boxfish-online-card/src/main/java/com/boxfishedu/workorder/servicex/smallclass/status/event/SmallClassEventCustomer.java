@@ -54,10 +54,18 @@ public abstract class SmallClassEventCustomer {
     }
 
     public void writeStatusBack2Card(SmallClass smallClass, FishCardStatusEnum fishCardStatusEnum) {
+        this.writeStatusBack2Card(smallClass, fishCardStatusEnum, false);
+    }
+
+    public void writeStatusBack2Card(SmallClass smallClass, FishCardStatusEnum fishCardStatusEnum, boolean filterStuntActed) {
         List<WorkOrder> workOrders = this.getWorkOrders(smallClass);
 
         logger.debug("@writeStatusBack2Card,smallclass[{}],workorders[{}]"
                 , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(workOrders));
+
+        if (filterStuntActed) {
+            workOrders = this.filterStudentActed(workOrders);
+        }
 
         this.updateWorkStatuses(workOrders, fishCardStatusEnum);
 
