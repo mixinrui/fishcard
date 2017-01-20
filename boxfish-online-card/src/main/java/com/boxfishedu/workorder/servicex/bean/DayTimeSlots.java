@@ -134,11 +134,14 @@ public class DayTimeSlots implements Cloneable, Serializable {
                 if (checkCourseSchedule(courseSchedule)) {
                     timeSlots.initTimeSlots(courseSchedule);
                     // 判断时间片是与当前日期的间隔, 时间间隔为4天
-                    long durationDays = DateUtil.durationOfDay(DateUtil.String2SimpleDate(day), new Date());
-                    if (StringUtils.isNotEmpty(courseSchedule.getCourseId())
-                            && (durationDays >= 0 && durationDays <= 4)) {
+                    if(org.apache.commons.lang3.StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
                         timeSlots.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
                     }
+//                    long durationDays = DateUtil.durationOfDay(DateUtil.String2SimpleDate(day), new Date());
+//                    if (StringUtils.isNotEmpty(courseSchedule.getCourseId())
+//                            && (durationDays >= 0 && durationDays <= 4)) {
+//                        timeSlots.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
+//                    }
                 }
             }
         }
