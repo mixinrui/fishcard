@@ -145,7 +145,7 @@ public class AssignTeacherService {
         if (null != oldWorkOrderId) {
             WorkOrder workOrder = workOrderService.findOne(oldWorkOrderId);
 
-            if(null==workOrder || ClassTypeEnum.SMALL.name().equals( workOrder.getClassType())){
+            if(null==workOrder || ClassTypeEnum.SMALL.name().equals( workOrder.getClassType()) || ClassTypeEnum.PUBLIC.equals( workOrder.getClassType())){
                 return JsonResultModel.newJsonResultModel(null);
             }
             skuId = workOrder.getSkuId();

@@ -113,25 +113,28 @@ public class PublicClassService {
         return publicClassRoom.getPublicClassRoomMembers(smallClassId);
     }
 
-
     public Long rollCall(Long smallClassId) {
         return publicClassRoom.rollCall(smallClassId);
     }
 
+    public void evictSmallClassIdById(Long smallClassId) {
+        publicClassCacheWithId.evict(smallClassId);
+    }
 
     private SmallClass getClassRoomById(Long smallClassId) {
+        return smallClassJpaRepository.findOne(smallClassId);
 
-        SmallClass smallClass = publicClassCacheWithId.get(smallClassId, SmallClass.class);
-        if(smallClass == null) {
-            synchronized (this) {
-                smallClass = smallClassJpaRepository.findOne(smallClassId);
-                if (smallClass == null) {
-                    throw new PublicClassException(PublicClassMessageEnum.ERROR_PUBLIC_CLASS);
-                }
-                publicClassCacheWithId.putIfAbsent(smallClassId, smallClass);
-            }
-        }
-        return smallClass;
+//        SmallClass smallClass = publicClassCacheWithId.get(smallClassId, SmallClass.class);
+//        if(smallClass == null) {
+//            synchronized (this) {
+//                smallClass = smallClassJpaRepository.findOne(smallClassId);
+//                if (smallClass == null) {
+//                    throw new PublicClassException(PublicClassMessageEnum.ERROR_PUBLIC_CLASS);
+//                }
+//                publicClassCacheWithId.putIfAbsent(smallClassId, smallClass);
+//            }
+//        }
+//        return smallClass;
     }
 
     /**
