@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.bean.RoleEnum;
 import com.boxfishedu.workorder.dao.mongo.SmallClassLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.web.param.SmallClassParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,6 +95,14 @@ public class SmallClassLogService {
                 , smallClass.getStatus()
                 , userId
                 , PublicClassInfoStatusEnum.getByCode(smallClass.getStatus()).getDesc());
+    }
+
+    public boolean studentActed(WorkOrder workOrder){
+        return this.studentActed(workOrder.getStudentId(),workOrder.getSmallClassId());
+    }
+
+    public boolean teacherActed(WorkOrder workOrder){
+        return this.teacherActed(workOrder.getTeacherId(),workOrder.getSmallClassId());
     }
 
     //学生动作

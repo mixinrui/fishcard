@@ -3,9 +3,12 @@ package com.boxfishedu.workorder.servicex.smallclass.status.event;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
+import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -31,6 +35,8 @@ public abstract class SmallClassEventCustomer {
 
     protected abstract void postHandle(SmallClass smallClass);
 
+    protected abstract SmallClassLogService getSmallClassLogService();
+
 
     public void exec(SmallClassEvent smallClassEvent) {
         SmallClass smallClass = smallClassEvent.getSource();
@@ -40,12 +46,18 @@ public abstract class SmallClassEventCustomer {
 
     public abstract void execute(SmallClass smallClass);
 
+    public List<WorkOrder> filterStudentActed(List<WorkOrder> workOrders) {
+        return workOrders
+                .stream()
+                .filter(workOrder -> this.getSmallClassLogService().studentActed(workOrder))
+                .collect(Collectors.toList());
+    }
 
     public void writeStatusBack2Card(SmallClass smallClass, FishCardStatusEnum fishCardStatusEnum) {
         List<WorkOrder> workOrders = this.getWorkOrders(smallClass);
 
         logger.debug("@writeStatusBack2Card,smallclass[{}],workorders[{}]"
-                                             , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(workOrders));
+                , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(workOrders));
 
         this.updateWorkStatuses(workOrders, fishCardStatusEnum);
 
@@ -57,7 +69,6 @@ public abstract class SmallClassEventCustomer {
                         workOrder, smallClass.getWriteBackDesc());
             }
         });
-
     }
 
     private List<WorkOrder> getWorkOrders(SmallClass smallClass) {

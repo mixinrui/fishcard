@@ -6,9 +6,8 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
-import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
-import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
+import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -45,6 +44,11 @@ public class StudentLeaveUnActiveCustomer extends SmallClassEventCustomer {
     @Override
     protected void postHandle(SmallClass smallClass) {
 
+    }
+
+    @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
     }
 
     @Override

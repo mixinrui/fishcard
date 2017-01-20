@@ -64,6 +64,11 @@ public class StudentValidatedEventCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordStudentLog(smallClass);
         switch (smallClass.getStatusEnum()) {
