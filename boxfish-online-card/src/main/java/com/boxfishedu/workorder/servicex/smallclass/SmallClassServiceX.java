@@ -31,19 +31,24 @@ public class SmallClassServiceX {
         LocalDateTime deadTime = startTime.plusMinutes(30);
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 
-        if (now.isBefore(startTime)) {
-            map.put("status", 10);
-            map.put("statusDesc", "too early");
-            map.put("classInfo", null);
-        } else if (now.isAfter(deadTime)) {
-            map.put("status", 20);
-            map.put("statusDesc", "completed");
-            map.put("classInfo", null);
-        } else {
-            map.put("status", 30);
-            map.put("statusDesc", "success");
-            map.put("classInfo", smallClass);
-        }
+        //TODO:测试
+        map.put("status", 30);
+        map.put("statusDesc", "success");
+        map.put("classInfo", smallClass);
+
+//        if (now.isBefore(startTime)) {
+//            map.put("status", 10);
+//            map.put("statusDesc", "too early");
+//            map.put("classInfo", null);
+//        } else if (now.isAfter(deadTime)) {
+//            map.put("status", 20);
+//            map.put("statusDesc", "completed");
+//            map.put("classInfo", null);
+//        } else {
+//            map.put("status", 30);
+//            map.put("statusDesc", "success");
+//            map.put("classInfo", smallClass);
+//        }
         return map;
     }
 }

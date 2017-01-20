@@ -19,38 +19,56 @@ import java.util.Optional;
 @Component
 public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallClassLog> {
 
-    public Long queryCount(SmallClassParam smallClassParam){
-        Query<SmallClassLog>  query = this.queryCondition(smallClassParam);
+    public Long queryCount(SmallClassParam smallClassParam) {
+        Query<SmallClassLog> query = this.queryCondition(smallClassParam);
         return query.countAll();
+    }
+
+    public List<SmallClassLog> queryByStudentAndSmallClass(Long studentId, Long smallClassId) {
+        SmallClassParam smallClassParam = new SmallClassParam();
+        smallClassParam.setStudentId(studentId);
+        smallClassParam.setSmallClassId(smallClassId);
+        List<SmallClassLog> smallClassLogs
+                = this.queryCondition(smallClassParam).asList();
+        return smallClassLogs;
+    }
+
+    public List<SmallClassLog> queryByTeacherAndSmallClass(Long teacherId, Long smallClassId) {
+        SmallClassParam smallClassParam = new SmallClassParam();
+        smallClassParam.setTeacherId(teacherId);
+        smallClassParam.setSmallClassId(smallClassId);
+        List<SmallClassLog> smallClassLogs
+                = this.queryCondition(smallClassParam).asList();
+        return smallClassLogs;
     }
 
     public Query<SmallClassLog> queryCondition(SmallClassParam smallClassParam) {
         Query<SmallClassLog> query = datastore.createQuery(SmallClassLog.class);
 
         //公开课id
-        if(null != smallClassParam.getId()){
+        if (null != smallClassParam.getId()) {
             query.and(query.criteria("smallClassId").equal(smallClassParam.getId()));
         }
-        if(null != smallClassParam.getTeacherId()){
+        if (null != smallClassParam.getTeacherId()) {
             query.and(query.criteria("teacherId").equal(smallClassParam.getTeacherId()));
         }
 
-        if(null != smallClassParam.getStudentId()){
+        if (null != smallClassParam.getStudentId()) {
             query.and(query.criteria("studentId").equal(smallClassParam.getStudentId()));
         }
 
         //创建时间排序
-        if(!StringUtils.isEmpty(smallClassParam.getCreateTimeSort()) ){
-            if("asc".equals(smallClassParam.getCreateTimeSort())){
+        if (!StringUtils.isEmpty(smallClassParam.getCreateTimeSort())) {
+            if ("asc".equals(smallClassParam.getCreateTimeSort())) {
                 query.order("createTime");
-            }else {
+            } else {
                 query.order("-createTime");
             }
 
         }
 
 
-        query.offset(smallClassParam.getOffSet( )).limit(smallClassParam.getLimit( ));
+        query.offset(smallClassParam.getOffSet()).limit(smallClassParam.getLimit());
         return query;
     }
 }

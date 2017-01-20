@@ -46,7 +46,7 @@ public enum PublicClassInfoStatusEnum {
     TEACHER_SWITCH_STUDENT(1120, "教师上课切换学生"),
     TEACHER_COMPLETED(1200, "教师正常完成"),
     TEACHER_COMPLETED_FORCE(1210, "教师强制完成"),
-    TEACHER_LEAVE_EARLY(1220, "教师教师早退");
+    TEACHER_LEAVE_EARLY(1220, "教师早退");
 
 
     private static Map<Integer, Enum> varMap = new HashMap<>();
