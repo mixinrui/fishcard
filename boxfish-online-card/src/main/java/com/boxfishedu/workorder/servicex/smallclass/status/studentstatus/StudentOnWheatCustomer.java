@@ -48,6 +48,11 @@ public class StudentOnWheatCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordStudentLog(smallClass);
     }

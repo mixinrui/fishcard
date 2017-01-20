@@ -49,6 +49,11 @@ public class StudentClassingCustomer extends SmallClassEventCustomer implements 
     }
 
     @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordStudentLog(smallClass);
         switch (smallClass.getStatusEnum()) {

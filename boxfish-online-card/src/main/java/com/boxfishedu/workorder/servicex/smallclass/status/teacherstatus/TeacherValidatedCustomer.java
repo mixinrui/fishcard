@@ -42,6 +42,11 @@ public class TeacherValidatedCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         switch (smallClass.getStatusEnum()) {
             case SMALL:

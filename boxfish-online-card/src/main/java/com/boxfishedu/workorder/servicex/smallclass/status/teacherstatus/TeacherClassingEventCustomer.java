@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
@@ -40,6 +41,11 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
     @Override
     protected void postHandle(SmallClass smallClass) {
 
+    }
+
+    @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
     }
 
     @Override
