@@ -15,10 +15,10 @@ import java.util.Set;
 /**
  * Created by oyjun on 16/2/29.
  */
-public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
+public interface ServiceJpaRepository extends JpaRepository<Service, Long> {
     public List<Service> findByOrderId(Long orderId);
 
-    public List<Service> findByOrderIdAndComboTypeAndCoursesSelected(Long orderId,String comboType,Integer courseSelected);
+    public List<Service> findByOrderIdAndComboTypeAndCoursesSelected(Long orderId, String comboType, Integer courseSelected);
 
     //使用top1,是由于按照逻辑,根据查询条件只应该有一条结果返回
     public Service findTop1ByOrderIdAndSkuId(Long orderId, Long skuId);
@@ -43,7 +43,7 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     List<Service> getForeignCommentServiceCount(long studentId, int productType);
 
     @Query("select s from Service s where s.studentId=?1 and s.coursesSelected=?2")
-    List<Service> getServiceSelectedStatus(long studentId,int coursesSelected);
+    List<Service> getServiceSelectedStatus(long studentId, int coursesSelected);
 
     // 当前可用的点评, (有可用次数的, 在有效期以内的, 并且取截止时间最近的service)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -64,19 +64,23 @@ public interface ServiceJpaRepository extends JpaRepository<Service,Long> {
     @Query("select s.studentId from Service s where s.productType=1002")
     Set<Long> getForeignCommentStudentIds();
 
-    /*********兼容老版本*************/
+    /*********
+     * 兼容老版本
+     *************/
     Service findTop1ByOrderIdAndComboType(Long orderId, String comboType);
 
-    List<Service> findByStudentIdAndCoursesSelected(Long studentId,Integer coursesSelected);
+    List<Service> findByStudentIdAndCoursesSelected(Long studentId, Integer coursesSelected);
 
-    List<Service> findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelectedAndProductType(Long studentId, String comboType,String tutorType,Integer selectedFlag,Integer productType);
+    List<Service> findByStudentIdAndComboTypeAndTutorTypeAndCoursesSelectedAndProductType(Long studentId, String comboType, String tutorType, Integer selectedFlag, Integer productType);
 
-    List<Service> findByStudentIdAndComboTypeInAndTutorTypeAndCoursesSelectedAndProductType(Long studentId, String[] comboTypes,String tutorType,Integer selectedFlag,Integer productType);
+    List<Service> findByStudentIdAndComboTypeInAndTutorTypeAndCoursesSelectedAndProductType(Long studentId, String[] comboTypes, String tutorType, Integer selectedFlag, Integer productType);
 
-    List<Service> findByStudentIdAndComboTypeAndCoursesSelectedAndProductType(Long studentId, String comboType ,Integer selectedFlag,Integer productType);
+    List<Service> findByStudentIdAndComboTypeAndCoursesSelectedAndProductType(Long studentId, String comboType, Integer selectedFlag, Integer productType);
 
-    List<Service> findByStudentIdAndComboTypeInAndCoursesSelectedAndProductType(Long studentId, String[] comboType ,Integer selectedFlag,Integer productType);
+    List<Service> findByStudentIdAndComboTypeInAndCoursesSelectedAndProductType(Long studentId, String[] comboType, Integer selectedFlag, Integer productType);
 
+    List<Service> findByStudentIdAndCoursesSelectedAndProductType(Long studentId, Integer selectedFlag, Integer productType);
+    
     //查找出学生所有状态的工单
     @Query("select distinct sv.studentId from Service sv")
     public List<Long> findDistinctUsersFromService();

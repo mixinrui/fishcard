@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.service.instantclass;
 
+import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
@@ -7,8 +8,10 @@ import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatu
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.InstantClassJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
+import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
@@ -56,6 +59,9 @@ public class InstantClassService {
 
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
+
+    @Autowired
+    private ServiceJpaRepository serviceJpaRepository;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -346,11 +352,17 @@ public class InstantClassService {
                     map.put("statusDesc", "只有外教");
                 }
             } else {
-                map.put("status", 3);
-                map.put("statusDesc", "既有中教也有外教");
+                this.noCourseInSchedule(studentId,map);
             }
         }
         return map;
+    }
+
+    private void noCourseInSchedule(Long studentId, Map<String, Object> map) {
+        List<Service> services
+                = serviceJpaRepository.findByStudentIdAndCoursesSelectedAndProductType(studentId, 0, ProductType.TEACHING.value());
+        map.put("status", 3);
+        map.put("statusDesc", "既有中教也有外教");
     }
 
 }
