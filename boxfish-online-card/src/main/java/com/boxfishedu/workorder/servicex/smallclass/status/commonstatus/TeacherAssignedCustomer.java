@@ -8,8 +8,6 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
-import com.boxfishedu.workorder.servicex.smallclass.SmallClassServiceX;
-import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -46,6 +44,11 @@ public class TeacherAssignedCustomer extends SmallClassEventCustomer {
     @Override
     protected void postHandle(SmallClass smallClass) {
 
+    }
+
+    @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
     }
 
     @Override
