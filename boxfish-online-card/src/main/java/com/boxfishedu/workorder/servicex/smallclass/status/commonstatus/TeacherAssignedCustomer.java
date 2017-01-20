@@ -49,6 +49,11 @@ public class TeacherAssignedCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordSystemLog(
                 smallClass, PublicClassInfoStatusEnum.TEACHER_ASSIGNED.getCode()

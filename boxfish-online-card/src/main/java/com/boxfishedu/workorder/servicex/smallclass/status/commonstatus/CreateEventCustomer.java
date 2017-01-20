@@ -53,6 +53,11 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
     }
 
     @Override
+    protected SmallClassLogService getSmallClassLogService() {
+        return smallClassLogService;
+    }
+
+    @Override
     public void execute(SmallClass smallClass) {
         logger.debug("@CreateEventCustomer触发状态改变事件,smallClass[{}]"
                 , JacksonUtil.toJSon(smallClass));
