@@ -46,6 +46,8 @@ public class StudentCourseSchedule implements Serializable {
 
     private String classType;
 
+    private Long smallClassId;
+
     public String getCourseType() {
         if(courseView == null || CollectionUtils.isEmpty(courseView.getCourseType())) {
             return courseType;

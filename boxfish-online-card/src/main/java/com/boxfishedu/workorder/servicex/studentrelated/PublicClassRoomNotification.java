@@ -59,6 +59,8 @@ public class PublicClassRoomNotification {
         return this;
     }
 
+
+
     public void notifyPush() {
         restTemplate.postForObject(createPublicClassNotifyPushURI(), this, Object.class);
     }
