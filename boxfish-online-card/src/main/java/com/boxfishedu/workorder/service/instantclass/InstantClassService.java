@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service.instantclass;
 
 import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
@@ -339,8 +340,6 @@ public class InstantClassService {
                 studentId, DateUtil.localDate2Date(localDateTime.minusMinutes(30)));
 
         java.util.Map<String, Object> map = new HashMap<>();
-        map.put("status", 0);
-        map.put("statusDesc", "既无中教也无外教");
         if (!CollectionUtils.isEmpty(skuIds)) {
             if (1 == skuIds.size()) {
                 if (skuIds.get(0) == TeachingType.ZHONGJIAO.getCode()) {
@@ -352,17 +351,28 @@ public class InstantClassService {
                     map.put("statusDesc", "只有外教");
                 }
             } else {
-                this.noCourseInSchedule(studentId,map);
+                map.put("status", 3);
+                map.put("statusDesc", "既有中教也有外教");
             }
+        } else {
+            this.noCourseInSchedule(studentId, map);
         }
         return map;
     }
 
     private void noCourseInSchedule(Long studentId, Map<String, Object> map) {
         List<Service> services
-                = serviceJpaRepository.findByStudentIdAndCoursesSelectedAndProductType(studentId, 0, ProductType.TEACHING.value());
-        map.put("status", 3);
-        map.put("statusDesc", "既有中教也有外教");
+                = serviceJpaRepository.findByStudentIdAndCoursesSelectedAndProductTypeAndComboTypeNotIn(
+                studentId, 0, ProductType.TEACHING.value(), Arrays.asList(ComboTypeEnum.SMALLCLASS.name()));
+
+        if (!CollectionUtils.isEmpty(services)) {
+            map.put("status", 4);
+            map.put("statusDesc", "买了课程套餐还没选时间呢，选完时间才能1对1实时上课哟～");
+        } else {
+            map.put("status", 0);
+            map.put("statusDesc", "既无中教也无外教");
+        }
+
     }
 
 }

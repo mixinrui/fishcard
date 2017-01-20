@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.google.common.collect.Lists;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -43,6 +45,9 @@ public class TimerXGroup extends GroupBuilder {
 
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
+
+    @Autowired
+    private DataCollectorService dataCollectorService;
 
     @Override
     protected List<WorkOrder> cardsToGroup() {
@@ -83,6 +88,15 @@ public class TimerXGroup extends GroupBuilder {
     @Override
     protected Integer smallClassMemeberNum() {
         return 4;
+    }
+
+    @Override
+    protected void updateHomePage(List<WorkOrder> cards) {
+        List<Long> studentIds = cards.stream()
+                                     .map(WorkOrder::getStudentId)
+                                     .distinct()
+                                     .collect(Collectors.toList());
+        studentIds.forEach(studentId -> dataCollectorService.updateBothChnAndFnItemAsync(studentId));
     }
 
     @Override

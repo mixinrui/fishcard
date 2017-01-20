@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 17/1/6.
@@ -27,6 +28,8 @@ public abstract class GroupBuilder {
     protected abstract WorkOrder selectLeader(List<WorkOrder> workOrders);
 
     protected abstract Integer smallClassMemeberNum();
+
+    protected abstract void updateHomePage(List<WorkOrder> workOrders);
 
     public void group() {
         List<WorkOrder> cards = this.cardsToGroup();
@@ -53,6 +56,7 @@ public abstract class GroupBuilder {
 ////                    groups.putAll(relationGrouped);
 //                });
         });
+        this.updateHomePage(cards);
     }
 
     //将小班按照信息获取
