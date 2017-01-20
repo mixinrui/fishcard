@@ -65,10 +65,10 @@ public class PublicClassRoom {
     public void enter(SmallClass smallClass, Long studentId, String nickName, String accessToken) {
 
         // 是否在上课正常时间范围内
-        Date now = new Date();
-        if(now.compareTo(smallClass.getStartTime()) < 0 || now.compareTo(smallClass.getEndTime()) > 0) {
-            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
-        }
+//        Date now = new Date();
+//        if(now.compareTo(smallClass.getStartTime()) < 0 || now.compareTo(smallClass.getEndTime()) > 0) {
+//            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
+//        }
 
         // 一 判断是否是第一次进入这个课堂, 如果不是, 则直接返回
         if(isOnceEntered(smallClass.getId(), studentId)) {
@@ -215,7 +215,7 @@ public class PublicClassRoom {
             // 非会员直接不让上课
             case "NONE" : throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
             // 会员验证
-            default:  memberCheck(classDate, studentId); break;
+            default:  //memberCheck(classDate, studentId); break;cd
         }
     }
 
