@@ -29,6 +29,7 @@ public class SmallClassTeacherController {
     @Autowired
     SmallClassStudentStatusServiceX smallClassStudentStatusServiceX;
 
+    @Autowired
     SmallClassServiceX smallClassServiceX;
 
     @RequestMapping(value = "/{smallclass_id}/validate", method = RequestMethod.GET)

@@ -114,7 +114,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
         //获取推荐教师
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
 
-        if (0 != teacherView.getId()) {
+        if (!Objects.isNull(teacherView) && 0 != teacherView.getId()) {
             this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);
         } else {
             logger.debug("@initGroupClass#getTeacher#fail#获取教师失败,退出小班课创建#smallclass[{}]"
