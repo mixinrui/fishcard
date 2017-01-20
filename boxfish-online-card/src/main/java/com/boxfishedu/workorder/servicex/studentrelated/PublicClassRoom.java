@@ -152,6 +152,7 @@ public class PublicClassRoom {
                 .flatMap(Collection::stream)
                 .map(c -> c.pushCode)
                 .collect(Collectors.toSet());
+//        Set<String> tags = Stream.of(CourseDifficultyEnum.values()).map(c -> c.pushCode).collect(Collectors.toSet());
         if(CollectionUtils.isNotEmpty(tags)) {
             System.out.println(tags);
 

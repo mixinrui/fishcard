@@ -279,6 +279,7 @@ public class TimePickerServiceX {
         studentCourseSchedule.setStatus(courseSchedule.getStatus());
         studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
         studentCourseSchedule.setClassType(courseSchedule.getClassType());
+        studentCourseSchedule.setSmallClassId(courseSchedule.getSmallClassId());
         if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
             studentCourseSchedule.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
         }
