@@ -3,12 +3,15 @@ package com.boxfishedu.workorder.web.controller.smallclass;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassStudentStatusServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
@@ -26,15 +29,13 @@ public class SmallClassTeacherController {
     @Autowired
     SmallClassStudentStatusServiceX smallClassStudentStatusServiceX;
 
+    SmallClassServiceX smallClassServiceX;
+
     @RequestMapping(value = "/{smallclass_id}/validate", method = RequestMethod.GET)
     public JsonResultModel validate(@PathVariable("smallclass_id") Long smallClassId) {
-        Map<String, Object> map = Maps.newLinkedHashMap();
-        //10:too early   20:completed   30:success
-        map.put("status", 30);
-        map.put("statusDesc", "success");
-        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
+        
+        Map<String, Object> map = smallClassServiceX.getTeacherValidateMap(smallClassId);
 
-        map.put("classInfo", smallClass);
         return JsonResultModel.newJsonResultModel(map);
     }
 
@@ -45,8 +46,9 @@ public class SmallClassTeacherController {
     }
 
     @RequestMapping(value = "/{smallclass_id}/status", method = RequestMethod.POST)
-    public JsonResultModel status(@PathVariable("smallclass_id") Long smallClassId
-            ,@RequestBody Map<String, String> statusReport, Long userId) {
+    public JsonResultModel status(
+            @PathVariable("smallclass_id") Long smallClassId
+            , @RequestBody Map<String, String> statusReport, Long userId) {
         smallClassStudentStatusServiceX.status(smallClassId, userId, statusReport);
         return JsonResultModel.newJsonResultModel("success");
     }
