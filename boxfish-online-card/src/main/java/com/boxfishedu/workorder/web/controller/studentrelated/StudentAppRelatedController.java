@@ -185,6 +185,12 @@ StudentAppRelatedController {
         return JsonResultModel.newJsonResultModel(Collections.singletonMap("count", count));
     }
 
+    @RequestMapping(value = "/publicClassRoom/evictCache/{smallClassId}", method = RequestMethod.PUT)
+    public JsonResultModel evictSmallClassIdById(@PathVariable Long smallClassId) {
+        publicClassService.evictSmallClassIdById(smallClassId);
+        return JsonResultModel.EMPTY;
+    }
+
     @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
                                      @PageableDefault(value = 15) Pageable pageable,

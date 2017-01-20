@@ -65,8 +65,8 @@ public class PublicClassRoom {
     public void enter(SmallClass smallClass, Long studentId, String nickName, String accessToken) {
 
         // 是否在上课正常时间范围内
-        long time = new Date().getTime();
-        if(time < smallClass.getStartTime().getTime() || time > smallClass.getEndTime().getTime()) {
+        Date now = new Date();
+        if(now.compareTo(smallClass.getStartTime()) < 0 || now.compareTo(smallClass.getEndTime()) > 0) {
             throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
         }
 
