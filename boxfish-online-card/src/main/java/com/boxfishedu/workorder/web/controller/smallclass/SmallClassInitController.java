@@ -28,6 +28,12 @@ public class SmallClassInitController {
         return JsonResultModel.newJsonResultModel("OK");
     }
 
+    @RequestMapping(value = "/init/{days}", method = RequestMethod.POST)
+    public JsonResultModel buildGroup(Integer days) {
+        groupBuilder.group(days);
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
     @RequestMapping(value = "/init/relation", method = RequestMethod.POST)
     public JsonResultModel buildRelation() {
         smallClassTimerServiceX.buildSmallCLassRelations();

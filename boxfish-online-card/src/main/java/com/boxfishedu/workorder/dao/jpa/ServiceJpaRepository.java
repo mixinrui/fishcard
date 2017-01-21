@@ -88,4 +88,6 @@ public interface ServiceJpaRepository extends JpaRepository<Service, Long> {
     //初始化客服系统中外教点评
     @Query("SELECT s FROM Service s where s.productType = '1002'")
     List<Service> findByProductType();
+
+    List<Service> findByStudentIdAndCoursesSelectedAndProductTypeAndComboTypeNotIn(Long studentId, int i, int value, List<String> fiteredComboTypes);
 }

@@ -55,7 +55,7 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
         switch (smallClass.getStatusEnum()) {
             case SMALL:
                 smallClass.setWriteBackDesc("正在上课[教师]");
-                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.ONCLASS);
+                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.ONCLASS, true);
                 break;
             default:
                 break;

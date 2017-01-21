@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 17/1/6.
@@ -12,7 +13,7 @@ import java.util.*;
  */
 public abstract class GroupBuilder {
 
-    protected abstract List<WorkOrder> cardsToGroup();
+    protected abstract List<WorkOrder> cardsToGroup(Integer days);
 
     protected abstract Map<String, List<WorkOrder>> groupByTime(List<WorkOrder> workOrders);
 
@@ -28,8 +29,18 @@ public abstract class GroupBuilder {
 
     protected abstract Integer smallClassMemeberNum();
 
-    public void group() {
-        List<WorkOrder> cards = this.cardsToGroup();
+    protected abstract void updateHomePage(List<WorkOrder> workOrders);
+
+    public void group(){
+        this.group(30);
+    }
+
+    public void group(Integer days) {
+        List<WorkOrder> cards = this.cardsToGroup(days);
+
+        if (CollectionUtils.isEmpty(cards)) {
+            return;
+        }
 
         Map<String, List<WorkOrder>> timeGrouped = this.groupByTime(cards);
 
@@ -53,6 +64,7 @@ public abstract class GroupBuilder {
 ////                    groups.putAll(relationGrouped);
 //                });
         });
+        this.updateHomePage(cards);
     }
 
     //将小班按照信息获取
