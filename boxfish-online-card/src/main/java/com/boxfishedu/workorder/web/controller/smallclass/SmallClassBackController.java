@@ -42,7 +42,7 @@ public class SmallClassBackController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @RequestMapping(value = "/smallclass/slot", method = RequestMethod.GET)
+    @RequestMapping(value = "/smallclass/slotitem", method = RequestMethod.GET)
     public JsonResultModel publicSlots(String roleId) {
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(Long.parseLong(roleId));
         List<TimeSlots> timeSlotses = dayTimeSlots.getDailyScheduleTime();
@@ -69,7 +69,7 @@ public class SmallClassBackController {
      * @param pageable
      * @return
      */
-    @RequestMapping(value = "/smallclass/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/smallclass/listitem", method = RequestMethod.GET)
     public JsonResultModel list(PublicFilterParam publicFilterParam, Pageable pageable) {
         return smallClassQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam, pageable);
     }
