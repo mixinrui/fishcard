@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Component
 public class TimePickerService {
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private RabbitMqSender rabbitMqSender;
 
@@ -41,10 +41,10 @@ public class TimePickerService {
         FetchTeacherParam fetchTeacherParam = new FetchTeacherParam();
         List<ScheduleModel> scheduleModelList = new ArrayList<>();
         for (CourseSchedule courseSchedule : courseSchedules) {
-            WorkOrder workOrder=workOrderService.findOne(courseSchedule.getWorkorderId());
+            WorkOrder workOrder = workOrderService.findOne(courseSchedule.getWorkorderId());
             // 如果是冻结的, 并且是小班课, 不分配老师
-            if(workOrder.getIsFreeze()==1 ||
-                    ! StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name())){
+            if (workOrder.getIsFreeze() == 1 ||
+                    StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name())) {
                 continue;
             }
             ScheduleModel scheduleModel = new ScheduleModel();
@@ -53,7 +53,7 @@ public class TimePickerService {
             scheduleModel.setCourseType(courseSchedule.getCourseType());
             try {
                 long time = courseSchedule.getClassDate().getTime();
-                logger.debug("-=-====----schedule的id:{},time为:{}",courseSchedule.getId(),time);
+                logger.debug("-=-====----schedule的id:{},time为:{}", courseSchedule.getId(), time);
                 scheduleModel.setDay(time);
             } catch (Exception ex) {
                 throw new BusinessException("日期格式不合法");
@@ -66,10 +66,10 @@ public class TimePickerService {
         rabbitMqSender.send(fetchTeacherParam.convertToScheduleBatchReq(), QueueTypeEnum.ASSIGN_TEACHER);
     }
 
-    public void getRecommandTeachers(WorkOrder workOrder){
-        List<CourseSchedule> list= Lists.newArrayList();
-        CourseSchedule courseSchedule=courseScheduleService.findByWorkOrderId(workOrder.getId());
+    public void getRecommandTeachers(WorkOrder workOrder) {
+        List<CourseSchedule> list = Lists.newArrayList();
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         list.add(courseSchedule);
-        this.getRecommandTeachers(workOrder.getService(),list);
+        this.getRecommandTeachers(workOrder.getService(), list);
     }
 }
