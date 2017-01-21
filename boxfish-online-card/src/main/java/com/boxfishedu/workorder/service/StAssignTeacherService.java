@@ -207,6 +207,7 @@ public class StAssignTeacherService {
                 workOrder.setTeacherId(teacherId);
                 workOrder.setTeacherName(responseScheduleBatchReqSt.getAssginTeacherName());
                 workOrder.setAssignTeacherTime(new Date());
+                workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode()); // 设置老师状态为分配老师
             }
 
             List<Long> needFireWorkOrderIds= Lists.newArrayList();
