@@ -15,6 +15,7 @@ import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -56,6 +57,7 @@ public class SmallClassBackServiceX {
         smallClass.setEndTime(DateUtil.localDate2Date(localDateTime.plusMinutes(30)));
     }
 
+    @Transactional
     public void delete(Long smallClassId) {
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
         teacherStudentRequester.notifyCancelSmallClassTeacher(smallClass);
