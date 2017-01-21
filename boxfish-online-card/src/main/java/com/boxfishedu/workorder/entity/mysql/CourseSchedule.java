@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.entity.mysql;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
@@ -94,5 +96,7 @@ public class CourseSchedule {
     @Transient
     private Integer matchStatus;  // 用于指定老师列表判断
 
-
+    public boolean isSmallClass(){
+        return StringUtils.equals(this.getClassType(), ClassTypeEnum.SMALL.name());
+    }
 }

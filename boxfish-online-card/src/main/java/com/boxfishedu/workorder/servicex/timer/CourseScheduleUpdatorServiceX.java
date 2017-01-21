@@ -77,7 +77,7 @@ public class CourseScheduleUpdatorServiceX {
 
         //小班课不需要分配老师
         courseScheduleList = courseScheduleList.stream()
-                                               .filter(courseSchedule -> !StringUtils.equals(courseSchedule.getClassType(), ClassTypeEnum.SMALL.name()))
+                                               .filter(courseSchedule -> !courseSchedule.isSmallClass())
                                                .collect(Collectors.toList());
 
         //向教师运营组发起请求获取教师
