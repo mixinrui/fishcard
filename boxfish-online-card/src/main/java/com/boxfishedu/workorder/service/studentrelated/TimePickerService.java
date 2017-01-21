@@ -42,7 +42,7 @@ public class TimePickerService {
         List<ScheduleModel> scheduleModelList = new ArrayList<>();
         for (CourseSchedule courseSchedule : courseSchedules) {
             WorkOrder workOrder = workOrderService.findOne(courseSchedule.getWorkorderId());
-            // 如果是冻结的, 并且是小班课, 不分配老师
+            // 如果是冻结的, 或者是小班课, 不分配老师
             if (workOrder.getIsFreeze() == 1 ||
                     StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name())) {
                 continue;
