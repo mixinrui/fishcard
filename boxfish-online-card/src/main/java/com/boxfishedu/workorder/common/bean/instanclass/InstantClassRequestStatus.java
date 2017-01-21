@@ -9,7 +9,7 @@ public enum InstantClassRequestStatus {
     HAVE_CLASS_IN_HALF_HOURS(30,"半小时内有即将上的课程,不能立即上课"),
     NOT_IN_RANGE(31,"该时间段不允许即时上课"),
     TUTOR_TYPE_NOT_SUPPORT(32,"目前只支持外教实时上课"),
-    OUT_OF_NUM(33,"先去购买课程吧,然后才能实时上课~"),
+    OUT_OF_NUM(33,"先去购买中教或外教1对1课程,然后才能实时上课~"),
     FAIL_RECOMMAND_COURSE(34,"暂时没有与你Level匹配的课程,请调整起点Level或者稍后再试吧"),
     MATCHED_LESS_THAN_30MINUTES(35,"半小时之内有匹配上的课程"),
     UNFINISHED_COURSE(36,"有还未完成的课程"),
