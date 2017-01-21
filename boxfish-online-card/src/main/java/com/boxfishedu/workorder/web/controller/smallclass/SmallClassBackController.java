@@ -42,14 +42,14 @@ public class SmallClassBackController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @RequestMapping(value = "/smallclass/slotitem", method = RequestMethod.GET)
+    @RequestMapping(value = "/smallclass/slot", method = RequestMethod.GET)
     public JsonResultModel publicSlots(String roleId) {
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(Long.parseLong(roleId));
         List<TimeSlots> timeSlotses = dayTimeSlots.getDailyScheduleTime();
         return JsonResultModel.newJsonResultModel(timeSlotses);
     }
 
-    @RequestMapping(value = "/smallclass", method = RequestMethod.POST)
+    @RequestMapping(value = "/smallclassitem", method = RequestMethod.POST)
     public JsonResultModel buildPublicClass(@RequestBody PublicClassBuilderParam publicClassBuilderParam) {
         logger.debug("@buildPublicClass创建公开课,参数[{}]", publicClassBuilderParam);
         smallClassBackServiceX.configPublicClass(publicClassBuilderParam);
@@ -69,8 +69,20 @@ public class SmallClassBackController {
      * @param pageable
      * @return
      */
-    @RequestMapping(value = "/smallclass/listitem", method = RequestMethod.GET)
+    @RequestMapping(value = "/smallclass/public/listitem", method = RequestMethod.GET)
     public JsonResultModel list(PublicFilterParam publicFilterParam, Pageable pageable) {
+        return smallClassQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam, pageable);
+    }
+
+    /**
+     * 查询公开课(后台)
+     *
+     * @param publicFilterParam
+     * @param pageable
+     * @return
+     */
+    @RequestMapping(value = "/smallclass/small/listitem", method = RequestMethod.GET)
+    public JsonResultModel smalllist(PublicFilterParam publicFilterParam, Pageable pageable) {
         return smallClassQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam, pageable);
     }
 
