@@ -10,7 +10,8 @@ public class ShortMessageCodeConstant {
 
 
     /** 学生明天有课提醒 编码 **/
-    public final  static String SMS_STU_NOTITY_TOMO_CODE="SMS_15120322";
+    //public final  static String SMS_STU_NOTITY_TOMO_CODE="SMS_15120322";
+    public final  static String SMS_STU_NOTITY_TOMO_CODE="SMS_43315095";
 
     /** 学生修改时间提醒 编码 **/
     public final  static String SMS_STU_NOTITY_CHANGE_CODE="SMS_32900109";
