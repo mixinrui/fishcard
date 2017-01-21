@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -47,7 +46,7 @@ public class CommentCardTimer {
     }
 
 
-    @RequestMapping(value = "/notify/public")
+//    @RequestMapping(value = "/notify/public")
 //    @Scheduled(cron = "0 0/1 * * * ?")
     public void notifyPublicClass() {
         publicClassRoom.publicClassRoomNotification();
