@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.timer;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
@@ -73,6 +74,12 @@ public class CourseScheduleUpdatorServiceX {
 //    @Scheduled(cron="*/10 * * * * ?")
     public void bathUpdateTeacherIntoSchedule() throws ParseException {
         List<CourseSchedule> courseScheduleList = courseScheduleService.findByTeacherId(CourseSchedule.NO_ASSIGN_TEACHER_ID.longValue());
+
+        //小班课不需要分配老师
+        courseScheduleList = courseScheduleList.stream()
+                                               .filter(courseSchedule -> !StringUtils.equals(courseSchedule.getClassType(), ClassTypeEnum.SMALL.name()))
+                                               .collect(Collectors.toList());
+
         //向教师运营组发起请求获取教师
         if (CollectionUtils.isEmpty(courseScheduleList)) {
             return;
