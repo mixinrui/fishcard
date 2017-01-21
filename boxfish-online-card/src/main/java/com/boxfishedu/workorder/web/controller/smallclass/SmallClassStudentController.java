@@ -30,4 +30,9 @@ public class SmallClassStudentController {
         return JsonResultModel.newJsonResultModel("success");
     }
 
+    @RequestMapping(value = "/publicTips", method = RequestMethod.GET)
+    public JsonResultModel publicTips() {
+        return JsonResultModel.newJsonResultModel("公开课预计于2月15号开放,欢迎使用");
+    }
+
 }

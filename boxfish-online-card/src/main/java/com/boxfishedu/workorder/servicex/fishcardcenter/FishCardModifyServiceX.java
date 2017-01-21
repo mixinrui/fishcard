@@ -21,6 +21,7 @@ import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
+import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
@@ -96,6 +97,9 @@ public class FishCardModifyServiceX {
     @Autowired
     FishCardModifyService fishCardModifyService;
 
+    @Autowired
+    OnlineAccountService onlineAccountService;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //选择五门课程供给学生选择
@@ -127,7 +131,7 @@ public class FishCardModifyServiceX {
         courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
 
         //异步操作  // 设置指定老师申请失效
-        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"换时间老师请假或者换老师");
+        assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(), "换时间老师请假或者换老师");
 
         //通知师生运营更换老师
         teacherStudentRequester.notifyChangeTeacher(workOrder, teacherChangeParam);
@@ -143,7 +147,7 @@ public class FishCardModifyServiceX {
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
 
-        changeTeacherLog(workOrder,oldWorkOrder);
+        changeTeacherLog(workOrder, oldWorkOrder);
         //返回结果
         return JsonResultModel.newJsonResultModel(null);
     }
@@ -160,15 +164,16 @@ public class FishCardModifyServiceX {
 
     /**
      * 验证换老师的时候,验证原来老师是否处于联通 呼叫 上课  (31,32,33,34,35,37) 的状态中
+     *
      * @param teacherChangeParam
      * @return
      */
-    public JsonResultModel checkCurrentTeacherStatus(TeacherChangeParam teacherChangeParam){
-        if(null==teacherChangeParam.getWorkOrderId()){
-            throw  new BusinessException("鱼卡id不存在");
+    public JsonResultModel checkCurrentTeacherStatus(TeacherChangeParam teacherChangeParam) {
+        if (null == teacherChangeParam.getWorkOrderId()) {
+            throw new BusinessException("鱼卡id不存在");
         }
         List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkIdAndStaus(teacherChangeParam.getWorkOrderId());
-        if(CollectionUtils.isEmpty(workOrderLogs)){
+        if (CollectionUtils.isEmpty(workOrderLogs)) {
             return JsonResultModel.newJsonResultModel(false);//不需要弹出提示 确认按钮
         }
         return JsonResultModel.newJsonResultModel(true);//需要弹出提示 确认按钮
@@ -194,32 +199,35 @@ public class FishCardModifyServiceX {
     }
 
     public void changerderCourses(Long studentId) {
-        List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndStatusLessThan(studentId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
-        if (CollectionUtils.isEmpty(workOrders)) {
+        if (!onlineAccountService.isMember(studentId)) {
             throw new NotFoundException();
         }
         try {
+            List<WorkOrder> workOrders = fishCardModifyService.findByStudentIdAndStatusLessThan(studentId, FishCardStatusEnum.WAITFORSTUDENT.getCode());
+            if (CollectionUtils.isEmpty(workOrders)) {
+                throw new NotFoundException();
+            }
             workOrders.stream()
-                    // 小班课学生修改level难度, 不重新修改课程推荐
-                    .filter(workOrder -> !StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name()))
-                    .forEach(workOrder -> {
-                Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
-                                                     DateUtil.convertLocalDateTime(workOrder.getStartTime()));
-                long hours = duration.toHours();
-                logger.info("workOrder startTime=[{}] and duration=[{}]", workOrder.getStartTime(), duration.toHours());
-                // 24小时以内如果有课,不再换课,无课则直接推荐
-                if (hours <= 24) {
-                    if (StringUtils.isEmpty(workOrder.getCourseId())) {
-                        fishCardModifyService.changeCourse(workOrder);
-                    }
-                }
-                // 24小时以上的课,有课再换
-                else {
-                    if (StringUtils.isNotEmpty(workOrder.getCourseId())) {
-                        fishCardModifyService.changeCourse(workOrder);
-                    }
-                }
-            });
+                      // 小班课学生修改level难度, 不重新修改课程推荐
+                      .filter(workOrder -> !StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name()))
+                      .forEach(workOrder -> {
+                          Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
+                                                               DateUtil.convertLocalDateTime(workOrder.getStartTime()));
+                          long hours = duration.toHours();
+                          logger.info("workOrder startTime=[{}] and duration=[{}]", workOrder.getStartTime(), duration.toHours());
+                          // 24小时以内如果有课,不再换课,无课则直接推荐
+                          if (hours <= 24) {
+                              if (StringUtils.isEmpty(workOrder.getCourseId())) {
+                                  fishCardModifyService.changeCourse(workOrder);
+                              }
+                          }
+                          // 24小时以上的课,有课再换
+                          else {
+                              if (StringUtils.isNotEmpty(workOrder.getCourseId())) {
+                                  fishCardModifyService.changeCourse(workOrder);
+                              }
+                          }
+                      });
         } catch (Exception ex) {
             logger.error("修改课程失败@changerderCourses", ex);
 

@@ -40,7 +40,7 @@ public enum PublicClassInfoStatusEnum {
      */
     TEACHER_CARD_VALIDATED(1000, "教师工单校验通过"),
     //进入音视频房间失败
-    TEACHER_VOICE_VIDEO_FAIL(1100, "教师接入言视频失败"),
+    TEACHER_VOICE_VIDEO_FAIL(1100, "教师接入音视频失败"),
     //进入视频房间成功
     TEACHER_CLASSING(1110, "教师开始上课"),
     TEACHER_SWITCH_STUDENT(1120, "教师上课切换学生"),

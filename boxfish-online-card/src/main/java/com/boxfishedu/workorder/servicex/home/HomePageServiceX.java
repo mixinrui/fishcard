@@ -86,7 +86,7 @@ public class HomePageServiceX {
     }
 
     public void putIntoRedis() {
-//        zSetOperations
+
     }
 
     private List<AccountCourseBean.CardCourseInfo> getPublicCourseInfosFromDb() {
