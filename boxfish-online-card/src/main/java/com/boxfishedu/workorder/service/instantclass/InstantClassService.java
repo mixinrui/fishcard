@@ -370,7 +370,7 @@ public class InstantClassService {
             map.put("statusDesc", "买了课程套餐还没选时间呢，选完时间才能1对1实时上课哟～");
         } else {
             map.put("status", 0);
-            map.put("statusDesc", "既无中教也无外教");
+            map.put("statusDesc", InstantClassRequestStatus.OUT_OF_NUM.getDesc());
         }
 
     }
