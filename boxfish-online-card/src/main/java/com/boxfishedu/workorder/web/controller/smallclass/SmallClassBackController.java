@@ -42,14 +42,14 @@ public class SmallClassBackController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @RequestMapping(value = "/smallclass/slotitem", method = RequestMethod.GET)
+    @RequestMapping(value = "/smallclass/slot", method = RequestMethod.GET)
     public JsonResultModel publicSlots(String roleId) {
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate(Long.parseLong(roleId));
         List<TimeSlots> timeSlotses = dayTimeSlots.getDailyScheduleTime();
         return JsonResultModel.newJsonResultModel(timeSlotses);
     }
 
-    @RequestMapping(value = "/smallclass", method = RequestMethod.POST)
+    @RequestMapping(value = "/smallclassitem", method = RequestMethod.POST)
     public JsonResultModel buildPublicClass(@RequestBody PublicClassBuilderParam publicClassBuilderParam) {
         logger.debug("@buildPublicClass创建公开课,参数[{}]", publicClassBuilderParam);
         smallClassBackServiceX.configPublicClass(publicClassBuilderParam);
