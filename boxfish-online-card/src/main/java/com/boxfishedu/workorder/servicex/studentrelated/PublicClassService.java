@@ -18,10 +18,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by LuoLiBing on 17/1/18.
@@ -83,6 +80,9 @@ public class PublicClassService {
     public Map<String, Object> enterPublicClassRoom(Long studentId, String nickName, Long smallClassId, String accessToken) {
         try {
             SmallClass smallClass = getClassRoomById(smallClassId);
+            if(Objects.isNull(smallClass)) {
+                throw new PublicClassException(PublicClassMessageEnum.ERROR_PUBLIC_CLASS);
+            }
             publicClassRoom.enter(smallClass, studentId, nickName, accessToken);
             return PublicClassMessageEnum.SUCCES.getMessageMap();
         } catch (Exception e) {

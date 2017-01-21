@@ -434,7 +434,7 @@ service:
     innerTeacherUrl: http://123.56.13.168:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
     #错误异常提醒邮件发送地址
-    errorReportMailUrl: http://120.27.236.110:9098/mail
+#    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
     type: test
 time:
