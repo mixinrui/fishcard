@@ -460,8 +460,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         // 小班课规模, 如果没有指定默认为-1
         String optionTwo = productComboDetail.getProductSku().getOptionTwo();
 
-        // 如果是小班课, OptionTwo为上课人数
-        service.setClassSize(productCombo.getClassSize());
+        // 小班课
+        Integer classSize = productCombo.getClassSize();
+        // 不传默认是-1
+        service.setClassSize(classSize == null ? -1 : classSize);
 
         List<ComboDurations> durations = productCombo.getComboDurations();
         if(CollectionUtils.isNotEmpty(durations)) {
