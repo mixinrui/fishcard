@@ -63,7 +63,8 @@ public class LastClassStrategy implements ScheduleStrategy {
 
         WorkOrder workOrder = workOrderJpaRepository.findOne(instantClassCard.getWorkorderId());
         List<WorkOrder> workOrders = workOrderJpaRepository
-                .findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(workOrder.getService().getOrderId(), new Date());
+                .findByOrderIdAndIsFreezeAndStartTimeAfterAndClassTypeIsNullOrderByStartTimeAsc(workOrder.getService().getOrderId(), new Integer(0), new Date());
+
         List<WorkOrder> typeChangedList = Lists.newArrayList();
         List<WorkOrder> typeUnChangedList = Lists.newArrayList();
 

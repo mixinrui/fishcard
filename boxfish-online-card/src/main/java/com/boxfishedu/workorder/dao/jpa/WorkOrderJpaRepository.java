@@ -90,6 +90,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     //按照订单ID  和  状态 查找鱼卡
     public List<WorkOrder> findByOrderIdAndStatus(Long orderId, int status);
 
+    List<WorkOrder> findByOrderIdAndIsFreezeAndStartTimeAfterAndClassTypeIsNullOrderByStartTimeAsc(Long orderId,Integer isFreeze,Date date);
+
     public List<WorkOrder> findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(Long orderId, Date date);
 
     //状态为退卡状态 并且 剩余课程不为零
