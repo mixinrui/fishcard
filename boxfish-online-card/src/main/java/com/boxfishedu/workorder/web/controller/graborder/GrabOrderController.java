@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.web.controller.graborder;
 
 import com.boxfishedu.card.bean.CourseTypeEnum;
+import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.online.order.entity.TeacherForm;
+import com.boxfishedu.workorder.common.rabbitmq.RabbitMqReciver;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.WorkOrderService;
@@ -13,13 +15,16 @@ import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.GrabOrderServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.fishcard.GrabOrderView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 抢单
@@ -59,7 +64,15 @@ public class GrabOrderController {
     @Autowired
     private TeacherStudentRequester teacherStudentRequester;
 
+    @Autowired
+    private RabbitMqReciver rabbitMqReciver;
 
+
+    @RequestMapping(value = "/order2service/notallow", method = RequestMethod.POST)
+    public JsonResultModel updateCourseIntoWorkOrder(@RequestBody OrderForm orderView) {
+         rabbitMqReciver.orderConsumer(orderView);
+         return JsonResultModel.newJsonResultModel("OK");
+    }
 
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
     public JsonResultModel tomonotify()throws Exception {

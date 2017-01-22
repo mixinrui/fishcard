@@ -67,7 +67,7 @@ parameter:
   mail_token: Tpn7MvMDAxLuS4reWbveS6uuacgOWuueaYk
 
   #收件人
-  recipients: luolibing@boxfish.cn
+  recipients: luolibing@boxfish.cn,jiaozijun@boxfish.cn,huchunlin@boxfish.cn
 
 spring.jpa:
   show-sql: true
