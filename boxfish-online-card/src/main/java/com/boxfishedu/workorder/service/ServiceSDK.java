@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.service;
 
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NetWorkException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -51,12 +52,13 @@ public class ServiceSDK {
 
     /**
      * 获取老师一个月选的时间片
+     *
      * @param teacherId
      * @param dateRangeForm
      * @return
      */
     public MonthTimeSlots getMonthTimeSlotsByDateBetween(Long teacherId, DateRangeForm dateRangeForm) {
-        logger.info("向师生运营组发起教师[{}]日期请求,url[{}]",teacherId,timeSlotsUrl());
+        logger.info("向师生运营组发起教师[{}]日期请求,url[{}]", teacherId, timeSlotsUrl());
         MonthTimeSlots monthTimeSlots = restTemplate.postForObject(
                 timeSlotsUrl(), timeSlotsParam(teacherId, dateRangeForm), MonthTimeSlots.class);
         // 将时间戳转换为日期字符串
@@ -70,8 +72,8 @@ public class ServiceSDK {
     }
 
 
-    public CourseView getCourseInfoByScheduleId(Long scheduleId, Locale locale){
-        ScheduleCourseInfo scheduleCourseInfo=scheduleCourseInfoService.queryByScheduleId(scheduleId);
+    public CourseView getCourseInfoByScheduleId(Long scheduleId, Locale locale) {
+        ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByScheduleId(scheduleId);
         return getCourseInfo(scheduleCourseInfo, locale);
     }
 
@@ -84,21 +86,31 @@ public class ServiceSDK {
 
     /**
      * 判断是否是会员
+     *
      * @param accessToken
      * @return
      */
     public JsonResultModel getMemberInfo(String accessToken) {
+        JsonResultModel resultModel = null;
+        URI uri = createMemberInfo(accessToken);
         try {
-            return restTemplate.getForObject(createMemberInfo(accessToken), JsonResultModel.class);
+            resultModel = restTemplate.getForObject(uri, JsonResultModel.class);
+            if (Objects.isNull(resultModel) || Objects.isNull(resultModel.getData())) {
+                throw new BusinessException("获取会员信息失败");
+            }
+            logger.debug("@getMemberInfo#获取会员信息成功,uri[{}],结果[{}]"
+                    , uri.toString(), JacksonUtil.toJSon(resultModel));
+            return resultModel;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("@getMemberInfo#获取会员信息失败,URI[{}],结果[{}]"
+                    , uri.toString(), JacksonUtil.toJSon(resultModel), e);
             return JsonResultModel.EMPTY;
         }
     }
 
-    public CourseView getCourseInfo(ScheduleCourseInfo scheduleCourseInfo, Locale locale){
+    public CourseView getCourseInfo(ScheduleCourseInfo scheduleCourseInfo, Locale locale) {
         CourseView courseView = CourseView.courseViewAdapter(scheduleCourseInfo);
-        if(Objects.isNull(courseView)) {
+        if (Objects.isNull(courseView)) {
             return null;
         }
         courseView.setLocale(locale);
@@ -113,24 +125,25 @@ public class ServiceSDK {
     }
 
     /**
-     *  {
-     "studentId":975443,
-     "teacherId":1028080,
-     "id":1
-     }
+     * {
+     * "studentId":975443,
+     * "teacherId":1028080,
+     * "id":1
+     * }
+     *
      * @param workOrder
      */
     public void createGroup(WorkOrder workOrder) {
-        logger.info("@createGroup开始通知在线授课创建组,鱼卡号:[{}]",workOrder.getId());
+        logger.info("@createGroup开始通知在线授课创建组,鱼卡号:[{}]", workOrder.getId());
         Map map = new HashMap<String, Long>(3);
         map.put("studentId", workOrder.getStudentId());
         map.put("teacherId", workOrder.getTeacherId());
         map.put("id", workOrder.getId());
 
-        workOrderLogService.saveWorkOrderLog(workOrder,"创建群组关系");
+        workOrderLogService.saveWorkOrderLog(workOrder, "创建群组关系");
         //使用mq向小马发送创组请求
         rabbitMqSender.send(map, QueueTypeEnum.CREATE_GROUP);
-        logger.info("完成通知在线授课创建组,鱼卡号:[{}]",workOrder.getId());
+        logger.info("完成通知在线授课创建组,鱼卡号:[{}]", workOrder.getId());
     }
 
     private Map<String, Object> timeSlotsParam(Long teacherId, DateRangeForm dateRangeForm) {
@@ -139,15 +152,15 @@ public class ServiceSDK {
         param.put("type", "TEACHER");
         param.put("begin", dateRangeForm.getBeginLongValue());
         param.put("end", dateRangeForm.getEndLongValue());
-        logger.info("获取教师[{}]的参数:{}",teacherId, JacksonUtil.toJSon(param));
+        logger.info("获取教师[{}]的参数:{}", teacherId, JacksonUtil.toJSon(param));
         return param;
     }
 
     private URI createMemberInfo(String accessToken) {
         return UriComponentsBuilder.fromUriString(urlConf.getMemberUrl())
-                .path("/info")
-                .queryParam("access_token", accessToken)
-                .build()
-                .toUri();
+                                   .path("/info")
+                                   .queryParam("access_token", accessToken)
+                                   .build()
+                                   .toUri();
     }
 }
