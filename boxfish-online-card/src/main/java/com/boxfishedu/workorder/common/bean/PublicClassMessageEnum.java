@@ -83,7 +83,7 @@ public enum PublicClassMessageEnum {
 
         @Override
         public String getMessage() {
-            return "网络抖动了一下, 请稍后再试";
+            return "网络抖动了一下, 请稍后重试";
         }
     };
 

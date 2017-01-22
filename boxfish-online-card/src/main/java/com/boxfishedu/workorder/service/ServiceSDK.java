@@ -1,9 +1,10 @@
 package com.boxfishedu.workorder.service;
 
+import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
-import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NetWorkException;
+import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
@@ -96,7 +97,7 @@ public class ServiceSDK {
         try {
             resultModel = restTemplate.getForObject(uri, JsonResultModel.class);
             if (Objects.isNull(resultModel) || Objects.isNull(resultModel.getData())) {
-                throw new BusinessException("获取会员信息失败");
+                throw new PublicClassException(PublicClassMessageEnum.NETWORK_ERROR);
             }
             logger.debug("@getMemberInfo#获取会员信息成功,uri[{}],结果[{}]"
                     , uri.toString(), JacksonUtil.toJSon(resultModel));
@@ -104,7 +105,9 @@ public class ServiceSDK {
         } catch (Exception e) {
             logger.error("@getMemberInfo#获取会员信息失败,URI[{}],结果[{}]"
                     , uri.toString(), JacksonUtil.toJSon(resultModel), e);
-            return JsonResultModel.EMPTY;
+            // 网络错误, 请重试
+            throw new PublicClassException(PublicClassMessageEnum.NETWORK_ERROR);
+//            return JsonResultModel.EMPTY;
         }
     }
 

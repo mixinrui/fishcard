@@ -65,10 +65,10 @@ public class PublicClassRoom {
     public void enter(SmallClass smallClass, Long studentId, String nickName, String accessToken) {
 
         // 是否在上课正常时间范围内
-        Date now = new Date();
-        if (now.before(smallClass.getStartTime()) || now.after(smallClass.getEndTime())) {
-            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
-        }
+//        Date now = new Date();
+//        if (now.before(smallClass.getStartTime()) || now.after(smallClass.getEndTime())) {
+//            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
+//        }
 
         // 一 判断是否是第一次进入这个课堂, 如果不是, 则直接返回
         if (isOnceEntered(smallClass.getId(), studentId)) {
