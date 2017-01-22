@@ -65,13 +65,13 @@ public class PublicClassRoom {
     public void enter(SmallClass smallClass, Long studentId, String nickName, String accessToken) {
 
         // 是否在上课正常时间范围内
-//        Date now = new Date();
-//        if(now.compareTo(smallClass.getStartTime()) < 0 || now.compareTo(smallClass.getEndTime()) > 0) {
-//            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
-//        }
+        Date now = new Date();
+        if (now.before(smallClass.getStartTime()) || now.after(smallClass.getEndTime())) {
+            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
+        }
 
         // 一 判断是否是第一次进入这个课堂, 如果不是, 则直接返回
-        if(isOnceEntered(smallClass.getId(), studentId)) {
+        if (isOnceEntered(smallClass.getId(), studentId)) {
             // 更改状态
             updateEnterStatus(smallClass.getId(), studentId);
             return;
@@ -90,12 +90,13 @@ public class PublicClassRoom {
 
     /**
      * 退出课堂
+     *
      * @param smallClassId
      * @param studentId
      */
     @Transactional
     public void quit(Long smallClassId, Long studentId) {
-        if(setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId) > 0) {
+        if (setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId) > 0) {
             publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.STUDENT_QUIT.getCode(), smallClassId, studentId);
         }
     }
@@ -103,6 +104,7 @@ public class PublicClassRoom {
 
     /**
      * 实时获取课堂人数
+     *
      * @param smallClassId
      * @return
      */
@@ -119,7 +121,7 @@ public class PublicClassRoom {
         List<SmallClass> smallClassList = smallClassJpaRepository.findByClassDateAndClassType(
                 DateUtil.convertToDate(localDate), ClassTypeEnum.PUBLIC.name());
         expireClassRoomCacheByDate(localDate);
-        for(SmallClass smallClass : smallClassList) {
+        for (SmallClass smallClass : smallClassList) {
             expireClassRoomCacheBySmallClassId(smallClass.getId());
         }
     }
@@ -127,6 +129,7 @@ public class PublicClassRoom {
 
     /**
      * 获取公开课学生集合
+     *
      * @param smallClassId
      * @return
      */
@@ -145,15 +148,15 @@ public class PublicClassRoom {
         List<SmallClass> smallClassList = smallClassJpaRepository.findByStartTimeRange(
                 DateUtil.convertToDate(from), DateUtil.convertToDate(to), ClassTypeEnum.PUBLIC.name());
         Set<String> tags = smallClassList.stream()
-                .map(SmallClass::getSlotId)
-                .distinct()
-                .map(PublicClassTimeEnum::getCourseDifficultiesBySlotId)
-                .filter(t -> t != null)
-                .flatMap(Collection::stream)
-                .map(c -> c.pushCode)
-                .collect(Collectors.toSet());
+                                         .map(SmallClass::getSlotId)
+                                         .distinct()
+                                         .map(PublicClassTimeEnum::getCourseDifficultiesBySlotId)
+                                         .filter(t -> t != null)
+                                         .flatMap(Collection::stream)
+                                         .map(c -> c.pushCode)
+                                         .collect(Collectors.toSet());
 //        Set<String> tags = Stream.of(CourseDifficultyEnum.values()).map(c -> c.pushCode).collect(Collectors.toSet());
-        if(CollectionUtils.isNotEmpty(tags)) {
+        if (CollectionUtils.isNotEmpty(tags)) {
             System.out.println(tags);
 
             new PublicClassRoomNotification()
@@ -184,6 +187,7 @@ public class PublicClassRoom {
 
     /**
      * 判断是否进入过房间
+     *
      * @param smallClassId
      * @param studentId
      * @return
@@ -206,7 +210,7 @@ public class PublicClassRoom {
         Map memberInfo = (Map) resultModel.getData();
         String memberType;
         // 如果获取不到会员类型, 默认为非会员
-        if(memberInfo.get("type") == null) {
+        if (memberInfo.get("type") == null) {
             memberType = "NONE";
         } else {
             memberType = memberInfo.get("type").toString();
@@ -214,8 +218,9 @@ public class PublicClassRoom {
         LocalDate classDate = DateUtil.convertLocalDate(smallClass.getClassDate());
         switch (memberType) {
             // 非会员直接不让上课
-            case "NONE" : throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
-            // 会员验证
+            case "NONE":
+                throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
+                // 会员验证
             default:  // memberCheck(classDate, studentId); break;
         }
     }
@@ -225,13 +230,13 @@ public class PublicClassRoom {
      */
     private void memberCheck(LocalDate classDate, Long studentId) {
         Boolean haveCourse = setOperations.isMember(CLASS_ROOM_MEMBER_DAY_KEY + DateUtil.dateFormatter.format(classDate), studentId);
-        if(haveCourse) {
+        if (haveCourse) {
             throw new PublicClassException(PublicClassMessageEnum.EVERY_DAY_LIMIT);
         }
 
         // 会员每天只能上一节课
         Integer count = publicClassInfoJpaRepository.findByClassDateAndStudentId(classDate, studentId);
-        if(count > 0) {
+        if (count > 0) {
             throw new PublicClassException(PublicClassMessageEnum.EVERY_DAY_LIMIT);
         }
     }
@@ -250,6 +255,7 @@ public class PublicClassRoom {
 
     /**
      * 更新进入课堂统计分析缓存
+     *
      * @param smallClass
      * @param studentId
      */
@@ -275,7 +281,6 @@ public class PublicClassRoom {
     }
 
 
-
     // ********************************* 暂时不用的方法 *********************************** //
 
     // 一周以内学过的学生
@@ -289,6 +294,7 @@ public class PublicClassRoom {
 
     /**
      * 非会员验证
+     *
      * @param classDate
      * @param studentId
      */
@@ -298,7 +304,7 @@ public class PublicClassRoom {
                 DateUtil.getFirstDateOfWeek(classDate),
                 DateUtil.getLastDateOfWeek(classDate),
                 studentId);
-        if(count > 0) {
+        if (count > 0) {
             throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
         }
     }
