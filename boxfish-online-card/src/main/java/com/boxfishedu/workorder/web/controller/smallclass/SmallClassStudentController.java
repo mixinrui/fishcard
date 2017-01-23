@@ -31,7 +31,7 @@ public class SmallClassStudentController {
     @RequestMapping(value = "/publicTips", method = RequestMethod.GET)
     public JsonResultModel publicTips() {
         //成为BOXFiSH学员 即可每天免费上课
-        return JsonResultModel.newJsonResultModel("公开课预计于2月15号开放,欢迎使用");
+        return JsonResultModel.newJsonResultModel("外教大讲堂预计2月15日开放，欢迎使用");
     }
 
 }

@@ -747,7 +747,7 @@ interface:
 #消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push
     # 会员url
-    memberUrl: http://123.56.6.91:8888/member
+    memberUrl: https://pay.boxfish.cn/member
 
 time:
   task:
@@ -830,7 +830,7 @@ interface:
     #消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push
     # 会员url
-    memberUrl: http://123.56.6.91:8888/member
+    memberUrl: https://pay.boxfish.cn/member
 #外教点评接口调用地址
 service:
   sdk:
