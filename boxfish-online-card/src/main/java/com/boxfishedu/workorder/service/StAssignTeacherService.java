@@ -235,10 +235,20 @@ public class StAssignTeacherService {
                 List<CourseSchedule> needFireCourseSchedules = courseScheduleRepository.findByWorkorderIdIn(needFireWorkOrderIds);
                 for(WorkOrder workOrder :needFireWorkOrders ){
                     workOrder.setTeacherId(0L);
+                    workOrder.setTeacherName(null);
+                    workOrder.setStatus(20);
+                    if(null == workOrder.getCourseId()){
+                        workOrder.setStatus(10);
+                    }
+
                     courseOnlineRequester.releaseGroup(workOrder);
                 }
                 for(CourseSchedule courseSchedule : needFireCourseSchedules ){
                     courseSchedule.setTeacherId(0L);
+                    courseSchedule.setStatus(20);
+                    if(null == courseSchedule.getCourseId()){
+                        courseSchedule.setStatus(10);
+                    }
                 }
 
                 workOrders.addAll(needFireWorkOrders);
@@ -463,7 +473,8 @@ public class StAssignTeacherService {
             workOrderLog.setCreateTime(new Date());
             workOrderLog.setWorkOrderId(scheduleModelSt.getWorkOrderId());
             workOrderLog.setStatus(workOrder.getStatus());
-            content = MessageFormat.format("@@@@assign-指定更换教师:workOrderId:{0}status={1},指定老师={2},之前鱼卡老师信息信息{3},匹配老师oldteacher信息{4},指定老师{5}",scheduleModelSt.getWorkOrderId(),FishCardStatusEnum.getDesc(workOrder.getStatus()),teacherId,workOrder.getTeacherId(),scheduleModelSt.getOldTeacherId(),teacherId);
+            content = MessageFormat.format("@@@@assign-指定更换教师:workOrderId:{0}status={1},指定老师={2},之前鱼卡老师信息信息{3},匹配老师oldteacher信息{4},指定老师{5}",
+                    scheduleModelSt.getWorkOrderId()+"",FishCardStatusEnum.getDesc(workOrder.getStatus()),teacherId+"",workOrder.getTeacherId()+"",scheduleModelSt.getOldTeacherId()+"",teacherId+"");
             workOrderLog.setContent(content);
             logger.info(content);
             workOrderLogs.add(workOrderLog);
