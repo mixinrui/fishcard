@@ -227,7 +227,7 @@ public class StAssignTeacherService {
             notifyOthers(workOrders);
             logger.info("@@@@assign 指定老师 channel====>>{}=====>>stp-2::::异步记录鱼卡日志:::::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>鱼卡IDS{}",
                     channel,studentId, teacherId, skuId, Collections3.extractToList(workOrders,"id"));
-            changeTeacherLog(macthedList,teacherId);
+
             if(Collections3.isNotEmpty(needFireWorkOrderIds)){
                 logger.info("@@@@assign ===channel====>>{}=====>> 指定老师 stp-3 needfire:::开始更新鱼卡和课表入库:::======>>>APP端学生ID:{}===>>>>发起指定老师:{}===>>skuId:{}====>>需要被释放的的鱼卡IDS{}",
                         channel,studentId, teacherId, skuId, needFireWorkOrderIds.toArray());
@@ -258,6 +258,7 @@ public class StAssignTeacherService {
             workOrderJpaRepository.save(workOrders);
             courseScheduleRepository.save(courseSchedules);
 
+            changeTeacherLog(macthedList,teacherId);
         }
 
 
