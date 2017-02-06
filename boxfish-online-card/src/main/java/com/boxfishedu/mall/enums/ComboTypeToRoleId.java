@@ -24,7 +24,8 @@ public enum ComboTypeToRoleId {
     // 小班课
     SMALLCLASS(3),
     // 公开课
-    PUBLIC(3);
+    PUBLIC(3),
+    FSCF(3);
 
     private int value;
 
