@@ -60,6 +60,7 @@ public enum TimerMessageType {
     // 外教点评会员过期提醒
     EXPIRE_COMMENT_CARD(149),
     ASSGIN_TEACHER(150),
+
     // 公开课缓存清理
     EXPIRE_PUBLIC_CLASS(151),
     // 公开课提前5分钟推送
@@ -68,7 +69,10 @@ public enum TimerMessageType {
     //创建小班课
     CREATE_SMALL_CLASS(154),
     //保存小班课学生的上课关系
-    SMALLCLASS_STUDENTS_RELATION(155);
+    SMALLCLASS_STUDENTS_RELATION(155),
+
+    //外教点评订单关闭
+    CLOSE_COMMENT_CARD_ORDER(156);
 
 
     private int code;

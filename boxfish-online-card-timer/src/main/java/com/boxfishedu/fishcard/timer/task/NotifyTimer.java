@@ -368,4 +368,15 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
+
+    /**
+     * 外教点评次数用完订单关闭
+     */
+    @Scheduled(cron = "0 0 1 * * ?")
+    public void commentCardCloseOrder(){
+        logger.info("<<<<<<开始通知<<<检查外教点评订单是否需要关闭>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.CLOSE_COMMENT_CARD_ORDER.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
 }

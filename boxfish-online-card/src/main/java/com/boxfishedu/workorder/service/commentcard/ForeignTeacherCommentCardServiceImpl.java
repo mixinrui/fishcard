@@ -14,6 +14,7 @@ import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.CommentCardOrderJdbc;
 import com.boxfishedu.workorder.dao.jpa.CommentCardStatisticsJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
@@ -76,6 +77,15 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Autowired
     CommentCardTimeConf commentCardTimeConf;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Autowired
+    private CommentCardOrderJdbc commentCardOrderJdbc;
+
+    @Autowired
+    private RabbitMqSender rabbitMaSender;
 
     private Logger logger = LoggerFactory.getLogger(ForeignTeacherCommentCardServiceImpl.class);
 
@@ -626,6 +636,21 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
         if(CollectionUtils.isNotEmpty(studentIds)) {
             pushExpireMessage(studentIds);
         }
+    }
+
+    /**
+     * 检查外教点评次数是否用尽以关闭订单
+     */
+    @Override
+    public void closeCommentCardOrder() {
+        List<Map<String,Object>> orderIdList = commentCardOrderJdbc.closeCommentCardOrder();
+        int count = 0;
+        for (Map map: orderIdList) {
+            map.put("status",40);
+            rabbitMaSender.send(map,QueueTypeEnum.CLOSE_COMMENT_CARD_ORDER);
+            count++;
+        }
+        logger.info("###closeCommentCardOrder###关闭订单个数为:" + count);
     }
 
     // 推送
