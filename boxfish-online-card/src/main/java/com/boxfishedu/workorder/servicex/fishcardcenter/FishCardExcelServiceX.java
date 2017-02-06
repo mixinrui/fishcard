@@ -125,7 +125,7 @@ public class FishCardExcelServiceX {
 
 
             hssfCell = hssfRow.createCell(2);
-            hssfCell.setCellValue( list.get(i).getStudentId() );
+            hssfCell.setCellValue( list.get(i).getStudentId()==null?0: list.get(i).getStudentId());
 
 
             hssfCell = hssfRow.createCell(3);
