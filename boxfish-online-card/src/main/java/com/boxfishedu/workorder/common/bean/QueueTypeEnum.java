@@ -11,7 +11,8 @@ public enum QueueTypeEnum {
     RECHARGE_ORDER(13),
     SHORT_MESSAGE(14),  //发送短信
     ASYNC_COMMENT_CARD_CUSTOMER_SERVICE(15),  //同步外教点评到客服系统
-    ASYNC_NOTIFY_CUSTOMER_SERVICE(20)
+    ASYNC_NOTIFY_CUSTOMER_SERVICE(20),
+    CLOSE_COMMENT_CARD_ORDER(21)//关闭外教点评订单
     ;
 
     private int code;

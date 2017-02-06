@@ -44,6 +44,7 @@ import java.util.Map;
 /**
  * Created by hucl on 16/4/15.
  */
+@SuppressWarnings("ALL")
 @Component
 @Configuration
 @Profile({"local_hucl","product","local","development","development_new","test","demo","pretest"})
@@ -229,6 +230,9 @@ public class RabbitMqReciver {
             else if(serviceTimerMessage.getType() == TimerMessageType.ASSGIN_TEACHER.value()) {
                 logger.info("==========>@@@@assign-timer===>>> 指定老师定时任务接受到任务");
                 assignTeacherServiceX.autoAssign();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.CLOSE_COMMENT_CARD_ORDER.value()){
+                logger.info("==========>CLOSE_COMMENT_CARD_ORDER ===>>> 检查外教点评次数用尽、关闭订单");
+                foreignTeacherCommentCardService.closeCommentCardOrder();
             }
             //
         } catch (Exception ex) {

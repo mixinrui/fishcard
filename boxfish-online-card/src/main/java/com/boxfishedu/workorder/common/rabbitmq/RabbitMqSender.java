@@ -56,6 +56,11 @@ public class RabbitMqSender {
                 notifyOrderTemplate.convertAndSend(object);
                 break;
             }
+            case CLOSE_COMMENT_CARD_ORDER:{
+                logger.info("@<-<-<-<-<-<-<-向订单中心发送关闭外教点评订单通知;参数:{}",JacksonUtil.toJSon(object));
+                notifyOrderTemplate.convertAndSend(object);
+                break;
+            }
             case NOTIFY_TIMER: {
                 logger.info("@<-<-<-<-<-<-<-回复定时器,参数{}",JacksonUtil.toJSon(object));
                 notifyTimerTemplate.convertAndSend(object);
