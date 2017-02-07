@@ -111,7 +111,7 @@ public class SmallClassRequester {
             info = restTemplate.getForObject(url, RecommandCourseView.class);
             logger.debug("@fetchClassCourseByUserIds获取用户课程成功,url[{}],结果[{}]", url, info);
         } catch (Exception ex) {
-            logger.error("@fetchClassCourseByUserIds2`1获取用户课程失败,url[{}]", url, ex);
+            logger.error("@fetchClassCourseByUserIds获取用户课程失败,url[{}]", url, ex);
             throw new BusinessException("获取用户课程失败");
         }
         return info;

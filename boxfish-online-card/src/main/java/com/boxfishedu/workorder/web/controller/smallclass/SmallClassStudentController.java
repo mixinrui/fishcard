@@ -19,6 +19,7 @@ public class SmallClassStudentController {
     @Autowired
     private SmallClassStudentStatusServiceX smallClassStudentStatusServiceX;
 
+    @Autowired
     private ConfigBeanMorphiaRepository configBeanMorphiaRepository;
 
     @RequestMapping(value = "/{smallclass_id}/status", method = RequestMethod.POST)
