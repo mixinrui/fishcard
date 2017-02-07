@@ -84,6 +84,7 @@ public class MongoConfiguration {
         morphia.map(NetPingAnalysisInfo.class);
         morphia.map(SmallClassLog.class);
         morphia.map(SmallClassStudentsRelation.class);
+        morphia.map(ConfigBean.class);
         Datastore datastore = morphia.createDatastore(mongoClient(), mongoProperties.getDbName());
         datastore.ensureIndexes();
         datastore.ensureIndex(

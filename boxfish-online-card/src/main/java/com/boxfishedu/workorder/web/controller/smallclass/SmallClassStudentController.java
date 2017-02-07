@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
+import com.boxfishedu.workorder.dao.mongo.ConfigBeanMorphiaRepository;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassStudentStatusServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ public class SmallClassStudentController {
     @Autowired
     private SmallClassStudentStatusServiceX smallClassStudentStatusServiceX;
 
+    private ConfigBeanMorphiaRepository configBeanMorphiaRepository;
+
     @RequestMapping(value = "/{smallclass_id}/status", method = RequestMethod.POST)
     public JsonResultModel status(
             @PathVariable("smallclass_id") Long smallClassId
@@ -30,8 +33,9 @@ public class SmallClassStudentController {
 
     @RequestMapping(value = "/publicTips", method = RequestMethod.GET)
     public JsonResultModel publicTips() {
+        String tips=configBeanMorphiaRepository.getPublicWarning();
         //成为BOXFiSH学员 即可每天免费上课
-        return JsonResultModel.newJsonResultModel("外教大讲堂预计2月15日开放，欢迎使用");
+        return JsonResultModel.newJsonResultModel(publicTips());
     }
 
 }
