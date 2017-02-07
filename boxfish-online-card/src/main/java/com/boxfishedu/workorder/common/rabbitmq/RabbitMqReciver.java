@@ -44,6 +44,7 @@ import java.util.Map;
 /**
  * Created by hucl on 16/4/15.
  */
+@SuppressWarnings("ALL")
 @Component
 @Configuration
 @Profile({"local_hucl", "product", "local", "development", "development_new", "test", "demo", "pretest"})
@@ -249,6 +250,9 @@ public class RabbitMqReciver {
             else if (serviceTimerMessage.getType() == TimerMessageType.SMALLCLASS_STUDENTS_RELATION.value()) {
                 logger.info("==========>@@@@SMALLCLASS_STUDENTS_RELATION===>>> 小班课上课关系记录");
                 smallClassTimerServiceX.buildSmallCLassRelations();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.CLOSE_COMMENT_CARD_ORDER.value()){
+                logger.info("==========>CLOSE_COMMENT_CARD_ORDER ===>>> 检查外教点评次数用尽、关闭订单");
+                foreignTeacherCommentCardService.closeCommentCardOrder();
             }
             //
         } catch (Exception ex) {

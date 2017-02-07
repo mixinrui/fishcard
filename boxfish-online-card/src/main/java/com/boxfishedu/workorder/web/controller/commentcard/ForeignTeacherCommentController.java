@@ -123,6 +123,12 @@ public class ForeignTeacherCommentController {
         return new JsonResultModel();
     }
 
+    @RequestMapping(value = "/handle/close/order" , method = RequestMethod.GET)
+    public Object closeCommentCardOrder(){
+        foreignTeacherCommentCardService.closeCommentCardOrder();
+        return new JsonResultModel();
+    }
+
     //all测试接口
     @RequestMapping(value = "/ansel/test", method = RequestMethod.GET)
     public Object anselTest(){

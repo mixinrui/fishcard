@@ -1,9 +1,11 @@
 package com.boxfishedu.workorder.web.controller.fishcardcenter;
 
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardExcelServiceX;
+import com.boxfishedu.workorder.web.param.ExcelPageAble;
 import com.boxfishedu.workorder.web.param.FishCardFilterParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +26,10 @@ public class DataExportController {
     @Autowired
     private FishCardExcelServiceX fishCardExcelServiceX;
     @RequestMapping(value = "/export", method = RequestMethod.GET)
-    public JsonResultModel listFishCardsByCond(FishCardFilterParam fishCardFilterParam, HttpServletResponse response, Pageable pageable) {
+    public JsonResultModel listFishCardsByCond(FishCardFilterParam fishCardFilterParam, HttpServletResponse response,ExcelPageAble excelPageAble) {
+
+//        ExcelPageAble    Pageable pageable
+        Pageable pageable = new PageRequest(excelPageAble.getPage(),excelPageAble.getSize());
         fishCardExcelServiceX.exportExcel(fishCardFilterParam,response,pageable);
         return JsonResultModel.newJsonResultModel();
     }
