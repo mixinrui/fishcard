@@ -87,7 +87,7 @@ spring.datasource:
   autoReconnect: true
   jdbc-interceptors: SlowQueryReport(threshold=1000)
 
-time.task.expireMessage: "会员要到期啦,外教点评还没用完呢,赶快去行使会员特权~"
+time.task.expireMessage: "BOXFiSH学员要到期啦，外教点评还没用完呢，赶快去行使学员特权～"
 
 spring.jackson.date-format: yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone: GMT+8
