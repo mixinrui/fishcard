@@ -20,4 +20,9 @@ public class ConfigBeanMorphiaRepository extends BaseMorphiaRepository<ConfigBea
         }
         return configBeans.get(0).getPublicWarning();
     }
+
+    public ConfigBean getSingleBean(){
+        Query<ConfigBean> query = datastore.createQuery(ConfigBean.class);
+        return query.get();
+    }
 }

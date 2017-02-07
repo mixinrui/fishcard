@@ -35,7 +35,7 @@ public class SmallClassStudentController {
     public JsonResultModel publicTips() {
         String tips=configBeanMorphiaRepository.getPublicWarning();
         //成为BOXFiSH学员 即可每天免费上课
-        return JsonResultModel.newJsonResultModel(publicTips());
+        return JsonResultModel.newJsonResultModel(tips);
     }
 
 }

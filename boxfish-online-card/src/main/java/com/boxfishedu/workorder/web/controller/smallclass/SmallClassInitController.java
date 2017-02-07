@@ -1,13 +1,15 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
+import com.boxfishedu.workorder.dao.mongo.ConfigBeanMorphiaRepository;
+import com.boxfishedu.workorder.entity.mongo.ConfigBean;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.groupbuilder.GroupBuilder;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/11.
@@ -18,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class SmallClassInitController {
     @Autowired
     private GroupBuilder groupBuilder;
+
+    @Autowired
+    private ConfigBeanMorphiaRepository configBeanMorphiaRepository;
 
     @Autowired
     private SmallClassTimerServiceX smallClassTimerServiceX;
@@ -38,5 +43,16 @@ public class SmallClassInitController {
     public JsonResultModel buildRelation() {
         smallClassTimerServiceX.buildSmallCLassRelations();
         return JsonResultModel.newJsonResultModel("OK");
+    }
+
+    @RequestMapping(value = "/init/publicWarnings", method = RequestMethod.POST)
+    public JsonResultModel addPublicWarnings(@RequestBody Map<String, String> map) {
+        ConfigBean configBean = configBeanMorphiaRepository.getSingleBean();
+        if (Objects.isNull(configBean)) {
+            configBean = new ConfigBean();
+        }
+        configBean.setPublicWarning(map.get("publicWarnings"));
+        configBeanMorphiaRepository.save(configBean);
+        return JsonResultModel.newJsonResultModel("ok");
     }
 }
