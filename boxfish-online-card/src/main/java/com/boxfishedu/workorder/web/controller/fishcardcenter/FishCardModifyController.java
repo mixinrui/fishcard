@@ -36,7 +36,7 @@ public class FishCardModifyController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * 换老师
+     * 换老师(1对1)
      * @param teacherChangeParam
      * @return
      */
@@ -44,6 +44,7 @@ public class FishCardModifyController {
     public JsonResultModel changeTeacher(@RequestBody TeacherChangeParam teacherChangeParam) {
         return fishCardModifyServiceX.changeTeacher(teacherChangeParam);
     }
+
 
     /**
      * 换老师之前  检查老师是否处于联通(31-37  除去 36 的状态)
@@ -53,6 +54,26 @@ public class FishCardModifyController {
     @RequestMapping(value = "/check/teacher", method = RequestMethod.PUT)
     public JsonResultModel checkCurrentTeacher(@RequestBody TeacherChangeParam teacherChangeParam){
         return fishCardModifyServiceX.checkCurrentTeacherStatus(teacherChangeParam);
+    }
+
+    /**
+     * 换老师(小班课 smallClass)
+     * @param teacherChangeParam
+     * @return
+     */
+    @RequestMapping(value = "/teacher/samllClass", method = RequestMethod.PUT)
+    public JsonResultModel changeTeacherSmallClass(@RequestBody TeacherChangeParam teacherChangeParam) {
+        return fishCardModifyServiceX.changeTeacherSmallClass(teacherChangeParam);
+    }
+
+    /**
+     * 小班课换老师之前  检查老师是否处于联通(PublicClassInfoConstantStatus >=1000)
+     * @param teacherChangeParam
+     * @return
+     */
+    @RequestMapping(value = "/check/teacher/smallClass", method = RequestMethod.PUT)
+    public JsonResultModel checkCurrentTeacherSmallClass(@RequestBody TeacherChangeParam teacherChangeParam){
+        return fishCardModifyServiceX.checkCurrentTeacherStatusSmallClass(teacherChangeParam);
     }
 
     
