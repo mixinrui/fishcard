@@ -26,6 +26,7 @@ import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherFixService;
+import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.FishCardDeleteParam;
@@ -327,6 +328,22 @@ public class FishCardModifyServiceX {
         return JsonResultModel.newJsonResultModel("OK");
     }
 
+    /**
+     * TODO
+     * @param makeUpCourseParam
+     * @return
+     */
+    public JsonResultModel changeTeachers(MakeUpCourseParam makeUpCourseParam){
+//        List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
+//        if(CollectionUtils.isEmpty(workOrders) ){
+//            return JsonResultModel.newJsonResultModel("鱼卡列表为空");
+//        }
+//
+//        //分配教师以后其实就已经是就绪,目前这两个状态有重叠
+//        if(workOrder.getStatus()== FishCardStatusEnum.CREATED.getCode() || workOrder.getStatus()==FishCardStatusEnum.COURSE_ASSIGNED.getCode() || workOrder.getStatus()==FishCardStatusEnum.TEACHER_ASSIGNED.getCode()){
+        return JsonResultModel.newJsonResultModel("OK");
+
+        }
 
     /**
      * 短信通知老师 课程取消
