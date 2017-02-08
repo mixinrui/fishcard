@@ -53,9 +53,11 @@ public class SmallClassTeacherRequester {
         try {
             jsonResultModel = restTemplate.postForObject(url, fetchTeacherParam, JsonResultModel.class);
             if (Objects.isNull(jsonResultModel.getData())) {
+
                 logger.error("@getSmallClassTeacher#获取小班课教师失败,没有获取到教师,url[{}],参数[{}],结果[{}]"
                         , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
                 return null;
+
             } else {
                 wrapTeacher(fetchTeacherParam, jsonResultModel, teacherView);
 
