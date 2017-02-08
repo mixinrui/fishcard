@@ -1,13 +1,18 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.StyledEditorKit;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -50,5 +55,15 @@ public class SmallClassServiceX {
             map.put("classInfo", smallClass);
         }
         return map;
+    }
+
+    // 验证小班课老师是否处于大于1000的状态  true  给出提示  false  不给提示
+    public boolean checkChangeTeacherForSmallClass(Long smallClassId) {
+
+        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
+        if(null!=smallClass && smallClass.getStatus() >=PublicClassInfoConstantStatus.TEACHER_CARD_VALIDATED){
+            return true;
+        }
+        return false;
     }
 }
