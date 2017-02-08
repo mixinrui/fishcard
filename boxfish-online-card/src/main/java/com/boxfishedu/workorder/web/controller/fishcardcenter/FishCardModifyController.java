@@ -61,7 +61,7 @@ public class FishCardModifyController {
      * @param teacherChangeParam
      * @return
      */
-    @RequestMapping(value = "/teacher/samllClass", method = RequestMethod.PUT)
+    @RequestMapping(value = "/teacher/smallClass", method = RequestMethod.PUT)
     public JsonResultModel changeTeacherSmallClass(@RequestBody TeacherChangeParam teacherChangeParam) {
         return fishCardModifyServiceX.changeTeacherSmallClass(teacherChangeParam);
     }
