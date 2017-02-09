@@ -178,4 +178,15 @@ public class CourseOnlineRequester {
 
 
     }
+
+    // 小班课 换老师解散群组关系
+    public void instantReleaseGroupForSmallClass(Long smallClassId,List<WorkOrder> workOrders) {
+        String url = String.format("%s/teaching/smallclass/group?%s", urlConf.getCourse_online_service(),"small_class_id="+smallClassId);
+        logger.debug("<<<<<<<<<<<<<@[instantReleaseGroupForSmallClass]小班课向在线教育发起[[[[释放师生关系]]]],url[{}]", url);
+        restTemplate.delete(url);
+        workOrders.stream().forEach(workOrder -> {
+            workOrderLogService.saveWorkOrderLog(workOrder, "小班课立即解散群组关系");
+        });
+
+    }
 }

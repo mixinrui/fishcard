@@ -2,16 +2,23 @@ package com.boxfishedu.workorder.servicex.fishcardcenter;
 
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.bean.RoleEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.NotFoundException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
+import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.ShortMessageCodeConstant;
+import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -23,8 +30,10 @@ import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.fishcardcenter.FishCardModifyService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AssignTeacherFixService;
 import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
@@ -32,8 +41,10 @@ import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.FishCardDeleteParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -46,9 +57,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hucl on 16/5/10.
@@ -101,6 +110,22 @@ public class FishCardModifyServiceX {
     @Autowired
     OnlineAccountService onlineAccountService;
 
+    @Autowired
+    private SmallClassJpaRepository smallClassJpaRepository;
+
+
+    @Autowired
+    private SmallClassServiceX smallClassServiceX;
+
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
+
+    @Autowired
+    private CourseScheduleRepository courseScheduleRepository;
+
+    @Autowired
+    private SmallClassLogService smallClassLogService;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //选择五门课程供给学生选择
@@ -148,17 +173,132 @@ public class FishCardModifyServiceX {
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
 
-        changeTeacherLog(workOrder, oldWorkOrder);
+        changeTeacherLog(workOrder, oldWorkOrder,"1对1");
         //返回结果
         return JsonResultModel.newJsonResultModel(null);
     }
 
-    private void changeTeacherLog(WorkOrder workOrder, WorkOrder oldWorkOrder) {
+    /**
+     * 小班课换老师
+     * @param teacherChangeParam
+     * @return
+     */
+    @Transactional
+    public JsonResultModel changeTeacherSmallClass(TeacherChangeParam teacherChangeParam) {
+
+        // 1 获取小班课 课程最新信息
+        SmallClass smallClass = smallClassJpaRepository.findOne(teacherChangeParam.getSmallClassId());
+
+        Long oldTeacherId = smallClass.getTeacherId(); // 旧的老师ID
+
+        // 2 获取小班课涉及的所有学生的课程
+        List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClass.getId());
+
+        // 3 小班课班长信息
+        WorkOrder leaderWorkOrder = null;
+
+        if (CollectionUtils.isEmpty(workOrders)) {
+            return JsonResultModel.newJsonResultModel("该小班课不存在鱼卡信息");
+        }
+
+        // 4 如果上完课不进行更换老师
+        for (WorkOrder wk : workOrders) {
+            if (wk.getIsCourseOver() == 1) {
+                throw new BusinessException("课程已经结束,不能更换教师");
+            }
+            if (wk.getId().longValue() == smallClass.getGroupLeaderCard().longValue()) {
+                leaderWorkOrder = wk.clone();
+            }
+        }
+
+        if(Objects.isNull(leaderWorkOrder)){
+            throw new BusinessException("该小班课没有班长,建班可能有问题");
+        }
+
+        // 抽取数据
+        List<Long> ids = Collections3.extractToList(workOrders, "id");
+
+        List<CourseSchedule> courseSchedules = courseScheduleRepository.findByWorkorderIdIn(ids);
+
+        // 小班课全部进行换老师操作
+        changeTeacherForWorkOrdersAndCourseSchedule(workOrders,courseSchedules,teacherChangeParam);
+
+
+
+
+
+        // 5 班长进行换老师操作
+        leaderWorkOrder.setTeacherId(teacherChangeParam.getTeacherId());
+        leaderWorkOrder.setAssignTeacherTime(new Date());
+        leaderWorkOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        leaderWorkOrder.setTeacherName(teacherChangeParam.getTeacherName());
+
+
+
+        // 7 通知师生运营更换老师 传送班长课程信息
+        teacherStudentRequester.notifyChangeTeacher(leaderWorkOrder, teacherChangeParam);
+
+
+
+
+        //立即解散群组
+        courseOnlineRequester.instantReleaseGroupForSmallClass(smallClass.getId(),workOrders);
+
+        //通知小马添加新的群组
+        List<Long> studentIds = Collections3.extractToList(workOrders, "studentId");
+        smallClass.setAllStudentIds(studentIds);
+        smallClass.setTeacherId(teacherChangeParam.getTeacherId());
+        smallClass.setTeacherName(teacherChangeParam.getTeacherName());
+        FishCardGroupsInfo fishCardGroupsInfo =  courseOnlineRequester.buildsmallClassChatRoom(smallClass);
+        smallClass.setGroupId(fishCardGroupsInfo.getGroupId());
+        smallClass.setChatRoomId(fishCardGroupsInfo.getChatRoomId());
+
+
+
+        //更新新的教师到workorder和courseschedule,此处做事务控制
+        workOrderService.updateWorkOrdersAndSchedules(workOrders, courseSchedules,smallClass);
+
+        // 小班课记录日志
+        smallClassLogService.recordLog(smallClass, PublicClassInfoConstantStatus.TEACHER_ASSIGNED, null,RoleEnum.SYSTEM,String.format("小班课换老师或者老师请假操作操作,旧的老师ID:%s",oldTeacherId));
+
+        //返回结果
+        return JsonResultModel.newJsonResultModel(null);
+    }
+
+
+    private void   changeTeacherForWorkOrdersAndCourseSchedule(List<WorkOrder> workOrders,List<CourseSchedule> courseSchedules,TeacherChangeParam teacherChangeParam){
+        workOrders.stream().forEach(workOrder -> {
+            WorkOrder oldWorkOrder = workOrder.clone();
+            workOrder.setTeacherId(teacherChangeParam.getTeacherId());
+            workOrder.setAssignTeacherTime(new Date());
+            workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+            workOrder.setTeacherName(teacherChangeParam.getTeacherName());
+
+            //异步操作  // 设置指定老师申请失效
+            assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(), "换时间老师请假或者换老师");
+
+            //调用首页接口
+            dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
+
+            //鱼卡记录日志
+            changeTeacherLog(workOrder, oldWorkOrder,"小班课");
+        });
+
+
+        courseSchedules.stream().forEach(courseSchedule -> {
+            courseSchedule.setTeacherId(teacherChangeParam.getTeacherId());
+            courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        });
+
+    }
+
+
+    private void changeTeacherLog(WorkOrder workOrder, WorkOrder oldWorkOrder,String source) {
         WorkOrderLog workOrderLog = new WorkOrderLog();
         workOrderLog.setCreateTime(new Date());
         workOrderLog.setWorkOrderId(workOrder.getId());
         workOrderLog.setStatus(workOrder.getStatus());
-        workOrderLog.setContent(String.format("更换教师:%s,旧的教师id%s"
+        workOrderLog.setContent(String.format("%s更换教师:%s,旧的教师id%s",source
                 , FishCardStatusEnum.getDesc(workOrder.getStatus()), oldWorkOrder.getTeacherId()));
         workOrderLogService.save(workOrderLog);
     }
@@ -179,6 +319,14 @@ public class FishCardModifyServiceX {
         }
         return JsonResultModel.newJsonResultModel(true);//需要弹出提示 确认按钮
     }
+
+    public JsonResultModel checkCurrentTeacherStatusSmallClass(TeacherChangeParam teacherChangeParam) {
+        if (null == teacherChangeParam.getSmallClassId()) {
+            throw new BusinessException("小班课id不存在");
+        }
+        return JsonResultModel.newJsonResultModel( smallClassServiceX.checkChangeTeacherForSmallClass(teacherChangeParam.getSmallClassId()));
+    }
+
 
     private void changeTeacherLog(WorkOrder workOrder) {
         WorkOrderLog workOrderLog = new WorkOrderLog();

@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
@@ -83,6 +84,9 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Autowired
     private TimePickerService timePickerService;
+
+    @Autowired
+    private SmallClassJpaRepository smallClassJpaRepository;
 
     @Autowired
     private ThreadPoolManager threadPoolManager;
@@ -178,6 +182,13 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     public void updateWorkOrderAndSchedule(WorkOrder workOrder, CourseSchedule courseSchedule) {
         this.save(workOrder);
         courseScheduleService.save(courseSchedule);
+    }
+
+    @Transactional
+    public void updateWorkOrdersAndSchedules(List<WorkOrder> workOrders, List<CourseSchedule> courseSchedules,SmallClass smallClass) {
+        this.save(workOrders);
+        courseScheduleService.save(courseSchedules);
+        smallClassJpaRepository.save(smallClass);
     }
 
     private void batchUpdateCourseSchedule(
