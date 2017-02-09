@@ -100,9 +100,9 @@ public class FishCardQueryServiceX {
             return;
         Map<Long,String> inspectsMap = Collections3.extractToMap(workOrderInspects,"studentId","studentName");
         workOrderList.stream().forEach(workOrder -> {
-            if(null !=workOrder.getStudentId() && null!= inspectsMap.get(workOrder.getStudentId())){
+            if(null !=workOrder.getStudentId() && null!= inspectsMap.get(workOrder.getStudentId().longValue())){
                 workOrder.setInspectFlag(true);
-                workOrder.setStudentName(Objects.isNull(  inspectsMap.get(workOrder.getStudentId()) )?"":inspectsMap.get(workOrder.getStudentId()));
+                workOrder.setStudentName(Objects.isNull(  inspectsMap.get(workOrder.getStudentId().longValue()) )?"":inspectsMap.get(workOrder.getStudentId().longValue()));
             }else {
                 workOrder.setInspectFlag(false);
             }
