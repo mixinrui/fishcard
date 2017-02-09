@@ -64,7 +64,7 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
             groupInitStrategy.initGroupClass(smallClass);
         }
         catch (Exception ex){
-            logger.error("创建小班课失败,smallclas[{}]",JacksonUtil.toJSon(smallClass),ex);
+            logger.error("@CreateEventCustomer创建小班课失败,smallclas[{}]",JacksonUtil.toJSon(smallClass),ex);
         }
 
     }
