@@ -21,8 +21,9 @@ public class InstantBackController {
     @Autowired
     private InstantClassServiceX instantClassServiceX;
 
-    @RequestMapping(value = "/limit/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/instantcard/list", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByLimitUser(InstantCardFilterParam instantCardFilterParam, Pageable pageable) {
-        return instantClassServiceX.listInstantCardsByCond(instantCardFilterParam, pageable);
+        return null;
+//        return instantClassServiceX.listInstantCardsByCond(instantCardFilterParam, pageable);
     }
 }
