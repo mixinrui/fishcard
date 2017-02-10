@@ -58,6 +58,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 16/5/10.
@@ -482,10 +484,19 @@ public class FishCardModifyServiceX {
      * @return
      */
     public JsonResultModel changeTeachers(MakeUpCourseParam makeUpCourseParam){
-//        List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
-//        if(CollectionUtils.isEmpty(workOrders) ){
-//            return JsonResultModel.newJsonResultModel("鱼卡列表为空");
-//        }
+        List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
+        if(CollectionUtils.isEmpty(workOrders) ){
+            return JsonResultModel.newJsonResultModel("鱼卡列表为空");
+        }
+
+        workOrders.stream().filter(
+                workOrder -> (workOrder.getIsCourseOver() ==0 && workOrder.getIsFreeze() ==0)
+        ).collect(Collectors.toList());
+
+        if(CollectionUtils.isEmpty(workOrders))
+            return JsonResultModel.newJsonResultModel("没有满足可以进行更换的课程");
+
+
 //
 //        //分配教师以后其实就已经是就绪,目前这两个状态有重叠
 //        if(workOrder.getStatus()== FishCardStatusEnum.CREATED.getCode() || workOrder.getStatus()==FishCardStatusEnum.COURSE_ASSIGNED.getCode() || workOrder.getStatus()==FishCardStatusEnum.TEACHER_ASSIGNED.getCode()){

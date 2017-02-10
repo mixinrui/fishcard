@@ -4,11 +4,14 @@ import com.boxfishedu.workorder.common.bean.FishCardNetStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.SkuTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
+import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderInspectJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.NetPingAnalysisInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.entity.mysql.WorkOrderInspect;
 import com.boxfishedu.workorder.requester.DataAnalysisRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.ServeService;
@@ -55,6 +58,9 @@ public class FishCardQueryServiceX {
     @Autowired
     private FetchHeartBeatServiceX fetchHeartBeatServiceX;
 
+    @Autowired
+    private WorkOrderInspectJpaRepository workOrderInspectJpaRepository;
+
     @Value("${parameter.network_bad}")
     private Long NETWORK_BAD;
 
@@ -66,6 +72,9 @@ public class FishCardQueryServiceX {
     public JsonResultModel listFishCardsByUnlimitedUserCond(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         workOrderService.processDateParam(fishCardFilterParam);
         List<WorkOrder> workOrderList = fishCardQueryService.filterFishCards(fishCardFilterParam, pageable);
+
+        //体验课学生id显示红色  inspectFlag
+        this.addInspect(workOrderList);
 
         this.addNetStatus(workOrderList);
 
@@ -83,6 +92,24 @@ public class FishCardQueryServiceX {
 
         return JsonResultModel.newJsonResultModel(page);
     }
+
+
+    private void addInspect(List<WorkOrder> workOrderList){
+        List<WorkOrderInspect> workOrderInspects = workOrderInspectJpaRepository.findByStudentIdGreaterThan(0L);
+        if(CollectionUtils.isEmpty(workOrderInspects) || CollectionUtils.isEmpty(workOrderList))
+            return;
+        Map<Long,String> inspectsMap = Collections3.extractToMap(workOrderInspects,"studentId","studentName");
+        workOrderList.stream().forEach(workOrder -> {
+            if(null !=workOrder.getStudentId() && null!= inspectsMap.get(workOrder.getStudentId().longValue())){
+                workOrder.setInspectFlag(true);
+                workOrder.setStudentName(Objects.isNull(  inspectsMap.get(workOrder.getStudentId().longValue()) )?"":inspectsMap.get(workOrder.getStudentId().longValue()));
+            }else {
+                workOrder.setInspectFlag(false);
+            }
+        });
+    }
+
+
 
     private void addNetStatus(List<WorkOrder> workOrderList) {
         for (WorkOrder workOrder : workOrderList) {

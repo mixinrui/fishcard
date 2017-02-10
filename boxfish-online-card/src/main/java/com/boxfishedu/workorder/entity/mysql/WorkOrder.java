@@ -114,6 +114,10 @@ public class WorkOrder implements Cloneable {
     @Transient
     private String statusDesc;
 
+
+    @Transient
+    private Boolean inspectFlag;   //  true 显示体验学生  flase 不显示学生
+
     /**
      * (TeachingType.WAIJIAO.getCode() ==wo.getSkuId()
      **/
