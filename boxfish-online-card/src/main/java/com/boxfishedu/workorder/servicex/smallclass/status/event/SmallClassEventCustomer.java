@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.google.common.collect.Lists;
 import lombok.Data;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,13 @@ public abstract class SmallClassEventCustomer {
 
 
     public void exec(SmallClassEvent smallClassEvent) {
-        SmallClass smallClass = smallClassEvent.getSource();
+        SmallClass smallClass = new SmallClass();
+        try {
+            BeanUtils.copyProperties(smallClass, smallClassEvent.getSource());
+        }
+        catch (Exception ex){
+            logger.error("@SmallClassEventCustomer#copy#拷贝属性失败",ex);
+        }
         this.execute(smallClass);
         this.postHandle(smallClass);
     }
@@ -73,8 +80,9 @@ public abstract class SmallClassEventCustomer {
             if (Objects.isNull(smallClass.getWriteBackDesc())) {
                 this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder);
             } else {
+                String desc=smallClass.getWriteBackDesc();
                 this.getWorkOrderService().saveStatusForCardAndSchedule(
-                        workOrder, smallClass.getWriteBackDesc());
+                        workOrder, desc);
             }
         });
     }
