@@ -95,7 +95,7 @@ public class FishCardQueryServiceX {
 
 
     private void addInspect(List<WorkOrder> workOrderList){
-        List<WorkOrderInspect> workOrderInspects = workOrderInspectJpaRepository.findAll();
+        List<WorkOrderInspect> workOrderInspects = workOrderInspectJpaRepository.findByStudentIdGreaterThan(0L);
         if(CollectionUtils.isEmpty(workOrderInspects) || CollectionUtils.isEmpty(workOrderList))
             return;
         Map<Long,String> inspectsMap = Collections3.extractToMap(workOrderInspects,"studentId","studentName");

@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Component
 @Data
 @Entity
-@Table(name = "work_order")
+@Table(name = "work_order_inspect")
 public class WorkOrderInspect implements Cloneable{
     @Id
     @Column(name = "id", nullable = false)

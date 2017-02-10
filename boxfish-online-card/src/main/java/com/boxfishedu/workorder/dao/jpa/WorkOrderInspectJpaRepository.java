@@ -19,4 +19,6 @@ import java.util.Optional;
  */
 public interface WorkOrderInspectJpaRepository extends JpaRepository<WorkOrderInspect, Long> {
 
+    public List<WorkOrderInspect> findByStudentIdGreaterThan(Long teacherId);
+
 }
