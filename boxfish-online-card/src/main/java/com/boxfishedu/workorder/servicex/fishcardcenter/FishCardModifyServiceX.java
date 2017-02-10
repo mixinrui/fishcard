@@ -175,13 +175,14 @@ public class FishCardModifyServiceX {
         //通知小马添加新的群组
         serviceSDK.createGroup(workOrder);
 
-        changeTeacherLog(workOrder, oldWorkOrder,"1对1");
+        changeTeacherLog(workOrder, oldWorkOrder, "1对1");
         //返回结果
         return JsonResultModel.newJsonResultModel(null);
     }
 
     /**
      * 小班课换老师
+     *
      * @param teacherChangeParam
      * @return
      */
@@ -213,7 +214,7 @@ public class FishCardModifyServiceX {
             }
         }
 
-        if(Objects.isNull(leaderWorkOrder)){
+        if (Objects.isNull(leaderWorkOrder)) {
             throw new BusinessException("该小班课没有班长,建班可能有问题");
         }
 
@@ -223,10 +224,7 @@ public class FishCardModifyServiceX {
         List<CourseSchedule> courseSchedules = courseScheduleRepository.findByWorkorderIdIn(ids);
 
         // 小班课全部进行换老师操作
-        changeTeacherForWorkOrdersAndCourseSchedule(workOrders,courseSchedules,teacherChangeParam);
-
-
-
+        changeTeacherForWorkOrdersAndCourseSchedule(workOrders, courseSchedules, teacherChangeParam);
 
 
         // 5 班长进行换老师操作
@@ -236,39 +234,35 @@ public class FishCardModifyServiceX {
         leaderWorkOrder.setTeacherName(teacherChangeParam.getTeacherName());
 
 
-
         // 7 通知师生运营更换老师 传送班长课程信息
         teacherStudentRequester.notifyChangeTeacher(leaderWorkOrder, teacherChangeParam);
 
 
-
-
         //立即解散群组
-        courseOnlineRequester.instantReleaseGroupForSmallClass(smallClass.getId(),workOrders);
+        courseOnlineRequester.instantReleaseGroupForSmallClass(smallClass.getId(), workOrders);
 
         //通知小马添加新的群组
         List<Long> studentIds = Collections3.extractToList(workOrders, "studentId");
         smallClass.setAllStudentIds(studentIds);
         smallClass.setTeacherId(teacherChangeParam.getTeacherId());
         smallClass.setTeacherName(teacherChangeParam.getTeacherName());
-        FishCardGroupsInfo fishCardGroupsInfo =  courseOnlineRequester.buildsmallClassChatRoom(smallClass);
+        FishCardGroupsInfo fishCardGroupsInfo = courseOnlineRequester.buildsmallClassChatRoom(smallClass);
         smallClass.setGroupId(fishCardGroupsInfo.getGroupId());
         smallClass.setChatRoomId(fishCardGroupsInfo.getChatRoomId());
 
 
-
         //更新新的教师到workorder和courseschedule,此处做事务控制
-        workOrderService.updateWorkOrdersAndSchedules(workOrders, courseSchedules,smallClass);
+        workOrderService.updateWorkOrdersAndSchedules(workOrders, courseSchedules, smallClass);
 
         // 小班课记录日志
-        smallClassLogService.recordLog(smallClass, PublicClassInfoConstantStatus.TEACHER_ASSIGNED, null,RoleEnum.SYSTEM,String.format("小班课换老师或者老师请假操作操作,旧的老师ID:%s",oldTeacherId));
+        smallClassLogService.recordLog(smallClass, PublicClassInfoConstantStatus.TEACHER_ASSIGNED, null, RoleEnum.SYSTEM, String.format("小班课换老师或者老师请假操作操作,旧的老师ID:%s", oldTeacherId));
 
         //返回结果
         return JsonResultModel.newJsonResultModel(null);
     }
 
 
-    private void   changeTeacherForWorkOrdersAndCourseSchedule(List<WorkOrder> workOrders,List<CourseSchedule> courseSchedules,TeacherChangeParam teacherChangeParam){
+    private void changeTeacherForWorkOrdersAndCourseSchedule(List<WorkOrder> workOrders, List<CourseSchedule> courseSchedules, TeacherChangeParam teacherChangeParam) {
         workOrders.stream().forEach(workOrder -> {
             WorkOrder oldWorkOrder = workOrder.clone();
             workOrder.setTeacherId(teacherChangeParam.getTeacherId());
@@ -283,7 +277,7 @@ public class FishCardModifyServiceX {
             dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
 
             //鱼卡记录日志
-            changeTeacherLog(workOrder, oldWorkOrder,"小班课");
+            changeTeacherLog(workOrder, oldWorkOrder, "小班课");
         });
 
 
@@ -295,12 +289,12 @@ public class FishCardModifyServiceX {
     }
 
 
-    private void changeTeacherLog(WorkOrder workOrder, WorkOrder oldWorkOrder,String source) {
+    private void changeTeacherLog(WorkOrder workOrder, WorkOrder oldWorkOrder, String source) {
         WorkOrderLog workOrderLog = new WorkOrderLog();
         workOrderLog.setCreateTime(new Date());
         workOrderLog.setWorkOrderId(workOrder.getId());
         workOrderLog.setStatus(workOrder.getStatus());
-        workOrderLog.setContent(String.format("%s更换教师:%s,旧的教师id%s",source
+        workOrderLog.setContent(String.format("%s更换教师:%s,旧的教师id%s", source
                 , FishCardStatusEnum.getDesc(workOrder.getStatus()), oldWorkOrder.getTeacherId()));
         workOrderLogService.save(workOrderLog);
     }
@@ -326,7 +320,7 @@ public class FishCardModifyServiceX {
         if (null == teacherChangeParam.getSmallClassId()) {
             throw new BusinessException("小班课id不存在");
         }
-        return JsonResultModel.newJsonResultModel( smallClassServiceX.checkChangeTeacherForSmallClass(teacherChangeParam.getSmallClassId()));
+        return JsonResultModel.newJsonResultModel(smallClassServiceX.checkChangeTeacherForSmallClass(teacherChangeParam.getSmallClassId()));
     }
 
 
@@ -359,26 +353,26 @@ public class FishCardModifyServiceX {
                 throw new NotFoundException();
             }
             workOrders.stream()
-                      // 小班课学生修改level难度, 不重新修改课程推荐
-                      .filter(workOrder -> !StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name()))
-                      .forEach(workOrder -> {
-                          Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
-                                                               DateUtil.convertLocalDateTime(workOrder.getStartTime()));
-                          long hours = duration.toHours();
-                          logger.info("workOrder startTime=[{}] and duration=[{}]", workOrder.getStartTime(), duration.toHours());
-                          // 24小时以内如果有课,不再换课,无课则直接推荐
-                          if (hours <= 24) {
-                              if (StringUtils.isEmpty(workOrder.getCourseId())) {
-                                  fishCardModifyService.changeCourse(workOrder);
-                              }
-                          }
-                          // 24小时以上的课,有课再换
-                          else {
-                              if (StringUtils.isNotEmpty(workOrder.getCourseId())) {
-                                  fishCardModifyService.changeCourse(workOrder);
-                              }
-                          }
-                      });
+                    // 小班课学生修改level难度, 不重新修改课程推荐
+                    .filter(workOrder -> !StringUtils.equals(workOrder.getClassType(), ClassTypeEnum.SMALL.name()))
+                    .forEach(workOrder -> {
+                        Duration duration = Duration.between(LocalDateTime.now(ZoneId.systemDefault()),
+                                DateUtil.convertLocalDateTime(workOrder.getStartTime()));
+                        long hours = duration.toHours();
+                        logger.info("workOrder startTime=[{}] and duration=[{}]", workOrder.getStartTime(), duration.toHours());
+                        // 24小时以内如果有课,不再换课,无课则直接推荐
+                        if (hours <= 24) {
+                            if (StringUtils.isEmpty(workOrder.getCourseId())) {
+                                fishCardModifyService.changeCourse(workOrder);
+                            }
+                        }
+                        // 24小时以上的课,有课再换
+                        else {
+                            if (StringUtils.isNotEmpty(workOrder.getCourseId())) {
+                                fishCardModifyService.changeCourse(workOrder);
+                            }
+                        }
+                    });
         } catch (Exception ex) {
             logger.error("修改课程失败@changerderCourses", ex);
 
@@ -479,30 +473,46 @@ public class FishCardModifyServiceX {
     }
 
     /**
-     * TODO
+     *
      * @param makeUpCourseParam
      * @return
      */
-    public JsonResultModel changeTeachers(MakeUpCourseParam makeUpCourseParam){
+    public JsonResultModel changeTeachers(MakeUpCourseParam makeUpCourseParam) {
         List<WorkOrder> workOrders = workOrderService.getAllWorkOrdersByIds(makeUpCourseParam.getWorkOrderIds());
-        if(CollectionUtils.isEmpty(workOrders) ){
+        if (CollectionUtils.isEmpty(workOrders)) {
             return JsonResultModel.newJsonResultModel("鱼卡列表为空");
         }
 
         workOrders.stream().filter(
-                workOrder -> (workOrder.getIsCourseOver() ==0 && workOrder.getIsFreeze() ==0)
+                workOrder -> (workOrder.getIsCourseOver() == 0 && workOrder.getIsFreeze() == 0)
         ).collect(Collectors.toList());
 
-        if(CollectionUtils.isEmpty(workOrders))
+        if (CollectionUtils.isEmpty(workOrders))
             return JsonResultModel.newJsonResultModel("没有满足可以进行更换的课程");
 
+        workOrders.stream().forEach(workOrder -> {
+            this.changeTeacherOnly(workOrder.getId());
+        });
 
-//
-//        //分配教师以后其实就已经是就绪,目前这两个状态有重叠
-//        if(workOrder.getStatus()== FishCardStatusEnum.CREATED.getCode() || workOrder.getStatus()==FishCardStatusEnum.COURSE_ASSIGNED.getCode() || workOrder.getStatus()==FishCardStatusEnum.TEACHER_ASSIGNED.getCode()){
         return JsonResultModel.newJsonResultModel("OK");
 
+    }
+
+
+    public JsonResultModel changeTeacherOnly(Long workOrderId) {
+        fishCardModifyService.changeTeacherOnlyFishCard(workOrderId);
+        dataCollectorService.updateBothChnAndFnItemForCardId(workOrderId);
+        WorkOrder workOrder = workOrderService.findOne(workOrderId);
+        logger.info("changeTeacherOnly 准备 分配老师 workOrderId {[]}", workOrder.getId());
+        if (workOrder.getTeacherId() == 0) {
+            logger.info("changeTeacherOnly 满足 分配老师 条件 workOrderId {[]}", workOrder.getId());
+            List<CourseSchedule> courseSchedules = Lists.newArrayList();
+            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrderId);
+            courseSchedules.add(courseSchedule);
+            timePickerService.getRecommandTeachers(workOrder.getService(), courseSchedules);
         }
+        return JsonResultModel.newJsonResultModel("OK");
+    }
 
     /**
      * 短信通知老师 课程取消

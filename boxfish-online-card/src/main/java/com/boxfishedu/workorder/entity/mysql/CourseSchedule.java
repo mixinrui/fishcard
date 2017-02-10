@@ -85,7 +85,6 @@ public class CourseSchedule {
     @Column(name = "start_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
-
     /** 由于假期原因,提示该鱼卡需要更换时间   10 需要更换时间  **/
     @Column(name = "need_change_time", nullable = true)
     private Integer needChangeTime;
