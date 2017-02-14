@@ -39,4 +39,10 @@ public class SmallClassStudentController {
         return JsonResultModel.newJsonResultModel(tips);
     }
 
+    @RequestMapping(value = "/publicCoverTips", method = RequestMethod.GET)
+    public JsonResultModel publicCoverTips() {
+        String tips=configBeanMorphiaRepository.getPublicWarning();
+        //成为BOXFiSH学员 即可每天免费上课
+        return JsonResultModel.newJsonResultModel(configBeanMorphiaRepository.getPublicCoverTips());
+    }
 }

@@ -161,34 +161,36 @@ public class FishCardUpdatorServiceX {
         //默认不为异常
         boolean isExceptionFlag = false;
 
-        List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
 
-        boolean containConnectedFlag = false;
-        LocalDateTime startLocalDate = LocalDateTime.ofInstant(
-                workOrder.getStartTime().toInstant(), ZoneId.systemDefault()).minusMinutes(3);
+/////////////////////////////新版本都是学生主动进入房间,将该判断去掉///////////////////////////////////
+//        List<WorkOrderLog> workOrderLogs = workOrderLogService.queryByWorkId(workOrder.getId());
+//
+//        boolean containConnectedFlag = false;
+//        LocalDateTime startLocalDate = LocalDateTime.ofInstant(
+//                workOrder.getStartTime().toInstant(), ZoneId.systemDefault()).minusMinutes(3);
 
-        LocalDateTime endLocalDate = startLocalDate.plusMinutes(studentAbsentTimeLimit);
-        Date startDate = DateUtil.localDate2Date(startLocalDate);
-        Date endDate = DateUtil.localDate2Date(endLocalDate);
+//        LocalDateTime endLocalDate = startLocalDate.plusMinutes(studentAbsentTimeLimit);
+//        Date startDate = DateUtil.localDate2Date(startLocalDate);
+//        Date endDate = DateUtil.localDate2Date(endLocalDate);
 
-        //老版本的没有学生点击进入的情况,十分钟之内的时候,如果有[师生互联]的状态则将其记录
-        for (WorkOrderLog workOrderLog : workOrderLogs) {
-            if (workOrderLog.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
-                    && workOrderLog.getCreateTime().after(startDate)
-                    && workOrderLog.getCreateTime().before(endDate)) {
-                containConnectedFlag = true;
-            }
-        }
+//        //老版本的没有学生点击进入的情况,十分钟之内的时候,如果有[师生互联]的状态则将其记录
+//        for (WorkOrderLog workOrderLog : workOrderLogs) {
+//            if (workOrderLog.getStatus() == FishCardStatusEnum.CONNECTED.getCode()
+//                    && workOrderLog.getCreateTime().after(startDate)
+//                    && workOrderLog.getCreateTime().before(endDate)) {
+//                containConnectedFlag = true;
+//            }
+//        }
 
-        boolean isOnline = fetchHeartBeatServiceX.isOnline(new DataAnalysisLogParam(workOrder.getStudentId(),
-                startDate.getTime(), endDate.getTime(), AppPointRecordEventEnum.STUDENT_ONLINE_STATUS.value()));
-
-        //没有联通但是在线,则表示为系统异常
-        if (!containConnectedFlag && isOnline) {
-            workOrderLogService.saveWorkOrderLog(workOrder, "学生课前在线,但是没有师生连通,将改为系统异常");
-            logger.info("studentForceAbsentUpdator判断鱼卡[{}]是否由于终端异常导致,判断结果[{}]", workOrder.getId(), isOnline);
-            return true;
-        }
+//        boolean isOnline = fetchHeartBeatServiceX.isOnline(new DataAnalysisLogParam(workOrder.getStudentId(),
+//                startDate.getTime(), endDate.getTime(), AppPointRecordEventEnum.STUDENT_ONLINE_STATUS.value()));
+//
+//        //没有联通但是在线,则表示为系统异常
+//        if (!containConnectedFlag && isOnline) {
+//            workOrderLogService.saveWorkOrderLog(workOrder, "学生课前在线,但是没有师生连通,将改为系统异常");
+//            logger.info("studentForceAbsentUpdator判断鱼卡[{}]是否由于终端异常导致,判断结果[{}]", workOrder.getId(), isOnline);
+//            return true;
+//        }
 
         logger.warn("[studentForceAbsentUpdator]鱼卡:[{}]的状态为学生旷课,开始处理", workOrder.getId());
 

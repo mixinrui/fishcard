@@ -19,4 +19,9 @@ public class ConfigBean {
 
     //公开课上线提醒:外教大讲堂预计2月15日开放，欢迎使用
     private String publicWarning;
+
+    private String coverTitle;
+
+    private String coverDesc;
+
 }
