@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.servicex.instantclass.instantvalidator;
 
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
@@ -46,13 +47,29 @@ public class ServiceTimeValidator implements InstantClassValidator {
             case COURSE_SCHEDULE_ENTERANCE:
                 return InstantClassRequestStatus.UNKNOWN.getCode();
             case OTHER_ENTERANCE:
-                List<Service> services=timePickerServiceXV1.ensureConvertOver(InstantRequestParam.timeSlotParamAdapter(instantRequestParam),0);
-                if(services.get(0).getOriginalAmount()!=1){
+                List<Service> services = timePickerServiceXV1.ensureConvertOver(InstantRequestParam.timeSlotParamAdapter(instantRequestParam), 0);
+                if (services.get(0).getOriginalAmount() != 1) {
                     throw new BusinessException("您当前的订单服务次数超过一次，不能立即上课");
                 }
+
+                validateClassType(services);
+
                 return InstantClassRequestStatus.UNKNOWN.getCode();
             default:
                 throw new BusinessException("未知的入口参数");
+        }
+    }
+
+    private void validateClassType(List<Service> services) {
+        //小班课不允许立即上课
+        switch (ComboTypeEnum.valueOf(services.get(0).getComboType())) {
+            case SMALLCLASS:
+            case FSCF:
+            case FSCC:
+                throw new BusinessException("小班课不允许立即上课");
+            default:
+                break;
+
         }
     }
 }

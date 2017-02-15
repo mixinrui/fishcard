@@ -21,7 +21,11 @@ public enum ComboTypeEnum {
 
     REWARD("REWARD"),
     //终极梦想+考试指导
-    INTELLIGENT("INTELLIGENT");
+    INTELLIGENT("INTELLIGENT"),
+
+    FSCF("FSCF"),
+
+    FSCC("FSCC");
 
     private String value;
 
