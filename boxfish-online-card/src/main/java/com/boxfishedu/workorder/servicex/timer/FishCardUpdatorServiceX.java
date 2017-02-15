@@ -124,7 +124,8 @@ public class FishCardUpdatorServiceX {
 
         if ((workOrder.getStatus() != FishCardStatusEnum.WAITFORSTUDENT.getCode()) && (workOrder.getStatus() != FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode())
                 && (workOrder.getStatus() != FishCardStatusEnum.CONNECTED.getCode()) && (workOrder.getStatus() != FishCardStatusEnum.STUDENT_INVITED_SCREEN.getCode())
-                && (workOrder.getStatus() != FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode())) {
+                && (workOrder.getStatus() != FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode())
+                && (workOrder.getStatus() != FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode())) {
             logger.info("@studentAbsentUpdator#status_changed#学生当前的鱼卡[{}]状态[{}]已经不是旷课需要处理的状态,暂不做处理",
                     workOrder.getId(), FishCardStatusEnum.getDesc(workOrder.getStatus()));
             return;

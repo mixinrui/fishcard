@@ -83,7 +83,7 @@ public class FishCardStatusService extends BaseService<WorkOrder, WorkOrderJpaRe
         Integer[] statuses = new Integer[]{FishCardStatusEnum.WAITFORSTUDENT.getCode()
                 , FishCardStatusEnum.TEACHER_CANCEL_PUSH.getCode(), FishCardStatusEnum.CONNECTED.getCode()
                 , FishCardStatusEnum.TEACHER_ASSIGNED.getCode(), FishCardStatusEnum.STUDENT_INVITED_SCREEN.getCode()
-                , FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode()};
+                , FishCardStatusEnum.TEACHER_LEAVE_EARLY.getCode(),FishCardStatusEnum.STUDENT_LEAVE_EARLY.getCode()};
 
         List<WorkOrder> result = jpa.findByStatusInAndStartTimeBetween(statuses, startDate, endDate);
         return result;
