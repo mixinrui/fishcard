@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatu
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.workorder.dao.mongo.ConfigBeanMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
@@ -38,6 +39,9 @@ public class ServiceTimeValidator implements InstantClassValidator {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
+    private ConfigBeanMorphiaRepository configBeanMorphiaRepository;
+
+    @Autowired
     private TimePickerServiceXV1 timePickerServiceXV1;
 
     @Override
@@ -66,7 +70,7 @@ public class ServiceTimeValidator implements InstantClassValidator {
             case SMALLCLASS:
             case FSCF:
             case FSCC:
-                throw new BusinessException("小班课不允许立即上课");
+                throw new BusinessException(configBeanMorphiaRepository.getSingleBean().getOnlySmallClassTips());
             default:
                 break;
 

@@ -24,4 +24,6 @@ public class ConfigBean {
 
     private String coverDesc;
 
+    private String onlySmallClassTips;
+
 }
