@@ -73,7 +73,7 @@ public class SmallClassInitController {
                 ReflectUtil.setValue(configDbBean, field[j].getName(), propertyValue);
             }
         }
-
+        configBeanMorphiaRepository.save(configDbBean);
         return JsonResultModel.newJsonResultModel("OK");
     }
 }
