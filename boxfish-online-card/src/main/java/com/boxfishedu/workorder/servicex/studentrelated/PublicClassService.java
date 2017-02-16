@@ -90,7 +90,8 @@ public class PublicClassService {
                 return (((PublicClassException) e).publicClassMessage).getMessageMap();
             }
             e.printStackTrace();
-            throw new BusinessException(e.getMessage());
+            return PublicClassMessageEnum.NETWORK_ERROR.getMessageMap();
+//            throw new BusinessException(e.getMessage());
         }
     }
 
