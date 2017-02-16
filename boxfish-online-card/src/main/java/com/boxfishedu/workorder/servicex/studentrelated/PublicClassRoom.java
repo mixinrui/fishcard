@@ -13,12 +13,16 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -50,9 +54,14 @@ public class PublicClassRoom {
     @Autowired
     private ServiceSDK serviceSdk;
 
+    @Value("${service.gateway.type}")
+    private String gateWay;
+
     private RedisTemplate<String, Long> redisTemplate;
 
     private SetOperations<String, Long> setOperations;
+
+    private final static Logger logger = LoggerFactory.getLogger(PublicClassRoom.class);
 
     @Autowired
     public void initRedis(@Qualifier(value = "stringLongRedisTemplate") RedisTemplate<String, Long> redisTemplate) {
@@ -60,6 +69,7 @@ public class PublicClassRoom {
         setOperations = redisTemplate.opsForSet();
     }
 
+    @Transactional
     public void enter(SmallClass smallClass, Long studentId, String nickName, String accessToken) {
 
         Date now = new Date();
@@ -96,6 +106,7 @@ public class PublicClassRoom {
      * @param smallClassId
      * @param studentId
      */
+    @Transactional
     public void quit(Long smallClassId, Long studentId) {
         if (setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId) > 0) {
             publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.STUDENT_QUIT.getCode(), smallClassId, studentId);
@@ -149,16 +160,14 @@ public class PublicClassRoom {
         List<SmallClass> smallClassList = smallClassJpaRepository.findByStartTimeRange(
                 DateUtil.convertToDate(from), DateUtil.convertToDate(to), ClassTypeEnum.PUBLIC.name());
         Set<String> tags = smallClassList.stream()
-                                         .map(SmallClass::getSlotId)
-                                         .distinct()
-                                         .map(PublicClassTimeEnum::getCourseDifficultiesBySlotId)
-                                         .filter(t -> t != null)
-                                         .flatMap(Collection::stream)
-                                         .map(c -> c.pushCode)
-                                         .collect(Collectors.toSet());
+                .map(s -> PublicClassTimeEnum.valueOf(s.getDifficultyLevel()).difficulties)
+                .flatMap(Collection::stream)
+                .map(d -> d.pushCode)
+                .collect(Collectors.toSet());
+
 //        Set<String> tags = Stream.of(CourseDifficultyEnum.values()).map(c -> c.pushCode).collect(Collectors.toSet());
-        if (CollectionUtils.isNotEmpty(tags)) {
-            System.out.println(tags);
+        if (CollectionUtils.isNotEmpty(tags) && "product".equals(gateWay)) {
+            logger.info("send jiguang notify by tag [{}]", tags);
 
             new PublicClassRoomNotification()
                     .addTag(tags)
