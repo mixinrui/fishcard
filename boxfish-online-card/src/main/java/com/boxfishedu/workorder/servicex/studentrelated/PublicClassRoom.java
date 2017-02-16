@@ -19,7 +19,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -61,13 +60,16 @@ public class PublicClassRoom {
         setOperations = redisTemplate.opsForSet();
     }
 
-    @Transactional
     public void enter(SmallClass smallClass, Long studentId, String nickName, String accessToken) {
 
-        // 是否在上课正常时间范围内
         Date now = new Date();
-        if (now.before(smallClass.getStartTime()) || now.after(smallClass.getEndTime())) {
-            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME);
+        // 上课时间之前
+        if (now.before(smallClass.getStartTime())) {
+            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME_BEFORE);
+        }
+        // 上课时间之后
+        else if(now.after(smallClass.getEndTime())) {
+            throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME_AFTER);
         }
 
         // 一 判断是否是第一次进入这个课堂, 如果不是, 则直接返回
@@ -94,7 +96,6 @@ public class PublicClassRoom {
      * @param smallClassId
      * @param studentId
      */
-    @Transactional
     public void quit(Long smallClassId, Long studentId) {
         if (setOperations.remove(CLASS_ROOM_MEMBER_REAL_TIME + smallClassId, studentId) > 0) {
             publicClassInfoJpaRepository.updateStatus(PublicClassInfoStatusEnum.STUDENT_QUIT.getCode(), smallClassId, studentId);

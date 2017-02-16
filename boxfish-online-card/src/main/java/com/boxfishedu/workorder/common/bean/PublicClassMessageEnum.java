@@ -48,8 +48,21 @@ public enum PublicClassMessageEnum {
         }
     },
 
-    // 不是正常上课时间
-    ERROR_TIME {
+    // 未到正常上课时间
+    ERROR_TIME_BEFORE {
+        @Override
+        public String getTitle() {
+            return "课程已结束";
+        }
+
+        @Override
+        public String getMessage() {
+            return "同学, 你很积极呦, 但是上课时间还没到呢, 准点再来吧~";
+        }
+    },
+
+    // 超过正常上课时间
+    ERROR_TIME_AFTER {
         @Override
         public String getTitle() {
             return "未到上课时间";
@@ -57,7 +70,7 @@ public enum PublicClassMessageEnum {
 
         @Override
         public String getMessage() {
-            return "同学, 你很积极呦, 但是上课时间还没到呢, 准点再来吧~";
+            return "啊，同学~ 你已经错过今天上课的时间啦，请明天准时再来吧！";
         }
     },
 
@@ -83,7 +96,7 @@ public enum PublicClassMessageEnum {
 
         @Override
         public String getMessage() {
-            return "网络抖动了一下, 请稍后重试";
+            return "网络出了点问题, 请稍后重试";
         }
     };
 
