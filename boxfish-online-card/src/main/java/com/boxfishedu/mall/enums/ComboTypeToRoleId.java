@@ -25,7 +25,8 @@ public enum ComboTypeToRoleId {
     SMALLCLASS(3),
     // 公开课
     PUBLIC(3),
-    FSCF(3);
+    FSCF(3),
+    FSCC(3);
 
     private int value;
 
@@ -38,7 +39,7 @@ public enum ComboTypeToRoleId {
     }
 
     public static ComboTypeToRoleId resolve(String comboType) {
-        if(StringUtils.isBlank(comboType)) {
+        if (StringUtils.isBlank(comboType)) {
             return UNKNOW;
         }
         ComboTypeToRoleId result = ComboTypeToRoleId.valueOf(comboType);

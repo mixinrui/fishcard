@@ -74,6 +74,16 @@ public class GrabOrderController {
          return JsonResultModel.newJsonResultModel("OK");
     }
 
+
+    /** 测试抢单 **/
+    @RequestMapping(value = "/testGrab", method = RequestMethod.GET)
+    public JsonResultModel testGrab()throws Exception {
+        makeWorkOrderServiceX.makeSendWorkOrder("true", CourseTypeEnum.FUNCTION.toString());
+        makeWorkOrderServiceX.makeSendWorkOrder("true", CourseTypeEnum.TALK.toString());
+        return new JsonResultModel();
+    }
+
+
     @RequestMapping(value = "/tomonotify", method = RequestMethod.GET)
     public JsonResultModel tomonotify()throws Exception {
         //测试明天有课推送

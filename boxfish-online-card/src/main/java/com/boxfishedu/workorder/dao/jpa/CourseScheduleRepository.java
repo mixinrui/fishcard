@@ -111,4 +111,5 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     public List<CourseSchedule> findByMyClasses(Long studentId, Date beginDate, Date endDate , List<Integer> slots);
 
     List<CourseSchedule> findBySmallClassId(Long smallClassId);
+
 }

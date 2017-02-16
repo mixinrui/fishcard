@@ -23,6 +23,7 @@ import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.instantclass.instantvalidator.InstantClassValidators;
 import com.boxfishedu.workorder.servicex.instantclass.tutorrange.StudentRangeContext;
 import com.boxfishedu.workorder.servicex.instantclass.tutorrange.TeacherRangeContext;
+import com.boxfishedu.workorder.web.param.InstantCardFilterParam;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
@@ -32,6 +33,7 @@ import org.apache.log4j.spi.LoggerFactory;
 import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -199,5 +201,9 @@ public class InstantClassServiceX {
         //清空缓存
         TutorTypeEnum tutorTypeEnum = TutorTypeEnum.getByValue(dateInfo.getTutorType());
         redisTemplate.delete(studentRangeContext.timeRangeKey(tutorTypeEnum));
+    }
+
+    public JsonResultModel listInstantCardsByCond(InstantCardFilterParam instantCardFilterParam, Pageable pageable) {
+        return null;
     }
 }

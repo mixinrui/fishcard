@@ -7,6 +7,7 @@ import lombok.Data;
  */
 @Data
 public class TeacherChangeParam {
+    private Long smallClassId;
     private Long workOrderId;
     private Long teacherId;
     private String teacherName;

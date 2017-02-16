@@ -109,10 +109,10 @@ public class SmallClassRequester {
         RecommandCourseView info = null;
         try {
             info = restTemplate.getForObject(url, RecommandCourseView.class);
-            logger.debug("@fetchUserStudyInfo获取用户课程成功,url[{}],结果[{}]", url, info);
+            logger.debug("@fetchClassCourseByUserIds获取用户课程成功,url[{}],结果[{}]", url, info);
         } catch (Exception ex) {
-            logger.error("@fetchUserStudyInfo获取用户学习计数,url[{}]", url, ex);
-            throw new BusinessException("获取用户学习计数失败");
+            logger.error("@fetchClassCourseByUserIds获取用户课程失败,url[{}]", url, ex);
+            throw new BusinessException("获取用户课程失败");
         }
         return info;
     }

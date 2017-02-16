@@ -279,3 +279,13 @@ method:GET
    "continueabsencenum":2
 }
 
+
+
+################批量换老师
+url:http://123.56.13.168:8080/fishcard/backend/fishcard/changeTeachers
+method:post
+参数说明:
+{
+workOrderIds:[323,32323,3232]
+}
+

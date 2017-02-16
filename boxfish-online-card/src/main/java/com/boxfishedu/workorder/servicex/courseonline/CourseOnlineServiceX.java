@@ -37,6 +37,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/3/22.
@@ -119,7 +120,7 @@ public class CourseOnlineServiceX {
 
         //处理完成的情况
         if (status == FishCardStatusEnum.COMPLETED.getCode() || status == FishCardStatusEnum.COMPLETED_FORCE.getCode()) {
-            logger.debug("@updateTeachingStatus#complete#fishcard{}完成上课,开始做完成处理",workOrder.getId());
+            logger.debug("@updateTeachingStatus#complete#fishcard{}完成上课,开始做完成处理", workOrder.getId());
             completeCourse(workOrder, courseSchedule, status);
         }
         //处理早退的情况(定时器不到不应该减去服务)
@@ -129,7 +130,9 @@ public class CourseOnlineServiceX {
             }
         } else {
             if (status == FishCardStatusEnum.ONCLASS.getCode()) {
-                workOrder.setActualStartTime(new Date());
+                if (Objects.isNull(workOrder.getActualStartTime())) {
+                    workOrder.setActualStartTime(new Date());
+                }
             }
             workOrder.setStatus(status);
             workOrder.setUpdateTime(new Date());
@@ -223,7 +226,7 @@ public class CourseOnlineServiceX {
     public void handleContinusAbsence(WorkOrder workOrder, Integer status) {
         threadPoolManager.execute(new Thread(() -> {
             try {
-                logger.debug("@handleContinusAbsence#user[{}],workorder[{}]连续旷课处理逻辑",workOrder.getStudentId(),workOrder.getId());
+                logger.debug("@handleContinusAbsence#user[{}],workorder[{}]连续旷课处理逻辑", workOrder.getStudentId(), workOrder.getId());
                 ContinousAbsenceRecord continousAbsenceRecord = absenceDealService.queryByStudentIdAndComboType(workOrder.getStudentId(), workOrder.getService().getComboType());
                 if (null != continousAbsenceRecord) {
                     if (status == FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
@@ -247,13 +250,13 @@ public class CourseOnlineServiceX {
                     absenceDealService.save(continousAbsenceRecord);
                 }
                 //连续旷课超过两次,
-                if(continousAbsenceRecord.getContinusAbsenceNum()>1){
+                if (continousAbsenceRecord.getContinusAbsenceNum() > 1) {
                     //如果超过两次,直接全部冻结
-                    if(workOrder.getOrderChannel().equals(ComboTypeEnum.EXCHANGE.toString())){
-                        logger.debug("@handleContinusAbsence#user[{}],workorder[{}],次数[{}]连续旷课次数超过一次处理逻辑",workOrder.getStudentId(),workOrder.getId(),continousAbsenceRecord.getContinusAbsenceNum());
-                        List<WorkOrder> workOrders=workOrderService.findByStudentIdAndOrderChannelAndStartTimeAfter(workOrder.getStudentId(),ComboTypeEnum.EXCHANGE.toString(),new Date());
+                    if (workOrder.getOrderChannel().equals(ComboTypeEnum.EXCHANGE.toString())) {
+                        logger.debug("@handleContinusAbsence#user[{}],workorder[{}],次数[{}]连续旷课次数超过一次处理逻辑", workOrder.getStudentId(), workOrder.getId(), continousAbsenceRecord.getContinusAbsenceNum());
+                        List<WorkOrder> workOrders = workOrderService.findByStudentIdAndOrderChannelAndStartTimeAfter(workOrder.getStudentId(), ComboTypeEnum.EXCHANGE.toString(), new Date());
                         workOrders.forEach(workOrder1 -> {
-                            logger.info("@handleContinusAbsence#freeze#冻结鱼卡[{}]",workOrder1.getId());
+                            logger.info("@handleContinusAbsence#freeze#冻结鱼卡[{}]", workOrder1.getId());
                             fishCardFreezeServiceX.freeze(workOrder1.getId());
                         });
                     }

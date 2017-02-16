@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.instantclass.instantvalidator;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
@@ -42,6 +43,9 @@ public class ParameterValidator implements InstantClassValidator {
     //
     @Value("${parameter.instant_allow_teacher_type}")
     private String INSTANT_ALLOW_TEACHER_TYPE;
+
+    @Autowired
+    private ServiceJpaRepository serviceJpaRepository;
 
     @Override
     public int preValidate() {

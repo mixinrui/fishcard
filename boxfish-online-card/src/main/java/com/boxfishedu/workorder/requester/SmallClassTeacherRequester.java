@@ -45,6 +45,50 @@ public class SmallClassTeacherRequester {
     private final String PUBLIC_CLASS = "PUBLIC_CLASS";
 
     public TeacherView getSmallClassTeacher(SmallClass smallClass) {
+        FetchTeacherParam fetchTeacherParam = this.getFetchTeacherParam(smallClass);
+
+        String url = String.format("%s/course/schedule/teacher/web/match", urlConf.getTeacher_service());
+        JsonResultModel jsonResultModel = null;
+        TeacherView teacherView = new TeacherView();
+        try {
+            jsonResultModel = restTemplate.postForObject(url, fetchTeacherParam, JsonResultModel.class);
+            if (Objects.isNull(jsonResultModel.getData())) {
+
+                logger.error("@getSmallClassTeacher#获取小班课教师失败,没有获取到教师,url[{}],参数[{}],结果[{}]"
+                        , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
+                return null;
+
+            } else {
+                wrapTeacher(fetchTeacherParam, jsonResultModel, teacherView);
+
+                if (0 == teacherView.getTeacherId()) {
+                    logger.error("@getSmallClassTeacher#获取小班课教师失败,没有获取到教师,url[{}],参数[{}],结果[{}]"
+                            , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
+                    return null;
+                }
+
+                logger.debug("@getSmallClassTeacher#获取小班课教师成功,url[{}],参数[{}],结果[{}]"
+                        , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
+            }
+        } catch (Exception ex) {
+            logger.error("@getSmallClassTeacher#获取小班课教师失败,url[{}],参数[{}],结果[{}]"
+                    , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
+            return null;
+        }
+        return teacherView;
+    }
+
+    private void wrapTeacher(FetchTeacherParam fetchTeacherParam, JsonResultModel jsonResultModel, TeacherView teacherView) {
+        HashMap<String, Map<String, Object>> result = jsonResultModel.getData(HashMap.class);
+        Map<String, Object> resultData = result
+                .get(fetchTeacherParam.getScheduleModelList().get(0).getId().toString());
+        teacherView.setTeacherId(Long.parseLong(resultData.get("teacherId").toString()));
+        teacherView.setTeacherName(Objects.isNull(
+                resultData.get("teacherName")) ? null : resultData.get("teacherName").toString());
+        teacherView.setId(teacherView.getTeacherId());
+    }
+
+    private FetchTeacherParam getFetchTeacherParam(SmallClass smallClass) {
         FetchTeacherParam fetchTeacherParam = new FetchTeacherParam();
         fetchTeacherParam.setUserId(smallClass.getGroupLeader());
 
@@ -58,31 +102,7 @@ public class SmallClassTeacherRequester {
 
         fetchTeacherParam.setScheduleModelList(Arrays.asList(scheduleModel));
 
-        String url = String.format("%s/course/schedule/teacher/web/match", urlConf.getTeacher_service());
-        JsonResultModel jsonResultModel = null;
-        try {
-            jsonResultModel = restTemplate.postForObject(url, fetchTeacherParam, JsonResultModel.class);
-            if (Objects.isNull(jsonResultModel.getData())) {
-                logger.error("@getSmallClassTeacher#获取教师失败,没有获取到教师,url[{}],参数[{}],结果[{}]"
-                        , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
-                return null;
-            } else {
-                logger.debug("@getSmallClassTeacher#获取小班课教师成功,url[{}],参数[{}],结果[{}]"
-                        , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
-            }
-        } catch (Exception ex) {
-            logger.error("@getSmallClassTeacher#获取小班课教师失败,url[{}],参数[{}],结果[{}]"
-                    , url, JacksonUtil.toJSon(fetchTeacherParam), JacksonUtil.toJSon(jsonResultModel));
-            return null;
-        }
-        HashMap<String, Map<String, Object>> result = jsonResultModel.getData(HashMap.class);
-        Map<String, Object> resultData = result.get(scheduleModel.getId().toString());
-        TeacherView teacherView = new TeacherView();
-        teacherView.setTeacherId(Long.parseLong(resultData.get("teacherId").toString()));
-        teacherView.setTeacherName(Objects.isNull(
-                resultData.get("teacherName")) ? null : resultData.get("teacherName").toString());
-        teacherView.setId(teacherView.getTeacherId());
-        return teacherView;
+        return fetchTeacherParam;
     }
 
     //获取公开课

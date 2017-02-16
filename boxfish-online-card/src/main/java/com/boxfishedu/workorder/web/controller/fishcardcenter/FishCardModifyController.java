@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardFreezeServiceX;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardModifyServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AvaliableTimeServiceX;
 import com.boxfishedu.workorder.web.param.CourseChangeParam;
+import com.boxfishedu.workorder.web.param.MakeUpCourseParam;
 import com.boxfishedu.workorder.web.param.StartTimeParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.FishCardDeleteParam;
@@ -35,7 +36,7 @@ public class FishCardModifyController {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
-     * 换老师
+     * 换老师(1对1)
      * @param teacherChangeParam
      * @return
      */
@@ -43,6 +44,7 @@ public class FishCardModifyController {
     public JsonResultModel changeTeacher(@RequestBody TeacherChangeParam teacherChangeParam) {
         return fishCardModifyServiceX.changeTeacher(teacherChangeParam);
     }
+
 
     /**
      * 换老师之前  检查老师是否处于联通(31-37  除去 36 的状态)
@@ -52,6 +54,26 @@ public class FishCardModifyController {
     @RequestMapping(value = "/check/teacher", method = RequestMethod.PUT)
     public JsonResultModel checkCurrentTeacher(@RequestBody TeacherChangeParam teacherChangeParam){
         return fishCardModifyServiceX.checkCurrentTeacherStatus(teacherChangeParam);
+    }
+
+    /**
+     * 换老师(小班课 smallClass)
+     * @param teacherChangeParam
+     * @return
+     */
+    @RequestMapping(value = "/teacher/smallClass", method = RequestMethod.PUT)
+    public JsonResultModel changeTeacherSmallClass(@RequestBody TeacherChangeParam teacherChangeParam) {
+        return fishCardModifyServiceX.changeTeacherSmallClass(teacherChangeParam);
+    }
+
+    /**
+     * 小班课换老师之前  检查老师是否处于联通(PublicClassInfoConstantStatus >=1000)
+     * @param teacherChangeParam
+     * @return
+     */
+    @RequestMapping(value = "/check/teacher/smallClass", method = RequestMethod.PUT)
+    public JsonResultModel checkCurrentTeacherSmallClass(@RequestBody TeacherChangeParam teacherChangeParam){
+        return fishCardModifyServiceX.checkCurrentTeacherStatusSmallClass(teacherChangeParam);
     }
 
     
@@ -110,6 +132,16 @@ public class FishCardModifyController {
     @RequestMapping(value = "/changeStartTime", method = RequestMethod.POST)
     public JsonResultModel changeStartTime(@RequestBody StartTimeParam startTimeParam) {
         return fishCardModifyServiceX.changeStartTime(startTimeParam,false);
+    }
+
+    /**
+     * 批量换老师后台
+     * @param makeUpCourseParam
+     * @return
+     */
+    @RequestMapping(value = "/changeTeachers", method = RequestMethod.POST)
+    public JsonResultModel changeTeachers(@RequestBody MakeUpCourseParam makeUpCourseParam){
+        return fishCardModifyServiceX.changeTeachers(makeUpCourseParam);
     }
 
     @RequestMapping(value = "/time/available/{workorder_id}/{date}", method = RequestMethod.GET)

@@ -29,6 +29,7 @@ import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/7/8.
@@ -252,6 +254,70 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         workOrderLogService.saveWorkOrderLog(workOrder,"更换换时间#旧的上课时间["+oldStartTime+"], #当前上课时间 ["+startTimeParam.getBeginDate()+"] ,#旧的教师id["+oldTeacherId+"],#旧的教师姓名["+oldTeacherName+"]"+",修改时间来源:"+source);
 
         return workOrder.getId();
+    }
+
+
+
+
+    /**
+     * 换老师  重新分配老师(批量换老师接口)
+     * @param startTimeParam
+     * @param checkTimeflag  是否需要验证时间
+     * @return
+     */
+    @Transactional
+    public void  changeTeacherOnlyFishCard(Long workOrderId){
+
+        Map<String,String> resultMap = Maps.newHashMap();
+
+        //获取鱼卡信息
+        WorkOrder workOrder =workOrderService.findByIdForUpdate(workOrderId)   ;
+        if(Objects.isNull(workOrder))
+            return;
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrderId);
+
+        if(workOrder.getStartTime().after(DateTime.now().toDate()))
+            return;
+
+
+        Long teacherId = workOrder.getTeacherId();
+        String startTime = DateUtil.Date2String(  workOrder.getStartTime());
+
+        // 验证鱼卡状态 创建、分配课程、分配老师
+
+            //******************* 先  进行1 ,2  在进行跟换鱼卡信息
+            // 1 通知师生运营释放教师资源
+           if(!Objects.isNull(teacherId)  && teacherId.longValue()>0L){
+               teacherStudentRequester.notifyCancelTeacher(workOrder);
+           }
+            //2 通知小马解散师生关系
+            courseOnlineRequester.releaseGroup(workOrder);
+
+
+
+            if(workOrder.getStatus()!=FishCardStatusEnum.CREATED.getCode()){
+                workOrder.setStatus(FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+                courseSchedule.setStatus( FishCardStatusEnum.COURSE_ASSIGNED.getCode());
+            }
+
+
+
+            //异步操作  // 设置指定老师申请失效
+            assignTeacherFixService.disableAssignWorkOrderOut(workOrder.getId(),"批量换老师");
+
+            workOrder.setTeacherId(0L);
+            workOrder.setTeacherName("");
+
+
+            workOrderService.save(workOrder);
+
+            courseSchedule.setTeacherId(0L);
+
+            courseScheduleService.save(courseSchedule);
+
+        // 记录日志
+        workOrderLogService.saveWorkOrderLog(workOrder,"旧老师ID"+workOrder.getTeacherId()+"], #原来状态 ["+workOrder.getStatus()+"]");
+
     }
 
     /**
