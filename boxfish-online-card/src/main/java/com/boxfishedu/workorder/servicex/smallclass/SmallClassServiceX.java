@@ -1,22 +1,21 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
-import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
+import com.boxfishedu.workorder.common.util.RedisKeyGenerator;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
-import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
+import com.boxfishedu.workorder.dao.mongo.ConfigBeanMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.google.common.collect.Lists;
+import com.boxfishedu.workorder.servicex.callbacklog.CallBackLogServiceX;
 import com.google.common.collect.Maps;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.StyledEditorKit;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by hucl on 17/1/5.
@@ -26,6 +25,22 @@ public class SmallClassServiceX {
 
     @Autowired
     SmallClassJpaRepository smallClassJpaRepository;
+
+    RedisTemplate<String, String> redisTemplate;
+
+    ZSetOperations<String, String> zSetOperations;
+
+    @Autowired
+    CallBackLogServiceX callBackLogServiceX;
+
+    @Autowired
+    ConfigBeanMorphiaRepository configBeanMorphiaRepository;
+
+    @Autowired
+    public void initRedis(@Qualifier(value = "stringLongRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+        this.zSetOperations = redisTemplate.opsForZSet();
+    }
 
     public Map<String, Object> getTeacherValidateMap(Long smallClassId) {
         Map<String, Object> map = Maps.newLinkedHashMap();
@@ -61,9 +76,22 @@ public class SmallClassServiceX {
     public boolean checkChangeTeacherForSmallClass(Long smallClassId) {
 
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
-        if(null!=smallClass && smallClass.getStatus() >=PublicClassInfoConstantStatus.TEACHER_CARD_VALIDATED){
+        if (null != smallClass && smallClass.getStatus() >= PublicClassInfoConstantStatus.TEACHER_CARD_VALIDATED) {
             return true;
         }
         return false;
+    }
+
+    public Set<String> selectRandomStudentList(Long smallClassId) {
+        String key = RedisKeyGenerator.getGroupClassHeartBeatKey(smallClassId);
+
+        Long limit = configBeanMorphiaRepository.getSingleBean().getSelectStudentNum();
+        if (Objects.isNull(limit)) {
+            limit = 1l;
+        }
+
+        Set<String> students = zSetOperations.range(key, 0, limit);
+
+        return students;
     }
 }
