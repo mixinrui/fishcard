@@ -1,24 +1,20 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
-import com.boxfishedu.workorder.common.bean.CourseDifficultyEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassMessageEnum;
-import com.boxfishedu.workorder.common.bean.PublicClassTimeEnum;
-import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
-import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
-import com.google.common.collect.Maps;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Created by LuoLiBing on 17/1/18.
@@ -43,26 +39,6 @@ public class PublicClassService {
         publicClassCacheWithId = cacheManager.getCache(
                 CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_ID);
     }
-
-    /**
-     * 获取公开课课表
-     * @param level
-     * @param now
-     * @return
-     */
-    public Map<String, Object> getStudentPublicClassTimeEnum(String level, LocalDate now) {
-        String key = createPublicClassCacheWithLevelAndDateKey(level, now);
-        Map classRoom = publicClassCacheWithLevelAndDate.get(key, Map.class);
-        if(classRoom == null) {
-            synchronized (this) {
-                classRoom = getClassRoomByLevelAndNowWithDatabase(level, now);
-                publicClassCacheWithLevelAndDate.putIfAbsent(key, classRoom);
-            }
-        }
-        return classRoom;
-
-    }
-
 
     public void evictPublicClassRoom(String level) {
         publicClassCacheWithLevelAndDate.evict(createPublicClassCacheWithLevelAndDateKey(level, LocalDate.now()));
@@ -136,32 +112,5 @@ public class PublicClassService {
 //            }
 //        }
 //        return smallClass;
-    }
-
-    /**
-     * 从数据库中查询课堂
-     * @param level
-     * @param now
-     * @return
-     */
-    private Map<String, Object> getClassRoomByLevelAndNowWithDatabase(String level, LocalDate now) {
-        // 先判断是否是可用的等级
-        CourseDifficultyEnum courseDifficulty;
-        try {
-            courseDifficulty = CourseDifficultyEnum.valueOf(level);
-        } catch (Exception e) {
-            throw new BusinessException("错误的level等级");
-        }
-        PublicClassTimeEnum publicClass = PublicClassTimeEnum.publicClassTime(courseDifficulty);
-        List<SmallClass> publicClassList = smallClassJpaRepository.findByClassDateAndSlotIdAndClassType(
-                DateUtil.convertToDate(now), publicClass.getTimeRange().getSlotId(), ClassTypeEnum.PUBLIC.name());
-        if(CollectionUtils.isEmpty(publicClassList)) {
-            throw new BusinessException("今天没有对应的公开课!");
-        }
-        SmallClass smallClass = publicClassList.get(0);
-        HashMap<String, Object> resultMap = Maps.newHashMap();
-        resultMap.put("classRoom", smallClass);
-        resultMap.put("timeRange", publicClass.getTimeRange().setClassDate(now));
-        return resultMap;
     }
 }

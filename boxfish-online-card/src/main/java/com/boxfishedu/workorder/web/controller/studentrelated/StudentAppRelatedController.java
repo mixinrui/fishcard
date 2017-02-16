@@ -26,7 +26,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -116,19 +115,6 @@ StudentAppRelatedController {
             evictRepeatedSubmission(e, timeSlotParam.getOrderId());
             throw e;
         }
-    }
-
-
-    /**
-     * 学生公开课
-     * @param studentId
-     * @param level
-     * @return
-     */
-//    @RequestMapping(value = "{studentId}/schedule/public", method = RequestMethod.GET)
-    public JsonResultModel courseSchedulePublic(@PathVariable Long studentId, String level) {
-        return JsonResultModel.newJsonResultModel(
-                publicClassService.getStudentPublicClassTimeEnum(level, LocalDate.now()));
     }
 
     @RequestMapping(value = "/{studentId}/enter/publicClassRoom", method = RequestMethod.PUT)

@@ -52,7 +52,7 @@ public enum PublicClassMessageEnum {
     ERROR_TIME_BEFORE {
         @Override
         public String getTitle() {
-            return "课程已结束";
+            return "未到上课时间";
         }
 
         @Override
@@ -65,7 +65,7 @@ public enum PublicClassMessageEnum {
     ERROR_TIME_AFTER {
         @Override
         public String getTitle() {
-            return "未到上课时间";
+            return "课程已结束";
         }
 
         @Override
