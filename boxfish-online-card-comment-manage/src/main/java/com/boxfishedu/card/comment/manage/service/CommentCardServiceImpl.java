@@ -241,7 +241,7 @@ public class CommentCardServiceImpl implements CommentCardService {
             }
             // 超时未点评
             else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.TIMEOUT.value())) {
-                predicateList.add(criteriaBuilder.lt(
+                predicateList.add(criteriaBuilder.gt(
                         root.get("status"), CommentCardStatus.ANSWERED.getCode()
                 ));
                 NotAnswerTime.DateRange dateRange = NotAnswerTime._24_48HOURS.getRange();
