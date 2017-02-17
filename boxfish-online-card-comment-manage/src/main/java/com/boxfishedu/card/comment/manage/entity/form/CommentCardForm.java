@@ -12,6 +12,11 @@ import java.util.Date;
 public class CommentCardForm {
 
     /**
+     * 点评卡id
+     */
+    private Long code;
+
+    /**
      * 未回答时长范围
      */
     private Integer notAnswerTime;

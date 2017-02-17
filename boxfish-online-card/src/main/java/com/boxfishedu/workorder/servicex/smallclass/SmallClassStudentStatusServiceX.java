@@ -9,6 +9,10 @@ import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
