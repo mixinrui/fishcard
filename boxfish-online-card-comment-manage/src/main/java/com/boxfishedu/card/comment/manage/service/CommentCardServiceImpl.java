@@ -190,6 +190,11 @@ public class CommentCardServiceImpl implements CommentCardService {
     private Predicate[] createPredicates(Root<CommentCard> root, CriteriaBuilder criteriaBuilder, CommentCardForm commentCardForm) {
         List<Predicate> predicateList = new ArrayList<>();
 
+        //点评卡id
+        if (Objects.nonNull(commentCardForm.getCode())){
+            predicateList.add(criteriaBuilder.or(criteriaBuilder.equal(root.get("id"), commentCardForm.getCode()),criteriaBuilder.equal(root.get("previous_id"), commentCardForm.getCode())));
+        }
+
         // 老师Id
         if(Objects.nonNull(commentCardForm.getTeacherId())) {
             predicateList.add(criteriaBuilder.equal(root.get("teacherId"), commentCardForm.getTeacherId()));
@@ -236,7 +241,7 @@ public class CommentCardServiceImpl implements CommentCardService {
             }
             // 超时未点评
             else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.TIMEOUT.value())) {
-                predicateList.add(criteriaBuilder.lt(
+                predicateList.add(criteriaBuilder.gt(
                         root.get("status"), CommentCardStatus.ANSWERED.getCode()
                 ));
                 NotAnswerTime.DateRange dateRange = NotAnswerTime._24_48HOURS.getRange();
