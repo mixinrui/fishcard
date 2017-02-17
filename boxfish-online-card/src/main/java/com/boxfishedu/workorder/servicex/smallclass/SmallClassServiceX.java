@@ -5,16 +5,24 @@ import com.boxfishedu.workorder.common.util.RedisKeyGenerator;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.ConfigBeanMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.service.smallclass.SelectStudentsService;
 import com.boxfishedu.workorder.servicex.callbacklog.CallBackLogServiceX;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.*;
 
 /**
@@ -30,6 +38,8 @@ public class SmallClassServiceX {
 
     ZSetOperations<String, String> zSetOperations;
 
+    SetOperations<String, String> setOperations;
+
     @Autowired
     CallBackLogServiceX callBackLogServiceX;
 
@@ -37,9 +47,13 @@ public class SmallClassServiceX {
     ConfigBeanMorphiaRepository configBeanMorphiaRepository;
 
     @Autowired
-    public void initRedis(@Qualifier(value = "stringLongRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+    SelectStudentsService selectStudentsService;
+
+    @Autowired
+    public void initRedis(@Qualifier(value = "stringRedisTemplate") RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.zSetOperations = redisTemplate.opsForZSet();
+        this.setOperations = redisTemplate.opsForSet();
     }
 
     public Map<String, Object> getTeacherValidateMap(Long smallClassId) {
@@ -50,11 +64,6 @@ public class SmallClassServiceX {
         LocalDateTime startTime = LocalDateTime.ofInstant(smallClass.getStartTime().toInstant(), ZoneId.systemDefault());
         LocalDateTime deadTime = startTime.plusMinutes(30);
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
-
-        //TODO:测试
-//        map.put("status", 30);
-//        map.put("statusDesc", "success");
-//        map.put("classInfo", smallClass);
 
         if (now.isBefore(startTime)) {
             map.put("status", 10);
@@ -72,7 +81,8 @@ public class SmallClassServiceX {
         return map;
     }
 
-    // 验证小班课老师是否处于大于1000的状态  true  给出提示  false  不给提示
+
+    // 验证小班课老师是否123处于大于1000的状态  true  给出提示  false  不给提示
     public boolean checkChangeTeacherForSmallClass(Long smallClassId) {
 
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
@@ -82,16 +92,7 @@ public class SmallClassServiceX {
         return false;
     }
 
-    public Set<String> selectRandomStudentList(Long smallClassId) {
-        String key = RedisKeyGenerator.getGroupClassHeartBeatKey(smallClassId);
-
-        Long limit = configBeanMorphiaRepository.getSingleBean().getSelectStudentNum();
-        if (Objects.isNull(limit)) {
-            limit = 1l;
-        }
-
-        Set<String> students = zSetOperations.range(key, 0, limit);
-
-        return students;
+    public String selectCandidate(Long smallClassId) {
+        return selectStudentsService.selectCandidate(smallClassId);
     }
 }

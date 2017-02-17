@@ -7,4 +7,8 @@ public class RedisKeyGenerator {
     public static String getGroupClassHeartBeatKey(Long smallClassId){
         return "groupkey"+smallClassId;
     }
+
+    public static String getGroupSelectedKey(Long smallClassId){
+        return "group:selected:"+smallClassId;
+    }
 }

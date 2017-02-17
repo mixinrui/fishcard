@@ -27,6 +27,6 @@ public class ConfigBean {
     private String onlySmallClassTips;
 
     //每次选多少学生
-    private Long selectStudentNum;
+    private String selectStudentNum;
 
 }

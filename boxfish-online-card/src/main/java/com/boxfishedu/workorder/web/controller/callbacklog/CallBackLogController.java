@@ -28,6 +28,7 @@ public class CallBackLogController {
 
     @RequestMapping(value = "/heartBeat", method = RequestMethod.POST)
     public Object heartBeat(@RequestBody CallBackHeartBeatParam param) {
+        callBackLogServiceX.updateSet(param);
         return JsonResultModel.newJsonResultModel(JacksonUtil.toJSon(param));
     }
 }
