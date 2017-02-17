@@ -63,7 +63,7 @@ public class SmallClassTeacherController {
      * @param smallClassId
      * @return
      */
-    @RequestMapping(value = "/{smallclass_id}/selectStudentList", method = RequestMethod.GET)
+    @RequestMapping(value = "/{smallclass_id}/selectCandidate", method = RequestMethod.GET)
     public JsonResultModel selectRandomStudentList(@PathVariable("smallclass_id") Long smallClassId) {
 
         String studentId = smallClassServiceX.selectCandidate(smallClassId);
