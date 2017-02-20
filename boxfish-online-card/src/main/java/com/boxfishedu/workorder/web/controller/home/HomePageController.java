@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.web.controller.home;
 
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
@@ -46,6 +47,11 @@ HomePageController {
     @RequestMapping(value = "/student/{student_id}/public", method = RequestMethod.GET)
     public JsonResultModel publicClassInfo() {
         return homePageServiceX.getPublicHomePage();
+    }
+
+    @RequestMapping(value = "/student/classInfo", method = RequestMethod.GET)
+    public JsonResultModel studentClassInfo(@RequestParam("studentId") Long studentId, @RequestParam("date") String date) {
+        return homePageServiceX.studentClassInfo(studentId, DateUtil.simpleString2Date(date));
     }
 
 }

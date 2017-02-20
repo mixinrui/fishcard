@@ -33,7 +33,7 @@ public class MethodInvokeInterceptor {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String className = joinPoint.getTarget().getClass().getName();
         String lastName = className.substring(className.lastIndexOf("."));
-        StringBuilder logBuilder=new StringBuilder("@>>>>>>>>>>>>>>>>>类").append(lastName).append("#########方法:").append(joinPoint.getSignature().getName()).append("#########url:").append(request.getRequestURI());
+        StringBuilder logBuilder=new StringBuilder("@>>>>>>>>>>>>>>>>>类#ACCESSREQUEST#").append(lastName).append("#########方法:").append(joinPoint.getSignature().getName()).append("#########url:").append(request.getRequestURI());
         Object[] args = joinPoint.getArgs();
         if (null != args && args.length > 0) {
             for (int i = 0; i < args.length; i++) {

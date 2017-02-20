@@ -32,6 +32,11 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     public Long exists(@Param("teacherId") Long teacherId, @Param("timeSlotId") Long timeSlotId,
                        @Param("startDate") Date classStartDate, @Param("endDate") Date classEndDate);
 
+    @Query(value = "select count(cs) from CourseSchedule cs where cs.studentId=?1 and cs.classDate=?2 and cs.isFreeze !=?3 and cs.classType is null and cs.status<?4")
+    Long studentOne2OneClassInfoCurrentDay(Long studentId,Date classDate,Integer isFreeze,Integer status);
+
+    @Query(value = "select count(cs) from CourseSchedule cs where cs.studentId=?1 and cs.classDate=?2 and cs.isFreeze !=?3 and cs.classType=?4 and cs.status<?5")
+    Long studentOtherTypeClassInfoCurrentDay(Long studentId,Date classDate,Integer isFreeze,String classType,Integer status);
 
     public List<CourseSchedule> findByStatus(Integer status);
 
