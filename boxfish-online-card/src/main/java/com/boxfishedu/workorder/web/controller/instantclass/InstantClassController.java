@@ -8,7 +8,6 @@ import com.boxfishedu.workorder.entity.mongo.InstantClassTimeRules;
 import com.boxfishedu.workorder.servicex.instantclass.InstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.TeacherInstantClassServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.config.DayRangeBean;
-import com.boxfishedu.workorder.servicex.instantclass.grabordervalidator.GrabInstatntClassKeyGenerator;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionException;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
