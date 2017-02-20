@@ -43,6 +43,8 @@ public enum ClassTypeEnum {
             return DEFAULT;
         }
         switch (comboTypeToRoleId) {
+            case FSCF:
+                return SMALL;
             case SMALLCLASS:
                 return SMALL;
             case PUBLIC:
