@@ -113,7 +113,7 @@ public class HomePageServiceX {
 
     public StudentClassInfo getStudentClassInfo(Long studentId, Date date) {
         if (!onlineAccountService.isMember(studentId)) {
-            return this.buildEmptyClassInfo(studentId);
+            return this.buildEmptyClassInfo();
         } else {
             Long one2One = courseScheduleRepository
                     .studentOne2OneClassInfoCurrentDay(
@@ -125,7 +125,7 @@ public class HomePageServiceX {
         }
     }
 
-    private StudentClassInfo buildEmptyClassInfo(Long studentId) {
+    private StudentClassInfo buildEmptyClassInfo() {
         if (Objects.isNull(emptyStudentClassInfo)) {
             synchronized (this) {
                 logger.debug("@buildEmptyClassInfo#首次初始化emptyStudentClassInfo");
