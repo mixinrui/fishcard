@@ -30,13 +30,13 @@ public class CallBackLogServiceX {
     }
 
     public Long getCardId(CallBackHeartBeatParam callBackHeartBeatParam) {
-        Map<String,Object> map=JacksonUtil.readValue(callBackHeartBeatParam.getMsgBody().get(0).getMsgContent().getData(), HashMap.class);
+        Map<String, Object> map = JacksonUtil.readValue(callBackHeartBeatParam.getMsgBody().get(0).getMsgContent().getData(), HashMap.class);
         return Long.parseLong(
                 map.get("workOrderId").toString());
     }
 
     private String getRole(CallBackHeartBeatParam callBackHeartBeatParam) {
-        Map<String,Object> map=JacksonUtil.readValue(callBackHeartBeatParam.getMsgBody().get(0).getMsgContent().getData(), HashMap.class);
+        Map<String, Object> map = JacksonUtil.readValue(callBackHeartBeatParam.getMsgBody().get(0).getMsgContent().getData(), HashMap.class);
         return map.get("role").toString();
     }
 
@@ -48,6 +48,5 @@ public class CallBackLogServiceX {
         if (StringUtils.equals("STUDENT", role)) {
             zSetOperations.add(key, useMd5, new Date().getTime());
         }
-
     }
 }

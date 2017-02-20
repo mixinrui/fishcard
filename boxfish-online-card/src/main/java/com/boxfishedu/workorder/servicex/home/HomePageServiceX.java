@@ -1,13 +1,17 @@
 package com.boxfishedu.workorder.servicex.home;
 
 import com.boxfishedu.workorder.common.bean.AccountCourseBean;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.servicex.studentrelated.validator.RepeatedSubmissionChecker;
+import com.boxfishedu.workorder.web.result.StudentClassInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by hucl on 16/11/30.
@@ -35,19 +40,12 @@ public class HomePageServiceX {
     @Autowired
     private SmallClassJpaRepository smallClassJpaRepository;
 
-//    @Autowired
-//    StringRedisTemplate redisTemplate;
+    private StudentClassInfo emptyStudentClassInfo;
 
-//    private ZSetOperations zSetOperations;
+    @Autowired
+    CourseScheduleRepository courseScheduleRepository;
 
     private final String PUBLIC_CLASS_KEY_PREFIX = "public_class:";
-
-//    @Autowired
-//    void opsForSet(
-//            @Qualifier("teachingServiceRedisTemplate")
-//            StringRedisTemplate redisTemplate) {
-//        zSetOperations = redisTemplate.opsForZSet();
-//    }
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -108,4 +106,34 @@ public class HomePageServiceX {
         });
         return cardCourseInfos;
     }
+
+    public JsonResultModel studentClassInfo(Long studentId, Date date) {
+        return JsonResultModel.newJsonResultModel(this.getStudentClassInfo(studentId, date));
+    }
+
+    public StudentClassInfo getStudentClassInfo(Long studentId, Date date) {
+        if (!onlineAccountService.isMember(studentId)) {
+            return this.buildEmptyClassInfo();
+        } else {
+            Long one2One = courseScheduleRepository
+                    .studentOne2OneClassInfoCurrentDay(
+                            studentId, date, 1, FishCardStatusEnum.WAITFORSTUDENT.getCode());
+            Long small = courseScheduleRepository
+                    .studentOtherTypeClassInfoCurrentDay(
+                            studentId, date, 1, ClassTypeEnum.SMALL.name(), FishCardStatusEnum.WAITFORSTUDENT.getCode());
+            return new StudentClassInfo(one2One, small);
+        }
+    }
+
+    private StudentClassInfo buildEmptyClassInfo() {
+        if (Objects.isNull(emptyStudentClassInfo)) {
+            synchronized (this) {
+                logger.debug("@buildEmptyClassInfo#首次初始化emptyStudentClassInfo");
+                emptyStudentClassInfo = new StudentClassInfo(0l, 0l);
+            }
+        }
+        return this.emptyStudentClassInfo;
+    }
+
+
 }
