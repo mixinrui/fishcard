@@ -314,17 +314,17 @@ public class AvaliableTimeServiceXV1 {
 
         logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);
 
-        // 一共延迟 8 周  最早下下周开始
+        // 一共延迟 8 周  最早下下周开始  海江 改为从后天开始
+        boolean weekFlag = DateUtil.getWeekDay();
         for (int i = 1; i < 9; i++) {
             JSONObject jb = new JSONObject();
-//            String firstWeek = "下周开始";
-//            String text = i == 1 ? firstWeek + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 2)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i))) + ")";
-//            Date date = i == 1 ? DateUtil.getAfter7Days(currentDate, 2) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 2), i));
 
-
-            String text = i == 1 ? "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 3)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i))) + ")";
-            Date date   = i == 1 ? DateUtil.getAfter7Days(currentDate, 3) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i));
-
+//            String text = i == 1 ? "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 3)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i))) + ")";
+//            Date date   = i == 1 ? DateUtil.getAfter7Days(currentDate, 3) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i));
+            String firstWeek = weekFlag ? "下周开始" : "本周开始";
+            String text = i == 1 ? firstWeek + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfterTomoDate(currentDate)) + ")" :
+                    "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(currentDate, weekFlag ? (i + 1) : (i)))) + ")";
+            Date date = i == 1 ? DateUtil.getAfterTomoDate(currentDate) : DateUtil.getMonday(DateUtil.getAfter7Days(currentDate, weekFlag ? (i + 1) : (i)));
 
             jb.put("id", i);
             jb.put("text", text);
