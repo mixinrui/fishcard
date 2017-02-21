@@ -30,8 +30,8 @@ public class DateUtil {
 
     public final static DateTimeFormatter timeFormatter1 = DateTimeFormatter.ofPattern("HH:mm");
 
-    public static Date simpleString2Date(String simpleStr){
-        return String2Date(String.join(" ",simpleStr,"00:00:00"));
+    public static Date simpleString2Date(String simpleStr) {
+        return String2Date(String.join(" ", simpleStr, "00:00:00"));
     }
 
     public static Date String2Date(String str) throws RuntimeException {
@@ -42,8 +42,8 @@ public class DateUtil {
         }
     }
 
-    public static LocalDateTime string2LocalDateTime(String dateStr){
-       return convertLocalDateTime(String2Date(dateStr));
+    public static LocalDateTime string2LocalDateTime(String dateStr) {
+        return convertLocalDateTime(String2Date(dateStr));
     }
 
     public static String Date2ForForeignDate(Date date) {
@@ -82,8 +82,8 @@ public class DateUtil {
         return String2SimpleDate(dateWithTimeStr);
     }
 
-    public static String dateTrimYear(Date date){
-        return StringUtils.split(DateUtil.Date2String(date)," ")[1];
+    public static String dateTrimYear(Date date) {
+        return StringUtils.split(DateUtil.Date2String(date), " ")[1];
     }
 
     public static String simpleDate2String(Date date) {
@@ -338,20 +338,18 @@ public class DateUtil {
     */
     public static int getBetweenDays(Date begin, Date end) {
         long l = end.getTime() - begin.getTime();
-        return  ((int)( l / (24 * 60 * 60 * 1000)) -1);
+        return ((int) (l / (24 * 60 * 60 * 1000)) - 1);
     }
 
     public static int getBetweenMinus(Date begin, Date end) {
         long l = end.getTime() - begin.getTime();
-        return  ((int)( l / ( 60 * 1000)) -1);
+        return ((int) (l / (60 * 1000)) - 1);
     }
-
-
-
 
 
     /**
      * 48小时以内
+     *
      * @param dateTime
      * @return
      */
@@ -364,6 +362,7 @@ public class DateUtil {
 
     /**
      * 72小时以内
+     *
      * @param dateTime
      * @return
      */
@@ -382,58 +381,57 @@ public class DateUtil {
         }
     }
 
-    public static boolean getWeekDay(){
+    public static boolean getWeekDay() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
-        int w =  cal.get(Calendar.DAY_OF_WEEK) - 1;
-        return (w==0 ||w==6) ?true:false;
+        int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
+        return (w == 0 || w == 6) ? true : false;
     }
 
-    public static boolean getWeekDay3567(Date date){
+    public static boolean getWeekDay3567(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        int w =  cal.get(Calendar.DAY_OF_WEEK);
-        return WorkOrderConstant.weekDays.contains (w) ?true:false;
+        int w = cal.get(Calendar.DAY_OF_WEEK);
+        return WorkOrderConstant.weekDays.contains(w) ? true : false;
     }
 
     // 是否包含在list的天中  2345671   周一到周日 4671
-    public static boolean getWeekInByDate(Date date  ,List<Integer> list){
+    public static boolean getWeekInByDate(Date date, List<Integer> list) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int week = cal.get(Calendar.DAY_OF_WEEK);
-        if(list.contains(week))
+        if (list.contains(week))
             return true;
         return false;
     }
 
 
     //注：周日是一周的开始 获取周一的日期  week 2345671
-    public static Date getMonday(Date date)throws Exception{
+    public static Date getMonday(Date date) throws Exception {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         int week = cal.get(Calendar.DAY_OF_WEEK);
-        if(week>=2){
-            cal.add(Calendar.DAY_OF_MONTH,-(week-2));
-        }else{
-            cal.add(Calendar.DAY_OF_MONTH,1-7);
+        if (week >= 2) {
+            cal.add(Calendar.DAY_OF_MONTH, -(week - 2));
+        } else {
+            cal.add(Calendar.DAY_OF_MONTH, 1 - 7);
         }
         return cal.getTime();
     }
 
-    public static void main(String[] args) throws Exception{
-        System.out.println(date2SimpleString(new Date()));
-    }
 
 
-    public static Date getAfterTomoDate(Date date){
-        return  addMinutes(date,60*24*2);
-    }
-    public static Date getAfter7Days(Date date,int i ){
-        return  (i-1)==0?date : addMinutes(date,60*24*(i-1)*7);
+
+    public static Date getAfterTomoDate(Date date) {
+        return addMinutes(date, 60 * 24 * 2);
     }
 
-    public static Date getAfterOneDay(Date date,int i){
-        return addMinutes(date,60*24*i);
+    public static Date getAfter7Days(Date date, int i) {
+        return (i - 1) == 0 ? date : addMinutes(date, 60 * 24 * (i - 1) * 7);
+    }
+
+    public static Date getAfterOneDay(Date date, int i) {
+        return addMinutes(date, 60 * 24 * i);
     }
 
     private final static long DAY_OF_SECONDS = 24 * 60 * 60 * 1000;
@@ -448,15 +446,15 @@ public class DateUtil {
 //        System.out.println(durationOfDay(from, new Date()));
 //    }
 
-    public static Date  getNextWeekSunday(Date date) {
+    public static Date getNextWeekSunday(Date date) {
 
         int mondayPlus = getMondayPlus();
         GregorianCalendar currentDate = new GregorianCalendar();
-        currentDate.add(GregorianCalendar.DATE, mondayPlus + 7+6);
+        currentDate.add(GregorianCalendar.DATE, mondayPlus + 7 + 6);
         Date monday = currentDate.getTime();
         DateFormat df = DateFormat.getDateInstance();
         String preMonday = df.format(monday);
-        return parseTime(monday,1)  ;
+        return parseTime(monday, 1);
     }
 
     public static LocalDate getFirstDateOfWeek(LocalDate localDate) {
@@ -472,12 +470,32 @@ public class DateUtil {
     private static int getMondayPlus() {
         Calendar cd = Calendar.getInstance();
         // 获得今天是一周的第几天，星期日是第一天，星期二是第二天......
-        int dayOfWeek = cd.get(Calendar.DAY_OF_WEEK)-1;         //因为按中国礼拜一作为第一天所以这里减1
+        int dayOfWeek = cd.get(Calendar.DAY_OF_WEEK) - 1;         //因为按中国礼拜一作为第一天所以这里减1
         if (dayOfWeek == 1) {
             return 0;
         } else {
             return 1 - dayOfWeek;
         }
+    }
+
+
+    // 是否在同一天
+    public static boolean isSameDate(Date date1, Date date2) {
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date1);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(date2);
+        boolean isSameYear = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+        boolean isSameMonth = isSameYear && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH);
+        boolean isSameDate = isSameMonth && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
+        return isSameDate;
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        Date date1 = DateTime.now().toDate();
+        Date date2 =DateTime.now().minusHours(15).toDate();
+                System.out.println(isSameDate(date1,date2));
     }
 
 }
