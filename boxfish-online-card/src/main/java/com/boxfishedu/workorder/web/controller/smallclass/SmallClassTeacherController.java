@@ -70,4 +70,9 @@ public class SmallClassTeacherController {
 
         return JsonResultModel.newJsonResultModel(studentId);
     }
+
+    @RequestMapping(value = "/candidateInterval", method = RequestMethod.GET)
+    public JsonResultModel candidateInterval() {
+        return JsonResultModel.newJsonResultModel(smallClassServiceX.candidateInterval());
+    }
 }
