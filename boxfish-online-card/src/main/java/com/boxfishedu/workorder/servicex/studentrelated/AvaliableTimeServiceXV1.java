@@ -227,11 +227,9 @@ public class AvaliableTimeServiceXV1 {
 
 
             // 同类型工单的最后一个工单   结束日期在当前日期之后 并且不在同一天
-            if (null != workOrder && workOrder.getEndTime().after(date)  ) {
+            if (null != workOrder && workOrder.getEndTime().after(date)  && !DateUtil.isSameDate(date,workOrder.getEndTime())) {
                 date = workOrder.getEndTime();
-                if( !DateUtil.isSameDate(date,workOrder.getEndTime())){
-                    afterDays = 1;
-                }
+                afterDays = 1;
             }
             startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
             if (afterDays > 0) {
