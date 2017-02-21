@@ -419,9 +419,7 @@ public class DateUtil {
         return cal.getTime();
     }
 
-    public static void main(String[] args) throws Exception {
-        System.out.println(date2SimpleString(new Date()));
-    }
+
 
 
     public static Date getAfterTomoDate(Date date) {
@@ -491,6 +489,13 @@ public class DateUtil {
         boolean isSameMonth = isSameYear && cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH);
         boolean isSameDate = isSameMonth && cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH);
         return isSameDate;
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        Date date1 = DateTime.now().toDate();
+        Date date2 =DateTime.now().minusHours(15).toDate();
+                System.out.println(isSameDate(date1,date2));
     }
 
 }
