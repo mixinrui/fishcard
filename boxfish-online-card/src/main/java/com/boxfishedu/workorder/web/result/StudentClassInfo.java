@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.web.result;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
