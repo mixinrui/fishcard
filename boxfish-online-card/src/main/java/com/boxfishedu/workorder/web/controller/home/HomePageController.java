@@ -54,4 +54,9 @@ HomePageController {
         return homePageServiceX.studentClassInfo(studentId, DateUtil.simpleString2Date(date));
     }
 
+    @RequestMapping(value = "/student/classInfo/{student_id}", method = RequestMethod.GET)
+    public JsonResultModel studentClassInfo(@PathVariable("student_id") Long studentId) {
+        return homePageServiceX.studentClassInfo(studentId, DateUtil.date2SimpleDate(new Date()));
+    }
+
 }
