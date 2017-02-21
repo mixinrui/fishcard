@@ -226,14 +226,17 @@ public class AvaliableTimeServiceXV1 {
             }
 
 
-            // 同类型工单的最后一个工单
-            if (null != workOrder && workOrder.getEndTime().after(date)) {
+            // 同类型工单的最后一个工单   结束日期在当前日期之后 并且不在同一天
+            if (null != workOrder && workOrder.getEndTime().after(date)  ) {
                 date = workOrder.getEndTime();
-                afterDays = 1;
+                if( !DateUtil.isSameDate(date,workOrder.getEndTime())){
+                    afterDays = 1;
+                }
             }
             startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
             if (afterDays > 0) {
                 startDate = startDate.plusDays(afterDays);
+
             }
 
         } else {
@@ -299,7 +302,7 @@ public class AvaliableTimeServiceXV1 {
         // 查找小班课的服务数据未选课程
         List<Service> services = serveService.findByOrderIdAndComboTypeAndCoursesSelected(orderId,ComboTypeToRoleId.SMALLCLASS.name() ,0);
         if (CollectionUtils.isEmpty(services)) {
-            throw new BusinessException("未生成有效服务数据或者数据有误");
+            throw new BusinessException("未生成有效服务数据或者数据有误或者已选课");
         }
 
         // 1 获取服务信息   返回获取一周几次课  service 的 original_amount 次数 除  combo_cycle
