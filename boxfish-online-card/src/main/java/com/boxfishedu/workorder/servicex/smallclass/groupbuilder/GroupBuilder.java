@@ -3,9 +3,10 @@ package com.boxfishedu.workorder.servicex.smallclass.groupbuilder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 17/1/6.
@@ -31,9 +32,11 @@ public abstract class GroupBuilder {
 
     protected abstract void updateHomePage(List<WorkOrder> workOrders);
 
-    public void group(){
+    public void group() {
         this.group(30);
     }
+
+    private Logger logger = LoggerFactory.getLogger("GroupBuilder");
 
     public void group(Integer days) {
         List<WorkOrder> cards = this.cardsToGroup(days);
@@ -83,9 +86,8 @@ public abstract class GroupBuilder {
                 groupCounter++;
                 currentGroup = Lists.newArrayList();
                 finalGroup.put(groupCounter, currentGroup);
-            } else {
-                currentGroup.add(workOrders.get(i));
             }
+            currentGroup.add(workOrders.get(i));
         }
         return finalGroup;
     }

@@ -192,6 +192,15 @@ public class InitDataController {
         return JsonResultModel.newJsonResultModel("OK");
     }
 
+    @RequestMapping(value = "/async/online/account/trial", method = RequestMethod.POST)
+    public JsonResultModel asyncInitTrialOnlineUser() {
+        List<WorkOrder> workOrders = workOrderJpaRepository.findByOrderId(9223372036854775807l);
+        Set<Long> useIdSet = workOrders.stream().map(service -> service.getStudentId()).collect(Collectors.toSet());
+        threadPoolManager.execute(new Thread(() -> useIdSet.forEach(userId -> onlineAccountService.add(userId))));
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
+
     //即时上课时间片限制生成
     @RequestMapping(value = "/instanttimes", method = RequestMethod.POST)
     public JsonResultModel instantClassTimes(@RequestBody Map<String, String> dateInfo) {
