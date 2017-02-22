@@ -33,6 +33,8 @@ public class FishCardFilterParam {
     private String actualStartTimeSort;
     /** 课程类型 数组形式 **/
     private String courseType;
+    /** 分配课程成功与否**/
+    private String courseAssign;
     //金币换课连续旷课次数
     private Integer ContineAbsenceNum;
 
