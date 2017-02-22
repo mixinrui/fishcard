@@ -196,6 +196,7 @@ public class InitDataController {
     public JsonResultModel asyncInitTrialOnlineUser() {
         List<WorkOrder> workOrders = workOrderJpaRepository.findByOrderId(9223372036854775807l);
         Set<Long> useIdSet = workOrders.stream().map(service -> service.getStudentId()).collect(Collectors.toSet());
+        useIdSet.forEach(id -> logger.debug("trialnumber:" + id));
         threadPoolManager.execute(new Thread(() -> useIdSet.forEach(userId -> onlineAccountService.add(userId))));
         return JsonResultModel.newJsonResultModel("OK");
     }
@@ -267,24 +268,24 @@ public class InitDataController {
         AtomicInteger failNum = new AtomicInteger();
         List<Long> failList = new Vector<>();
         cardIds.forEach(cardId ->
-                        {
-                            threadPoolManager.execute(new Thread(() -> {
-                                try {
-                                    WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
-                                    CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
-                                    courseSchedule.setStartTime(workOrder.getStartTime());
-                                    courseSchedule.setClassDate(workOrder.getStartTime());
-                                    courseSchedule.setTimeSlotId(workOrder.getSlotId());
-                                    courseScheduleService.save(courseSchedule);
-                                    int dealNum = successNum.addAndGet(1);
-                                    logger.debug("->" + cardId + ";已经处理{}条,剩余{}条", dealNum, (totalNum - dealNum));
-                                } catch (Exception ex) {
-                                    failNum.addAndGet(1);
-                                    failList.add(cardId);
-                                    logger.error("失败[{}]", cardId, ex);
-                                }
-                            }));
+                {
+                    threadPoolManager.execute(new Thread(() -> {
+                        try {
+                            WorkOrder workOrder = workOrderJpaRepository.findOne(cardId);
+                            CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(cardId);
+                            courseSchedule.setStartTime(workOrder.getStartTime());
+                            courseSchedule.setClassDate(workOrder.getStartTime());
+                            courseSchedule.setTimeSlotId(workOrder.getSlotId());
+                            courseScheduleService.save(courseSchedule);
+                            int dealNum = successNum.addAndGet(1);
+                            logger.debug("->" + cardId + ";已经处理{}条,剩余{}条", dealNum, (totalNum - dealNum));
+                        } catch (Exception ex) {
+                            failNum.addAndGet(1);
+                            failList.add(cardId);
+                            logger.error("失败[{}]", cardId, ex);
                         }
+                    }));
+                }
         );
         while (true) {
             if (failNum.get() + successNum.get() == totalNum) {
