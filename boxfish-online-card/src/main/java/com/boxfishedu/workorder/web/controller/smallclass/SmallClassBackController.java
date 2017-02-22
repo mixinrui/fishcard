@@ -119,4 +119,26 @@ public class SmallClassBackController {
     public JsonResultModel listCardDetail(SmallClassParam smallClassParam, Pageable pageable) throws Exception {
         return smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam, pageable);
     }
+
+    /**
+     * 鱼卡后台 小班课列表获取补课学生列表
+     * @param smallClassId
+     * @return
+     */
+    @RequestMapping(value = "/stulist/{smallclass_id}", method = RequestMethod.GET)
+    public JsonResultModel stulist(@PathVariable("smallclass_id") Long smallClassId) {
+       return smallClassBackServiceX.getStudentList(smallClassId);
+    }
+
+    /**
+     * 鱼卡后台 小班课列表查询所有补课学生level
+     * @return
+     */
+    @RequestMapping(value = "/stulevellist", method = RequestMethod.GET)
+    public JsonResultModel stulistforlevel() {
+        return  smallClassBackServiceX.getStudentList();
+    }
+
+
+
 }
