@@ -104,6 +104,9 @@ public class SmallClass implements Cloneable, Serializable {
     @Transient
     private Long statusReporter;
 
+    @Transient
+    private Long classNum = 0L;   //课程数量
+
     @JsonIgnore
     @Transient
     private String writeBackDesc;

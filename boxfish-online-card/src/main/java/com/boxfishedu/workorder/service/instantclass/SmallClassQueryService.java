@@ -4,8 +4,13 @@ import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
+import com.boxfishedu.workorder.common.util.Collections3;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +19,8 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 公开课查询
@@ -25,6 +32,9 @@ public class SmallClassQueryService {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
 
     public Long filterFishCardsCount(PublicFilterParam publicFilterParam) {
         String prefix = "select count(wo) ";
@@ -42,7 +52,20 @@ public class SmallClassQueryService {
         query.setFirstResult(pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
         List<SmallClass> smallClasss = query.getResultList();
+        filterSmallClass(smallClasss);
         return smallClasss;
+    }
+
+    public void filterSmallClass(List<SmallClass> smallClasss){
+        if(CollectionUtils.isNotEmpty(smallClasss) && ClassTypeEnum.SMALL.name().equals(smallClasss.get(0).getClassType())){
+            List<Long> smallIds = Collections3.extractToList(smallClasss,"id");
+            List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassNum(smallIds);
+            final Map<Long,Long> smallClassMap =workOrders.stream().collect(Collectors.groupingBy(WorkOrder::getSmallClassId, Collectors.counting()));
+            smallClasss.stream().forEach(smallClass -> {
+                smallClass.setClassNum( smallClassMap.get(smallClass.getId()) );
+            });
+
+        }
     }
 
 
