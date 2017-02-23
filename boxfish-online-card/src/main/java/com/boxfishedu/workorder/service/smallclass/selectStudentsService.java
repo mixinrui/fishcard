@@ -65,14 +65,14 @@ public class SelectStudentsService {
         Long heartBeatNum = zSetOperations.size(key);
 
         Long limit = Long.parseLong(configBeanMorphiaRepository.getSingleBean().getSelectStudentNum());
-        limit = limit > heartBeatNum ? limit : heartBeatNum;
+        limit = limit < heartBeatNum ? limit : heartBeatNum;
 
         //recursive exit
         if (limit * retryTimes >= heartBeatNum) {
             return dealAllRepeatedSet(key, smallClassId, limit);
         }
 
-        Set<String> students = zSetOperations.range(key, retryTimes, limit);
+        Set<String> students = zSetOperations.reverseRange(key, retryTimes, limit);
         Set<String> selectedStudents = this.filterSelectedStudents(students, smallClassId);
 
         if (!CollectionUtils.isEmpty(students) && CollectionUtils.isEmpty(selectedStudents)) {
