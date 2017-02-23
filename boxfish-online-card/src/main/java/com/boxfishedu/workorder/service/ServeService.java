@@ -371,9 +371,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         if(     services.size()==1 &&
                 (ComboTypeToRoleId.FSCF.name().equals(services.get(0).getComboType()) || ComboTypeToRoleId.FSCC.name().equals(services.get(0).getComboType()))
                 &&
-                services.get(0).getOriginalAmount()==1 && !Objects.isNull(orderView.getSmallClassId())
+                services.get(0).getOriginalAmount()==1 && !Objects.isNull(productCombo) && !Objects.isNull(productCombo.getSmallClassId())
                 ){
-            autoTimePickerService.syncServiceToWorkOrder(services.get(0),orderView.getSmallClassId());
+            autoTimePickerService.syncServiceToWorkOrder(services.get(0),productCombo.getSmallClassId());
         }
 
         logger.info("@order2Service 购买点评次数,设置首页点评次数");
