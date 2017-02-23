@@ -362,6 +362,7 @@ time:
 server.port: 8080
 
 #===============================================================test环境:123.56.13.168 机器密码:Boxfish98765===============================================================
+#===============================================================redis-cli -h 123.56.13.168 -p 6379 -a Box12345678
 #===============================================================mongo  mongo --host 123.56.13.168:27017 --authenticationDatabase fishcard -u root -p Boxfish2016========
 ---
 spring:
@@ -726,8 +727,8 @@ interface:
     course_recommended_service: http://base.boxfish.cn/recommend
     course_wudaokou_recommend_service: http://base.boxfish.cn/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://base.boxfish.cn/boxfish-wudaokou-course/course/info
-    fishcard_service: http://online-api.boxfish.cn/fishcard
-    order_service: http://online-api.inside.boxfish.cn/order
+    fishcard_service:
+      order_service: http://online-api.inside.boxfish.cn/order
     course_online_service: http://online-api.boxfish.cn/teaching-service
     auth_user: http://base.boxfish.cn/passbook
 #鱼卡管理后台的页面地址
