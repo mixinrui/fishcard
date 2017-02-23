@@ -34,6 +34,7 @@ import com.boxfishedu.workorder.web.param.TimeSlotParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
@@ -55,6 +56,9 @@ import java.util.*;
 @Component
 public class AutoTimePickerService {
 
+    @Value("${parameter.small_class_size}")
+    private Integer smallClassSize;
+
     @Autowired
     private TimePickerServiceXV1 timePickerServiceXV1;
 
@@ -63,9 +67,6 @@ public class AutoTimePickerService {
 
     @Autowired
     private ServiceJpaRepository serviceJpaRepository;
-
-    @Autowired
-    private SmallClassQueryService smallClassQueryService;
 
     @Autowired
     private SmallClassJpaRepository smallClassJpaRepository;
@@ -95,16 +96,16 @@ public class AutoTimePickerService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // 小班课一节课  自动操作 调用异步消息
-    public void syncServiceToWorkOrder(Service service){
+    public void syncServiceToWorkOrder(Service service,Long smallClassId){
 
         threadPoolManager.execute(new Thread(() -> {
-            this.auToMakeClassesForSmallClass(service);
+            this.auToMakeClassesForSmallClass(service,smallClassId);
         }));
     }
 
 
 
-    public void auToMakeClassesForSmallClass(Service service){
+    public void auToMakeClassesForSmallClass(Service service,Long smallClassId){
         logger.info("auToMakeClassesForSmallClass->serviceInfo:[{}]" , JSON.toJSON(service));
 
         List<Service> servicedb = null;
@@ -119,7 +120,13 @@ public class AutoTimePickerService {
             return;
         }
 
-        SmallClass smallClass  = getSmallClass(service);
+        SmallClass smallClass  = getSmallClass(service,smallClassId);
+
+        if(Objects.isNull(smallClass)){
+            logger.info("auToMakeClassesForSmallClassERROR,订单id:[{}]该学生不满足生成小班课 小班课id:[{}]",service.getOrderId(),smallClassId);
+            return;
+        }
+
         TimeSlotParam timeSlotParam = makeTimeSlotParam(service,smallClass);
         //组装TimeSlotParam 学生id
          timePickerServiceXV1.ensureCourseTimesv2(timeSlotParam);
@@ -191,17 +198,16 @@ public class AutoTimePickerService {
     }
 
 
-    public SmallClass getSmallClass(Service service){
+    public SmallClass getSmallClass(Service service,Long smallClassId){
         String level = smallClassRequester.fetchUserDifficultyInfo(service.getStudentId());
-        List<SmallClass>  smallClasses = smallClassJpaRepository.findByStartTimeRangeLevel(DateUtil.parseTime(DateTime.now().toDate(),0),DateUtil.parseTime(DateTime.now().toDate(),1),ClassTypeEnum.SMALL.name(),level);
-        smallClassQueryService.filterSmallClass(smallClasses);  // 增加数量
-        for(SmallClass sc:smallClasses){
-            //查询学生此时的课程  判断学生在此时无课
-            List<WorkOrder> workOrders = workOrderJpaRepository.findByStartTimeAndStudentId(sc.getStartTime(),service.getStudentId());
-            if(sc.getClassNum() <4l && CollectionUtils.isEmpty(workOrders)){
-                return sc;
-            }
+        SmallClass smallClass =  smallClassJpaRepository.findOne(smallClassId);
+
+        List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
+
+        if(Objects.equals(level,smallClass.getDifficultyLevel()) && workOrders.size()<smallClassSize){
+            return smallClass;
         }
+
         return null;
 
     }
@@ -218,7 +224,11 @@ public class AutoTimePickerService {
 
         // 添加小班课群主关系
         smallClass.setAllStudentIds(Lists.newArrayList(workOrder.getStudentId()));
-        courseOnlineRequester.buildsmallClassChatRoom(smallClass);
+        FishCardGroupsInfo fishCardGroupsInfo =  courseOnlineRequester.buildsmallClassChatRoom(smallClass);
+
+        String  groupId = fishCardGroupsInfo==null?"":fishCardGroupsInfo.getGroupId();  //群主Id
+        Long  chatRoomId= fishCardGroupsInfo==null?null:fishCardGroupsInfo.getChatRoomId();//房间号
+        logger.info( String.format( "auToMakeClassesForSmallClassFishCardGroupsInfo:%s__ %s",groupId,chatRoomId));
 
         //调用首页接口
         dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());

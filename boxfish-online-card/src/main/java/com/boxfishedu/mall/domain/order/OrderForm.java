@@ -60,6 +60,9 @@ public class OrderForm extends BaseEntity {
     // 小班课规模
     private Integer classSize;
 
+    //小班课id
+    private Long smallClassId;
+
 //    @Transient
 //    private List<OrderDetail> orderDetails;
 

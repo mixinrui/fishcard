@@ -7,10 +7,13 @@ import com.boxfishedu.workorder.servicex.smallclass.SmallClassBackServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.PublicClassInfoQueryServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassLogServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassQueryServiceX;
+import com.boxfishedu.workorder.servicex.studentrelated.AutoTimePickerServiceX;
 import com.boxfishedu.workorder.web.param.SmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.SmallClassAddStuParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,9 @@ public class SmallClassBackController {
 
     @Autowired
     private SmallClassLogServiceX smallClassLogServiceX;
+
+    @Autowired
+    private AutoTimePickerServiceX addStudentForSmallClass;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -137,6 +143,21 @@ public class SmallClassBackController {
     @RequestMapping(value = "/stulevellist", method = RequestMethod.GET)
     public JsonResultModel stulistforlevel() {
         return  smallClassBackServiceX.getStudentList();
+    }
+
+
+    /**
+     * 批量给学生添加 订单forfree
+     * @param smallClassAddStuParam
+     * @return
+     */
+    @RequestMapping(value = "/addStudents", method = RequestMethod.POST)
+    public JsonResultModel addStudents(@RequestBody SmallClassAddStuParam smallClassAddStuParam) {
+        if (CollectionUtils.isEmpty(smallClassAddStuParam.getStudentIds())) {
+            return JsonResultModel.newJsonResultModel("fail");
+        }
+
+        return addStudentForSmallClass.addStudentForSmallClass(smallClassAddStuParam);
     }
 
 

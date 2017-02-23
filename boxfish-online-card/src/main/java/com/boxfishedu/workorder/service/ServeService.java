@@ -369,10 +369,11 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         // 判断小班课补课  services size =1  combo_type='FSCF' 或者 'FSCC'  and original_amount=1
         // 自动生成鱼卡 补齐小班 不影响service 采用异步操作
         if(     services.size()==1 &&
-                ComboTypeToRoleId.SMALLCLASS.name().equals(services.get(0).getComboType()) &&
-                services.get(0).getOriginalAmount()==1
+                (ComboTypeToRoleId.FSCF.name().equals(services.get(0).getComboType()) || ComboTypeToRoleId.FSCC.name().equals(services.get(0).getComboType()))
+                &&
+                services.get(0).getOriginalAmount()==1 && !Objects.isNull(orderView.getSmallClassId())
                 ){
-            autoTimePickerService.syncServiceToWorkOrder(services.get(0));
+            autoTimePickerService.syncServiceToWorkOrder(services.get(0),orderView.getSmallClassId());
         }
 
         logger.info("@order2Service 购买点评次数,设置首页点评次数");
