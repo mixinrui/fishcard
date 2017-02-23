@@ -75,7 +75,7 @@ public class SmallClassBackController {
     }
 
     /**
-     * 查询公开课(后台)
+     * 查询小班课(后台)
      *
      * @param publicFilterParam
      * @param pageable
