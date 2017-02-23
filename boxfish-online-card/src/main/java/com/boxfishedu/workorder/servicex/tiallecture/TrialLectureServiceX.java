@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.web.param.TrialLectureModifyParam;
 import com.boxfishedu.workorder.web.param.TrialLectureParam;
 import org.slf4j.Logger;
@@ -34,12 +35,15 @@ public class TrialLectureServiceX {
     @Autowired
     private ServeService serveService;
 
+    @Autowired
+    OnlineAccountService onlineAccountService;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void buildFishCard(TrialLectureParam trialLectureParam) {
         logger.info("开始生成试讲课工单:参数[{}]", JacksonUtil.toJSon(trialLectureParam));
-        CourseSchedule courseSchedule=getOldCourseSchedule(trialLectureParam);
-        if(null!=courseSchedule){
+        CourseSchedule courseSchedule = getOldCourseSchedule(trialLectureParam);
+        if (null != courseSchedule) {
             throw new BusinessException("学生在当前时间片内已存在课程,请勿重复安排课程");
         }
         //虚拟订单
@@ -49,14 +53,16 @@ public class TrialLectureServiceX {
         workOrder.setIsFreeze(0);
         workOrder.setComboType(service.getComboType());
         workOrder.setOrderId(service.getOrderId());
-        saveParamIntoWorkOrder(workOrder,trialLectureParam);
+        saveParamIntoWorkOrder(workOrder, trialLectureParam);
+
+        onlineAccountService.add(trialLectureParam.getStudentId());
 
         serveService.saveWorkorderAndCourse(workOrder);
         serviceSDK.createGroup(workOrder);
         logger.info("试讲课鱼卡生成结束,鱼卡id[{}]:", workOrder.getId());
     }
 
-    private void saveParamIntoWorkOrder(WorkOrder workOrder,TrialLectureParam trialLectureParam) {
+    private void saveParamIntoWorkOrder(WorkOrder workOrder, TrialLectureParam trialLectureParam) {
         workOrder.setCourseType(trialLectureParam.getCourseType());
         workOrder.setCourseId(trialLectureParam.getCourseId());
         workOrder.setCourseName(trialLectureParam.getCourseName());
@@ -101,10 +107,11 @@ public class TrialLectureServiceX {
 
     @Transactional
     public void modifyFishCard(TrialLectureModifyParam trialLectureModifyParam) {
-        TrialLectureParam before=trialLectureModifyParam.getBefore();
-        TrialLectureParam after=trialLectureModifyParam.getAfter();
-        CourseSchedule courseSchedule=getOldCourseSchedule(before);
-        if(null==courseSchedule){
+        TrialLectureParam before = trialLectureModifyParam.getBefore();
+        TrialLectureParam after = trialLectureModifyParam.getAfter();
+        CourseSchedule courseSchedule = getOldCourseSchedule(before);
+        onlineAccountService.add(trialLectureModifyParam.getAfter().getStudentId());
+        if (null == courseSchedule) {
             throw new BusinessException("不存在对应的鱼卡,请检查参数");
         }
 
@@ -112,12 +119,12 @@ public class TrialLectureServiceX {
         buildFishCard(after);
     }
 
-    public void deleteFishCard(TrialLectureParam trialLectureParam){
-        CourseSchedule courseSchedule=getOldCourseSchedule(trialLectureParam);
-        if(null==courseSchedule){
+    public void deleteFishCard(TrialLectureParam trialLectureParam) {
+        CourseSchedule courseSchedule = getOldCourseSchedule(trialLectureParam);
+        if (null == courseSchedule) {
             throw new BusinessException("删除失败,无对应的课程安排");
         }
-        WorkOrder workOrder=workOrderService.getOne(courseSchedule.getWorkorderId());
-        serveService.deleteWorkOrderAndSchedule(workOrder,courseSchedule);
+        WorkOrder workOrder = workOrderService.getOne(courseSchedule.getWorkorderId());
+        serveService.deleteWorkOrderAndSchedule(workOrder, courseSchedule);
     }
 }

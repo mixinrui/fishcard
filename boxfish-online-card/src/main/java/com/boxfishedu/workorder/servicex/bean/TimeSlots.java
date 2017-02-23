@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.bean;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
+import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,6 +12,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -44,7 +49,8 @@ public class TimeSlots implements Cloneable, Serializable {
     private Long workOrderId;
     private Long smallClassId;
 
-    public TimeSlots() {}
+    public TimeSlots() {
+    }
 
     public TimeSlots(CourseSchedule courseSchedule) {
         initTimeSlots(courseSchedule);
@@ -61,14 +67,29 @@ public class TimeSlots implements Cloneable, Serializable {
         this.courseScheduleStatus = courseSchedule.getStatus();
         this.classType = courseSchedule.getClassType();
         this.smallClassId = courseSchedule.getSmallClassId();
-        if(isInstant(courseSchedule)){
-            this.startTime=courseSchedule.getInstantStartTtime();
-            this.endTime=courseSchedule.getInstantEndTtime();
+        if (isInstant(courseSchedule)) {
+            this.startTime = courseSchedule.getInstantStartTtime();
+            this.endTime = courseSchedule.getInstantEndTtime();
+        } else if (isPublic(courseSchedule)) {
+            dealPublicType(courseSchedule);
         }
     }
 
-    private boolean isInstant(CourseSchedule courseSchedule){
-        return StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType());
+    private void dealPublicType(CourseSchedule courseSchedule) {
+        LocalDateTime startLocal = LocalDateTime.ofInstant(
+                courseSchedule.getStartTime().toInstant(), ZoneId.systemDefault());
+        //以后需要做配置或者放数据库字段
+        LocalDateTime endLocal = startLocal.plusMinutes(30);
+        this.startTime = DateUtil.dateTrimYear(courseSchedule.getStartTime());
+        this.endTime = DateUtil.dateTrimYear(DateUtil.localDate2Date(endLocal));
+    }
+
+    private boolean isInstant(CourseSchedule courseSchedule) {
+        return StringUtils.equals(ClassTypeEnum.INSTNAT.toString(), courseSchedule.getClassType());
+    }
+
+    private boolean isPublic(CourseSchedule courseSchedule) {
+        return StringUtils.equals(ClassTypeEnum.PUBLIC.name(), courseSchedule.getClassType());
     }
 
     @Override
@@ -86,6 +107,7 @@ public class TimeSlots implements Cloneable, Serializable {
 
     /**
      * 是否有课,通过状态大于0来判断
+     *
      * @return
      */
     public boolean isHaveCourse() {
@@ -93,7 +115,7 @@ public class TimeSlots implements Cloneable, Serializable {
     }
 
     public String getCourseType() {
-        if(courseView == null || CollectionUtils.isEmpty(courseView.getCourseType())) {
+        if (courseView == null || CollectionUtils.isEmpty(courseView.getCourseType())) {
             return courseType;
         } else {
             return courseView.getCourseType().get(0);
@@ -112,12 +134,13 @@ public class TimeSlots implements Cloneable, Serializable {
 
     /**
      * 根据语言环境设置课程信息, Accept-Language: zh-CN
+     *
      * @param courseView
      * @param locale
      */
     public void setCourseView(CourseView courseView, Locale locale) {
         this.courseView = courseView;
-        if(Objects.isNull(courseView)) {
+        if (Objects.isNull(courseView)) {
             return;
         }
 

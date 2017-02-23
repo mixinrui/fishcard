@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -196,6 +197,14 @@ public class FishCardQueryService extends BaseService<WorkOrder, WorkOrderJpaRep
 
         if (null != fishCardFilterParam.getCourseType() && StringUtils.isNotEmpty(fishCardFilterParam.getCourseType())) {
             sql.append("and courseType in (").append(splitCourseType(fishCardFilterParam.getCourseType())).append(") ");
+        }
+
+        if (null != fishCardFilterParam.getCourseAssign() && StringUtils.isNotEmpty(fishCardFilterParam.getCourseAssign()) && Objects.equals("true",fishCardFilterParam.getCourseAssign())) {
+            sql.append("and courseId is not null ");
+        }
+ 
+        if (null != fishCardFilterParam.getCourseAssign() && StringUtils.isNotEmpty(fishCardFilterParam.getCourseAssign()) && Objects.equals("false",fishCardFilterParam.getCourseAssign())) {
+            sql.append("and courseId is null ");
         }
 
         if (null != fishCardFilterParam.getStatuses() && StringUtils.isNotEmpty(fishCardFilterParam.getStatuses())) {

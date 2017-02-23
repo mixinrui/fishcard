@@ -37,7 +37,7 @@ public class SmallClassInitController {
     }
 
     @RequestMapping(value = "/init/{days}", method = RequestMethod.POST)
-    public JsonResultModel buildGroup(Integer days) {
+    public JsonResultModel buildGroup(@PathVariable("days") Integer days) {
         groupBuilder.group(days);
         return JsonResultModel.newJsonResultModel("OK");
     }
