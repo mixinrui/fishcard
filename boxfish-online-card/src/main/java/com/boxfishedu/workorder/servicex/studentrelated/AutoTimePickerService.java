@@ -147,7 +147,7 @@ public class AutoTimePickerService {
         CourseSchedule courseSchedule = courseScheduleRepository.findTop1ByWorkorderId(workOrder.getId());
 
         // 根据smallClass 更新WorkOrder  CourseSchele
-        workOrder.setCourseType(smallClass.getCourseId());
+        workOrder.setCourseType(smallClass.getCourseType());
         workOrder.setCourseId(smallClass.getCourseId());
         workOrder.setCourseName(smallClass.getCourseName());
         workOrder.setTeacherId(smallClass.getTeacherId());
@@ -157,7 +157,7 @@ public class AutoTimePickerService {
         workOrder.setUpdateTime(new Date());
 
 
-        courseSchedule.setCourseType(smallClass.getCourseId());
+        courseSchedule.setCourseType(smallClass.getCourseType());
         courseSchedule.setCourseId(smallClass.getCourseId());
         courseSchedule.setCourseName(smallClass.getCourseName());
         courseSchedule.setTeacherId(smallClass.getTeacherId());
