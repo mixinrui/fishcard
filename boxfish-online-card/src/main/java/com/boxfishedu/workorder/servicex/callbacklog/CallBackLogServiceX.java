@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/2/16.
@@ -37,6 +38,9 @@ public class CallBackLogServiceX {
 
     private String getRole(CallBackHeartBeatParam callBackHeartBeatParam) {
         Map<String, Object> map = JacksonUtil.readValue(callBackHeartBeatParam.getMsgBody().get(0).getMsgContent().getData(), HashMap.class);
+        if (Objects.isNull(map.get("role"))) {
+            return null;
+        }
         return map.get("role").toString();
     }
 

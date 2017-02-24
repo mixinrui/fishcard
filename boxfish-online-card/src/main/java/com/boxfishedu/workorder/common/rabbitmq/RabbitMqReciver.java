@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.common.rabbitmq;
 
+import com.alibaba.fastjson.JSON;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
@@ -120,7 +121,8 @@ public class RabbitMqReciver {
     public void orderConsumer(OrderForm orderView) {
         logger.info("@orderConsumer");
         try {
-            System.out.println(orderView);
+            //System.out.println(orderView);
+            logger.info(String.format("orderConsumerKK:%s", JSON.toJSON(orderView)));
             serveService.order2ServiceAndWorkOrder(orderView);
 
             //更新首页和用户信息

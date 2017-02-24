@@ -39,6 +39,9 @@ public class ProductCombo extends BaseEntity {
     // 班级人数
     private Integer classSize;
 
+    //小班课id
+    private Long smallClassId;
+
     private Integer comboCycle;//限制该套餐在几周内完成,不需要限制的标识为-1,用于需要选时间的订单在生成服务时计算选时间的次数
 
     @Enumerated(EnumType.STRING)

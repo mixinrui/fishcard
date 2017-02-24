@@ -95,4 +95,12 @@ public class SmallClassServiceX {
     public String selectCandidate(Long smallClassId) {
         return selectStudentsService.selectCandidate(smallClassId);
     }
+
+    public Long candidateInterval() {
+        String interval = configBeanMorphiaRepository.getSingleBean().getCandidateInterval();
+        if(Objects.isNull(interval)){
+            return 3l;
+        }
+        return Long.parseLong(interval);
+    }
 }

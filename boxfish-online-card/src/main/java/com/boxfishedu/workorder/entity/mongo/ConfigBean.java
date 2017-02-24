@@ -29,4 +29,7 @@ public class ConfigBean {
     //每次选多少学生
     private String selectStudentNum;
 
+    //点名时间间隔
+    private String candidateInterval;
+
 }

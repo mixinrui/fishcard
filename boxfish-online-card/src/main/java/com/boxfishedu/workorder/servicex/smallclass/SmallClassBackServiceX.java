@@ -1,19 +1,25 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
+import com.boxfishedu.workorder.common.bean.LevelEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.SmallClassStuJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.entity.mysql.SmallClassStu;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 17/1/10.
@@ -43,6 +50,12 @@ public class SmallClassBackServiceX {
 
     @Autowired
     private CourseScheduleRepository courseScheduleRepository;
+
+    @Autowired
+    private SmallClassStuJpaRepository smallClassStuJpaRepository;
+
+    @Autowired
+    private SmallClassRequester smallClassRequester;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -74,4 +87,49 @@ public class SmallClassBackServiceX {
         logger.debug("@delete#删除小班课,smallclass[{}],鱼卡[{}],课表[{}]"
                 , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(workOrders), JacksonUtil.toJSon(courseSchedules));
     }
+
+    //根据小班课id 和 学生列表获取
+    public JsonResultModel getStudentList(Long smallClassId) {
+        //获取小班课信息
+        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
+        // 1 此时没有课程的学生
+        List<SmallClassStu> smallClassStus = smallClassStuJpaRepository.findByStuWithOutClasses(smallClass.getStartTime());
+        //2 增加level 过滤level
+        filterSmallClassStu(smallClassStus);
+        smallClassStus =filterEqualLevel(smallClass, smallClassStus);
+
+        //3 课程过滤  还未讨论
+
+        return JsonResultModel.newJsonResultModel(smallClassStus);
+    }
+
+    //查询小班课补课学生名单含有level
+    public JsonResultModel getStudentList() {
+
+        List<SmallClassStu> smallClassStus = smallClassStuJpaRepository.findAll();
+        //2 增加level
+        filterSmallClassStu(smallClassStus);
+        return JsonResultModel.newJsonResultModel(smallClassStus);
+    }
+
+
+    // 获取 level
+    private void filterSmallClassStu(List<SmallClassStu> smallClassStus) {
+        smallClassStus.stream().forEach(smallClassStu -> {
+            smallClassStu.setLevel(smallClassRequester.fetchUserDifficultyInfo(smallClassStu.getStudentId()));
+        });
+
+    }
+
+
+    private List<SmallClassStu> filterEqualLevel(SmallClass smallClass, List<SmallClassStu> smallClassStus){
+        // 过滤level 可以过滤相同level  如果level5  可以放level 5,6,7,8 的学生  枚举类 LevelEnum
+        return  smallClassStus.stream().filter(smallClassStu ->
+                (
+                        smallClass.getDifficultyLevel().equals(smallClassStu.getLevel())
+                )
+        ).collect(Collectors.toList());
+    }
+
+
 }

@@ -20,6 +20,8 @@ import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.web.param.FetchTeacherParam;
 import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.SmallClassAddStuParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.SmallClassAddStuTransParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.base.StudentInfo;
 import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
@@ -408,6 +410,26 @@ public class TeacherStudentRequester {
         }
 
     }
+
+
+    /**
+     * 为了小班课凑人数生成免费订单
+     *
+     * @param orderCode
+     */
+    public void requestToCreateOrder(SmallClassAddStuTransParam smallClassAddStuTransParam) {
+        String url = new StringBuffer(urlConf.getOrder_service()).append("/small-class/gift").toString();
+        logger.info("@requestToCreateOrder#{}", JSON.toJSON(smallClassAddStuTransParam));
+        JsonResultModel jsonResultModel = null;
+        try {
+            jsonResultModel = restTemplate.postForObject(url, smallClassAddStuTransParam, JsonResultModel.class);
+        } catch (Exception e) {
+            logger.error("@requestToCreateOrder#小班课ID:{}#returnException 返回信息:[{}]", smallClassAddStuTransParam.getSmallClassId(), jsonResultModel == null ? "null" : jsonResultModel.getReturnMsg());
+            throw new BusinessException("为了小班课凑人数生成免费订单:" + jsonResultModel.getReturnMsg());
+        }
+
+    }
+
 
     /**
      * token验证接口

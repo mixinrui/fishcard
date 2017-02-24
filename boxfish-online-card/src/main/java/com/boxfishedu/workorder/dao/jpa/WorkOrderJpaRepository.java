@@ -10,10 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Created by oyjun on 16/2/29.
@@ -27,6 +24,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public Page<WorkOrder> findByOrderIdAndIsFreeze(Long orderId, Integer isFreeze, Pageable pageable);
 
     public WorkOrder findByOrderIdAndServiceId(Long orderId, Long serviceId);
+
+
+    public List<WorkOrder> findByStartTimeAndStudentId(Date startTime,Long studentId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select wo from  WorkOrder wo where wo.id=?1 ")
@@ -224,4 +224,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     WorkOrder findBySmallClassIdAndStudentId(Long smallClassId, Long studentId);
 
     List<WorkOrder> findByClassTypeAndSmallClassIdIsNullAndStartTimeBetween(String name, Date date, Date deadDate);
+
+    @Query("select wo from  WorkOrder wo where wo.smallClassId in (?1)")
+    List<WorkOrder> findBySmallClassNum(List<Long> smallClassIds);
 }

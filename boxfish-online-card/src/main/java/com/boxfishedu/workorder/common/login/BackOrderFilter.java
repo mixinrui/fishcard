@@ -36,6 +36,7 @@ import java.util.Set;
         "/fishcard/backend/backorder/*",
         "/fishcard/backend/makeup/*",
         "/fishcard/backend/fishcard/*",
+        "/fishcard/service/backend/*",
 
         "/backend/backorder/*",
         "/backend/makeup/*",

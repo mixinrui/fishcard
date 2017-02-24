@@ -7,12 +7,12 @@ import lombok.Data;
  */
 @Data
 public class StudentClassInfo {
-    private Long one2One;
-    private Long smallClass;
+    private Long singleClass;
+    private Long multiClass;
 
     public StudentClassInfo(Long one2One,Long smallClass){
-        this.one2One=one2One;
-        this.smallClass=smallClass;
+        this.singleClass=one2One;
+        this.multiClass=smallClass;
     }
 
     public StudentClassInfo(){

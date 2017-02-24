@@ -46,7 +46,6 @@ public class SmallClassRequester {
         try {
             difficulty = restTemplate.getForObject(url, String.class);
             logger.debug("@fetchUserDifficultyInfo获取用户课程难度信息,url[{}],结果[{}]", url, difficulty);
-            logger.debug("");
         } catch (Exception ex) {
             logger.error("@fetchUserDifficultyInfo获取用户课程难度信息失败,url[{}]", url, ex);
             throw new BusinessException("获取用户难度信息失败");

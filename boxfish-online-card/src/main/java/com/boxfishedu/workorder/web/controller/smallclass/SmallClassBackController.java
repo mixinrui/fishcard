@@ -7,10 +7,13 @@ import com.boxfishedu.workorder.servicex.smallclass.SmallClassBackServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.PublicClassInfoQueryServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassLogServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassQueryServiceX;
+import com.boxfishedu.workorder.servicex.studentrelated.AutoTimePickerServiceX;
 import com.boxfishedu.workorder.web.param.SmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.SmallClassAddStuParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,9 @@ public class SmallClassBackController {
 
     @Autowired
     private SmallClassLogServiceX smallClassLogServiceX;
+
+    @Autowired
+    private AutoTimePickerServiceX addStudentForSmallClass;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -75,7 +81,7 @@ public class SmallClassBackController {
     }
 
     /**
-     * 查询公开课(后台)
+     * 查询小班课(后台)
      *
      * @param publicFilterParam
      * @param pageable
@@ -119,4 +125,41 @@ public class SmallClassBackController {
     public JsonResultModel listCardDetail(SmallClassParam smallClassParam, Pageable pageable) throws Exception {
         return smallClassLogServiceX.listSmallClassLogByUnlimitedUserCond(smallClassParam, pageable);
     }
+
+    /**
+     * 鱼卡后台 小班课列表获取补课学生列表
+     * @param smallClassId
+     * @return
+     */
+    @RequestMapping(value = "/stulist/{smallclass_id}", method = RequestMethod.GET)
+    public JsonResultModel stulist(@PathVariable("smallclass_id") Long smallClassId) {
+       return smallClassBackServiceX.getStudentList(smallClassId);
+    }
+
+    /**
+     * 鱼卡后台 小班课列表查询所有补课学生level
+     * @return
+     */
+    @RequestMapping(value = "/stulevellist", method = RequestMethod.GET)
+    public JsonResultModel stulistforlevel() {
+        return  smallClassBackServiceX.getStudentList();
+    }
+
+
+    /**
+     * 批量给学生添加 订单forfree
+     * @param smallClassAddStuParam
+     * @return
+     */
+    @RequestMapping(value = "/addStudents", method = RequestMethod.POST)
+    public JsonResultModel addStudents(@RequestBody SmallClassAddStuParam smallClassAddStuParam) {
+        if (CollectionUtils.isEmpty(smallClassAddStuParam.getStudentIds())) {
+            return JsonResultModel.newJsonResultModel("fail");
+        }
+
+        return addStudentForSmallClass.addStudentForSmallClass(smallClassAddStuParam);
+    }
+
+
+
 }
