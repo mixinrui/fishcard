@@ -20,6 +20,7 @@ import com.boxfishedu.workorder.web.view.fishcard.GrabOrderView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping("/graborder")
+@Profile({"local_hucl", "product", "local", "development", "development_new", "test", "demo", "pretest"})
 public class GrabOrderController {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());

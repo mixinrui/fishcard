@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.web.view.base.DateIntervalView;
 import com.boxfishedu.workorder.web.view.base.ResponseBaseView;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * 月
  */
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MonthTimeSlots extends ResponseBaseView implements Serializable {
 
     private String returnCode = "200";
@@ -26,7 +28,11 @@ public class MonthTimeSlots extends ResponseBaseView implements Serializable {
 
     private List<DayTimeSlots> data;
 
+    private String selectMessage;
+
     private boolean hasMoreHistory = false;
+
+    public final static MonthTimeSlots DEFAULT = new MonthTimeSlots();
 
     /**
      * 一天的毫秒数
