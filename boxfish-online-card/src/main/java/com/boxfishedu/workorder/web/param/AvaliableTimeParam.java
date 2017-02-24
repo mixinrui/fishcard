@@ -1,12 +1,11 @@
 package com.boxfishedu.workorder.web.param;
 
 import com.boxfishedu.mall.enums.ComboTypeToRoleId;
-import com.google.common.collect.Lists;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
+import com.boxfishedu.workorder.servicex.bean.SelectMessageEnum;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by hucl on 16/5/12.
@@ -33,6 +32,8 @@ public class AvaliableTimeParam implements Serializable {
 
     // 推迟周数
     private Integer delayWeek;
+    // 几周完成
+    private Integer totalWeeks;
     // 推迟时间开始点
     private String    rangeStartTime;
 
@@ -42,5 +43,20 @@ public class AvaliableTimeParam implements Serializable {
         return ComboTypeToRoleId.resolve(comboType);
     }
 
-
+    public String selectMessage() {
+        // 老版本几周完成不传, 返回默认值
+        if(totalWeeks == null) {
+            return SelectMessageEnum.DEFAULT.message;
+        }
+        ComboTypeToRoleId comboType = ComboTypeToRoleId.valueOf(this.comboType);
+        ClassTypeEnum classType;
+        if(comboType.isSmallClassType()) {
+            classType = ClassTypeEnum.SMALL;
+        } else {
+            classType = ClassTypeEnum.NORMAL;
+        }
+        SelectMessageEnum.Weeks weeks = SelectMessageEnum.Weeks.resolve(totalWeeks);
+        String message = SelectMessageEnum.resolve(classType, weeks).message;
+        return message.replaceAll("%@", Integer.toString(totalWeeks - 1));
+    }
 }

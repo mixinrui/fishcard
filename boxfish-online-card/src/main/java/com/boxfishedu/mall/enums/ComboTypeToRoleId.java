@@ -46,4 +46,7 @@ public enum ComboTypeToRoleId {
         return result == null ? UNKNOW : result;
     }
 
+    public boolean isSmallClassType() {
+        return this == SMALLCLASS || this == FSCF;
+    }
 }

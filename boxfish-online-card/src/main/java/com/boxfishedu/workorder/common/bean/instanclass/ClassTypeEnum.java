@@ -26,7 +26,6 @@ public enum ClassTypeEnum {
     }
 
     public static ClassTypeEnum getByName(String name) {
-        ClassTypeEnum classTypeEnum;
         try {
             return Enum.valueOf(ClassTypeEnum.class, name);
         } catch (Exception ex) {
