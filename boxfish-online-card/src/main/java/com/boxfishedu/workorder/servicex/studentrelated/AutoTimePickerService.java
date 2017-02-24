@@ -15,12 +15,10 @@ import com.boxfishedu.workorder.dao.jpa.*;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.CourseOnlineRequester;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.ServeService;
-import com.boxfishedu.workorder.service.StStudentApplyRecordsService;
-import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.*;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.instantclass.SmallClassQueryService;
 import com.boxfishedu.workorder.service.studentrelated.TimePickerService;
@@ -92,6 +90,12 @@ public class AutoTimePickerService {
 
     @Autowired
     private WorkOrderService workOrderService;
+
+    @Autowired
+    private ScheduleCourseInfoService courseInfoService;
+
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -167,6 +171,8 @@ public class AutoTimePickerService {
 
         restoreClassForSmallClass(workOrder,courseSchedule,smallClass);
 
+        //课程保存到mongo中
+        saveCourseScheToMongo(workOrder,courseSchedule);
 
     }
 
@@ -243,5 +249,11 @@ public class AutoTimePickerService {
         workOrderLog.setStatus(workOrder.getStatus());
         workOrderLog.setContent(String.format("%s[小班课][后台添加学生]",content));
         workOrderLogService.save(workOrderLog);
+    }
+
+    //课程保存到mongo中
+    public void saveCourseScheToMongo(WorkOrder workOrder, CourseSchedule courseSchedule){
+        RecommandCourseView courseView = recommandCourseRequester.getCourseViewDetail(courseSchedule.getCourseId());
+        courseInfoService.saveSingleCourseInfo(workOrder,courseSchedule,courseView);
     }
 }
