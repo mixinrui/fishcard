@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
+import com.boxfishedu.workorder.servicex.bean.MonthTimeSlots;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseChangeTimeNotifySerceX;
 import com.boxfishedu.workorder.servicex.home.HomePageServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.*;
@@ -210,7 +211,7 @@ StudentAppRelatedController {
     }
 
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
-    public JsonResultModel timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
+    public Object timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
         commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(), userId);
         if(null != avaliableTimeParam.getStudentId())
             avaliableTimeParam.setStudentId(userId);
@@ -220,14 +221,14 @@ StudentAppRelatedController {
 
 
     @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public JsonResultModel test(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
+    public Object test(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
 
         Map<String,Integer> querData =Maps.newHashMap();
 
         for(int i=0;i<100;i++){
-            JsonResultModel jsonResultModel =  avaliableTimeServiceXV1.getTimeAvailable(avaliableTimeParam);
+            MonthTimeSlots monthTimeSlots =  avaliableTimeServiceXV1.getTimeAvailable(avaliableTimeParam);
 
-            List<DayTimeSlots> list = (List<DayTimeSlots>)jsonResultModel.getData();
+            List<DayTimeSlots> list = (List<DayTimeSlots>)monthTimeSlots.getData();
             for(DayTimeSlots dts : list){
                 final String day = dts.getDay();
                 dts.getDailyScheduleTime().stream().forEach(timeSlots -> {

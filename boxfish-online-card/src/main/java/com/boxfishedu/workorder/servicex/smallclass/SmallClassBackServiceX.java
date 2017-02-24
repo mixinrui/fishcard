@@ -123,17 +123,10 @@ public class SmallClassBackServiceX {
 
 
     private List<SmallClassStu> filterEqualLevel(SmallClass smallClass, List<SmallClassStu> smallClassStus){
-        List level5on = Lists.newArrayList(LevelEnum.LEVEL_6.getDesc(),LevelEnum.LEVEL_7.getDesc(),LevelEnum.LEVEL_8.getDesc());
         // 过滤level 可以过滤相同level  如果level5  可以放level 5,6,7,8 的学生  枚举类 LevelEnum
         return  smallClassStus.stream().filter(smallClassStu ->
                 (
                         smallClass.getDifficultyLevel().equals(smallClassStu.getLevel())
-                                ||
-                                (
-                                        LevelEnum.LEVEL_5.getDesc().equals(smallClass.getDifficultyLevel())
-                                                &&
-                                                ( level5on.contains(smallClassStu.getLevel() )  )
-                                )
                 )
         ).collect(Collectors.toList());
     }

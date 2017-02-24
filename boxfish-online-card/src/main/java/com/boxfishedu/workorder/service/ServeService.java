@@ -28,6 +28,7 @@ import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.commentcard.SyncCommentCard2SystemService;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
+import com.boxfishedu.workorder.servicex.studentrelated.AutoTimePickerService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
 import com.boxfishedu.workorder.web.view.course.ResponseCourseView;
@@ -98,6 +99,9 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     @Autowired
     private MailSupport mailSupport;
+
+    @Autowired
+    private AutoTimePickerService autoTimePickerService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -361,6 +365,17 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                 syncCommentCard2SystemService.syncCommentCard2System(service.getId(),CommentCardStatus.UNASKED.getCode(),null);
             }
         }
+
+        // 判断小班课补课  services size =1  combo_type='FSCF' 或者 'FSCC'  and original_amount=1
+        // 自动生成鱼卡 补齐小班 不影响service 采用异步操作
+        if(     services.size()==1 &&
+                (ComboTypeToRoleId.FSCF.name().equals(services.get(0).getComboType()) || ComboTypeToRoleId.FSCC.name().equals(services.get(0).getComboType()))
+                &&
+                services.get(0).getOriginalAmount()==1 && !Objects.isNull(productCombo) && !Objects.isNull(productCombo.getSmallClassId())
+                ){
+            autoTimePickerService.syncServiceToWorkOrder(services.get(0),productCombo.getSmallClassId());
+        }
+
         logger.info("@order2Service 购买点评次数,设置首页点评次数");
         commentTeacherAppServiceX.findHomeComment(orderView.getUserId());
 

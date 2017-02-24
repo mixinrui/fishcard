@@ -25,6 +25,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     public WorkOrder findByOrderIdAndServiceId(Long orderId, Long serviceId);
 
+
+    public List<WorkOrder> findByStartTimeAndStudentId(Date startTime,Long studentId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select wo from  WorkOrder wo where wo.id=?1 ")
     public WorkOrder findByIdForUpdate(Long id);

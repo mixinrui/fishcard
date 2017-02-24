@@ -6,7 +6,6 @@ import com.boxfishedu.mall.enums.ProductType;
 import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
@@ -91,7 +90,7 @@ public class AvaliableTimeServiceXV1 {
      * @return
      * @throws CloneNotSupportedException
      */
-    public JsonResultModel getTimeAvailable(AvaliableTimeParam avaliableTimeParam) throws CloneNotSupportedException {
+    public MonthTimeSlots getTimeAvailable(AvaliableTimeParam avaliableTimeParam) throws CloneNotSupportedException {
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(avaliableTimeParam, getOptionalDays(avaliableTimeParam));
 
@@ -100,14 +99,16 @@ public class AvaliableTimeServiceXV1 {
         for (int i = 0; i < 4; i++) {
             List<DayTimeSlots> result = getTimeAvailable(avaliableTimeParam, dateRange, classDateTimeSlotsSet);
             if (org.apache.commons.collections.CollectionUtils.isNotEmpty(result)) {
-                return JsonResultModel.newJsonResultModel(new MonthTimeSlots(result).getData());
+                MonthTimeSlots month = new MonthTimeSlots(result);
+                month.setSelectMessage(avaliableTimeParam.selectMessage());
+                return month;
             } else {
                 // 如果为空, 则推后一周
                 dateRange.incrementAWeek();
             }
         }
         // 如果推后了一个月都没有可选时间则, 则返回空
-        return JsonResultModel.newJsonResultModel();
+        return MonthTimeSlots.DEFAULT;
     }
 
 

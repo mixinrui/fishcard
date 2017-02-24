@@ -85,4 +85,12 @@ public class UrlConf {
     @Value("${interface.address.memberUrl}")
     private String memberUrl;
 
+    // 免费补订单验证串couponCode
+    @Value("${interface.address.order_check_couponCode}")
+    private String order_check_couponCode;
+
+    // 免费补订单验证串memberKey
+    @Value("${interface.address.order_check_small_class_key}")
+    private String order_check_small_class_key;
+
 }
