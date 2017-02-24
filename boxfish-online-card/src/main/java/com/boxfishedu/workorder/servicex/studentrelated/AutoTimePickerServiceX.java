@@ -41,6 +41,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -68,6 +69,10 @@ public class AutoTimePickerServiceX {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public JsonResultModel  addStudentForSmallClass(SmallClassAddStuParam smallClassAddStuParam){
+
+        //学生id去重复
+        smallClassAddStuParam.setStudentIds(trimList(smallClassAddStuParam.getStudentIds()));
+        logger.info("addStudentForSmallClass:[{}]",JSON.toJSON(smallClassAddStuParam.getStudentIds()));
         //根据小班课获取学生鱼卡信息 查看班级是否已满
         List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassAddStuParam.getId());
         if(CollectionUtils.isEmpty(workOrders) || workOrders.size()>=smallClassSize ||
@@ -87,6 +92,7 @@ public class AutoTimePickerServiceX {
         logger.info(String.format( "addStudentForSmallClass:beforerequestBody:%s",JSON.toJSON(smallClassAddStuParam)));
 
         for(Long studentId:smallClassAddStuParam.getStudentIds()){
+            logger.info("addStudentForSmallClassSize:[{}]",smallClassAddStuParam.getStudentIds().size());
             SmallClassAddStuTransParam smallClassAddStuTransParam =new SmallClassAddStuTransParam();
             smallClassAddStuTransParam.setUserId(studentId);  //1
             // couponCode userId smallClassKey
@@ -102,5 +108,21 @@ public class AutoTimePickerServiceX {
         return JsonResultModel.newJsonResultModel("success");
 
     }
+
+    public List<Long> trimList(List<Long> studentIds){
+        List<Long>  listTemp = Lists.newArrayList();
+        Iterator<Long> it=studentIds.iterator();
+        while(it.hasNext()){
+            long a=it.next();
+            if(listTemp.contains(a)){
+                it.remove();
+            }
+            else{
+                listTemp.add(a);
+            }
+        }
+        return listTemp;
+    }
+
 
 }
