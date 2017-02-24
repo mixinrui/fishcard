@@ -210,7 +210,8 @@ public class AutoTimePickerService {
 
         List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
 
-        if(Objects.equals(level,smallClass.getDifficultyLevel()) && workOrders.size()<smallClassSize){
+       // if(Objects.equals(level,smallClass.getDifficultyLevel()) && workOrders.size()<smallClassSize){
+        if(workOrders.size()<smallClassSize){
             return smallClass;
         }
 
