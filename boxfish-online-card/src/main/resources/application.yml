@@ -731,7 +731,7 @@ interface:
     course_wudaokou_recommend_service: http://base.boxfish.cn/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://base.boxfish.cn/boxfish-wudaokou-course/course/info
     fishcard_service: http://online-api.boxfish.cn/fishcard
-    order_service: http://online-api.inside.boxfish.cn/order
+    order_service: http://online-api.boxfish.cn/order
     order_check_couponCode: MARKET_FSCF_1F
     order_check_small_class_key: U2FsdGVkX1/Sx80wr9XFQaoeEu72KTuP7oKzX8CcdFWZ7HMv8VpOXQ==
     course_online_service: http://online-api.boxfish.cn/teaching-service
@@ -834,9 +834,9 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
     login_filter_url: http://login-dt.boxfish.cn
-    teacher_photo: https://api.boxfish.cn/online/figure
-    resource_url: http://api.boxfish.cn/online
-    #消息推送地址
+    teacher_photo: https://api.boxfish.cn//online/figure
+    resource_url: http://api.boxfish.cn//online
+#消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push
     # 会员url
     memberUrl: https://pay.boxfish.cn/member
