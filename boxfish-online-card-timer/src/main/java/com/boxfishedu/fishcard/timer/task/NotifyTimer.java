@@ -357,7 +357,7 @@ public class NotifyTimer {
                 new ServiceTimerMessage(TimerMessageType.CREATE_SMALL_CLASS.value());
 
         Map<String, String> param = Maps.newHashMap();
-        param.put("days", 50 + "");
+        param.put("days", 2 + "");
 
         serviceTimerMessage.setParam(param);
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
