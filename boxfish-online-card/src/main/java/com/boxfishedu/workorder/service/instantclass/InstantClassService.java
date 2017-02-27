@@ -5,6 +5,7 @@ import com.boxfishedu.mall.enums.TutorType;
 import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.InstantClassRequestStatus;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -24,6 +25,7 @@ import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.result.InstantClassResult;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -337,7 +339,7 @@ public class InstantClassService {
         LocalDateTime localDateTime = LocalDateTime.now(ZoneId.systemDefault());
 
         List<Integer> skuIds = workOrderJpaRepository.findDistinctSkuIds(
-                studentId, DateUtil.localDate2Date(localDateTime.minusMinutes(30)));
+                studentId, DateUtil.localDate2Date(localDateTime.minusMinutes(30)), Arrays.asList(ClassTypeEnum.SMALL.name()));
 
         java.util.Map<String, Object> map = new HashMap<>();
         if (!CollectionUtils.isEmpty(skuIds)) {
