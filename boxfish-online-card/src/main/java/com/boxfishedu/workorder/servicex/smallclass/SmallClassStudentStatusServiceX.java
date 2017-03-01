@@ -41,7 +41,7 @@ public class SmallClassStudentStatusServiceX {
         Date reportTime = DateUtil.String2Date(
                 statusReport.get("reportTime").toString());
 
-        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
+        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId).clone();
 
         if (Objects.isNull(smallClass)) {
             logger.error("@status#无对应的小班课id[{}]", smallClassId);

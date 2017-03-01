@@ -350,6 +350,10 @@ public class WorkOrder implements Cloneable {
         }
     }
 
+    public boolean reachOverTime(){
+        return !new Date().before(this.getEndTime());
+    }
+
     public boolean notGroupWorkOrder() {
         return !Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name())
                 && !Objects.equals(this.getClassType(), ClassTypeEnum.SMALL.name());

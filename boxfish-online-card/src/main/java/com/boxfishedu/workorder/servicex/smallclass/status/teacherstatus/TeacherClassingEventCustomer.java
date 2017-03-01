@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
     @Autowired
     SmallClassJpaRepository smallClassJpaRepository;
 
+    @Autowired
+    SmallClassService smallClassService;
+
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.TEACHER_CLASSING);
@@ -58,7 +62,7 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
 
-        persistIntoDb(smallClass);
+        smallClassService.persistIntoDb(smallClass,PublicClassInfoStatusEnum.TEACHER_CLASSING);
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:
@@ -68,14 +72,5 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
             default:
                 break;
         }
-    }
-
-    private void persistIntoDb(SmallClass smallClass) {
-        SmallClass dbSmallClass = smallClassJpaRepository.findOne(smallClass.getId());
-        dbSmallClass.setStatus(PublicClassInfoStatusEnum.TEACHER_CLASSING.getCode());
-        if (Objects.isNull(dbSmallClass.getActualStartTime())) {
-            dbSmallClass.setActualStartTime(new Date());
-        }
-        smallClassJpaRepository.save(dbSmallClass);
     }
 }
