@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class TeacherCompleteEventCustomer extends SmallClassEventCustomer {
     @Autowired
     SmallClassJpaRepository smallClassJpaRepository;
 
+    @Autowired
+    SmallClassService smallClassService;
+
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.TEACHER_COMPLETED);
@@ -55,7 +59,7 @@ public class TeacherCompleteEventCustomer extends SmallClassEventCustomer {
     @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
-        this.persistIntoDb(smallClass);
+        smallClassService.persistIntoDb(smallClass,PublicClassInfoStatusEnum.TEACHER_COMPLETED);
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:
@@ -69,12 +73,4 @@ public class TeacherCompleteEventCustomer extends SmallClassEventCustomer {
         }
     }
 
-    private void persistIntoDb(SmallClass smallClass) {
-        SmallClass dbSmallClass = smallClassJpaRepository.findOne(smallClass.getId());
-        dbSmallClass.setStatus(PublicClassInfoStatusEnum.TEACHER_COMPLETED.getCode());
-        if (Objects.isNull(dbSmallClass.getActualEndTime())) {
-            dbSmallClass.setActualEndTime(new Date());
-        }
-        smallClassJpaRepository.save(dbSmallClass);
-    }
 }

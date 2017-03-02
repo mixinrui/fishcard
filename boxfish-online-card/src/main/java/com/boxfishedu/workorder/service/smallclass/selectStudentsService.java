@@ -72,7 +72,7 @@ public class SelectStudentsService {
             return dealAllRepeatedSet(key, smallClassId, limit);
         }
 
-        Set<String> students = zSetOperations.reverseRange(key, retryTimes, limit);
+        Set<String> students = zSetOperations.reverseRange(key, retryTimes*limit, (retryTimes+1)*limit);
         Set<String> selectedStudents = this.filterSelectedStudents(students, smallClassId);
 
         if (!CollectionUtils.isEmpty(students) && CollectionUtils.isEmpty(selectedStudents)) {
@@ -83,7 +83,7 @@ public class SelectStudentsService {
     }
 
     public Set<String> dealAllRepeatedSet(String key, Long smallClassId, Long limit) {
-        Set<String> randomSet = zSetOperations.range(key, 0, limit);
+        Set<String> randomSet = zSetOperations.reverseRange(key,0,-1);
         if (CollectionUtils.isEmpty(randomSet)) {
             return this.selectStudentdsFromDb(smallClassId);
         }

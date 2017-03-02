@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class TeacherValidatedCustomer extends SmallClassEventCustomer {
 
     @Autowired
     SmallClassLogService smallClassLogService;
+
+    @Autowired
+    SmallClassService smallClassService;
 
     @PostConstruct
     public void initEvent() {
@@ -48,6 +52,9 @@ public class TeacherValidatedCustomer extends SmallClassEventCustomer {
 
     @Override
     public void execute(SmallClass smallClass) {
+        smallClassLogService.recordTeacherLog(smallClass);
+        smallClassService.persistIntoDb(smallClass, PublicClassInfoStatusEnum.TEACHER_CARD_VALIDATED);
+
         switch (smallClass.getStatusEnum()) {
             case SMALL:
                 smallClass.setWriteBackDesc(

@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.event;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -40,13 +42,7 @@ public abstract class SmallClassEventCustomer {
 
 
     public void exec(SmallClassEvent smallClassEvent) {
-        SmallClass smallClass = new SmallClass();
-        try {
-            BeanUtils.copyProperties(smallClass, smallClassEvent.getSource());
-        }
-        catch (Exception ex){
-            logger.error("@SmallClassEventCustomer#copy#拷贝属性失败",ex);
-        }
+        SmallClass smallClass = smallClassEvent.getSource();
         this.execute(smallClass);
         this.postHandle(smallClass);
     }
