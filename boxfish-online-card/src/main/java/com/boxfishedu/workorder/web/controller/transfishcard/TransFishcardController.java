@@ -1,7 +1,5 @@
 package com.boxfishedu.workorder.web.controller.transfishcard;
 
-import com.boxfishedu.workorder.common.bean.classtype.ClassType;
-import com.boxfishedu.workorder.common.bean.classtype.One2OneClassType;
 import com.boxfishedu.workorder.service.transfishcard.ComputeFishCard;
 import com.boxfishedu.workorder.service.transfishcard.ComputeFishCardOne2One;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
