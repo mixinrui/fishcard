@@ -433,7 +433,7 @@ interface:
 #   login_token
     login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api-online.test.boxfish.cn/online/figure
-    resource_url: http://api.online.test.boxfish.cn/online
+    resource_url: http://api-online.test.boxfish.cn/online
 #  师生运营匹配老师
     #消息推送地址
     msg_push_url: http://123.56.13.168:9091

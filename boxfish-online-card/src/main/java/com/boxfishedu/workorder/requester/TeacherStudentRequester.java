@@ -593,7 +593,7 @@ public class TeacherStudentRequester {
      * 向在学生系统发送完结鱼卡信息
      */
     public void pushStudentSysOnlineMsg(Long studentId,String courseId, StudentSysParam studentSysParam) {
-        String url = String.format("%s/user/%s/lesson/%s", urlConf.getCourse_online_service(),studentId,courseId);
+        String url = String.format("%s/user/%s/lesson/%s", urlConf.getResource_url(),studentId,courseId);
         logger.debug("::::::::::::::::::::::::::::::::@[computeFishCardNoticeStudentSystem]向在学生系统发送完结鱼卡信息url[{}]::::::::::::::::::::::::::::::::", url);
 
         logger.info("@computeFishCardNoticeStudentSystemBody:[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(studentSysParam));
