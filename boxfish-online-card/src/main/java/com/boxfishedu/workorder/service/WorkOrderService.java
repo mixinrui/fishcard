@@ -161,22 +161,24 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
                 || FishCardStatusEnum.COMPLETED_FORCE.getCode() == workOrder.getStatus()) {
 
             if (workOrder.reachOverTime()) {
-                workOrder.setIsCourseOver((short) 1);
-                courseOnlineServiceX.completeCourse(workOrder, courseSchedule, workOrder.getStatus());
+                if (Objects.isNull(workOrder.getIsCourseOver()) || 1 != workOrder.getIsCourseOver()) {
+                    workOrder.setIsCourseOver((short) 1);
+                    courseOnlineServiceX.completeCourse(workOrder, courseSchedule, workOrder.getStatus());
+                } else {
+                    workOrderLogService.saveWorkOrderLog(
+                            workOrder, "未到下课时间,客户端上报正常完成,不做处理");
+                    return;
+                }
             } else {
-                workOrderLogService.saveWorkOrderLog(
-                        workOrder, "未到下课时间,客户端上报正常完成,不做处理");
-                return;
+                this.save(workOrder);
+                courseScheduleService.save(courseSchedule);
             }
-        } else {
-            this.save(workOrder);
-            courseScheduleService.save(courseSchedule);
-        }
 
-        threadPoolManager.execute(new Thread(() -> {
-            workOrderLogService.saveWorkOrderLog(
-                    workOrder, desc);
-        }));
+            threadPoolManager.execute(new Thread(() -> {
+                workOrderLogService.saveWorkOrderLog(
+                        workOrder, desc);
+            }));
+        }
     }
 
     public boolean isWorkOrderValid(Long workOrderId) throws BoxfishException {
