@@ -6,8 +6,6 @@ import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
 import com.boxfishedu.mall.domain.order.OrderForm;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
-import com.boxfishedu.workorder.common.bean.classtype.ClassType;
-import com.boxfishedu.workorder.common.bean.classtype.One2OneClassType;
 import com.boxfishedu.workorder.common.log.ServiceLog;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JSONParser;
