@@ -386,4 +386,12 @@ public class NotifyTimer {
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
+
+    /**
+     * 计算课程完成情况通知学生系统
+     */
+    @Scheduled(cron = "0 0/3 * * * ?")
+    public void computeFishCardNoticeStudentSystem(){
+        logger.info("<<<<<<computeFishCardNoticeStudentSystem开始通知<<<计算课程完成情况通知学生系统>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+    }
 }

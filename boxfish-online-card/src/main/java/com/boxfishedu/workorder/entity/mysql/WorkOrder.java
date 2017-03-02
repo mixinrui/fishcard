@@ -246,6 +246,10 @@ public class WorkOrder implements Cloneable {
     @Column(name = "need_change_time", nullable = true)
     private Integer needChangeTime;
 
+    // 1对1  小班课  公开课  向学生系统发送 完成标示  1 发送过  0 或者null  未发送
+    @Column(name = "is_compute_send")
+    private Short isComputeSend;
+
 
     @Transient
     private String groupId; // 群组id

@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.dao.jpa;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.data.domain.Page;
@@ -227,4 +228,21 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     @Query("select wo from  WorkOrder wo where wo.smallClassId in (?1)")
     List<WorkOrder> findBySmallClassNum(List<Long> smallClassIds);
+
+    //查询未发送并且在时间范围内的鱼卡数据(1 to 1)
+    @Query("select wo from  WorkOrder wo where (wo.startTime between ?1 and ?2)  and wo.status in (?3) and  (wo.classType is null or wo.classType=?4)  and wo.isComputeSend is null ")
+    public List<WorkOrder> findByComputeSendDatas( Date beginDate, Date endDate ,List<Integer> status ,String classType);
+
+
+    @Modifying
+    @Query("update WorkOrder o set o.isComputeSend= ?1 where o.id in (?2)")
+    int setFixedIsComputeSendFor(Short isComputeSend, List<Long> ids);
+
+
+
+    //查询未发送并且在时间范围内的鱼卡数据(小班课 and 公开课)
+    @Query("select wo from  WorkOrder wo where (wo.startTime between ?1 and ?2) and    wo.classType=?3   and wo.isComputeSend is null and wo.smallClassId is not null")
+    public List<WorkOrder> findByComputeSendDatasPUBLIC( Date beginDate, Date endDate  ,String classType);
+
+
 }
