@@ -627,6 +627,8 @@ public class TeacherStudentRequester {
         if (Objects.equals(responseEntity.getStatusCode(), HttpStatus.OK)) {
             Object user = responseEntity.getBody();
             logger.info("@computeFishCardNoticeStudentSystemBodyOK");
+        }else{
+            logger.info("@computeFishCardNoticeStudentSystemBodyERROR");
         }
     }
 
