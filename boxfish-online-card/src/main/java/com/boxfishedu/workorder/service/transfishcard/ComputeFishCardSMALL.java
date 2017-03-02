@@ -4,12 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.boxfishedu.workorder.common.bean.ChannelTypeEnum;
 import com.boxfishedu.workorder.common.bean.RoleEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
-import com.boxfishedu.workorder.common.bean.classtype.ClassType;
-import com.boxfishedu.workorder.common.bean.classtype.SmallClassType;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.Collections3;
-import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.SmallClassLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
@@ -60,20 +57,22 @@ public class ComputeFishCardSMALL {
         logger.info("@@computeFishCardNoticeStudentSystempublic_Begin");
 
 
-        //1 (计算)获取满足条件的鱼卡数据
+        //1 (计算)获取满足条件的鱼卡数据(小班课 未发送过 3天内)
         List<WorkOrder> listWorks = getMyListWorks();
 
         if(CollectionUtils.isEmpty(listWorks)) return;
 
-        //小班课对应中外教
+        //小班课对应中外教  key 小班课id  value :skuID
         Map<Long,Integer> smallClassesForCHMap =  Collections3.extractToMap(listWorks,"smallClassId","skuId");
-        //小班课对应课程id
+        //小班课对应课程id  key 小班课id  value 课程id
         Map<Long,String>   smallClassesCourseIDMap =  Collections3.extractToMap(listWorks,"smallClassId","courseId");
+        // 鱼卡id集合
         List<Long> ids = Lists.transform(listWorks, input -> input.getId());
+        // 公开课id集合
         List<Long> smallClassIds = Lists.transform(listWorks,input -> input.getSmallClassId());// 公开课id集合
         smallClassIds = smallClassIds.stream().distinct().collect(Collectors.toList());
 
-        //小班课id 和 学生id作为主健
+        //小班课id 和 学生id作为主健 发送消息的主体
         Map<String,SmallClassLog>  disSmallClassLog =    getPublicSmallClassLog(smallClassIds);
 
         if(CollectionUtils.isEmpty(disSmallClassLog)){

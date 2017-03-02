@@ -4,23 +4,18 @@ import com.alibaba.fastjson.JSON;
 import com.boxfishedu.workorder.common.bean.ChannelTypeEnum;
 import com.boxfishedu.workorder.common.bean.RoleEnum;
 import com.boxfishedu.workorder.common.bean.TeachingType;
-import com.boxfishedu.workorder.common.bean.classtype.ClassType;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.util.Collections3;
-import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.SmallClassLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.StudentSysParam;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lombok.Data;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +55,7 @@ public class ComputeFishCardPublic{
 
     @Transactional
     public void compute() {
-        logger.info("@@computeFishCardNoticeStudentSystempublic_Begin");
+        logger.info("@@computeFishCardNoticeStudentSystemSmall_Begin");
 
 
         //1 (计算)获取满足条件的鱼卡数据
@@ -74,6 +69,7 @@ public class ComputeFishCardPublic{
         Map<Long,String>   smallClassesCourseIDMap =  Collections3.extractToMap(listWorks,"smallClassId","courseId");
         List<Long> ids = Lists.transform(listWorks, input -> input.getId());
         List<Long> smallClassIds = Lists.transform(listWorks,input -> input.getSmallClassId());// 公开课id集合
+
         smallClassIds = smallClassIds.stream().distinct().collect(Collectors.toList());
 
         //小班课id 和 学生id作为主健
