@@ -74,10 +74,7 @@ public class SmallClass implements Cloneable, Serializable {
 
     @Column(name = "teacher_photo")
     private String teacherPhoto;
-
-    // 1对1  小班课  公开课  向学生系统发送 完成标示  1 发送过  0 或者null  未发送
-    @Column(name = "is_compute_send")
-    private Short isComputeSend;
+    
 
     private Long groupLeader;
 
