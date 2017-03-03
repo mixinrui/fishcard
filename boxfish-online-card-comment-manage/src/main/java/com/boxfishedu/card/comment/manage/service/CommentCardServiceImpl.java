@@ -481,7 +481,6 @@ public class CommentCardServiceImpl implements CommentCardService {
      * 导出excel2
      */
     public CommentCardExcelDto exportExcel2(CommentCardForm commentCardForm, int page,  int size){
-        ObjectMapper objectMapper = new ObjectMapper();
         List<Map<String,Object>> list = findCommentCardByOptions(commentCardForm,page,size);
         List<CommentCard> commentCardList = new ArrayList<>();
         for(Map map:list){
@@ -496,6 +495,7 @@ public class CommentCardServiceImpl implements CommentCardService {
     }
 
     private CommentCard getCommentCard(Map map){
+        System.out.println("map: "+ map.toString());
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         CommentCard commentCard = new CommentCard();
         commentCard.setId(Long.parseLong(map.get("id").toString()));
@@ -506,10 +506,10 @@ public class CommentCardServiceImpl implements CommentCardService {
         commentCard.setAskVoicePath(map.get("ask_voice_path") == null?null:map.get("ask_voice_path").toString());
         commentCard.setVoiceTime(map.get("voice_time") == null?null:Long.parseLong(map.get("voice_time").toString()));
         try {
-            commentCard.setStudentAskTime(map.get("student_ask_time") == null?null:simpleDateFormat.parse(map.get("student_ask_time").toString()));
-            commentCard.setAssignTeacherTime(map.get("assign_teacher_time") == null?null:simpleDateFormat.parse(map.get("assign_teacher_time").toString()));
-            commentCard.setTeacherAnswerTime(map.get("teacher_answer_time") == null?null:simpleDateFormat.parse(map.get("teacher_answer_time").toString()));
-            commentCard.setStudentCommentTeacherTime(map.get("student_comment_teacher_time") == null?null:simpleDateFormat.parse(map.get("student_comment_teacher_time").toString()));
+            commentCard.setStudentAskTime(map.get("student_ask_time") == null?null:simpleDateFormat.parse(String.valueOf(map.get("student_ask_time"))));
+            commentCard.setAssignTeacherTime(map.get("assign_teacher_time") == null?null:simpleDateFormat.parse(String.valueOf(map.get("assign_teacher_time"))));
+            commentCard.setTeacherAnswerTime(map.get("teacher_answer_time") == null?null:simpleDateFormat.parse(String.valueOf(map.get("teacher_answer_time"))));
+            commentCard.setStudentCommentTeacherTime(map.get("student_comment_teacher_time") == null?null:simpleDateFormat.parse(String.valueOf(map.get("student_comment_teacher_time"))));
             commentCard.setCreateTime(map.get("create_time") == null?null:simpleDateFormat.parse(map.get("create_time").toString()));
             commentCard.setUpdateTime(map.get("update_time") == null?null:simpleDateFormat.parse(map.get("update_time").toString()));
         } catch (ParseException e) {

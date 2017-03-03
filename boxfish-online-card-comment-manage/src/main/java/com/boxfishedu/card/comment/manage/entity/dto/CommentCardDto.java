@@ -8,6 +8,7 @@ import lombok.Data;
 import org.jdto.annotation.DTOTransient;
 import org.jdto.annotation.Source;
 import org.jdto.annotation.Sources;
+import org.jdto.mergers.DateFormatMerger;
 
 import java.util.Date;
 import java.util.Objects;
@@ -45,7 +46,10 @@ public class CommentCardDto {
 
     private Date assignTeacherTime;
 
-    private Date teacherAnswerTime;
+    @Source(value = "teacherAnswerTime", merger = DateFormatMerger.class, mergerParam = "yyyy-MM-dd HH:mm:ss")
+    private String teacherAnswerTime;
+
+//    private Date teacherAnswerTime;
 
     @Source(value = "answerVideoPath", merger = AliCloudPathMerger.class)
     private String answerVideoPath;
@@ -84,9 +88,16 @@ public class CommentCardDto {
     @JsonIgnore
     private CommentCardDtoStatus commentStatus;
 
-    private Date createTime;
+    @Source(value = "createTime", merger = DateFormatMerger.class, mergerParam = "yyyy-MM-dd HH:mm:ss")
+    private String createTime;
 
-    private Date updateTime;
+//    private Date createTime;
+
+    @Source(value = "updateTime", merger = DateFormatMerger.class, mergerParam = "yyyy-MM-dd HH:mm:ss")
+    private String updateTime;
+
+//    private Date updateTime;
+
 
     @DTOTransient
     public int getStatus() {
