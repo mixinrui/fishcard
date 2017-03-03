@@ -1,6 +1,5 @@
 package com.boxfishedu.card.comment.manage.service;
 
-import com.alibaba.fastjson.JSONArray;
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardDto;
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardExcelDto;
 import com.boxfishedu.card.comment.manage.entity.dto.CommentCardLogDto;
@@ -18,8 +17,6 @@ import com.boxfishedu.card.comment.manage.exception.BoxfishAsserts;
 import com.boxfishedu.card.comment.manage.exception.BusinessException;
 import com.boxfishedu.card.comment.manage.service.sdk.CommentCardManageSDK;
 import com.boxfishedu.card.comment.manage.util.DateUtils;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdto.DTOBinder;
@@ -32,7 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Column;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
