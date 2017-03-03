@@ -393,5 +393,8 @@ public class NotifyTimer {
     @Scheduled(cron = "0 0/40 * * * ?")
     public void computeFishCardNoticeStudentSystem(){
         logger.info("<<<<<<computeFishCardNoticeStudentSystem开始通知<<<计算课程完成情况通知学生系统>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.SNED_STUDENT_FISHCARD_STATUS.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
     }
 }
