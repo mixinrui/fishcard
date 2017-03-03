@@ -72,7 +72,10 @@ public enum TimerMessageType {
     SMALLCLASS_STUDENTS_RELATION(155),
 
     //外教点评订单关闭
-    CLOSE_COMMENT_CARD_ORDER(156);
+    CLOSE_COMMENT_CARD_ORDER(156),
+
+    //向学生系统传入鱼卡状态(已完成)
+    SNED_STUDENT_FISHCARD_STATUS(157);
 
 
     private int code;

@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.web.param.SmallClassParam;
 import org.jboss.netty.util.internal.StringUtil;
 import org.mongodb.morphia.query.Query;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -70,5 +71,26 @@ public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallC
 
         query.offset(smallClassParam.getOffSet()).limit(smallClassParam.getLimit());
         return query;
+    }
+
+
+    //用于公开课小班课的计算
+    public List<SmallClassLog> querySmallAndPublicLog(List<Long> smallClassIds,String roleName,List<Integer> statuses) {
+        Query<SmallClassLog> query = datastore.createQuery(SmallClassLog.class);
+        if(!CollectionUtils.isEmpty(smallClassIds  )){
+            query.and(query.criteria("smallClassId").in(smallClassIds) );
+        }
+
+        if(!CollectionUtils.isEmpty(smallClassIds )){
+            query.and(query.criteria("role").equal(roleName));
+        }
+
+        if(!CollectionUtils.isEmpty(smallClassIds  )){
+            query.and(query.criteria("status").in(statuses));
+        }
+
+
+        return query.asList();
+
     }
 }

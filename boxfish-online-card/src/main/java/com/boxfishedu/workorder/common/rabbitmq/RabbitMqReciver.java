@@ -17,6 +17,7 @@ import com.boxfishedu.workorder.service.absenteeism.AbsenteeismService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
+import com.boxfishedu.workorder.service.transfishcard.ComputeFishCard;
 import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
 import com.boxfishedu.workorder.servicex.coursenotify.CourseNotifyOneDayServiceX;
 import com.boxfishedu.workorder.servicex.courseonline.CourseOnlineServiceX;
@@ -113,6 +114,8 @@ public class RabbitMqReciver {
     @Autowired
     private GroupBuilder groupBuilder;
 
+    @Autowired
+    private ComputeFishCard computeFishCard;
 
     /**
      * 订单中心转换请求
@@ -255,6 +258,9 @@ public class RabbitMqReciver {
             } else if (serviceTimerMessage.getType() == TimerMessageType.CLOSE_COMMENT_CARD_ORDER.value()) {
                 logger.info("==========>CLOSE_COMMENT_CARD_ORDER ===>>> 检查外教点评次数用尽、关闭订单");
                 foreignTeacherCommentCardService.closeCommentCardOrder();
+            }else if(serviceTimerMessage.getType() == TimerMessageType.SNED_STUDENT_FISHCARD_STATUS.value()){
+                logger.info("==========>CLOSE_COMMENT_CARD_ORDER ===>>>向学生系统传入上课课程鱼卡信息");
+                computeFishCard.compute();
             }
             //
         } catch (Exception ex) {
