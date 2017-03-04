@@ -60,6 +60,9 @@ public class StudentLeaveActiveCustomer extends SmallClassEventCustomer {
                     smallClass.setWriteBackDesc("完成[学生(学生主动退出)]");
                     this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED);
                 } else {
+                    if (!smallClassLogService.teacherActed(smallClass.getTeacherId(), smallClass.getId())) {
+                        return;
+                    }
                     smallClass.setWriteBackDesc("学生早退[学生(学生主动退出)]");
                     this.writeStatusBack2Card(smallClass, FishCardStatusEnum.STUDENT_LEAVE_EARLY);
                 }

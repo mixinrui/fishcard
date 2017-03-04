@@ -95,7 +95,7 @@ public class SmallClassLogService {
         this.recordTeacherLog(smallClass
                 , smallClass.getStatus()
                 , userId
-                , PublicClassInfoStatusEnum.getByCode(smallClass.getStatus()).getDesc())  ;
+                , PublicClassInfoStatusEnum.getByCode(smallClass.getStatus()).getDesc());
     }
 
     public boolean studentActed(WorkOrder workOrder) {
@@ -131,6 +131,9 @@ public class SmallClassLogService {
     public boolean teacherActed(Long teacherId, Long smallClassId) {
         List<SmallClassLog> smallClassLogs
                 = smallClassLogMorphiaRepository.queryByTeacherAndSmallClass(teacherId, smallClassId);
+        if (CollectionUtils.isEmpty(smallClassLogs)) {
+            return false;
+        }
 
         for (SmallClassLog smallClassLog : smallClassLogs) {
 
