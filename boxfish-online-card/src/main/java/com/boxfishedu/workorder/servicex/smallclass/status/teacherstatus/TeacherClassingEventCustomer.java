@@ -62,12 +62,12 @@ public class TeacherClassingEventCustomer extends SmallClassEventCustomer {
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
 
-        smallClassService.persistIntoDb(smallClass,PublicClassInfoStatusEnum.TEACHER_CLASSING);
+        smallClassService.persistIntoDb(smallClass, PublicClassInfoStatusEnum.TEACHER_CLASSING);
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:
-                smallClass.setWriteBackDesc("正在上课[教师]");
-                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.ONCLASS, true);
+//                smallClass.setWriteBackDesc("正在上课[教师]");
+//                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.ONCLASS, true);
                 break;
             default:
                 break;
