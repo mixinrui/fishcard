@@ -97,6 +97,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     }
 
     @Override
+    @Transactional
     public void initGroupClass(SmallClass smallClass) {
         //找出leader鱼卡
         WorkOrder leader = this.selectLeader(smallClass.getAllCards());
@@ -139,7 +140,6 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
     }
 
     @Override
-    @Transactional
     public void persistGroupClass(SmallClass smallClass, List<WorkOrder> workOrders, RecommandCourseView recommandCourseView) {
         this.persistSmallClass(smallClass);
         smallClass.setAllCards(workOrders);

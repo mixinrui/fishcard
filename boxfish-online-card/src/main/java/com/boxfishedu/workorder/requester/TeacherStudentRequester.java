@@ -22,6 +22,7 @@ import com.boxfishedu.workorder.web.param.StudentTeacherParam;
 import com.boxfishedu.workorder.web.param.TeacherChangeParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.SmallClassAddStuParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.SmallClassAddStuTransParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.StudentSysParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.base.StudentInfo;
 import com.boxfishedu.workorder.web.view.base.TokenReturnBean;
@@ -31,14 +32,15 @@ import com.boxfishedu.workorder.web.view.teacher.TeacherView;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -585,6 +587,49 @@ public class TeacherStudentRequester {
         }
         logger.info("checkTeacherIsFreeze 向师生运营检查老师是否冻结");
         return false;
+    }
+
+
+    /**
+     * 向在学生系统发送完结鱼卡信息
+     */
+    public void pushStudentSysOnlineMsg(Long studentId,String courseId, StudentSysParam studentSysParam) {
+        String url = String.format("%s/user/%s/lesson/%s", urlConf.getResource_url(),studentId,courseId);
+        logger.debug("::::::::::::::::::::::::::::::::@[computeFishCardNoticeStudentSystem]向在学生系统发送完结鱼卡信息url[{}]::::::::::::::::::::::::::::::::", url);
+
+        logger.info("@computeFishCardNoticeStudentSystemBody:[{}]::::::::::::::::::::::::::::::::", JSON.toJSONString(studentSysParam));
+        threadPoolManager.execute(new Thread(() -> {
+            //restTemplate.postForObject(url, studentSysParam, Object.class);
+            sendPostForm(url,studentSysParam);
+
+        }));
+        logger.info("::::::::::::::::::::::::::::::::sendData:over::::::::::::::");
+        //restTemplate.postForObject(url,teachingOnlineListMsg,Object.class);
+        //JsonResultModel jsonResultModel = restTemplate.postForObject(url, teachingOnlineListMsg,JsonResultModel.class);
+    }
+
+
+
+    private void sendPostForm(String url , StudentSysParam studentSysParam){
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("channel", studentSysParam.getChannel());
+        params.add("channel_type", studentSysParam.getChannel_type());
+        params.add("finished", studentSysParam.getFinished());
+
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.set("Request-ID", UUID.randomUUID().toString());
+
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(params, headers);
+        ResponseEntity responseEntity = restTemplate.postForEntity(url, entity, Object.class);
+        if (Objects.equals(responseEntity.getStatusCode(), HttpStatus.OK)) {
+            Object user = responseEntity.getBody();
+            logger.info("@computeFishCardNoticeStudentSystemBodyOK");
+        }else{
+            logger.info("@computeFishCardNoticeStudentSystemBodyERROR");
+        }
     }
 
 }

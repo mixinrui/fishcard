@@ -8,10 +8,7 @@ import com.boxfishedu.card.comment.manage.service.CommentCardService;
 import com.boxfishedu.card.comment.manage.util.FormatterUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
@@ -38,10 +35,17 @@ public class CommentCardController {
         return JsonResultModel.newJsonResultModel(commentCardService.findCommentCardById(id));
     }
 
-    @RequestMapping(value = "/export",method = RequestMethod.GET)
-    public void exportCommentCardExcel(CommentCardForm commentCardForm,Pageable pageable, HttpServletResponse httpServletResponse){
+//    @RequestMapping(value = "/export",method = RequestMethod.GET)
+//    public void exportCommentCardExcel(CommentCardForm commentCardForm,Pageable pageable, HttpServletResponse httpServletResponse){
+//
+//        CommentCardExcelDto commentCardExcelDto = commentCardService.exportExcel(commentCardForm,pageable);
+//        commentCardExcelDto.downLoad(httpServletResponse, FormatterUtils.DATE_TIME_FORMATTER_0.format(LocalDateTime.now()));
+//    }
 
-        CommentCardExcelDto commentCardExcelDto = commentCardService.exportExcel(commentCardForm,pageable);
+    //2017-03-03 修改为下面的导出,可导出每页至多60000行
+    @RequestMapping(value = "/export",method = RequestMethod.GET)
+    public void exportCommentCardExcel(CommentCardForm commentCardForm, @RequestParam(value = "page") int page, @RequestParam(value = "size") int size, HttpServletResponse httpServletResponse){
+        CommentCardExcelDto commentCardExcelDto = commentCardService.exportExcel2(commentCardForm,page,size);
         commentCardExcelDto.downLoad(httpServletResponse, FormatterUtils.DATE_TIME_FORMATTER_0.format(LocalDateTime.now()));
     }
 

@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.dao.jpa;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.springframework.data.domain.Page;
@@ -199,8 +200,8 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     Optional<WorkOrder> findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterAndClassTypeIsNullOrderByStartTimeAsc(Long studentId, Integer skuId, Integer isFreeze, Date date);
 
-    @Query(value = "select distinct wo.skuId from WorkOrder wo where studentId=? and startTime>?")
-    List<Integer> findDistinctSkuIds(Long studentId, Date startTime);
+    @Query(value = "select distinct wo.skuId from WorkOrder wo where studentId=?1 and startTime>?2 and (wo.classType not in(?3) or wo.classType is null)")
+    List<Integer> findDistinctSkuIds(Long studentId, Date startTime,List<String> listClassTypes);
 
     @Query(value = "select wo from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and wo.skuId=?3 and wo.isFreeze=?4  and (wo.classType not in(?5) or wo.classType is null)  ")
     List<WorkOrder>  findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId,Date startTime,Integer skuId,Integer isFreeze,List<String> listClassTypes);
@@ -227,4 +228,21 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     @Query("select wo from  WorkOrder wo where wo.smallClassId in (?1)")
     List<WorkOrder> findBySmallClassNum(List<Long> smallClassIds);
+
+    //查询未发送并且在时间范围内的鱼卡数据(1 to 1)
+    @Query("select wo from  WorkOrder wo where (wo.startTime between ?1 and ?2)  and wo.status in (?3) and  (wo.classType is null or wo.classType=?4)  and wo.isComputeSend is null ")
+    public List<WorkOrder> findByComputeSendDatas( Date beginDate, Date endDate ,List<Integer> status ,String classType);
+
+
+    @Modifying
+    @Query("update WorkOrder o set o.isComputeSend= ?1 where o.id in (?2)")
+    int setFixedIsComputeSendFor(Short isComputeSend, List<Long> ids);
+
+
+
+    //查询未发送并且在时间范围内的鱼卡数据(小班课 and 公开课)
+    @Query("select wo from  WorkOrder wo where (wo.startTime between ?1 and ?2) and    wo.classType=?3   and wo.isComputeSend is null and wo.smallClassId is not null")
+    public List<WorkOrder> findByComputeSendDatasPUBLIC( Date beginDate, Date endDate  ,String classType);
+
+
 }

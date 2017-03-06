@@ -74,6 +74,7 @@ public class SmallClass implements Cloneable, Serializable {
 
     @Column(name = "teacher_photo")
     private String teacherPhoto;
+    
 
     private Long groupLeader;
 
@@ -163,10 +164,6 @@ public class SmallClass implements Cloneable, Serializable {
 
     //小班课上课时间30分钟
     public boolean reachOverTime() {
-        LocalDateTime startLocalTime =
-                LocalDateTime.ofInstant(
-                        this.getStartTime().toInstant(), ZoneId.systemDefault());
-        LocalDateTime overTime = startLocalTime.plusMinutes(30);
-        return LocalDateTime.now().isAfter(overTime);
+        return new Date().after(this.getEndTime());
     }
 }

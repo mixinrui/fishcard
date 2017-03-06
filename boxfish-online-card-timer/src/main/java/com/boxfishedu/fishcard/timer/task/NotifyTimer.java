@@ -4,6 +4,7 @@ import com.boxfishedu.card.bean.ServiceTimerMessage;
 import com.boxfishedu.card.bean.TimerMessageType;
 import com.boxfishedu.fishcard.timer.common.util.DateUtil;
 import com.boxfishedu.fishcard.timer.mq.RabbitMqSender;
+import com.google.common.collect.Maps;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/5/7.
@@ -346,13 +348,18 @@ public class NotifyTimer {
     }
 
     /**
-     *  创建小班课
+     * 创建小班课
      */
     @Scheduled(cron = "0 0 2 * * ?")
-    public void BuildSmallClassGroup() {
+    public void buildSmallClassGroup() {
         logger.info("<<<<<<@@@@创建学生关系 开始通知<<<创建学生关系>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage =
                 new ServiceTimerMessage(TimerMessageType.CREATE_SMALL_CLASS.value());
+
+        Map<String, String> param = Maps.newHashMap();
+        param.put("days", 2 + "");
+
+        serviceTimerMessage.setParam(param);
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }
@@ -373,9 +380,20 @@ public class NotifyTimer {
      * 外教点评次数用完订单关闭
      */
     @Scheduled(cron = "0 0 1 * * ?")
-    public void commentCardCloseOrder(){
+    public void commentCardCloseOrder() {
         logger.info("<<<<<<开始通知<<<检查外教点评订单是否需要关闭>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.CLOSE_COMMENT_CARD_ORDER.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    /**
+     * 计算课程完成情况通知学生系统
+     */
+    @Scheduled(cron = "0 0/40 * * * ?")
+    public void computeFishCardNoticeStudentSystem(){
+        logger.info("<<<<<<computeFishCardNoticeStudentSystem开始通知<<<计算课程完成情况通知学生系统>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.SNED_STUDENT_FISHCARD_STATUS.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

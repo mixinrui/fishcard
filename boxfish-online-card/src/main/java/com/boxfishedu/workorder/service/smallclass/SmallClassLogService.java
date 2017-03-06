@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.web.param.SmallClassParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -97,18 +98,22 @@ public class SmallClassLogService {
                 , PublicClassInfoStatusEnum.getByCode(smallClass.getStatus()).getDesc());
     }
 
-    public boolean studentActed(WorkOrder workOrder){
-        return this.studentActed(workOrder.getStudentId(),workOrder.getSmallClassId());
+    public boolean studentActed(WorkOrder workOrder) {
+        return this.studentActed(workOrder.getStudentId(), workOrder.getSmallClassId());
     }
 
-    public boolean teacherActed(WorkOrder workOrder){
-        return this.teacherActed(workOrder.getTeacherId(),workOrder.getSmallClassId());
+    public boolean teacherActed(WorkOrder workOrder) {
+        return this.teacherActed(workOrder.getTeacherId(), workOrder.getSmallClassId());
     }
 
     //学生动作
     public boolean studentActed(Long studentId, Long smallClassId) {
         List<SmallClassLog> smallClassLogs
                 = smallClassLogMorphiaRepository.queryByStudentAndSmallClass(studentId, smallClassId);
+
+        if (CollectionUtils.isEmpty(smallClassLogs)) {
+            return false;
+        }
 
         for (SmallClassLog smallClassLog : smallClassLogs) {
 
@@ -117,6 +122,7 @@ public class SmallClassLogService {
                 return true;
             }
         }
+
         return false;
 
     }
@@ -125,6 +131,9 @@ public class SmallClassLogService {
     public boolean teacherActed(Long teacherId, Long smallClassId) {
         List<SmallClassLog> smallClassLogs
                 = smallClassLogMorphiaRepository.queryByTeacherAndSmallClass(teacherId, smallClassId);
+        if (CollectionUtils.isEmpty(smallClassLogs)) {
+            return false;
+        }
 
         for (SmallClassLog smallClassLog : smallClassLogs) {
 

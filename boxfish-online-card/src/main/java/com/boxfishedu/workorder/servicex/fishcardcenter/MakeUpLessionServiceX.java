@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.MessagePushTypeEnum;
 import com.boxfishedu.workorder.common.bean.QueueTypeEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -97,6 +98,13 @@ public class MakeUpLessionServiceX {
         if (null == oldWorkOrder) {
             throw new BusinessException("所传参数不合法");
         }
+
+        // 小班课  公开课 控制不能进行补课操作
+        if( ClassTypeEnum.SMALL.name().equals(oldWorkOrder.getClassType()) ||  ClassTypeEnum.PUBLIC.name().equals(oldWorkOrder.getClassType())){
+            throw new BusinessException("小班课或者公开课不能进行补课");
+        }
+
+
         CourseSchedule oldCourseSchedule = courseScheduleService.findByWorkOrderId(oldWorkOrder.getId());
         if (null == oldCourseSchedule) {
             throw new BusinessException("无对应的排课表");

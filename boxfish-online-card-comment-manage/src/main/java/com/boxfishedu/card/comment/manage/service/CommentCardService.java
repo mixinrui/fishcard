@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Created by LuoLiBing on 16/9/2.
@@ -17,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 public interface CommentCardService {
 
     Page<CommentCardDto> findCommentCardByOptions(CommentCardForm commentCardForm, Pageable pageable);
+
+    List  findCommentCardByOptions(CommentCardForm commentCardForm,int page,int size);
 
     CommentCardDto findCommentCardById(Long id);
 
@@ -33,4 +36,6 @@ public interface CommentCardService {
     ChangeTeacherForm changeCommentCardToInnerTeacher(Long teacherId);
 
     CommentCardExcelDto exportExcel(CommentCardForm commentCardForm, Pageable pageable);
+
+    CommentCardExcelDto exportExcel2(CommentCardForm commentCardForm, int page,  int size);
 }

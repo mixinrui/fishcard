@@ -1,15 +1,14 @@
 package com.boxfishedu.workorder.web.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.InstantClassCard;
-import com.boxfishedu.workorder.entity.mysql.StStudentApplyRecords;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.ServiceSDK;
@@ -18,13 +17,17 @@ import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
+import com.boxfishedu.workorder.service.smallclass.SmallClassService;
 import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -69,57 +72,65 @@ public class TestController {
     private AssignTeacherServiceX assignTeacherServiceX;
 
     @Autowired
+    private SmallClassJpaRepository smallClassJpaRepository;
+
+    @Autowired
     private StStudentApplyRecordsJpaRepository stStudentApplyRecordsJpaRepository;
 
     @Autowired
     private DataCollectorService dataCollectorService;
 
-    @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
-    public void changeFishCardTime(@RequestBody Map<String,String> param){
-       String idStr=param.get("id");
-        String beginStr=param.get("begin");
-        String endStr=param.get("end");
-        String timeSlotIdStr=param.get("timeSlotId");
-        String teacherIdStr=param.get("teacherId");
-        String studentIdStr=param.get("studentId");
-        Long id=null,teacherId=null,studentId=null;
-        Integer timeSlotId=null;
-        Date begin=null,end=null;
-        if(null!=idStr)
-            id=Long.parseLong(idStr);
-        if(null!=beginStr)
-            begin=DateUtil.String2Date(beginStr);
-        if(null!=endStr)
-            end=DateUtil.String2Date(endStr);
-        if(null!=timeSlotIdStr)
-            timeSlotId=Integer.parseInt(timeSlotIdStr);
-        if(null!=teacherIdStr)
-            teacherId=Long.parseLong(teacherIdStr);
-        if(null!=studentIdStr)
-            studentId=Long.parseLong(studentIdStr);
+    @Autowired
+    private SmallClassService smallClassService;
 
-        WorkOrder workOrder=workOrderService.findOne(id);
-        CourseSchedule courseSchedule=courseScheduleService.findByWorkOrderId(id);
-        if(null!=end)
+    private Logger logger= LoggerFactory.getLogger(this.getClass());
+
+    @RequestMapping(value = "/fishcard", method = RequestMethod.PUT)
+    public void changeFishCardTime(@RequestBody Map<String, String> param) {
+        String idStr = param.get("id");
+        String beginStr = param.get("begin");
+        String endStr = param.get("end");
+        String timeSlotIdStr = param.get("timeSlotId");
+        String teacherIdStr = param.get("teacherId");
+        String studentIdStr = param.get("studentId");
+        Long id = null, teacherId = null, studentId = null;
+        Integer timeSlotId = null;
+        Date begin = null, end = null;
+        if (null != idStr)
+            id = Long.parseLong(idStr);
+        if (null != beginStr)
+            begin = DateUtil.String2Date(beginStr);
+        if (null != endStr)
+            end = DateUtil.String2Date(endStr);
+        if (null != timeSlotIdStr)
+            timeSlotId = Integer.parseInt(timeSlotIdStr);
+        if (null != teacherIdStr)
+            teacherId = Long.parseLong(teacherIdStr);
+        if (null != studentIdStr)
+            studentId = Long.parseLong(studentIdStr);
+
+        WorkOrder workOrder = workOrderService.findOne(id);
+        CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(id);
+        if (null != end)
             workOrder.setEndTime(end);
-        if(null!=begin) {
+        if (null != begin) {
             courseSchedule.setClassDate(DateUtil.date2SimpleDate(begin));
             courseSchedule.setStartTime(begin);
             workOrder.setStartTime(begin);
         }
-        if(null!=timeSlotId) {
+        if (null != timeSlotId) {
             workOrder.setSlotId(timeSlotId);
             courseSchedule.setTimeSlotId(timeSlotId);
         }
         workOrder.setUpdateTime(new Date());
         courseSchedule.setUpdateTime(new Date());
-        if(null!=teacherId){
+        if (null != teacherId) {
             workOrder.setTeacherId(teacherId);
             courseSchedule.setTeacherId(teacherId);
             workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
             courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
         }
-        if(null!=studentId){
+        if (null != studentId) {
             workOrder.setStudentId(studentId);
             courseSchedule.setStudentId(studentId);
         }
@@ -131,9 +142,9 @@ public class TestController {
     }
 
     @RequestMapping(value = "/save/code", method = RequestMethod.POST)
-    public void pdateWorkOrder(){
-        List<WorkOrder> workOrders=workOrderService.findAll();
-        for (WorkOrder workOrder:workOrders){
+    public void pdateWorkOrder() {
+        List<WorkOrder> workOrders = workOrderService.findAll();
+        for (WorkOrder workOrder : workOrders) {
             workOrder.setOrderCode(workOrder.getService().getOrderCode());
         }
         workOrderService.save(workOrders);
@@ -141,57 +152,58 @@ public class TestController {
     }
 
     @RequestMapping(value = "/redis/{value}", method = RequestMethod.POST)
-    public void testRedis(@PathVariable("value") String value){
+    public void testRedis(@PathVariable("value") String value) {
         cacheManager.getCache(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY).put("21212121212112", value);
         System.out.println(cacheManager.getCache(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY).get("21212121212112").get().toString());
     }
 
     @RequestMapping(value = "/change_teacher/{workOrderId}", method = RequestMethod.POST)
-    public void testTeacher(@PathVariable("workOrderId") Long workOrderId){
-        WorkOrder workOrder=workOrderService.findOne(workOrderId);
+    public void testTeacher(@PathVariable("workOrderId") Long workOrderId) {
+        WorkOrder workOrder = workOrderService.findOne(workOrderId);
         workOrderService.changeTeacherForTypeChanged(workOrder);
     }
 
     @RequestMapping(value = "/add/redis/user/{user_id}", method = RequestMethod.POST)
-    public void addUser(@PathVariable("user_id") Long userId){
+    public void addUser(@PathVariable("user_id") Long userId) {
         onlineAccountService.add(userId);
     }
 
     @RequestMapping(value = "/redis/user/{user_id}", method = RequestMethod.GET)
-    public JsonResultModel getUser(@PathVariable("user_id") Long userId){
+    public JsonResultModel getUser(@PathVariable("user_id") Long userId) {
         return JsonResultModel.newJsonResultModel(onlineAccountService.isMember(userId));
     }
 
     @RequestMapping(value = "/add/redis/sync", method = RequestMethod.POST)
-    public void syncMongo2Redis(){
+    public void syncMongo2Redis() {
         onlineAccountService.syncMongo2Redis();
     }
 
     @RequestMapping(value = "/slot/latest", method = RequestMethod.GET)
-    public void slot(){
+    public void slot() {
         System.out.println(instantClassService.getMostSimilarSlot(2l));
     }
 
     @RequestMapping(value = "/queue", method = RequestMethod.GET)
-    public void queueTest(){
-        InstantClassCard instantClassCard=new InstantClassCard();
+    public void queueTest() {
+        InstantClassCard instantClassCard = new InstantClassCard();
         instantClassCard.setWorkorderId(58805l);
         instantClassCard.setSlotId(29l);
         scheduleEntranceDataGenerator.initCardAndSchedule(instantClassCard);
     }
 
     @RequestMapping(value = "/instantcard/{instant_id}", method = RequestMethod.GET)
-    public JsonResultModel notiFyTeachers(@PathVariable("instant_id") Long instantId){
+    public JsonResultModel notiFyTeachers(@PathVariable("instant_id") Long instantId) {
         return JsonResultModel.newJsonResultModel(instantCardLogMorphiaRepository.findByInstantCardId(instantId));
     }
 
     @RequestMapping(value = "/instantlog/student/{student_id}", method = RequestMethod.GET)
-    public JsonResultModel notiFyTeachersByStudent(@PathVariable("student_id") Long studentId){
+    public JsonResultModel notiFyTeachersByStudent(@PathVariable("student_id") Long studentId) {
         return JsonResultModel.newJsonResultModel(instantCardLogMorphiaRepository.findByInstantStudentId(studentId));
     }
 
     /**
      * 初始化 新的时间片
+     *
      * @param days
      * @return
      */
@@ -203,22 +215,51 @@ public class TestController {
 
     @RequestMapping(value = "/assign")
 
-    public void testAssign(Long studentId,Long teacherId ,Integer skuid){
-        assignTeacherServiceX.maualAssign( teacherId,  studentId, skuid);
+    public void testAssign(Long studentId, Long teacherId, Integer skuid) {
+        assignTeacherServiceX.maualAssign(teacherId, studentId, skuid);
     }
+
     @RequestMapping(value = "/teacherAccept")
-    public void teacherAccept(Long studentId,Long teacherId){
-        List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndTeacherIdAndValid(studentId,teacherId, StStudentApplyRecords.VALID.yes);
-        List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList,"courseScheleId");
-        List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList,"workOrderId");
-        assignTeacherServiceX.teacherAccept(teacherId,studentId, workOrderIds);
+    public void teacherAccept(Long studentId, Long teacherId) {
+        List<StStudentApplyRecords> stStudentApplyRecordsList = stStudentApplyRecordsJpaRepository.findByStudentIdAndTeacherIdAndValid(studentId, teacherId, StStudentApplyRecords.VALID.yes);
+        List<Long> courseScheleIds = Collections3.extractToList(stStudentApplyRecordsList, "courseScheleId");
+        List<Long> workOrderIds = Collections3.extractToList(stStudentApplyRecordsList, "workOrderId");
+        assignTeacherServiceX.teacherAccept(teacherId, studentId, workOrderIds);
     }
 
     @RequestMapping(value = "/homeupdate", method = RequestMethod.GET)
-    public JsonResultModel homeupdate(Long studentId){
+    public JsonResultModel homeupdate(Long studentId) {
         dataCollectorService.updateBothChnAndFnItem(studentId);
         return JsonResultModel.newJsonResultModel("ok");
     }
 
+    @RequestMapping(value = "/proxy", method = RequestMethod.POST)
+    public JsonResultModel proxy(String flag) {
+        //代理
+        if (Objects.equals("true", flag)) {
+            smallClassService.testProxy();
+        }
+        //非代理
+        else {
+            this.testNotProxy();
+        }
+        return JsonResultModel.newJsonResultModel();
+    }
+
+    @Transactional
+    private void testNotProxy() {
+        SmallClass smallClass=new SmallClass();
+        smallClass.setStartTime(new Date());
+        smallClass.setStatus(10);
+        smallClass.setEndTime(new Date());
+        smallClass.setClassDate(new Date());
+        smallClass.setClassNum(1l);
+        smallClass.setCreateTime(new Date());
+
+        logger.debug("&&&&&&&&&&&&&&&&&&&&&& not proxy[{}]",smallClass.getId());
+
+        smallClassJpaRepository.save(smallClass);
+        smallClass.setClassNum(2l);
+    }
 
 }

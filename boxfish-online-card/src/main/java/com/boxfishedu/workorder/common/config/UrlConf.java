@@ -93,4 +93,16 @@ public class UrlConf {
     @Value("${interface.address.order_check_small_class_key}")
     private String order_check_small_class_key;
 
+    //向用户完成课程系统发送一对一的终态鱼卡
+    @Value("${parameter.fishcard_status}")
+    private String fishcard_status;
+
+
+    @Value("${parameter.fishcard_public_small_status}")
+    private String fishcard_public_small_status;
+
+    //小班课 公开课 计算累计时间 单位15分钟
+    @Value("${parameter.total_minutes}")
+    private Long total_minutes;
+
 }

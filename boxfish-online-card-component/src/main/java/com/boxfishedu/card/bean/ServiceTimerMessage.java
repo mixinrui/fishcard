@@ -15,6 +15,7 @@ public class ServiceTimerMessage {
     //0为无需处理;1为需要处理
     private Integer status;
     private Map<Integer,Long> body;
+    private Map<String,String> param;
     private String startTime;
     private String endTime;
 

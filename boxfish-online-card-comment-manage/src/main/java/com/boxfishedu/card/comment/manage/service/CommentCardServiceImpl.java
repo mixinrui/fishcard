@@ -9,6 +9,7 @@ import com.boxfishedu.card.comment.manage.entity.enums.CommentCardStatus;
 import com.boxfishedu.card.comment.manage.entity.enums.NotAnswerTime;
 import com.boxfishedu.card.comment.manage.entity.form.ChangeTeacherForm;
 import com.boxfishedu.card.comment.manage.entity.form.CommentCardForm;
+import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJdbc;
 import com.boxfishedu.card.comment.manage.entity.jpa.CommentCardJpaRepository;
 import com.boxfishedu.card.comment.manage.entity.jpa.EntityQuery;
 import com.boxfishedu.card.comment.manage.entity.mysql.CommentCard;
@@ -19,6 +20,8 @@ import com.boxfishedu.card.comment.manage.util.DateUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jdto.DTOBinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,10 +33,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * Created by LuoLiBing on 16/9/2.
@@ -41,6 +44,7 @@ import java.util.Objects;
 @Service
 public class CommentCardServiceImpl implements CommentCardService {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private EntityManager entityManager;
 
@@ -52,6 +56,9 @@ public class CommentCardServiceImpl implements CommentCardService {
 
     @Autowired
     private CommentCardManageSDK commentCardManageSDK;
+
+    @Autowired
+    private CommentCardJdbc commentCardJdbc;
 
     /**
      * 多条件查询
@@ -71,6 +78,143 @@ public class CommentCardServiceImpl implements CommentCardService {
         List<CommentCardDto> resultList = dtoBinder.bindFromBusinessObjectList(CommentCardDto.class, page.getContent());
         return new PageImpl<>(resultList, pageable, page.getTotalElements());
     }
+
+    @Override
+    public List findCommentCardByOptions(CommentCardForm commentCardForm, int page, int size) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        StringBuffer sb = new StringBuffer("SELECT * FROM COMMENT_CARD WHERE 1=1");
+        //点评卡id
+        if (Objects.nonNull(commentCardForm.getCode())){
+            sb.append(" AND (ID = ");
+            sb.append(commentCardForm.getCode());
+            sb.append(" OR PREVIOUS_ID = ");
+            sb.append(commentCardForm.getCode());
+            sb.append(")");
+        }
+
+        // 老师Id
+        if(Objects.nonNull(commentCardForm.getTeacherId())) {
+            sb.append(" AND TEACHER_ID = ");
+            sb.append(commentCardForm.getTeacherId());
+        }
+
+        // 老师姓名
+        if(StringUtils.isNotBlank(commentCardForm.getTeacherName())) {
+            sb.append(" AND TEACHER_NAME = '");
+            sb.append(commentCardForm.getTeacherName());
+            sb.append("'");
+        }
+
+        // 学生Id
+        if(Objects.nonNull(commentCardForm.getStudentId())) {
+            sb.append(" AND STUDENT_ID = ");
+            sb.append(commentCardForm.getStudentId());
+        }
+
+        // 学生姓名
+        if(StringUtils.isNotBlank(commentCardForm.getStudentName())) {
+            sb.append(" AND STUDENT_NAME = '");
+            sb.append(commentCardForm.getStudentName());
+            sb.append("'");
+        }
+
+        // 课程类型
+        if(StringUtils.isNotBlank(commentCardForm.getCourseType())) {
+            sb.append(" AND COURSE_TYPE = '");
+            sb.append(commentCardForm.getCourseType());
+            sb.append("'");
+        }
+        // 课程难度
+        if(StringUtils.isNotBlank(commentCardForm.getCourseDifficulty())) {
+            sb.append(" AND COURSE_DIFFICULTY = '");
+            sb.append(commentCardForm.getCourseDifficulty());
+            sb.append("'");
+        }
+        // 状态
+        if(Objects.nonNull(commentCardForm.getStatus())) {
+            // 未点评
+            if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.NOTANSWER.value())) {
+                sb.append(" AND STATUS < ");
+                sb.append(CommentCardStatus.ANSWERED.getCode());
+            }
+            // 已点评
+            else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.ANSWERED.value())) {
+                sb.append(" AND (STATUS = ");
+                sb.append(CommentCardStatus.ANSWERED.getCode());
+                sb.append(" OR STATUS = ");
+                sb.append(CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode());
+                sb.append(")");
+            }
+            // 超时未点评
+            else if(Objects.equals(commentCardForm.getStatus(), CommentCardFormStatus.TIMEOUT.value())) {
+                sb.append(" AND (STATUS < ");
+                sb.append(CommentCardStatus.ANSWERED.getCode());
+                NotAnswerTime.DateRange dateRange = NotAnswerTime._24_48HOURS.getRange();
+                sb.append(" AND STUDENT_ASK_TIME >= '");
+                sb.append(simpleDateFormat.format(DateUtils.parseFromLocalDateTime(dateRange.getFrom())));
+                sb.append("'");
+                sb.append(" AND STUDENT_ASK_TIME <= '");
+                sb.append(simpleDateFormat.format(DateUtils.parseFromLocalDateTime(dateRange.getTo())));
+                sb.append("')");
+            }
+        }
+
+
+        // 时间区间
+        if(notAnswerDateTimeRangeOption(commentCardForm)) {
+            if(Objects.isNull(commentCardForm.getStatus())) {
+                sb.append(" AND (STATUS < ");
+                sb.append(CommentCardStatus.ANSWERED.getCode());
+            }
+            NotAnswerTime.DateRange dateRange = NotAnswerTime.resolve(commentCardForm.getNotAnswerTime()).getRange();
+            if(Objects.equals(commentCardForm.getNotAnswerTime(), NotAnswerTime._36HOURS.code())) {
+                sb.append(" AND STUDENT_ASK_TIME <= '");
+                sb.append(simpleDateFormat.format(DateUtils.parseFromLocalDateTime(dateRange.getTo())));
+                sb.append("')");
+            } else {
+                sb.append(" AND STUDENT_ASK_TIME >= '");
+                sb.append(simpleDateFormat.format(DateUtils.parseFromLocalDateTime(dateRange.getFrom())));
+                sb.append("'");
+                sb.append(" AND STUDENT_ASK_TIME <= '");
+                sb.append(simpleDateFormat.format(DateUtils.parseFromLocalDateTime(dateRange.getTo())));
+                sb.append("')");
+            }
+        }
+
+        // 订单类型
+        if(StringUtils.isNotBlank(commentCardForm.getOrderChannel())) {
+
+        }
+
+        // 订单编号
+        if(StringUtils.isNotBlank(commentCardForm.getOrderCode())) {
+            sb.append(" AND ORDER_CODE = '");
+            sb.append(commentCardForm.getOrderCode());
+            sb.append("'");
+        }
+
+        // 点评创建开始时间
+        if(Objects.nonNull(commentCardForm.getStudentAskTimeRangeFrom())) {
+            sb.append(" AND STUDENT_ASK_TIME >= '");
+            sb.append(simpleDateFormat.format(commentCardForm.getStudentAskTimeRangeFrom()));
+            sb.append("'");
+        }
+
+        // 点评创建结束时间
+        if(Objects.nonNull(commentCardForm.getStudentAskTimeRangeTo())) {
+            sb.append(" AND STUDENT_ASK_TIME <= '");
+            sb.append(simpleDateFormat.format(commentCardForm.getStudentAskTimeRangeTo()));
+            sb.append("'");
+        }
+
+        // 超时过期作废的点评卡排除
+        sb.append(" AND STATUS != ");
+        sb.append(CommentCardStatus.OVERTIME.getCode());
+        logger.info("export comment_card excel : sql [{}]",sb.toString());
+        return commentCardJdbc.getCommentCardByOptions(sb.toString());
+    }
+
 
     @Override
     public CommentCardDto findCommentCardById(Long id) {
@@ -325,7 +469,84 @@ public class CommentCardServiceImpl implements CommentCardService {
         if (page.getSize() == 0){
             throw new BusinessException();
         }
+        System.out.println("page.getContent"+ page.getContent().toString());
         return new CommentCardExcelDto(page.getContent());
     }
 
+    /**
+     * 导出excel2
+     */
+    public CommentCardExcelDto exportExcel2(CommentCardForm commentCardForm, int page,  int size){
+        List<Map<String,Object>> list = findCommentCardByOptions(commentCardForm,page,size);
+        List<CommentCard> commentCardList = new ArrayList<>();
+        for(Map map:list){
+            CommentCard commentCard = getCommentCard(map);
+            commentCardList.add(commentCard);
+        }
+        if (list.size() == 0){
+            throw new BusinessException();
+        }
+        List<CommentCardDto> resultList = dtoBinder.bindFromBusinessObjectList(CommentCardDto.class, commentCardList);
+        return new CommentCardExcelDto(resultList);
+    }
+
+    private CommentCard getCommentCard(Map map){
+        System.out.println("map: "+ map.toString());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        CommentCard commentCard = new CommentCard();
+        commentCard.setId(Long.parseLong(map.get("id").toString()));
+        commentCard.setPrevious_id(map.get("previous_id") == null?null:Long.parseLong(map.get("previous_id").toString()));
+        commentCard.setStudentId(Long.parseLong(map.get("student_id").toString()));
+        commentCard.setStudentName(map.get("student_name") == null?null:map.get("student_name").toString());
+        commentCard.setStudentPicturePath(map.get("student_picture_path") == null?null:map.get("student_picture_path").toString());
+        commentCard.setAskVoicePath(map.get("ask_voice_path") == null?null:map.get("ask_voice_path").toString());
+        commentCard.setVoiceTime(map.get("voice_time") == null?null:Long.parseLong(map.get("voice_time").toString()));
+        try {
+            commentCard.setStudentAskTime(map.get("student_ask_time") == null?null:simpleDateFormat.parse(String.valueOf(map.get("student_ask_time"))));
+            commentCard.setAssignTeacherTime(map.get("assign_teacher_time") == null?null:simpleDateFormat.parse(String.valueOf(map.get("assign_teacher_time"))));
+            commentCard.setTeacherAnswerTime(map.get("teacher_answer_time") == null?null:simpleDateFormat.parse(String.valueOf(map.get("teacher_answer_time"))));
+            commentCard.setStudentCommentTeacherTime(map.get("student_comment_teacher_time") == null?null:simpleDateFormat.parse(String.valueOf(map.get("student_comment_teacher_time"))));
+            commentCard.setCreateTime(map.get("create_time") == null?null:simpleDateFormat.parse(map.get("create_time").toString()));
+            commentCard.setUpdateTime(map.get("update_time") == null?null:simpleDateFormat.parse(map.get("update_time").toString()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        commentCard.setTeacherId(map.get("teacher_id")==null?null:Long.parseLong(map.get("teacher_id").toString()));
+        commentCard.setTeacherFirstName(map.get("teacher_first_name") == null?null:map.get("teacher_first_name").toString());
+        commentCard.setTeacherLastName(map.get("teacher_last_name") == null?null:map.get("teacher_last_name").toString());
+        commentCard.setTeacherName(map.get("teacher_name") == null?null:map.get("teacher_name").toString());
+        commentCard.setTeacherPicturePath(map.get("teacher_picture_path") == null?null:map.get("teacher_picture_path").toString());
+        commentCard.setAskVoicePath(map.get("answer_video_path") == null?null:map.get("answer_video_path").toString());
+        commentCard.setTeacherStatus(map.get("teacher_status") == null?null:Integer.parseInt(map.get("teacher_status").toString()));
+        commentCard.setAssignTeacherCount(map.get("assign_teacher_count") == null?null:Integer.parseInt(map.get("assign_teacher_count").toString()));
+        commentCard.setStatus(map.get("status") == null?null:Integer.parseInt(map.get("status").toString()));
+        commentCard.setQuestionType(map.get("question_type") == null?null:Integer.parseInt(map.get("question_type").toString()));
+        if (Objects.equals(map.get("student_read_flag"),0)){
+            commentCard.setStudentReadFlag(0);
+        }else {
+            commentCard.setStudentReadFlag(1);
+        }
+        if (Objects.equals(map.get("teacher_read_flag"),0)){
+            commentCard.setTeacherReadFlag(0);
+        }else {
+            commentCard.setStudentReadFlag(1);
+        }
+        commentCard.setAnswerVideoTime(map.get("answer_video_time")==null?null:Long.parseLong(map.get("answer_video_time").toString()));
+        commentCard.setAnswerVideoSize(map.get("answer_video_size")==null?null:Long.parseLong(map.get("answer_video_size").toString()));
+        commentCard.setOrderId(map.get("order_id")==null?null:Long.parseLong(map.get("order_id").toString()));
+        commentCard.setServiceId(map.get("service_id")==null?null:Long.parseLong(map.get("service_id").toString()));
+        commentCard.setCourseId(map.get("course_id") == null?null:map.get("course_id").toString());
+        commentCard.setCourseName(map.get("course_name") == null?null:map.get("course_name").toString());
+        commentCard.setCourseType(map.get("course_type") == null?null:map.get("course_type").toString());
+        commentCard.setCourseDifficulty(map.get("course_difficulty") == null?null:map.get("course_difficulty").toString());
+        commentCard.setQuestionName(map.get("question_name") == null?null:map.get("question_name").toString());
+        commentCard.setCover(map.get("cover") == null?null:map.get("cover").toString());
+        commentCard.setOrderCode(map.get("order_code") == null?null:map.get("order_code").toString());
+        commentCard.setStudentCommentGoodTagCode(map.get("student_comment_good_tag_code") == null?null:map.get("student_comment_good_tag_code").toString());
+        commentCard.setStudentCommentBadTagCode(map.get("student_comment_bad_tag_code") == null?null:map.get("student_comment_bad_tag_code").toString());
+        commentCard.setQuestionCode(map.get("question_code") == null?null:map.get("question_code").toString());
+
+
+        return commentCard;
+    }
 }

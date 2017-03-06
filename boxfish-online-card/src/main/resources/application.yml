@@ -34,6 +34,7 @@ choiceTime:
 
 ################项目其他参数配置
 parameter:
+  #小班课人数
   small_class_size: 4
   workorder_valid_time_peroid: 5
   allow_test: true
@@ -69,6 +70,15 @@ parameter:
 
   #收件人
   recipients: luolibing@boxfish.cn,jiaozijun@boxfish.cn,huchunlin@boxfish.cn,liuyanman@boxfish.cn
+
+  #向用户完成课程系统发送公开课 小班课 学生鱼卡的状态
+  fishcard_public_small_status: 300,400,410,500,510
+
+  #向用户完成课程系统发送一对一的终态鱼卡
+  fishcard_status: 40,41,42,52,60
+
+  #小班课 公开课 计算累计时间 单位15分钟
+  total_minutes: 15
 
 spring.jpa:
   show-sql: true
@@ -423,7 +433,7 @@ interface:
 #   login_token
     login_filter_url: http://login-dt.boxfish.cn
     teacher_photo: https://api-online.test.boxfish.cn/online/figure
-    resource_url: http://api.online.test.boxfish.cn/online
+    resource_url: http://api-online.test.boxfish.cn/online
 #  师生运营匹配老师
     #消息推送地址
     msg_push_url: http://123.56.13.168:9091
@@ -681,6 +691,7 @@ time:
 
 #===============================================================生产环境===============================================================
 #=============192.168.1.30===============192.168.1.29======================192.168.1.25===============================================#
+#=============redis-cli -h 96cbdee519414aba.m.cnhza.kvstore.aliyuncs.com -p 6379 -a kVxowYcWE6NdfKAP6zDhxZsZgkPGuC
 #=================mongo:    mongo --host dds-bp1d8c5924fd01642.mongodb.rds.aliyuncs.com:3717 --authenticationDatabase admin -u root -p sp3JDgEQKPXXshJBFPi8bbFfzbTGMtVc
 #=================外网mq:   120.27.227.72:5672(映射:120.27.227.72:5672)================================================================#
 ---
@@ -731,7 +742,7 @@ interface:
     course_wudaokou_recommend_service: http://base.boxfish.cn/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://base.boxfish.cn/boxfish-wudaokou-course/course/info
     fishcard_service: http://online-api.boxfish.cn/fishcard
-    order_service: http://online-api.inside.boxfish.cn/order
+    order_service: http://online-api.boxfish.cn/order
     order_check_couponCode: MARKET_FSCF_1F
     order_check_small_class_key: U2FsdGVkX1/Sx80wr9XFQaoeEu72KTuP7oKzX8CcdFWZ7HMv8VpOXQ==
     course_online_service: http://online-api.boxfish.cn/teaching-service
@@ -834,9 +845,9 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #   login_token
     login_filter_url: http://login-dt.boxfish.cn
-    teacher_photo: https://api.boxfish.cn/online/figure
-    resource_url: http://api.boxfish.cn/online
-    #消息推送地址
+    teacher_photo: https://api.boxfish.cn//online/figure
+    resource_url: http://api.boxfish.cn//online
+#消息推送地址
     msg_push_url: http://online.boxfish.cn/boxfish-push
     # 会员url
     memberUrl: https://pay.boxfish.cn/member
