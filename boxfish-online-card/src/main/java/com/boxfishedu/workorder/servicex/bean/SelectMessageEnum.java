@@ -8,7 +8,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 public enum SelectMessageEnum {
 
     NORM_CLASS_BEFORE_1(Weeks.LESS_AND_EQUALS_THAN_1, ClassTypeEnum.NORMAL, "您已选择以下时间段课程，最快后天可上课"),
-    SMALL_CLASS_BEFORE_1(Weeks.LESS_AND_EQUALS_THAN_1, ClassTypeEnum.SMALL, "您已选择以下时间段课程，最快2周后可上课"),
+    SMALL_CLASS_BEFORE_1(Weeks.LESS_AND_EQUALS_THAN_1, ClassTypeEnum.SMALL, "您已选择以下时间段课程，最快后天可上课"),
     NORM_CLASS_AFTER_1(Weeks.GREATER_THAN_1, ClassTypeEnum.NORMAL, "您已选择以下时间段课程，后%@周将与第一周上课时间相同，最快后天可上课"),
     SMALL_CLASS_AFTER_1(Weeks.GREATER_THAN_1, ClassTypeEnum.SMALL, "您已选择以下时间段课程，后%@周将与第一周上课时间相同，最快2周后可上课"),
     DEFAULT(Weeks.DEFAULT, ClassTypeEnum.NORMAL, null);
