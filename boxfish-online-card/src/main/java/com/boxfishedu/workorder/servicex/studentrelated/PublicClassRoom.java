@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.bean.PublicClassTimeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.PublicClassException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.TextUtils;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.PublicClassInfo;
 import com.boxfishedu.workorder.entity.mysql.PublicClassInfoJpaRepository;
@@ -188,7 +189,7 @@ public class PublicClassRoom {
         entity.setSmallClassId(smallClass.getId());
         entity.setStudentId(studentId);
         entity.setStartTime(smallClass.getStartTime());
-        entity.setStudentName(nickName);
+        entity.setStudentName(TextUtils.stripEmoji(nickName));
         entity.setStatus(PublicClassInfoStatusEnum.STUDENT_ENTER.getCode());
         publicClassInfoJpaRepository.save(entity);
         // 更新课堂实时缓存
