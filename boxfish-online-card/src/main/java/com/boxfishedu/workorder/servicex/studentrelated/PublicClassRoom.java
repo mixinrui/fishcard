@@ -12,7 +12,9 @@ import com.boxfishedu.workorder.entity.mysql.PublicClassInfoJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,7 +190,9 @@ public class PublicClassRoom {
         entity.setSmallClassId(smallClass.getId());
         entity.setStudentId(studentId);
         entity.setStartTime(smallClass.getStartTime());
-        entity.setStudentName(nickName);
+        if(StringUtils.isNotEmpty(nickName)) {
+            entity.setStudentName(EmojiParser.removeAllEmojis(nickName));
+        }
         entity.setStatus(PublicClassInfoStatusEnum.STUDENT_ENTER.getCode());
         publicClassInfoJpaRepository.save(entity);
         // 更新课堂实时缓存
