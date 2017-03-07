@@ -20,4 +20,7 @@ public interface SmallClassStuJpaRepository extends JpaRepository<SmallClassStu,
     public List<SmallClassStu> findByStuWithOutClasses(Date startTime);
 
 
+    public SmallClassStu findByStudentId(Long studentId);
+
+    public Page<SmallClassStu> findByStudentId(Long studentId, Pageable pageable);
 }

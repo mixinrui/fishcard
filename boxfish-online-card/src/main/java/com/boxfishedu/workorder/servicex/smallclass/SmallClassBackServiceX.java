@@ -17,18 +17,22 @@ import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
+import com.boxfishedu.workorder.web.param.StudentForSmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.orm.jpa.vendor.OpenJpaDialect;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -129,6 +133,50 @@ public class SmallClassBackServiceX {
                         smallClass.getDifficultyLevel().equals(smallClassStu.getLevel())
                 )
         ).collect(Collectors.toList());
+    }
+
+
+
+
+
+
+
+
+     public JsonResultModel getStudentBackUpList(Long studentId,Pageable pageable){
+         if(Objects.isNull(studentId)){
+             return JsonResultModel.newJsonResultModel( smallClassStuJpaRepository.findAll(pageable));
+         }else {
+            return JsonResultModel.newJsonResultModel(  smallClassStuJpaRepository.findByStudentId(studentId,pageable));
+         }
+
+     }
+
+
+    @Transactional
+    public JsonResultModel deletebackup(Long studentId) {
+        SmallClassStu smallClassStu =  smallClassStuJpaRepository.findByStudentId(studentId);
+        if(Objects.isNull(smallClassStu)){
+            return JsonResultModel.newJsonResultModel("该学生不存在");
+        }
+
+        smallClassStuJpaRepository.delete(smallClassStu.getId());
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
+    @Transactional
+    public JsonResultModel addbackup(StudentForSmallClassParam studentForSmallClassParam) {
+        SmallClassStu smallClassStu =  smallClassStuJpaRepository.findByStudentId(studentForSmallClassParam.getStudentId());
+        if(!Objects.isNull(smallClassStu)){
+            return JsonResultModel.newJsonResultModel("该学生已经存在");
+        }
+
+        smallClassStu = new SmallClassStu();
+        smallClassStu.setStudentId(studentForSmallClassParam.getStudentId());
+
+        smallClassStu.setPhone(studentForSmallClassParam.getPhone());
+        smallClassStu.setStudentName(studentForSmallClassParam.getStudentName());
+        smallClassStuJpaRepository.save(smallClassStu);
+        return JsonResultModel.newJsonResultModel("OK");
     }
 
 

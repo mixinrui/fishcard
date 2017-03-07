@@ -91,6 +91,14 @@ public class AvaliableTimeServiceXV1 {
      * @throws CloneNotSupportedException
      */
     public MonthTimeSlots getTimeAvailable(AvaliableTimeParam avaliableTimeParam) throws CloneNotSupportedException {
+
+        // 根据订单和  获取服务信息
+        // 课程数量
+        Integer class_num = null;
+        ComboTypeToRoleId comboType = ComboTypeToRoleId.valueOf(avaliableTimeParam.getComboType());
+        if(comboType.isSmallClassType()  && !Objects.isNull(avaliableTimeParam.getOrderId())){
+            class_num =  serveService.findByOrderId(avaliableTimeParam.getOrderId()).get(0).getOriginalAmount();
+        }
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(avaliableTimeParam, getOptionalDays(avaliableTimeParam));
 
@@ -100,7 +108,7 @@ public class AvaliableTimeServiceXV1 {
             List<DayTimeSlots> result = getTimeAvailable(avaliableTimeParam, dateRange, classDateTimeSlotsSet);
             if (org.apache.commons.collections.CollectionUtils.isNotEmpty(result)) {
                 MonthTimeSlots month = new MonthTimeSlots(result);
-                month.setSelectMessage(avaliableTimeParam.selectMessage());
+                month.setSelectMessage(avaliableTimeParam.selectMessage(class_num));
                 return month;
             } else {
                 // 如果为空, 则推后一周
