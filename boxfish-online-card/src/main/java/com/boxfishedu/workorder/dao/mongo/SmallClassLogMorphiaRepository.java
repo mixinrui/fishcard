@@ -75,17 +75,17 @@ public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallC
 
 
     //用于公开课小班课的计算
-    public List<SmallClassLog> querySmallAndPublicLog(List<Long> smallClassIds,String roleName,List<Integer> statuses) {
+    public List<SmallClassLog> querySmallAndPublicLog(List<Long> smallClassIds, String roleName, List<Integer> statuses) {
         Query<SmallClassLog> query = datastore.createQuery(SmallClassLog.class);
-        if(!CollectionUtils.isEmpty(smallClassIds  )){
-            query.and(query.criteria("smallClassId").in(smallClassIds) );
+        if (!CollectionUtils.isEmpty(smallClassIds)) {
+            query.and(query.criteria("smallClassId").in(smallClassIds));
         }
 
-        if(!CollectionUtils.isEmpty(smallClassIds )){
+        if (!CollectionUtils.isEmpty(smallClassIds)) {
             query.and(query.criteria("role").equal(roleName));
         }
 
-        if(!CollectionUtils.isEmpty(smallClassIds  )){
+        if (!CollectionUtils.isEmpty(smallClassIds)) {
             query.and(query.criteria("status").in(statuses));
         }
 

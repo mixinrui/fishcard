@@ -117,7 +117,7 @@ public class SmallClassLogService {
 
         for (SmallClassLog smallClassLog : smallClassLogs) {
 
-            if (smallClassLog.getStatus() > PublicClassInfoStatusEnum.STUDENT_ENTER.getCode()
+            if (smallClassLog.getStatus() >= PublicClassInfoStatusEnum.STUDENT_ENTER.getCode()
                     && smallClassLog.getStatus() <= PublicClassInfoStatusEnum.STUDENT_QUIT.getCode()) {
                 return true;
             }
