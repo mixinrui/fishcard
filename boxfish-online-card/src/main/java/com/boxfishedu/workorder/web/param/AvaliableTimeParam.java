@@ -43,7 +43,7 @@ public class AvaliableTimeParam implements Serializable {
         return ComboTypeToRoleId.resolve(comboType);
     }
 
-    public String selectMessage() {
+    public String selectMessage(Integer class_num) {
         // 老版本几周完成不传, 返回默认值
         if(totalWeeks == null) {
             return SelectMessageEnum.DEFAULT.message;
@@ -56,7 +56,7 @@ public class AvaliableTimeParam implements Serializable {
             classType = ClassTypeEnum.NORMAL;
         }
         SelectMessageEnum.Weeks weeks = SelectMessageEnum.Weeks.resolve(totalWeeks);
-        String message = SelectMessageEnum.resolve(classType, weeks).message;
+        String message = SelectMessageEnum.resolve(classType, weeks,class_num).message;
         return message.replaceAll("%@", Integer.toString(totalWeeks - 1));
     }
 }

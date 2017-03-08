@@ -9,6 +9,7 @@ import com.boxfishedu.workorder.servicex.smallclass.SmallClassLogServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassQueryServiceX;
 import com.boxfishedu.workorder.servicex.studentrelated.AutoTimePickerServiceX;
 import com.boxfishedu.workorder.web.param.SmallClassParam;
+import com.boxfishedu.workorder.web.param.StudentForSmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.SmallClassAddStuParam;
@@ -160,6 +161,43 @@ public class SmallClassBackController {
         return addStudentForSmallClass.addStudentForSmallClass(smallClassAddStuParam);
     }
 
+
+
+
+
+
+    ///////   /service/backend
+
+    /**
+     * 删除候补学生名单
+     * @param studentId
+     * @return
+     */
+    @RequestMapping(value = "/studentbackup/{student_id}", method = RequestMethod.DELETE)
+    public JsonResultModel deleteStudent(@PathVariable("student_id") Long studentId) {
+        smallClassBackServiceX.deletebackup(studentId);
+        return JsonResultModel.newJsonResultModel();
+    }
+
+    /**
+     * 获取候补学生名单
+     * @param studentId
+     * @return
+     */
+    @RequestMapping(value = "studentbackup/getlist", method = RequestMethod.GET)
+    public JsonResultModel getStudents(Long studentId, Pageable pageable) {
+        return smallClassBackServiceX.getStudentBackUpList(studentId,pageable);
+    }
+
+    /**
+     * 新增候补学生名单
+     * @param studentForSmallClassParam
+     * @return
+     */
+    @RequestMapping(value = "/studentbackup/add", method = RequestMethod.POST)
+    public JsonResultModel addBackUpStudent(@RequestBody StudentForSmallClassParam studentForSmallClassParam) {
+        return JsonResultModel.newJsonResultModel(smallClassBackServiceX.addbackup(studentForSmallClassParam));
+    }
 
 
 }
