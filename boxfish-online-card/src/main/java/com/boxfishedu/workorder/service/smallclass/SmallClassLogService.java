@@ -3,11 +3,14 @@ package com.boxfishedu.workorder.service.smallclass;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.RoleEnum;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.mongo.SmallClassLogMorphiaRepository;
 import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.web.param.SmallClassParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -22,6 +25,8 @@ import java.util.List;
 public class SmallClassLogService {
     @Autowired
     private SmallClassLogMorphiaRepository smallClassLogMorphiaRepository;
+
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     public void recordLog(
             SmallClass smallClass,
@@ -110,6 +115,9 @@ public class SmallClassLogService {
     public boolean studentActed(Long studentId, Long smallClassId) {
         List<SmallClassLog> smallClassLogs
                 = smallClassLogMorphiaRepository.queryByStudentAndSmallClass(studentId, smallClassId);
+
+        logger.debug("@studentActed#studentId[{}]#smallClassId[{}]#result[{}]"
+                , studentId, smallClassId, JacksonUtil.toJSon(smallClassLogs));
 
         if (CollectionUtils.isEmpty(smallClassLogs)) {
             return false;

@@ -12,7 +12,6 @@ import com.boxfishedu.workorder.entity.mysql.PublicClassInfoJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.ServiceSDK;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

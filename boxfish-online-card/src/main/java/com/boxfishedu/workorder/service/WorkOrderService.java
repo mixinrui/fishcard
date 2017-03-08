@@ -167,7 +167,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
                 } else {
                     workOrderLogService.saveWorkOrderLog(
                             workOrder, "未到下课时间,客户端上报正常完成,不做处理");
-                    return;
+                    throw new BusinessException("未到下课时间,客户端上报正常完成,不做处理");
                 }
             } else {
                 this.save(workOrder);
