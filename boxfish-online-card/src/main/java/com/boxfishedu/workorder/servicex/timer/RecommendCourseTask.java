@@ -38,7 +38,7 @@ public class RecommendCourseTask implements Runnable {
     public void run() {
         for (int i = 0, size = workOrders.size(); i < size; i++) {
             if (workOrders.get(i).isGroupCard()) {
-                return;
+                continue;
             }
             handler.singleRecommend(
                     workOrders.get(i), courseScheduleMap.get(workOrders.get(i).getId()),
