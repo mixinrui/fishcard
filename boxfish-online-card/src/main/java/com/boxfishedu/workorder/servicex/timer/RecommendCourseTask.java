@@ -24,18 +24,22 @@ public class RecommendCourseTask implements Runnable {
 
     private List<WorkOrder> workOrders;
 
-    private Map<Long,CourseSchedule> courseScheduleMap;
+    private Map<Long, CourseSchedule> courseScheduleMap;
 
-    public RecommendCourseTask() {}
+    public RecommendCourseTask() {
+    }
 
-    public RecommendCourseTask(List<WorkOrder> workOrders, Map<Long,CourseSchedule> courseScheduleMap) {
+    public RecommendCourseTask(List<WorkOrder> workOrders, Map<Long, CourseSchedule> courseScheduleMap) {
         this.workOrders = workOrders;
         this.courseScheduleMap = courseScheduleMap;
     }
 
     @Override
     public void run() {
-        for(int i = 0, size = workOrders.size(); i < size; i++) {
+        for (int i = 0, size = workOrders.size(); i < size; i++) {
+            if (workOrders.get(i).isGroupCard()) {
+                return;
+            }
             handler.singleRecommend(
                     workOrders.get(i), courseScheduleMap.get(workOrders.get(i).getId()),
                     (w -> DateUtil.within72Hours(w.getStartTime())));

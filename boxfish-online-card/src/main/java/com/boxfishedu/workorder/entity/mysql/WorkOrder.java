@@ -354,8 +354,13 @@ public class WorkOrder implements Cloneable {
         }
     }
 
-    public boolean reachOverTime(){
+    public boolean reachOverTime() {
         return !new Date().before(this.getEndTime());
+    }
+
+    public boolean isGroupCard() {
+        return Objects.equals(this.getClassType(), ClassTypeEnum.SMALL.name())
+                || Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name());
     }
 
     public boolean notGroupWorkOrder() {
