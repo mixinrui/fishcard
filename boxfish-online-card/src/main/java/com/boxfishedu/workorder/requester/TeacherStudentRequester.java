@@ -613,7 +613,7 @@ public class TeacherStudentRequester {
     private void sendPostForm(String url , StudentSysParam studentSysParam){
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
         params.add("channel", studentSysParam.getChannel());
-        params.add("channel_type", studentSysParam.getChannel_type());
+        params.add("channel_type", studentSysParam.getChannel_type().toString());
         params.add("finished", studentSysParam.getFinished());
 
 
