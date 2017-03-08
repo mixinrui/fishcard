@@ -742,7 +742,7 @@ interface:
     course_wudaokou_recommend_service: http://base.boxfish.cn/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://base.boxfish.cn/boxfish-wudaokou-course/course/info
     fishcard_service: http://online-api.boxfish.cn/fishcard
-    order_service: http://online-api.boxfish.cn/order
+    order_service:  http://online-api.inside.boxfish.cn/order
     order_check_couponCode: MARKET_FSCF_1F
     order_check_small_class_key: U2FsdGVkX1/Sx80wr9XFQaoeEu72KTuP7oKzX8CcdFWZ7HMv8VpOXQ==
     course_online_service: http://online-api.boxfish.cn/teaching-service
@@ -828,7 +828,7 @@ interface:
     course_wudaokou_recommend_service: http://base.boxfish.cn/boxfish-wudaokou-recommend/recommend
     course_wudaokou_detail_service: http://base.boxfish.cn/boxfish-wudaokou-course/course/info
     fishcard_service: http://online-api.boxfish.cn/fishcard
-    order_service: http://online-api.boxfish.cn/order
+    order_service: http://online-api.inside.boxfish.cn/order
     order_check_couponCode: MARKET_FSCF_1F
     order_check_small_class_key: U2FsdGVkX1/Sx80wr9XFQaoeEu72KTuP7oKzX8CcdFWZ7HMv8VpOXQ==
     course_online_service: http://online-api.boxfish.cn/teaching-service
