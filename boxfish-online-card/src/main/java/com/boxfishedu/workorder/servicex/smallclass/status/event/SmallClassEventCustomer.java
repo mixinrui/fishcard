@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.event;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
@@ -78,17 +79,25 @@ public abstract class SmallClassEventCustomer {
             workOrders = this.filterStudentActed(workOrders);
         }
 
-        this.updateWorkStatuses(workOrders, fishCardStatusEnum);
+//        this.updateWorkStatuses(workOrders, fishCardStatusEnum);
 
-        workOrders.forEach(workOrder -> {
+        for (WorkOrder workOrder : workOrders) {
             if (Objects.isNull(smallClass.getWriteBackDesc())) {
-                this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder);
+                this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder, fishCardStatusEnum);
             } else {
                 String desc = smallClass.getWriteBackDesc();
-                this.getWorkOrderService().saveStatusForCardAndSchedule(
-                        workOrder, desc);
+
+                try {
+                    this.getWorkOrderService().saveStatusForCardAndSchedule(
+                            workOrder, desc, fishCardStatusEnum);
+                } catch (BusinessException ex) {
+                    if (workOrders.size() == 1) {
+                        throw new BusinessException(ex);
+                    }
+                    continue;
+                }
             }
-        });
+        }
     }
 
     private List<WorkOrder> getWorkOrders(SmallClass smallClass) {

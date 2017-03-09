@@ -149,13 +149,16 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     @Transactional
-    public void saveStatusForCardAndSchedule(WorkOrder workOrder) {
-        this.saveStatusForCardAndSchedule(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()));
+    public void saveStatusForCardAndSchedule(WorkOrder workOrder, FishCardStatusEnum fishCardStatusEnum) {
+        this.saveStatusForCardAndSchedule(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()), fishCardStatusEnum);
     }
 
     @Transactional
-    public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc) {
+    public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc, FishCardStatusEnum fishCardStatusEnum) {
         this.dealStudentAbsent(workOrder, desc);
+        this.dealTeacherAbsent(workOrder, desc);
+
+        workOrder.setStatus(fishCardStatusEnum.getCode());
 
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         courseSchedule.setStatus(workOrder.getStatus());
@@ -174,10 +177,17 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         recordFishCardLog(workOrder, desc);
     }
 
+    private void dealTeacherAbsent(WorkOrder workOrder, String desc) {
+        if (workOrder.isTeacherAbsent()) {
+            recordFishCardLog(workOrder, String.join(",", "教师已旷课,不允许覆盖状态", desc));
+            throw new BusinessException("教师已旷课,不可更新数据库数据");
+        }
+    }
+
     private void dealStudentAbsent(WorkOrder workOrder, String desc) {
         if (workOrder.isStudentAbsent()) {
             recordFishCardLog(workOrder, String.join(",", "学生已旷课,不允许覆盖状态", desc));
-            throw new BusinessException("鱼卡[{}]已经旷课,不可更新数据库数据");
+            throw new BusinessException("学生已旷课,不可更新数据库数据");
         }
     }
 

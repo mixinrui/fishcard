@@ -19,6 +19,10 @@ public class BusinessException extends BoxfishException {
         this.returnMsg = returnMsg;
     }
 
+    public BusinessException(BusinessException ex) {
+        this.returnMsg = ex.getReturnMsg();
+    }
+
     public BusinessException() {
         returnMsg = "无效的请求,请重试";
     }
