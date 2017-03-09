@@ -358,6 +358,10 @@ public class WorkOrder implements Cloneable {
         return Objects.isNull(this.getIsCourseOver()) || 1 != this.getIsCourseOver();
     }
 
+    public boolean isStudentAbsent() {
+        return FishCardStatusEnum.STUDENT_ABSENT.getCode() == this.getStatus();
+    }
+
     public boolean statusFinished() {
         return FishCardStatusEnum.COMPLETED.getCode() == this.getStatus()
                 || FishCardStatusEnum.COMPLETED_FORCE.getCode() == this.getStatus();

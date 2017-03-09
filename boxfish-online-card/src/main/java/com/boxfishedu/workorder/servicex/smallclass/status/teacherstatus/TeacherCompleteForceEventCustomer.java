@@ -59,7 +59,7 @@ public class TeacherCompleteForceEventCustomer extends SmallClassEventCustomer {
     @Override
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
-        smallClassService.persistIntoDb(smallClass,PublicClassInfoStatusEnum.TEACHER_COMPLETED_FORCE);
+        smallClassService.persistIntoDb(smallClass, PublicClassInfoStatusEnum.TEACHER_COMPLETED_FORCE);
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:

@@ -155,6 +155,8 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Transactional
     public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc) {
+        this.dealStudentAbsent(workOrder, desc);
+
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         courseSchedule.setStatus(workOrder.getStatus());
         if (workOrder.statusFinished()) {
@@ -169,6 +171,17 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
                 throw new BusinessException("未到下课时间,客户端上报正常完成,不做处理");
             }
         }
+        recordFishCardLog(workOrder, desc);
+    }
+
+    private void dealStudentAbsent(WorkOrder workOrder, String desc) {
+        if (workOrder.isStudentAbsent()) {
+            recordFishCardLog(workOrder, String.join(",", "学生已旷课,不允许覆盖状态", desc));
+            throw new BusinessException("鱼卡[{}]已经旷课,不可更新数据库数据");
+        }
+    }
+
+    private void recordFishCardLog(WorkOrder workOrder, String desc) {
         threadPoolManager.execute(new Thread(() -> {
             workOrderLogService.saveWorkOrderLog(
                     workOrder, desc);
