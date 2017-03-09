@@ -354,6 +354,15 @@ public class WorkOrder implements Cloneable {
         }
     }
 
+    public boolean isCourseNotOver() {
+        return Objects.isNull(this.getIsCourseOver()) || 1 != this.getIsCourseOver();
+    }
+
+    public boolean statusFinished() {
+        return FishCardStatusEnum.COMPLETED.getCode() == this.getStatus()
+                || FishCardStatusEnum.COMPLETED_FORCE.getCode() == this.getStatus();
+    }
+
     public boolean reachOverTime() {
         return !new Date().before(this.getEndTime());
     }

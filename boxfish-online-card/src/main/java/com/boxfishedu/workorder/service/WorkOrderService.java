@@ -157,28 +157,22 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc) {
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         courseSchedule.setStatus(workOrder.getStatus());
-        if (FishCardStatusEnum.COMPLETED.getCode() == workOrder.getStatus()
-                || FishCardStatusEnum.COMPLETED_FORCE.getCode() == workOrder.getStatus()) {
-
+        if (workOrder.statusFinished()) {
             if (workOrder.reachOverTime()) {
-                if (Objects.isNull(workOrder.getIsCourseOver()) || 1 != workOrder.getIsCourseOver()) {
+                if (workOrder.isCourseNotOver()) {
                     workOrder.setIsCourseOver((short) 1);
                     courseOnlineServiceX.completeCourse(workOrder, courseSchedule, workOrder.getStatus());
-                } else {
-                    workOrderLogService.saveWorkOrderLog(
-                            workOrder, "未到下课时间,客户端上报正常完成,不做处理");
-                    throw new BusinessException("未到下课时间,客户端上报正常完成,不做处理");
                 }
             } else {
-                this.save(workOrder);
-                courseScheduleService.save(courseSchedule);
-            }
-
-            threadPoolManager.execute(new Thread(() -> {
                 workOrderLogService.saveWorkOrderLog(
-                        workOrder, desc);
-            }));
+                        workOrder, "未到下课时间,客户端上报正常完成,不做处理");
+                throw new BusinessException("未到下课时间,客户端上报正常完成,不做处理");
+            }
         }
+        threadPoolManager.execute(new Thread(() -> {
+            workOrderLogService.saveWorkOrderLog(
+                    workOrder, desc);
+        }));
     }
 
     public boolean isWorkOrderValid(Long workOrderId) throws BoxfishException {
