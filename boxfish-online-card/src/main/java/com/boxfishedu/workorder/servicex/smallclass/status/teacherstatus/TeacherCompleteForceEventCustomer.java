@@ -63,8 +63,8 @@ public class TeacherCompleteForceEventCustomer extends SmallClassEventCustomer {
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:
-                smallClass.setWriteBackDesc("强制完成[教师小班课]");
-                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED_FORCE,true);
+//                smallClass.setWriteBackDesc("强制完成[教师小班课]");
+//                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED_FORCE,true);
                 break;
             default:
                 smallClass.setWriteBackDesc("强制完成[教师公开课]");

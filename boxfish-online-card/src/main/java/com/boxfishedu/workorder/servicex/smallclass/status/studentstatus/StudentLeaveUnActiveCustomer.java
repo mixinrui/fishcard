@@ -64,6 +64,10 @@ public class StudentLeaveUnActiveCustomer extends SmallClassEventCustomer {
                     this.stuWriteStatusBack2Card(smallClass, FishCardStatusEnum.COMPLETED, workOrder);
                 }
                 //没有到下课时间的鱼卡如何去处理
+                else {
+                    smallClass.setWriteBackDesc("未到下课时间被动退出,标记为教师早退[学生被动退出]");
+                    this.stuWriteStatusBack2Card(smallClass, FishCardStatusEnum.TEACHER_LEAVE_EARLY, workOrder);
+                }
                 break;
             default:
                 break;

@@ -57,8 +57,8 @@ public class TeacherLeaveEarlyEventCustomer extends SmallClassEventCustomer {
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:
-                smallClass.setWriteBackDesc("教师早退[教师小班课]");
-                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.TEACHER_LEAVE_EARLY, true);
+//                smallClass.setWriteBackDesc("教师早退[教师小班课]");
+//                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.TEACHER_LEAVE_EARLY, true);
                 break;
             default:
                 smallClass.setWriteBackDesc("教师早退[教师公开课]");
