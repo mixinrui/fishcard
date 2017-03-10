@@ -245,4 +245,10 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByComputeSendDatasPUBLIC( Date beginDate, Date endDate  ,String classType);
 
 
+
+    //查找出学生所有状态的工单
+    @Query("SELECT wo.smallClassId from WorkOrder wo where wo.smallClassId is not null and wo.classType=?1   GROUP BY  wo.smallClassId HAVING count(wo.id) <=?2 ")
+    public List<Long> findDistinctSmallClassFromWorkOrder(String classType, Long times);
+
+
 }

@@ -92,6 +92,11 @@ public class SmallClassQueryService {
         if (null != publicFilterParam.getId()) {
             sql.append("and id=:id ");
         }
+
+        if(null!=publicFilterParam.getIds()){
+            sql.append("   and wo.id in(:ids) ");
+        }
+
         if (null != publicFilterParam.getStudentId()) {
             sql.append("and studentId=:studentId ");
         }
@@ -154,7 +159,13 @@ public class SmallClassQueryService {
         if (null != publicFilterParam.getId()) {
             query.setParameter("id", publicFilterParam.getId());
         }
-        
+
+
+        if(null!=publicFilterParam.getIds()){
+            query.setParameter("ids", publicFilterParam.getIds());
+        }
+
+
         if (null != publicFilterParam.getClassType()) {
             query.setParameter("classType", publicFilterParam.getClassType());
         }
