@@ -107,11 +107,6 @@ public class InstantClassTeacherService {
         try {
             List<WorkOrder> workOrders = this.initCardAndSchedule(instantClassCard, instantAssignTeacher);
 
-            if (!Objects.isNull(ThreadLocalUtil.waitReleasedWorkOrder.get())) {
-                //释放最后一节教师的课
-                logger.debug("@prepareForInstantClass释放最后一节课的教师资源,参数[{}]", instantClassCard);
-                teacherStudentRequester.releaseTeacher(ThreadLocalUtil.waitReleasedWorkOrder.get());
-            }
             try {
                 BeanUtils.copyProperties(
                         instantGroupInfo, courseOnlineRequester.instantCreateGroup(
@@ -120,6 +115,13 @@ public class InstantClassTeacherService {
                 logger.error("@prepareForInstantClass#创建群组失败,instantcard:[{}]", instantClassCard, ex);
                 throw new BusinessException("创建群组失败");
             }
+
+            if (!Objects.isNull(ThreadLocalUtil.waitReleasedWorkOrder.get())) {
+                //释放最后一节教师的课
+                logger.debug("@prepareForInstantClass释放最后一节课的教师资源,参数[{}]", instantClassCard);
+                teacherStudentRequester.notifyCancelTeacher(ThreadLocalUtil.waitReleasedWorkOrder.get());
+            }
+            
             return workOrders;
         }
         //所有在分配老师后异常的抢课卡需要释放原来的教师资源
