@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.web.param.fishcardcenetr;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by hucl on 17/1/10.
@@ -82,5 +83,10 @@ public class PublicFilterParam {
     private Boolean showGroup;// 是否显示group信息  null 和 true 显示  false 不显示
 
     private String classType;// classType   SMALL  小班课  PULIC 公开课  NORMAL 正常课程（1对1）
+
+    private Long times;//几个人
+
+    private List<Long> ids;//用于判断小班课人数过滤条件
+
 
 }
