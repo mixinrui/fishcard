@@ -80,7 +80,7 @@ public interface ServiceJpaRepository extends JpaRepository<Service, Long> {
     List<Service> findByStudentIdAndComboTypeInAndCoursesSelectedAndProductType(Long studentId, String[] comboType, Integer selectedFlag, Integer productType);
 
     List<Service> findByStudentIdAndCoursesSelectedAndProductType(Long studentId, Integer selectedFlag, Integer productType);
-    
+
     //查找出学生所有状态的工单
     @Query("select distinct sv.studentId from Service sv")
     public List<Long> findDistinctUsersFromService();
@@ -88,6 +88,17 @@ public interface ServiceJpaRepository extends JpaRepository<Service, Long> {
     //初始化客服系统中外教点评
     @Query("SELECT s FROM Service s where s.productType = '1002'")
     List<Service> findByProductType();
+
+    //初始化客服系统中外教点评
+    @Query("SELECT s FROM Service s where s.studentId=?1 and s.productType = '1001' and (s.classSize is null or s.classSize<?2)")
+    List<Service> findOne2OneServices(Long studentId, Integer classSize);
+
+    @Query("SELECT s FROM Service s where s.studentId=?1 and s.productType = '1001' and s.classSize>?2")
+    List<Service> findSmallClassServices(Long studentId, Integer classSize);
+
+    List<Service> findByStudentIdAndProductTypeAndComboType(Long studentId,Integer productType,String comboType);
+
+    List<Service> findByStudentIdAndProductTypeAndComboTypeNot(Long studentId,Integer productType,String comboType);
 
     List<Service> findByStudentIdAndCoursesSelectedAndProductTypeAndComboTypeNotIn(Long studentId, int i, int value, List<String> fiteredComboTypes);
 }
