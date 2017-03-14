@@ -33,13 +33,14 @@ public class CardCourseModifyController {
         return JsonResultModel.newJsonResultModel("ok");
     }
 
+    //修改鱼卡的课程(改难度等 更改课程难度 )
     @RequestMapping(value = "/courses/all", method = RequestMethod.PUT)
     public JsonResultModel changeOrderCourses(@RequestBody CourseChangeParam courseChangeParam) {
         fishCardModifyServiceX.changerderCourses(courseChangeParam.getStudentId());
         return JsonResultModel.newJsonResultModel("ok");
     }
 
-    //修改鱼卡的课程
+    //修改鱼卡的课程(改难度等 手工调用 )
     @RequestMapping(value = "/course", method = RequestMethod.PUT)
     public JsonResultModel changeCourse(@RequestBody CourseChangeParam courseChangeParam){
         fishCardModifyServiceX.changCourse(courseChangeParam.getWorkOrderId());

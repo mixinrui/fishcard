@@ -9,6 +9,8 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,11 +36,15 @@ public class PersistCoursesHandler {
     @Autowired
     private UrlConf urlConf;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Transactional
     public void persistCourseInfos(WorkOrder workOrder, CourseSchedule courseSchedule, RecommandCourseView courseView) {
         // 保存鱼卡
         workOrder.initCourseInfo(courseView);
-        workOrderJpaRepository.save(workOrder);
+        //workOrderJpaRepository.save(workOrder); 防止更改其他字段
+        workOrderJpaRepository.setFixedCourseIdAndCourseNameAndCourseTypeAndStatusFor(workOrder.getCourseId(),workOrder.getCourseName(),workOrder.getCourseType(),workOrder.getStatus(),courseSchedule.getId());
+
 
         // 记鱼卡日志
         workOrderLogService.saveWorkOrderLog(workOrder,
@@ -50,8 +56,10 @@ public class PersistCoursesHandler {
         courseSchedule.setCourseId(workOrder.getCourseId());
         courseSchedule.setCourseName(workOrder.getCourseName());
         courseSchedule.setCourseType(workOrder.getCourseType());
-        courseScheduleRepository.save(courseSchedule);
 
+       // courseScheduleRepository.save(courseSchedule); 防止更改其他字段
+        courseScheduleRepository.setFixedCourseIdAndCourseNameAndCourseTypeAndStatusFor(workOrder.getCourseId(),workOrder.getCourseName(),workOrder.getCourseType(),workOrder.getStatus(),courseSchedule.getId());
+        logger.info("persistCourseInfos:courseId:[{}],courseName:[{}],CourseType:[{}],Status:[{}],id:[{}]",workOrder.getCourseId(),workOrder.getCourseName(),workOrder.getCourseType(),workOrder.getStatus(),courseSchedule.getId());
         // 保存mongo课程信息
         ScheduleCourseInfo scheduleCourseInfo = scheduleCourseInfoService.queryByWorkId(workOrder.getId());
         if(scheduleCourseInfo == null) {
