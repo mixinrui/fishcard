@@ -153,8 +153,10 @@ public class HomePageServiceX {
     private StudentClassInfo buildEmptyClassInfo() {
         if (Objects.isNull(emptyStudentClassInfo)) {
             synchronized (this) {
-                logger.debug("@buildEmptyClassInfo#首次初始化emptyStudentClassInfo");
-                emptyStudentClassInfo = new StudentClassInfo(-1l, -1l);
+                if (Objects.isNull(emptyStudentClassInfo)) {
+                    logger.debug("@buildEmptyClassInfo#首次初始化emptyStudentClassInfo");
+                    emptyStudentClassInfo = new StudentClassInfo(-1l, -1l);
+                }
             }
         }
         return this.emptyStudentClassInfo;
