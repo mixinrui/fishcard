@@ -54,7 +54,7 @@ public class CallBackLogServiceX {
     }
 
     public void updateSet(CallBackHeartBeatParam callBackHeartBeatParam) {
-        if (JSON.toJSONString(callBackHeartBeatParam).contains(CallBackBeanEnum.heartBeat.name())) {
+        if (JSON.toJSONString(callBackHeartBeatParam).contains(CallBackBeanEnum.heartbeat.name())) {
             updateHeartBeatSet(callBackHeartBeatParam);
         } else {
             updateTeacherCommands(callBackHeartBeatParam);
