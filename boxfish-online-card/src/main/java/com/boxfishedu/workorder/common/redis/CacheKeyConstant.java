@@ -33,4 +33,11 @@ public class CacheKeyConstant {
 
     // 公开课课堂, 通过id查询
     public static final String PUBLIC_CLASS_ROOM_WITH_ID = "PUBLIC_CLASS_ROOM_WITH_ID";
+
+    public static final String SMALL_CLASS_HEART_BEAT_KEY="groupkey:";
+
+    public static final String TEACHER_OPERATION_KEY="teacheroperation:";
+
+    public static final String STUDENT_PICKED_KEY="group:selected:";
+
 }

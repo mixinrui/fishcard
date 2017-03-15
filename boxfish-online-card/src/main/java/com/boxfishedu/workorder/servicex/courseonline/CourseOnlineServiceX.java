@@ -111,13 +111,6 @@ public class CourseOnlineServiceX {
         //处理参数问题
         dealNullFishCard(workOrderId, workOrder, courseSchedule);
 
-        //未到上课时间尝试更新,不做处理
-//        Date now = new Date();
-//        if (now.before(workOrder.getStartTime())) {
-//            tooEarlyReport(status, workOrder);
-//            return;
-//        }
-
         //处理完成的情况
         if (status == FishCardStatusEnum.COMPLETED.getCode() || status == FishCardStatusEnum.COMPLETED_FORCE.getCode()) {
             logger.debug("@updateTeachingStatus#complete#fishcard{}完成上课,开始做完成处理", workOrder.getId());
