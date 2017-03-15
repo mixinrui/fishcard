@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -95,6 +96,12 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     @Autowired
     CourseOnlineServiceX courseOnlineServiceX;
 
+    @Autowired
+    private  WorkOrderJpaRepository workOrderJpaRepository;
+
+    @Autowired
+    private CourseScheduleRepository courseScheduleRepository;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public Page<WorkOrder> findByServiceIdOrderByStartTime(Long serviceId, Pageable pageable) {
@@ -145,6 +152,15 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     public void saveWorkOrderAndSchedule(WorkOrder workOrder, CourseSchedule courseSchedule) {
         this.save(workOrder);
         courseScheduleService.save(courseSchedule);
+        logger.info("||||||鱼卡[{}]入库成功;排课表入库成功[{}]", workOrder.getId(), courseSchedule.getId());
+    }
+
+    @Transactional
+    public void saveWorkOrderAndScheduleForSingleValue(WorkOrder workOrder, CourseSchedule courseSchedule) {
+       // this.save(workOrder);
+        workOrderJpaRepository.setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(workOrder.getCourseId(),workOrder.getCourseName(),workOrder.getCourseType(),workOrder.getUpdatetimeChangecourse(),workOrder.getSendflagcc(),workOrder.getId());
+        //courseScheduleService.save(courseSchedule);
+        courseScheduleRepository.setFixedCourseIdAndCourseNameAndCourseTypeFor(courseSchedule.getCourseId(),courseSchedule.getCourseName(),courseSchedule.getCourseType(),courseSchedule.getId());
         logger.info("||||||鱼卡[{}]入库成功;排课表入库成功[{}]", workOrder.getId(), courseSchedule.getId());
     }
 

@@ -215,6 +215,8 @@ interface:
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
+#定时解散公开课和小班课群组
+    destroy_group_service: http://123.56.13.168:9090
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099/teacher
@@ -223,6 +225,7 @@ service:
     innerTeacherUrl: http://123.56.13.168:8099/teacher
     #错误异常提醒邮件发送地址
 #    errorReportMailUrl: http://120.27.236.110:9098/mail
+
   gateway:
     type: test
 time:
@@ -283,6 +286,8 @@ interface:
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
+#定时解散公开课和小班课群组
+    destroy_group_service: http://123.56.13.168:9090
 service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099/teacher
@@ -353,6 +358,8 @@ interface:
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
+#定时解散公开课和小班课群组
+    destroy_group_service: http://123.56.13.168:9090
 service:
   sdk:
     teacherAbsenceUrl: http://101.201.237.252:8099/teacher
@@ -439,7 +446,8 @@ interface:
     msg_push_url: http://123.56.13.168:9091
     # 会员url
     memberUrl: http://123.56.6.91:8888/member
-
+#定时解散公开课和小班课群组
+    destroy_group_service: http://123.56.13.168:9090
 service:
   sdk:
     teacherAbsenceUrl: http://123.56.13.168:8099/teacher
@@ -525,6 +533,8 @@ interface:
     course_type_and_difficulty: https://online-api.test.boxfish.cn/
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
+#定时解散公开课和小班课群组
+    destroy_group_service: http://123.56.13.168:9090
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099/teacher
@@ -599,6 +609,8 @@ interface:
     resource_url: http://api.online.test.boxfish.cn/online
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
+#定时解散公开课和小班课群组
+    destroy_group_service: http://123.56.13.168:9090
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099/teacher
@@ -671,6 +683,8 @@ interface:
     course_type_and_difficulty: https://base.boxfish.cn
 #消息推送地址
     msg_push_url: http://123.56.13.168:9091
+#定时解散公开课和小班课群组
+    destroy_group_service: http://123.56.13.168:9090
 service:
   sdk:
     teacherAbsenceUrl: http://127.0.0.1:8099
@@ -765,7 +779,8 @@ interface:
     msg_push_url: http://online.boxfish.cn/boxfish-push
     # 会员url
     memberUrl: https://pay.boxfish.cn/member
-
+#定时解散公开课和小班课群组
+    destroy_group_service: http://online-api.boxfish.cn/teaching-service
 time:
   task:
     nodeOne: 0
@@ -851,6 +866,8 @@ interface:
     msg_push_url: http://online.boxfish.cn/boxfish-push
     # 会员url
     memberUrl: https://pay.boxfish.cn/member
+#定时解散公开课和小班课群组
+    destroy_group_service: http://online-api.boxfish.cn/teaching-service
 #外教点评接口调用地址
 service:
   sdk:

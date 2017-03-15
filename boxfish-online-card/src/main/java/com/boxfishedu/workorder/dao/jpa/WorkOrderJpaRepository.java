@@ -24,6 +24,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     //按照订单id查找鱼卡
     public Page<WorkOrder> findByOrderIdAndIsFreeze(Long orderId, Integer isFreeze, Pageable pageable);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     public WorkOrder findByOrderIdAndServiceId(Long orderId, Long serviceId);
 
 
@@ -250,5 +251,13 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("SELECT wo.smallClassId from WorkOrder wo where wo.smallClassId is not null and wo.classType=?1   GROUP BY  wo.smallClassId HAVING count(wo.id) <=?2 ")
     public List<Long> findDistinctSmallClassFromWorkOrder(String classType, Long times);
 
+
+    @Modifying
+    @Query("update WorkOrder o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3 ,o.status = ?4 ,o.updateTime=current_timestamp    where o.id = ?5")
+    int setFixedCourseIdAndCourseNameAndCourseTypeAndStatusFor(String courseId, String courseName ,String courseType, Integer status, Long workorderId);
+
+    @Modifying
+    @Query("update WorkOrder o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3 ,o.updatetimeChangecourse= ?4 ,o.sendflagcc= ?5 ,o.updateTime=current_timestamp    where o.id = ?6")
+    int setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(String courseId, String courseName ,String courseType,Date updateTimeChangeCourse,String sendFlaggcc, Long workorderId);
 
 }

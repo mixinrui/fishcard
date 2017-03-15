@@ -116,7 +116,10 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         //}
 
         scheduleCourseInfoService.updateCourseIntoScheduleInfo(scheduleCourseInfo);
-        workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
+        //workOrderService.saveWorkOrderAndSchedule(workOrder, courseSchedule);
+        // 防止并发 更改其他字段
+        workOrderService.saveWorkOrderAndScheduleForSingleValue(workOrder, courseSchedule);
+
         workOrderLogService.saveWorkOrderLog(workOrder, "!更换课程信息,老课程[" + oldCourseName + "]");
     }
 

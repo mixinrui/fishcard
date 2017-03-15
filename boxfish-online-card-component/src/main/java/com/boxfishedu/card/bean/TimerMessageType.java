@@ -75,7 +75,10 @@ public enum TimerMessageType {
     CLOSE_COMMENT_CARD_ORDER(156),
 
     //向学生系统传入鱼卡状态(已完成)
-    SNED_STUDENT_FISHCARD_STATUS(157);
+    SNED_STUDENT_FISHCARD_STATUS(157),
+
+    //定时解散公开课和小班课群组
+    DESTROY_PUBLIC_AND_SMALL_GROUP(158);
 
 
     private int code;

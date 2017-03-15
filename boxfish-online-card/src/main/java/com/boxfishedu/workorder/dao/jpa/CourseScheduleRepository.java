@@ -117,4 +117,12 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
 
     List<CourseSchedule> findBySmallClassId(Long smallClassId);
 
+    @Modifying
+    @Query("update CourseSchedule o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3 ,o.status = ?4 ,o.updateTime=current_timestamp    where o.id = ?5")
+    int setFixedCourseIdAndCourseNameAndCourseTypeAndStatusFor(String courseId, String courseName ,String courseType, Integer status, Long courseScheduleId);
+
+    @Modifying
+    @Query("update CourseSchedule o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3  ,o.updateTime=current_timestamp    where o.id = ?4")
+    int setFixedCourseIdAndCourseNameAndCourseTypeFor(String courseId, String courseName ,String courseType,  Long courseScheduleId);
+
 }
