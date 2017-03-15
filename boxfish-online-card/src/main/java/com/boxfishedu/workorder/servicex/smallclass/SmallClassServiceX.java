@@ -10,8 +10,10 @@ import com.boxfishedu.workorder.servicex.callbacklog.CallBackLogServiceX;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -40,6 +42,8 @@ public class SmallClassServiceX {
 
     SetOperations<String, String> setOperations;
 
+    ListOperations<String, String> listOperations;
+
     @Autowired
     CallBackLogServiceX callBackLogServiceX;
 
@@ -54,6 +58,7 @@ public class SmallClassServiceX {
         this.redisTemplate = redisTemplate;
         this.zSetOperations = redisTemplate.opsForZSet();
         this.setOperations = redisTemplate.opsForSet();
+        this.listOperations = redisTemplate.opsForList();
     }
 
     public Map<String, Object> getTeacherValidateMap(Long smallClassId) {
@@ -98,9 +103,18 @@ public class SmallClassServiceX {
 
     public Long candidateInterval() {
         String interval = configBeanMorphiaRepository.getSingleBean().getCandidateInterval();
-        if(Objects.isNull(interval)){
+        if (Objects.isNull(interval)) {
             return 3l;
         }
         return Long.parseLong(interval);
+    }
+
+    public Long currentPageIndex(Long smallClassId) {
+        String key = RedisKeyGenerator.getTeacherOperationKey(smallClassId);
+        List<String> pageIndexes = listOperations.range(key, 0, 0);
+        if (CollectionUtils.isEmpty(pageIndexes)) {
+            return -1l;
+        }
+        return Long.parseLong(pageIndexes.get(0));
     }
 }

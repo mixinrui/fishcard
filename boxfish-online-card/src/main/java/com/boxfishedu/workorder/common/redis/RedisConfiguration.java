@@ -83,15 +83,15 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         // 时间片有效期为2小时
         expires.put("timeSlots", 3600 * 2L);
         expires.put(DayTimeSlots.CACHE_KEY, 3600 * 2L);
-        expires.put(CacheKeyConstant.NOTIFY_TEACHEZr_PREPARE_CLASS_KEY,60*10l);
-        expires.put(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY,3600*24L);
+        expires.put(CacheKeyConstant.NOTIFY_TEACHEZr_PREPARE_CLASS_KEY, 60 * 10l);
+        expires.put(CacheKeyConstant.TIME_LIMIT_RULES_CACHE_KEY, 3600 * 24L);
         //  鱼卡后台 用户信息永久有效
-        expires.put(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO,3600 * 24 * 30 *12 * 15L);
-        expires.put(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY,60*10l);
+        expires.put(CacheKeyConstant.FISHCARD_BACK_ORDER_USERINFO, 3600 * 24 * 30 * 12 * 15L);
+        expires.put(CacheKeyConstant.NOTIFY_TEACHER_PREPARE_CLASS_KEY, 60 * 10l);
         // 防重复选时间缓存
         expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 2L);
         //立即上课,缓存三分钟
-        expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 3*60L);
+        expires.put(CacheKeyConstant.WORKORDERS_REPEATED_SUBMISSION, 3 * 60L);
         // 选时间缓存一周
         expires.put(CacheKeyConstant.BASE_TIME_SLOTS, 3600 * 24 * 7L);
         // 外教点评次数缓存
@@ -99,11 +99,16 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         // 公开课缓存一天
         expires.put(CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_LEVELANDDATE, 3600 * 24L);
         expires.put(CacheKeyConstant.PUBLIC_CLASS_ROOM_WITH_ID, 3600 * 24L);
+
+        //学生骰子
+        expires.put(CacheKeyConstant.SMALL_CLASS_HEART_BEAT_KEY, 3600 * 24L * 5);
+        expires.put(CacheKeyConstant.TEACHER_OPERATION_KEY, 3600 * 24L * 5);
+        expires.put(CacheKeyConstant.STUDENT_PICKED_KEY, 3600 * 24L * 5);
         cacheManager.setExpires(expires);
         return cacheManager;
     }
 
-    @Bean(name="teachingServiceRedisTemplate")
+    @Bean(name = "teachingServiceRedisTemplate")
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
         StringRedisTemplate template = new StringRedisTemplate(factory);
         setSerializer(template); //设置序列化工具，这样ReportBean不需要实现Serializable接口
@@ -111,13 +116,14 @@ public class RedisConfiguration extends CachingConfigurerSupport {
         return template;
     }
 
-    @Bean(name="stringLongRedisTemplate")
+    @Bean(name = "stringLongRedisTemplate")
     public RedisTemplate<String, Long> stringLongTemplate(RedisConnectionFactory factory) {
-        RedisTemplate<String,Long> stringLongTemplate = new RedisTemplate<>();
+        RedisTemplate<String, Long> stringLongTemplate = new RedisTemplate<>();
         RedisSerializer<String> stringSerializer = new StringRedisSerializer();
         stringLongTemplate.setKeySerializer(stringSerializer);
         stringLongTemplate.setConnectionFactory(factory);
-        stringLongTemplate.afterPropertiesSet();;
+        stringLongTemplate.afterPropertiesSet();
+        ;
         return stringLongTemplate;
     }
 
