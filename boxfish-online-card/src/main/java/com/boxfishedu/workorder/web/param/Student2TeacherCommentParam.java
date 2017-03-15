@@ -13,4 +13,5 @@ public class Student2TeacherCommentParam {
     private List<String> forGoodReviews;
     private List<String> forBadReviews;
     private Long studentId;
+    private List<String> tagCode;
 }
