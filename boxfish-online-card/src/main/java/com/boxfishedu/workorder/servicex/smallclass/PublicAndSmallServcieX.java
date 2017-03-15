@@ -37,12 +37,11 @@ public class PublicAndSmallServcieX {
         LocalDateTime now = LocalDateTime.now();
         List<SmallClass> listPublicAndSmall = smallClassJpaRepository.findPublicAndSmallClassForDestory(
                 DateUtil.localDate2Date(now.minusHours(0)),DateUtil.localDate2Date(now.minusHours(24)));
-        StringBuffer stringBuffer = new StringBuffer(destroyGroupUrl);
-        stringBuffer.append("/teaching/destroy/public_and_small_group/");
-        listPublicAndSmall.stream().filter(smallClass -> Objects.nonNull(smallClass)).forEach(smallClass -> {
-            StringBuffer sbTemp = stringBuffer;
-            sbTemp.append(smallClass.getGroupId());
-            restTemplate.delete(UriComponentsBuilder.fromUriString(sbTemp.toString())
+        StringBuilder stringBuilder = new StringBuilder(destroyGroupUrl);
+        stringBuilder.append("/teaching/destroy/public_and_small_group/");
+        listPublicAndSmall.stream().filter(Objects::nonNull).forEach(smallClass -> {
+            stringBuilder.append(smallClass.getGroupId());
+            restTemplate.delete(UriComponentsBuilder.fromUriString(stringBuilder.toString())
                     .path("")
                     .queryParam("")
                     .build()
