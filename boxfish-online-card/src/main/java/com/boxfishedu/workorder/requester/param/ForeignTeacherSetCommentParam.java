@@ -35,7 +35,11 @@ public class ForeignTeacherSetCommentParam {
         }
 
         if(CollectionUtils.isNotEmpty(student2TeacherCommentParam.getForBadReviews())) {
-            foreignTeacherSetCommentParam.setForBadReviews(student2TeacherCommentParam.getTagCode());
+            if(CollectionUtils.isNotEmpty(student2TeacherCommentParam.getTagCode())){
+                foreignTeacherSetCommentParam.setForBadReviews(student2TeacherCommentParam.getTagCode());
+            }else {
+                foreignTeacherSetCommentParam.setForBadReviews(student2TeacherCommentParam.getForBadReviews());
+            }
         }
         return foreignTeacherSetCommentParam;
     }
