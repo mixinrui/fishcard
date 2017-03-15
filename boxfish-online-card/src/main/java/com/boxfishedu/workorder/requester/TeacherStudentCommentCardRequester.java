@@ -59,6 +59,7 @@ public class TeacherStudentCommentCardRequester {
 
 
     public void sendStudentComment2Teacher(Student2TeacherCommentParam student2TeacherCommentParam) {
+        logger.debug("<<<<<<<<<<<<<@[sendStudentComment2Teaxcher]点评卡修改[[[[设置鱼卡的点评信息]]]],参数:[{}]",student2TeacherCommentParam);
         CommentCard commentCard=commentCardTeacherAppService.findById(student2TeacherCommentParam.getCommentCardId());
         if(null==commentCard){
             throw new BusinessException("不存在对应的点评卡:["+student2TeacherCommentParam.getCommentCardId()+"]");
