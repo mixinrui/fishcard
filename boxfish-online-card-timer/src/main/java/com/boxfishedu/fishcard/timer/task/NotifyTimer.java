@@ -403,7 +403,7 @@ public class NotifyTimer {
      */
     @Scheduled(cron = "0 30 1 * * ?")
     public void destroyPublicAndSmallClassGroup(){
-        logger.info("<<<<<<destoryPublicAndSmallClassGroup开始通知<<<群组(teaching-service)>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        logger.info("<<<<<<destroyPublicAndSmallClassGroup开始通知<<<群组(teaching-service)>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.DESTROY_PUBLIC_AND_SMALL_GROUP.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
