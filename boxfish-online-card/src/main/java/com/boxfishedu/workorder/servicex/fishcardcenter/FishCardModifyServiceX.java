@@ -460,7 +460,7 @@ public class FishCardModifyServiceX {
 
         Long workOrderId = fishCardModifyService.changeStartTimeFishCard(startTimeParam, checkTimeflag);
         dataCollectorService.updateBothChnAndFnItemForCardId(workOrderId);
-        WorkOrder workOrder = workOrderService.findByIdForUpdate(workOrderId)  ;
+        WorkOrder workOrder = workOrderService.findOne(workOrderId) ;
         logger.info("changeStartTime 准备 分配老师 workOrderId {[]}", workOrder.getId());
         if (workOrder.getTeacherId() == 0) {
             logger.info("changeStartTime 满足 分配老师 条件 workOrderId {[]}", workOrder.getId());
