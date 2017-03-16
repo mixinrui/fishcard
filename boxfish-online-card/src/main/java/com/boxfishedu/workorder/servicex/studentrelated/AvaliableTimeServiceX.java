@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.servicex.studentrelated;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
@@ -57,6 +59,7 @@ public class AvaliableTimeServiceX {
     @Value("${choiceTime.consumerStartDay:2}")
     private Integer consumerStartDay;
     private final static Integer daysOfWeek = 7;
+    private final static Integer smallClassSlot= 27;//
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -101,6 +104,9 @@ public class AvaliableTimeServiceX {
         avaliableTimeParam.setTutorType(workOrder.getService().getTutorType());
         avaliableTimeParam.setDate(date);
 
+        if( ClassTypeEnum.SMALL.name().equals(workOrder.getClassType())  &&   !DateUtil.getWeekDay3567(DateUtil.String2Date(date)) && null!=workOrder.getSmallClassId()){
+            return JsonResultModel.newJsonResultModel(null);
+        }
 
         Integer days = new Integer(1);
         // 获取时间区间
@@ -116,9 +122,17 @@ public class AvaliableTimeServiceX {
 //            DayTimeSlots result = timeLimitPolicy.limit(clone);
             //获取时间片范围内的数据
             DayTimeSlots result = randomSlotFilterService.removeSlotsNotInRange(clone,avaliableTimeParam);
-            result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
-                    .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
-                    .collect(Collectors.toList()));
+            if(ClassTypeEnum.SMALL.name().equals(workOrder.getClassType()) ){
+                result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+                        .filter(t ->  (    !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))    && (  WorkOrderConstant.slots.contains(t.getSlotId().intValue()))  )
+
+                        .collect(Collectors.toList()));
+            }else {
+                result.setDailyScheduleTime(result.getDailyScheduleTime().stream()
+                        .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", clone.getDay(), t.getSlotId().toString())))
+                        .collect(Collectors.toList()));
+            }
+
             return result;
         });
         return JsonResultModel.newJsonResultModel(new MonthTimeSlots(dayTimeSlotsList).getData());
