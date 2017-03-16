@@ -262,7 +262,7 @@ public class RabbitMqReciver {
                 logger.info("==========>CLOSE_COMMENT_CARD_ORDER ===>>> 检查外教点评次数用尽、关闭订单");
                 foreignTeacherCommentCardService.closeCommentCardOrder();
             }else if(serviceTimerMessage.getType() == TimerMessageType.SNED_STUDENT_FISHCARD_STATUS.value()){
-                logger.info("==========>CLOSE_COMMENT_CARD_ORDER ===>>>向学生系统传入上课课程鱼卡信息");
+                logger.info("==========>CHECK_FINISH_COURSE_THEN_SEND ===>>>向学生系统传入上课课程鱼卡信息");
                 computeFishCard.compute();
             } else if(serviceTimerMessage.getType() == TimerMessageType.DESTROY_PUBLIC_AND_SMALL_GROUP.value()){
                 publicAndSmallServcieX.destroyPublicAndSmallClass();
