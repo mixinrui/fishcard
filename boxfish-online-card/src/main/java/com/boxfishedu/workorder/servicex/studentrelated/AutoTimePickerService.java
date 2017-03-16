@@ -159,6 +159,9 @@ public class AutoTimePickerService {
             }
         }
 
+
+        logger.info("@auToMakeClassesForSmallClass");
+
         if (null == workOrder) {
             logger.error("auToMakeClassesForSmallClassERROR,订单id:[{}]没有生成workOrder", service.getOrderId());
             return;

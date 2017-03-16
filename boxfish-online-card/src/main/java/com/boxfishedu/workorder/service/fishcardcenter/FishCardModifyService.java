@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.service.fishcardcenter;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.config.UrlConf;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -165,6 +166,19 @@ public class FishCardModifyService extends BaseService<WorkOrder, WorkOrderJpaRe
         //获取鱼卡信息
         WorkOrder workOrder =workOrderService.findByIdForUpdate(startTimeParam.getWorkOrderId())   ;
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(startTimeParam.getWorkOrderId());
+
+        //小班课更改时间验证
+        if(ClassTypeEnum.SMALL.name().equals(workOrder.getClassType())){
+
+            if(!Objects.isNull(workOrder.getSmallClassId())){
+                throw new BusinessException("已经排课的小班课不支持更改时间操作");
+            }
+
+            if( !DateUtil.getWeekDay3567(startTimeParam.getBeginDateFormat()) || !WorkOrderConstant.slots.contains(startTimeParam.getTimeslotId())){
+                throw new BusinessException("小班课日期不合法");
+            }
+
+        }
 
         if(null == workOrder || courseSchedule ==null){
             throw new BusinessException("课程信息不存在");

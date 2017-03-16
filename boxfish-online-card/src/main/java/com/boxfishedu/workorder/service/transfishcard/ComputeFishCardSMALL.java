@@ -157,7 +157,7 @@ public class ComputeFishCardSMALL {
     }
 
     public Date getBeginDate(){
-        return DateTime.now().minusDays(3).toDate();
+        return DateTime.now().minusDays(2).toDate();
     }
 
     public Date getBaseNowDate(){

@@ -26,7 +26,7 @@ import com.boxfishedu.workorder.servicex.graborder.CourseChangeServiceX;
 import com.boxfishedu.workorder.servicex.graborder.MakeWorkOrderServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.timer.InstantClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.orderrelated.OrderRelatedServiceX;
-import com.boxfishedu.workorder.servicex.smallclass.PublicAndSmallServcieX;
+import com.boxfishedu.workorder.servicex.smallclass.PublicAndSmallServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.SmallClassTimerServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.groupbuilder.GroupBuilder;
 import com.boxfishedu.workorder.servicex.studentrelated.PublicClassRoom;
@@ -119,7 +119,7 @@ public class RabbitMqReciver {
     private ComputeFishCard computeFishCard;
 
     @Autowired
-    private PublicAndSmallServcieX publicAndSmallServcieX;
+    private PublicAndSmallServiceX publicAndSmallServiceX;
     /**
      * 订单中心转换请求
      */
@@ -262,10 +262,10 @@ public class RabbitMqReciver {
                 logger.info("==========>CLOSE_COMMENT_CARD_ORDER ===>>> 检查外教点评次数用尽、关闭订单");
                 foreignTeacherCommentCardService.closeCommentCardOrder();
             }else if(serviceTimerMessage.getType() == TimerMessageType.SNED_STUDENT_FISHCARD_STATUS.value()){
-                logger.info("==========>CLOSE_COMMENT_CARD_ORDER ===>>>向学生系统传入上课课程鱼卡信息");
+                logger.info("==========>CHECK_FINISH_COURSE_THEN_SEND ===>>>向学生系统传入上课课程鱼卡信息");
                 computeFishCard.compute();
             } else if(serviceTimerMessage.getType() == TimerMessageType.DESTROY_PUBLIC_AND_SMALL_GROUP.value()){
-                publicAndSmallServcieX.destroyPublicAndSmallClass();
+                publicAndSmallServiceX.destroyPublicAndSmallClass();
             }
             //
         } catch (Exception ex) {
