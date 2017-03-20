@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.InstantTeacherRequester;
 import com.boxfishedu.workorder.web.param.InstantRequestParam;
 import com.boxfishedu.workorder.web.param.TeacherInstantRequestParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,11 +21,12 @@ public class ThreadLocalUtil {
     public static final ThreadLocal<Date> classDateIn30Minutes = new ThreadLocal<>();
     public static final ThreadLocal<InstantClassCard> instantCardMatched30Minutes = new ThreadLocal<>();
     public static final ThreadLocal<String> unFinishedCourses30MinutesTips = new ThreadLocal<>();
-    public static final ThreadLocal<WorkOrder> waitReleasedWorkOrder=new ThreadLocal<>();
-    public static final ThreadLocal<InstantTeacherRequester.InstantAssignTeacherParam> instantAssignTeacherParam=new ThreadLocal<>();
-    public static final ThreadLocal<Long> visitUser=new ThreadLocal<>();
+    public static final ThreadLocal<WorkOrder> waitReleasedWorkOrder = new ThreadLocal<>();
+    public static final ThreadLocal<InstantTeacherRequester.InstantAssignTeacherParam> instantAssignTeacherParam = new ThreadLocal<>();
+    public static final ThreadLocal<TrialSmallClassParam> trialSmallClassParamLocal = new ThreadLocal<>();
+    public static final ThreadLocal<Long> visitUser = new ThreadLocal<>();
 
-    public static TeacherInstantRequestParam getTeacherInstantParam(){
+    public static TeacherInstantRequestParam getTeacherInstantParam() {
         return TeacherInstantParamThreadLocal.get();
     }
 

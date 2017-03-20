@@ -15,10 +15,12 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
+import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.param.StudentForSmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -100,7 +102,7 @@ public class SmallClassBackServiceX {
         List<SmallClassStu> smallClassStus = smallClassStuJpaRepository.findByStuWithOutClasses(smallClass.getStartTime());
         //2 增加level 过滤level
         filterSmallClassStu(smallClassStus);
-        smallClassStus =filterEqualLevel(smallClass, smallClassStus);
+        smallClassStus = filterEqualLevel(smallClass, smallClassStus);
 
         //3 课程过滤  还未讨论
 
@@ -126,9 +128,9 @@ public class SmallClassBackServiceX {
     }
 
 
-    private List<SmallClassStu> filterEqualLevel(SmallClass smallClass, List<SmallClassStu> smallClassStus){
+    private List<SmallClassStu> filterEqualLevel(SmallClass smallClass, List<SmallClassStu> smallClassStus) {
         // 过滤level 可以过滤相同level  如果level5  可以放level 5,6,7,8 的学生  枚举类 LevelEnum
-        return  smallClassStus.stream().filter(smallClassStu ->
+        return smallClassStus.stream().filter(smallClassStu ->
                 (
                         smallClass.getDifficultyLevel().equals(smallClassStu.getLevel())
                 )
@@ -136,26 +138,20 @@ public class SmallClassBackServiceX {
     }
 
 
+    public JsonResultModel getStudentBackUpList(Long studentId, Pageable pageable) {
+        if (Objects.isNull(studentId)) {
+            return JsonResultModel.newJsonResultModel(smallClassStuJpaRepository.findAll(pageable));
+        } else {
+            return JsonResultModel.newJsonResultModel(smallClassStuJpaRepository.findByStudentId(studentId, pageable));
+        }
 
-
-
-
-
-
-     public JsonResultModel getStudentBackUpList(Long studentId,Pageable pageable){
-         if(Objects.isNull(studentId)){
-             return JsonResultModel.newJsonResultModel( smallClassStuJpaRepository.findAll(pageable));
-         }else {
-            return JsonResultModel.newJsonResultModel(  smallClassStuJpaRepository.findByStudentId(studentId,pageable));
-         }
-
-     }
+    }
 
 
     @Transactional
     public JsonResultModel deletebackup(Long studentId) {
-        SmallClassStu smallClassStu =  smallClassStuJpaRepository.findByStudentId(studentId);
-        if(Objects.isNull(smallClassStu)){
+        SmallClassStu smallClassStu = smallClassStuJpaRepository.findByStudentId(studentId);
+        if (Objects.isNull(smallClassStu)) {
             return JsonResultModel.newJsonResultModel("该学生不存在");
         }
 
@@ -165,8 +161,8 @@ public class SmallClassBackServiceX {
 
     @Transactional
     public JsonResultModel addbackup(StudentForSmallClassParam studentForSmallClassParam) {
-        SmallClassStu smallClassStu =  smallClassStuJpaRepository.findByStudentId(studentForSmallClassParam.getStudentId());
-        if(!Objects.isNull(smallClassStu)){
+        SmallClassStu smallClassStu = smallClassStuJpaRepository.findByStudentId(studentForSmallClassParam.getStudentId());
+        if (!Objects.isNull(smallClassStu)) {
             return JsonResultModel.newJsonResultModel("该学生已经存在");
         }
 
@@ -180,4 +176,10 @@ public class SmallClassBackServiceX {
     }
 
 
+    public void buildTrialSmallClass(TrialSmallClassParam trialSmallClassParam) {
+        ThreadLocalUtil.trialSmallClassParamLocal.set(trialSmallClassParam);
+        SmallClass smallClass = new SmallClass(trialSmallClassParam);
+        smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.CREATE);
+        new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
+    }
 }
