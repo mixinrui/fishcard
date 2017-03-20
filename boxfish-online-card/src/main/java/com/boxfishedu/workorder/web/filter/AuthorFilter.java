@@ -43,8 +43,7 @@ import java.util.Set;
         "/service/student/*",
         "/comment_card/*",
         "/comment/foreign/*",
-        "/graborder/*",
-        "/class/monitor/*"})
+        "/graborder/*"})
 public class AuthorFilter extends OncePerRequestFilter {
 
     private Logger logger = LoggerFactory.getLogger(AuthorFilter.class);
