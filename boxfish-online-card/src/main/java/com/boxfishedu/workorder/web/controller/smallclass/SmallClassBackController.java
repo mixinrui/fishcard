@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.smallclass;
 
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.servicex.bean.DayTimeSlots;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
@@ -13,6 +14,7 @@ import com.boxfishedu.workorder.web.param.StudentForSmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.SmallClassAddStuParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -129,26 +131,29 @@ public class SmallClassBackController {
 
     /**
      * 鱼卡后台 小班课列表获取补课学生列表
+     *
      * @param smallClassId
      * @return
      */
     @RequestMapping(value = "/stulist/{smallclass_id}", method = RequestMethod.GET)
     public JsonResultModel stulist(@PathVariable("smallclass_id") Long smallClassId) {
-       return smallClassBackServiceX.getStudentList(smallClassId);
+        return smallClassBackServiceX.getStudentList(smallClassId);
     }
 
     /**
      * 鱼卡后台 小班课列表查询所有补课学生level
+     *
      * @return
      */
     @RequestMapping(value = "/stulevellist", method = RequestMethod.GET)
     public JsonResultModel stulistforlevel() {
-        return  smallClassBackServiceX.getStudentList();
+        return smallClassBackServiceX.getStudentList();
     }
 
 
     /**
      * 批量给学生添加 订单forfree
+     *
      * @param smallClassAddStuParam
      * @return
      */
@@ -162,14 +167,11 @@ public class SmallClassBackController {
     }
 
 
-
-
-
-
     ///////   /service/backend
 
     /**
      * 删除候补学生名单
+     *
      * @param studentId
      * @return
      */
@@ -181,16 +183,18 @@ public class SmallClassBackController {
 
     /**
      * 获取候补学生名单
+     *
      * @param studentId
      * @return
      */
     @RequestMapping(value = "studentbackup/getlist", method = RequestMethod.GET)
     public JsonResultModel getStudents(Long studentId, Pageable pageable) {
-        return smallClassBackServiceX.getStudentBackUpList(studentId,pageable);
+        return smallClassBackServiceX.getStudentBackUpList(studentId, pageable);
     }
 
     /**
      * 新增候补学生名单
+     *
      * @param studentForSmallClassParam
      * @return
      */
@@ -199,5 +203,11 @@ public class SmallClassBackController {
         return JsonResultModel.newJsonResultModel(smallClassBackServiceX.addbackup(studentForSmallClassParam));
     }
 
+    @RequestMapping(value = "/smallclass/trial", method = RequestMethod.POST)
+    public JsonResultModel buildTrialSmallClass(@RequestBody TrialSmallClassParam trialSmallClassParam) {
+        logger.debug("@buildTrialSmallClass创建试讲小班课,参数[{}]", JacksonUtil.toJSon(trialSmallClassParam));
+//        smallClassBackServiceX.buildTrialSmallClass(trialSmallClassParam);
+        return JsonResultModel.newJsonResultModel("OK");
+    }
 
 }

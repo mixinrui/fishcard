@@ -42,13 +42,19 @@ public class CallBackLogServiceX {
         List<CallBackHeartBeatParam.CallBackMsgBody> callBackMsgBodies = callBackHeartBeatParam.getMsgBody();
         Long cardId = -1l;
         for (int i = 0; i < callBackMsgBodies.size(); i++) {
-            CallBackHeartBeatParam.CallBackMsgBody callBackMsgBody = callBackMsgBodies.get(i);
-            Map<String, Object> map = JacksonUtil.readValue(callBackMsgBody.getMsgContent().getData(), HashMap.class);
-            Object objectCardId = map.get("workOrderId");
-            if (Objects.isNull(objectCardId)) {
+            try {
+                CallBackHeartBeatParam.CallBackMsgBody callBackMsgBody = callBackMsgBodies.get(i);
+                Map<String, Object> map = JacksonUtil.readValue(callBackMsgBody.getMsgContent().getData(), HashMap.class);
+                Object objectCardId = map.get("workOrderId");
+                if (Objects.isNull(objectCardId)) {
+                    continue;
+                }
+                cardId = Long.parseLong(objectCardId.toString());
+            }
+            catch (Exception ex){
                 continue;
             }
-            cardId = Long.parseLong(objectCardId.toString());
+
         }
         return cardId;
     }
@@ -98,23 +104,37 @@ public class CallBackLogServiceX {
     }
 
     private String getRole(CallBackHeartBeatParam callBackHeartBeatParam) {
-        Map<String, Object> map = JacksonUtil.readValue(callBackHeartBeatParam.getMsgBody().get(0).getMsgContent().getData(), HashMap.class);
-        if (Objects.isNull(map.get("role"))) {
-            return null;
+        List<CallBackHeartBeatParam.CallBackMsgBody> callBackMsgBodies = callBackHeartBeatParam.getMsgBody();
+        String role = null;
+        for (CallBackHeartBeatParam.CallBackMsgBody callBackMsgBody : callBackMsgBodies) {
+            try {
+                Map<String, Object> map = JacksonUtil.readValue(callBackMsgBody.getMsgContent().getData(), HashMap.class);
+                Object roleObject = map.get("role");
+                if (Objects.isNull(roleObject)) {
+                    continue;
+                }
+                role = roleObject.toString();
+            } catch (Exception ex) {
+                continue;
+            }
         }
-        return map.get("role").toString();
+        return role;
     }
 
     private Long getPageIndex(CallBackHeartBeatParam callBackHeartBeatParam) {
         List<CallBackHeartBeatParam.CallBackMsgBody> callBackMsgBodies = callBackHeartBeatParam.getMsgBody();
         Long pageIndex = -1l;
         for (CallBackHeartBeatParam.CallBackMsgBody callBackMsgBody : callBackMsgBodies) {
-            Map<String, Object> map = JacksonUtil.readValue(callBackMsgBody.getMsgContent().getData(), HashMap.class);
-            Object objectPageIndex = map.get("pageIndex");
-            if (Objects.isNull(objectPageIndex)) {
+            try {
+                Map<String, Object> map = JacksonUtil.readValue(callBackMsgBody.getMsgContent().getData(), HashMap.class);
+                Object objectPageIndex = map.get("pageIndex");
+                if (Objects.isNull(objectPageIndex)) {
+                    continue;
+                }
+                pageIndex = Long.parseLong(objectPageIndex.toString());
+            }catch (Exception ex){
                 continue;
             }
-            pageIndex = Long.parseLong(objectPageIndex.toString());
         }
         return pageIndex;
     }
