@@ -66,6 +66,10 @@ public class ClassMonitorController {
         monitorUser1.setUserId(123456l);
         MonitorUser monitorUser2 = new MonitorUser();
         monitorUser2.setUserId(567890l);
+        MonitorUser monitorUser3 = new MonitorUser();
+        monitorUser1.setUserId(1298929l);
+        MonitorUser monitorUser4 = new MonitorUser();
+        monitorUser2.setUserId(100000002398l);
         List list = new ArrayList();
         list.add(monitorUser1);
         list.add(monitorUser2);
