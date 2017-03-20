@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaSmallClassRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.StStudentApplyRecordsJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.InstantCardLogMorphiaRepository;
@@ -16,6 +17,7 @@ import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
+import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotSmallClassService;
 import com.boxfishedu.workorder.service.instantclass.InstantClassService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassService;
 import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
@@ -82,6 +84,9 @@ public class TestController {
 
     @Autowired
     private SmallClassService smallClassService;
+
+    @Autowired
+    private BaseTimeSlotSmallClassService baseTimeSlotSmallClassService;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -202,7 +207,7 @@ public class TestController {
     }
 
     /**
-     * 初始化 新的时间片
+     * 初始化 新的时间片(1对1)
      *
      * @param days
      * @return
@@ -210,6 +215,21 @@ public class TestController {
     @RequestMapping(value = "/baseTime/init/{days}")
     public Object initBaseTimeSlots(@PathVariable Integer days) {
         baseTimeSlotService.initBaseTimeSlots(days);
+        return ResponseEntity.ok().build();
+    }
+
+
+
+
+    /**
+     * 初始化 新的时间片(小班课)
+     *
+     * @param days
+     * @return
+     */
+    @RequestMapping(value = "/baseTime/init/smallclass/{days}")
+    public Object initBaseTimeSlotsForSmallClass(@PathVariable Integer days) {
+        baseTimeSlotSmallClassService.initBaseTimeSlotsSmallClass(days);
         return ResponseEntity.ok().build();
     }
 
