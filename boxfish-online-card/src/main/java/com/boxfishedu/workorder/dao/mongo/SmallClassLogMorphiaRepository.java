@@ -1,11 +1,14 @@
 package com.boxfishedu.workorder.dao.mongo;
 
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.web.param.SmallClassParam;
 import org.jboss.netty.util.internal.StringUtil;
 import org.mongodb.morphia.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -20,6 +23,8 @@ import java.util.Optional;
 @Component
 public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallClassLog> {
 
+    Logger logger = LoggerFactory.getLogger(getClass());
+
     public Long queryCount(SmallClassParam smallClassParam) {
         Query<SmallClassLog> query = this.queryCondition(smallClassParam);
         return query.countAll();
@@ -31,6 +36,10 @@ public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallC
         smallClassParam.setSmallClassId(smallClassId);
         List<SmallClassLog> smallClassLogs
                 = this.queryCondition(smallClassParam).asList();
+
+        logger.debug("@queryByStudentAndSmallClass#param[{}]#result[{}]"
+                , JacksonUtil.toJSon(smallClassParam), JacksonUtil.toJSon(smallClassLogs));
+
         return smallClassLogs;
     }
 
@@ -40,6 +49,10 @@ public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallC
         smallClassParam.setSmallClassId(smallClassId);
         List<SmallClassLog> smallClassLogs
                 = this.queryCondition(smallClassParam).asList();
+
+        logger.debug("@queryByTeacherAndSmallClass#param[{}]#result[{}]"
+                , JacksonUtil.toJSon(smallClassParam), JacksonUtil.toJSon(smallClassLogs));
+
         return smallClassLogs;
     }
 
@@ -75,17 +88,17 @@ public class SmallClassLogMorphiaRepository extends BaseMorphiaRepository<SmallC
 
 
     //用于公开课小班课的计算
-    public List<SmallClassLog> querySmallAndPublicLog(List<Long> smallClassIds,String roleName,List<Integer> statuses) {
+    public List<SmallClassLog> querySmallAndPublicLog(List<Long> smallClassIds, String roleName, List<Integer> statuses) {
         Query<SmallClassLog> query = datastore.createQuery(SmallClassLog.class);
-        if(!CollectionUtils.isEmpty(smallClassIds  )){
-            query.and(query.criteria("smallClassId").in(smallClassIds) );
+        if (!CollectionUtils.isEmpty(smallClassIds)) {
+            query.and(query.criteria("smallClassId").in(smallClassIds));
         }
 
-        if(!CollectionUtils.isEmpty(smallClassIds )){
+        if (!CollectionUtils.isEmpty(smallClassIds)) {
             query.and(query.criteria("role").equal(roleName));
         }
 
-        if(!CollectionUtils.isEmpty(smallClassIds  )){
+        if (!CollectionUtils.isEmpty(smallClassIds)) {
             query.and(query.criteria("status").in(statuses));
         }
 

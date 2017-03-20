@@ -20,7 +20,7 @@ public interface BaseTimeSlotJpaRepository extends JpaRepository<BaseTimeSlots, 
     @Query(value = "select max(e.classDate) from BaseTimeSlots e")
     Date findMaxDate();
 
-    public Page<BaseTimeSlots> findByTeachingTypeAndClassDateBetween(Integer teachingType, Date beginDate, Date endDate, Pageable pageable);
+    Page<BaseTimeSlots> findByTeachingTypeAndClassDateBetween(Integer teachingType, Date beginDate, Date endDate, Pageable pageable);
 
-    public List<BaseTimeSlots> findByTeachingTypeAndClassDateBetween(Integer teachingType, Date beginDate, Date endDate);
+    List<BaseTimeSlots> findByTeachingTypeAndClassDateBetween(Integer teachingType, Date beginDate, Date endDate);
 }

@@ -38,4 +38,5 @@ public class ConstantUtil {
 
     public static final String SMALL_CLASS_INIT="INIT_SMALL";
     public static final String PUBLIC_CLASS_INIT="INIT_PUBLIC";
+    public static final String SMALLCLASS_TRIAL_INIT="INIT_SMALLCLASS_TRIAL";
 }

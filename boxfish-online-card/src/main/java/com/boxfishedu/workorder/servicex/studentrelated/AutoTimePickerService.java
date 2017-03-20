@@ -100,53 +100,74 @@ public class AutoTimePickerService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // 小班课一节课  自动操作 调用异步消息
-    public void syncServiceToWorkOrder(Service service,Long smallClassId){
+    public void syncServiceToWorkOrder(Service service, Long smallClassId) {
 
         threadPoolManager.execute(new Thread(() -> {
-            this.auToMakeClassesForSmallClass(service,smallClassId);
+            this.auToMakeClassesForSmallClass(service, smallClassId);
         }));
     }
 
 
-
-    public void auToMakeClassesForSmallClass(Service service,Long smallClassId){
-        logger.info("auToMakeClassesForSmallClass->serviceInfo:[{}]" , JSON.toJSON(service));
+    public void auToMakeClassesForSmallClass(Service service, Long smallClassId) {
+        logger.info("auToMakeClassesForSmallClass->serviceInfo:[{}]", JSON.toJSON(service));
 
         List<Service> servicedb = null;
         // 确保service 生成  循环六次 每次1秒
-        for(int i=0;i<6;i++){
+        for (int i = 0; i < 6; i++) {
             servicedb = serviceJpaRepository.findByOrderId(service.getOrderId());
-            if(CollectionUtils.isEmpty(servicedb)){ try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace();} }else { break; }
+            if (CollectionUtils.isEmpty(servicedb)) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                break;
+            }
         }
 
-        if(CollectionUtils.isEmpty(servicedb)){
-            logger.error("auToMakeClassesForSmallClassERROR,订单id:[{}]没有生成service",service.getOrderId());
+        if (CollectionUtils.isEmpty(servicedb)) {
+            logger.error("auToMakeClassesForSmallClassERROR,订单id:[{}]没有生成service", service.getOrderId());
             return;
         }
 
-        SmallClass smallClass  = getSmallClass(service,smallClassId);
+        SmallClass smallClass = getSmallClass(service, smallClassId);
 
-        if(Objects.isNull(smallClass)){
-            logger.info("auToMakeClassesForSmallClassERROR,订单id:[{}]该学生不满足生成小班课 小班课id:[{}]",service.getOrderId(),smallClassId);
+        if (Objects.isNull(smallClass)) {
+            logger.info("auToMakeClassesForSmallClassERROR,订单id:[{}]该学生不满足生成小班课 小班课id:[{}]", service.getOrderId(), smallClassId);
             return;
         }
 
-        TimeSlotParam timeSlotParam = makeTimeSlotParam(service,smallClass);
+        TimeSlotParam timeSlotParam = makeTimeSlotParam(service, smallClass);
         //组装TimeSlotParam 学生id
-         timePickerServiceXV1.ensureCourseTimesv2(timeSlotParam);
+        timePickerServiceXV1.ensureCourseTimesv2(timeSlotParam);
 
 
         WorkOrder workOrder = null;
         //确定生成鱼卡数据
-        for(int i=0;i<6;i++){
-            workOrder = workOrderJpaRepository.findByOrderIdAndServiceId(servicedb.get(0).getOrderId(),servicedb.get(0).getId());
-            if(null==workOrder){ try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace();} }else { break; }
+        for (int i = 0; i < 6; i++) {
+            workOrder = workOrderJpaRepository.findByOrderIdAndServiceId(servicedb.get(0).getOrderId(), servicedb.get(0).getId());
+            if (null == workOrder) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    logger.error("@auToMakeClassesForSmallClass#exception",e);
+                    e.printStackTrace();
+                }
+            } else {
+                break;
+            }
         }
 
-        if(null == workOrder){
-            logger.error("auToMakeClassesForSmallClassERROR,订单id:[{}]没有生成workOrder",service.getOrderId());
+
+        logger.info("@auToMakeClassesForSmallClass");
+
+        if (null == workOrder) {
+            logger.error("auToMakeClassesForSmallClassERROR,订单id:[{}]没有生成workOrder", service.getOrderId());
             return;
         }
+
+        logger.debug("@auToMakeClassesForSmallClass#smallclass[{}]",JacksonUtil.toJSon(smallClass));
 
         CourseSchedule courseSchedule = courseScheduleRepository.findTop1ByWorkorderId(workOrder.getId());
 
@@ -169,14 +190,15 @@ public class AutoTimePickerService {
         courseSchedule.setSmallClassId(smallClass.getId());
         courseSchedule.setUpdateTime(new Date());
 
-        restoreClassForSmallClass(workOrder,courseSchedule,smallClass);
+        logger.debug("@auToMakeClassesForSmallClass#开始保存小班课信息,workOrder[{}]",JacksonUtil.toJSon(workOrder));
+        restoreClassForSmallClass(workOrder, courseSchedule, smallClass);
 
         //课程保存到mongo中
-        saveCourseScheToMongo(workOrder,courseSchedule);
+        saveCourseScheToMongo(workOrder, courseSchedule);
 
     }
 
-    private TimeSlotParam  makeTimeSlotParam(Service service,SmallClass smallClass){
+    private TimeSlotParam makeTimeSlotParam(Service service, SmallClass smallClass) {
         TimeSlotParam timeSlotParam = new TimeSlotParam();
 
         timeSlotParam.setStudentId(service.getStudentId());
@@ -185,10 +207,10 @@ public class AutoTimePickerService {
         timeSlotParam.setProductType(service.getProductType());
         timeSlotParam.setSelectMode(0);
         timeSlotParam.setTutorType(service.getTutorType());
-        if(TutorTypeEnum.CN.name().equals(service.getTutorType())){
+        if (TutorTypeEnum.CN.name().equals(service.getTutorType())) {
             timeSlotParam.setSkuId(1);
         }
-        if(TutorTypeEnum.FRN.name().equals(service.getTutorType())){
+        if (TutorTypeEnum.FRN.name().equals(service.getTutorType())) {
             timeSlotParam.setSkuId(2);
         }
 
@@ -199,19 +221,19 @@ public class AutoTimePickerService {
         List<SelectedTime> selectedTimes = Lists.newArrayList(selectedTime);
 
         timeSlotParam.setSelectedTimes(selectedTimes);
-        logger.info("auToMakeClassesForSmallClass->timeSlotParam:[{}]" , JSON.toJSON(timeSlotParam));
+        logger.info("auToMakeClassesForSmallClass->timeSlotParam:[{}]", JSON.toJSON(timeSlotParam));
         return timeSlotParam;
     }
 
 
-    public SmallClass getSmallClass(Service service,Long smallClassId){
+    public SmallClass getSmallClass(Service service, Long smallClassId) {
         String level = smallClassRequester.fetchUserDifficultyInfo(service.getStudentId());
-        SmallClass smallClass =  smallClassJpaRepository.findOne(smallClassId);
+        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
 
         List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
 
-       // if(Objects.equals(level,smallClass.getDifficultyLevel()) && workOrders.size()<smallClassSize){
-        if(workOrders.size()<smallClassSize){
+        // if(Objects.equals(level,smallClass.getDifficultyLevel()) && workOrders.size()<smallClassSize){
+        if (workOrders.size() < smallClassSize) {
             return smallClass;
         }
 
@@ -220,22 +242,22 @@ public class AutoTimePickerService {
     }
 
 
-
     @Transactional
-    public void restoreClassForSmallClass(WorkOrder workOrder, CourseSchedule  courseSchedule,SmallClass smallClass){
+    public void restoreClassForSmallClass(WorkOrder workOrder, CourseSchedule courseSchedule, SmallClass smallClass) {
+        logger.debug("@restoreClassForSmallClass#鱼卡[{}]", JacksonUtil.toJSon(workOrder));
         // 更新workOrder 和 courseSchedule
-        workOrderService.updateWorkOrderAndSchedule(workOrder,courseSchedule);
+        workOrderService.updateWorkOrderAndSchedule(workOrder, courseSchedule);
 
-        changeWorkOrderLog(workOrder,"分配课程");
-        changeWorkOrderLog(workOrder,"分配老师");
+        changeWorkOrderLog(workOrder, "分配课程");
+        changeWorkOrderLog(workOrder, "分配老师");
 
         // 添加小班课群主关系
         smallClass.setAllStudentIds(Lists.newArrayList(workOrder.getStudentId()));
-        FishCardGroupsInfo fishCardGroupsInfo =  courseOnlineRequester.buildsmallClassChatRoom(smallClass);
+        FishCardGroupsInfo fishCardGroupsInfo = courseOnlineRequester.buildsmallClassChatRoom(smallClass);
 
-        String  groupId = fishCardGroupsInfo==null?"":fishCardGroupsInfo.getGroupId();  //群主Id
-        Long  chatRoomId= fishCardGroupsInfo==null?null:fishCardGroupsInfo.getChatRoomId();//房间号
-        logger.info( String.format( "auToMakeClassesForSmallClassFishCardGroupsInfo:%s__ %s",groupId,chatRoomId));
+        String groupId = fishCardGroupsInfo == null ? "" : fishCardGroupsInfo.getGroupId();  //群主Id
+        Long chatRoomId = fishCardGroupsInfo == null ? null : fishCardGroupsInfo.getChatRoomId();//房间号
+        logger.info(String.format("auToMakeClassesForSmallClassFishCardGroupsInfo:%s__ %s", groupId, chatRoomId));
 
         //调用首页接口
         dataCollectorService.updateBothChnAndFnItemAsync(workOrder.getStudentId());
@@ -243,18 +265,18 @@ public class AutoTimePickerService {
     }
 
 
-    private void changeWorkOrderLog(WorkOrder workOrder,String content) {
+    private void changeWorkOrderLog(WorkOrder workOrder, String content) {
         WorkOrderLog workOrderLog = new WorkOrderLog();
         workOrderLog.setCreateTime(new Date());
         workOrderLog.setWorkOrderId(workOrder.getId());
         workOrderLog.setStatus(workOrder.getStatus());
-        workOrderLog.setContent(String.format("%s[小班课][后台添加学生]",content));
+        workOrderLog.setContent(String.format("%s[小班课][后台添加学生]", content));
         workOrderLogService.save(workOrderLog);
     }
 
     //课程保存到mongo中
-    public void saveCourseScheToMongo(WorkOrder workOrder, CourseSchedule courseSchedule){
+    public void saveCourseScheToMongo(WorkOrder workOrder, CourseSchedule courseSchedule) {
         RecommandCourseView courseView = recommandCourseRequester.getCourseViewDetail(courseSchedule.getCourseId());
-        courseInfoService.saveSingleCourseInfo(workOrder,courseSchedule,courseView);
+        courseInfoService.saveSingleCourseInfo(workOrder, courseSchedule, courseView);
     }
 }

@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.web.param.Student2TeacherCommentParam;
 import com.google.common.collect.Lists;
 import lombok.Data;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
 
@@ -21,19 +22,25 @@ public class ForeignTeacherSetCommentParam {
 
     private List<String> forBadReviews;
 
+    private String goodReview = "false";
+
     public static ForeignTeacherSetCommentParam paramAdapter(Student2TeacherCommentParam student2TeacherCommentParam, CommentCard commentCard){
         ForeignTeacherSetCommentParam foreignTeacherSetCommentParam=new ForeignTeacherSetCommentParam();
         foreignTeacherSetCommentParam.setFishCardId(student2TeacherCommentParam.getCommentCardId());
         foreignTeacherSetCommentParam.setTeacherId(commentCard.getTeacherId());
-
-        if(null!=student2TeacherCommentParam.getForGoodReviews()) {
-            foreignTeacherSetCommentParam.setForGoodReviews(student2TeacherCommentParam.getForGoodReviews());
+        if(CollectionUtils.isNotEmpty(student2TeacherCommentParam.getForGoodReviews())) {
+            //好评目前没有标签,所以不传
+//            foreignTeacherSetCommentParam.setForGoodReviews(student2TeacherCommentParam.getTagCode());
+            foreignTeacherSetCommentParam.setGoodReview("true");
         }
 
-        if(null!=student2TeacherCommentParam.getForBadReviews()) {
-            foreignTeacherSetCommentParam.setForBadReviews(student2TeacherCommentParam.getForBadReviews());
+        if(CollectionUtils.isNotEmpty(student2TeacherCommentParam.getForBadReviews())) {
+            if(CollectionUtils.isNotEmpty(student2TeacherCommentParam.getTagCode())){
+                foreignTeacherSetCommentParam.setForBadReviews(student2TeacherCommentParam.getTagCode());
+            }else {
+                foreignTeacherSetCommentParam.setForBadReviews(student2TeacherCommentParam.getForBadReviews());
+            }
         }
-
         return foreignTeacherSetCommentParam;
     }
 }

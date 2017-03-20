@@ -42,7 +42,11 @@ public class CommentCardLogDto {
         }
 
         if(Objects.equals(latestCommentCard.getStatus(), CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())) {
-            logs.put("学生已评价", latestCommentCard.getStudentCommentTeacherTime());
+            if(!Objects.isNull(latestCommentCard.getStudentCommentGoodTagCode())){
+                logs.put("学生已评价[" + String.valueOf(latestCommentCard.getStudentCommentGoodTagCode() + ", 点赞]"), latestCommentCard.getStudentCommentTeacherTime());
+            }else if (!Objects.isNull(latestCommentCard.getStudentCommentBadTagCode())){
+                logs.put("学生已评价[" + String.valueOf(latestCommentCard.getStudentCommentBadTagCode() + "]"), latestCommentCard.getStudentCommentTeacherTime());
+            }
         }
     }
 
@@ -63,7 +67,12 @@ public class CommentCardLogDto {
         }
 
         if(Objects.equals(firstCommentCard.getStatus(), CommentCardStatus.STUDENT_COMMENT_TO_TEACHER.getCode())) {
-            logs.put("学生已评价", firstCommentCard.getStudentCommentTeacherTime());
+            if(!Objects.isNull(firstCommentCard.getStudentCommentGoodTagCode())){
+                logs.put("学生已评价[" + String.valueOf(firstCommentCard.getStudentCommentGoodTagCode() + ", 点赞]"), firstCommentCard.getStudentCommentTeacherTime());
+            }else if (!Objects.isNull(firstCommentCard.getStudentCommentBadTagCode())){
+                logs.put("学生已评价[" + String.valueOf(firstCommentCard.getStudentCommentBadTagCode() + "]"), firstCommentCard.getStudentCommentTeacherTime());
+            }
+
         }
     }
 

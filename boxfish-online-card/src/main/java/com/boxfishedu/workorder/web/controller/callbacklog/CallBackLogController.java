@@ -26,9 +26,14 @@ public class CallBackLogController {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    //不只是heartBeat
     @RequestMapping(value = "/heartBeat", method = RequestMethod.POST)
     public Object heartBeat(@RequestBody CallBackHeartBeatParam param) {
         callBackLogServiceX.updateSet(param);
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
+    public Object teacherOperation(){
         return JsonResultModel.newJsonResultModel("OK");
     }
 

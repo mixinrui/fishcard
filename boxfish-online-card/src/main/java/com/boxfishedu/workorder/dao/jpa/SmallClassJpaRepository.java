@@ -32,4 +32,7 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
 
     List<SmallClass> findByClassTypeAndStartTimeLessThan(String classType, Date date);
 
+    @Query("select s from SmallClass s where s.endTime between ?1 and ?2")
+    List<SmallClass> findPublicAndSmallClassForDestroy(Date from, Date to);
+
 }

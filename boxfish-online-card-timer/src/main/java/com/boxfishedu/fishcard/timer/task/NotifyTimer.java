@@ -390,10 +390,21 @@ public class NotifyTimer {
     /**
      * 计算课程完成情况通知学生系统
      */
-    @Scheduled(cron = "0 0/40 * * * ?")
+    @Scheduled(cron = "0 0/30 * * * ?")
     public void computeFishCardNoticeStudentSystem(){
         logger.info("<<<<<<computeFishCardNoticeStudentSystem开始通知<<<计算课程完成情况通知学生系统>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
         ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.SNED_STUDENT_FISHCARD_STATUS.value());
+        serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
+        rabbitMqSender.send(serviceTimerMessage);
+    }
+
+    /**
+     * 凌晨定时解散公开课和小班课的群组
+     */
+    @Scheduled(cron = "0 30 1 * * ?")
+    public void destroyPublicAndSmallClassGroup(){
+        logger.info("<<<<<<destroyPublicAndSmallClassGroup开始通知<<<群组(teaching-service)>>>的消息,时间[{}]", DateUtil.Date2String(new Date()));
+        ServiceTimerMessage serviceTimerMessage = new ServiceTimerMessage(TimerMessageType.DESTROY_PUBLIC_AND_SMALL_GROUP.value());
         serviceTimerMessage.setTime(DateUtil.Date2String(new Date()));
         rabbitMqSender.send(serviceTimerMessage);
     }

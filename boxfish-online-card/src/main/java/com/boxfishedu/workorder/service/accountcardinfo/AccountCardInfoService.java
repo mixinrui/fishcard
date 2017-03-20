@@ -21,7 +21,7 @@ public class AccountCardInfoService {
     @Autowired
     private AcountCardInfoMorphiaRepository acountCardInfoMorphiaRepository;
 
-    private Logger logger= LoggerFactory.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private ServeService serveService;
@@ -33,11 +33,11 @@ public class AccountCardInfoService {
     @Autowired
     private DataCollectorService dataCollectorService;
 
-    public AccountCardInfo queryByStudentId(Long studentId){
-        logger.debug("@queryByStudentId#userId[{}]",studentId);
-        AccountCardInfo accountCardInfo= acountCardInfoMorphiaRepository.queryByStudentId(studentId);
-        if(null==accountCardInfo){
-            logger.debug("@queryByStudentId#init#userId[{}]",studentId);
+    public AccountCardInfo queryByStudentId(Long studentId) {
+        logger.debug("@queryByStudentId#userId[{}]", studentId);
+        AccountCardInfo accountCardInfo = acountCardInfoMorphiaRepository.queryByStudentId(studentId);
+        if (null == accountCardInfo) {
+            logger.debug("@queryByStudentId#init#userId[{}]", studentId);
             dataCollectorService.updateBothChnAndFnItem(studentId);
             return acountCardInfoMorphiaRepository.queryByStudentId(studentId);
         }
@@ -45,20 +45,19 @@ public class AccountCardInfoService {
     }
 
 
-
-    public void save(AccountCardInfo accountCardInfo){
+    public void save(AccountCardInfo accountCardInfo) {
         acountCardInfoMorphiaRepository.save(accountCardInfo);
     }
 
-    public void saveOrUpdateChAndFrn(Long studentId, AccountCourseBean chineseCourseBean, AccountCourseBean foreignAccountBean){
-        acountCardInfoMorphiaRepository.saveOrUpdateChAndFrn(studentId,chineseCourseBean,foreignAccountBean);
+    public void saveOrUpdateChAndFrn(Long studentId, AccountCourseBean chineseCourseBean, AccountCourseBean foreignAccountBean) {
+        acountCardInfoMorphiaRepository.saveOrUpdateChAndFrn(studentId, chineseCourseBean, foreignAccountBean);
     }
 
-    public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum){
-        acountCardInfoMorphiaRepository.saveOrUpdate(studentId,accountCourseBean,accountCourseEnum);
+    public void saveOrUpdate(Long studentId, AccountCourseBean accountCourseBean, AccountCourseEnum accountCourseEnum) {
+        acountCardInfoMorphiaRepository.saveOrUpdate(studentId, accountCourseBean, accountCourseEnum);
     }
 
-    public void updateCommentLeftAmount(Long studentId,Integer leftAmount){
-        acountCardInfoMorphiaRepository.updateCommentLeftAmount(studentId,leftAmount);
+    public void updateCommentLeftAmount(Long studentId, Integer leftAmount) {
+        acountCardInfoMorphiaRepository.updateCommentLeftAmount(studentId, leftAmount);
     }
 }

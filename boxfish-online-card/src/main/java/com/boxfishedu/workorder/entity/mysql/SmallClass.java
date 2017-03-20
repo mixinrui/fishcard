@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -74,7 +75,7 @@ public class SmallClass implements Cloneable, Serializable {
 
     @Column(name = "teacher_photo")
     private String teacherPhoto;
-    
+
 
     private Long groupLeader;
 
@@ -100,6 +101,11 @@ public class SmallClass implements Cloneable, Serializable {
     @JsonIgnore
     @Transient
     private Date reportTime;
+
+    //是否为试讲课
+    @JsonIgnore
+    @Transient
+    private Boolean isTrial;
 
     @JsonIgnore
     @Transient
@@ -156,6 +162,25 @@ public class SmallClass implements Cloneable, Serializable {
         this.setSlotId(publicClassBuilderParam.getSlotId().intValue());
         this.setCreateTime(new Date());
         this.setDifficultyLevel(publicClassBuilderParam.getDifficulty());
+    }
+
+    public SmallClass(TrialSmallClassParam trialSmallClassParam) {
+        this.setTeacherId(trialSmallClassParam.getTeacherId());
+        this.setTeacherName(trialSmallClassParam.getTeacherName());
+        this.setRoleId(trialSmallClassParam.getRoleId().intValue());
+
+        this.setClassDate(DateUtil.simpleString2Date(trialSmallClassParam.getStartTime()));
+
+        this.setStartTime(DateUtil.String2Date(trialSmallClassParam.getStartTime()));
+        this.setSlotId(trialSmallClassParam.getTimeSlotId());
+
+        this.setIsTrial(true);
+
+        this.setClassType("SMALLCLASS_TRIAL");
+
+        this.setCreateTime(new Date());
+        this.setUpdateTime(new Date());
+        this.setDifficultyLevel(trialSmallClassParam.getDifficultyLevel());
     }
 
     public ClassTypeEnum getStatusEnum() {

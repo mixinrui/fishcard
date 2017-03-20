@@ -424,7 +424,7 @@ public class AssignTeacherService {
         }
 
         Date now = new Date();
-        stStudentApplyRecordsList.stream().filter(stStu ->
+        stStudentApplyRecordsList = stStudentApplyRecordsList.stream().filter(stStu ->
                 checkTimeOutForInvitedClass(stStu, now)
         ).collect(Collectors.toList());
 

@@ -46,6 +46,9 @@ public class CallBackHeartBeatParam {
 
         @JsonProperty("Ext")
         private String Ext;
+
+        @JsonProperty("FileSize")
+        private Object FileSize;
     }
 
 }

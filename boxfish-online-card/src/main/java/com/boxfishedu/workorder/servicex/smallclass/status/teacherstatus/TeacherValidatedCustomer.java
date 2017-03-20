@@ -57,9 +57,11 @@ public class TeacherValidatedCustomer extends SmallClassEventCustomer {
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:
-                smallClass.setWriteBackDesc(
-                        String.join("[", FishCardStatusEnum.WAITFORSTUDENT.getDesc(), "小班教师校验通过]"));
-                this.writeStatusBack2Card(smallClass, FishCardStatusEnum.WAITFORSTUDENT);
+                if (!smallClass.reachOverTime()) {
+                    smallClass.setWriteBackDesc(
+                            String.join("[", FishCardStatusEnum.WAITFORSTUDENT.getDesc(), "小班教师校验通过]"));
+                    this.writeStatusBack2Card(smallClass, FishCardStatusEnum.WAITFORSTUDENT);
+                }
                 break;
             default:
                 break;

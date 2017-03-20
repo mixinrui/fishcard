@@ -2,29 +2,19 @@ package com.boxfishedu.workorder.service;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.config.UrlConf;
-import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 /**
  * Created by hucl on 16/5/5.
  */
 @Component
 public class CourseOnlineService {
-    @Autowired
-    private UrlConf urlConf;
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private ThreadPoolManager threadPoolManager;
 
     @Autowired
     private WorkOrderService workOrderService;
@@ -35,16 +25,9 @@ public class CourseOnlineService {
     @Autowired
     private WorkOrderLogService workOrderLogService;
 
-    @Autowired
-    private CourseOnlineRequester courseOnlineRequester;
-
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    //通知上课中心,添加学生和答疑老师做好友
-    public void notifyMakeFriends(WorkOrder workOrder){
-//        String url=String.format("%s/teaching/add_friends/{source_id}/{target_id}")
-    }
 
     public void notAllowUpdateStatus(WorkOrder workOrder,Integer newStatus){
         notAllowUpdateStatus(workOrder,"不能覆盖已有消息,新消息:"+FishCardStatusEnum.getDesc(newStatus));

@@ -12,6 +12,7 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
@@ -95,6 +96,12 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     @Autowired
     CourseOnlineServiceX courseOnlineServiceX;
 
+    @Autowired
+    private  WorkOrderJpaRepository workOrderJpaRepository;
+
+    @Autowired
+    private CourseScheduleRepository courseScheduleRepository;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public Page<WorkOrder> findByServiceIdOrderByStartTime(Long serviceId, Pageable pageable) {
@@ -149,36 +156,62 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     }
 
     @Transactional
-    public void saveStatusForCardAndSchedule(WorkOrder workOrder) {
-        this.saveStatusForCardAndSchedule(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()));
+    public void saveWorkOrderAndScheduleForSingleValue(WorkOrder workOrder, CourseSchedule courseSchedule) {
+       // this.save(workOrder);
+        workOrderJpaRepository.setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(workOrder.getCourseId(),workOrder.getCourseName(),workOrder.getCourseType(),workOrder.getUpdatetimeChangecourse(),workOrder.getSendflagcc(),workOrder.getId());
+        //courseScheduleService.save(courseSchedule);
+        courseScheduleRepository.setFixedCourseIdAndCourseNameAndCourseTypeFor(courseSchedule.getCourseId(),courseSchedule.getCourseName(),courseSchedule.getCourseType(),courseSchedule.getId());
+        logger.info("||||||鱼卡[{}]入库成功;排课表入库成功[{}]", workOrder.getId(), courseSchedule.getId());
     }
 
     @Transactional
-    public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc) {
+    public void saveStatusForCardAndSchedule(WorkOrder workOrder, FishCardStatusEnum fishCardStatusEnum) {
+        this.saveStatusForCardAndSchedule(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()), fishCardStatusEnum);
+    }
+
+    @Transactional
+    public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc, FishCardStatusEnum fishCardStatusEnum) {
+        this.dealStudentAbsent(workOrder, desc);
+        this.dealTeacherAbsent(workOrder, desc);
+
+        workOrder.setStatus(fishCardStatusEnum.getCode());
+
         CourseSchedule courseSchedule = courseScheduleService.findByWorkOrderId(workOrder.getId());
         courseSchedule.setStatus(workOrder.getStatus());
-        if (FishCardStatusEnum.COMPLETED.getCode() == workOrder.getStatus()
-                || FishCardStatusEnum.COMPLETED_FORCE.getCode() == workOrder.getStatus()) {
-
+        if (workOrder.statusFinished()) {
             if (workOrder.reachOverTime()) {
-                if (Objects.isNull(workOrder.getIsCourseOver()) || 1 != workOrder.getIsCourseOver()) {
+                if (workOrder.isCourseNotOver()) {
                     workOrder.setIsCourseOver((short) 1);
                     courseOnlineServiceX.completeCourse(workOrder, courseSchedule, workOrder.getStatus());
-                } else {
-                    workOrderLogService.saveWorkOrderLog(
-                            workOrder, "未到下课时间,客户端上报正常完成,不做处理");
-                    return;
                 }
             } else {
-                this.save(workOrder);
-                courseScheduleService.save(courseSchedule);
-            }
-
-            threadPoolManager.execute(new Thread(() -> {
                 workOrderLogService.saveWorkOrderLog(
-                        workOrder, desc);
-            }));
+                        workOrder, "未到下课时间,客户端上报正常完成,不做处理");
+                throw new BusinessException("未到下课时间,客户端上报正常完成,不做处理");
+            }
         }
+        recordFishCardLog(workOrder, desc);
+    }
+
+    private void dealTeacherAbsent(WorkOrder workOrder, String desc) {
+        if (workOrder.isTeacherAbsent()) {
+            recordFishCardLog(workOrder, String.join(",", "教师已旷课,不允许覆盖状态", desc));
+            throw new BusinessException("教师已旷课,不可更新数据库数据");
+        }
+    }
+
+    private void dealStudentAbsent(WorkOrder workOrder, String desc) {
+        if (workOrder.isStudentAbsent()) {
+            recordFishCardLog(workOrder, String.join(",", "学生已旷课,不允许覆盖状态", desc));
+            throw new BusinessException("学生已旷课,不可更新数据库数据");
+        }
+    }
+
+    private void recordFishCardLog(WorkOrder workOrder, String desc) {
+        threadPoolManager.execute(new Thread(() -> {
+            workOrderLogService.saveWorkOrderLog(
+                    workOrder, desc);
+        }));
     }
 
     public boolean isWorkOrderValid(Long workOrderId) throws BoxfishException {

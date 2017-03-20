@@ -2,22 +2,18 @@ package com.boxfishedu.workorder.servicex.smallclass.status.event;
 
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
-import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
-import com.boxfishedu.workorder.entity.mongo.SmallClassLog;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
-import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.google.common.collect.Lists;
 import lombok.Data;
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -56,6 +52,13 @@ public abstract class SmallClassEventCustomer {
                 .collect(Collectors.toList());
     }
 
+    public void stuWriteStatusBack2Card(SmallClass smallClass, FishCardStatusEnum fishCardStatusEnum, WorkOrder workOrder) {
+        List<WorkOrder> workOrders = Lists.newArrayList();
+        workOrders.add(workOrder);
+
+        this.writeStatusBack2Card(smallClass, workOrders, fishCardStatusEnum, false);
+    }
+
     public void writeStatusBack2Card(SmallClass smallClass, FishCardStatusEnum fishCardStatusEnum) {
         this.writeStatusBack2Card(smallClass, fishCardStatusEnum, false);
     }
@@ -66,21 +69,35 @@ public abstract class SmallClassEventCustomer {
         logger.debug("@writeStatusBack2Card,smallclass[{}],workorders[{}]"
                 , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(workOrders));
 
+        this.writeStatusBack2Card(smallClass, workOrders, fishCardStatusEnum, filterStuntActed);
+    }
+
+    public void writeStatusBack2Card(SmallClass smallClass, List<WorkOrder> workOrders
+            , FishCardStatusEnum fishCardStatusEnum, boolean filterStuntActed) {
+
         if (filterStuntActed) {
             workOrders = this.filterStudentActed(workOrders);
         }
 
-        this.updateWorkStatuses(workOrders, fishCardStatusEnum);
+//        this.updateWorkStatuses(workOrders, fishCardStatusEnum);
 
-        workOrders.forEach(workOrder -> {
+        for (WorkOrder workOrder : workOrders) {
             if (Objects.isNull(smallClass.getWriteBackDesc())) {
-                this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder);
+                this.getWorkOrderService().saveStatusForCardAndSchedule(workOrder, fishCardStatusEnum);
             } else {
-                String desc=smallClass.getWriteBackDesc();
-                this.getWorkOrderService().saveStatusForCardAndSchedule(
-                        workOrder, desc);
+                String desc = smallClass.getWriteBackDesc();
+
+                try {
+                    this.getWorkOrderService().saveStatusForCardAndSchedule(
+                            workOrder, desc, fishCardStatusEnum);
+                } catch (BusinessException ex) {
+                    if (workOrders.size() == 1) {
+                        throw new BusinessException(ex);
+                    }
+                    continue;
+                }
             }
-        });
+        }
     }
 
     private List<WorkOrder> getWorkOrders(SmallClass smallClass) {
@@ -92,8 +109,8 @@ public abstract class SmallClassEventCustomer {
         else if (smallClass.getStatus() < PublicClassInfoStatusEnum.TEACHER_CARD_VALIDATED.getCode()) {
             WorkOrder workOrder
                     = this.getWorkOrderService()
-                          .findBySmallClassIdAndStudentId(
-                                  smallClass.getId(), smallClass.getStatusReporter());
+                    .findBySmallClassIdAndStudentId(
+                            smallClass.getId(), smallClass.getStatusReporter());
             workOrders = Arrays.asList(workOrder);
         }
         //teacher

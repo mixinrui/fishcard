@@ -27,7 +27,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public WorkOrder findByOrderIdAndServiceId(Long orderId, Long serviceId);
 
 
-    public List<WorkOrder> findByStartTimeAndStudentId(Date startTime,Long studentId);
+    public List<WorkOrder> findByStartTimeAndStudentId(Date startTime, Long studentId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select wo from  WorkOrder wo where wo.id=?1 ")
@@ -91,7 +91,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     //按照订单ID  和  状态 查找鱼卡
     public List<WorkOrder> findByOrderIdAndStatus(Long orderId, int status);
 
-    List<WorkOrder> findByOrderIdAndIsFreezeAndStartTimeAfterAndClassTypeIsNullOrderByStartTimeAsc(Long orderId,Integer isFreeze,Date date);
+    List<WorkOrder> findByOrderIdAndIsFreezeAndStartTimeAfterAndClassTypeIsNullOrderByStartTimeAsc(Long orderId, Integer isFreeze, Date date);
 
     public List<WorkOrder> findByOrderIdAndStartTimeAfterOrderByStartTimeAsc(Long orderId, Date date);
 
@@ -201,10 +201,10 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     Optional<WorkOrder> findTop1ByStudentIdAndSkuIdAndIsFreezeAndStartTimeAfterAndClassTypeIsNullOrderByStartTimeAsc(Long studentId, Integer skuId, Integer isFreeze, Date date);
 
     @Query(value = "select distinct wo.skuId from WorkOrder wo where studentId=?1 and startTime>?2 and (wo.classType not in(?3) or wo.classType is null)")
-    List<Integer> findDistinctSkuIds(Long studentId, Date startTime,List<String> listClassTypes);
+    List<Integer> findDistinctSkuIds(Long studentId, Date startTime, List<String> listClassTypes);
 
     @Query(value = "select wo from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and wo.skuId=?3 and wo.isFreeze=?4  and (wo.classType not in(?5) or wo.classType is null)  ")
-    List<WorkOrder>  findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId,Date startTime,Integer skuId,Integer isFreeze,List<String> listClassTypes);
+    List<WorkOrder> findByStudentIdAndStartTimeGreaterThanAndSkuIdAndIsFreeze(Long studentId, Date startTime, Integer skuId, Integer isFreeze, List<String> listClassTypes);
 
     List<WorkOrder> findByTeacherIdAndIsFreezeAndStartTimeIn(Long teacherId, Integer isFreeze, List startTimes);
 
@@ -231,7 +231,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     //查询未发送并且在时间范围内的鱼卡数据(1 to 1)
     @Query("select wo from  WorkOrder wo where (wo.startTime between ?1 and ?2)  and wo.status in (?3) and  (wo.classType is null or wo.classType=?4)  and wo.isComputeSend is null ")
-    public List<WorkOrder> findByComputeSendDatas( Date beginDate, Date endDate ,List<Integer> status ,String classType);
+    public List<WorkOrder> findByComputeSendDatas(Date beginDate, Date endDate, List<Integer> status, String classType);
 
 
     @Modifying
@@ -239,10 +239,22 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     int setFixedIsComputeSendFor(Short isComputeSend, List<Long> ids);
 
 
-
     //查询未发送并且在时间范围内的鱼卡数据(小班课 and 公开课)
     @Query("select wo from  WorkOrder wo where (wo.startTime between ?1 and ?2) and    wo.classType=?3   and wo.isComputeSend is null and wo.smallClassId is not null")
-    public List<WorkOrder> findByComputeSendDatasPUBLIC( Date beginDate, Date endDate  ,String classType);
+    public List<WorkOrder> findByComputeSendDatasPUBLIC(Date beginDate, Date endDate, String classType);
 
+
+    //查找出学生所有状态的工单
+    @Query("SELECT wo.smallClassId from WorkOrder wo where wo.smallClassId is not null and wo.classType=?1   GROUP BY  wo.smallClassId HAVING count(wo.id) <=?2 ")
+    public List<Long> findDistinctSmallClassFromWorkOrder(String classType, Long times);
+
+
+    @Modifying
+    @Query("update WorkOrder o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3 ,o.status = ?4 ,o.updateTime=current_timestamp    where o.id = ?5")
+    int setFixedCourseIdAndCourseNameAndCourseTypeAndStatusFor(String courseId, String courseName, String courseType, Integer status, Long workorderId);
+
+    @Modifying
+    @Query("update WorkOrder o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3 ,o.updatetimeChangecourse= ?4 ,o.sendflagcc= ?5 ,o.updateTime=current_timestamp    where o.id = ?6")
+    int setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(String courseId, String courseName, String courseType, Date updateTimeChangeCourse, String sendFlaggcc, Long workorderId);
 
 }
