@@ -43,7 +43,7 @@ public class PersistCoursesHandler {
         // 保存鱼卡
         workOrder.initCourseInfo(courseView);
         //workOrderJpaRepository.save(workOrder); 防止更改其他字段
-        workOrderJpaRepository.setFixedCourseIdAndCourseNameAndCourseTypeAndStatusFor(workOrder.getCourseId(),workOrder.getCourseName(),workOrder.getCourseType(),workOrder.getStatus(),courseSchedule.getId());
+        workOrderJpaRepository.setFixedCourseIdAndCourseNameAndCourseTypeAndStatusFor(workOrder.getCourseId(),workOrder.getCourseName(),workOrder.getCourseType(),workOrder.getStatus(),workOrder.getId());
 
 
         // 记鱼卡日志
