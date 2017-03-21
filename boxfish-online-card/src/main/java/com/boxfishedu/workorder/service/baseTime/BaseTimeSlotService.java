@@ -8,6 +8,7 @@ import com.boxfishedu.workorder.service.RedisMapService;
 import com.boxfishedu.workorder.web.param.BaseTimeSlotParam;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.joda.time.Days;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +37,51 @@ public class BaseTimeSlotService {
     @Autowired
     private RedisMapService redisMapService;
 
+    // 1对1 添加时间片
+    @Transactional
+    public void addTimeSlots(Integer slots){
+        Date dateTo = baseTimeSlotJpaRepository.findMaxDate();
+        if(dateTo == null) {
+           return;
+        }
+
+        LocalDate localDateTo = Instant.ofEpochMilli(dateTo.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+
+        LocalDate localDate = LocalDate.now();
+
+        int days  =(int) (localDateTo.toEpochDay()-localDate.toEpochDay());
+
+
+        for(int i = 1; i <= days; i++) {
+
+            LocalDate localt=  localDate.plusDays(i);
+            if(localt.getDayOfWeek().getValue()<= 5) {
+                List<BaseTimeSlots> list = findByDate(localt, 0,slots);
+                baseTimeSlotJpaRepository.save(list);
+
+                list = findByDate(localt, 1,slots);
+                baseTimeSlotJpaRepository.save(list);
+            }
+
+        }
+
+
+    }
+
+
+    private List<BaseTimeSlots> findByDate(LocalDate localDate, int teachingType,Integer slot) {
+        List<BaseTimeSlots> result = new ArrayList<>();
+        int from=slot, to =slot;
+
+        for(int i = from; i <=to; i++) {
+            result.add(createBaseTimeSlots(i, localDate, teachingType));
+        }
+        return result;
+    }
+
+
+
+    @Transactional
     public void initBaseTimeSlots(int days) {
         Date date = baseTimeSlotJpaRepository.findMaxDate();
         if(date == null) {
@@ -56,7 +103,7 @@ public class BaseTimeSlotService {
         if(localDate.getDayOfWeek().getValue() > 5) {
             from = 1; to = 34;
         } else {
-            from = 25; to = 34;
+            from = 23; to = 34;
         }
         for(int i = from; i <=to; i++) {
             result.add(createBaseTimeSlots(i, localDate, teachingType));
@@ -70,7 +117,13 @@ public class BaseTimeSlotService {
         t1.setClassDate(Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         t1.setSlotId(slotId);
         t1.initTime();
-        t1.setProbability(100);
+
+        if(teachingType==0 && (slotId==23 ||slotId==24)){
+            t1.setProbability(0);
+        }else {
+
+            t1.setProbability(100);
+        }
         t1.setTeachingType(teachingType);
         t1.setClientType(0);
         return t1;

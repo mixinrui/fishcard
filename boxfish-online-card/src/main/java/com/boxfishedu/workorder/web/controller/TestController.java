@@ -206,6 +206,14 @@ public class TestController {
         return JsonResultModel.newJsonResultModel(instantCardLogMorphiaRepository.findByInstantStudentId(studentId));
     }
 
+    // 增加时间片   增加目前已有的时间片
+    @RequestMapping(value= "/baseTime/addSlot/{slots}")
+    public Object addOne2OneTimeSlots(@PathVariable Integer slots) {
+        baseTimeSlotService.addTimeSlots(slots);
+        return ResponseEntity.ok().build();
+    }
+
+
     /**
      * 初始化 新的时间片(1对1)
      *

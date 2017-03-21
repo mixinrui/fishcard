@@ -60,7 +60,7 @@ public class BaseTimeSlotSmallClassService {
         if(localDate.getDayOfWeek().getValue() > 5) {
             from = 1; to = 34;
         } else {
-            from = 25; to = 34;
+            from = 23; to = 34;
         }
         for(int i = from; i <=to; i++) {
             result.add(createBaseTimeSlots(i, localDate, teachingType));
