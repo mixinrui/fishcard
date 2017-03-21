@@ -4,12 +4,12 @@ import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.MonitorResponseForm;
 import com.boxfishedu.workorder.entity.mysql.MonitorUser;
+import com.boxfishedu.workorder.entity.mysql.MonitorUserRequestForm;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.service.monitor.MonitorUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -22,6 +22,9 @@ public class ClassMonitorController {
 
     @Autowired
     SmallClassJpaRepository smallClassJpaRepository;
+
+    @Autowired
+    MonitorUserService monitorUserService;
 
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     public Object page(String classType,Date startTime,Date endTime,Pageable pageable,Long userId){
@@ -60,22 +63,76 @@ public class ClassMonitorController {
 
     @RequestMapping(value = "/super/user", method = RequestMethod.GET)
     public Object superUser(){
-
         //mock
-        MonitorUser monitorUser1 = new MonitorUser();
-        monitorUser1.setUserId(123456l);
-        MonitorUser monitorUser2 = new MonitorUser();
-        monitorUser2.setUserId(567890l);
-        MonitorUser monitorUser3 = new MonitorUser();
-        monitorUser1.setUserId(1298929l);
-        MonitorUser monitorUser4 = new MonitorUser();
-        monitorUser2.setUserId(100000002398l);
-        List list = new ArrayList();
-        list.add(monitorUser1);
-        list.add(monitorUser2);
-        JsonResultModel jsonResultModel = new JsonResultModel();
-        jsonResultModel.setData(list);
-        return jsonResultModel;
+//        MonitorUser monitorUser1 = new MonitorUser();
+//        monitorUser1.setUserId(123456l);
+//        MonitorUser monitorUser2 = new MonitorUser();
+//        monitorUser2.setUserId(567890l);
+//        MonitorUser monitorUser3 = new MonitorUser();
+//        monitorUser1.setUserId(1298929l);
+//        MonitorUser monitorUser4 = new MonitorUser();
+//        monitorUser2.setUserId(100000002398l);
+//        List list = monitorUserService.getAllSuperUser();
+//        list.add(monitorUser1);
+//        list.add(monitorUser2);
+//        JsonResultModel jsonResultModel = new JsonResultModel();
+//        jsonResultModel.setData(list);
+        return JsonResultModel.newJsonResultModel(monitorUserService.getAllSuperUser());
+    }
+
+    @RequestMapping(value = "/add/super/user",method = RequestMethod.POST)
+    public Object addSuperUser(@RequestBody MonitorUserRequestForm monitorUserRequestForm){
+        if (Objects.isNull(monitorUserRequestForm.getUserId())){
+            JsonResultModel jsonResultModel = new JsonResultModel();
+            jsonResultModel.setData(null);
+            jsonResultModel.setReturnMsg("添加失败,userId不能为空!");
+            jsonResultModel.setReturnCode(403);
+            return jsonResultModel;
+        }else {
+            return JsonResultModel.newJsonResultModel(monitorUserService.addMonitorUser(monitorUserRequestForm));
+        }
+    }
+
+    @RequestMapping(value = "/update/super/user",method = RequestMethod.POST)
+    public Object updateSuperUser(@RequestBody MonitorUserRequestForm monitorUserRequestForm){
+        if (Objects.isNull(monitorUserRequestForm.getUserId())){
+            JsonResultModel jsonResultModel = new JsonResultModel();
+            jsonResultModel.setData(null);
+            jsonResultModel.setReturnMsg("修改失败,userId不能为空!");
+            jsonResultModel.setReturnCode(403);
+            return jsonResultModel;
+        }else {
+            return JsonResultModel.newJsonResultModel(monitorUserService.updateUserInfo(monitorUserRequestForm));
+        }
+
+    }
+
+    @RequestMapping(value = "/enabled/super/user",method = RequestMethod.POST)
+    public Object enabledSuperUser(@RequestParam  Long userId){
+        if (Objects.isNull(userId)){
+            JsonResultModel jsonResultModel = new JsonResultModel();
+            jsonResultModel.setData(null);
+            jsonResultModel.setReturnMsg("激活失败,userId不能为空!");
+            jsonResultModel.setReturnCode(403);
+            return jsonResultModel;
+        }else {
+            monitorUserService.enabledMonitorUser(userId);
+            return JsonResultModel.newJsonResultModel();
+        }
+    }
+
+    @RequestMapping(value = "/disabled/super/user",method = RequestMethod.POST)
+    public Object disabledSuperUser(@RequestParam  Long userId){
+        if (Objects.isNull(userId)){
+            JsonResultModel jsonResultModel = new JsonResultModel();
+            jsonResultModel.setData(null);
+            jsonResultModel.setReturnMsg("注销失败,userId不能为空!");
+            jsonResultModel.setReturnCode(403);
+            return jsonResultModel;
+        }else {
+            monitorUserService.disabledMonitorUser(userId);
+            return JsonResultModel.newJsonResultModel();
+        }
     }
 
 }
