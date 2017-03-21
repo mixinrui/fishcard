@@ -38,7 +38,7 @@ public class BaseTimeSlotService {
     private RedisMapService redisMapService;
 
     // 1对1 添加时间片
-    @Transactional
+
     public void addTimeSlots(Integer slots){
         Date dateTo = baseTimeSlotJpaRepository.findMaxDate();
         if(dateTo == null) {
@@ -56,17 +56,21 @@ public class BaseTimeSlotService {
 
             LocalDate localt=  localDate.plusDays(i);
             if(localt.getDayOfWeek().getValue()<= 5) {
-                List<BaseTimeSlots> list = findByDate(localt, 0,slots);
-                baseTimeSlotJpaRepository.save(list);
+                try{
+                    List<BaseTimeSlots> list = findByDate(localt, 0,slots);
+                    baseTimeSlotJpaRepository.save(list);
 
-                list = findByDate(localt, 1,slots);
-                baseTimeSlotJpaRepository.save(list);
+                    list = findByDate(localt, 1,slots);
+                    baseTimeSlotJpaRepository.save(list);
+                }catch (Exception e){
+                    e.printStackTrace();}
+
             }
-
         }
 
-
     }
+
+
 
 
     private List<BaseTimeSlots> findByDate(LocalDate localDate, int teachingType,Integer slot) {
@@ -89,11 +93,16 @@ public class BaseTimeSlotService {
         }
         LocalDate localDate = Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
         for(int i = 1; i <= days; i++) {
-            List<BaseTimeSlots> list = findByDate(localDate.plusDays(i), 0);
-            baseTimeSlotJpaRepository.save(list);
+            try{
+                List<BaseTimeSlots> list = findByDate(localDate.plusDays(i), 0);
+                baseTimeSlotJpaRepository.save(list);
 
-            list = findByDate(localDate.plusDays(i), 1);
-            baseTimeSlotJpaRepository.save(list);
+                list = findByDate(localDate.plusDays(i), 1);
+                baseTimeSlotJpaRepository.save(list);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
         }
     }
 

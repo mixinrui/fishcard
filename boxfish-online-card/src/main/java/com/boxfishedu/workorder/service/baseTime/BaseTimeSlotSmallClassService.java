@@ -121,7 +121,7 @@ public class BaseTimeSlotSmallClassService {
         for(String key:rediscache.keySet()){
             BaseTimeSlotsSmallClass baseTimeSlots = rediscache.get(key).get(0);
             if(null != baseTimeSlots){
-                redisMapService.delMap(baseTimeSlots.getTeachingType() +""+BaseTimeSlots.CLIENT_TYPE_STU ,DateUtil.date2SimpleString(baseTimeSlots.getClassDate()) );
+                redisMapService.delMapSmallClass(baseTimeSlots.getTeachingType() +""+BaseTimeSlots.CLIENT_TYPE_STU ,DateUtil.date2SimpleString(baseTimeSlots.getClassDate()) );
             }
         }
 

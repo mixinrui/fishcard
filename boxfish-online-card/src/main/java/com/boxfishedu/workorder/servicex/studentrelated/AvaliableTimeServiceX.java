@@ -71,7 +71,7 @@ public class AvaliableTimeServiceX {
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(avaliableTimeParam, days);
 
-        // TODO
+        // TODO  classDateTimeSlotsSet 格式 (年月日 时间片id)
         Set<String> classDateTimeSlotsSet = courseScheduleService.findByStudentIdAndAfterDate(avaliableTimeParam.getStudentId());
         // 获取时间片模板,并且复制
         DayTimeSlots dayTimeSlots = teacherStudentRequester.dayTimeSlotsTemplate((long) avaliableTimeParam.getComboTypeEnum().getValue());
