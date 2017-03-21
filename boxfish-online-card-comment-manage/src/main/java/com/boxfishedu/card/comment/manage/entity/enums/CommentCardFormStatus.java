@@ -23,12 +23,12 @@ public enum CommentCardFormStatus {
         return code;
     }
 
+    public final static Map<String, Integer> mapping;
 
-    public static Map<String, Integer> getMappings() {
-        Map<String, Integer> result = Maps.newLinkedHashMap();
+    static {
+        mapping = Maps.newLinkedHashMap();
         for(CommentCardFormStatus commentCardFormStatus : values())  {
-            result.put(commentCardFormStatus.desc, commentCardFormStatus.code);
+            mapping.put(commentCardFormStatus.desc, commentCardFormStatus.code);
         }
-        return result;
     }
 }
