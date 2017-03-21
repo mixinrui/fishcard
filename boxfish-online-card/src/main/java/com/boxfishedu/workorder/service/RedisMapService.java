@@ -3,6 +3,7 @@ package com.boxfishedu.workorder.service;
 import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
+import com.boxfishedu.workorder.entity.mysql.BaseTimeSlotsSmallClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -37,6 +38,28 @@ public class RedisMapService {
 
     public void delMap(String key,String date){
         String key_Front= CacheKeyConstant.BASE_TIME_SLOTS;
+        key = key_Front+key;
+        Object text = redisTemplate.opsForHash().get(key,date);
+        redisTemplate.opsForHash().delete(key,date);
+    }
+
+
+
+    public void setMapSmallClass(String key ,String date , List<BaseTimeSlotsSmallClass> baseTimeSlotsList){
+        String key_Front= CacheKeyConstant.BASE_TIME_SLOTS_SMALL_CLASS;
+        key = key_Front+key;
+        redisTemplate.opsForHash().putIfAbsent(key,date, JSONObject.toJSONString(baseTimeSlotsList ) );
+    }
+
+    public List<BaseTimeSlotsSmallClass> getMapSmallClass(String key, String date){
+        String key_Front= CacheKeyConstant.BASE_TIME_SLOTS_SMALL_CLASS;
+        key = key_Front+key;
+        Object text = redisTemplate.opsForHash().get(key,date);
+        return    JSONObject.parseArray(null==text?null:text.toString() , BaseTimeSlotsSmallClass.class) ;
+    }
+
+    public void delMapSmallClass(String key,String date){
+        String key_Front= CacheKeyConstant.BASE_TIME_SLOTS_SMALL_CLASS;
         key = key_Front+key;
         Object text = redisTemplate.opsForHash().get(key,date);
         redisTemplate.opsForHash().delete(key,date);

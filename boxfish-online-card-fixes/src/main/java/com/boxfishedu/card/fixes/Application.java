@@ -64,6 +64,8 @@ public class Application implements CommandLineRunner {
         return ResponseEntity.ok().build();
     }
 
+
+    //课程修补程序
     @Scheduled(cron = "0 30 2 * * ?")
 //    @Scheduled(cron = "0/50 * * * * ?")
     public void synchronousCourseInfo() {

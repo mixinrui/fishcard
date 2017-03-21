@@ -6,7 +6,9 @@ import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
 import com.boxfishedu.workorder.entity.mongo.WorkOrderLog;
 import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
+import com.boxfishedu.workorder.entity.mysql.BaseTimeSlotsSmallClass;
 import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotService;
+import com.boxfishedu.workorder.service.baseTime.BaseTimeSlotSmallClassService;
 import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.fishcardcenter.FishCardQueryServiceX;
 import com.boxfishedu.workorder.web.param.BaseTimeSlotParam;
@@ -35,6 +37,10 @@ public class BaseTimeSlotController {
     private BaseTimeSlotService baseTimeSlotService;
 
 
+    @Autowired
+    private BaseTimeSlotSmallClassService baseTimeSlotSmallClassService;
+
+
     /**
      * 查询获取基础时间片
      * @param baseTimeSlotParam
@@ -58,6 +64,35 @@ public class BaseTimeSlotController {
 
         return JsonResultModel.newJsonResultModel("OK");
     }
+
+
+
+    //////////////#######  begin 小班课时间片  #############################////////////////////
+    /**
+     * 查询获取基础时间片
+     * @param baseTimeSlotParam
+     * @param pageable
+     * @return
+     */
+    @RequestMapping(value = "/slotspage/smallclass", method = RequestMethod.GET)
+    public JsonResultModel listBaseSlotsSmallClass(BaseTimeSlotParam baseTimeSlotParam, Pageable pageable) {
+        return JsonResultModel.newJsonResultModel(baseTimeSlotSmallClassService.findByTeachingTypeAndClassDateBetween( baseTimeSlotParam,pageable));
+    }
+
+    @RequestMapping(value = "/slots/smallclass", method = RequestMethod.GET)
+    public JsonResultModel listBaseSlotsSmallClass(BaseTimeSlotParam baseTimeSlotParam) {
+        return JsonResultModel.newJsonResultModel(baseTimeSlotSmallClassService.findByTeachingTypeAndClassDateBetween( baseTimeSlotParam));
+    }
+
+    @RequestMapping(value = "/modify/smallclass", method = RequestMethod.POST)
+    public JsonResultModel listBaseSlotsSmallClass(@RequestBody List<BaseTimeSlotsSmallClass> baseTimeSlots) {
+
+        baseTimeSlotSmallClassService.modify(baseTimeSlots);
+
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
+    //////////////#######  end 小班课时间片  #############################////////////////////
 
 
 
