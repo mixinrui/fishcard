@@ -35,4 +35,7 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
     @Query("select s from SmallClass s where s.endTime between ?1 and ?2")
     List<SmallClass> findPublicAndSmallClassForDestroy(Date from, Date to);
 
+    @Query("select s from SmallClass s where s.id >= 1882 and s.id <= 1893")
+    List<SmallClass> findMockData();
+
 }
