@@ -39,7 +39,7 @@ public interface ServiceJpaRepository extends JpaRepository<Service, Long> {
 
     public Service findTop1ByOrderId(Long orderId);
 
-    @Query("select s from Service s where s.studentId=?1 and s.productType=?2 and s.endTime>CURRENT_DATE")
+    @Query("select s from Service s where s.studentId=?1 and s.productType=?2")
     List<Service> getForeignCommentServiceCount(long studentId, int productType);
 
     @Query("select s from Service s where s.studentId=?1 and s.coursesSelected=?2")

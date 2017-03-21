@@ -538,9 +538,17 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                 (total, service) -> total + service.getOriginalAmount(),
                 Integer::sum
         );
+        Date now = new Date();
         Integer amount = services.stream().reduce(
                 0,
-                (total, service) -> total + service.getAmount(),
+                (total, service) -> {
+                    // 有效期内
+                    if(service.getEndTime() !=null &&
+                            service.getEndTime().getTime() > now.getTime()) {
+                        return total + service.getAmount();
+                    }
+                    return total;
+                },
                 Integer::sum
         );
         Map<String, Integer> countMap = Maps.newHashMap();
