@@ -152,13 +152,7 @@ public class BaseTimeSlotService {
         t1.setClassDate(Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         t1.setSlotId(slotId);
         t1.initTime();
-
-        if (teachingType == 0 && (slotId == 23 || slotId == 24)) {
-            t1.setProbability(0);
-        } else {
-
-            t1.setProbability(100);
-        }
+        t1.setProbability(100);
         t1.setTeachingType(teachingType);
         t1.setClientType(0);
         return t1;
