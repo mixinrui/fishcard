@@ -59,8 +59,8 @@ SmallClassSuperStudentController {
             }
 
             Long workOrderId = 1111L;
-
-            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(workOrderId);
+            smallClassSuperStuParam.setWorkOrderId(workOrderId);
+            JsonResultModel jsonResultModel = JsonResultModel.newJsonResultModel(smallClassSuperStuParam);
             checker.evictRepeatedSubmission(smallClassSuperStuParam.getId());
             return jsonResultModel;
         } catch (Exception e) {
