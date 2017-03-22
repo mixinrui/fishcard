@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 @Data
 @Table(name = "monitor_user")
+@Entity
 public class MonitorUser {
 
     @Id
