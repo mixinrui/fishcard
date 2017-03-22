@@ -62,6 +62,9 @@ public class MonitorUser {
             this.passWord = monitorUserRequestForm.getPassWord();
         }
         if (Objects.nonNull(monitorUserRequestForm.getAccessToken())){
+            this.accessToken = monitorUserRequestForm.getAccessToken();
+        }
+        if (Objects.nonNull(monitorUserRequestForm.getUserType())){
             this.userType = monitorUserRequestForm.getUserType();
         }
         this.enabled = 1;

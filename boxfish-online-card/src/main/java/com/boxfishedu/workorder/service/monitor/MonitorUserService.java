@@ -52,13 +52,13 @@ public class MonitorUserService {
             monitorUser.setUserName(monitorUserRequestForm.getUserName());
         }
         if (Objects.nonNull(monitorUserRequestForm.getPassWord())){
-            monitorUser.setUserName(monitorUserRequestForm.getPassWord());
+            monitorUser.setPassWord(monitorUserRequestForm.getPassWord());
         }
         if (Objects.nonNull(monitorUserRequestForm.getAccessToken())){
-            monitorUser.setUserName(monitorUserRequestForm.getAccessToken());
+            monitorUser.setAccessToken(monitorUserRequestForm.getAccessToken());
         }
         if (Objects.nonNull(monitorUserRequestForm.getUserType())){
-            monitorUser.setUserName(monitorUserRequestForm.getUserType());
+            monitorUser.setUserType(monitorUserRequestForm.getUserType());
         }
         monitorUser.setUpdateTime(new Date());
         return monitorUserJpaRepository.save(monitorUser);

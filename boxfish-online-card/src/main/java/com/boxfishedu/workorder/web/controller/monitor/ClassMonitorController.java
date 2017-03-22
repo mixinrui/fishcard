@@ -63,20 +63,6 @@ public class ClassMonitorController {
 
     @RequestMapping(value = "/super/user", method = RequestMethod.GET)
     public Object superUser(){
-        //mock
-//        MonitorUser monitorUser1 = new MonitorUser();
-//        monitorUser1.setUserId(123456l);
-//        MonitorUser monitorUser2 = new MonitorUser();
-//        monitorUser2.setUserId(567890l);
-//        MonitorUser monitorUser3 = new MonitorUser();
-//        monitorUser1.setUserId(1298929l);
-//        MonitorUser monitorUser4 = new MonitorUser();
-//        monitorUser2.setUserId(100000002398l);
-//        List list = monitorUserService.getAllSuperUser();
-//        list.add(monitorUser1);
-//        list.add(monitorUser2);
-//        JsonResultModel jsonResultModel = new JsonResultModel();
-//        jsonResultModel.setData(list);
         return JsonResultModel.newJsonResultModel(monitorUserService.getAllSuperUser());
     }
 
@@ -126,7 +112,7 @@ public class ClassMonitorController {
         if (Objects.isNull(userId)){
             JsonResultModel jsonResultModel = new JsonResultModel();
             jsonResultModel.setData(null);
-            jsonResultModel.setReturnMsg("注销失败,userId不能为空!");
+            jsonResultModel.setReturnMsg("禁用失败,userId不能为空!");
             jsonResultModel.setReturnCode(403);
             return jsonResultModel;
         }else {
