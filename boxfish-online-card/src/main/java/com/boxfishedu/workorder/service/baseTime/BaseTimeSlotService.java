@@ -57,11 +57,12 @@ public class BaseTimeSlotService {
 
             //中教
             List<BaseTimeSlots> list = findByDate(localt, 0, slots);
-            //if(localt.getDayOfWeek().getValue()<= 5) {
-            try {
-                baseTimeSlotJpaRepository.save(list);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (localt.getDayOfWeek().getValue() <= 5) {
+                try {
+                    baseTimeSlotJpaRepository.save(list);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             //外教
@@ -84,9 +85,27 @@ public class BaseTimeSlotService {
         int from = slot, to = slot;
 
         for (int i = from; i <= to; i++) {
-            result.add(createBaseTimeSlots(i, localDate, teachingType));
+            result.add(createBaseTimeSlotsadd(i, localDate, teachingType));
         }
         return result;
+    }
+
+
+    private BaseTimeSlots createBaseTimeSlotsadd(int slotId, LocalDate localDate, int teachingType) {
+        BaseTimeSlots t1 = new BaseTimeSlots();
+        t1.setClassDate(Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        t1.setSlotId(slotId);
+        t1.initTime();
+
+        if (teachingType == 0 && (slotId == 23 || slotId == 24)) {
+            t1.setProbability(0);
+        } else {
+
+            t1.setProbability(100);
+        }
+        t1.setTeachingType(teachingType);
+        t1.setClientType(0);
+        return t1;
     }
 
 
