@@ -145,6 +145,11 @@ public class AvaliableTimeForChangeTimeServiceXV {
                         timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType( DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
                         redisMapService.setMap ( teachingType+""+BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d),timeSlotsList); ;
                     }
+
+                    if(!CollectionUtils.isEmpty(timeSlotsList)){
+                        timeSlotsList.sort((t1,t2)->t1.getSlotId().compareTo(t2.getSlotId()));
+                    }
+
                     return createDayTimeSlots(d, timeSlotsList);
                 });
 
