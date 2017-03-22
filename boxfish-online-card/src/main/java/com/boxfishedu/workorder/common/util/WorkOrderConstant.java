@@ -76,10 +76,10 @@ public class WorkOrderConstant {
     /**
      * 用于判断小班课 周几   周3 周五  六日
      **/
-    public final static List<Integer> slots = Lists.newArrayList(27);  // 每天的时间片
+    public final static List<Integer> slots = Lists.newArrayList(27,28);  // 每天的时间片
 
     public static boolean checkContains(Integer slot) {
-        for (Integer s : slots) {
+        for (Integer s :  slots) {
             if (s.longValue() == slot.longValue()) {
                 return true;
             }
