@@ -176,6 +176,10 @@ public class AvaliableTimeServiceXV1 {
                             redisMapService.setMap(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d), timeSlotsList);
                             ;
                         }
+                        //按照 时间片id排序
+                        if(!CollectionUtils.isEmpty(timeSlotsList)){
+                            timeSlotsList.sort((t1,t2) -> t1.getSlotId().compareTo(t2.getSlotId()));
+                        }
                         return createDayTimeSlots(d, timeSlotsList);
                     }
 

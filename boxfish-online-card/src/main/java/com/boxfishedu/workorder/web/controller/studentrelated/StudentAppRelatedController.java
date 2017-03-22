@@ -211,6 +211,7 @@ StudentAppRelatedController {
         return avaliableTimeServiceXV1.getDelayWeekDaysForSmallClass(orderId,userId);
     }
 
+    //获取可用的时间片
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
     public Object timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
         commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(), userId);
