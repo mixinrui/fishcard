@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Long>{
 
-    @Query("select mu from MonitorUser mu where mu.enabled = 1 and mu.user_type = 'student'")
+    @Query("select mu from MonitorUser mu where mu.enabled = 1 and mu.userType = 'student'")
     List<MonitorUser> getEnabledUser();
 
     MonitorUser findByUserId(Long userId);
