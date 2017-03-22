@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.entity.mysql;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.Objects;
 /**
  * Created by ansel on 2017/3/20.
  */
+@Component
 @Data
 @Table(name = "monitor_user")
 @Entity
