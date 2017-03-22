@@ -2,11 +2,9 @@ package com.boxfishedu.workorder.web.controller.monitor;
 
 import com.boxfishedu.beans.view.JsonResultModel;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
-import com.boxfishedu.workorder.entity.mysql.MonitorResponseForm;
-import com.boxfishedu.workorder.entity.mysql.MonitorUser;
-import com.boxfishedu.workorder.entity.mysql.MonitorUserRequestForm;
-import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.service.monitor.MonitorUserService;
+import com.boxfishedu.workorder.servicex.CommonServeServiceX;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +24,9 @@ public class ClassMonitorController {
     @Autowired
     MonitorUserService monitorUserService;
 
+    @Autowired
+    CommonServeServiceX commonServeServiceX;
+
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     public Object page(String classType,Date startTime,Date endTime,Pageable pageable,Long userId){
 
@@ -43,11 +44,9 @@ public class ClassMonitorController {
     }
 
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
-    public Object detail(String classType,Pageable pageable, Date startTime, Date endTime, Long userId){
-
-
-
-        //mock
+    public Object detailList(String classType,Pageable pageable, Date startTime, Date endTime,Long studentId, Long userId){
+        commonServeServiceX.checkToken(studentId, userId);
+        //mock--start
         SmallClass smallClass = new SmallClass();
         List<SmallClass> listSmallClass = smallClassJpaRepository.findMockData();
         Map map = new HashMap();
@@ -58,6 +57,7 @@ public class ClassMonitorController {
         map.put("dailyScheduleTime",listSmallClass);
         JsonResultModel jsonResultModel = new JsonResultModel();
         jsonResultModel.setData(map);
+        //mock--end
         return jsonResultModel;
     }
 
