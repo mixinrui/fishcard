@@ -226,7 +226,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     List<WorkOrder> findByClassTypeAndSmallClassIdIsNullAndStartTimeBetween(String name, Date date, Date deadDate);
 
-    @Query("select wo from  WorkOrder wo where wo.smallClassId in (?1)")
+    @Query("select wo from  WorkOrder wo where wo.smallClassId in (?1)  and wo.generatorType is null ")
     List<WorkOrder> findBySmallClassNum(List<Long> smallClassIds);
 
     //查询未发送并且在时间范围内的鱼卡数据(1 to 1)

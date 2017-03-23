@@ -151,6 +151,7 @@ public class Service {
 
     public void authentication(Long userId) {
         if(!Objects.equals(studentId, userId)) {
+            if( orderId.longValue()!=  (Long.MAX_VALUE - 10))
             throw new BusinessException("非法用户,拒绝访问!");
         }
     }

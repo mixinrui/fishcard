@@ -23,8 +23,9 @@ public enum ComboTypeEnum {
     //终极梦想+考试指导
     INTELLIGENT("INTELLIGENT"),
 
+    //free smallClassForergin
     FSCF("FSCF"),
-
+    //free smallClassChinese
     FSCC("FSCC");
 
     private String value;
