@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.monitor.MonitorUserService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/5.
@@ -30,6 +32,9 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
     @Autowired
     private SmallClassLogService smallClassLogService;
+
+    @Autowired
+    private MonitorUserService monitorUserService;
 
     @PostConstruct
     public void initEvent() {
@@ -59,9 +64,12 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
         GroupInitStrategy groupInitStrategy
                 = groupInitStrategyMap.get(this.prefix + smallClass.getClassType());
 
-        //初始化小班课信息
+        //TODO: 课程监控
         try {
             groupInitStrategy.initGroupClass(smallClass);
+            if(!Objects.isNull(smallClass.getId())){
+                monitorUserService.distributeClassToMonitor(smallClass);
+            }
         }
         catch (Exception ex){
             logger.error("@CreateEventCustomer创建小班课失败,smallclas[{}]",JacksonUtil.toJSon(smallClass),ex);

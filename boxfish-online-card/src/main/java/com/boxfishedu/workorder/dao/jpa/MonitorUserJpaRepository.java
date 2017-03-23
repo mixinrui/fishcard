@@ -26,5 +26,9 @@ public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Lon
     @Query("update MonitorUser mu set mu.enabled = 0,mu.updateTime = ?1 where mu.userId = ?2")
     void disabledMonitorUser(Date updateTime,Long userId);
 
+    @Query("select min(mu.avgSum) from MonitorUser mu where mu.enabled = 1 and mu.userType = 'student'")
+    Integer getMinAvgSum();
 
+    @Query("select mu from MonitorUser mu where mu.userType = 'student' and mu.enabled = 1 and mu.avgSum in (select min(mu2.avgSum) from MonitorUser mu2)")
+    List<MonitorUser> getMinAvgSumUser();
 }

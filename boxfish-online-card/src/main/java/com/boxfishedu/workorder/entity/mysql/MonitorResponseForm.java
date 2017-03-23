@@ -13,9 +13,9 @@ public class MonitorResponseForm {
 
     private Date endTime;
 
-    private Integer sum;
+    private Long sum;
 
-    public MonitorResponseForm(Date startTime, Date endTime, Integer sum){
+    public MonitorResponseForm(Date startTime, Date endTime, Long sum){
         this.startTime = startTime;
         this.endTime = endTime;
         this.sum = sum;

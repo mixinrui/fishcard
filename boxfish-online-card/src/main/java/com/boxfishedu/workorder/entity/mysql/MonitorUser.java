@@ -37,6 +37,9 @@ public class MonitorUser {
     @Column(name = "user_type")
     private String userType;
 
+    @Column(name = "avg_sum")
+    private Integer avgSum;
+
     @Column(name = "enabled")
     private Integer enabled;
 

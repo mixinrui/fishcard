@@ -38,4 +38,9 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
     @Query("select s from SmallClass s where s.id >= 1882 and s.id <= 1893")
     List<SmallClass> findMockData();
 
+    SmallClass findById(Long id);
+
+    @Query("select sc from SmallClass sc where sc.id in (select muc.classId from MonitorUserCourse muc where muc.startTime between ?1 and ?2 and muc.classType = ?3 and muc.userId = ?4)" +
+            " and sc.startTime between ?1 and ?2 and sc.classType = ?3")
+    Page<SmallClass> findMonitorUserCourse(Date startTime, Date endTime,String classType, Long studentId,Pageable pageable);
 }

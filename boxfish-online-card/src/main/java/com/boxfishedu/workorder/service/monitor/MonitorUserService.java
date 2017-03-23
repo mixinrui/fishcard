@@ -3,10 +3,11 @@ package com.boxfishedu.workorder.service.monitor;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.EntityQuery;
+import com.boxfishedu.workorder.dao.jpa.MonitorUserCourseJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.MonitorUserJpaRepository;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.MonitorUser;
-import com.boxfishedu.workorder.entity.mysql.MonitorUserRequestForm;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.ServiceSDK;
@@ -24,6 +25,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.Predicate;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -46,6 +51,16 @@ public class MonitorUserService {
     @Autowired
     TeacherStudentRequester teacherStudentRequester;
 
+    @Autowired
+    SmallClassJpaRepository smallClassJpaRepository;
+
+    @Autowired
+    MonitorUserCourseJpaRepository monitorUserCourseJpaRepository;
+
+    @Autowired
+    EntityManager entityManager;
+
+
     public List<MonitorUser> getAllSuperUser(){
         logger.info("@getAllSuperUser checking for login ...");
         return monitorUserJpaRepository.getEnabledUser();
@@ -53,8 +68,13 @@ public class MonitorUserService {
 
     public MonitorUser addMonitorUser(MonitorUserRequestForm monitorUserRequestForm){
         logger.info("@addSuperUser adding monitor user ...");
-        MonitorUser monitorUser = new MonitorUser(monitorUserRequestForm);
-        return monitorUserJpaRepository.save(monitorUser);
+        int min = 0;
+        if (Objects.nonNull(monitorUserJpaRepository.getMinAvgSum())){
+            min = monitorUserJpaRepository.getMinAvgSum();
+        }
+        MonitorUser monitorUserNew = new MonitorUser(monitorUserRequestForm);
+        monitorUserNew.setAvgSum(min);
+        return monitorUserJpaRepository.save(monitorUserNew);
     }
 
     @Transactional
@@ -88,74 +108,35 @@ public class MonitorUserService {
         return monitorUserJpaRepository.save(monitorUser);
     }
 
-    public Object detailList(Long userId, Pageable pageable,Locale locale){
-
-        Page<CourseSchedule> page = courseScheduleService.findByStudentId(userId, pageable);
-        List<Map<String, Object>> result = adapterCourseScheduleLists(page.getContent(), locale);
-        HashMap<String, Object> resultMap = Maps.newHashMap();
-        resultMap.put("data", result);
-        resultMap.put("returnCode", HttpStatus.SC_OK);
-        resultMap.put("totalElements", page.getTotalElements());
-        resultMap.put("number", page.getNumber());
-        resultMap.put("totalPages", page.getTotalPages());
-        resultMap.put("size", page.getSize());
-        return resultMap;
+    public Page<MonitorResponseForm> page(String classType,Date startTime,Date endTime,Long userId,Pageable pageable){
+        logger.info("@page get class sum group by startTime ,userId:[{}]",userId);
+        return monitorUserCourseJpaRepository.getClassPage(classType,startTime,endTime,userId,pageable);
     }
 
-    private List<Map<String, Object>> adapterCourseScheduleLists(List<CourseSchedule> courseScheduleList, Locale locale) {
-        Map<String, List<StudentCourseSchedule>> courseScheduleMap = Maps.newLinkedHashMap();
-        Date now = new Date();
-        courseScheduleList.forEach(courseSchedule -> {
-            String date = DateUtil.simpleDate2String(courseSchedule.getClassDate());
-            courseScheduleMap.compute(date, (k, v) -> {
-                if(v == null) {
-                    v = Lists.newArrayList();
-                }
-                v.add(createStudentCourseSchedule(courseSchedule, locale,now));
-                return v;
-            });
-        });
-
-        List<Map<String, Object>> result = Lists.newArrayList();
-        courseScheduleMap.forEach((key, val) -> {
-            Map<String, Object> beanMap = Maps.newHashMap();
-            beanMap.put("day", key);
-            beanMap.put("dailyScheduleTime", val);
-            result.add(beanMap);
-        });
-        return result;
+    public Object detailList(String classType, Date startTime, Date endTime,Long studentId,Pageable pageable){
+        logger.info("@detailList get class table ... studentId:[{}],classType:[{}]",studentId,classType);
+        return smallClassJpaRepository.findMonitorUserCourse(startTime,endTime,classType,studentId,pageable);
     }
 
-    private StudentCourseSchedule createStudentCourseSchedule(CourseSchedule courseSchedule, Locale locale,Date now) {
-        TimeSlots timeSlots = getTimeSlotById(courseSchedule.getTimeSlotId());
-        StudentCourseSchedule studentCourseSchedule = new StudentCourseSchedule();
-        studentCourseSchedule.setId(courseSchedule.getId());
-        studentCourseSchedule.setCourseId(courseSchedule.getCourseId());
-
-        if (courseSchedule.getStartTime().after(now) && Objects.equals(1, courseSchedule.getIsFreeze())) {
-            studentCourseSchedule.setNeedChangeTime(courseSchedule.getNeedChangeTime());/** 显示需要修改时间的鱼卡信息 **/
-        } else {
-            studentCourseSchedule.setNeedChangeTime(null);
+    public void distributeClassToMonitor(SmallClass smallClass){
+        List<MonitorUser> listUser = monitorUserJpaRepository.getMinAvgSumUser();
+        if (Objects.nonNull(listUser)){
+            logger.info("@distributeClassToMonitor distribute SmallClass:[{}] to userId:[{}]",smallClass,listUser.get(0).getUserId());
+            MonitorUserCourse monitorUserCourse = new MonitorUserCourse();
+            monitorUserCourse.setMonitorUserId(listUser.get(0).getId());
+            monitorUserCourse.setUserId(listUser.get(0).getUserId());
+            monitorUserCourse.setClassId(smallClass.getId());
+            monitorUserCourse.setClassType(smallClass.getClassType());
+            monitorUserCourse.setCourseId(smallClass.getCourseId());
+            monitorUserCourse.setStartTime(smallClass.getStartTime());
+            monitorUserCourse.setEndTime(smallClass.getEndTime());
+            monitorUserCourse.setCreateTime(new Date());
+            monitorUserCourseJpaRepository.save(monitorUserCourse);
+            MonitorUser monitorUser = listUser.get(0);
+            monitorUser.setAvgSum(listUser.get(0).getAvgSum() + 1);
+            monitorUserJpaRepository.save(monitorUser);
+        }else {
+            logger.info("@distributeClassToMonitor System does not have any monitor user!");
         }
-        studentCourseSchedule.setCourseType(courseSchedule.getCourseType());
-        if(StringUtils.equals(ClassTypeEnum.INSTNAT.toString(),courseSchedule.getClassType())){
-            studentCourseSchedule.setTime(courseSchedule.getInstantStartTtime());
-        }
-        else {
-            studentCourseSchedule.setTime(timeSlots.getStartTime());
-        }
-        studentCourseSchedule.setWorkOrderId(courseSchedule.getWorkorderId());
-        studentCourseSchedule.setStatus(courseSchedule.getStatus());
-        studentCourseSchedule.setIsFreeze(courseSchedule.getIsFreeze());
-        studentCourseSchedule.setClassType(courseSchedule.getClassType());
-        studentCourseSchedule.setSmallClassId(courseSchedule.getSmallClassId());
-        if (StringUtils.isNotEmpty(courseSchedule.getCourseId())) {
-            studentCourseSchedule.setCourseView(serviceSDK.getCourseInfoByScheduleId(courseSchedule.getId(), locale));
-        }
-        return studentCourseSchedule;
-    }
-
-    public TimeSlots getTimeSlotById(Integer id) throws BusinessException {
-        return teacherStudentRequester.getTimeSlot(id);
     }
 }

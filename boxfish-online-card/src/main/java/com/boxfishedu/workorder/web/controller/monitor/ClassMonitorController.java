@@ -1,7 +1,6 @@
 package com.boxfishedu.workorder.web.controller.monitor;
 
 import com.boxfishedu.beans.view.JsonResultModel;
-import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.service.monitor.MonitorUserService;
 import com.boxfishedu.workorder.servicex.CommonServeServiceX;
@@ -19,46 +18,20 @@ import java.util.*;
 public class ClassMonitorController {
 
     @Autowired
-    SmallClassJpaRepository smallClassJpaRepository;
-
-    @Autowired
     MonitorUserService monitorUserService;
 
     @Autowired
     CommonServeServiceX commonServeServiceX;
 
     @RequestMapping(value = "/page", method = RequestMethod.GET)
-    public Object page(String classType,Date startTime,Date endTime,Pageable pageable,Long userId){
-
-        //mock
-        Map map = new HashMap();
-        List monitorList = new ArrayList();
-        map.put("page",1);
-        map.put("size",2);
-        monitorList.add(new MonitorResponseForm(new Date(),new Date(),20));
-        monitorList.add(new MonitorResponseForm(new Date(),new Date(),13));
-        map.put("content",monitorList);
-        JsonResultModel jsonResultModel = new JsonResultModel();
-        jsonResultModel.setData(map);
-        return jsonResultModel;
+    public JsonResultModel page(String classType,Date startTime,Date endTime,Pageable pageable,Long userId){
+        return JsonResultModel.newJsonResultModel(monitorUserService.page(classType,startTime,endTime,userId,pageable));
     }
 
     @RequestMapping(value = "/detail", method = RequestMethod.GET)
     public Object detailList(String classType,Pageable pageable, Date startTime, Date endTime,Long studentId, Long userId){
         commonServeServiceX.checkToken(studentId, userId);
-        //mock--start
-        SmallClass smallClass = new SmallClass();
-        List<SmallClass> listSmallClass = smallClassJpaRepository.findMockData();
-        Map map = new HashMap();
-        map.put("page",1);
-        map.put("size",9);
-        map.put("totalPages",2);
-        map.put("totalElements",19);
-        map.put("dailyScheduleTime",listSmallClass);
-        JsonResultModel jsonResultModel = new JsonResultModel();
-        jsonResultModel.setData(map);
-        //mock--end
-        return jsonResultModel;
+        return monitorUserService.detailList(classType,startTime,endTime,userId,pageable);
     }
 
     @RequestMapping(value = "/super/user", method = RequestMethod.GET)
@@ -120,5 +93,4 @@ public class ClassMonitorController {
             return JsonResultModel.newJsonResultModel();
         }
     }
-
 }
