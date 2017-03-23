@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.util.RedisKeyGenerator;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.ConfigBeanMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SelectStudentsService;
 import com.boxfishedu.workorder.servicex.callbacklog.CallBackLogServiceX;
 import com.google.common.collect.Maps;
@@ -26,6 +27,7 @@ import java.time.ZoneId;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 17/1/5.
@@ -52,6 +54,9 @@ public class SmallClassServiceX {
 
     @Autowired
     SelectStudentsService selectStudentsService;
+
+    @Autowired
+    WorkOrderService workOrderService;
 
     @Autowired
     public void initRedis(@Qualifier(value = "stringRedisTemplate") RedisTemplate<String, String> redisTemplate) {
@@ -116,5 +121,12 @@ public class SmallClassServiceX {
             return -1l;
         }
         return Long.parseLong(pageIndexes.get(0));
+    }
+
+    public List<Long> getMembers(SmallClass smallClass) {
+        return workOrderService.findBySmallClassId(smallClass.getId())
+                .stream()
+                .map(workOrder -> workOrder.getStudentId())
+                .collect(Collectors.toList());
     }
 }

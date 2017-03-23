@@ -14,24 +14,31 @@ import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.rabbitmq.RabbitMqSender;
 import com.boxfishedu.workorder.common.redis.CacheKeyConstant;
+import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.common.util.MailSupport;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
 import com.boxfishedu.workorder.entity.mongo.TrialCourse;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
+import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.service.base.BaseService;
 import com.boxfishedu.workorder.service.commentcard.SyncCommentCard2SystemService;
 import com.boxfishedu.workorder.servicex.commentcard.CommentTeacherAppServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
+import com.boxfishedu.workorder.servicex.smallclass.initstrategy.SmallClassInitStrategy;
 import com.boxfishedu.workorder.servicex.studentrelated.AutoTimePickerService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.boxfishedu.workorder.web.view.course.CourseView;
+import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.boxfishedu.workorder.web.view.course.ResponseCourseView;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import com.boxfishedu.workorder.web.view.order.OrderDetailView;
 import com.boxfishedu.workorder.web.view.order.ProductSKUView;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,6 +49,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -102,6 +110,17 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     @Autowired
     private AutoTimePickerService autoTimePickerService;
+
+    @Autowired
+    private RecommandCourseRequester recommandCourseRequester;
+
+    @Autowired
+    private
+    @Qualifier(ConstantUtil.SMALL_CLASS_INIT)
+    SmallClassInitStrategy smallClassInitStrategy;
+
+    @Autowired
+    private SmallClassJpaRepository smallClassJpaRepository;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -166,7 +185,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         ResponseCourseView responseCourseView;
         try {
             responseCourseView = restTemplate.getForObject(buffer.toString(), ResponseCourseView.class);
-            if (null==responseCourseView||(null == responseCourseView.getData())) {
+            if (null == responseCourseView || (null == responseCourseView.getData())) {
                 throw new BusinessException("获取课程信息失败:" + buffer.toString());
             }
         } catch (Exception ex) {
@@ -197,8 +216,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return jpa.findByOrderId(orderId);
     }
 
-    public List<Service> findByOrderIdAndComboTypeAndCoursesSelected(Long orderId,String comboType,Integer courseSelected){
-        return jpa.findByOrderIdAndComboTypeAndCoursesSelected(orderId,comboType,courseSelected);
+    public List<Service> findByOrderIdAndComboTypeAndCoursesSelected(Long orderId, String comboType, Integer courseSelected) {
+        return jpa.findByOrderIdAndComboTypeAndCoursesSelected(orderId, comboType, courseSelected);
     }
 
     public Service findTop1ByOrderIdAndSkuId(Long orderId, Long skuId) {
@@ -231,13 +250,13 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     //通知订单中心修改订单状态
     public void notifyOrderUpdateStatus(WorkOrder workOrder, Integer status) {
-        List<Service> services=this.findByOrderId(workOrder.getService().getOrderId());
-        int leftAmount=services.stream().collect(Collectors.summingInt(Service::getAmount));
-        if(leftAmount>0){
-            logger.debug("@notifyOrderUpdateStatus#{}服务次数大于0,不处理,鱼卡[{}]",workOrder.getId(),workOrder.getId(),workOrder.getId());
+        List<Service> services = this.findByOrderId(workOrder.getService().getOrderId());
+        int leftAmount = services.stream().collect(Collectors.summingInt(Service::getAmount));
+        if (leftAmount > 0) {
+            logger.debug("@notifyOrderUpdateStatus#{}服务次数大于0,不处理,鱼卡[{}]", workOrder.getId(), workOrder.getId(), workOrder.getId());
             return;
         }
-        logger.info("@notifyOrderUpdateStatus#{}向订单中心发起订单完成消息,鱼卡[{}],订单[{}]",workOrder.getId(),workOrder.getId(),workOrder.getOrderId());
+        logger.info("@notifyOrderUpdateStatus#{}向订单中心发起订单完成消息,鱼卡[{}],订单[{}]", workOrder.getId(), workOrder.getId(), workOrder.getOrderId());
         Map param = Maps.newHashMap();
         param.put("id", workOrder.getOrderId());
         param.put("status", status);
@@ -246,15 +265,15 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     public void notifyOrderUpdateStatus(Long orderId, Integer status) {
         Map param = Maps.newHashMap();
-        param.put("id",orderId.toString());
-        param.put("status",status.toString());
+        param.put("id", orderId.toString());
+        param.put("status", status.toString());
         rabbitMqSender.send(param, QueueTypeEnum.NOTIFY_ORDER);
     }
 
     @Transactional
-    public void order2ServiceAndWorkOrder(OrderForm orderView){
+    public void order2ServiceAndWorkOrder(OrderForm orderView) {
         try {
-            StopWatch stopWatch=new StopWatch();
+            StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             logger.info("@order2ServiceAndWorkOrder*****订单:[{}]转换服务,答疑单,鱼卡开始***** 订单信息[{}]", orderView.getId(), JacksonUtil.toJSon(orderView));
 //            订单转服务
@@ -266,7 +285,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             //尝试粗粒度通知等待结果
 
             stopWatch.stop();
-            logger.info("*****订单:[{}]转换服务,答疑单,鱼卡成功*****;耗时:[{}]", orderView.getId(),stopWatch.getTotalTimeSeconds());
+            logger.info("*****订单:[{}]转换服务,答疑单,鱼卡成功*****;耗时:[{}]", orderView.getId(), stopWatch.getTotalTimeSeconds());
         } catch (Exception ex) {
             logger.error("订单:[{}]转换为服务失败", orderView.getId(), ex);
             mailSupport.reportError("订单" + orderView.getId() + "转换失败", ex, orderView);
@@ -276,33 +295,32 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     @Transactional
     //此处需要使用select for update对service的更新记录加锁
-    public void decreaseService(WorkOrder workOrder,CourseSchedule courseSchedule,Integer status) throws BoxfishException {
+    public void decreaseService(WorkOrder workOrder, CourseSchedule courseSchedule, Integer status) throws BoxfishException {
         //从service表中减去已经上课的数量
         Service service = workOrder.getService();
         logger.info("@decreaseService:开始对服务次数进行减操作,操作的鱼卡号[{}],服务号[{}],服务初始数量[{}],还剩数量[{}],触发操作的状态为[{}],状态描述是[{}]",
-                workOrder.getId(),service.getId(),service.getOriginalAmount(),service.getAmount(),status,FishCardStatusEnum.getDesc(status));
+                workOrder.getId(), service.getId(), service.getOriginalAmount(), service.getAmount(), status, FishCardStatusEnum.getDesc(status));
         if (null == service) {
-            logger.error("@decreaseService:鱼卡[{}]无对应的服务",workOrder.getId());
+            logger.error("@decreaseService:鱼卡[{}]无对应的服务", workOrder.getId());
             throw new BusinessException("订单无对应的服务");
         }
         //使用select for update为记录加锁
-        service=findByIdForUpdate(service.getId());
+        service = findByIdForUpdate(service.getId());
         //此处是否是减去1?
-        if(service.getAmount()>0) {
+        if (service.getAmount() > 0) {
             if (null == workOrder.getMakeUpSeq() || 0 == workOrder.getMakeUpSeq()) {
                 service.setAmount(service.getAmount() - 1);
             }
-        }
-        else{
-            logger.error("@decreaseService,服务出现不够减情况,需要排查问题service[{}],鱼卡[{}]",service.getId(),workOrder.getId());
+        } else {
+            logger.error("@decreaseService,服务出现不够减情况,需要排查问题service[{}],鱼卡[{}]", service.getId(), workOrder.getId());
         }
         service.setUpdateTime(new Date());
         save(service);
 
         //修改WorkOrder的状态
         workOrder.setUpdateTime(new Date());
-        workOrder.setIsCourseOver((short)1);
-        if(status!=FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
+        workOrder.setIsCourseOver((short) 1);
+        if (status != FishCardStatusEnum.STUDENT_ABSENT.getCode()) {
             workOrder.setActualEndTime(new Date());
         }
         workOrder.setStatus(status);
@@ -315,6 +333,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     /**
      * 订单转换为服务
+     *
      * @param orderView
      * @throws Exception
      */
@@ -329,18 +348,18 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         // 混合型套餐特殊处理,合并为一个service
         boolean isOverAll = Objects.equals(productCombo.getComboType(), ComboTypeToRoleId.OVERALL);
 
-        productCombo.getComboDetails().forEach( productComboDetail -> {
+        productCombo.getComboDetails().forEach(productComboDetail -> {
             // 改成用comboCode作为分组字段
             String key = productComboDetail.getComboCode();
-            if(StringUtils.isEmpty(key)) {
-                if(isOverAll) {
+            if (StringUtils.isEmpty(key)) {
+                if (isOverAll) {
                     key = productCombo.getComboType().name();
                 } else {
                     key = productComboDetail.getTutorType().name();
                 }
             }
             Service service = serviceHashMap.get(key);
-            if(service != null) {
+            if (service != null) {
                 //增加有效期,数量
                 setServiceExistedSpecs(service, productComboDetail, orderView);
             } else {
@@ -354,26 +373,26 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         addValidTimeForServices(services, orderView);
         save(services);
 
-        for (Service service:services){
+        for (Service service : services) {
             // 如果是外教点评, 则刷新外教点评次数缓存
-            if(Objects.equals(service.getProductType(), ProductType.COMMENT.value())) {
+            if (Objects.equals(service.getProductType(), ProductType.COMMENT.value())) {
                 cacheManager.getCache(CacheKeyConstant.COMMENT_CARD_AMOUNT).evict(service.getStudentId());
             }
-            logger.info("订单[{}],保存服务[{}]成功",orderView.getId(),service.getId());
-            if (Objects.equals(service.getProductType(),1002)){
+            logger.info("订单[{}],保存服务[{}]成功", orderView.getId(), service.getId());
+            if (Objects.equals(service.getProductType(), 1002)) {
                 logger.info("@order2Service2 购买点评次数,通知跟单系统");
-                syncCommentCard2SystemService.syncCommentCard2System(service.getId(),CommentCardStatus.UNASKED.getCode(),null);
+                syncCommentCard2SystemService.syncCommentCard2System(service.getId(), CommentCardStatus.UNASKED.getCode(), null);
             }
         }
 
         // 判断小班课补课  services size =1  combo_type='FSCF' 或者 'FSCC'  and original_amount=1
         // 自动生成鱼卡 补齐小班 不影响service 采用异步操作
-        if(     services.size()==1 &&
+        if (services.size() == 1 &&
                 (ComboTypeToRoleId.FSCF.name().equals(services.get(0).getComboType()) || ComboTypeToRoleId.FSCC.name().equals(services.get(0).getComboType()))
                 &&
-                services.get(0).getOriginalAmount()==1 && !Objects.isNull(productCombo) && !Objects.isNull(productCombo.getSmallClassId())
-                ){
-            autoTimePickerService.syncServiceToWorkOrder(services.get(0),productCombo.getSmallClassId());
+                services.get(0).getOriginalAmount() == 1 && !Objects.isNull(productCombo) && !Objects.isNull(productCombo.getSmallClassId())
+                ) {
+            autoTimePickerService.syncServiceToWorkOrder(services.get(0), productCombo.getSmallClassId());
         }
 
         logger.info("@order2Service 购买点评次数,设置首页点评次数");
@@ -423,7 +442,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         LocalDate now = LocalDate.now();
         for (Service service : services) {
             service.setStartTime(DateUtil.convertToDate(now));
-            if(StringUtils.isEmpty(orderForm.getExpiredDate())) {
+            if (StringUtils.isEmpty(orderForm.getExpiredDate())) {
                 // 从购买当天0点算起, 到过期的第一天0点为止
                 service.setEndTime(DateUtil.convertToDate(now.plusDays(service.getValidityDay() + 1)));
             } else {
@@ -438,7 +457,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setOriginalAmount(service.getOriginalAmount() + productComboDetail.getSkuAmount());
         service.setAmount(service.getOriginalAmount());
         // TODO 长期有效service.getValidityDay() + serviceSKU.getValidDay()
-        if(Objects.isNull(orderForm.getValidDays())) {
+        if (Objects.isNull(orderForm.getValidDays())) {
             service.setValidityDay(365 * 2);
         } else {
             service.setValidityDay(orderForm.getValidDays());
@@ -456,7 +475,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         // 设置用户会员类型
         service.setUserType(UserTypeEnum.getUserTypeByComboCode(productCombo.getComboCode()).type());
         // 课程类型
-        if(isOverAll) {
+        if (isOverAll) {
             service.setTutorType(TutorType.MIXED.name());
         } else {
             service.setTutorType(productComboDetail.getTutorType().name());
@@ -481,10 +500,10 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         service.setClassSize(classSize == null ? -1 : classSize);
 
         List<ComboDurations> durations = productCombo.getComboDurations();
-        if(CollectionUtils.isNotEmpty(durations)) {
-            for(int i = 0, size = durations.size(); i < size;  i++) {
+        if (CollectionUtils.isNotEmpty(durations)) {
+            for (int i = 0, size = durations.size(); i < size; i++) {
                 ComboDurations duration = durations.get(i);
-                if(Objects.equals(duration.getComboCode(), productComboDetail.getComboCode())) {
+                if (Objects.equals(duration.getComboCode(), productComboDetail.getComboCode())) {
                     service.setComboCycle(duration.getDurationWeeks());
                     service.setCountInMonth(duration.getPerWeekCourseCount());
                     break;
@@ -496,14 +515,22 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return service;
     }
 
-    public Service findTop1ByOrderId(Long orderId){
+    public Service findTop1ByOrderId(Long orderId) {
         return jpa.findTop1ByOrderId(orderId);
     }
 
+    //试讲小班课
     @Transactional
-    public void saveWorkorderAndCourse(WorkOrder workOrder){
+    public void batchSaveWorkOrderAndCourses(List<WorkOrder> workOrders) {
+        workOrders.forEach(workOrder -> {
+            this.saveWorkorderAndCourse(workOrder, true);
+        });
+    }
+
+    @Transactional
+    public void saveWorkorderAndCourse(WorkOrder workOrder, boolean retriveFlag) {
         workOrderService.save(workOrder);
-        CourseSchedule courseSchedule=new CourseSchedule();
+        CourseSchedule courseSchedule = new CourseSchedule();
         courseSchedule.setStatus(workOrder.getStatus());
         courseSchedule.setStudentId(workOrder.getStudentId());
         courseSchedule.setCourseId(workOrder.getCourseId());
@@ -516,9 +543,14 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         courseSchedule.setWorkorderId(workOrder.getId());
         courseSchedule.setTeacherId(workOrder.getTeacherId());
         courseScheduleService.save(courseSchedule);
-//        ScheduleCourseInfo courseInfo=scheduleCourseInfoService.queryByCourseIdAndScheduleType(courseSchedule.getCourseId(), ScheduleTypeEnum.TRIAL.getDesc());
-        TrialCourse trialCourse=scheduleCourseInfoService.queryByCourseIdAndScheduleType(courseSchedule.getCourseId(), ScheduleTypeEnum.TRIAL.getDesc());
-        ScheduleCourseInfo scheduleCourseInfo=new ScheduleCourseInfo();
+        ScheduleCourseInfo scheduleCourseInfo = getScheduleCourseInfo(workOrder, courseSchedule, retriveFlag);
+        scheduleCourseInfoService.save(scheduleCourseInfo);
+    }
+
+
+    private ScheduleCourseInfo getScheduleCourseInfo(WorkOrder workOrder, CourseSchedule courseSchedule, boolean retriveFlag) {
+        TrialCourse trialCourse = getTrialCourse(courseSchedule, false);
+        ScheduleCourseInfo scheduleCourseInfo = new ScheduleCourseInfo();
         scheduleCourseInfo.setCourseType(trialCourse.getCourseType());
         scheduleCourseInfo.setThumbnail(trialCourse.getThumbnail());
         scheduleCourseInfo.setName(trialCourse.getName());
@@ -527,7 +559,19 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         scheduleCourseInfo.setLastModified(trialCourse.getLastModified());
         scheduleCourseInfo.setWorkOrderId(workOrder.getId());
         scheduleCourseInfo.setScheduleId(courseSchedule.getId());
-        scheduleCourseInfoService.save(scheduleCourseInfo);
+        return scheduleCourseInfo;
+    }
+
+    private TrialCourse getTrialCourse(CourseSchedule courseSchedule, boolean retriveFlag) {
+        if (!retriveFlag) {
+            return scheduleCourseInfoService.queryByCourseIdAndScheduleType(courseSchedule.getCourseId(), ScheduleTypeEnum.TRIAL.getDesc());
+        } else {
+            RecommandCourseView recommandCourseView = recommandCourseRequester.getCourseViewDetail(courseSchedule.getCourseId());
+            if (!Objects.isNull(recommandCourseView)) {
+                return new TrialCourse(recommandCourseView, urlConf.getThumbnail_server());
+            }
+        }
+        return null;
     }
 
     public Map<String, Integer> getForeignCommentServiceCount(long studentId) {
@@ -562,25 +606,8 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                 Optional.empty() : Optional.of(servicePage.getContent().get(0));
     }
 
-//    @Transactional
-//    public void saveWorkorderAndCourse(WorkOrder workOrder,CourseSchedule courseSchedule,TrialLectureModifyParam trialLectureModifyParam){
-//        workOrderService.save(workOrder);
-//        courseSchedule.setStatus(workOrder.getStatus());
-//        courseSchedule.setStudentId(workOrder.getStudentId());
-//        courseSchedule.setCourseId(workOrder.getCourseId());
-//        courseSchedule.setCourseName(workOrder.getCourseName());
-//        courseSchedule.setCourseType(workOrder.getCourseType());
-//        courseSchedule.setCreateTime(workOrder.getCreateTime());
-//        courseSchedule.setTimeSlotId(workOrder.getSlotId());
-//        courseSchedule.setClassDate(workOrder.getStartTime());
-//        courseSchedule.setWorkorderId(workOrder.getId());
-//        courseSchedule.setTeacherId(workOrder.getTeacherId());
-//        courseScheduleService.save(courseSchedule);
-//        scheduleCourseInfoService.updateTrialScheduleInfo(trialLectureModifyParam,workOrder,courseSchedule);
-//    }
-
     @Transactional
-    public void deleteWorkOrderAndSchedule(WorkOrder workOrder,CourseSchedule courseSchedule){
+    public void deleteWorkOrderAndSchedule(WorkOrder workOrder, CourseSchedule courseSchedule) {
         workOrderService.delete(workOrder);
         courseScheduleService.delete(courseSchedule);
     }
@@ -589,6 +616,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     /**************** 兼容历史版本代码******************/
     /**
      * 每周选几次课
+     *
      * @param service
      * @return
      */
@@ -606,6 +634,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     /**
      * 几周上完
+     *
      * @param service
      * @return
      */
@@ -616,55 +645,59 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             return 4;
         } else {
             int comboCycle = service.getComboCycle();
-            return (getNumPerWeek(service) -1 + service.getAmount()) / getNumPerWeek(service);
+            return (getNumPerWeek(service) - 1 + service.getAmount()) / getNumPerWeek(service);
 //            return service.getAmount() % comboCycle == 0
 //                    ? comboCycle : service.getAmount() / getNumPerWeek(service);
         }
     }
 
 
-    /*********兼容老版本*************/
+    /*********
+     * 兼容老版本
+     *************/
     public Service findTop1ByOrderIdAndComboType(Long orderId, String comboType) {
         return jpa.findTop1ByOrderIdAndComboType(orderId, comboType);
     }
 
     /**
      * 获取首次鱼卡时间
+     *
      * @param workOrder
      * @return
      */
     @Transactional
-    public Date getFirstTimeOfService(WorkOrder workOrder){
+    public Date getFirstTimeOfService(WorkOrder workOrder) {
         //获取首次鱼卡开始时间
         WorkOrder fistWorkOrder = null;
 
         Date beginDate = workOrder.getService().getFirstTime();
 
-        if(null==beginDate){
+        if (null == beginDate) {
             //获取该订单所有鱼卡信息
             List<WorkOrder> workOrders = validateAndGetWorkOrders(workOrder.getOrderId());
             fistWorkOrder = getFirstOrder(workOrders);
             beginDate = fistWorkOrder.getStartTime();
-            logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]",fistWorkOrder.getId(),   fistWorkOrder.getStartTime());
+            logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]", fistWorkOrder.getId(), fistWorkOrder.getStartTime());
             //更新service的首次鱼卡开始时间
-            Service  service =this.findByIdForUpdate(fistWorkOrder.getService().getId());
+            Service service = this.findByIdForUpdate(fistWorkOrder.getService().getId());
             service.setFirstTime(beginDate);
             this.save(service);
         }
-        logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]",workOrder.getId(),   workOrder.getStartTime());
+        logger.info("getFirstTimeOfService====>fishcardId[{}]====>开始时间[{}]", workOrder.getId(), workOrder.getStartTime());
         return beginDate;
     }
 
     /**
      * 返回首次时间
+     *
      * @param workOrders
      * @return
      */
-    private WorkOrder getFirstOrder(List<WorkOrder> workOrders){
+    private WorkOrder getFirstOrder(List<WorkOrder> workOrders) {
         workOrders.sort(new Comparator<WorkOrder>() {
             @Override
             public int compare(WorkOrder o1, WorkOrder o2) {
-                if(o1.getStartTime().after(o2.getStartTime())){
+                if (o1.getStartTime().after(o2.getStartTime())) {
                     return 0;
                 }
                 return -1;
@@ -676,11 +709,12 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     /**
      * 根据鱼卡获取该订单所有鱼卡
+     *
      * @param workOrderId
      * @return
      */
-    private List<WorkOrder> validateAndGetWorkOrders(Long workOrderId){
-        List<WorkOrder> list =  null;
+    private List<WorkOrder> validateAndGetWorkOrders(Long workOrderId) {
+        List<WorkOrder> list = null;
         try {
             list = workOrderService.getAllWorkOrdersByOrderId(workOrderId);
             if (org.springframework.util.CollectionUtils.isEmpty(list)) {
@@ -692,23 +726,34 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         return list;
     }
 
-    private List<Service> getServiceSelectedStatus(Long studentId,Integer coursesSelected){
-        return jpa.getServiceSelectedStatus(studentId,coursesSelected);
+    private List<Service> getServiceSelectedStatus(Long studentId, Integer coursesSelected) {
+        return jpa.getServiceSelectedStatus(studentId, coursesSelected);
     }
 
-    public List<Service> getUnselectedService(Long studentId, List<ComboTypeEnum> comboTypeEnums, TutorTypeEnum tutorTypeEnum,Integer selectedFlag){
-        return jpa.findByStudentIdAndComboTypeInAndTutorTypeAndCoursesSelectedAndProductType(studentId, workOrderService.enums2StringAray(comboTypeEnums),tutorTypeEnum.toString(),selectedFlag,ProductType.TEACHING.value());
+    public List<Service> getUnselectedService(Long studentId, List<ComboTypeEnum> comboTypeEnums, TutorTypeEnum tutorTypeEnum, Integer selectedFlag) {
+        return jpa.findByStudentIdAndComboTypeInAndTutorTypeAndCoursesSelectedAndProductType(studentId, workOrderService.enums2StringAray(comboTypeEnums), tutorTypeEnum.toString(), selectedFlag, ProductType.TEACHING.value());
     }
 
-    public List<Service> getUnselectedService(Long studentId,ComboTypeEnum comboTypeEnum,Integer selectedFlag){
-        return jpa.findByStudentIdAndComboTypeAndCoursesSelectedAndProductType(studentId, comboTypeEnum.toString() ,selectedFlag,ProductType.TEACHING.value());
+    public List<Service> getUnselectedService(Long studentId, ComboTypeEnum comboTypeEnum, Integer selectedFlag) {
+        return jpa.findByStudentIdAndComboTypeAndCoursesSelectedAndProductType(studentId, comboTypeEnum.toString(), selectedFlag, ProductType.TEACHING.value());
     }
 
-    public List<Service> getUnselectedService(Long studentId,List<ComboTypeEnum> comboTypeEnums,Integer selectedFlag){
-        return jpa.findByStudentIdAndComboTypeInAndCoursesSelectedAndProductType(studentId, workOrderService.enums2StringAray(comboTypeEnums) ,selectedFlag,ProductType.TEACHING.value());
+    public List<Service> getUnselectedService(Long studentId, List<ComboTypeEnum> comboTypeEnums, Integer selectedFlag) {
+        return jpa.findByStudentIdAndComboTypeInAndCoursesSelectedAndProductType(studentId, workOrderService.enums2StringAray(comboTypeEnums), selectedFlag, ProductType.TEACHING.value());
     }
 
     public Set<Long> getForeignCommentStudentIds() {
         return jpa.getForeignCommentStudentIds();
+    }
+
+    @Transactional
+    public void saveSmallClassAndCards(SmallClass smallClass, List<WorkOrder> workOrders) {
+        this.batchSaveWorkOrderAndCourses(workOrders);
+        smallClass.setAllCards(workOrders);
+        //回写群组信息到smallclass
+        FishCardGroupsInfo fishCardGroupsInfo = smallClassInitStrategy.buildChatRoom(smallClass);
+        smallClassInitStrategy.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
+
+        smallClassJpaRepository.save(smallClass);
     }
 }

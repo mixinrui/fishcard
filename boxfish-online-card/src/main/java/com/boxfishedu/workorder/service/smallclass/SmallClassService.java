@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,7 +24,7 @@ public class SmallClassService {
     @Autowired
     SmallClassJpaRepository smallClassJpaRepository;
 
-    Logger logger= LoggerFactory.getLogger(this.getClass());
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void persistIntoDb(SmallClass smallClass, PublicClassInfoStatusEnum publicClassInfoStatusEnum) {
         SmallClass dbSmallClass = smallClassJpaRepository.findOne(smallClass.getId());
@@ -51,8 +52,8 @@ public class SmallClassService {
     }
 
     @Transactional
-    public void testProxy(){
-        SmallClass smallClass=new SmallClass();
+    public void testProxy() {
+        SmallClass smallClass = new SmallClass();
         smallClass.setStartTime(new Date());
         smallClass.setStatus(10);
         smallClass.setEndTime(new Date());
@@ -61,7 +62,7 @@ public class SmallClassService {
         smallClassJpaRepository.save(smallClass);
         smallClass.setCreateTime(new Date());
 
-        logger.debug("&&&&&&&&&&&&&&&&&&&&&&proxy[{}]",smallClass.getId());
+        logger.debug("&&&&&&&&&&&&&&&&&&&&&&proxy[{}]", smallClass.getId());
 
         smallClass.setClassNum(2l);
     }

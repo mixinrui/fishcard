@@ -30,6 +30,7 @@ import java.util.*;
 /**
  * Created by hucl on 17/1/8.
  */
+@SuppressWarnings("ALL")
 @Component(ConstantUtil.SMALL_CLASS_INIT)
 public class SmallClassInitStrategy implements GroupInitStrategy {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

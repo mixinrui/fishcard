@@ -11,6 +11,7 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -56,13 +57,13 @@ public class SmallClassQueryService {
         return smallClasss;
     }
 
-    public void filterSmallClass(List<SmallClass> smallClasss){
-        if(CollectionUtils.isNotEmpty(smallClasss) && ClassTypeEnum.SMALL.name().equals(smallClasss.get(0).getClassType())){
-            List<Long> smallIds = Collections3.extractToList(smallClasss,"id");
+    public void filterSmallClass(List<SmallClass> smallClasss) {
+        if (CollectionUtils.isNotEmpty(smallClasss) && ClassTypeEnum.SMALL.name().equals(smallClasss.get(0).getClassType())) {
+            List<Long> smallIds = Collections3.extractToList(smallClasss, "id");
             List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassNum(smallIds);
-            final Map<Long,Long> smallClassMap =workOrders.stream().collect(Collectors.groupingBy(WorkOrder::getSmallClassId, Collectors.counting()));
+            final Map<Long, Long> smallClassMap = workOrders.stream().collect(Collectors.groupingBy(WorkOrder::getSmallClassId, Collectors.counting()));
             smallClasss.stream().forEach(smallClass -> {
-                smallClass.setClassNum( smallClassMap.get(smallClass.getId()) );
+                smallClass.setClassNum(smallClassMap.get(smallClass.getId()));
             });
 
         }
@@ -72,9 +73,6 @@ public class SmallClassQueryService {
     private String getFilterSql(PublicFilterParam publicFilterParam) {
 
         StringBuilder sql = new StringBuilder("from SmallClass wo where wo.startTime between :begin and :end ");
-
-
-
 
 
         // 中外教
@@ -93,7 +91,7 @@ public class SmallClassQueryService {
             sql.append("and id=:id ");
         }
 
-        if(null!=publicFilterParam.getIds()){
+        if (null != publicFilterParam.getIds()) {
             sql.append("   and wo.id in(:ids) ");
         }
 
@@ -118,24 +116,27 @@ public class SmallClassQueryService {
         }
 
         //小班课 公开课的 处理
-        if(null != publicFilterParam.getClassType()){
+        if (null != publicFilterParam.getClassType()) {
             sql.append(" and classType =:classType ");  // 除了小班课 和公开课
+        }
+
+        if (BooleanUtils.isNotFalse(publicFilterParam.getIsDemo())) {
+            sql.append(" and demoFlag = :demoFlag");
         }
 
         sql.append(" order by ");
 
 
-
         if (null != publicFilterParam.getStartTimeSort()) {
-            sql.append(" wo.startTime   ").append(publicFilterParam.getStartTimeSort().toLowerCase()) .append(" ,");
+            sql.append(" wo.startTime   ").append(publicFilterParam.getStartTimeSort().toLowerCase()).append(" ,");
         }
 
         if (null != publicFilterParam.getActualStartTimeSort()) {
-            sql.append("  wo.actualStartTime ").append(publicFilterParam.getActualStartTimeSort())  .append(" ,");
+            sql.append("  wo.actualStartTime ").append(publicFilterParam.getActualStartTimeSort()).append(" ,");
         }
 
         if (null != publicFilterParam.getStartTimeSort() && null != publicFilterParam.getActualStartTimeSort()) {
-            sql.append("  wo.teacherId asc , wo.createTime desc")  .append(" ,");
+            sql.append("  wo.teacherId asc , wo.createTime desc").append(" ,");
         }
 
 
@@ -161,7 +162,7 @@ public class SmallClassQueryService {
         }
 
 
-        if(null!=publicFilterParam.getIds()){
+        if (null != publicFilterParam.getIds()) {
             query.setParameter("ids", publicFilterParam.getIds());
         }
 
@@ -171,7 +172,6 @@ public class SmallClassQueryService {
         }
 
 
-
         if (null != publicFilterParam.getCreateBeginDateFormat()) {
             query.setParameter("createbegin", publicFilterParam.getCreateBeginDateFormat());
         }
@@ -179,8 +179,8 @@ public class SmallClassQueryService {
             query.setParameter("createend", publicFilterParam.getCreateEndDateFormat());
         }
 
-        if(null!=publicFilterParam.getStatus()){
-            query.setParameter("status",publicFilterParam.getStatus());
+        if (null != publicFilterParam.getStatus()) {
+            query.setParameter("status", publicFilterParam.getStatus());
         }
         if (null != publicFilterParam.getOrderCode()) {
             query.setParameter("orderCode", publicFilterParam.getOrderCode());
@@ -193,14 +193,17 @@ public class SmallClassQueryService {
         }
 
 
-
         if (null != publicFilterParam.getRoleId()) {
             query.setParameter("roleId", publicFilterParam.getRoleId());
         }
 
         //小班课 公开课的 处理
-        if( null != publicFilterParam.getClassType()){
+        if (null != publicFilterParam.getClassType()) {
             query.setParameter("classType", publicFilterParam.getClassType());
+        }
+
+        if (BooleanUtils.isNotFalse(publicFilterParam.getIsDemo())) {
+            query.setParameter("demoFlag", 1);
         }
         return query;
     }

@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Created by hucl on 17/1/8.
  */
+@SuppressWarnings("ALL")
 @Component(ConstantUtil.PUBLIC_CLASS_INIT)
 public class PublicClassStrategy implements GroupInitStrategy {
     @Autowired

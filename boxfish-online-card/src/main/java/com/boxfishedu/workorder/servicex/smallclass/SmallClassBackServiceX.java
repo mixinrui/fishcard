@@ -1,6 +1,5 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
-import com.boxfishedu.workorder.common.bean.LevelEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -22,12 +21,10 @@ import com.boxfishedu.workorder.web.param.StudentForSmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.orm.jpa.vendor.OpenJpaDialect;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

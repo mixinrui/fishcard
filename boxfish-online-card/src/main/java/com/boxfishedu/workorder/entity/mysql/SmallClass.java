@@ -98,6 +98,8 @@ public class SmallClass implements Cloneable, Serializable {
 
     private Integer status;
 
+    private Integer demoFlag;
+
     @JsonIgnore
     @Transient
     private Date reportTime;
@@ -129,6 +131,9 @@ public class SmallClass implements Cloneable, Serializable {
     @JsonIgnore
     @Transient
     private PublicClassInfoStatusEnum classStatusEnum;
+
+    @Transient
+    private List<Long> members;
 
     //班级类型
     private String classType;
@@ -190,5 +195,10 @@ public class SmallClass implements Cloneable, Serializable {
     //小班课上课时间30分钟
     public boolean reachOverTime() {
         return new Date().after(this.getEndTime());
+    }
+
+    public boolean isDemo() {
+        return this.demoFlag == null ? false :
+                (1 == this.demoFlag ? true : false);
     }
 }

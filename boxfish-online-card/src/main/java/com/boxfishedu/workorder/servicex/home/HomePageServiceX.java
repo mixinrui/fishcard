@@ -40,7 +40,7 @@ public class HomePageServiceX {
     @Autowired
     private SmallClassJpaRepository smallClassJpaRepository;
 
-    private StudentClassInfo emptyStudentClassInfo;
+    private volatile StudentClassInfo emptyStudentClassInfo;
 
     @Autowired
     private ServiceJpaRepository serviceJpaRepository;

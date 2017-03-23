@@ -4,6 +4,8 @@ import com.boxfishedu.workorder.common.bean.FishCardNetStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;

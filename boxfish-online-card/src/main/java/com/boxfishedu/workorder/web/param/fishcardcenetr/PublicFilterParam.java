@@ -54,6 +54,7 @@ public class PublicFilterParam {
     //金币换课连续旷课次数
     private Integer ContineAbsenceNum;
 
+    private Boolean isDemo;
 
     /**
      * 鱼卡是否确认 1 未确认   0  已经确认

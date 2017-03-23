@@ -57,7 +57,7 @@ public class TrialLectureServiceX {
 
         onlineAccountService.add(trialLectureParam.getStudentId());
 
-        serveService.saveWorkorderAndCourse(workOrder);
+        serveService.saveWorkorderAndCourse(workOrder,false);
         serviceSDK.createGroup(workOrder);
         logger.info("试讲课鱼卡生成结束,鱼卡id[{}]:", workOrder.getId());
     }
@@ -96,10 +96,12 @@ public class TrialLectureServiceX {
         return service;
     }
 
-    public CourseSchedule getOldCourseSchedule(TrialLectureParam trialLectureParam) {
-        Date classDate = DateUtil.String2SimpleDate(trialLectureParam.getStartTime());
-        Long studentId = trialLectureParam.getStudentId();
-        Integer timeSlotId = trialLectureParam.getTimeSlotId();
+    private CourseSchedule getOldCourseSchedule(TrialLectureParam trialLectureParam) {
+        return this.getOldCourseSchedule(trialLectureParam.getStartTime(), trialLectureParam.getStudentId(), trialLectureParam.getTimeSlotId());
+    }
+
+    public CourseSchedule getOldCourseSchedule(String date, Long studentId, Integer timeSlotId) {
+        Date classDate = DateUtil.String2SimpleDate(date);
         CourseSchedule courseSchedule = courseScheduleService.findTop1ByStudentIdAndTimeSlotIdAndClassDate(
                 studentId, timeSlotId, classDate);
         return courseSchedule;

@@ -203,11 +203,4 @@ public class SmallClassBackController {
         return JsonResultModel.newJsonResultModel(smallClassBackServiceX.addbackup(studentForSmallClassParam));
     }
 
-    @RequestMapping(value = "/smallclass/trial", method = RequestMethod.POST)
-    public JsonResultModel buildTrialSmallClass(@RequestBody TrialSmallClassParam trialSmallClassParam) {
-        logger.debug("@buildTrialSmallClass创建试讲小班课,参数[{}]", JacksonUtil.toJSon(trialSmallClassParam));
-//        smallClassBackServiceX.buildTrialSmallClass(trialSmallClassParam);
-        return JsonResultModel.newJsonResultModel("OK");
-    }
-
 }
