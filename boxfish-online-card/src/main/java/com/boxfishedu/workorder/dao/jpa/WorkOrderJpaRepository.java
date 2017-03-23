@@ -156,7 +156,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByStudentIdAndEndTimeLessThanOrderByStartTimeDesc(Long studentId, Date date);
 
     public List<WorkOrder> findByStudentIdAndOrderChannelAndStartTimeAfter(Long studentId, String orderChannel, Date date);
-
+  
     /**
      * 查询旷课的、还未扣积分的学生
      **/
