@@ -24,6 +24,7 @@ public class CommentCardInitiateController {
 
     @RequestMapping(value = "/handle/update/course/type_and_difficulty", method = RequestMethod.GET)
     public Object handleUpdateCourseTypeAndDifficulty(){
+        
         commentCardInitiateService.timeToUpdateTypeAndDifficulty();
         return new JsonResultModel();
     }
