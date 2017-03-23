@@ -16,4 +16,5 @@ public class SmallClassSuperStuParam {
     private String classType;
     private Long studentId;
     private Long workOrderId;
+    private String message;
 }

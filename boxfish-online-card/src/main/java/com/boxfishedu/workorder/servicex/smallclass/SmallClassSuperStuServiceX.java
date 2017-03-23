@@ -7,25 +7,17 @@ import com.boxfishedu.workorder.common.bean.TeachingType;
 import com.boxfishedu.workorder.common.bean.TutorTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassUserTypeEnum;
-import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
-import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
-import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.requester.CourseOnlineRequester;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
-import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
-import com.boxfishedu.workorder.service.WorkOrderService;
-import com.boxfishedu.workorder.service.accountcardinfo.DataCollectorService;
-import com.boxfishedu.workorder.service.workorderlog.WorkOrderLogService;
 import com.boxfishedu.workorder.servicex.studentrelated.SmallClassSuperStuService;
 import com.boxfishedu.workorder.servicex.studentrelated.TimePickerServiceXV1;
 import com.boxfishedu.workorder.web.param.SelectedTime;
@@ -230,6 +222,8 @@ public class SmallClassSuperStuServiceX {
         RecommandCourseView courseView = recommandCourseRequester.getCourseViewDetail(courseSchedule.getCourseId());
         courseInfoService.saveSingleCourseInfo(workOrder, courseSchedule, courseView);
     }
+
+
 
 
 
