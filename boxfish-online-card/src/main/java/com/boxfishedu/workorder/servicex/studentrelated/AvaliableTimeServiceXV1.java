@@ -97,8 +97,8 @@ public class AvaliableTimeServiceXV1 {
         // 课程数量
         Integer class_num = null;
         ComboTypeToRoleId comboType = ComboTypeToRoleId.valueOf(avaliableTimeParam.getComboType());
-        if(comboType.isSmallClassType()  && !Objects.isNull(avaliableTimeParam.getOrderId())){
-            class_num =  serveService.findByOrderId(avaliableTimeParam.getOrderId()).get(0).getOriginalAmount();
+        if (comboType.isSmallClassType() && !Objects.isNull(avaliableTimeParam.getOrderId())) {
+            class_num = serveService.findByOrderId(avaliableTimeParam.getOrderId()).get(0).getOriginalAmount();
         }
         // 获取时间区间
         DateRange dateRange = getEnableDateRange(avaliableTimeParam, getOptionalDays(avaliableTimeParam));
@@ -129,7 +129,7 @@ public class AvaliableTimeServiceXV1 {
 
                     //小班课
                     if (ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getComboType()) || "SMALLCLASS".equals(avaliableTimeParam.getComboType())) {
-                        logger.info("getTimeAvailable:compotye [{}]",avaliableTimeParam.getComboType());
+                        logger.info("getTimeAvailable:compotye [{}]", avaliableTimeParam.getComboType());
                         dayTimeSlot.setDailyScheduleTime(dayTimeSlot.getDailyScheduleTime().stream()
                                 .filter(t -> !classDateTimeSlotsSet.contains(String.join(" ", dayTimeSlot.getDay(), t.getSlotId().toString()))
                                         &&
@@ -165,7 +165,7 @@ public class AvaliableTimeServiceXV1 {
                         }
                         return createDayTimeSlotsSmallClass(d, timeSlotsList);
                     } else {
-                    //1对1 处理逻辑
+                        //1对1 处理逻辑
                         int teachingType = BaseTimeSlots.TEACHING_TYPE_CN;
                         if (StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
                             teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
@@ -175,6 +175,10 @@ public class AvaliableTimeServiceXV1 {
                             timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType(DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
                             redisMapService.setMap(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d), timeSlotsList);
                             ;
+                        }
+                        //按照 时间片id排序
+                        if(!CollectionUtils.isEmpty(timeSlotsList)){
+                            timeSlotsList.sort((t1,t2) -> t1.getSlotId().compareTo(t2.getSlotId()));
                         }
                         return createDayTimeSlots(d, timeSlotsList);
                     }
@@ -249,7 +253,7 @@ public class AvaliableTimeServiceXV1 {
 
 
             // 同类型工单的最后一个工单   结束日期在当前日期之后 并且不在同一天
-            if (null != workOrder && workOrder.getEndTime().after(date)  && !DateUtil.isSameDate(date,workOrder.getEndTime())) {
+            if (null != workOrder && workOrder.getEndTime().after(date) && !DateUtil.isSameDate(date, workOrder.getEndTime())) {
                 date = workOrder.getEndTime();
                 afterDays = 1;
             }
@@ -309,7 +313,6 @@ public class AvaliableTimeServiceXV1 {
     }
 
     /**
-     *
      * @param orderId
      * @param userId
      * @return
@@ -320,7 +323,7 @@ public class AvaliableTimeServiceXV1 {
         Date currentDate = new Date();
 
         // 查找小班课的服务数据未选课程
-        List<Service> services = serveService.findByOrderIdAndComboTypeAndCoursesSelected(orderId,ComboTypeToRoleId.SMALLCLASS.name() ,0);
+        List<Service> services = serveService.findByOrderIdAndComboTypeAndCoursesSelected(orderId, ComboTypeToRoleId.SMALLCLASS.name(), 0);
         if (CollectionUtils.isEmpty(services)) {
             throw new BusinessException("未生成有效服务数据或者数据有误或者已选课");
         }
@@ -332,7 +335,7 @@ public class AvaliableTimeServiceXV1 {
         int countByWeek = service.getOriginalAmount() / service.getComboCycle();
         int yushuByWeek = service.getOriginalAmount() % service.getComboCycle();
         if (0 != yushuByWeek) {
-            countByWeek= (service.getOriginalAmount()+(service.getComboCycle()-yushuByWeek))/service.getComboCycle();// 如果还有余数,推算一周上几节课
+            countByWeek = (service.getOriginalAmount() + (service.getComboCycle() - yushuByWeek)) / service.getComboCycle();// 如果还有余数,推算一周上几节课
         }
 
         logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);
@@ -343,7 +346,7 @@ public class AvaliableTimeServiceXV1 {
             JSONObject jb = new JSONObject();
 
             String text = i == 1 ? "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfter7Days(currentDate, 3)) + ")" : "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i))) + ")";
-            Date date   = i == 1 ? DateUtil.getAfter7Days(currentDate, 3) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i));
+            Date date = i == 1 ? DateUtil.getAfter7Days(currentDate, 3) : DateUtil.getMonday(DateUtil.getAfter7Days(DateUtil.getAfter7Days(currentDate, 3), i));
 //            String firstWeek = weekFlag ? "下周开始" : "本周开始";
 //            String text = i == 1 ? firstWeek + " (" + DateUtil.formatMonthDay2String(DateUtil.getAfterTomoDate(currentDate)) + ")" :
 //                    "第" + String.valueOf(i) + "周开始" + " (" + DateUtil.formatMonthDay2String(DateUtil.getMonday(DateUtil.getAfter7Days(currentDate, weekFlag ? (i + 1) : (i)))) + ")";
@@ -373,7 +376,7 @@ public class AvaliableTimeServiceXV1 {
             return JsonResultModel.newJsonResultModel(delayRange);
         }
 
-        Map<String, Integer> courseMap = extractToMap(listCourses, "classDate", "timeSlotId");
+        Map<String, Set<Integer>> courseMap = extractToMap(listCourses, "classDate", "timeSlotId");
 
         // 循环 判断每周 是否满足条件  countByWeek每周
         for (int i = 0; i < 8; i++) {
@@ -395,7 +398,9 @@ public class AvaliableTimeServiceXV1 {
                 int countClassesWeek = 0;
 
                 for (String o : compareDateList) {
-                    if (courseMap.get(o) != null) countClassesWeek++;
+                    if (courseMap.get(o) != null) {
+                        countClassesWeek = (countClassesWeek+1);
+                    }
                 }
 
                 // 可用的时间片数量 减去 每周已有课程的数量 小于
@@ -421,7 +426,11 @@ public class AvaliableTimeServiceXV1 {
             Date baseDate = beginDate;
             for (int j = 0; j < 7; j++) {
                 if (DateUtil.getWeekDay3567(DateUtil.getAfterOneDay(baseDate, j))) {
-                    listDate.add(DateUtil.date2SimpleString(DateUtil.getAfterOneDay(baseDate, j)));
+                    String date =DateUtil.date2SimpleString(DateUtil.getAfterOneDay(baseDate, j));
+                    for(int m=0; m<  WorkOrderConstant.slots.size() ;m++){
+                        listDate.add(date+"_"+WorkOrderConstant.slots.get(m));  //日期和时间片作为参考
+                    }
+
                 }
             }
 
@@ -435,10 +444,13 @@ public class AvaliableTimeServiceXV1 {
 
     public static Map extractToMap(final Collection collection, final String keyPropertyName, final String valuePropertyName) {
         Map map = new HashMap(collection.size());
-
         try {
             for (Object obj : collection) {
-                map.put(DateUtil.date2SimpleString((Date) PropertyUtils.getProperty(obj, keyPropertyName)), PropertyUtils.getProperty(obj, valuePropertyName));
+                String key = PropertyUtils.getProperty(obj, keyPropertyName)+"_"+PropertyUtils.getProperty(obj, valuePropertyName);
+                Object value = PropertyUtils.getProperty(obj, valuePropertyName);
+
+                map.put(key,value);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
