@@ -18,6 +18,8 @@ public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Lon
 
     MonitorUser findByUserId(Long userId);
 
+    MonitorUser findByUserIdAndEnabled(Long userId,Integer enabled);
+
     @Modifying
     @Query("update MonitorUser mu set mu.enabled = 1,mu.updateTime = ?1 where mu.userId = ?2")
     void enabledMonitorUser(Date updateTime,Long userId);

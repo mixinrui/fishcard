@@ -112,8 +112,8 @@ public class MonitorUserService {
         }
     }
 
-    public MonitorUser checkMointorUser(Long userId){
-
-        return null;
+    public MonitorUser checkMonitorUser(Long userId){
+        logger.info("@checkMonitorUser userId:[{}]",userId);
+        return monitorUserJpaRepository.findByUserIdAndEnabled(userId,1);
     }
 }
