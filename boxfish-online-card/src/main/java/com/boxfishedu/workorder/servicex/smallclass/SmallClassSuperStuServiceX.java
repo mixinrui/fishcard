@@ -188,35 +188,6 @@ public class SmallClassSuperStuServiceX {
     }
 
 
-    private TimeSlotParam makeTimeSlotParam(SmallClassSuperStuParam smallClassSuperStuParam,Service service, SmallClass smallClass) {
-        TimeSlotParam timeSlotParam = new TimeSlotParam();
-
-        timeSlotParam.setStudentId(smallClassSuperStuParam.getStudentId());
-        timeSlotParam.setComboType(service.getComboType());
-        timeSlotParam.setOrderId(service.getOrderId());
-        timeSlotParam.setProductType(service.getProductType());
-        timeSlotParam.setSelectMode(0);
-        timeSlotParam.setTutorType(service.getTutorType());
-        if (TutorTypeEnum.CN.name().equals(service.getTutorType())) {
-            timeSlotParam.setSkuId(1);
-        }
-        if (TutorTypeEnum.FRN.name().equals(service.getTutorType())) {
-            timeSlotParam.setSkuId(2);
-        }
-
-
-        SelectedTime selectedTime = new SelectedTime();
-        selectedTime.setSelectedDate(DateUtil.date2SimpleString(smallClass.getStartTime()));
-        selectedTime.setTimeSlotId(smallClass.getSlotId());
-        List<SelectedTime> selectedTimes = Lists.newArrayList(selectedTime);
-
-        timeSlotParam.setSelectedTimes(selectedTimes);
-        logger.info("auToMakeClassesForSmallClass->timeSlotParam:[{}]", JSON.toJSON(timeSlotParam));
-        return timeSlotParam;
-    }
-
-
-
     //课程保存到mongo中
     public void saveCourseScheToMongo(WorkOrder workOrder, CourseSchedule courseSchedule) {
         RecommandCourseView courseView = recommandCourseRequester.getCourseViewDetail(courseSchedule.getCourseId());
