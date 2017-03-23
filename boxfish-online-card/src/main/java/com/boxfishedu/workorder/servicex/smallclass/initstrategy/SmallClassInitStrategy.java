@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass.initstrategy;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
@@ -14,6 +15,7 @@ import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
+import com.boxfishedu.workorder.service.monitor.MonitorUserService;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
@@ -57,6 +59,12 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Autowired
     private CourseOnlineRequester courseOnlineRequester;
+
+    @Autowired
+    private ThreadPoolManager threadPoolManager;
+
+    @Autowired
+    private MonitorUserService monitorUserService;
 
     public WorkOrder selectLeader(List<WorkOrder> workOrders) {
         logger.debug("小班鱼卡[{}]", JacksonUtil.toJSon(workOrders));
@@ -132,6 +140,10 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
         logger.debug("@initGroupClass#small#创建小班成功,小班是[{}],小班里的鱼卡是[{}]"
                 , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(smallClass.getAllCards()));
+
+        threadPoolManager.execute(new Thread(()->{
+            monitorUserService.distributeClassToMonitor(smallClass);
+        }));
     }
 
     @Override

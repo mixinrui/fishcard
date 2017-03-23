@@ -64,12 +64,8 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
         GroupInitStrategy groupInitStrategy
                 = groupInitStrategyMap.get(this.prefix + smallClass.getClassType());
 
-        //TODO: 课程监控
         try {
             groupInitStrategy.initGroupClass(smallClass);
-            if(!Objects.isNull(smallClass.getId())){
-                monitorUserService.distributeClassToMonitor(smallClass);
-            }
         }
         catch (Exception ex){
             logger.error("@CreateEventCustomer创建小班课失败,smallclas[{}]",JacksonUtil.toJSon(smallClass),ex);
