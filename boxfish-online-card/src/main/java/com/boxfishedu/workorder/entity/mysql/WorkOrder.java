@@ -221,6 +221,10 @@ public class WorkOrder implements Cloneable {
     @Column(name = "class_type", nullable = true)
     private String classType;
 
+    // 生成方式  小班课超级用户 super  ClassUserTypeEnum
+    @Column(name = "generator_type", nullable = true)
+    private String generatorType;
+
     //小班课id
     @Column(name = "small_class_id")
     private Long smallClassId;
