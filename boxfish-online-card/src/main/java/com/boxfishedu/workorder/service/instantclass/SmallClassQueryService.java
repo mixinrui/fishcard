@@ -21,6 +21,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -120,7 +121,7 @@ public class SmallClassQueryService {
             sql.append(" and classType =:classType ");  // 除了小班课 和公开课
         }
 
-        if (BooleanUtils.isNotFalse(publicFilterParam.getIsDemo())) {
+        if (!BooleanUtils.isNotTrue(publicFilterParam.getIsDemo())) {
             sql.append(" and demoFlag = :demoFlag");
         }
 
@@ -202,7 +203,7 @@ public class SmallClassQueryService {
             query.setParameter("classType", publicFilterParam.getClassType());
         }
 
-        if (BooleanUtils.isNotFalse(publicFilterParam.getIsDemo())) {
+        if (!Objects.isNull(publicFilterParam.getIsDemo()) && publicFilterParam.getIsDemo() == true) {
             query.setParameter("demoFlag", 1);
         }
         return query;
