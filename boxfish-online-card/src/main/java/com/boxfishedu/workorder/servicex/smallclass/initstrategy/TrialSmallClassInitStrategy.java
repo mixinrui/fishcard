@@ -20,6 +20,7 @@ import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
+import com.boxfishedu.workorder.servicex.smallclass.SmallClassBackServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.servicex.tiallecture.TrialLectureServiceX;
 import com.boxfishedu.workorder.web.param.TrialLectureParam;
@@ -83,12 +84,10 @@ public class TrialSmallClassInitStrategy implements GroupInitStrategy {
     private OnlineAccountService onlineAccountService;
 
     @Autowired
-    private ServeService serveService;
+    private SmallClassBackServiceX smallClassBackServiceX;
 
     @Autowired
-    private
-    @Qualifier(ConstantUtil.SMALL_CLASS_INIT)
-    SmallClassInitStrategy smallClassInitStrategy;
+    private ServeService serveService;
 
     private final String GENERATE_DEMO_SERVICE = "GENERATE_DEMO_SERVICE";
 
@@ -192,7 +191,7 @@ public class TrialSmallClassInitStrategy implements GroupInitStrategy {
             onlineAccountService.add(studentId);
         });
 
-        serveService.saveSmallClassAndCards(smallClass, workOrders);
+        smallClassBackServiceX.saveSmallClassAndCards(smallClass, workOrders);
 
         logger.info("试讲课鱼卡生成结束,鱼卡列表[{}]:", JacksonUtil.toJSon(workOrders));
     }

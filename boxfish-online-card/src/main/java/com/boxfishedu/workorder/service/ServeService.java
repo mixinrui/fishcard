@@ -115,11 +115,6 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
     private RecommandCourseRequester recommandCourseRequester;
 
     @Autowired
-    private
-    @Qualifier(ConstantUtil.SMALL_CLASS_INIT)
-    SmallClassInitStrategy smallClassInitStrategy;
-
-    @Autowired
     private SmallClassJpaRepository smallClassJpaRepository;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -752,16 +747,5 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     public Set<Long> getForeignCommentStudentIds() {
         return jpa.getForeignCommentStudentIds();
-    }
-
-    @Transactional
-    public void saveSmallClassAndCards(SmallClass smallClass, List<WorkOrder> workOrders) {
-        this.batchSaveWorkOrderAndCourses(workOrders);
-        smallClass.setAllCards(workOrders);
-        //回写群组信息到smallclass
-        FishCardGroupsInfo fishCardGroupsInfo = smallClassInitStrategy.buildChatRoom(smallClass);
-        smallClassInitStrategy.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
-
-        smallClassJpaRepository.save(smallClass);
     }
 }

@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
@@ -13,17 +14,22 @@ import com.boxfishedu.workorder.entity.mysql.SmallClassStu;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
+import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
+import com.boxfishedu.workorder.servicex.smallclass.initstrategy.SmallClassInitStrategy;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.param.StudentForSmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +65,14 @@ public class SmallClassBackServiceX {
 
     @Autowired
     private SmallClassRequester smallClassRequester;
+
+    @Autowired
+    private ServeService serveService;
+
+    @Autowired
+    private
+    @Qualifier(ConstantUtil.SMALL_CLASS_INIT)
+    GroupInitStrategy smallClassInitStrategy;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -178,5 +192,16 @@ public class SmallClassBackServiceX {
         SmallClass smallClass = new SmallClass(trialSmallClassParam);
         smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.CREATE);
         new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
+    }
+
+    @Transactional
+    public void saveSmallClassAndCards(SmallClass smallClass, List<WorkOrder> workOrders) {
+        serveService.batchSaveWorkOrderAndCourses(workOrders);
+        smallClass.setAllCards(workOrders);
+        //回写群组信息到smallclass
+        FishCardGroupsInfo fishCardGroupsInfo = smallClassInitStrategy.buildChatRoom(smallClass);
+        smallClassInitStrategy.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
+
+        smallClassJpaRepository.save(smallClass);
     }
 }
