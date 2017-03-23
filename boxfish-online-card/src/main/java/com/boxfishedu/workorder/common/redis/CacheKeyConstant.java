@@ -24,6 +24,9 @@ public class CacheKeyConstant {
 
     public static final String BASE_TIME_SLOTS = "BASE_TIME_SLOTS";
 
+    // 小班课
+    public static final String BASE_TIME_SLOTS_SMALL_CLASS = "BASE_TIME_SLOTS_SMALL_CLASS";
+
     public static final String SCHEDULE_HAS_MORE_HISTORY = "SCHEDULE_HAS_MORE_HISTORY";
 
     public static final String COMMENT_CARD_AMOUNT = "COMMENT_CARD_AMOUNT";

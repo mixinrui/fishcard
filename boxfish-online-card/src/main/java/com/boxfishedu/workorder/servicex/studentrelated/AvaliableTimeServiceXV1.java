@@ -9,12 +9,10 @@ import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.WorkOrderConstant;
 import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.BaseTimeSlotJpaSmallClassRepository;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
-import com.boxfishedu.workorder.entity.mysql.BaseTimeSlots;
-import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
-import com.boxfishedu.workorder.entity.mysql.Service;
-import com.boxfishedu.workorder.entity.mysql.WorkOrder;
+import com.boxfishedu.workorder.entity.mysql.*;
 import com.boxfishedu.workorder.service.CourseScheduleService;
 import com.boxfishedu.workorder.service.RedisMapService;
 import com.boxfishedu.workorder.service.ServeService;
@@ -56,6 +54,9 @@ public class AvaliableTimeServiceXV1 {
 
     @Autowired
     private BaseTimeSlotJpaRepository baseTimeSlotJpaRepository;
+
+    @Autowired
+    private BaseTimeSlotJpaSmallClassRepository baseTimeSlotJpaSmallClassRepository;
 
     @Autowired
     private RedisMapService redisMapService;
@@ -148,21 +149,33 @@ public class AvaliableTimeServiceXV1 {
                 },
                 // 根据日期获取到对应的DayTimeSlots
                 (d) -> {
-                    int teachingType = BaseTimeSlots.TEACHING_TYPE_CN;
-                    if (StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
-                        teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
-                    }
-                    List<BaseTimeSlots> timeSlotsList = redisMapService.getMap(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d));
-                    if (CollectionUtils.isEmpty(timeSlotsList)) {
-                        timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType(DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
-                        redisMapService.setMap(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d), timeSlotsList);
-                        ;
-                    }
 
-                    //小班课单独处理 只分0% 和 100% 对待
+
+                    //小班课单独处理
                     if (ClassTypeEnum.SMALL.name().equals(avaliableTimeParam.getClassType()) || "SMALLCLASS".equals(avaliableTimeParam.getComboType())) {
+                        int teachingType = BaseTimeSlotsSmallClass.TEACHING_TYPE_CN;
+                        if (StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
+                            teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
+                        }
+                        List<BaseTimeSlotsSmallClass> timeSlotsList = redisMapService.getMapSmallClass(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d));
+                        if (CollectionUtils.isEmpty(timeSlotsList)) {
+                            timeSlotsList = baseTimeSlotJpaSmallClassRepository.findByClassDateAndTeachingTypeAndClientType(DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
+                            redisMapService.setMapSmallClass(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d), timeSlotsList);
+                            ;
+                        }
                         return createDayTimeSlotsSmallClass(d, timeSlotsList);
                     } else {
+                    //1对1 处理逻辑
+                        int teachingType = BaseTimeSlots.TEACHING_TYPE_CN;
+                        if (StringUtils.equals(avaliableTimeParam.getTutorType(), TutorType.FRN.name())) {
+                            teachingType = BaseTimeSlots.TEACHING_TYPE_FRN;
+                        }
+                        List<BaseTimeSlots> timeSlotsList = redisMapService.getMap(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d));
+                        if (CollectionUtils.isEmpty(timeSlotsList)) {
+                            timeSlotsList = baseTimeSlotJpaRepository.findByClassDateAndTeachingTypeAndClientType(DateUtil.convertToDate(d.toLocalDate()), teachingType, BaseTimeSlots.CLIENT_TYPE_STU);
+                            redisMapService.setMap(teachingType + "" + BaseTimeSlots.CLIENT_TYPE_STU, DateUtil.localDate2SimpleString(d), timeSlotsList);
+                            ;
+                        }
                         return createDayTimeSlots(d, timeSlotsList);
                     }
 
@@ -186,11 +199,11 @@ public class AvaliableTimeServiceXV1 {
         return result;
     }
 
-    public DayTimeSlots createDayTimeSlotsSmallClass(LocalDateTime date, List<BaseTimeSlots> timeSlotsList) {
+    public DayTimeSlots createDayTimeSlotsSmallClass(LocalDateTime date, List<BaseTimeSlotsSmallClass> timeSlotsList) {
         DayTimeSlots result = new DayTimeSlots();
         result.setDay(DateUtil.formatLocalDate(date));
         List<TimeSlots> list = timeSlotsList.stream()
-                .filter(BaseTimeSlots::rollForSmallClass)
+                .filter(BaseTimeSlotsSmallClass::roll)
                 .map(baseTimeSlots -> {
                     TimeSlots timeSlots = new TimeSlots();
                     timeSlots.setSlotId(baseTimeSlots.getSlotId().longValue());
@@ -324,7 +337,7 @@ public class AvaliableTimeServiceXV1 {
 
         logger.info("getDelayWeekDaysForSmallClass userId:[{}] ,countByWeek:[{}],yushuByWeek:[{}]", userId, countByWeek, yushuByWeek);
 
-        // 一共延迟 8 周  最早下下周开始  海江 改为从后天开始
+        // 一共延迟 8 周  最早下下周开始
 //        boolean weekFlag = DateUtil.getWeekDay();
         for (int i = 1; i < 9; i++) {
             JSONObject jb = new JSONObject();
@@ -339,7 +352,7 @@ public class AvaliableTimeServiceXV1 {
             jb.put("id", i);
             jb.put("text", text);
             jb.put("date", DateUtil.Date2String24(date));
-            jb.put("valid", true);
+            jb.put("valid", true); //前段用于显示是否置灰
             jb.put("realDate", date);
             jb.put("endDate", DateUtil.getAfter7Days(date, (service.getComboCycle() + 1)));
             delayRange.add(jb);

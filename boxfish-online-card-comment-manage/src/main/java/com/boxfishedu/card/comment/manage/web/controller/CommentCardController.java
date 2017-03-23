@@ -89,7 +89,7 @@ public class CommentCardController {
      */
     @RequestMapping(value = "/statuses", method = RequestMethod.GET)
     public Object statuses() {
-        return JsonResultModel.newJsonResultModel(CommentCardFormStatus.getMappings());
+        return JsonResultModel.newJsonResultModel(CommentCardFormStatus.mapping);
     }
 
     @RequestMapping(value = "/logs/{id}", method = RequestMethod.GET)
