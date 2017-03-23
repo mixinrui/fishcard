@@ -1,22 +1,10 @@
 package com.boxfishedu.workorder.service.monitor;
 
-import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
-import com.boxfishedu.workorder.common.exception.BusinessException;
-import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.dao.jpa.EntityQuery;
 import com.boxfishedu.workorder.dao.jpa.MonitorUserCourseJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.MonitorUserJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.*;
-import com.boxfishedu.workorder.requester.TeacherStudentRequester;
-import com.boxfishedu.workorder.service.CourseScheduleService;
-import com.boxfishedu.workorder.service.ServiceSDK;
-import com.boxfishedu.workorder.servicex.bean.StudentCourseSchedule;
-import com.boxfishedu.workorder.servicex.bean.TimeSlots;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
+import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.Predicate;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -43,22 +27,10 @@ public class MonitorUserService {
     MonitorUserJpaRepository monitorUserJpaRepository;
 
     @Autowired
-    CourseScheduleService courseScheduleService;
-
-    @Autowired
-    ServiceSDK serviceSDK;
-
-    @Autowired
-    TeacherStudentRequester teacherStudentRequester;
-
-    @Autowired
     SmallClassJpaRepository smallClassJpaRepository;
 
     @Autowired
     MonitorUserCourseJpaRepository monitorUserCourseJpaRepository;
-
-    @Autowired
-    EntityManager entityManager;
 
 
     public List<MonitorUser> getAllSuperUser(){
@@ -138,5 +110,10 @@ public class MonitorUserService {
         }else {
             logger.info("@distributeClassToMonitor System does not have any monitor user!");
         }
+    }
+
+    public MonitorUser checkMointorUser(Long userId){
+
+        return null;
     }
 }
