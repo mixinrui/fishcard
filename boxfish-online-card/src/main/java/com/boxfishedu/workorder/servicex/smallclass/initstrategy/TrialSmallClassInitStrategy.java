@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.servicex.smallclass.initstrategy;
 
+import com.boxfishedu.workorder.common.bean.ComboTypeEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -140,9 +142,6 @@ public class TrialSmallClassInitStrategy implements GroupInitStrategy {
 
         this.buildFishCards(smallClass);
 
-        this.recordLog(smallClass, PublicClassInfoStatusEnum.COURSE_ASSIGNED);
-        this.recordLog(smallClass, PublicClassInfoStatusEnum.TEACHER_ASSIGNED);
-
         logger.debug("@initGroupClass#small#创建试讲小班成功,小班是[{}],小班里的鱼卡是[{}]"
                 , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(smallClass.getAllCards()));
     }
@@ -179,11 +178,16 @@ public class TrialSmallClassInitStrategy implements GroupInitStrategy {
 
             workOrder.setService(service);
             workOrder.setIsFreeze(0);
+            workOrder.setClassType(ClassTypeEnum.SMALL.name());
             workOrder.setComboType(service.getComboType());
             workOrder.setOrderId(service.getOrderId());
+            workOrder.setStudentId(studentId);
+            workOrder.setComboType(ComboTypeEnum.SMALLCLASS.name());
 
             //虚拟订单
             this.saveParamIntoWorkOrder(workOrder, smallClass);
+
+            workOrders.add(workOrder);
 
         });
 
@@ -201,7 +205,10 @@ public class TrialSmallClassInitStrategy implements GroupInitStrategy {
         workOrder.setCourseId(smallClass.getCourseId());
         workOrder.setCourseName(smallClass.getCourseName());
         workOrder.setCreateTime(new Date());
+
         workOrder.setTeacherId(smallClass.getTeacherId());
+        workOrder.setTeacherName(smallClass.getTeacherName());
+
         workOrder.setSlotId(smallClass.getSlotId());
         workOrder.setStartTime(smallClass.getStartTime());
         workOrder.setEndTime(smallClass.getEndTime());

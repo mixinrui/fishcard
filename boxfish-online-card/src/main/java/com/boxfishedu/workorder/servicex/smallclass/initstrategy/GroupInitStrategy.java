@@ -89,6 +89,9 @@ public interface GroupInitStrategy {
         workOrders.forEach(workOrder -> {
             workOrder.setGroupId(smallClass.getGroupId());
             workOrder.setChatRoomId(smallClass.getChatRoomId());
+            if(Objects.isNull(workOrder.getSmallClassId())){
+                workOrder.setSmallClassId(smallClass.getId());
+            }
         });
         smallClass.setAllCards(workOrders);
     }

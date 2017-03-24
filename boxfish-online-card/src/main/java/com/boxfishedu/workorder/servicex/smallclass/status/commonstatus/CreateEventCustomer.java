@@ -2,6 +2,7 @@ package com.boxfishedu.workorder.servicex.smallclass.status.commonstatus;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
@@ -66,9 +67,12 @@ public class CreateEventCustomer extends SmallClassEventCustomer {
 
         try {
             groupInitStrategy.initGroupClass(smallClass);
-        }
-        catch (Exception ex){
-            logger.error("@CreateEventCustomer创建小班课失败,smallclas[{}]",JacksonUtil.toJSon(smallClass),ex);
+        } catch (BusinessException ex) {
+            logger.error("@CreateEventCustomer创建小班课失败,smallclas[{}]", JacksonUtil.toJSon(smallClass), ex);
+            if (smallClass.getClassType().equals("SMALLCLASS_TRIAL")) {
+                throw new BusinessException(ex);
+            }
+
         }
 
     }

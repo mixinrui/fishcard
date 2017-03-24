@@ -4,12 +4,14 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -177,9 +179,15 @@ public class SmallClass implements Cloneable, Serializable {
         this.setClassDate(DateUtil.simpleString2Date(trialSmallClassParam.getStartTime()));
 
         this.setStartTime(DateUtil.String2Date(trialSmallClassParam.getStartTime()));
+        this.setEndTime(DateUtil.String2Date(trialSmallClassParam.getEndTime()));
         this.setSlotId(trialSmallClassParam.getTimeSlotId());
 
         this.setIsTrial(true);
+        this.setDemoFlag(1);
+
+        this.setCourseId(trialSmallClassParam.getCourseId());
+        this.setCourseName(trialSmallClassParam.getCourseName());
+        this.setCourseType(trialSmallClassParam.getCourseType());
 
         this.setClassType("SMALLCLASS_TRIAL");
 

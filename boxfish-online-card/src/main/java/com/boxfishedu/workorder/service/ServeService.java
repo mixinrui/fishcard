@@ -299,18 +299,21 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
             logger.error("@decreaseService:鱼卡[{}]无对应的服务", workOrder.getId());
             throw new BusinessException("订单无对应的服务");
         }
-        //使用select for update为记录加锁
-        service = findByIdForUpdate(service.getId());
-        //此处是否是减去1?
-        if (service.getAmount() > 0) {
-            if (null == workOrder.getMakeUpSeq() || 0 == workOrder.getMakeUpSeq()) {
-                service.setAmount(service.getAmount() - 1);
+
+        if (!service.isPublic()) {
+            //使用select for update为记录加锁
+            service = findByIdForUpdate(service.getId());
+            //此处是否是减去1?
+            if (service.getAmount() > 0) {
+                if (null == workOrder.getMakeUpSeq() || 0 == workOrder.getMakeUpSeq()) {
+                    service.setAmount(service.getAmount() - 1);
+                }
+            } else {
+                logger.error("@decreaseService,服务出现不够减情况,需要排查问题service[{}],鱼卡[{}]", service.getId(), workOrder.getId());
             }
-        } else {
-            logger.error("@decreaseService,服务出现不够减情况,需要排查问题service[{}],鱼卡[{}]", service.getId(), workOrder.getId());
+            service.setUpdateTime(new Date());
+            save(service);
         }
-        service.setUpdateTime(new Date());
-        save(service);
 
         //修改WorkOrder的状态
         workOrder.setUpdateTime(new Date());
@@ -516,14 +519,14 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
 
     //试讲小班课
     @Transactional
-    public void batchSaveWorkOrderAndCourses(List<WorkOrder> workOrders) {
+    public void batchSaveWorkOrderAndCourses(SmallClass smallClass, List<WorkOrder> workOrders) {
         workOrders.forEach(workOrder -> {
-            this.saveWorkorderAndCourse(workOrder, true);
+            smallClass.setCover(this.saveWorkorderAndCourse(workOrder, true).getThumbnail());
         });
     }
 
     @Transactional
-    public void saveWorkorderAndCourse(WorkOrder workOrder, boolean retriveFlag) {
+    public ScheduleCourseInfo saveWorkorderAndCourse(WorkOrder workOrder, boolean retriveFlag) {
         workOrderService.save(workOrder);
         CourseSchedule courseSchedule = new CourseSchedule();
         courseSchedule.setStatus(workOrder.getStatus());
@@ -537,14 +540,16 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         courseSchedule.setStartTime(workOrder.getStartTime());
         courseSchedule.setWorkorderId(workOrder.getId());
         courseSchedule.setTeacherId(workOrder.getTeacherId());
+        courseSchedule.setClassType(workOrder.getClassType());
         courseScheduleService.save(courseSchedule);
         ScheduleCourseInfo scheduleCourseInfo = getScheduleCourseInfo(workOrder, courseSchedule, retriveFlag);
         scheduleCourseInfoService.save(scheduleCourseInfo);
+        return scheduleCourseInfo;
     }
 
 
     private ScheduleCourseInfo getScheduleCourseInfo(WorkOrder workOrder, CourseSchedule courseSchedule, boolean retriveFlag) {
-        TrialCourse trialCourse = getTrialCourse(courseSchedule, false);
+        TrialCourse trialCourse = getTrialCourse(courseSchedule, retriveFlag);
         ScheduleCourseInfo scheduleCourseInfo = new ScheduleCourseInfo();
         scheduleCourseInfo.setCourseType(trialCourse.getCourseType());
         scheduleCourseInfo.setThumbnail(trialCourse.getThumbnail());
@@ -582,7 +587,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
                 0,
                 (total, service) -> {
                     // 有效期内
-                    if(service.getEndTime() !=null &&
+                    if (service.getEndTime() != null &&
                             service.getEndTime().getTime() > now.getTime()) {
                         return total + service.getAmount();
                     }

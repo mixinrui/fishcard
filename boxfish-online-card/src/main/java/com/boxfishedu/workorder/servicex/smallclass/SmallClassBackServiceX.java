@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
@@ -13,6 +14,7 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.SmallClassStu;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
+import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
@@ -68,6 +70,9 @@ public class SmallClassBackServiceX {
 
     @Autowired
     private ServeService serveService;
+
+    @Autowired
+    private TeacherPhotoRequester teacherPhotoRequester;
 
     @Autowired
     private
@@ -190,14 +195,21 @@ public class SmallClassBackServiceX {
     public void buildTrialSmallClass(TrialSmallClassParam trialSmallClassParam) {
         ThreadLocalUtil.trialSmallClassParamLocal.set(trialSmallClassParam);
         SmallClass smallClass = new SmallClass(trialSmallClassParam);
+        smallClass.setTeacherPhoto(teacherPhotoRequester.getTeacherPhoto(trialSmallClassParam.getTeacherId()));
         smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.CREATE);
         new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
     }
 
     @Transactional
     public void saveSmallClassAndCards(SmallClass smallClass, List<WorkOrder> workOrders) {
-        serveService.batchSaveWorkOrderAndCourses(workOrders);
+        serveService.batchSaveWorkOrderAndCourses(smallClass, workOrders);
+
         smallClass.setAllCards(workOrders);
+        smallClass.setGroupLeader(workOrders.get(0).getStudentId());
+        smallClass.setGroupLeaderCard(workOrders.get(0).getId());
+        smallClass.setClassType(ClassTypeEnum.SMALL.name());
+        smallClass.setStatus(PublicClassInfoStatusEnum.TEACHER_ASSIGNED.getCode());
+
         smallClassJpaRepository.save(smallClass);
         //回写群组信息到smallclass
         FishCardGroupsInfo fishCardGroupsInfo = smallClassInitStrategy.buildChatRoom(smallClass);

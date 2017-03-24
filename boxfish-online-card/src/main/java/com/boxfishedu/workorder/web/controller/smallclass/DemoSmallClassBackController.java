@@ -34,6 +34,7 @@ public class DemoSmallClassBackController {
 
     @RequestMapping(value = "/smallclass/{smallClassId}", method = RequestMethod.DELETE)
     public JsonResultModel deleteDemo(@PathVariable("smallClassId") Long smallClassId) {
+        smallClassBackServiceX.delete(smallClassId);
         return JsonResultModel.EMPTY;
     }
 
