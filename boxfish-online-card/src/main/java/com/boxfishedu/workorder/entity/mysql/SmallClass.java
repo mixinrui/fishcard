@@ -183,6 +183,8 @@ public class SmallClass implements Cloneable, Serializable {
 
         this.setClassType("SMALLCLASS_TRIAL");
 
+        this.setAllStudentIds(trialSmallClassParam.getStudentIds());
+
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
         this.setDifficultyLevel(trialSmallClassParam.getDifficultyLevel());

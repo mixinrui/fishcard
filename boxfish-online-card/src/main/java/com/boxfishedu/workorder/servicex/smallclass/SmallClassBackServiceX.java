@@ -198,10 +198,9 @@ public class SmallClassBackServiceX {
     public void saveSmallClassAndCards(SmallClass smallClass, List<WorkOrder> workOrders) {
         serveService.batchSaveWorkOrderAndCourses(workOrders);
         smallClass.setAllCards(workOrders);
+        smallClassJpaRepository.save(smallClass);
         //回写群组信息到smallclass
         FishCardGroupsInfo fishCardGroupsInfo = smallClassInitStrategy.buildChatRoom(smallClass);
         smallClassInitStrategy.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
-
-        smallClassJpaRepository.save(smallClass);
     }
 }
