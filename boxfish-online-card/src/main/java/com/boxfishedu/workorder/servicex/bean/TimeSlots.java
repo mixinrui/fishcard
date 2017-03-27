@@ -79,7 +79,7 @@ public class TimeSlots implements Cloneable, Serializable {
         LocalDateTime startLocal = LocalDateTime.ofInstant(
                 courseSchedule.getStartTime().toInstant(), ZoneId.systemDefault());
         //以后需要做配置或者放数据库字段
-        LocalDateTime endLocal = startLocal.plusMinutes(30);
+        LocalDateTime endLocal = startLocal.plusMinutes(35);
         this.startTime = DateUtil.dateTrimYear(courseSchedule.getStartTime());
         this.endTime = DateUtil.dateTrimYear(DateUtil.localDate2Date(endLocal));
     }

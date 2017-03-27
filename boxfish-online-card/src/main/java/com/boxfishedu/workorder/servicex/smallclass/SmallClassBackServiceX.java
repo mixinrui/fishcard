@@ -94,7 +94,7 @@ public class SmallClassBackServiceX {
                 DateUtil.String2Date(String.join(" ", publicClassBuilderParam.getDate(), timeSlots.getStartTime())));
         LocalDateTime localDateTime = LocalDateTime.ofInstant(
                 smallClass.getStartTime().toInstant(), ZoneId.systemDefault());
-        smallClass.setEndTime(DateUtil.localDate2Date(localDateTime.plusMinutes(30)));
+        smallClass.setEndTime(DateUtil.localDate2Date(localDateTime.plusMinutes(35)));
     }
 
     @Transactional

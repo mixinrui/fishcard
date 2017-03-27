@@ -257,4 +257,9 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("update WorkOrder o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3 ,o.updatetimeChangecourse= ?4 ,o.sendflagcc= ?5 ,o.updateTime=current_timestamp    where o.id = ?6")
     int setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(String courseId, String courseName, String courseType, Date updateTimeChangeCourse, String sendFlaggcc, Long workorderId);
 
+    @Query("select count(wo) from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and wo.classType=?3 and (wo.isFreeze is null or wo.isFreeze!=1)")
+    Long multiLeftAmount(Long studentId,Date date,String classType);
+
+    @Query("select count(wo) from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and (wo.classType is null or wo.classType !=?3) and wo.skuId=?4 and (wo.isFreeze is null or wo.isFreeze!=1)")
+    Long singleLeftAmount(Long studentId,Date date,String classType,Integer skuId);
 }

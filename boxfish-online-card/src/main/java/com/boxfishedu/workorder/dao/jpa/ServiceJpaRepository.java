@@ -54,6 +54,9 @@ public interface ServiceJpaRepository extends JpaRepository<Service, Long> {
     @Query("select count(s) from Service s where s.studentId=?1 and s.productType=?2 and s.amount>0 and s.endTime>CURRENT_DATE")
     Integer getAvailableForeignCommentServiceCount(long studentId, int productType);
 
+    @Query("select sum(s.amount) from Service s where s.studentId=?1 and s.productType=?2 ")
+    Long leftCommentAmount(long studentId, int productType);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Service findById(Long id);
 

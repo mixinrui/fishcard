@@ -8,14 +8,17 @@ import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.ServiceJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mongo.AccountCardInfo;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.accountcardinfo.AccountCardInfoService;
 import com.boxfishedu.workorder.service.accountcardinfo.OnlineAccountService;
 import com.boxfishedu.workorder.web.result.StudentClassInfo;
+import com.boxfishedu.workorder.web.result.StudentLeftInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
+import org.hibernate.type.ClassType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -41,6 +45,11 @@ public class HomePageServiceX {
     private SmallClassJpaRepository smallClassJpaRepository;
 
     private volatile StudentClassInfo emptyStudentClassInfo;
+
+    private volatile StudentLeftInfo emptyStudentLeftInfo;
+
+    @Autowired
+    private WorkOrderJpaRepository workOrderJpaRepository;
 
     @Autowired
     private ServiceJpaRepository serviceJpaRepository;
@@ -162,5 +171,27 @@ public class HomePageServiceX {
         return this.emptyStudentClassInfo;
     }
 
+    private StudentLeftInfo buildEmptyStudentLeftInfo() {
+        if (Objects.isNull(emptyStudentClassInfo)) {
+            synchronized (this) {
+                if (Objects.isNull(emptyStudentLeftInfo)) {
+                    logger.debug("@studentLeftInfo#首次初始化emptyStudentClassInfo");
+                    emptyStudentLeftInfo = new StudentLeftInfo(0l,0l,0l,0l);
+                }
+            }
+        }
+        return this.emptyStudentLeftInfo;
+    }
 
+
+    public StudentLeftInfo getLeftInfo(Long studentId) {
+        if (!onlineAccountService.isMember(studentId)) {
+            return this.buildEmptyStudentLeftInfo();
+        }
+        Long multiFRN=workOrderJpaRepository.multiLeftAmount(studentId,new Date(), ClassTypeEnum.SMALL.name());
+        Long singleCN=workOrderJpaRepository.singleLeftAmount(studentId,new Date(),ClassTypeEnum.SMALL.name(),1);
+        Long singleFRN=workOrderJpaRepository.singleLeftAmount(studentId,new Date(),ClassTypeEnum.SMALL.name(),2);
+        Long comment=serviceJpaRepository.leftCommentAmount(studentId,ProductType.COMMENT.value());
+        return new StudentLeftInfo(singleCN,singleFRN,comment,multiFRN);
+    }
 }
