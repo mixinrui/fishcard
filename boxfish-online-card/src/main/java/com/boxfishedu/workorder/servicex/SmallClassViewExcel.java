@@ -1,16 +1,15 @@
-package com.boxfishedu.workorder.servicex.bean;
+package com.boxfishedu.workorder.servicex;
 
-import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
+import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
-import com.mysql.jdbc.StringUtils;
 
 import java.util.Date;
 
 /**
  * Created by jiaozijun on 16/8/5.
  */
-public class WorkOrderViewExcel {
+public class SmallClassViewExcel {
     private Long id;
     private String createTime;
     private Long studentId;
@@ -22,13 +21,31 @@ public class WorkOrderViewExcel {
     private String status;
     private String planStartTime;
     private String planEndTime;
+
+    public String getRealStartTime() {
+        return realStartTime;
+    }
+
+    public void setRealStartTime(String realStartTime) {
+        this.realStartTime = realStartTime;
+    }
+
     private String realStartTime;
+
+    public String getRealEndTime() {
+        return realEndTime;
+    }
+
+    public void setRealEndTime(String realEndTime) {
+        this.realEndTime = realEndTime;
+    }
+
     private String realEndTime;
     private String orderCode;
 
-    private String orderType;
+    private String groupId;
 
-    private Long classNum = 0L;   //课程数量
+    private Long classNum;
 
     public Long getClassNum() {
         return classNum;
@@ -39,6 +56,34 @@ public class WorkOrderViewExcel {
     }
 
 
+    public String getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    public void setDifficultyLevel(String difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
+    }
+
+    private String difficultyLevel;
+
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public Long getChatRoomId() {
+        return chatRoomId;
+    }
+
+    public void setChatRoomId(Long chatRoomId) {
+        this.chatRoomId = chatRoomId;
+    }
+
+    private Long chatRoomId;
 
 
 
@@ -115,7 +160,7 @@ public class WorkOrderViewExcel {
     }
 
     public void setStatus(Integer status) {
-        this.status = FishCardStatusEnum.get(status).getDesc();
+        this.status = PublicClassInfoStatusEnum.get(status).getDesc();
     }
 
     public String getPlanStartTime() {
@@ -142,9 +187,6 @@ public class WorkOrderViewExcel {
         }
     }
 
-    public String getRealStartTime() {
-        return realStartTime;
-    }
 
     public void setRealStartTime(Date realStartTime) {
         if(null == realStartTime){
@@ -154,9 +196,6 @@ public class WorkOrderViewExcel {
         }
     }
 
-    public String getRealEndTime() {
-        return realEndTime;
-    }
 
     public void setRealEndTime(Date actualEndTime) {
         if(null == actualEndTime){
@@ -178,15 +217,6 @@ public class WorkOrderViewExcel {
 
 
 
-    public String setOrderType(String orderType) {
-        return this.orderType=orderType;
-//        if(StringUtils.isNullOrEmpty(OrderChannelDesc.get(orderType).getDesc() ))
-//            return orderType;
-//        return this.orderType = OrderChannelDesc.get(orderType).getDesc();
-    }
-    public String getOrderType() {
-        return orderType;
-    }
 
 
 }
