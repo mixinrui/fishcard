@@ -172,7 +172,7 @@ public class HomePageServiceX {
     }
 
     private StudentLeftInfo buildEmptyStudentLeftInfo() {
-        if (Objects.isNull(emptyStudentClassInfo)) {
+        if (Objects.isNull(emptyStudentLeftInfo)) {
             synchronized (this) {
                 if (Objects.isNull(emptyStudentLeftInfo)) {
                     logger.debug("@studentLeftInfo#首次初始化emptyStudentClassInfo");
