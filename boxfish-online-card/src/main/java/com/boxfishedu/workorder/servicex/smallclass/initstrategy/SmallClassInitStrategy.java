@@ -142,6 +142,7 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
                 , JacksonUtil.toJSon(smallClass), JacksonUtil.toJSon(smallClass.getAllCards()));
 
         threadPoolManager.execute(new Thread(()->{
+            logger.info("@initGroupClass#small distributing class to monitor ...smallClass[{}]",smallClass);
             monitorUserService.distributeClassToMonitor(smallClass);
         }));
     }
