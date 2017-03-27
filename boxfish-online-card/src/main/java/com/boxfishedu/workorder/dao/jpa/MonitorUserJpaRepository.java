@@ -31,6 +31,7 @@ public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Lon
     @Query("select min(mu.avgSum) from MonitorUser mu where mu.enabled = 1 and mu.userType = 'student'")
     Integer getMinAvgSum();
 
-    @Query("select mu from MonitorUser mu where mu.userType = 'student' and mu.enabled = 1 and mu.avgSum in (select min(mu2.avgSum) from MonitorUser mu2)")
+    @Query("select mu from MonitorUser mu where mu.userType = 'student' and mu.enabled = 1 and mu.avgSum in" +
+            " (select min(mu2.avgSum) from MonitorUser mu2 where mu2.userType = 'student' and mu2.enabled = 1)")
     List<MonitorUser> getMinAvgSumUser();
 }
