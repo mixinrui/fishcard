@@ -71,6 +71,7 @@ public class CommentCardSDK {
     }
 
     public JsonResultModel getInnerTeacherId(Map paramMap){
+        logger.info("@getInnerTeacherId paramMap:[{}]",paramMap);
         return restTemplate.postForObject(getInnerTeacherURI(), paramMap,JsonResultModel.class);
     }
 
