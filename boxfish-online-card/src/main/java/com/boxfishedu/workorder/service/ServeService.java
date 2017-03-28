@@ -541,6 +541,7 @@ public class ServeService extends BaseService<Service, ServiceJpaRepository, Lon
         courseSchedule.setWorkorderId(workOrder.getId());
         courseSchedule.setTeacherId(workOrder.getTeacherId());
         courseSchedule.setClassType(workOrder.getClassType());
+        courseSchedule.setSmallClassId(workOrder.getSmallClassId());
         courseScheduleService.save(courseSchedule);
         ScheduleCourseInfo scheduleCourseInfo = getScheduleCourseInfo(workOrder, courseSchedule, retriveFlag);
         scheduleCourseInfoService.save(scheduleCourseInfo);

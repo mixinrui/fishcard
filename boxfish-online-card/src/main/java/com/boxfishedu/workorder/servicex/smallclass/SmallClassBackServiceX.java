@@ -202,7 +202,7 @@ public class SmallClassBackServiceX {
 
     @Transactional
     public void saveSmallClassAndCards(SmallClass smallClass, List<WorkOrder> workOrders) {
-        serveService.batchSaveWorkOrderAndCourses(smallClass, workOrders);
+        workOrderJpaRepository.save(workOrders);
 
         smallClass.setAllCards(workOrders);
         smallClass.setGroupLeader(workOrders.get(0).getStudentId());
@@ -214,5 +214,6 @@ public class SmallClassBackServiceX {
         //回写群组信息到smallclass
         FishCardGroupsInfo fishCardGroupsInfo = smallClassInitStrategy.buildChatRoom(smallClass);
         smallClassInitStrategy.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
+        serveService.batchSaveWorkOrderAndCourses(smallClass, workOrders);
     }
 }

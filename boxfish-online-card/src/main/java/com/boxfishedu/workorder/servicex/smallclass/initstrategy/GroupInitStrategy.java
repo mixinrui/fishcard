@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * Created by hucl on 17/1/8.
  */
 public interface GroupInitStrategy {
-    Logger logger= LoggerFactory.getLogger("GroupInitStrategy");
+    Logger logger = LoggerFactory.getLogger("GroupInitStrategy");
 
     RecommandCourseView getRecommandCourse(SmallClass smallClass);
 
@@ -63,7 +63,7 @@ public interface GroupInitStrategy {
             smallClass.setClassStatusEnum(publicClassInfoStatusEnum);
             new SmallClassEvent(smallClass, this.getSmallEventDispathch(), smallClass.getClassStatusEnum());
         } catch (Exception ex) {
-           logger.error("@recordLog,记录日志错误",ex);
+            logger.error("@recordLog,记录日志错误", ex);
         }
     }
 
@@ -89,7 +89,7 @@ public interface GroupInitStrategy {
         workOrders.forEach(workOrder -> {
             workOrder.setGroupId(smallClass.getGroupId());
             workOrder.setChatRoomId(smallClass.getChatRoomId());
-            if(Objects.isNull(workOrder.getSmallClassId())){
+            if (Objects.isNull(workOrder.getSmallClassId()) || 0 == workOrder.getSmallClassId()) {
                 workOrder.setSmallClassId(smallClass.getId());
             }
         });
@@ -129,9 +129,9 @@ public interface GroupInitStrategy {
             , RecommandCourseView recommandCourseView) {
 
         List<Long> studentIds = smallClass.getAllCards()
-                                          .stream()
-                                          .map(WorkOrder::getStudentId)
-                                          .collect(Collectors.toList());
+                .stream()
+                .map(WorkOrder::getStudentId)
+                .collect(Collectors.toList());
         smallClass.setAllStudentIds(studentIds);
 
         FishCardGroupsInfo fishCardGroupsInfo = this.buildChatRoom(smallClass);

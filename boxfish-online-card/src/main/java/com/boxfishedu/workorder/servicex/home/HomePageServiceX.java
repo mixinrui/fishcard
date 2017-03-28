@@ -176,7 +176,7 @@ public class HomePageServiceX {
             synchronized (this) {
                 if (Objects.isNull(emptyStudentLeftInfo)) {
                     logger.debug("@studentLeftInfo#首次初始化emptyStudentClassInfo");
-                    emptyStudentLeftInfo = new StudentLeftInfo(0l,0l,0l,0l);
+                    emptyStudentLeftInfo = new StudentLeftInfo(0l, 0l, 0l, 0l);
                 }
             }
         }
@@ -188,10 +188,10 @@ public class HomePageServiceX {
         if (!onlineAccountService.isMember(studentId)) {
             return this.buildEmptyStudentLeftInfo();
         }
-        Long multiFRN=workOrderJpaRepository.multiLeftAmount(studentId,new Date(), ClassTypeEnum.SMALL.name());
-        Long singleCN=workOrderJpaRepository.singleLeftAmount(studentId,new Date(),ClassTypeEnum.SMALL.name(),1);
-        Long singleFRN=workOrderJpaRepository.singleLeftAmount(studentId,new Date(),ClassTypeEnum.SMALL.name(),2);
-        Long comment=serviceJpaRepository.leftCommentAmount(studentId,ProductType.COMMENT.value());
-        return new StudentLeftInfo(singleCN,singleFRN,comment,multiFRN);
+        Long multiFRN = workOrderJpaRepository.multiLeftAmount(studentId, new Date(), ClassTypeEnum.SMALL.name());
+        Long singleCN = workOrderJpaRepository.singleLeftAmount(studentId, new Date(), ClassTypeEnum.SMALL.name(), 1);
+        Long singleFRN = workOrderJpaRepository.singleLeftAmount(studentId, new Date(), ClassTypeEnum.SMALL.name(), 2);
+        Long comment = serviceJpaRepository.leftCommentAmount(studentId, ProductType.COMMENT.value());
+        return new StudentLeftInfo(singleCN, singleFRN, comment, multiFRN);
     }
 }
