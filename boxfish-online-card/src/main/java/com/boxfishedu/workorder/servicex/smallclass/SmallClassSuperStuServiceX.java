@@ -91,7 +91,6 @@ public class SmallClassSuperStuServiceX {
             return null;
         }
 
-
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassSuperStuParam.getId());
 
         if(Objects.isNull(smallClass)){
@@ -99,23 +98,28 @@ public class SmallClassSuperStuServiceX {
             return null;
         }
 
-        // TODO: 17/3/22
-//        TimeSlotParam timeSlotParam = makeTimeSlotParam(smallClassSuperStuParam   ,service, smallClass);
-//
-//        //组装TimeSlotParam 学生id
-//        List<CourseSchedule> listcourses = timePickerServiceXV1.smallClassSuperStu(timeSlotParam);
-//
-//
-//        WorkOrder workOrder = Collections3.isEmpty(listcourses)?null:workOrderJpaRepository.findOne(listcourses.get(0).getWorkorderId());
-//
-//        if(Objects.isNull(workOrder)){
-//            logger.error("auToMakeClassesForSmallClassERROR,没有生成workOrder");
-//        }
+        //生成虚拟鱼卡
+        WorkOrder workOrder = getWorkOrder(smallClassSuperStuParam, service, smallClass);
+
+        workOrder = workOrderJpaRepository.save(workOrder);
+
+        //生成虚拟courseschedule
+        CourseSchedule courseSchedule = getCourseSchedule(smallClassSuperStuParam, smallClass, workOrder);
+
+        courseScheduleRepository.save(courseSchedule);
+
+        logger.debug("@auToMakeClassesForSmallClass#开始保存小班课信息,workOrder[{}]", JacksonUtil.toJSon(workOrder));
+        smallClassSuperStuService.restoreClassForSmallClass(workOrder, courseSchedule, smallClass);
+
+        //课程保存到mongo中
+        saveCourseScheToMongo(workOrder, courseSchedule);
+
+        return workOrder;
 
 
+    }
 
-//        CourseSchedule courseSchedule = courseScheduleRepository.findTop1ByWorkorderId(workOrder.getId());
-
+    private WorkOrder getWorkOrder(SmallClassSuperStuParam smallClassSuperStuParam, Service service, SmallClass smallClass) {
         WorkOrder workOrder = new WorkOrder();
         // 根据smallClass 更新WorkOrder  CourseSchele
         workOrder.setCourseType(smallClass.getCourseType());
@@ -147,10 +151,10 @@ public class SmallClassSuperStuServiceX {
         workOrder.setIsFreeze(0);
 
         workOrder.setClassType(ClassTypeEnum.SMALL.name());
+        return workOrder;
+    }
 
-        workOrder = workOrderJpaRepository.save(workOrder);
-
-
+    private CourseSchedule getCourseSchedule(SmallClassSuperStuParam smallClassSuperStuParam, SmallClass smallClass, WorkOrder workOrder) {
         CourseSchedule courseSchedule = new CourseSchedule();
         courseSchedule.setWorkorderId(workOrder.getId());
 
@@ -173,18 +177,7 @@ public class SmallClassSuperStuServiceX {
         courseSchedule.setRoleId(1);
         courseSchedule.setSkuIdExtra(110);
         courseSchedule.setIsFreeze(0);
-
-        courseScheduleRepository.save(courseSchedule);
-
-        logger.debug("@auToMakeClassesForSmallClass#开始保存小班课信息,workOrder[{}]", JacksonUtil.toJSon(workOrder));
-        smallClassSuperStuService.restoreClassForSmallClass(workOrder, courseSchedule, smallClass);
-
-        //课程保存到mongo中
-        saveCourseScheToMongo(workOrder, courseSchedule);
-
-        return workOrder;
-
-
+        return courseSchedule;
     }
 
 
