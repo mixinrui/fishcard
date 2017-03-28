@@ -90,6 +90,7 @@ public class MonitorUserService {
         return smallClassJpaRepository.findMonitorUserCourse(startTime,endTime,classType,studentId,pageable);
     }
 
+    @Transactional
     public void distributeClassToMonitor(SmallClass smallClass){
         List<MonitorUser> listUser = monitorUserJpaRepository.getMinAvgSumUser();
         if (Objects.nonNull(listUser)){
@@ -104,9 +105,10 @@ public class MonitorUserService {
             monitorUserCourse.setEndTime(smallClass.getEndTime());
             monitorUserCourse.setCreateTime(new Date());
             monitorUserCourseJpaRepository.save(monitorUserCourse);
-            MonitorUser monitorUser = listUser.get(0);
-            monitorUser.setAvgSum(listUser.get(0).getAvgSum() + 1);
-            monitorUserJpaRepository.save(monitorUser);
+//            MonitorUser monitorUser = listUser.get(0);
+//            monitorUser.setAvgSum(listUser.get(0).getAvgSum() + 1);
+//            monitorUserJpaRepository.save(monitorUser);
+            monitorUserJpaRepository.updateAvgSum(listUser.get(0).getId());
         }else {
             logger.info("@distributeClassToMonitor System does not have any monitor user!");
         }
