@@ -208,6 +208,7 @@ public class TrialSmallClassInitStrategy implements GroupInitStrategy {
 
         workOrder.setTeacherId(smallClass.getTeacherId());
         workOrder.setTeacherName(smallClass.getTeacherName());
+        workOrder.setSkuId(smallClass.getRoleId());
 
         workOrder.setSlotId(smallClass.getSlotId());
         workOrder.setStartTime(smallClass.getStartTime());
