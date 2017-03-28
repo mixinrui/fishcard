@@ -7,10 +7,10 @@ import lombok.Data;
  */
 @Data
 public class StudentLeftInfo {
-    private Long singleCN;
-    private Long singleFRN;
-    private Long comment;
-    private Long multiFRN;
+    private Long singleCN=0l;
+    private Long singleFRN=0l;
+    private Long comment=0l;
+    private Long multiFRN=0l;
 
     public StudentLeftInfo(){
 
