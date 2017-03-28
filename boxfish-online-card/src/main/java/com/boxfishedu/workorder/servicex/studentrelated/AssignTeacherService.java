@@ -233,7 +233,10 @@ public class AssignTeacherService {
 
         CourseInfo courseInfo = new CourseInfo();
         //2 获取是否本课为指定老师
-        StStudentSchema stStudentSchema = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuIdAndStSchema(workOrder.getStudentId(), workOrder.getTeacherId(), StStudentSchema.CourseType.getEnum(workOrder.getSkuId()), StStudentSchema.StSchema.assgin);
+        StStudentSchema stStudentSchema = null;
+        if(!Objects.isNull(workOrder.getSkuId())){
+            stStudentSchema = stStudentSchemaJpaRepository.findByStudentIdAndTeacherIdAndSkuIdAndStSchema(workOrder.getStudentId(), workOrder.getTeacherId(), StStudentSchema.CourseType.getEnum(workOrder.getSkuId()), StStudentSchema.StSchema.assgin);
+        }
         if (null != stStudentSchema) {
             courseInfo.setAssignFlag(true);// 指定老师
         } else {
