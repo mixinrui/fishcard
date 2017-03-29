@@ -91,6 +91,7 @@ public class MonitorUserService {
         return smallClassJpaRepository.findMonitorUserCourse(startTime,endTime,classType,studentId,pageable);
     }
 
+    @Transactional
     public void distributeClassToMonitor(SmallClass smallClass){
         MonitorUser monitorUser = monitorUserJpaRepository.findTop1ByUserTypeAndEnabledOrderByAvgSum("student",1);
         if (Objects.nonNull(monitorUser)){
