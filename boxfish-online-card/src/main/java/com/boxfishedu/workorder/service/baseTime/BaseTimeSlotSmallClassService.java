@@ -76,7 +76,11 @@ public class BaseTimeSlotSmallClassService {
         t1.initTime();
 
         // 目前 初始化 小班课 20:00点 和 20:30 两个时间片为100
-        if( slotId==27 || slotId==28){
+        List slots =Lists.newArrayList(27,28);
+        List weeks =Lists.newArrayList(3,5,6,7);
+
+        // 目前 初始化 小班课 20:00点 和 20:30 两个时间片为100
+        if( slots.contains(slotId) &&   weeks.contains(localDate.getDayOfWeek().getValue()) && teachingType==1 ){
             t1.setProbability(100);
         }else {
             t1.setProbability(0);
