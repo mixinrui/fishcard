@@ -10,9 +10,6 @@ import com.boxfishedu.workorder.servicex.callbacklog.CallBackLogServiceX;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
@@ -22,8 +19,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.*;
 
