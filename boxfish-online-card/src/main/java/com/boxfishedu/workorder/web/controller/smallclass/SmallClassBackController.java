@@ -210,4 +210,13 @@ public class SmallClassBackController {
         return JsonResultModel.newJsonResultModel("OK");
     }
 
+    /**
+     * 解散小班课
+     * @return
+     */
+    @RequestMapping(value="/{smallclass_id}/smallclassdismiss",method=RequestMethod.DELETE)
+    public JsonResultModel dismissSmallClass(){
+        return null;
+    }
+
 }

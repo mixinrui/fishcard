@@ -1,5 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
+import com.boxfishedu.workorder.common.bean.FishCardAuthEnum;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.LevelEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.util.DateUtil;
@@ -8,6 +10,7 @@ import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassStuJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.SmallClassStu;
@@ -62,6 +65,9 @@ public class SmallClassBackServiceX {
 
     @Autowired
     private SmallClassRequester smallClassRequester;
+
+    @Autowired
+    private ScheduleCourseInfoMorphiaRepository scheduleCourseInfoMorphiaRepository;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -181,5 +187,42 @@ public class SmallClassBackServiceX {
         SmallClass smallClass = new SmallClass(trialSmallClassParam);
         smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.CREATE);
         new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
+    }
+    @Transactional
+    public JsonResultModel dissmissSmallClass(Long smallClassId){
+        //重置鱼卡
+        List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
+        workOrders.stream().forEach(workOrder ->{
+            workOrder.setTeacherId(0l);
+            workOrder.setTeacherName(null);
+            workOrder.setAssignTeacherTime(null);
+            workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
+            workOrder.setCourseId(null);
+            workOrder.setCourseName(null);
+            workOrder.setCourseType(null);
+            workOrder.setSmallClassId(null);
+            workOrderJpaRepository.save(workOrder);
+            scheduleCourseInfoMorphiaRepository.delete(scheduleCourseInfoMorphiaRepository.queryByWorkId(workOrder.getId()));
+                }
+        );
+        //重置CourseSchedule
+        List<CourseSchedule> courseSchedules=courseScheduleRepository.findBySmallClassId(smallClassId);
+        courseSchedules.stream().forEach(courseSchedule -> {
+            courseSchedule.setTeacherId(0l);
+            courseSchedule.setCourseId(null);
+            courseSchedule.setStatus(FishCardStatusEnum.CREATED.getCode());
+            courseSchedule.setCourseName(null);
+            courseSchedule.setCourseType(null);
+            courseSchedule.setSmallClassId(null);
+            courseScheduleRepository.save(courseSchedule);
+        });
+        //删除ScheduleCourseInfo
+
+        //删除小班课
+        smallClassJpaRepository.delete(smallClassId);
+        //通知释放teacher
+        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
+        teacherStudentRequester.notifyCancelSmallClassTeacher(smallClass);
+        return null;
     }
 }
