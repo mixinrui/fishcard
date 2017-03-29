@@ -72,7 +72,13 @@ public class SmallClassServiceX {
 
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
         LocalDateTime startTime = LocalDateTime.ofInstant(smallClass.getStartTime().toInstant(), ZoneId.systemDefault());
-        LocalDateTime deadTime = startTime.plusMinutes(30);
+
+        int plusMinutes = 30;
+        if (smallClass.isPublic()) {
+            plusMinutes = 35;
+        }
+        LocalDateTime deadTime = startTime.plusMinutes(plusMinutes);
+
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 
         if (now.isBefore(startTime)) {

@@ -4,20 +4,16 @@ import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.DateUtil;
-import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -210,5 +206,9 @@ public class SmallClass implements Cloneable, Serializable {
     public boolean isDemo() {
         return this.demoFlag == null ? false :
                 (1 == this.demoFlag ? true : false);
+    }
+
+    public boolean isPublic(){
+        return StringUtils.equals(ClassTypeEnum.PUBLIC.name(),this.getClassType());
     }
 }
