@@ -43,6 +43,7 @@ public class CommentCardSDK {
         paramMap.put("teacherId", Objects.toString(teacherId));
         paramMap.put("studentId", Objects.toString(studentId));
         paramMap.put("fishCardId",Objects.toString(id));
+        logger.info("@setTeacherAbsence paramMap:[{}]",paramMap);
         return restTemplate.postForObject(createTeacherAbsenceURI(), paramMap,JsonResultModel.class);
     }
 
