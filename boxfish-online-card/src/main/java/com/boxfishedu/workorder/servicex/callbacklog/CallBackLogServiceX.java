@@ -73,8 +73,8 @@ public class CallBackLogServiceX {
             return;
         }
 
-        Long pageIndex = getPageIndex(callBackHeartBeatParam);
-        if (-1 == pageIndex) {
+        Long pageNumber = getPageNumber(callBackHeartBeatParam);
+        if (-1 == pageNumber) {
             logger.debug("@updateTeacherCommands#没获取到页码,不作更新[{}]", JacksonUtil.toJSon(callBackHeartBeatParam));
             return;
         }
@@ -87,7 +87,7 @@ public class CallBackLogServiceX {
 
         String key = RedisKeyGenerator.getTeacherOperationKey(cardId);
 
-        listTeacherOperations.leftPush(key, pageIndex.toString());
+        listTeacherOperations.leftPush(key, pageNumber.toString());
 
     }
 
@@ -121,21 +121,21 @@ public class CallBackLogServiceX {
         return role;
     }
 
-    private Long getPageIndex(CallBackHeartBeatParam callBackHeartBeatParam) {
+    private Long getPageNumber(CallBackHeartBeatParam callBackHeartBeatParam) {
         List<CallBackHeartBeatParam.CallBackMsgBody> callBackMsgBodies = callBackHeartBeatParam.getMsgBody();
-        Long pageIndex = -1l;
+        Long pageNumber = -1l;
         for (CallBackHeartBeatParam.CallBackMsgBody callBackMsgBody : callBackMsgBodies) {
             try {
                 Map<String, Object> map = JacksonUtil.readValue(callBackMsgBody.getMsgContent().getData(), HashMap.class);
-                Object objectPageIndex = map.get("pageIndex");
-                if (Objects.isNull(objectPageIndex)) {
+                Object objectPageNumber = map.get("pageNumber");
+                if (Objects.isNull(objectPageNumber)) {
                     continue;
                 }
-                pageIndex = Long.parseLong(objectPageIndex.toString());
+                pageNumber = Long.parseLong(objectPageNumber.toString());
             }catch (Exception ex){
                 continue;
             }
         }
-        return pageIndex;
+        return pageNumber;
     }
 }

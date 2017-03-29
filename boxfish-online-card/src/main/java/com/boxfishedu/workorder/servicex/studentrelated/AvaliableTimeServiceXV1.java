@@ -177,8 +177,8 @@ public class AvaliableTimeServiceXV1 {
                             ;
                         }
                         //按照 时间片id排序
-                        if(!CollectionUtils.isEmpty(timeSlotsList)){
-                            timeSlotsList.sort((t1,t2) -> t1.getSlotId().compareTo(t2.getSlotId()));
+                        if (!CollectionUtils.isEmpty(timeSlotsList)) {
+                            timeSlotsList.sort((t1, t2) -> t1.getSlotId().compareTo(t2.getSlotId()));
                         }
                         return createDayTimeSlots(d, timeSlotsList);
                     }
@@ -243,26 +243,19 @@ public class AvaliableTimeServiceXV1 {
                 ex.printStackTrace();
                 logger.error("获取可用时间片时获取鱼卡失败,此次选课为该学生的首单选课");
             }
+
             Date date = new Date();
             int afterDays = consumerStartDay;
-
-            // 推迟上课周数
-            if (null != avaliableTimeParam.getDelayWeek()) {
-                afterDays += (daysOfWeek * avaliableTimeParam.getDelayWeek());
-            }
-
 
             // 同类型工单的最后一个工单   结束日期在当前日期之后 并且不在同一天
             if (null != workOrder && workOrder.getEndTime().after(date) && !DateUtil.isSameDate(date, workOrder.getEndTime())) {
                 date = workOrder.getEndTime();
                 afterDays = 1;
             }
-            startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
-            if (afterDays > 0) {
-                startDate = startDate.plusDays(afterDays);
 
-            }
-
+            //同类型课今天之后没课则加2,否则加1
+            startDate = LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
+                    .plusDays(afterDays);
         } else {
             // 延迟上课
             startDate = LocalDateTime.ofInstant(DateUtil.String2Date(avaliableTimeParam.getRangeStartTime()).toInstant(), ZoneId.systemDefault());
@@ -399,7 +392,7 @@ public class AvaliableTimeServiceXV1 {
 
                 for (String o : compareDateList) {
                     if (courseMap.get(o) != null) {
-                        countClassesWeek = (countClassesWeek+1);
+                        countClassesWeek = (countClassesWeek + 1);
                     }
                 }
 
@@ -426,9 +419,9 @@ public class AvaliableTimeServiceXV1 {
             Date baseDate = beginDate;
             for (int j = 0; j < 7; j++) {
                 if (DateUtil.getWeekDay3567(DateUtil.getAfterOneDay(baseDate, j))) {
-                    String date =DateUtil.date2SimpleString(DateUtil.getAfterOneDay(baseDate, j));
-                    for(int m=0; m<  WorkOrderConstant.slots.size() ;m++){
-                        listDate.add(date+"_"+WorkOrderConstant.slots.get(m));  //日期和时间片作为参考
+                    String date = DateUtil.date2SimpleString(DateUtil.getAfterOneDay(baseDate, j));
+                    for (int m = 0; m < WorkOrderConstant.slots.size(); m++) {
+                        listDate.add(date + "_" + WorkOrderConstant.slots.get(m));  //日期和时间片作为参考
                     }
 
                 }
@@ -446,10 +439,10 @@ public class AvaliableTimeServiceXV1 {
         Map map = new HashMap(collection.size());
         try {
             for (Object obj : collection) {
-                String key = PropertyUtils.getProperty(obj, keyPropertyName)+"_"+PropertyUtils.getProperty(obj, valuePropertyName);
+                String key = PropertyUtils.getProperty(obj, keyPropertyName) + "_" + PropertyUtils.getProperty(obj, valuePropertyName);
                 Object value = PropertyUtils.getProperty(obj, valuePropertyName);
 
-                map.put(key,value);
+                map.put(key, value);
 
             }
         } catch (Exception e) {
