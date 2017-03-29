@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,12 +93,12 @@ public class MonitorUserService {
 
     @Transactional
     public void distributeClassToMonitor(SmallClass smallClass){
-        List<MonitorUser> listUser = monitorUserJpaRepository.getMinAvgSumUser();
-        if (Objects.nonNull(listUser)){
-            logger.info("@distributeClassToMonitor distribute SmallClass:[{}] to userId:[{}]",smallClass,listUser.get(0).getUserId());
+        MonitorUser monitorUser = monitorUserJpaRepository.findTop1ByUserTypeAndEnabledOrderByAvgSum("student",1);
+        if (Objects.nonNull(monitorUser)){
+            logger.info("@distributeClassToMonitor distribute SmallClass:[{}] to userId:[{}]",smallClass,monitorUser.getUserId());
             MonitorUserCourse monitorUserCourse = new MonitorUserCourse();
-            monitorUserCourse.setMonitorUserId(listUser.get(0).getId());
-            monitorUserCourse.setUserId(listUser.get(0).getUserId());
+            monitorUserCourse.setMonitorUserId(monitorUser.getId());
+            monitorUserCourse.setUserId(monitorUser.getUserId());
             monitorUserCourse.setClassId(smallClass.getId());
             monitorUserCourse.setClassType(smallClass.getClassType());
             monitorUserCourse.setCourseId(smallClass.getCourseId());
@@ -105,10 +106,7 @@ public class MonitorUserService {
             monitorUserCourse.setEndTime(smallClass.getEndTime());
             monitorUserCourse.setCreateTime(new Date());
             monitorUserCourseJpaRepository.save(monitorUserCourse);
-//            MonitorUser monitorUser = listUser.get(0);
-//            monitorUser.setAvgSum(listUser.get(0).getAvgSum() + 1);
-//            monitorUserJpaRepository.save(monitorUser);
-            monitorUserJpaRepository.updateAvgSum(listUser.get(0).getId());
+            monitorUserJpaRepository.updateAvgSum(monitorUser.getId());
         }else {
             logger.info("@distributeClassToMonitor System does not have any monitor user!");
         }
