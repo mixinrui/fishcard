@@ -215,8 +215,9 @@ public class SmallClassBackController {
      * @return
      */
     @RequestMapping(value="/{smallclass_id}/smallclassdismiss",method=RequestMethod.DELETE)
-    public JsonResultModel dismissSmallClass(){
-        return null;
+    public JsonResultModel dismissSmallClass(@PathVariable("smallclass_id") Long smallClassID){
+        smallClassBackServiceX.dissmissSmallClass(smallClassID);
+        return JsonResultModel.newJsonResultModel("OK");
     }
 
 }

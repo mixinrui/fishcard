@@ -189,7 +189,7 @@ public class SmallClassBackServiceX {
         new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
     }
     @Transactional
-    public JsonResultModel dissmissSmallClass(Long smallClassId){
+    public void dissmissSmallClass(Long smallClassId){
         //重置鱼卡
         List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
         workOrders.stream().forEach(workOrder ->{
@@ -202,7 +202,8 @@ public class SmallClassBackServiceX {
             workOrder.setCourseType(null);
             workOrder.setSmallClassId(null);
             workOrderJpaRepository.save(workOrder);
-            scheduleCourseInfoMorphiaRepository.delete(scheduleCourseInfoMorphiaRepository.queryByWorkId(workOrder.getId()));
+            //删除ScheduleCourseInfo
+            scheduleCourseInfoMorphiaRepository.deleteByworkOrderId(workOrder.getId());
                 }
         );
         //重置CourseSchedule
@@ -216,13 +217,10 @@ public class SmallClassBackServiceX {
             courseSchedule.setSmallClassId(null);
             courseScheduleRepository.save(courseSchedule);
         });
-        //删除ScheduleCourseInfo
-
-        //删除小班课
-        smallClassJpaRepository.delete(smallClassId);
         //通知释放teacher
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
         teacherStudentRequester.notifyCancelSmallClassTeacher(smallClass);
-        return null;
+        //删除小班课
+        smallClassJpaRepository.delete(smallClassId);
     }
 }
