@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +93,8 @@ public class MonitorUserService {
 
     @Transactional
     public void distributeClassToMonitor(SmallClass smallClass){
-        List<MonitorUser> listUser = monitorUserJpaRepository.getMinAvgSumUser();
+        Pageable pageable = new PageRequest(1,1);
+        List<MonitorUser> listUser = monitorUserJpaRepository.getMinAvgSumUser(pageable).getContent();
         if (Objects.nonNull(listUser)){
             logger.info("@distributeClassToMonitor distribute SmallClass:[{}] to userId:[{}]",smallClass,listUser.get(0).getUserId());
             MonitorUserCourse monitorUserCourse = new MonitorUserCourse();
@@ -105,9 +107,6 @@ public class MonitorUserService {
             monitorUserCourse.setEndTime(smallClass.getEndTime());
             monitorUserCourse.setCreateTime(new Date());
             monitorUserCourseJpaRepository.save(monitorUserCourse);
-//            MonitorUser monitorUser = listUser.get(0);
-//            monitorUser.setAvgSum(listUser.get(0).getAvgSum() + 1);
-//            monitorUserJpaRepository.save(monitorUser);
             monitorUserJpaRepository.updateAvgSum(listUser.get(0).getId());
         }else {
             logger.info("@distributeClassToMonitor System does not have any monitor user!");
