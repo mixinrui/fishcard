@@ -75,7 +75,7 @@ public class SmallClassServiceX {
 
         int plusMinutes = 30;
         if (smallClass.isPublic()) {
-            plusMinutes = 35;
+            plusMinutes = 40;
         }
         LocalDateTime deadTime = startTime.plusMinutes(plusMinutes);
 
