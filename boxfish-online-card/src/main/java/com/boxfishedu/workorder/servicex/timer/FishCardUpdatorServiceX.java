@@ -85,8 +85,13 @@ public class FishCardUpdatorServiceX {
     public void teacherAbsentUpdator(FishCardDelayMessage fishCardDelayMessage) {
         logger.debug("@teacherAbsentUpdator,参数{}", JacksonUtil.toJSon(fishCardDelayMessage));
         WorkOrder workOrder = workOrderService.findOne(fishCardDelayMessage.getId());
+
         if (null == workOrder) {
             throw new BusinessException("无对应的鱼卡:" + fishCardDelayMessage.getId());
+        }
+        if(workOrder.isPublic()){
+            logger.debug("@teacherAbsentUpdator#公开课不更新教师旷课[{}]",JacksonUtil.toJSon(workOrder));
+            return;
         }
         if (!isTeacherAbsent(workOrder)) {
             logger.debug("@absentUpdator鱼卡:[{}]的已经处理过,没有旷课现象;当前状态:[{}]",

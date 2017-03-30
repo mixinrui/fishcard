@@ -386,6 +386,10 @@ public class WorkOrder implements Cloneable {
                 || Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name());
     }
 
+    public boolean isPublic(){
+        Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name());
+    }
+
     public boolean notGroupWorkOrder() {
         return !Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name())
                 && !Objects.equals(this.getClassType(), ClassTypeEnum.SMALL.name());
