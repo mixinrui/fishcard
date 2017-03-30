@@ -10,6 +10,7 @@ import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BoxfishException;
 import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.threadpool.ThreadPoolManager;
+import com.boxfishedu.workorder.common.util.Collections3;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
@@ -239,9 +240,17 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Transactional
     public void updateWorkOrdersAndSchedules(List<WorkOrder> workOrders, List<CourseSchedule> courseSchedules, SmallClass smallClass) {
-        this.save(workOrders);
-        courseScheduleService.save(courseSchedules);
-        smallClassJpaRepository.save(smallClass);
+
+        List<Long> workOrderIds       = Collections3.extractToList(workOrders, "id");
+        List<Long> courseSchedulesIds = Collections3.extractToList(courseSchedules, "id");
+        WorkOrder workOrder  = workOrders.get(0);
+        CourseSchedule courseSchedule  = courseSchedules.get(0);
+
+        long wo = workOrderJpaRepository.setFixedTeacherIdAndStatusAndTeacherNameFor(workOrder.getTeacherId(),workOrder.getStatus(),workOrder.getTeacherName() ,workOrderIds);
+        long cs = courseScheduleRepository.setFixedTeacherIdAndStatusFor(courseSchedule.getTeacherId(),courseSchedule.getStatus(),courseSchedulesIds);
+        long sc = smallClassJpaRepository.setFixedTeacherIdAndTeacherNameAndGroupIdAndChatRoomIdFor(smallClass.getTeacherId(),smallClass.getTeacherName(),smallClass.getGroupId(),smallClass.getChatRoomId(),smallClass.getId());
+
+        logger.info("@smallClassChangeTeacher_Num wo:[{}] cs:[{}] sc :[{}]",wo,cs,sc);
     }
 
     private void batchUpdateCourseSchedule(
