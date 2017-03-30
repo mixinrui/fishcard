@@ -125,4 +125,11 @@ public interface CourseScheduleRepository extends JpaRepository<CourseSchedule, 
     @Query("update CourseSchedule o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3  ,o.updateTime=current_timestamp    where o.id = ?4")
     int setFixedCourseIdAndCourseNameAndCourseTypeFor(String courseId, String courseName ,String courseType,  Long courseScheduleId);
 
+
+
+    //小班课换老师操作
+    @Modifying
+    @Query("update CourseSchedule o set o.teacherId= ?1 ,o.status= ?2   where o.id in (?3)")
+    int setFixedTeacherIdAndStatusFor(Long teacherId,Integer status , List<Long> ids);
+
 }
