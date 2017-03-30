@@ -89,7 +89,7 @@ public abstract class SmallClassEventCustomer {
 
                 try {
                     this.getWorkOrderService().saveStatusForCardAndSchedule(
-                            workOrder, desc, fishCardStatusEnum);
+                            workOrder, desc, fishCardStatusEnum,true);
                 } catch (BusinessException ex) {
                     if (workOrders.size() == 1) {
                         throw new BusinessException(ex);

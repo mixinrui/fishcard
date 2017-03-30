@@ -97,7 +97,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     CourseOnlineServiceX courseOnlineServiceX;
 
     @Autowired
-    private  WorkOrderJpaRepository workOrderJpaRepository;
+    private WorkOrderJpaRepository workOrderJpaRepository;
 
     @Autowired
     private CourseScheduleRepository courseScheduleRepository;
@@ -157,20 +157,23 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
 
     @Transactional
     public void saveWorkOrderAndScheduleForSingleValue(WorkOrder workOrder, CourseSchedule courseSchedule) {
-       // this.save(workOrder);
-        workOrderJpaRepository.setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(workOrder.getCourseId(),workOrder.getCourseName(),workOrder.getCourseType(),workOrder.getUpdatetimeChangecourse(),workOrder.getSendflagcc(),workOrder.getId());
+        // this.save(workOrder);
+        workOrderJpaRepository.setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(workOrder.getCourseId(), workOrder.getCourseName(), workOrder.getCourseType(), workOrder.getUpdatetimeChangecourse(), workOrder.getSendflagcc(), workOrder.getId());
         //courseScheduleService.save(courseSchedule);
-        courseScheduleRepository.setFixedCourseIdAndCourseNameAndCourseTypeFor(courseSchedule.getCourseId(),courseSchedule.getCourseName(),courseSchedule.getCourseType(),courseSchedule.getId());
+        courseScheduleRepository.setFixedCourseIdAndCourseNameAndCourseTypeFor(courseSchedule.getCourseId(), courseSchedule.getCourseName(), courseSchedule.getCourseType(), courseSchedule.getId());
         logger.info("||||||鱼卡[{}]入库成功;排课表入库成功[{}]", workOrder.getId(), courseSchedule.getId());
     }
 
     @Transactional
     public void saveStatusForCardAndSchedule(WorkOrder workOrder, FishCardStatusEnum fishCardStatusEnum) {
-        this.saveStatusForCardAndSchedule(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()), fishCardStatusEnum);
+        this.saveStatusForCardAndSchedule(workOrder, FishCardStatusEnum.getDesc(workOrder.getStatus()), fishCardStatusEnum, true);
     }
 
     @Transactional
-    public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc, FishCardStatusEnum fishCardStatusEnum) {
+    public void saveStatusForCardAndSchedule(WorkOrder workOrder, String desc, FishCardStatusEnum fishCardStatusEnum, boolean isGroup) {
+        if (isGroup) {
+            workOrder = workOrderJpaRepository.findByIdForUpdate(workOrder.getId());
+        }
         this.dealStudentAbsent(workOrder, desc);
         this.dealTeacherAbsent(workOrder, desc);
 
