@@ -143,6 +143,8 @@ public class SmallClassSuperStuServiceX {
         workOrder.setSeqNum(1);
         workOrder.setSkuId(TeachingType.WAIJIAO.getCode());
 
+        workOrder.setClassType(smallClass.getClassType());
+
 
         workOrder.setSkuIdExtra(110);
         workOrder.setIsCourseOver((short)0);
@@ -172,6 +174,8 @@ public class SmallClassSuperStuServiceX {
         courseSchedule.setClassDate(workOrder.getStartTime());
         courseSchedule.setCreateTime(new Date());
         courseSchedule.setStartTime(workOrder.getStartTime());
+
+        courseSchedule.setClassType(smallClass.getClassType());
 
 
         courseSchedule.setRoleId(1);

@@ -79,7 +79,7 @@ public class BaseTimeSlotSmallClassService {
         List weeks =Lists.newArrayList(3,5,6,7);
 
         // 目前 初始化 小班课 20:00点 和 20:30 两个时间片为100
-        if( slots.contains(slotId) &&   weeks.contains(localDate.getDayOfWeek()) && teachingType==1 ){
+        if( slots.contains(slotId) &&   weeks.contains(localDate.getDayOfWeek().getValue()) && teachingType==1 ){
 
             t1.setProbability(100);
         }else {
