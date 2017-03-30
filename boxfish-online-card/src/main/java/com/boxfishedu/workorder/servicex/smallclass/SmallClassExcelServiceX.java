@@ -1,10 +1,12 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
+import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.BackOrderService;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.graborder.MakeWorkOrderService;
 import com.boxfishedu.workorder.service.instantclass.SmallClassQueryService;
 import com.boxfishedu.workorder.servicex.SmallClassViewExcel;
@@ -52,6 +54,9 @@ public class SmallClassExcelServiceX {
     @Autowired
     private MakeWorkOrderService makeWorkOrderService;
 
+    @Autowired
+    private WorkOrderService workOrderService;
+
 
     @Autowired
     protected SmallClassQueryService smallClassQueryService;
@@ -62,7 +67,7 @@ public class SmallClassExcelServiceX {
      * @param pageable
      */
     public void exportExcel(PublicFilterParam publicFilterParam, HttpServletResponse response, Pageable pageable) {
-
+        processDateParam(publicFilterParam);
         List<SmallClass> workOrderList = smallClassQueryService.filterFishCards(publicFilterParam, pageable);
 
         if(null == workOrderList || workOrderList.isEmpty()){
@@ -151,7 +156,7 @@ public class SmallClassExcelServiceX {
 
 
             hssfCell = hssfRow.createCell(5);
-            hssfCell.setCellValue( list.get(i).getChatRoomId() );
+            hssfCell.setCellValue( list.get(i).getChatRoomId()==null?"":""+list.get(i).getChatRoomId() );
 
 
 
@@ -179,7 +184,7 @@ public class SmallClassExcelServiceX {
 
 
             hssfCell = hssfRow.createCell(13);
-            hssfCell.setCellValue( list.get(i).getClassNum());
+            hssfCell.setCellValue( list.get(i).getClassNum()==null?"":""+list.get(i).getClassNum());
 
         }
 
@@ -250,5 +255,27 @@ public class SmallClassExcelServiceX {
 
         return workOrders;
 
+    }
+
+
+    public void processDateParam(PublicFilterParam fishCardFilterParam) {
+        if (null == fishCardFilterParam.getBeginDate()) {
+            fishCardFilterParam.setBeginDateFormat(DateUtil.String2Date(ConstantUtil.EARLIEST_TIME));
+        } else {
+            fishCardFilterParam.setBeginDateFormat(DateUtil.String2Date(fishCardFilterParam.getBeginDate()));
+        }
+        if (null == fishCardFilterParam.getEndDate()) {
+            fishCardFilterParam.setEndDateFormat(DateUtil.String2Date(ConstantUtil.LATEST_TIME));
+        } else {
+            fishCardFilterParam.setEndDateFormat(DateUtil.String2Date(fishCardFilterParam.getEndDate()));
+        }
+
+        if (null != fishCardFilterParam.getCreateBeginDate()) {
+            fishCardFilterParam.setCreateBeginDateFormat(DateUtil.String2Date(fishCardFilterParam.getCreateBeginDate()));
+        }
+
+        if (null != fishCardFilterParam.getCreateEndDate()) {
+            fishCardFilterParam.setCreateEndDateFormat(DateUtil.String2Date(fishCardFilterParam.getCreateEndDate()));
+        }
     }
 }
