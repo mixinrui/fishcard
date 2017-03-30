@@ -4,6 +4,7 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
@@ -43,4 +44,10 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
     @Query("select sc from SmallClass sc where sc.id in (select muc.classId from MonitorUserCourse muc where muc.startTime between ?1 and ?2 and muc.classType = ?3 and muc.userId = ?4)" +
             " and sc.startTime between ?1 and ?2 and sc.classType = ?3")
     Page<SmallClass> findMonitorUserCourse(Date startTime, Date endTime,String classType, Long studentId,Pageable pageable);
+
+    //小班课换老师操作
+    @Modifying
+    @Query("update SmallClass o set o.teacherId= ?1 ,o.teacherName= ?2 ,o.groupId  = ?3,o.chatRoomId = ?4   where o.id =  ?5 ")
+    int setFixedTeacherIdAndTeacherNameAndGroupIdAndChatRoomIdFor(Long teacherId ,String teacherName,String groupId,Long chatRoomId, Long id);
+
 }
