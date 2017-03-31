@@ -127,7 +127,7 @@ public class SmallClassSuperStuServiceX {
         workOrder.setCourseName(smallClass.getCourseName());
         workOrder.setTeacherId(smallClass.getTeacherId());
         workOrder.setTeacherName(smallClass.getTeacherName());
-        workOrder.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        workOrder.setStatus(FishCardStatusEnum.WAITFORSTUDENT.getCode());
         workOrder.setSmallClassId(smallClass.getId());
         workOrder.setUpdateTime(new Date());
         workOrder.setGeneratorType(ClassUserTypeEnum.SUPER.name());  // 超级用户
@@ -164,7 +164,7 @@ public class SmallClassSuperStuServiceX {
         courseSchedule.setCourseId(smallClass.getCourseId());
         courseSchedule.setCourseName(smallClass.getCourseName());
         courseSchedule.setTeacherId(smallClass.getTeacherId());
-        courseSchedule.setStatus(FishCardStatusEnum.TEACHER_ASSIGNED.getCode());
+        courseSchedule.setStatus(FishCardStatusEnum.WAITFORSTUDENT.getCode());
         courseSchedule.setSmallClassId(smallClass.getId());
         courseSchedule.setUpdateTime(new Date());
 
