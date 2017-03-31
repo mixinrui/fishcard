@@ -203,4 +203,22 @@ public class SmallClassBackController {
         return JsonResultModel.newJsonResultModel(smallClassBackServiceX.addbackup(studentForSmallClassParam));
     }
 
+
+    @RequestMapping(value = "/smallclass/trial", method = RequestMethod.POST)
+    public JsonResultModel buildTrialSmallClass(@RequestBody TrialSmallClassParam trialSmallClassParam) {
+        logger.debug("@buildTrialSmallClass创建试讲小班课,参数[{}]", JacksonUtil.toJSon(trialSmallClassParam));
+//        smallClassBackServiceX.buildTrialSmallClass(trialSmallClassParam);
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
+    /**
+     * 解散小班课
+     * @return
+     */
+    @RequestMapping(value="/{smallclass_id}/smallclassdismiss",method=RequestMethod.DELETE)
+    public JsonResultModel dismissSmallClass(@PathVariable("smallclass_id") Long smallClassID){
+        smallClassBackServiceX.dissmissSmallClass(smallClassID);
+        return JsonResultModel.newJsonResultModel("OK");
+    }
+
 }

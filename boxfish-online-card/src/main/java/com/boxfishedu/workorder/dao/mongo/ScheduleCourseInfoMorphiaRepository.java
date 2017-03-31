@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.dao.mongo;
 
 import com.boxfishedu.workorder.entity.mongo.ScheduleCourseInfo;
+import com.mongodb.WriteResult;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,8 @@ public class ScheduleCourseInfoMorphiaRepository extends BaseMorphiaRepository<S
                 query.criteria("scheduleType").equal(scheduleType)
         );
         return query.get();
+    }
+    public WriteResult deleteByworkOrderId(Long workID){
+      return  datastore.delete(datastore.find(ScheduleCourseInfo.class,"workOrderId",workID));
     }
 }
