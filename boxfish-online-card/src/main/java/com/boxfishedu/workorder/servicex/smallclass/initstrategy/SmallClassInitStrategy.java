@@ -9,10 +9,7 @@ import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
-import com.boxfishedu.workorder.requester.CourseOnlineRequester;
-import com.boxfishedu.workorder.requester.RecommandCourseRequester;
-import com.boxfishedu.workorder.requester.SmallClassRequester;
-import com.boxfishedu.workorder.requester.SmallClassTeacherRequester;
+import com.boxfishedu.workorder.requester.*;
 import com.boxfishedu.workorder.service.ScheduleCourseInfoService;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.monitor.MonitorUserService;
@@ -66,6 +63,9 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
     @Autowired
     private MonitorUserService monitorUserService;
+
+    @Autowired
+    private TeacherPhotoRequester teacherPhotoRequester;
 
     public WorkOrder selectLeader(List<WorkOrder> workOrders) {
         logger.debug("小班鱼卡[{}]", JacksonUtil.toJSon(workOrders));
@@ -123,6 +123,8 @@ public class SmallClassInitStrategy implements GroupInitStrategy {
 
         //获取推荐教师
         TeacherView teacherView = this.getRecommandTeacher(smallClass);
+        String teacherPhoto = teacherPhotoRequester.getTeacherPhoto(smallClass.getTeacherId());
+        smallClass.setTeacherPhoto(teacherPhoto);
 
         if (!Objects.isNull(teacherView) && 0 != teacherView.getId()) {
             this.writeTeacherInfoBack(smallClass, smallClass.getAllCards(), teacherView);

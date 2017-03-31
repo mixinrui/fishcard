@@ -191,7 +191,7 @@ public class HomePageServiceX {
         Long multiFRN = workOrderJpaRepository.multiLeftAmount(studentId, new Date(), ClassTypeEnum.SMALL.name());
         Long singleCN = workOrderJpaRepository.singleLeftAmount(studentId, new Date(), ClassTypeEnum.SMALL.name(), 1);
         Long singleFRN = workOrderJpaRepository.singleLeftAmount(studentId, new Date(), ClassTypeEnum.SMALL.name(), 2);
-        Long comment = serviceJpaRepository.leftCommentAmount(studentId, ProductType.COMMENT.value());
-        return new StudentLeftInfo(singleCN, singleFRN, comment, multiFRN);
+        Integer comment = serviceJpaRepository.getAvailableForeignCommentServiceCount(studentId, ProductType.COMMENT.value());
+        return new StudentLeftInfo(singleCN, singleFRN, comment.longValue(), multiFRN);
     }
 }
