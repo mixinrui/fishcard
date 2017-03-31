@@ -1,7 +1,9 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
@@ -41,21 +44,9 @@ public class SmallClassExcelServiceX {
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private FishCardQueryServiceX fishCardQueryServiceX;
-
 
     @Autowired
-    private TeacherStudentRequester teacherStudentRequester;
-
-    @Autowired
-    private BackOrderService backOrderService;
-
-    @Autowired
-    private MakeWorkOrderService makeWorkOrderService;
-
-    @Autowired
-    private WorkOrderService workOrderService;
+    private WorkOrderJpaRepository workOrderJpaRepository;
 
 
     @Autowired
@@ -276,6 +267,16 @@ public class SmallClassExcelServiceX {
 
         if (null != fishCardFilterParam.getCreateEndDate()) {
             fishCardFilterParam.setCreateEndDateFormat(DateUtil.String2Date(fishCardFilterParam.getCreateEndDate()));
+        }
+
+
+        if(null!=fishCardFilterParam.getTimes()){
+            List<Long>  ids =  workOrderJpaRepository.findDistinctSmallClassFromWorkOrder(ClassTypeEnum.SMALL.name(),fishCardFilterParam.getTimes());
+            if(CollectionUtils.isEmpty(ids)){
+                fishCardFilterParam.setIds(Lists.newArrayList(999999999999L));
+            }else{
+                fishCardFilterParam.setIds(ids);
+            }
         }
     }
 }
