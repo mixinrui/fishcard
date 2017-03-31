@@ -2,12 +2,14 @@ package com.boxfishedu.workorder.servicex.smallclass.groupbuilder;
 
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.google.common.collect.Lists;
-import com.sun.xml.internal.ws.api.pipe.FiberContextSwitchInterceptor;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/6.
