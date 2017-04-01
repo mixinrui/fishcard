@@ -244,16 +244,16 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
     @Transactional
     public void updateWorkOrdersAndSchedules(List<WorkOrder> workOrders, List<CourseSchedule> courseSchedules, SmallClass smallClass) {
 
-        List<Long> workOrderIds       = Collections3.extractToList(workOrders, "id");
+        List<Long> workOrderIds = Collections3.extractToList(workOrders, "id");
         List<Long> courseSchedulesIds = Collections3.extractToList(courseSchedules, "id");
-        WorkOrder workOrder  = workOrders.get(0);
-        CourseSchedule courseSchedule  = courseSchedules.get(0);
+        WorkOrder workOrder = workOrders.get(0);
+        CourseSchedule courseSchedule = courseSchedules.get(0);
 
-        long wo = workOrderJpaRepository.setFixedTeacherIdAndStatusAndTeacherNameFor(workOrder.getTeacherId(),workOrder.getStatus(),workOrder.getTeacherName() ,workOrderIds);
-        long cs = courseScheduleRepository.setFixedTeacherIdAndStatusFor(courseSchedule.getTeacherId(),courseSchedule.getStatus(),courseSchedulesIds);
-        long sc = smallClassJpaRepository.setFixedTeacherIdAndTeacherNameAndGroupIdAndChatRoomIdFor(smallClass.getTeacherId(),smallClass.getTeacherName(),smallClass.getGroupId(),smallClass.getChatRoomId(),smallClass.getId());
+        long wo = workOrderJpaRepository.setFixedTeacherIdAndStatusAndTeacherNameFor(workOrder.getTeacherId(), workOrder.getStatus(), workOrder.getTeacherName(), workOrderIds);
+        long cs = courseScheduleRepository.setFixedTeacherIdAndStatusFor(courseSchedule.getTeacherId(), courseSchedule.getStatus(), courseSchedulesIds);
+        long sc = smallClassJpaRepository.setFixedTeacherIdAndTeacherNameAndGroupIdAndChatRoomIdFor(smallClass.getTeacherId(), smallClass.getTeacherName(), smallClass.getGroupId(), smallClass.getChatRoomId(), smallClass.getId());
 
-        logger.info("@smallClassChangeTeacher_Num wo:[{}] cs:[{}] sc :[{}]",wo,cs,sc);
+        logger.info("@smallClassChangeTeacher_Num wo:[{}] cs:[{}] sc :[{}]", wo, cs, sc);
     }
 
     private void batchUpdateCourseSchedule(
@@ -577,7 +577,7 @@ public class WorkOrderService extends BaseService<WorkOrder, WorkOrderJpaReposit
         for (WorkOrder workOrder : workOrders) {
             CourseSchedule courseSchedule = new CourseSchedule();
             courseSchedule.setStatus(workOrder.getStatus());
-            courseSchedule.setStudentId(service.getStudentId());
+            courseSchedule.setStudentId(workOrder.getStudentId());
             courseSchedule.setTeacherId(workOrder.getTeacherId());
             courseSchedule.setCourseId(workOrder.getCourseId());
             courseSchedule.setCourseName(workOrder.getCourseName());
