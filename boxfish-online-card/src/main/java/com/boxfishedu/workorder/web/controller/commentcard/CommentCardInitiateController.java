@@ -19,6 +19,7 @@ public class CommentCardInitiateController {
 
     @RequestMapping(value = "/course/type_and_difficulty", method = RequestMethod.GET)
     public Object initiateCourseTypeAndDifficulty(){
+
         return "本次初始化个数为" + commentCardInitiateService.initiateCourseTypeAndDifficulty();
     }
 

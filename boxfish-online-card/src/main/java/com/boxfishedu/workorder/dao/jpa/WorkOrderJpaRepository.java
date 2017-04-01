@@ -156,7 +156,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     public List<WorkOrder> findByStudentIdAndEndTimeLessThanOrderByStartTimeDesc(Long studentId, Date date);
 
     public List<WorkOrder> findByStudentIdAndOrderChannelAndStartTimeAfter(Long studentId, String orderChannel, Date date);
- 
+
     /**
      * 查询旷课的、还未扣积分的学生
      **/
@@ -226,7 +226,7 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
 
     List<WorkOrder> findByClassTypeAndSmallClassIdIsNullAndStartTimeBetween(String name, Date date, Date deadDate);
 
-    @Query("select wo from  WorkOrder wo where wo.smallClassId in (?1)")
+    @Query("select wo from  WorkOrder wo where wo.smallClassId in (?1)  and wo.generatorType is null ")
     List<WorkOrder> findBySmallClassNum(List<Long> smallClassIds);
 
     //查询未发送并且在时间范围内的鱼卡数据(1 to 1)
@@ -257,4 +257,14 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     @Query("update WorkOrder o set o.courseId= ?1 ,o.courseName = ?2 ,o.courseType= ?3 ,o.updatetimeChangecourse= ?4 ,o.sendflagcc= ?5 ,o.updateTime=current_timestamp    where o.id = ?6")
     int setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(String courseId, String courseName, String courseType, Date updateTimeChangeCourse, String sendFlaggcc, Long workorderId);
 
+    @Query("select count(wo) from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and wo.classType=?3 and (wo.isFreeze is null or wo.isFreeze!=1)")
+    Long multiLeftAmount(Long studentId,Date date,String classType);
+
+    @Query("select count(wo) from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and (wo.classType is null or wo.classType !=?3) and wo.skuId=?4 and (wo.isFreeze is null or wo.isFreeze!=1)")
+    Long singleLeftAmount(Long studentId,Date date,String classType,Integer skuId);
+
+    //小班课换老师操作
+    @Modifying
+    @Query("update WorkOrder o set o.teacherId= ?1 ,o.assignTeacherTime=current_timestamp,o.status= ?2 ,o.teacherName = ?3  where o.id in (?4)")
+    int setFixedTeacherIdAndStatusAndTeacherNameFor(Long teacherId,Integer status ,String teacherName, List<Long> ids);
 }

@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.requester.RecommandCourseRequester;
 import com.boxfishedu.workorder.servicex.home.HomePageServiceX;
+import com.boxfishedu.workorder.web.result.StudentLeftInfo;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by hucl on 16/3/31.
@@ -57,6 +59,11 @@ HomePageController {
     @RequestMapping(value = "/student/classInfo/{student_id}", method = RequestMethod.GET)
     public Object studentClassInfo(@PathVariable("student_id") Long studentId) {
         return homePageServiceX.getStudentClassInfo(studentId, DateUtil.date2SimpleDate(new Date()));
+    }
+
+    @RequestMapping(value = "/student/leftInfo/{student_id}", method = RequestMethod.GET)
+    public StudentLeftInfo studentLeftInfo(@PathVariable("student_id") Long studentId){
+        return homePageServiceX.getLeftInfo(studentId);
     }
 
 }

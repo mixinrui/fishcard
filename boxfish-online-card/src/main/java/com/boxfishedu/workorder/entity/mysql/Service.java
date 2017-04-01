@@ -61,7 +61,9 @@ public class Service {
     private String skuName;
 
 
-    /** 第一次鱼卡开始时间  **/
+    /**
+     * 第一次鱼卡开始时间
+     **/
     @Column(name = "first_time", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date firstTime;
@@ -150,13 +152,18 @@ public class Service {
     private Integer classSize;
 
     public void authentication(Long userId) {
-        if(!Objects.equals(studentId, userId)) {
-            throw new BusinessException("非法用户,拒绝访问!");
+        if (!Objects.equals(studentId, userId)) {
+            if (orderId.longValue() != (Long.MAX_VALUE - 10))
+                throw new BusinessException("非法用户,拒绝访问!");
         }
     }
 
-    public boolean isGroupClass(){
+    public boolean isGroupClass() {
         return Objects.equals(this.comboType, ComboTypeToRoleId.SMALLCLASS.name());
+    }
+
+    public boolean isPublic() {
+        return this.orderId == Long.MAX_VALUE - 2;
     }
 
 }

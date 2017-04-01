@@ -189,6 +189,64 @@ public class TimePickerServiceXV1 {
     }
 
 
+    /**
+     * 为超级用户生成工单
+     * @param timeSlotParam
+     * @return
+     * @throws BoxfishException
+     */
+    public  List<CourseSchedule>  smallClassSuperStu(TimeSlotParam timeSlotParam) throws BoxfishException {
+        logger.info("ensureCourseTimesv2客户端发起选课请求;参数:[{}]", JacksonUtil.toJSon(timeSlotParam));
+
+        //根据订单id,type获取对应的服务
+        List<Service> serviceList = ensureConvertOver(timeSlotParam);
+
+        // 获取选课策略,每周选几次,持续几周
+        SelectMode selectMode = selectModeFactory.createSelectMode(timeSlotParam);
+
+        // 选时间参数验证
+        studentTimePickerValidatorSupport.prepareValidate(timeSlotParam, selectMode, serviceList);
+
+        // 批量生成工单 TODO 生成工单
+        List<WorkOrder> workOrderList = batchInitWorkorders(timeSlotParam, selectMode, serviceList);
+
+        Set<String> classDateTimeslotsSet = courseScheduleService.findByStudentIdAndAfterDate(timeSlotParam.getStudentId());
+
+        studentTimePickerValidatorSupport.postValidate(serviceList, workOrderList, classDateTimeslotsSet);
+
+        // 获取课程推荐
+        Map<Integer, RecommandCourseView> recommandCourses = recommendHandlerHelper.recommendCourses(workOrderList, timeSlotParam);
+
+        // 批量保存鱼卡与课表
+        List<CourseSchedule> courseSchedules = workOrderService.persistCardInfos(serviceList, workOrderList, recommandCourses);
+
+        dataCollectorService.updateBothChnAndFnItem(serviceList.get(0).getStudentId());
+
+        // 保存日志
+        workOrderLogService.batchSaveWorkOrderLogs(workOrderList);
+
+
+        //判断是否指定过老师
+        //StStudentApplyRecords stStudentApplyRecords = stStudentApplyRecordsService.findMyLastAssignTeacher(timeSlotParam.getStudentId(),timeSlotParam.getSkuId() );
+
+        logger.info("ensureCourseTimesv2,studentId [{}],orderId [{}]",timeSlotParam.getStudentId(),timeSlotParam.getOrderId());
+        StStudentSchema stStudentSchema  =  stStudentSchemaJpaRepository.findTop1ByStudentIdAndStSchemaAndSkuId(timeSlotParam.getStudentId(),StStudentSchema.StSchema.assgin,StStudentSchema.CourseType.getEnum(timeSlotParam.getSkuId()));
+
+        if(null == stStudentSchema){
+            // 分配老师
+            timePickerService.getRecommandTeachers(serviceList.get(0), courseSchedules);
+        }
+
+        // 通知其他模块
+        notifyOtherModules(workOrderList, serviceList.get(0));
+
+        logger.info("学生[{}]选课结束", serviceList.get(0).getStudentId());
+        return courseSchedules;
+    }
+
+
+
+
 
     public List<Service> ensureConvertOver(TimeSlotParam timeSlotParam) {
         return ensureConvertOver(timeSlotParam, 0);

@@ -6,13 +6,18 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by hucl on 17/1/6.
  * 完成小班课的group
  */
 public abstract class GroupBuilder {
+
+    protected abstract List<WorkOrder> cardsToGroupNowToTomorrow();
 
     protected abstract List<WorkOrder> cardsToGroup(Integer days);
 
@@ -69,7 +74,37 @@ public abstract class GroupBuilder {
         });
         this.updateHomePage(cards);
     }
+    public void groupToTomorrowMidnight() {
+        List<WorkOrder> cards = this.cardsToGroupNowToTomorrow();
 
+        if (CollectionUtils.isEmpty(cards)) {
+            return;
+        }
+
+        Map<String, List<WorkOrder>> timeGrouped = this.groupByTime(cards);
+
+        timeGrouped.forEach((timeKey, timedWorkOrders) -> {
+            Map<String, List<WorkOrder>> levelGrouped = this.groupbyLevel(timedWorkOrders);
+
+            levelGrouped.forEach((key, workOrders) -> {
+                if (!CollectionUtils.isEmpty(workOrders)) {
+                    Map<Integer, List<WorkOrder>> finalGroups = this.divideGroup(workOrders);
+                    this.initGroup(finalGroups);
+                }
+            });
+
+//            levelGrouped.forEach((levelKey, leveledWorkOrders) -> {
+//                Map<String, List<WorkOrder>> studyCounterGrouped = this.groupByStudyCounter(leveledWorkOrders);
+//
+//                Integer groupSeq = 0;
+            //TODO:等待确定规则
+//                studyCounterGrouped.forEach((studyCounterKey, studyCounterWorkOrders) -> {
+//                    Map<String, List<WorkOrder>> relationGrouped = this.groupByRelation(studyCounterWorkOrders);
+////                    groups.putAll(relationGrouped);
+//                });
+        });
+        this.updateHomePage(cards);
+    }
     //将小班按照信息获取
     protected Map<Integer, List<WorkOrder>> divideGroup(List<WorkOrder> workOrders) {
         Integer memNum = this.smallClassMemeberNum();

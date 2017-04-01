@@ -9,13 +9,11 @@ import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -98,6 +96,8 @@ public class SmallClass implements Cloneable, Serializable {
 
     private Integer status;
 
+    private Integer demoFlag;
+
     @JsonIgnore
     @Transient
     private Date reportTime;
@@ -129,6 +129,9 @@ public class SmallClass implements Cloneable, Serializable {
     @JsonIgnore
     @Transient
     private PublicClassInfoStatusEnum classStatusEnum;
+
+    @Transient
+    private List<Long> members;
 
     //班级类型
     private String classType;
@@ -172,11 +175,19 @@ public class SmallClass implements Cloneable, Serializable {
         this.setClassDate(DateUtil.simpleString2Date(trialSmallClassParam.getStartTime()));
 
         this.setStartTime(DateUtil.String2Date(trialSmallClassParam.getStartTime()));
+        this.setEndTime(DateUtil.String2Date(trialSmallClassParam.getEndTime()));
         this.setSlotId(trialSmallClassParam.getTimeSlotId());
 
         this.setIsTrial(true);
+        this.setDemoFlag(1);
+
+        this.setCourseId(trialSmallClassParam.getCourseId());
+        this.setCourseName(trialSmallClassParam.getCourseName());
+        this.setCourseType(trialSmallClassParam.getCourseType());
 
         this.setClassType("SMALLCLASS_TRIAL");
+
+        this.setAllStudentIds(trialSmallClassParam.getStudentIds());
 
         this.setCreateTime(new Date());
         this.setUpdateTime(new Date());
@@ -190,5 +201,14 @@ public class SmallClass implements Cloneable, Serializable {
     //小班课上课时间30分钟
     public boolean reachOverTime() {
         return new Date().after(this.getEndTime());
+    }
+
+    public boolean isDemo() {
+        return this.demoFlag == null ? false :
+                (1 == this.demoFlag ? true : false);
+    }
+
+    public boolean isPublic(){
+        return StringUtils.equals(ClassTypeEnum.PUBLIC.name(),this.getClassType());
     }
 }

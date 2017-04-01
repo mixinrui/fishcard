@@ -28,7 +28,18 @@ public class WorkOrderViewExcel {
 
     private String orderType;
 
-    private String hasAddCourse;//是否补过课
+    private Long classNum = 0L;   //课程数量
+
+    public Long getClassNum() {
+        return classNum;
+    }
+
+    public void setClassNum(Long classNum) {
+        this.classNum = classNum;
+    }
+
+
+
 
 
     public Long getId() {
@@ -164,17 +175,6 @@ public class WorkOrderViewExcel {
         this.orderCode = orderCode;
     }
 
-    public String getHasAddCourse() {
-        return hasAddCourse;
-    }
-
-    public void setHasAddCourse(Short makeUpFlag) {
-        if(null==makeUpFlag){
-            this.hasAddCourse="否";
-        }else {
-            this.hasAddCourse="是";
-        }
-    }
 
 
 

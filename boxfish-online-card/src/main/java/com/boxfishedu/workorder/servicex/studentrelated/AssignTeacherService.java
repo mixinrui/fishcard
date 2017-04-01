@@ -232,6 +232,7 @@ public class AssignTeacherService {
         }
 
         CourseInfo courseInfo = new CourseInfo();
+
         //2 获取是否本课为指定老师
         StStudentSchema stStudentSchema = null;
         if(!Objects.isNull(workOrder.getSkuId())){

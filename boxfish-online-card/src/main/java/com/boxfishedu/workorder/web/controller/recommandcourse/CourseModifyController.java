@@ -26,11 +26,13 @@ public class CourseModifyController {
         return JsonResultModel.newJsonResultModel("ok");
     }
 
+    // 改变某个学生所有的课程  参数 学生id
     @RequestMapping(value = "/courses/all", method = RequestMethod.PUT)
     public JsonResultModel changeOrderCourses(@RequestBody CourseChangeParam courseChangeParam) {
         fishCardModifyServiceX.changerderCourses(courseChangeParam.getStudentId());
         return JsonResultModel.newJsonResultModel("ok");
     }
+
 
     //修改鱼卡的课程
     @RequestMapping(value = "/course", method = RequestMethod.PUT)

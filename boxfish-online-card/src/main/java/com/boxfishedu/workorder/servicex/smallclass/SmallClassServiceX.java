@@ -5,14 +5,12 @@ import com.boxfishedu.workorder.common.util.RedisKeyGenerator;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.ConfigBeanMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SelectStudentsService;
 import com.boxfishedu.workorder.servicex.callbacklog.CallBackLogServiceX;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
@@ -23,9 +21,8 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by hucl on 17/1/5.
@@ -54,6 +51,9 @@ public class SmallClassServiceX {
     SelectStudentsService selectStudentsService;
 
     @Autowired
+    WorkOrderService workOrderService;
+
+    @Autowired
     public void initRedis(@Qualifier(value = "stringRedisTemplate") RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.zSetOperations = redisTemplate.opsForZSet();
@@ -67,7 +67,13 @@ public class SmallClassServiceX {
 
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
         LocalDateTime startTime = LocalDateTime.ofInstant(smallClass.getStartTime().toInstant(), ZoneId.systemDefault());
-        LocalDateTime deadTime = startTime.plusMinutes(30);
+
+        int plusMinutes = 30;
+        if (smallClass.isPublic()) {
+            plusMinutes = 40;
+        }
+        LocalDateTime deadTime = startTime.plusMinutes(plusMinutes);
+
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
 
         if (now.isBefore(startTime)) {
@@ -116,5 +122,12 @@ public class SmallClassServiceX {
             return -1l;
         }
         return Long.parseLong(pageIndexes.get(0));
+    }
+
+    public List<Long> getMembers(SmallClass smallClass) {
+        return workOrderService.findBySmallClassId(smallClass.getId())
+                .stream()
+                .map(workOrder -> workOrder.getStudentId())
+                .collect(Collectors.toList());
     }
 }

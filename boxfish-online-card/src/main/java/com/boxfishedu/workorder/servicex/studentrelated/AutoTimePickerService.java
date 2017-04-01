@@ -227,10 +227,11 @@ public class AutoTimePickerService {
 
 
     public SmallClass getSmallClass(Service service, Long smallClassId) {
+        // level  如果添加严格限制 可以放开
         String level = smallClassRequester.fetchUserDifficultyInfo(service.getStudentId());
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
 
-        List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
+        List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassNum( Lists.newArrayList(smallClassId) );
 
         // if(Objects.equals(level,smallClass.getDifficultyLevel()) && workOrders.size()<smallClassSize){
         if (workOrders.size() < smallClassSize) {

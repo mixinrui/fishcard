@@ -178,6 +178,7 @@ StudentAppRelatedController {
         return JsonResultModel.EMPTY;
     }
 
+    //APP获取学生课表
     @RequestMapping(value = "{student_Id}/schedule/page", method = RequestMethod.GET)
     public Object courseSchedulePage(@PathVariable("student_Id") Long studentId, Long userId,
                                      @PageableDefault(value = 15) Pageable pageable,
@@ -187,7 +188,7 @@ StudentAppRelatedController {
     }
 
     /**
-     * 获取延迟上课的周数
+     * 获取延迟上课的周数(1对1)
      * @param userId
      * @return
      */
@@ -210,6 +211,7 @@ StudentAppRelatedController {
         return avaliableTimeServiceXV1.getDelayWeekDaysForSmallClass(orderId,userId);
     }
 
+    //获取可用的时间片
     @RequestMapping(value = "/v1/time/available", method = RequestMethod.GET)
     public Object timeAvailableV1(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
         commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(), userId);
@@ -286,6 +288,7 @@ StudentAppRelatedController {
         }
     }
 
+    // 老接口
     @RequestMapping(value = "/time/available", method = RequestMethod.GET)
     public JsonResultModel timeAvailable(AvaliableTimeParam avaliableTimeParam, Long userId) throws CloneNotSupportedException {
         commonServeServiceX.checkToken(avaliableTimeParam.getStudentId(), userId);

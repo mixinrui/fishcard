@@ -6,6 +6,7 @@ import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
+import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.service.instantclass.SmallClassQueryService;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicFilterParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -38,16 +39,22 @@ public class SmallClassQueryServiceX {
     @Autowired
     private WorkOrderJpaRepository workOrderJpaRepository;
 
-    public JsonResultModel listFishCardsByUnlimitedUserCond(PublicFilterParam publicFilterParam, Pageable pageable) {
-        processDateParam(publicFilterParam);
-        List<SmallClass> workOrderList = smallClassQueryService.filterFishCards(publicFilterParam, pageable);
+    @Autowired
+    private SmallClassServiceX smallClassServiceX;
 
-        Long count = smallClassQueryService.filterFishCardsCount(publicFilterParam);
-        Page<SmallClass> page = new PageImpl(workOrderList, pageable, count);
+    public JsonResultModel listFishCardsByUnlimitedUserCond(PublicFilterParam publicFilterParam, Pageable pageable) {
+        Page<SmallClass> page = getSmallClasses(publicFilterParam, pageable);
 
         return JsonResultModel.newJsonResultModel(page);
     }
 
+    private Page<SmallClass> getSmallClasses(PublicFilterParam publicFilterParam, Pageable pageable) {
+        processDateParam(publicFilterParam);
+        List<SmallClass> workOrderList = smallClassQueryService.filterFishCards(publicFilterParam, pageable);
+
+        Long count = smallClassQueryService.filterFishCardsCount(publicFilterParam);
+        return new PageImpl(workOrderList, pageable, count);
+    }
 
 
     public void processDateParam(PublicFilterParam publicFilterParam) {
@@ -62,26 +69,23 @@ public class SmallClassQueryServiceX {
             publicFilterParam.setEndDateFormat(DateUtil.String2Date(publicFilterParam.getEndDate()));
         }
 
-        if(null != publicFilterParam.getCreateBeginDate()){
-            publicFilterParam.setCreateBeginDateFormat(  DateUtil.String2Date(publicFilterParam.getCreateBeginDate()));
+        if (null != publicFilterParam.getCreateBeginDate()) {
+            publicFilterParam.setCreateBeginDateFormat(DateUtil.String2Date(publicFilterParam.getCreateBeginDate()));
         }
 
-        if(null != publicFilterParam.getCreateEndDate()){
+        if (null != publicFilterParam.getCreateEndDate()) {
             publicFilterParam.setCreateEndDateFormat(DateUtil.String2Date(publicFilterParam.getCreateEndDate()));
         }
 
-        if(null!=publicFilterParam.getTimes()){
-            List<Long>  ids =  workOrderJpaRepository.findDistinctSmallClassFromWorkOrder(ClassTypeEnum.SMALL.name(),publicFilterParam.getTimes());
-            if(CollectionUtils.isEmpty(ids)){
+        if (null != publicFilterParam.getTimes()) {
+            List<Long> ids = workOrderJpaRepository.findDistinctSmallClassFromWorkOrder(ClassTypeEnum.SMALL.name(), publicFilterParam.getTimes());
+            if (CollectionUtils.isEmpty(ids)) {
                 publicFilterParam.setIds(Lists.newArrayList(999999999999L));
-            }else{
+            } else {
                 publicFilterParam.setIds(ids);
             }
         }
     }
-
-
-
 
     public JsonResultModel listAllStatus() {
         Map<Integer, String> statusMap = Maps.newHashMap();
@@ -91,4 +95,13 @@ public class SmallClassQueryServiceX {
         return JsonResultModel.newJsonResultModel(statusMap);
     }
 
+    public JsonResultModel listDemoSmallClass(PublicFilterParam publicFilterParam, Pageable pageable) {
+        publicFilterParam.setIsDemo(true);
+        Page<SmallClass> page = this.getSmallClasses(publicFilterParam, pageable);
+        if (CollectionUtils.isEmpty(page.getContent())) {
+            return JsonResultModel.newJsonResultModel(page);
+        }
+        page.getContent().forEach(smallClass -> smallClass.setMembers(smallClassServiceX.getMembers(smallClass)));
+        return JsonResultModel.newJsonResultModel(page);
+    }
 }

@@ -35,6 +35,11 @@ public class SmallClassInitController {
         groupBuilder.group();
         return JsonResultModel.newJsonResultModel("OK");
     }
+    @RequestMapping(value="/initNowToTomorrowMidnight",method = RequestMethod.POST)
+    public JsonResultModel buildGroupNowToTomorrowMidnight(){
+        groupBuilder.groupToTomorrowMidnight();
+        return JsonResultModel.newJsonResultModel("OK");
+    }
 
     @RequestMapping(value = "/init/{days}", method = RequestMethod.POST)
     public JsonResultModel buildGroup(@PathVariable("days") Integer days) {
@@ -76,4 +81,6 @@ public class SmallClassInitController {
         configBeanMorphiaRepository.save(configDbBean);
         return JsonResultModel.newJsonResultModel("OK");
     }
+
+
 }

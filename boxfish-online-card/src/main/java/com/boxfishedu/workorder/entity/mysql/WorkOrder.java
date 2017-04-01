@@ -4,6 +4,8 @@ import com.boxfishedu.workorder.common.bean.FishCardNetStatusEnum;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.common.exception.BusinessException;
+import com.boxfishedu.workorder.common.util.DateUtil;
+import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.boxfishedu.workorder.web.view.course.RecommandCourseView;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -221,6 +223,10 @@ public class WorkOrder implements Cloneable {
     @Column(name = "class_type", nullable = true)
     private String classType;
 
+    // 生成方式  小班课超级用户 super  ClassUserTypeEnum
+    @Column(name = "generator_type", nullable = true)
+    private String generatorType;
+
     //小班课id
     @Column(name = "small_class_id")
     private Long smallClassId;
@@ -378,6 +384,10 @@ public class WorkOrder implements Cloneable {
     public boolean isGroupCard() {
         return Objects.equals(this.getClassType(), ClassTypeEnum.SMALL.name())
                 || Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name());
+    }
+
+    public boolean isPublic(){
+        return Objects.equals(this.getClassType(), ClassTypeEnum.PUBLIC.name());
     }
 
     public boolean notGroupWorkOrder() {

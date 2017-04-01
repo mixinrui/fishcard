@@ -1,33 +1,43 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
+
+import com.boxfishedu.workorder.common.bean.FishCardAuthEnum;
+import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.LevelEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
+import com.boxfishedu.workorder.common.util.ConstantUtil;
 import com.boxfishedu.workorder.common.util.DateUtil;
 import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.CourseScheduleRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.SmallClassStuJpaRepository;
 import com.boxfishedu.workorder.dao.jpa.WorkOrderJpaRepository;
+import com.boxfishedu.workorder.dao.mongo.ScheduleCourseInfoMorphiaRepository;
 import com.boxfishedu.workorder.entity.mysql.CourseSchedule;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.entity.mysql.SmallClassStu;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.requester.SmallClassRequester;
+import com.boxfishedu.workorder.requester.TeacherPhotoRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
+import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.servicex.bean.TimeSlots;
 import com.boxfishedu.workorder.servicex.instantclass.container.ThreadLocalUtil;
+import com.boxfishedu.workorder.servicex.smallclass.initstrategy.GroupInitStrategy;
+import com.boxfishedu.workorder.servicex.smallclass.initstrategy.SmallClassInitStrategy;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventDispatch;
 import com.boxfishedu.workorder.web.param.StudentForSmallClassParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.PublicClassBuilderParam;
 import com.boxfishedu.workorder.web.param.fishcardcenetr.TrialSmallClassParam;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
-import com.google.common.collect.Lists;
+import com.boxfishedu.workorder.web.view.fishcard.FishCardGroupsInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
-import org.springframework.orm.jpa.vendor.OpenJpaDialect;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +73,18 @@ public class SmallClassBackServiceX {
     @Autowired
     private SmallClassRequester smallClassRequester;
 
+    @Autowired
+    private ServeService serveService;
+
+    @Autowired
+    private TeacherPhotoRequester teacherPhotoRequester;
+
+    @Autowired
+    private
+    @Qualifier(ConstantUtil.SMALL_CLASS_INIT)
+    GroupInitStrategy smallClassInitStrategy;
+    private ScheduleCourseInfoMorphiaRepository scheduleCourseInfoMorphiaRepository;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public void configPublicClass(PublicClassBuilderParam publicClassBuilderParam) {
@@ -78,7 +100,7 @@ public class SmallClassBackServiceX {
                 DateUtil.String2Date(String.join(" ", publicClassBuilderParam.getDate(), timeSlots.getStartTime())));
         LocalDateTime localDateTime = LocalDateTime.ofInstant(
                 smallClass.getStartTime().toInstant(), ZoneId.systemDefault());
-        smallClass.setEndTime(DateUtil.localDate2Date(localDateTime.plusMinutes(30)));
+        smallClass.setEndTime(DateUtil.localDate2Date(localDateTime.plusMinutes(35)));
     }
 
     @Transactional
@@ -179,7 +201,60 @@ public class SmallClassBackServiceX {
     public void buildTrialSmallClass(TrialSmallClassParam trialSmallClassParam) {
         ThreadLocalUtil.trialSmallClassParamLocal.set(trialSmallClassParam);
         SmallClass smallClass = new SmallClass(trialSmallClassParam);
+        smallClass.setTeacherPhoto(teacherPhotoRequester.getTeacherPhoto(trialSmallClassParam.getTeacherId()));
         smallClass.setClassStatusEnum(PublicClassInfoStatusEnum.CREATE);
         new SmallClassEvent(smallClass, smallClassEventDispatch, smallClass.getClassStatusEnum());
+    }
+
+    @Transactional
+    public void saveSmallClassAndCards(SmallClass smallClass, List<WorkOrder> workOrders) {
+        workOrderJpaRepository.save(workOrders);
+
+        smallClass.setAllCards(workOrders);
+        smallClass.setGroupLeader(workOrders.get(0).getStudentId());
+        smallClass.setGroupLeaderCard(workOrders.get(0).getId());
+        smallClass.setClassType(ClassTypeEnum.SMALL.name());
+        smallClass.setStatus(PublicClassInfoStatusEnum.TEACHER_ASSIGNED.getCode());
+
+        smallClassJpaRepository.save(smallClass);
+        //回写群组信息到smallclass
+        FishCardGroupsInfo fishCardGroupsInfo = smallClassInitStrategy.buildChatRoom(smallClass);
+        smallClassInitStrategy.writeChatRoomBack(smallClass, workOrders, fishCardGroupsInfo);
+        serveService.batchSaveWorkOrderAndCourses(smallClass, workOrders);
+    }
+    @Transactional
+    public void dissmissSmallClass(Long smallClassId){
+        //重置鱼卡
+        List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
+        workOrders.stream().forEach(workOrder ->{
+            workOrder.setTeacherId(0l);
+            workOrder.setTeacherName(null);
+            workOrder.setAssignTeacherTime(null);
+            workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
+            workOrder.setCourseId(null);
+            workOrder.setCourseName(null);
+            workOrder.setCourseType(null);
+            workOrder.setSmallClassId(null);
+            workOrderJpaRepository.save(workOrder);
+            //删除ScheduleCourseInfo
+            scheduleCourseInfoMorphiaRepository.deleteByworkOrderId(workOrder.getId());
+                }
+        );
+        //重置CourseSchedule
+        List<CourseSchedule> courseSchedules=courseScheduleRepository.findBySmallClassId(smallClassId);
+        courseSchedules.stream().forEach(courseSchedule -> {
+            courseSchedule.setTeacherId(0l);
+            courseSchedule.setCourseId(null);
+            courseSchedule.setStatus(FishCardStatusEnum.CREATED.getCode());
+            courseSchedule.setCourseName(null);
+            courseSchedule.setCourseType(null);
+            courseSchedule.setSmallClassId(null);
+            courseScheduleRepository.save(courseSchedule);
+        });
+        //通知释放teacher
+        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
+        teacherStudentRequester.notifyCancelSmallClassTeacher(smallClass);
+        //删除小班课
+        smallClassJpaRepository.delete(smallClassId);
     }
 }

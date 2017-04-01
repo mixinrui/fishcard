@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 /**
  * Created by hucl on 17/1/8.
  */
+@SuppressWarnings("ALL")
 @Component(ConstantUtil.PUBLIC_CLASS_INIT)
 public class PublicClassStrategy implements GroupInitStrategy {
     @Autowired
@@ -175,6 +176,7 @@ public class PublicClassStrategy implements GroupInitStrategy {
         workOrder.setSkuId(smallClass.getRoleId());
         workOrder.setService(service);
         workOrder.setStatus(FishCardStatusEnum.CREATED.getCode());
+        workOrder.setStudentId(0l);
         workOrder.setSeqNum(0);
         workOrder.setSlotId(smallClass.getSlotId());
         workOrder.setOrderId(service.getOrderId());
