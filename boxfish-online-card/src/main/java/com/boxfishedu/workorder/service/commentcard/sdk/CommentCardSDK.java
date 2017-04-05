@@ -173,7 +173,7 @@ public class CommentCardSDK {
     private URI info2TeacherAndStudentURI(){
         logger.info("Accessing info2TeacherAndStudentURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getInfo2TeacherAndStudentUrl())
-                .path("/teacher/f_teacher_review/setInvalid")
+                .path("/f_teacher_review/setInvalid")
                 .build()
                 .toUri();
     }

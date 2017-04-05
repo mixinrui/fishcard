@@ -5,6 +5,7 @@ import com.boxfishedu.workorder.common.exception.ValidationException;
 import com.boxfishedu.workorder.dao.jpa.CommentCardJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.CommentCard;
 import com.boxfishedu.workorder.entity.mysql.CommentCardForm;
+import com.boxfishedu.workorder.entity.mysql.FromTeacherStudentForm;
 import com.boxfishedu.workorder.entity.mysql.UpdatePicturesForm;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.commentcard.ForeignTeacherCommentCardService;
@@ -130,8 +131,10 @@ public class ForeignTeacherCommentController {
     }
 
     //all测试接口
-    @RequestMapping(value = "/ansel/test", method = RequestMethod.GET)
-    public Object anselTest(){
-        return commentCardJpaRepository.getUncommentedCard(1299462l);
+    @RequestMapping(value = "/ansel/test", method = RequestMethod.POST)
+    public Object anselTest(@RequestBody FromTeacherStudentForm fromTeacherStudentForm){
+
+        foreignTeacherCommentCardService.foreignTeacherCommentUpdateAnswer(fromTeacherStudentForm);
+        return JsonResultModel.newJsonResultModel();
     }
 }
