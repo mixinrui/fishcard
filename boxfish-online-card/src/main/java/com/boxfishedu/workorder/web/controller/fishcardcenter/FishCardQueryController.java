@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.boxfishedu.card.bean.CourseTypeEnum;
 import com.boxfishedu.mall.enums.OrderChannelDesc;
 import com.boxfishedu.workorder.common.bean.FishCardChargebackStatusEnum;
+import com.boxfishedu.workorder.common.bean.instanclass.ClassTypeEnum;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.servicex.dataanalysis.FetchHeartBeatServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
@@ -98,7 +99,14 @@ public class FishCardQueryController {
     public JsonResultModel listFishCardsByCond(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam, pageable);
     }
-
+    /**
+     * 用户id不做限制的查询  鱼卡管理(小班课)
+     */
+    @RequestMapping(value = "/listxbitem", method = RequestMethod.GET)
+    public JsonResultModel listFishCardsByCondXB(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        fishCardFilterParam.setClassType(ClassTypeEnum.getByName("SMALL").toString());
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCondWithLevel(fishCardFilterParam, pageable);
+    }
 
     /**
      * 用户id不做限制的查询 鱼卡管理(中教)

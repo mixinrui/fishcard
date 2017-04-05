@@ -22,6 +22,7 @@ public class FishCardFilterParam {
 
     private String teacherName;
     /** desc asc **/
+    private String smallclassIDSort;
     private String teacherNameSort;
     private String createBeginDate;
     private String createEndDate;
@@ -64,4 +65,5 @@ public class FishCardFilterParam {
 
     private Long smallClassId;//小班课id
 
+    private String isGroupUp;//是否已经组课  1 是  2  不是   3  全部
 }
