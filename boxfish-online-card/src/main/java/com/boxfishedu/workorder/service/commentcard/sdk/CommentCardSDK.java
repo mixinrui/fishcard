@@ -86,6 +86,14 @@ public class CommentCardSDK {
         return restTemplate.postForObject(createBoxfishPushURI(), requestBody, JsonResultModel.class);
     }
 
+    public Object info2TeacherAndStudent(Long cardId, Long teacherId){
+        logger.info("@info2TeacherAndStudent cardId:[{}], teacherId:[{}]",cardId,teacherId);
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("fishCardId", cardId);
+        requestBody.put("teacherId", teacherId);
+        return restTemplate.postForObject(info2TeacherAndStudentURI(),requestBody,Object.class);
+    }
+
     private URI createTeacherAbsenceURI(){
         logger.info("Accessing createTeacherAbsenceURI in CommentCardSDK......");
         return UriComponentsBuilder.fromUriString(commentCardUrlConf.getTeacherAbsenceUrl())
@@ -158,6 +166,14 @@ public class CommentCardSDK {
                 .queryParam("lesson_id","外教点评")
                 .queryParam("channel","online")
                 .queryParam("score",point)
+                .build()
+                .toUri();
+    }
+
+    private URI info2TeacherAndStudentURI(){
+        logger.info("Accessing info2TeacherAndStudentURI in CommentCardSDK......");
+        return UriComponentsBuilder.fromUriString(commentCardUrlConf.getInfo2TeacherAndStudentUrl())
+                .path("/teacher/f_teacher_review/setInvalid")
                 .build()
                 .toUri();
     }

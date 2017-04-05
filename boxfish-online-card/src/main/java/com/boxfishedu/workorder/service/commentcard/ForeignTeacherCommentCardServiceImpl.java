@@ -180,7 +180,8 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
 
     @Override
     public void foreignTeacherCommentUpdateAnswer(FromTeacherStudentForm fromTeacherStudentForm) {
-        CommentCard commentCard = commentCardJpaRepository.findOne(fromTeacherStudentForm.getFishCardId());
+//        CommentCard commentCard = commentCardJpaRepository.findOne(fromTeacherStudentForm.getFishCardId());
+        CommentCard commentCard = commentCardJpaRepository.findByIdAndStatus(fromTeacherStudentForm.getFishCardId(),CommentCardStatus.REQUEST_ASSIGN_TEACHER.getCode());
         String name;
         logger.info("@foreignTeacherCommentUpdateAnswer1 接收师生运营分配老师:"+fromTeacherStudentForm+",并准备修改点评卡:"+commentCard);
         if (Objects.isNull(commentCard)){
@@ -190,6 +191,7 @@ public class ForeignTeacherCommentCardServiceImpl implements ForeignTeacherComme
                     .errorLevel()
                     .operation("点评卡分配老师")
                     .toString());
+            commentCardSDK.info2TeacherAndStudent(fromTeacherStudentForm.getFishCardId(),fromTeacherStudentForm.getTeacherId());
             throw new UnauthorizedException("不存在的点评卡!");
         }else {
             if(Objects.isNull(fromTeacherStudentForm.getTeacherId())){
