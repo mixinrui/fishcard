@@ -16,6 +16,7 @@
         <module>boxfish-online-card-comment-manage</module>
         <module>boxfish-online-card-fixes</module>
         <module>boxfish-online-card-eureka</module>
+        <module>boxfish-online-card-health</module>
     </modules>
 
 

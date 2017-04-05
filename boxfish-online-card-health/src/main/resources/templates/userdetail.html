@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="js/angular.js"></script>
+<script src="js/angular-route.js"></script>
+用户信息
+</head>
+<body>
+
+<div ng-app="myApp" ng-controller="personCtrl">
+
+名字：<input type="text" ng-model="user.name"><br>
+性别：<input type="text" ng-model="user.sex"><br>
+年龄：<input type="text" ng-model="user.age"><br>
+用户： {{user}}
+
+</div>
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('personCtrl',function($scope,$http) {
+	$http.get("/userdetail/").success(function($scope,usr){
+		$scope.user=usr;
+	});
+
+});
+</script>
+
+</body>
+</html>

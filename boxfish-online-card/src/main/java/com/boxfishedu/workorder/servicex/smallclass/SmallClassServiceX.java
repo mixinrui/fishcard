@@ -1,6 +1,7 @@
 package com.boxfishedu.workorder.servicex.smallclass;
 
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
+import com.boxfishedu.workorder.common.exception.BusinessException;
 import com.boxfishedu.workorder.common.util.RedisKeyGenerator;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.dao.mongo.ConfigBeanMorphiaRepository;
@@ -89,6 +90,20 @@ public class SmallClassServiceX {
             map.put("statusDesc", "success");
             map.put("classInfo", smallClass);
         }
+        return map;
+    }
+
+    public Map<String, Object> getTeacherWithoutValidateMap(Long smallClassId) {
+        Map<String, Object> map = Maps.newLinkedHashMap();
+
+        SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
+        if(Objects.isNull(smallClass)){
+            throw new BusinessException("不存在对应的鱼卡");
+        }
+
+        map.put("status", 30);
+        map.put("statusDesc", "success");
+        map.put("classInfo", smallClass);
         return map;
     }
 
