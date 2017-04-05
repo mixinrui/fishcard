@@ -46,6 +46,10 @@ public abstract class GroupBuilder {
     public void group(Integer days) {
         List<WorkOrder> cards = this.cardsToGroup(days);
 
+        groupWithCards(cards);
+    }
+
+    private void groupWithCards(List<WorkOrder> cards) {
         if (CollectionUtils.isEmpty(cards)) {
             return;
         }
@@ -74,36 +78,11 @@ public abstract class GroupBuilder {
         });
         this.updateHomePage(cards);
     }
+
     public void groupToTomorrowMidnight() {
         List<WorkOrder> cards = this.cardsToGroupNowToTomorrow();
 
-        if (CollectionUtils.isEmpty(cards)) {
-            return;
-        }
-
-        Map<String, List<WorkOrder>> timeGrouped = this.groupByTime(cards);
-
-        timeGrouped.forEach((timeKey, timedWorkOrders) -> {
-            Map<String, List<WorkOrder>> levelGrouped = this.groupbyLevel(timedWorkOrders);
-
-            levelGrouped.forEach((key, workOrders) -> {
-                if (!CollectionUtils.isEmpty(workOrders)) {
-                    Map<Integer, List<WorkOrder>> finalGroups = this.divideGroup(workOrders);
-                    this.initGroup(finalGroups);
-                }
-            });
-
-//            levelGrouped.forEach((levelKey, leveledWorkOrders) -> {
-//                Map<String, List<WorkOrder>> studyCounterGrouped = this.groupByStudyCounter(leveledWorkOrders);
-//
-//                Integer groupSeq = 0;
-            //TODO:等待确定规则
-//                studyCounterGrouped.forEach((studyCounterKey, studyCounterWorkOrders) -> {
-//                    Map<String, List<WorkOrder>> relationGrouped = this.groupByRelation(studyCounterWorkOrders);
-////                    groups.putAll(relationGrouped);
-//                });
-        });
-        this.updateHomePage(cards);
+        groupWithCards(cards);
     }
     //将小班按照信息获取
     protected Map<Integer, List<WorkOrder>> divideGroup(List<WorkOrder> workOrders) {
