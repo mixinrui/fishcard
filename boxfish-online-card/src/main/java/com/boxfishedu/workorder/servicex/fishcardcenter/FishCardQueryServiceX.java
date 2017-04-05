@@ -78,7 +78,6 @@ public class FishCardQueryServiceX {
         Page<WorkOrder> page = getWorkOrders(fishCardFilterParam, pageable, workOrderList);
         return JsonResultModel.newJsonResultModel(page);
     }
-    
     public JsonResultModel listFishCardsByUnlimitedUserCondWithLevel(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         workOrderService.processDateParam(fishCardFilterParam);
         List<WorkOrder> workOrderList = fishCardQueryService.filterFishCards(fishCardFilterParam, pageable);
