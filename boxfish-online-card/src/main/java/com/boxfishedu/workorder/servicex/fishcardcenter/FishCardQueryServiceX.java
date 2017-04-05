@@ -13,6 +13,7 @@ import com.boxfishedu.workorder.entity.mysql.Service;
 import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import com.boxfishedu.workorder.entity.mysql.WorkOrderInspect;
 import com.boxfishedu.workorder.requester.DataAnalysisRequester;
+import com.boxfishedu.workorder.requester.SmallClassRequester;
 import com.boxfishedu.workorder.requester.TeacherStudentRequester;
 import com.boxfishedu.workorder.service.ServeService;
 import com.boxfishedu.workorder.service.WorkOrderService;
@@ -61,6 +62,8 @@ public class FishCardQueryServiceX {
     @Autowired
     private WorkOrderInspectJpaRepository workOrderInspectJpaRepository;
 
+    @Autowired
+    private SmallClassRequester smallClassRequester;
     @Value("${parameter.network_bad}")
     private Long NETWORK_BAD;
 
@@ -72,7 +75,21 @@ public class FishCardQueryServiceX {
     public JsonResultModel listFishCardsByUnlimitedUserCond(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         workOrderService.processDateParam(fishCardFilterParam);
         List<WorkOrder> workOrderList = fishCardQueryService.filterFishCards(fishCardFilterParam, pageable);
-
+        Page<WorkOrder> page = getWorkOrders(fishCardFilterParam, pageable, workOrderList);
+        return JsonResultModel.newJsonResultModel(page);
+    }
+    
+    public JsonResultModel listFishCardsByUnlimitedUserCondWithLevel(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
+        workOrderService.processDateParam(fishCardFilterParam);
+        List<WorkOrder> workOrderList = fishCardQueryService.filterFishCards(fishCardFilterParam, pageable);
+        workOrderList.stream().forEach(workOrder -> workOrder.setStudentLevel(
+                smallClassRequester.fetchUserDifficultyInfo(workOrder.getStudentId())
+                )
+        );
+        Page<WorkOrder> page = getWorkOrders(fishCardFilterParam, pageable, workOrderList);
+        return JsonResultModel.newJsonResultModel(page);
+    }
+    private Page<WorkOrder> getWorkOrders(FishCardFilterParam fishCardFilterParam, Pageable pageable, List<WorkOrder> workOrderList) {
         //体验课学生id显示红色  inspectFlag
         this.addInspect(workOrderList);
 
@@ -89,8 +106,7 @@ public class FishCardQueryServiceX {
                 logger.info("listFishCardsByUnlimitedUserCond");
             }
         }
-
-        return JsonResultModel.newJsonResultModel(page);
+        return page;
     }
 
 

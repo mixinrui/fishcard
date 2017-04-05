@@ -276,6 +276,10 @@ public class WorkOrder implements Cloneable {
     @Transient
     private String studentNetStatusDesc;
 
+    @Transient
+    private String studentLevel;
+
+
     @Override
     public String toString() {
         return "WorkOrder{" +

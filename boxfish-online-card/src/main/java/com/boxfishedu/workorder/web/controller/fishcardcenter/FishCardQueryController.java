@@ -105,7 +105,7 @@ public class FishCardQueryController {
     @RequestMapping(value = "/listxbitem", method = RequestMethod.GET)
     public JsonResultModel listFishCardsByCondXB(FishCardFilterParam fishCardFilterParam, Pageable pageable) {
         fishCardFilterParam.setClassType(ClassTypeEnum.getByName("SMALL").toString());
-        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCond(fishCardFilterParam, pageable);
+        return fishCardQueryServiceX.listFishCardsByUnlimitedUserCondWithLevel(fishCardFilterParam, pageable);
     }
 
     /**
