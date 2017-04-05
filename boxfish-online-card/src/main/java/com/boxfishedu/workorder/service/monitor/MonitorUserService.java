@@ -116,4 +116,26 @@ public class MonitorUserService {
         logger.info("@checkMonitorUser userId:[{}]",userId);
         return monitorUserJpaRepository.findByUserIdAndEnabled(userId,1);
     }
+
+    public JsonResultModel changeMonitor(Long userId, Long classId,String classType){
+        JsonResultModel jsonResultModel = new JsonResultModel();
+        MonitorUser monitorUser = monitorUserJpaRepository.findByUserIdAndEnabled(userId,1);
+        if (Objects.isNull(monitorUser)){
+            jsonResultModel.setData(null);
+            jsonResultModel.setReturnCode(403);
+            jsonResultModel.setReturnMsg("用户无效,id:" + userId);
+            return jsonResultModel;
+        }
+        MonitorUserCourse monitorUserCourse = monitorUserCourseJpaRepository.findByClassIdAndClassType(classId,classType);
+        if (Objects.isNull(monitorUserCourse)){
+            jsonResultModel.setData(null);
+            jsonResultModel.setReturnMsg("小班课还未分配,请在小班课上课当天更换,smallClassId:" + classId);
+            return jsonResultModel;
+        }
+        MonitorUserCourse monitorUserCourseNew = monitorUserCourseJpaRepository.changeMonitor(monitorUser.getId(),userId,classId,classType);
+        jsonResultModel.setData(monitorUserCourseNew);
+        jsonResultModel.setReturnCode(200);
+        jsonResultModel.setReturnMsg("更换成功!");
+        return jsonResultModel;
+    }
 }
