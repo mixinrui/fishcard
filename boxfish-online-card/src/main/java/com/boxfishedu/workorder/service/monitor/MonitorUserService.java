@@ -2,12 +2,12 @@ package com.boxfishedu.workorder.service.monitor;
 
 import com.boxfishedu.workorder.dao.jpa.*;
 import com.boxfishedu.workorder.entity.mysql.*;
+import com.boxfishedu.workorder.servicex.monitor.MonitorUserServiceX;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +31,8 @@ public class MonitorUserService {
     @Autowired
     MonitorUserCourseJpaRepository monitorUserCourseJpaRepository;
 
+    @Autowired
+    MonitorUserServiceX monitorUserServiceX;
 
     public List<MonitorUser> getAllSuperUser(){
         logger.info("@getAllSuperUser checking for login ...");
@@ -130,13 +132,19 @@ public class MonitorUserService {
             jsonResultModel.setReturnMsg("小班课还未分配,请在小班课上课当天更换,smallClassId:" + classId);
             return jsonResultModel;
         }
-        MonitorUserCourse monitorUserCourseNew = monitorUserCourseJpaRepository.changeMonitor(monitorUser.getId(),userId,classId,classType);
-        jsonResultModel.setData(monitorUserCourseNew);
-        jsonResultModel.setReturnCode(200);
-        jsonResultModel.setReturnMsg("更换成功!");
-        return jsonResultModel;
+        boolean status = monitorUserServiceX.deleteMoniorCourse(userId,classId);
+        if (status){
+            MonitorUserCourse monitorUserCourseNew = monitorUserCourseJpaRepository.changeMonitor(monitorUser.getId(),userId,classId,classType);
+            jsonResultModel.setData(monitorUserCourseNew);
+            jsonResultModel.setReturnCode(200);
+            jsonResultModel.setReturnMsg("更换成功!");
+            return jsonResultModel;
+        }else {
+            jsonResultModel.setData(null);
+            jsonResultModel.setReturnCode(403);
+            jsonResultModel.setReturnMsg("参数有误,请核对后操作,id:" + userId+",smallClassId:" + classId);
+            return jsonResultModel;
+        }
     }
-
-
 
 }
