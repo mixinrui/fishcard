@@ -39,7 +39,7 @@ public class MonitorUserServiceX {
             logger.info("@deleteMoniorCourse_params_not_available");
             return false;
         }
-        WorkOrder workOrder = workOrderJpaRepository.findBySmallClassIdAndStudentId(studentId,smallClassId);
+        WorkOrder workOrder = workOrderJpaRepository.findBySmallClassIdAndStudentId(smallClassId,studentId);
         if(Objects.isNull(workOrder)){
             logger.info("@deleteMoniorCourse_params_no_class");
             //还没有产生鱼卡 可以进行更换操作
