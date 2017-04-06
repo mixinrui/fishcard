@@ -117,6 +117,7 @@ public class MonitorUserService {
         return monitorUserJpaRepository.findByUserIdAndEnabled(userId,1);
     }
 
+    @Transactional
     public JsonResultModel changeMonitor(Long userId, Long classId,String classType){
         JsonResultModel jsonResultModel = new JsonResultModel();
         MonitorUser monitorUser = monitorUserJpaRepository.findByUserIdAndEnabled(userId,1);
@@ -126,7 +127,7 @@ public class MonitorUserService {
             jsonResultModel.setReturnMsg("用户无效,id:" + userId);
             return jsonResultModel;
         }
-        MonitorUserCourse monitorUserCourse = monitorUserCourseJpaRepository.findByClassIdAndClassType(classId,classType);
+        List<MonitorUserCourse> monitorUserCourse = monitorUserCourseJpaRepository.findByClassIdAndClassType(classId,classType);
         if (Objects.isNull(monitorUserCourse)){
             jsonResultModel.setData(null);
             jsonResultModel.setReturnMsg("小班课还未分配,请在小班课上课当天更换,smallClassId:" + classId);
@@ -134,8 +135,8 @@ public class MonitorUserService {
         }
         boolean status = monitorUserServiceX.deleteMoniorCourse(userId,classId);
         if (status){
-            MonitorUserCourse monitorUserCourseNew = monitorUserCourseJpaRepository.changeMonitor(monitorUser.getId(),userId,classId,classType);
-            jsonResultModel.setData(monitorUserCourseNew);
+            monitorUserCourseJpaRepository.changeMonitor(monitorUser.getId(),userId,classId,classType);
+            jsonResultModel.setData(null);
             jsonResultModel.setReturnCode(200);
             jsonResultModel.setReturnMsg("更换成功!");
             return jsonResultModel;

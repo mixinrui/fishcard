@@ -95,9 +95,9 @@ public class ClassMonitorController {
     }
 
     @RequestMapping(value = "/change/super/user", method = RequestMethod.POST)
-    public Object changeMonitor(@RequestParam  Long userId,
-                                @RequestParam  Long classId,
-                                @RequestParam  String classType){
+    public Object changeMonitor(@RequestParam(value = "userId")  Long userId,
+                                @RequestParam(value = "classId")  Long classId,
+                                @RequestParam(value = "classType")  String classType){
         return monitorUserService.changeMonitor(userId,classId,classType);
     }
 }

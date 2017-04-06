@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.entity.mysql.WorkOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
@@ -14,6 +15,7 @@ import java.util.Objects;
 /**
  * Created by jiaozijun on 17/4/6.
  */
+@Service
 public class MonitorUserServiceX {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
