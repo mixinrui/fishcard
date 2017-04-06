@@ -17,4 +17,5 @@ public class CommentCardUrlConf {
     private String innerTeacherUrl;
     private String scoreUrl;
     private String errorReportMailUrl;
+    private String info2TeacherAndStudentUrl;
 }
