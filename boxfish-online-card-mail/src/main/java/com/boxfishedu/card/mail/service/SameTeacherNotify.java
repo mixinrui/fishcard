@@ -39,7 +39,7 @@ public class SameTeacherNotify {
     @Autowired
     private SameTeacherJavaMailConfig javaMailConfig;
 
-    @Scheduled(cron = "0 0 11 * * *")
+    @Scheduled(cron = "0 30 4 * * *")
     public void notifySameTeacher() throws MessagingException {
         List<Map<String, Object>> workOrders = getSameTeacherList();
         logger.info("notifySameTeacher workOrder, find out size=[{}]", workOrders == null ? 0 : workOrders.size());
