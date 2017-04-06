@@ -40,6 +40,11 @@ mail:
     sender: online@send.boxfish.cn
     subject: 48小时以内未成功推荐课程的鱼卡id列表
 
+  sameTeacher1Month:
+    recipients: jiaozijun@boxfish.cn, huchunlin@boxfish.cn, suhaijiang@boxfish.cn, liuyanman@boxfish.cn
+    sender: online@send.boxfish.cn
+    subject: 未来一个月同一个老师同一个时间片有两节课
+
   sender: online@send.boxfish.cn
   token: Tpn7MvMDAxLuS4reWbveS6uuacgOWuueaYk
 
