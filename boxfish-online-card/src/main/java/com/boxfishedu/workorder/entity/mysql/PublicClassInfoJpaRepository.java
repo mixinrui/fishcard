@@ -22,6 +22,9 @@ public interface PublicClassInfoJpaRepository extends JpaRepository<PublicClassI
     @Query(value = "select count(p) from PublicClassInfo p where p.classDate=?1 and p.studentId=?2")
     Integer findByClassDateAndStudentId(LocalDate classDate, Long studentId);
 
+    @Query(value = "select count(p) from PublicClassInfo p where p.studentId=?1")
+    Integer usedPublicCount(Long studentId);
+
     @Modifying
     @Query("update PublicClassInfo c set c.status =?1 where c.smallClassId = ?2 and c.studentId=?3")
     void updateStatus(Integer status, Long smallClassId, Long studentId);
