@@ -75,10 +75,7 @@ public class BaseTimeSlotSmallClassService {
         t1.setSlotId(slotId);
         t1.initTime();
 
-        List slots =Lists.newArrayList(27,28);
-        List weeks =Lists.newArrayList(3,5,6,7);
 
-        // 目前 初始化 小班课 20:00点 和 20:30 两个时间片为100
         List slots =Lists.newArrayList(27,28);
         List weeks =Lists.newArrayList(3,5,6,7);
 
