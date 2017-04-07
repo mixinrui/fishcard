@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/memberInfo/student")
+@RequestMapping("/classConsumeInfo/student")
 public class MemberController {
 
     @Autowired
