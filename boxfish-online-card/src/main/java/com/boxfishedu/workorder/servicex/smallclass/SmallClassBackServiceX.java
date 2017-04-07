@@ -83,6 +83,8 @@ public class SmallClassBackServiceX {
     private
     @Qualifier(ConstantUtil.SMALL_CLASS_INIT)
     GroupInitStrategy smallClassInitStrategy;
+
+    @Autowired
     private ScheduleCourseInfoMorphiaRepository scheduleCourseInfoMorphiaRepository;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
