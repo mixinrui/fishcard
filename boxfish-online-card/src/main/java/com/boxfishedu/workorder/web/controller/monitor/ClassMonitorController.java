@@ -93,4 +93,11 @@ public class ClassMonitorController {
             return JsonResultModel.newJsonResultModel();
         }
     }
+
+    @RequestMapping(value = "/change/super/user", method = RequestMethod.POST)
+    public Object changeMonitor(@RequestParam(value = "userId")  Long userId,
+                                @RequestParam(value = "classId")  Long classId,
+                                @RequestParam(value = "classType")  String classType){
+        return monitorUserService.changeMonitor(userId,classId,classType);
+    }
 }

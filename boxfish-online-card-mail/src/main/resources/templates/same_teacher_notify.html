@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>鱼卡列表</title>
+</head>
+<body>
+<table class="table table-striped">
+    <caption>未来一个月内相同老师在同一个时间点有两节课</caption>
+    <thead>
+    <tr>
+        <th style="width: 100px;">序号</th>
+        <th style="width: 100px;">鱼卡ID1</th>
+        <th style="width: 100px;">鱼卡ID2</th>
+        <th style="width: 100px;">老师ID</th>
+        <th style="width: 200px;">上课时间</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="card,iterCard: ${workOrders}">
+        <td th:text="${iterCard.index + 1}"></td>
+        <td th:text="${card.id1}"></td>
+        <td th:text="${card.id2}"></td>
+        <td th:text="${card.teacher_id}"></td>
+        <td th:text="${card.start_time}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -151,7 +151,7 @@ spring:
   profiles: local
 time:
   task:
-    nodeOne: 0
+    nodeOne: 2
     nodeTwo: 10
     nodeThree: 20
     nodeFour: 60000
@@ -223,6 +223,8 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://123.56.13.168:8099/teacher
+    info2TeacherAndStudentUrl: http://123.56.13.168:8099/teacher
+
     #错误异常提醒邮件发送地址
 #    errorReportMailUrl: http://120.27.236.110:9098/mail
 
@@ -230,7 +232,7 @@ service:
     type: test
 time:
   task:
-    nodeOne: 0
+    nodeOne: 2
     nodeTwo: 10
     nodeThree: 20
     nodeFour: 60000
@@ -294,12 +296,13 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://101.201.237.252:8099/teacher
+    info2TeacherAndStudentUrl: http://101.201.237.252:8099/teacher
     #错误异常提醒邮件发送地址
 #    errorReportMailUrl: http://120.27.236.110:9098/mail
 
 time:
   task:
-    nodeOne: 0
+    nodeOne: 2
     nodeTwo: 10
     nodeThree: 20
     nodeFour: 60000
@@ -366,6 +369,7 @@ service:
     getPictureUrl: http://114.55.58.184:8099
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://101.201.237.252:8099/teacher
+    info2TeacherAndStudentUrl: http://101.201.237.252:8099/teacher
     #错误异常提醒邮件发送地址
 #    errorReportMailUrl: http://120.27.236.110:9098/mail
 
@@ -373,7 +377,7 @@ service:
       type: development_new
 time:
   task:
-    nodeOne: 0
+    nodeOne: 2
     nodeTwo: 10
     nodeThree: 20
     nodeFour: 60000
@@ -455,13 +459,14 @@ service:
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://123.56.13.168:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
+    info2TeacherAndStudentUrl: http://123.56.13.168:8099/teacher
     #错误异常提醒邮件发送地址
 #    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
     type: test
 time:
   task:
-    nodeOne: 0
+    nodeOne: 2
     nodeTwo: 10
     nodeThree: 20
     nodeFour: 60000
@@ -544,11 +549,12 @@ service:
     scoreUrl: http://api.online.test.boxfish.cn
     #错误异常提醒邮件发送地址
     errorReportMailUrl: http://120.27.236.110:9098/mail
+    info2TeacherAndStudentUrl: http://127.0.0.1:8099/teacher
   gateway:
       type: pretest
 time:
   task:
-    nodeOne: 0
+    nodeOne: 2
     nodeTwo: 10
     nodeThree: 20
     nodeFour: 60000
@@ -618,13 +624,14 @@ service:
     pushInfoIrl: http://123.56.13.168:9091
     innerTeacherUrl: http://127.0.0.1:8099/teacher
     scoreUrl: http://api.online.test.boxfish.cn
+    info2TeacherAndStudentUrl: http://127.0.0.1:8099/teacher
     #错误异常提醒邮件发送地址
 #    errorReportMailUrl: http://120.27.236.110:9098/mail
   gateway:
       type: demo
 time:
   task:
-    nodeOne: 0
+    nodeOne: 2
     nodeTwo: 10
     nodeThree: 20
     nodeFour: 60000
@@ -694,11 +701,12 @@ service:
     scoreUrl: http://api.online.test.boxfish.cn
     #错误异常提醒邮件发送地址
     errorReportMailUrl: http://120.27.236.110:9098/mail
+    info2TeacherAndStudentUrl: http://127.0.0.1:8099/teacher
   gateway:
       type: preproduct
 time:
   task:
-    nodeOne: 0
+    nodeOne: 20
     nodeTwo: 1440
     nodeThree: 2880
     nodeFour: 43200
@@ -783,7 +791,7 @@ interface:
     destroy_group_service: http://online-api.boxfish.cn/teaching-service
 time:
   task:
-    nodeOne: 0
+    nodeOne: 20
     nodeTwo: 1440
     nodeThree: 2880
     nodeFour: 43200
@@ -797,6 +805,7 @@ service:
     scoreUrl: api.boxfish.cn
     #错误异常提醒邮件发送地址
     errorReportMailUrl: http://120.27.236.110:9098/mail
+    info2TeacherAndStudentUrl: http://online-api.boxfish.cn/teacher
   gateway:
     type: product
 
@@ -878,11 +887,12 @@ service:
     scoreUrl: api.boxfish.cn
     #错误异常提醒邮件发送地址
     errorReportMailUrl: http://120.27.236.110:9098/mail
+    info2TeacherAndStudentUrl: http://online-api.boxfish.cn/teacher
   gateway:
     type: product
 time:
   task:
-    nodeOne: 0
+    nodeOne: 20
     nodeTwo: 1440
     nodeThree: 2880
     nodeFour: 43200

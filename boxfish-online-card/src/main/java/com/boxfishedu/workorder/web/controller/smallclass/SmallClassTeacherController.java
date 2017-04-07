@@ -43,6 +43,14 @@ public class SmallClassTeacherController {
         return JsonResultModel.newJsonResultModel(map);
     }
 
+    @RequestMapping(value = "/{smallclass_id}/withoutValidate", method = RequestMethod.GET)
+    public JsonResultModel withoutValidate(@PathVariable("smallclass_id") Long smallClassId) {
+
+        Map<String, Object> map = smallClassServiceX.getTeacherWithoutValidateMap(smallClassId);
+
+        return JsonResultModel.newJsonResultModel(map);
+    }
+
     @RequestMapping(value = "/{smallclass_id}/detail", method = RequestMethod.GET)
     public JsonResultModel classDetail(@PathVariable("smallclass_id") Long smallClassId) {
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
