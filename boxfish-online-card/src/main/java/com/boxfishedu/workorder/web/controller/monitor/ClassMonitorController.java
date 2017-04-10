@@ -100,4 +100,12 @@ public class ClassMonitorController {
                                 @RequestParam(value = "classType")  String classType){
         return monitorUserService.changeMonitor(userId,classId,classType);
     }
+
+    @RequestMapping(value = "/change/monitor/flag", method = RequestMethod.POST)
+    public Object changeMonitorFlag(@RequestParam(value = "userId") Long userId,
+                                  @RequestParam(value = "classId")  Long classId,
+                                  @RequestParam(value = "classType")  String classType){
+        monitorUserService.changeMonitorFlag(userId,classId,classType);
+        return JsonResultModel.newJsonResultModel();
+    }
 }

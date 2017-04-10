@@ -39,4 +39,6 @@ public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Lon
 
     MonitorUser findTop1ByUserTypeAndEnabledOrderByAvgSum(String userType, Integer enabled);
 
+
+
 }
