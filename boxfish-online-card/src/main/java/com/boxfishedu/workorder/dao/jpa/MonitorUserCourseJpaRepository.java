@@ -29,4 +29,7 @@ public interface MonitorUserCourseJpaRepository extends JpaRepository<MonitorUse
     @Modifying
     @Query("update MonitorUserCourse muc set muc.monitorFlag = 1 where muc.userId = ?1 and muc.classId = ?2 and muc.classType = ?3")
     void changeMonitorFlag(Long userId, Long classId, String classType);
+
+    @Query("select muc from MonitorUserCourse muc where muc.classId = ?1 and muc.classType = ?2")
+    MonitorUserCourse getByClassIdAndClassType(Long classId,String classType);
 }
