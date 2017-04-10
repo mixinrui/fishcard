@@ -109,6 +109,11 @@ public class SmallClassBackController {
         return publicClassInfoQueryServiceX.listFishCardsByUnlimitedUserCond(publicFilterParam, pageable);
     }
 
+    /**
+     * 删除公开课
+     * @param smallClassId
+     * @return
+     */
     @RequestMapping(value = "/smallclass/{smallclass_id}", method = RequestMethod.DELETE)
     public JsonResultModel delete(@PathVariable("smallclass_id") Long smallClassId) {
         smallClassBackServiceX.delete(smallClassId);
