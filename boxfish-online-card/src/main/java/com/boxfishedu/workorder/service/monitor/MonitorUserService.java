@@ -148,4 +148,10 @@ public class MonitorUserService {
         }
     }
 
+    @Transactional
+    public void changeMonitorFlag(Long userId, Long classId, String classType){
+        logger.info("@changeMonitorFlag userId=[{}], classId=[{}], classType=[{}]",userId,classId,classType);
+        monitorUserCourseJpaRepository.changeMonitorFlag(userId,classId,classType);
+    }
+
 }
