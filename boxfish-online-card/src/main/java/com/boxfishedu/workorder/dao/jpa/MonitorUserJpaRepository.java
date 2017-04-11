@@ -39,7 +39,7 @@ public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Lon
 
     MonitorUser findTop1ByUserTypeAndEnabledOrderByAvgSum(String userType, Integer enabled);
 
-    @Query("select mu from MonitorUser mu where mu.enabled = 1 and mu.userType = 'student' and userId <> ?1")
+    @Query("select mu from MonitorUser mu where mu.enabled = 1 and (mu.userType = 'student' or mu.userType = 'content') and mu.userId <> ?1")
     Page<MonitorUser> monitorBackendGetUserList(Long userId,Pageable pageable);
 
 }
