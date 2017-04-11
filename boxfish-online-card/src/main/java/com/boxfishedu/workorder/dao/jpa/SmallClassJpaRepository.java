@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.dao.jpa;
 
+import com.boxfishedu.workorder.entity.mysql.MonitorTeacherIdASCForm;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,5 +50,8 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
     @Modifying
     @Query("update SmallClass o set o.teacherId= ?1 ,o.teacherName= ?2 ,o.groupId  = ?3,o.chatRoomId = ?4   where o.id =  ?5 ")
     int setFixedTeacherIdAndTeacherNameAndGroupIdAndChatRoomIdFor(Long teacherId ,String teacherName,String groupId,Long chatRoomId, Long id);
+
+//    @Query()
+//    List<MonitorTeacherIdASCForm> getMonitorTeacherIdASC();
 
 }

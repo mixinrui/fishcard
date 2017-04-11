@@ -46,6 +46,7 @@ public class ClassMonitorBackendController {
             requestMap.put("userId",monitorUserCourse.getUserId());
             requestMap.put("userName",monitorUser.getUserName());
             requestMap.put("userType",monitorUser.getUserType());
+            requestMap.put("enabled",monitorUser.getEnabled());
             jsonResultModel.setData(requestMap);
             return jsonResultModel;
         }
