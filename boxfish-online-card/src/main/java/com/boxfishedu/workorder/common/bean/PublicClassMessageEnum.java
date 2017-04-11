@@ -17,7 +17,7 @@ public enum PublicClassMessageEnum {
         }
     },
 
-    // 非会员
+    // 老板表示非会员,新版表示不是公开课用户
     NON_MEMBER {
         @Override
         public String getTitle() {

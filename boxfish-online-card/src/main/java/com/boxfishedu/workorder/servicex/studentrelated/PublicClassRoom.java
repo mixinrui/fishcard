@@ -233,7 +233,7 @@ public class PublicClassRoom {
             }
         }
 
-        //为旧的版本
+        //为旧的版本,钟伟部分返回的结果以type表示会员
         else {
             if (memberInfo.get("type") == null) {
                 memberType = "NONE";
