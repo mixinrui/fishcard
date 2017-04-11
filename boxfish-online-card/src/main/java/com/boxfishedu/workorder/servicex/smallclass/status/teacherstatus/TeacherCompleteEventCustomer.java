@@ -3,11 +3,13 @@ package com.boxfishedu.workorder.servicex.smallclass.status.teacherstatus;
 import com.boxfishedu.workorder.common.bean.FishCardStatusEnum;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoConstantStatus;
 import com.boxfishedu.workorder.common.bean.PublicClassInfoStatusEnum;
+import com.boxfishedu.workorder.common.util.JacksonUtil;
 import com.boxfishedu.workorder.dao.jpa.SmallClassJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassService;
+import com.boxfishedu.workorder.servicex.callbacklog.CallBackLogServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,9 @@ public class TeacherCompleteEventCustomer extends SmallClassEventCustomer {
     @Autowired
     SmallClassService smallClassService;
 
+    @Autowired
+    CallBackLogServiceX callBackLogServiceX;
+
     @PostConstruct
     public void initEvent() {
         this.setSmallClassCardStatus(PublicClassInfoStatusEnum.TEACHER_COMPLETED);
@@ -60,6 +65,8 @@ public class TeacherCompleteEventCustomer extends SmallClassEventCustomer {
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
         smallClassService.persistIntoDb(smallClass,PublicClassInfoStatusEnum.TEACHER_COMPLETED);
+
+        callBackLogServiceX.resetPageIndex(smallClass.getId());
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:
