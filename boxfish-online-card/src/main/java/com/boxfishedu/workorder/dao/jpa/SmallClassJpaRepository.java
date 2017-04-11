@@ -50,8 +50,5 @@ public interface SmallClassJpaRepository extends JpaRepository<SmallClass, Long>
     @Modifying
     @Query("update SmallClass o set o.teacherId= ?1 ,o.teacherName= ?2 ,o.groupId  = ?3,o.chatRoomId = ?4   where o.id =  ?5 ")
     int setFixedTeacherIdAndTeacherNameAndGroupIdAndChatRoomIdFor(Long teacherId ,String teacherName,String groupId,Long chatRoomId, Long id);
-
-//    @Query()
-//    List<MonitorTeacherIdASCForm> getMonitorTeacherIdASC();
-
+    
 }
