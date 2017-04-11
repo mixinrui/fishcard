@@ -293,6 +293,10 @@ public class PublicClassRoom {
         redisTemplate.expire(CLASS_ROOM_MEMBER_DAY_KEY + DateUtil.dateFormatter.format(localDate), 1, TimeUnit.SECONDS);
     }
 
+    public void allowStudentsMultiPublic(Long studentId,Long smallClassId) {
+        setOperations.add(CLASS_ROOM_MEMBER_KEY + smallClassId, studentId);
+    }
+
 
     // ********************************* 暂时不用的方法 *********************************** //
 
