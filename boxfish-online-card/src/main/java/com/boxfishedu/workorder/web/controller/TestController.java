@@ -22,6 +22,7 @@ import com.boxfishedu.workorder.service.instantclass.InstantClassService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassService;
 import com.boxfishedu.workorder.servicex.assignTeacher.AssignTeacherServiceX;
 import com.boxfishedu.workorder.servicex.instantclass.classdatagenerator.ScheduleEntranceDataGenerator;
+import com.boxfishedu.workorder.servicex.studentrelated.PublicClassRoom;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +88,9 @@ public class TestController {
 
     @Autowired
     private BaseTimeSlotSmallClassService baseTimeSlotSmallClassService;
+
+    @Autowired
+    private PublicClassRoom publicClassRoom;
 
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
@@ -288,6 +292,12 @@ public class TestController {
 
         smallClassJpaRepository.save(smallClass);
         smallClass.setClassNum(2l);
+    }
+
+    @RequestMapping(value = "/multiPublics", method = RequestMethod.POST)
+    public JsonResultModel allowStudentAttendMultiPublics(Long studentId,Long smallClassId){
+        publicClassRoom.allowStudentsMultiPublic(studentId,smallClassId);
+        return JsonResultModel.EMPTY;
     }
 
 }
