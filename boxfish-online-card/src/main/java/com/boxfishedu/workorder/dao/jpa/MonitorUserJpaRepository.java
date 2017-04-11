@@ -23,8 +23,8 @@ public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Lon
     MonitorUser findByUserIdAndEnabled(Long userId,Integer enabled);
 
     @Modifying
-    @Query("update MonitorUser mu set mu.enabled = 1,mu.updateTime = ?1 where mu.userId = ?2")
-    void enabledMonitorUser(Date updateTime,Long userId);
+    @Query("update MonitorUser mu set mu.enabled = 1,mu.updateTime = ?1,mu.avgSum = ?3 where mu.userId = ?2")
+    void enabledMonitorUser(Date updateTime,Long userId,Integer minAvg);
 
     @Modifying
     @Query("update MonitorUser mu set mu.enabled = 0,mu.updateTime = ?1 where mu.userId = ?2")

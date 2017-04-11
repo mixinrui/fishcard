@@ -71,7 +71,8 @@ public class MonitorUserService {
     @Transactional
     public void enabledMonitorUser(Long userId) {
         logger.info("@enabledMonitorUser userId:[{}]", userId);
-        monitorUserJpaRepository.enabledMonitorUser(new Date(), userId);
+        int minAvg = monitorUserJpaRepository.getMinAvgSum();
+        monitorUserJpaRepository.enabledMonitorUser(new Date(), userId,minAvg);
     }
 
     @Transactional
