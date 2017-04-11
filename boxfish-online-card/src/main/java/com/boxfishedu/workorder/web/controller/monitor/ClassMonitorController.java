@@ -47,4 +47,16 @@ public class ClassMonitorController {
         monitorUserService.changeMonitorFlag(userId,classId,classType);
         return JsonResultModel.newJsonResultModel();
     }
+
+    @RequestMapping(value = "/get/teacher/app/release", method = RequestMethod.GET)
+    public Object getTeacherApp(@RequestParam(value = "userId") Long userId,
+                                @RequestParam(value = "userId2")  Long classId){
+
+        List list = new ArrayList();
+        list.add(userId);
+        list.add(classId);
+        JsonResultModel jsonResultModel = new JsonResultModel();
+        jsonResultModel.setData(monitorUserService.getTeacherAppRelease(list));
+        return jsonResultModel;
+    }
 }

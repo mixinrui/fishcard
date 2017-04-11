@@ -1,5 +1,6 @@
 package com.boxfishedu.workorder.web.controller.monitor;
 
+import com.boxfishedu.workorder.dao.jpa.MonitorUserJpaRepository;
 import com.boxfishedu.workorder.entity.mysql.MonitorUser;
 import com.boxfishedu.workorder.entity.mysql.MonitorUserCourse;
 import com.boxfishedu.workorder.entity.mysql.MonitorUserRequestForm;
@@ -7,16 +8,17 @@ import com.boxfishedu.workorder.service.monitor.MonitorUserBackendService;
 import com.boxfishedu.workorder.service.monitor.MonitorUserService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * Created by ansel on 2017/4/10.
  */
+@CrossOrigin
 @RestController
 @RequestMapping(value = "/backend/monitor")
 public class ClassMonitorBackendController {
@@ -27,6 +29,9 @@ public class ClassMonitorBackendController {
     @Autowired
     MonitorUserService monitorUserService;
 
+    @Autowired
+    MonitorUserJpaRepository monitorUserJpaRepository;
+
     @RequestMapping(value = "/get/monitor_course", method = RequestMethod.GET)
     public Object getMonitorCourse(@RequestParam(value = "classId") Long classId, @RequestParam(value = "classType") String classType){
         MonitorUserCourse monitorUserCourse = monitorUserBackendService.getMonitorCourse(classId,classType);
@@ -34,7 +39,14 @@ public class ClassMonitorBackendController {
         if (Objects.isNull(monitorUserCourse)){
             return jsonResultModel;
         }else {
-            jsonResultModel.setData(monitorUserCourse);
+            MonitorUser monitorUser = monitorUserJpaRepository.findByUserId(monitorUserCourse.getUserId());
+            Map requestMap = new HashMap();
+            requestMap.put("classId",monitorUserCourse.getClassId());
+            requestMap.put("classType",monitorUserCourse.getClassType());
+            requestMap.put("userId",monitorUserCourse.getUserId());
+            requestMap.put("userName",monitorUser.getUserName());
+            requestMap.put("userType",monitorUser.getUserType());
+            jsonResultModel.setData(requestMap);
             return jsonResultModel;
         }
     }
