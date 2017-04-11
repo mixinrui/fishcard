@@ -52,7 +52,7 @@ public class ClassMonitorBackendController {
         }
     }
 
-    @RequestMapping(value = "/get/monitor_list", method = RequestMethod.GET)
+    @RequestMapping(value = "/get/monitor_listitem", method = RequestMethod.GET)
     public Object getMonitorList(@RequestParam(value = "classId") Long classId,
                                  @RequestParam(value = "classType") String classType,Pageable pageable){
         Object monitorUserList = monitorUserBackendService.getMonitorList(classId,classType,pageable);
