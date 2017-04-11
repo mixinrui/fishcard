@@ -23,6 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 import com.vdurmont.emoji.EmojiParser;
+
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -79,7 +80,7 @@ public class PublicClassRoom {
             throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME_BEFORE);
         }
         // 上课时间之后
-        else if(now.after(smallClass.getEndTime())) {
+        else if (now.after(smallClass.getEndTime())) {
             throw new PublicClassException(PublicClassMessageEnum.ERROR_TIME_AFTER);
         }
 
@@ -189,7 +190,7 @@ public class PublicClassRoom {
         entity.setSmallClassId(smallClass.getId());
         entity.setStudentId(studentId);
         entity.setStartTime(smallClass.getStartTime());
-        if(StringUtils.isNotEmpty(nickName)) {
+        if (StringUtils.isNotEmpty(nickName)) {
             entity.setStudentName(EmojiParser.removeAllEmojis(nickName));
         }
         entity.setStatus(PublicClassInfoStatusEnum.STUDENT_ENTER.getCode());
@@ -217,24 +218,37 @@ public class PublicClassRoom {
     }
 
     private void checkMember(SmallClass smallClass, Long studentId, String accessToken) {
-
         // 获取会员信息
         JsonResultModel resultModel = serviceSdk.getMemberInfo(accessToken);
         Map memberInfo = (Map) resultModel.getData();
         String memberType;
-        // 如果获取不到会员类型, 默认为非会员
-        if (memberInfo.get("type") == null) {
-            memberType = "NONE";
-        } else {
-            memberType = memberInfo.get("type").toString();
-        }
         LocalDate classDate = DateUtil.convertLocalDate(smallClass.getClassDate());
-        switch (memberType) {
-            // 非会员直接不让上课
-            case "NONE":
+
+        //如果为新版本
+        if (memberInfo.containsKey("canJoinBigLecture")) {
+            if (StringUtils.equals("YES", memberInfo.get("canJoinBigLecture").toString())) {
+                memberCheck(classDate, studentId);
+            } else {
                 throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
-                // 会员验证
-            default:   memberCheck(classDate, studentId); break;
+            }
+        }
+
+        //为旧的版本
+        else {
+            if (memberInfo.get("type") == null) {
+                memberType = "NONE";
+            } else {
+                memberType = memberInfo.get("type").toString();
+            }
+            switch (memberType) {
+                // 非会员直接不让上课
+                case "NONE":
+                    throw new PublicClassException(PublicClassMessageEnum.NON_MEMBER);
+                    // 会员验证
+                default:
+                    memberCheck(classDate, studentId);
+                    break;
+            }
         }
     }
 
@@ -293,7 +307,7 @@ public class PublicClassRoom {
         redisTemplate.expire(CLASS_ROOM_MEMBER_DAY_KEY + DateUtil.dateFormatter.format(localDate), 1, TimeUnit.SECONDS);
     }
 
-    public void allowStudentsMultiPublic(Long studentId,Long smallClassId) {
+    public void allowStudentsMultiPublic(Long studentId, Long smallClassId) {
         setOperations.add(CLASS_ROOM_MEMBER_KEY + smallClassId, studentId);
     }
 
