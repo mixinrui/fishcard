@@ -107,11 +107,6 @@ public class MonitorUserService {
 
     public Object detailList(String classType, Date startTime, Date endTime, Long studentId, Pageable pageable) {
         logger.info("@detailList get class table ... studentId:[{}],classType:[{}]", studentId, classType);
-
-        //TODO 调用数据组接口,获取appRelease
-        Page<SmallClass> smallClassJpaRepositories = smallClassJpaRepository.findMonitorUserCourse(startTime, endTime, classType, studentId, pageable);
-
-
         return smallClassJpaRepository.findMonitorUserCourse(startTime, endTime, classType, studentId, pageable);
     }
 

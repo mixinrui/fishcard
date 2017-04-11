@@ -18,6 +18,9 @@ public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Lon
     @Query("select mu from MonitorUser mu where mu.enabled = 1 and (mu.userType = 'student' or mu.userType = 'content')")
     List<MonitorUser> getEnabledUser();
 
+    @Query("select mu from MonitorUser mu where mu.enabled = 1 and (mu.userType = 'student' or mu.userType = 'content')")
+    Page<MonitorUser> getEnabledUserPage(Pageable pageable);
+
     MonitorUser findByUserId(Long userId);
 
     MonitorUser findByUserIdAndEnabled(Long userId,Integer enabled);

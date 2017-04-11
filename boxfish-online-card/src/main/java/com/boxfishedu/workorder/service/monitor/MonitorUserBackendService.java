@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by ansel on 2017/4/10.
@@ -33,7 +34,11 @@ public class MonitorUserBackendService {
 
     public Object getMonitorList(Long classId, String classType, Pageable pageable){
         logger.info("@getMonitorList classId=[{}], classType=[{}]", classId, classType);
-        MonitorUserCourse monitorUserCourse = getMonitorCourse(classId,classType);
-        return monitorUserJpaRepository.monitorBackendGetUserList(monitorUserCourse.getUserId(),pageable);
+        if (Objects.nonNull(classId)){
+            MonitorUserCourse monitorUserCourse = getMonitorCourse(classId,classType);
+            return monitorUserJpaRepository.monitorBackendGetUserList(monitorUserCourse.getUserId(),pageable);
+        } else {
+            return monitorUserJpaRepository.getEnabledUserPage(pageable);
+        }
     }
 }
