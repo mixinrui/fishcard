@@ -7,6 +7,8 @@ import com.boxfishedu.workorder.service.monitor.MonitorUserBackendService;
 import com.boxfishedu.workorder.service.monitor.MonitorUserService;
 import com.boxfishedu.workorder.web.view.base.JsonResultModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,8 +40,9 @@ public class ClassMonitorBackendController {
     }
 
     @RequestMapping(value = "/get/monitor_list", method = RequestMethod.GET)
-    public Object getMonitorList(@RequestParam(value = "classId") Long classId, @RequestParam(value = "classType") String classType){
-        List<MonitorUser> monitorUserList = monitorUserBackendService.getMonitorList(classId,classType);
+    public Object getMonitorList(@RequestParam(value = "classId") Long classId,
+                                 @RequestParam(value = "classType") String classType,Pageable pageable){
+        Object monitorUserList = monitorUserBackendService.getMonitorList(classId,classType,pageable);
         JsonResultModel jsonResultModel = new JsonResultModel();
         if (Objects.isNull(monitorUserList)){
             return jsonResultModel;

@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.entity.mysql.MonitorUserCourse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,9 +31,9 @@ public class MonitorUserBackendService {
         return monitorUserCourseJpaRepository.getByClassIdAndClassType(classId,classType);
     }
 
-    public List<MonitorUser> getMonitorList(Long classId, String classType){
+    public Object getMonitorList(Long classId, String classType, Pageable pageable){
         logger.info("@getMonitorList classId=[{}], classType=[{}]", classId, classType);
         MonitorUserCourse monitorUserCourse = getMonitorCourse(classId,classType);
-        return monitorUserJpaRepository.monitorBackendGetUserList(monitorUserCourse.getUserId());
+        return monitorUserJpaRepository.monitorBackendGetUserList(monitorUserCourse.getUserId(),pageable);
     }
 }
