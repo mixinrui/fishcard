@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -100,15 +101,16 @@ public class MonitorUserService {
 
     public Page<MonitorResponseForm> page(String classType, Date startTime, Date endTime, Long userId, Pageable pageable) {
         logger.info("@page get class sum group by startTime ,userId:[{}]", userId);
-        Page<MonitorResponseForm> monitorResponseFormPage = monitorUserCourseJpaRepository.getClassPage(classType, startTime, endTime, userId, pageable);
-        //TODO 调用数据组接口,获取appRelease
-
-
         return monitorUserCourseJpaRepository.getClassPage(classType, startTime, endTime, userId, pageable);
     }
 
     public Object detailList(String classType, Date startTime, Date endTime, Long studentId, Pageable pageable) {
         logger.info("@detailList get class table ... studentId:[{}],classType:[{}]", studentId, classType);
+
+        //TODO 调用数据组接口,获取appRelease
+        Page<SmallClass> smallClassJpaRepositories = smallClassJpaRepository.findMonitorUserCourse(startTime, endTime, classType, studentId, pageable);
+
+
         return smallClassJpaRepository.findMonitorUserCourse(startTime, endTime, classType, studentId, pageable);
     }
 
@@ -177,15 +179,17 @@ public class MonitorUserService {
 
     public TeacherAppReleaseForm getTeacherAppRelease(List userIdList) {
         Long time = System.currentTimeMillis();
-//        Map paramMap = new HashMap();
-//        paramMap.put("userIds", userIdList);
-//        paramMap.put("time", time);
-        String token = digest(userIdList.toString(), String.valueOf(time));
-        Map header = new MultiValueMap();
-        header.put("token", token);
-        HttpEntity httpEntity = new HttpEntity(header);
+        Object userIds = userIdList.stream()
+                .filter(Objects::nonNull)
+                .map(e -> e.toString())
+                .collect(Collectors.joining(","));
+        String token = digest(userIds.toString(),time+"");
+        org.springframework.util.MultiValueMap<String, String> header = new LinkedMultiValueMap<>();
+        header.add("token", token);
+        HttpEntity httpEntity = new HttpEntity(null,header);
         try {
-            TeacherAppReleaseForm teacherAppReleaseForm = template.exchange(createTeacherAppReleaseURI(userIdList,time), HttpMethod.GET, httpEntity, TeacherAppReleaseForm.class).getBody();
+            ResponseEntity<TeacherAppReleaseForm> responseEntity = template.exchange(createTeacherAppReleaseURI(userIds.toString(), time + ""), HttpMethod.GET, httpEntity, TeacherAppReleaseForm.class);
+            TeacherAppReleaseForm teacherAppReleaseForm = responseEntity.getBody();
             if (Objects.equals(teacherAppReleaseForm.getCode(), 0)) {
                 return teacherAppReleaseForm;
             } else if (Objects.equals(teacherAppReleaseForm.getCode(), 1)) {
@@ -198,7 +202,7 @@ public class MonitorUserService {
         return null;
     }
 
-    private URI createTeacherAppReleaseURI(List userIdsList, Long time) {
+    private URI createTeacherAppReleaseURI(String userIdsList, String time) {
         logger.info("Accessing createTeacherAppReleaseURI in MonitorUserService......");
         org.springframework.util.MultiValueMap paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userIds",userIdsList);
@@ -211,7 +215,7 @@ public class MonitorUserService {
     }
 
     private String digest(String... args) {
-        return DigestUtils.md5Hex(Arrays.stream(args).sorted(String::compareToIgnoreCase).collect(Collectors.joining()));
+        return DigestUtils.md5Hex(teacherAppReleaseConf.getSalt()+Arrays.stream(args).sorted(String::compareToIgnoreCase).collect(Collectors.joining()));
     }
 
     @Bean

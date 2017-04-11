@@ -12,4 +12,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(value = "teacher.app")
 public class TeacherAppReleaseConf {
     private String getReleaseUrl;
+    private String salt;
 }
