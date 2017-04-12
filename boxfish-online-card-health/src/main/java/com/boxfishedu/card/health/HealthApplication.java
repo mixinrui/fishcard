@@ -1,20 +1,18 @@
-package main.java.com.boxfishedu.card.health;
+package com.boxfishedu.card.health;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Created by LuoLiBing on 16/10/17.
- */
-@RestController
 @EnableScheduling
+@EnableAutoConfiguration
 @SpringBootApplication
-public class Application extends SpringBootServletInitializer {
-
+@ServletComponentScan
+public class HealthApplication extends SpringBootServletInitializer {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(HealthApplication.class, args);
     }
 }

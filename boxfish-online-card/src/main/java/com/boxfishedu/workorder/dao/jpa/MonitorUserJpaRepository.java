@@ -15,16 +15,19 @@ import java.util.List;
  */
 public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Long>{
 
-    @Query("select mu from MonitorUser mu where mu.enabled = 1 and mu.userType = 'student'")
+    @Query("select mu from MonitorUser mu where mu.enabled = 1 and (mu.userType = 'student' or mu.userType = 'content')")
     List<MonitorUser> getEnabledUser();
+
+    @Query("select mu from MonitorUser mu where mu.enabled = 1 and (mu.userType = 'student' or mu.userType = 'content')")
+    Page<MonitorUser> getEnabledUserPage(Pageable pageable);
 
     MonitorUser findByUserId(Long userId);
 
     MonitorUser findByUserIdAndEnabled(Long userId,Integer enabled);
 
     @Modifying
-    @Query("update MonitorUser mu set mu.enabled = 1,mu.updateTime = ?1 where mu.userId = ?2")
-    void enabledMonitorUser(Date updateTime,Long userId);
+    @Query("update MonitorUser mu set mu.enabled = 1,mu.updateTime = ?1,mu.avgSum = ?3 where mu.userId = ?2")
+    void enabledMonitorUser(Date updateTime,Long userId,Integer minAvg);
 
     @Modifying
     @Query("update MonitorUser mu set mu.enabled = 0,mu.updateTime = ?1 where mu.userId = ?2")
@@ -38,5 +41,8 @@ public interface MonitorUserJpaRepository extends JpaRepository<MonitorUser, Lon
     void updateAvgSum(Long id);
 
     MonitorUser findTop1ByUserTypeAndEnabledOrderByAvgSum(String userType, Integer enabled);
+
+    @Query("select mu from MonitorUser mu where mu.enabled = 1 and (mu.userType = 'student' or mu.userType = 'content') and mu.userId <> ?1")
+    Page<MonitorUser> monitorBackendGetUserList(Long userId,Pageable pageable);
 
 }

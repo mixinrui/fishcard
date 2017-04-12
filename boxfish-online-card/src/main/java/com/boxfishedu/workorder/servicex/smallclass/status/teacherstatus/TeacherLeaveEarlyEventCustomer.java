@@ -7,6 +7,7 @@ import com.boxfishedu.workorder.entity.mysql.SmallClass;
 import com.boxfishedu.workorder.service.WorkOrderService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassLogService;
 import com.boxfishedu.workorder.service.smallclass.SmallClassService;
+import com.boxfishedu.workorder.servicex.callbacklog.CallBackLogServiceX;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEvent;
 import com.boxfishedu.workorder.servicex.smallclass.status.event.SmallClassEventCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class TeacherLeaveEarlyEventCustomer extends SmallClassEventCustomer {
 
     @Autowired
     SmallClassService smallClassService;
+
+    @Autowired
+    CallBackLogServiceX callBackLogServiceX;
 
     @PostConstruct
     public void initEvent() {
@@ -54,6 +58,8 @@ public class TeacherLeaveEarlyEventCustomer extends SmallClassEventCustomer {
     public void execute(SmallClass smallClass) {
         smallClassLogService.recordTeacherLog(smallClass);
         smallClassService.persistIntoDb(smallClass, PublicClassInfoStatusEnum.TEACHER_LEAVE_EARLY);
+
+        callBackLogServiceX.resetPageIndex(smallClass.getId());
 
         switch (smallClass.getStatusEnum()) {
             case SMALL:

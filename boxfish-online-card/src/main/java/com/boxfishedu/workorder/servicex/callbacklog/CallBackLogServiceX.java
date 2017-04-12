@@ -91,6 +91,17 @@ public class CallBackLogServiceX {
 
     }
 
+    public void resetPageIndex(Long cardId){
+        try {
+            logger.debug("resetPageIndex#重置小班课的页码到-1,小班课id[{}]", cardId);
+            listTeacherOperations.leftPush(RedisKeyGenerator.getTeacherOperationKey(cardId), Integer.toString(-1));
+        }
+        catch (Exception ex){
+            logger.error("resetPageIndexError#重置小班课[{}]课程页面为-1出错",cardId,ex);
+        }
+
+    }
+
     public void updateHeartBeatSet(CallBackHeartBeatParam callBackHeartBeatParam) {
         Long cardId = this.getCardId(callBackHeartBeatParam);
         String role = this.getRole(callBackHeartBeatParam);

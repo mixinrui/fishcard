@@ -41,7 +41,9 @@ import java.util.Set;
         "/backend/backorder/*",
         "/backend/makeup/*",
         "/backend/fishcard/*",
-        "/service/backend/*"
+        "/service/backend/*",
+
+        "/backend/monitor/*"
 
         })
 @Profile({"local_hucl","product","local","development","development_new","demo","pretest"})

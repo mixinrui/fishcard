@@ -33,6 +33,9 @@ public class MonitorUserCourse {
     @Column(name = "course_id")
     private String courseId;
 
+    @Column(name = "monitor_flag")
+    private Integer monitorFlag = 0;
+
     @Column(name = "start_time")
     private Date startTime;
 

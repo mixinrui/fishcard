@@ -57,6 +57,9 @@ public interface ServiceJpaRepository extends JpaRepository<Service, Long> {
     @Query("select sum(s.amount) from Service s where s.studentId=?1 and s.productType=?2 and s.endTime>CURRENT_DATE ")
     Long leftCommentAmount(long studentId, int productType);
 
+    @Query("select (sum(s.originalAmount)-sum(s.amount)) from Service s where s.studentId=?1 and s.productType=?2 ")
+    Integer usedCommentAmount(Long studentId,int productType);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Service findById(Long id);
 

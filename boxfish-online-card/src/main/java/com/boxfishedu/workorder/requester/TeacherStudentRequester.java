@@ -311,11 +311,29 @@ public class TeacherStudentRequester {
         map.put("teacherId", smallClass.getTeacherId());
         map.put("studentId", 0);
 
-        logger.info("鱼卡[{}]向师生运营发起取消公开课教师的请求[{}],参数[{}]", smallClass.getId(), url,JacksonUtil.toJSon(map));
+        logger.info("鱼卡[{}]向师生运营发起取消小班课教师的请求[{}],参数[{}]", smallClass.getId(), url,JacksonUtil.toJSon(map));
 
         threadPoolManager.execute(new Thread(() -> {
                                       restTemplate.postForObject(url, map, JsonResultModel.class);
                                   })
+        );
+
+    }
+
+    public void notifyCancelPublicClassTeacher(SmallClass smallClass) {
+        String url = String.format("%s/public/course/schedule/teacher/course/cancel", urlConf.getTeacher_service_admin());
+
+        Map map = Maps.newHashMap();
+        map.put("day", DateUtil.date2SimpleDate(smallClass.getClassDate()).getTime());
+        map.put("timeSlotId", smallClass.getSlotId());
+        map.put("teacherId", smallClass.getTeacherId());
+        map.put("studentId", 0);
+
+        logger.info("鱼卡[{}]向师生运营发起取消公开课教师的请求[{}],参数[{}]", smallClass.getId(), url,JacksonUtil.toJSon(map));
+
+        threadPoolManager.execute(new Thread(() -> {
+                    restTemplate.postForObject(url, map, JsonResultModel.class);
+                })
         );
 
     }

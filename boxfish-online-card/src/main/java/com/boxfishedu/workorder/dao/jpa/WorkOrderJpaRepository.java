@@ -258,13 +258,19 @@ public interface WorkOrderJpaRepository extends JpaRepository<WorkOrder, Long> {
     int setFixedCourseIdAndCourseNameAndCourseTypeAndUpdatetimeChangecourseAndSendflagccFor(String courseId, String courseName, String courseType, Date updateTimeChangeCourse, String sendFlaggcc, Long workorderId);
 
     @Query("select count(wo) from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and wo.classType=?3 and (wo.isFreeze is null or wo.isFreeze!=1)")
-    Long multiLeftAmount(Long studentId,Date date,String classType);
+    Long multiLeftAmount(Long studentId, Date date, String classType);
 
     @Query("select count(wo) from WorkOrder wo where wo.studentId=?1 and wo.startTime>?2 and (wo.classType is null or wo.classType !=?3) and wo.skuId=?4 and (wo.isFreeze is null or wo.isFreeze!=1)")
-    Long singleLeftAmount(Long studentId,Date date,String classType,Integer skuId);
+    Long singleLeftAmount(Long studentId, Date date, String classType, Integer skuId);
+
+    @Query("select count(wo) from WorkOrder wo where wo.studentId=?1 and wo.endTime<CURRENT_DATE and (wo.classType is null or wo.classType !=?2) and wo.skuId=?3 and wo.status>?4 and wo.status!=?5 and wo.status!=?6")
+    Integer singleUsedAmount(Long studentId, String classType, Integer skuId, Integer minStatus, Integer teacherAbsentStatus, Integer studentAbsentStatus);
+
+    @Query("select count(wo) from WorkOrder wo where wo.studentId=?1 and wo.endTime<CURRENT_DATE and wo.classType=?2 and wo.status>?3 and wo.status!=?4 and wo.status!=?5")
+    Integer multiUsedAmount(Long studentId, String classType, Integer minStatus, Integer teacherAbsentStatus, Integer studentAbsentStatus);
 
     //小班课换老师操作
     @Modifying
     @Query("update WorkOrder o set o.teacherId= ?1 ,o.assignTeacherTime=current_timestamp,o.status= ?2 ,o.teacherName = ?3  where o.id in (?4)")
-    int setFixedTeacherIdAndStatusAndTeacherNameFor(Long teacherId,Integer status ,String teacherName, List<Long> ids);
+    int setFixedTeacherIdAndStatusAndTeacherNameFor(Long teacherId, Integer status, String teacherName, List<Long> ids);
 }

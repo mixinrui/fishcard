@@ -17,16 +17,16 @@ public enum PublicClassMessageEnum {
         }
     },
 
-    // 非会员
+    // 老板表示非会员,新版表示不是公开课用户
     NON_MEMBER {
         @Override
         public String getTitle() {
-            return "学员专享";
+            return "外教大讲堂";
         }
 
         @Override
         public String getMessage() {
-            return "成为BOXFISH学员, 每天都能上外教公开课~";
+            return "先购买后上课~ 49.8元/月，更可获赠相同时长的学员全服务！";
         }
 
         @Override

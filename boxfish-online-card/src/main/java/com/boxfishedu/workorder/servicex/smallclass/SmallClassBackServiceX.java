@@ -108,7 +108,12 @@ public class SmallClassBackServiceX {
     @Transactional
     public void delete(Long smallClassId) {
         SmallClass smallClass = smallClassJpaRepository.findOne(smallClassId);
-        teacherStudentRequester.notifyCancelSmallClassTeacher(smallClass);
+        if(smallClass.isPublic()){
+            teacherStudentRequester.notifyCancelPublicClassTeacher(smallClass);
+        }
+        else{
+            teacherStudentRequester.notifyCancelSmallClassTeacher(smallClass);
+        }
         List<WorkOrder> workOrders = workOrderJpaRepository.findBySmallClassId(smallClassId);
         List<CourseSchedule> courseSchedules = courseScheduleRepository.findBySmallClassId(smallClassId);
         workOrderJpaRepository.delete(workOrders);
